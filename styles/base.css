@@ -1,0 +1,226 @@
+/**
+ * Bible Forge (alpha testing)
+ */
+
+html, body {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	width: 100%;
+}
+
+html {
+	overflow-y: scroll;
+	overflow-x: hidden;
+	font-family: Verdana, Arial, sans-serif;
+	font-size: 15px;
+}
+body {
+	overflow: hidden;
+}
+
+#topBar {
+	position: fixed;
+	top:0px;
+	left:0px;
+	width: 100%;
+	height: 30px;
+}
+
+#searchBar {
+	background-image: url("../images/90-white.png");
+	width: 100%;
+	height: 100%;
+}
+
+#infoBar {
+	background-image: url("../images/90-yellow.png");
+	border-top: #EEE999 solid 1px;
+	border-bottom: #EEE999 solid 1px;
+	width: 100%;
+	height: 18px;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	font-size: 13px;
+}
+
+/* Individual words in verses */
+#page b {
+	font-weight: normal;
+	line-height: 19px;
+	height: 19px;
+}
+
+#page {
+	overflow: hidden;
+	max-width: 800px;
+	min-width: 200px;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 0 1px 0 1px; /* Fixes the clipping of italics p's at the beginning of a line (e.g., acts 5:3 with a large window). */
+}
+
+/* Verse blocks */
+#page div {
+	/* display: inline-block; is required for IE to use .clientHeight for an object. */
+	display: inline-block;
+}
+
+.loader {
+	height: 50px;
+	width: 100%;
+	background: url("../images/loader.gif") no-repeat center;
+	visibility: hidden;
+}
+
+
+/* Vereses created from a search. */
+.search_verse {
+	
+	/* This gives reverse indent, but causes problems with margins (tested w/Mozilla).
+	text-indent: -2em;
+	margin-left: 2em;
+	*/
+	text-indent: 2em;
+	width: 100%;
+}
+
+/* Vereses created from a verse lookup. */
+.verse {
+	text-indent: 1em;
+	width: 100%;
+}
+
+/* Vereses created from a verse lookup. */
+.pslam_title {
+	margin: 0px 2em 19px 2em;
+}
+
+/* Drop caps for the first letter of a chapter */
+.first_verse:first-letter {
+	font-size: 55px;
+	float: left;
+	/* Bold makes some letters better, esp. "P" */
+	/*font-weight: bold;*/
+	/* This fixes the spacing problem with some letters, especially capital J's. */
+	margin-bottom:-15px;
+}
+/* Fixes a bug where the last word of the first verse somtimes wraps. */
+.first_verse {
+	width: 100%;
+	/* This makes sure that the first line is atleast two lines long to give the drop caps just enough space. */
+	min-height: 38px;
+}
+
+/* Serif fonts */
+.book, .chapter, .first_verse:first-letter, .d {
+	font-family: 'URWPalladioL', 'Palatino Linotype', Palatino, 'Book Antiqua', 'Times new Roman', Times, serif;
+}
+
+.book, .chapter {
+	text-align: center;
+	width: 100%;
+	font-size: 26px;
+}
+.chapter {
+	padding: 13px 0 13px 0;
+	margin: 0;
+}
+
+/* Short Title */
+h1.book {
+	padding: 10px;
+}
+
+
+/* Long Title */
+div.book {
+	padding: 58px 0px 23px 0px;
+}
+
+/* Main name for long title */
+h1 {
+	margin-top: 14px;
+	margin-bottom: 0px;
+	font-size: 69px;
+	display: block;
+}
+
+/* The divine name of God */
+.d {
+	font-variant: small-caps;
+	font-size: 16px;
+	vertical-align: 1px;
+}
+
+/* Added (implied) words */
+.a {
+	font-style: italic;
+}
+
+/* Quotations of Jesus */
+.q {
+	color: #D00;
+}
+
+.f1 {background: #FF6;}
+.f2 {background: #AFF;}
+.f3 {background: #9F9;}
+.f4 {background: #F99;}
+.f5 {background: #F6F;}
+.f6 {background: #800;}
+.f7 {background: #0A0;}
+.f8 {background: #860;}
+.f9 {background: #049;}
+.f10 {background: #909;}
+.f11 {background: #EE0;}
+.f12 {background: #0FF;}
+.f13 {background: #A0A;}
+.f14 {background: #7F0;}
+.f15 {background: #19f;}
+.f16 {background: #F00;}
+.f17 {background: #F70;}
+.f18 {background: #CF0;}
+.f19 {background: #AA9;}
+.f20 {background: #469;}
+
+/* Fonts for IE */
+/*
+@font-face {
+	font-family: 'TeX Gyre Pagella';
+	src: url('fonts/fonts/texgyrepagella-regular.eot');
+}
+*/
+/* Fonts for Mozilla/Opera/Webkit */
+
+@font-face {
+	font-family: 'URWPalladioL';
+	src: local('URWPalladioL'),
+	     local('URWPalladioL-Roma'),
+	     url('fonts/URWPalladioL-Roma.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'URWPalladioL';
+	src: local('URWPalladioL Italic'),
+	     local('URWPalladioL-Italic'),
+	     url('fonts/URWPalladioL-Ital.ttf') format('truetype');
+	font-style: italic;
+}
+
+@font-face {
+	font-family: 'URWPalladioL';
+	src: local('URWPalladioL Bold'),
+	     local('URWPalladioL-Bold'),
+	     url('fonts/URWPalladioL-Bold.ttf') format('truetype');
+	font-weight: bold;
+}
+
+@font-face {
+	font-family: 'URWPalladioL';
+	src: local('URWPalladioL Bold Italic'),
+	     local('URWPalladioL-BoldItalic'),
+	     url('fonts/URWPalladioL-BoldItal.ttf') format('truetype');
+	font-weight: bold;
+	font-style: italic;
+}
