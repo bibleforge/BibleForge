@@ -270,7 +270,7 @@ function simple_search($query, $direction, $start_id = 0)
 /**
  * Parse a query to detime the book, chapter, and/or verse references.
  *
- * This is used to convert a query like "John 3:16" and convert it to the number 43003016.
+ * This is used to convert a query like "John 3:16" to the number 43003016.
  *
  * @example $verse_id = parse_reference($query);
  * @param $query (string) The input to be parsed.

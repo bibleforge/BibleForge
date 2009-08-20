@@ -12,7 +12,7 @@ html, body {
 html {
 	overflow-y: scroll;
 	overflow-x: hidden;
-	font-family: Verdana, Arial, sans-serif;
+	font-family: 'Bitstream Vera Sans', Verdana, 'DejaVu Sans', Arial, sans-serif;
 	font-size: 15px;
 }
 body {
@@ -149,8 +149,8 @@ h1 {
 /* The divine name of God */
 .d {
 	font-variant: small-caps;
-	font-size: 16px;
-	vertical-align: 1px;
+	font-size: 15px;
+	vertical-align: 0px;
 }
 
 /* Added (implied) words */
@@ -221,6 +221,39 @@ h1 {
 	src: local('URWPalladioL Bold Italic'),
 	     local('URWPalladioL-BoldItalic'),
 	     url('fonts/URWPalladioL-BoldItal.ttf') format('truetype');
+	font-weight: bold;
+	font-style: italic;
+}
+
+
+@font-face {
+	font-family: 'Bitstream Vera Sans';
+	src: local('Bitstream Vera Sans'),
+	     local('BitstreamVeraSans'),
+	     url('fonts/Vera.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Bitstream Vera Sans';
+	src: local('Bitstream Vera Sans Oblique'),
+	     local('BitstreamVeraSans-Oblique'),
+	     url('fonts/VeraIt.ttf') format('truetype');
+	font-style: italic;
+}
+
+@font-face {
+	font-family: 'Bitstream Vera Sans';
+	src: local('Bitstream Vera Sans Bold'),
+	     local('BitstreamVeraSans-Bold'),
+	     url('fonts/VeraBd.ttf') format('truetype');
+	font-weight: bold;
+}
+
+@font-face {
+	font-family: 'Bitstream Vera Sans';
+	src: local('Bitstream Vera Sans Bold Oblique'),
+	     local('BitstreamVeraSans-BoldOblique'),
+	     url('fonts/VeraBI.ttf') format('truetype');
 	font-weight: bold;
 	font-style: italic;
 }
