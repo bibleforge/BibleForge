@@ -3,6 +3,6 @@ All BibleForge source code, images, and other data not mentioned below are copyr
 
 Font licenses:
 
-The Bitsream Vera Sans fonts are copyrighted under a generous copyright as found in bitstream_license.txt.
+The Tex Gyre Pagella fonts are copyrighted under a generous copyright as found in gust_font_license.txt.
 
 The URW Palladio fonts are copyrighted under the GPLv2, which can be found in gpl2.txt.

@@ -12,7 +12,7 @@ html, body {
 html {
 	overflow-y: scroll;
 	overflow-x: hidden;
-	font-family: 'Bitstream Vera Sans', Verdana, 'DejaVu Sans', Arial, sans-serif;
+	font-family: Verdana, 'BibleForge Sans', Verdana, 'Bitstream Vera Sans', 'DejaVu Sans', Arial, sans-serif;
 	font-size: 15px;
 }
 body {
@@ -57,7 +57,7 @@ body {
 	min-width: 200px;
 	margin-left: auto;
 	margin-right: auto;
-	padding: 0 1px 0 1px; /* Fixes the clipping of italics p's at the beginning of a line (e.g., acts 5:3 with a large window). */
+	padding: 0 4px 0 4px; /* Fixes the clipping of italics p's at the beginning of a line (e.g., Acts 5:3 with a large window) or f's at the end of a line (Ex. 36:8). */
 }
 
 /* Verse blocks */
@@ -114,13 +114,13 @@ body {
 
 /* Serif fonts */
 .book, .chapter, .first_verse:first-letter, .d {
-	font-family: 'URWPalladioL', 'Palatino Linotype', Palatino, 'Book Antiqua', 'Times new Roman', Times, serif;
+	font-family: 'Palatino Linotype', Palatino, TexGyrePagella, 'TeX Gyre Pagella', 'URWPalladioL', 'Book Antiqua', 'Times new Roman', Times, serif;
 }
 
 .book, .chapter {
 	text-align: center;
 	width: 100%;
-	font-size: 26px;
+	font-size: 23px;
 }
 .chapter {
 	padding: 13px 0 13px 0;
@@ -135,12 +135,12 @@ h1.book {
 
 /* Long Title */
 div.book {
-	padding: 58px 0px 23px 0px;
+	padding: 60px 0px 20px 0px;
 }
 
 /* Main name for long title */
 h1 {
-	margin-top: 14px;
+	margin-top: 5px;
 	margin-bottom: 0px;
 	font-size: 69px;
 	display: block;
@@ -149,7 +149,7 @@ h1 {
 /* The divine name of God */
 .d {
 	font-variant: small-caps;
-	font-size: 15px;
+	font-size: 16px;
 	vertical-align: 0px;
 }
 
@@ -185,42 +185,42 @@ h1 {
 .f20 {background: #469;}
 
 /* Fonts for IE */
-/*
+
 @font-face {
 	font-family: 'TeX Gyre Pagella';
 	src: url('fonts/fonts/texgyrepagella-regular.eot');
 }
-*/
+
 /* Fonts for Mozilla/Opera/Webkit */
 
 @font-face {
-	font-family: 'URWPalladioL';
-	src: local('URWPalladioL'),
-	     local('URWPalladioL-Roma'),
-	     url('fonts/URWPalladioL-Roma.ttf') format('truetype');
+	font-family: 'TeX Gyre Pagella';
+	src: local('TeX Gyre Pagella Regular'),
+	     local('TeXGyrePagella-Regular'),
+	     url('texgyrepagella-regular.otf') format('opentype');
 }
 
 @font-face {
-	font-family: 'URWPalladioL';
-	src: local('URWPalladioL Italic'),
-	     local('URWPalladioL-Italic'),
-	     url('fonts/URWPalladioL-Ital.ttf') format('truetype');
+	font-family: 'TeX Gyre Pagella';
+	src: local('TeX Gyre Pagella Italic'),
+	     local('TeXGyrePagella-Italic'),
+	     url('texgyrepagella-italic.otf') format('opentype');
 	font-style: italic;
 }
 
 @font-face {
-	font-family: 'URWPalladioL';
-	src: local('URWPalladioL Bold'),
-	     local('URWPalladioL-Bold'),
-	     url('fonts/URWPalladioL-Bold.ttf') format('truetype');
+	font-family: 'TeX Gyre Pagella';
+	src: local('TeX Gyre Pagella Bold'),
+	     local('TeXGyrePagella-Bold'),
+	     url('texgyrepagella-bold.otf') format('opentype');
 	font-weight: bold;
 }
 
 @font-face {
-	font-family: 'URWPalladioL';
-	src: local('URWPalladioL Bold Italic'),
-	     local('URWPalladioL-BoldItalic'),
-	     url('fonts/URWPalladioL-BoldItal.ttf') format('truetype');
+	font-family: 'TeX Gyre Pagella';
+	src: local('TeX Gyre Pagella Bold Italic'),
+	     local('TeXGyrePagella-BoldItalic'),
+	     url('texgyrepagella-bolditalic.otf') format('opentype');
 	font-weight: bold;
 	font-style: italic;
 }
