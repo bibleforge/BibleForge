@@ -7,13 +7,12 @@
  * @link http://www.BibleForge.com
  */
 
+error_reporting(E_ALL);
+
 if (get_magic_quotes_gpc()) {
     function stripslashes_deep($value)
     {
-        $value = is_array($value) ?
-                    array_map('stripslashes_deep', $value) :
-                    stripslashes($value);
-
+        $value = is_array($value) ? array_map('stripslashes_deep', $value) : stripslashes($value);
         return $value;
     }
 
@@ -23,16 +22,12 @@ if (get_magic_quotes_gpc()) {
     $_REQUEST = array_map('stripslashes_deep', $_REQUEST);
 }
 
-error_reporting(E_ALL);
-
 define('SEARCH', 1);
 define('VERSE_LOOKUP', 2);
 define('ADDITIONAL', 1);
 define('PREVIOUS', 2);
 
-define('LIMIT', 40); ///FIXME: Where should this be defined?
-
-define('SPHINX_PORT', 7312);
+define('LIMIT', 40); ///FIXME: Where should this be defined?  Should it be defined?
 
 /// Prepare for search.
 
@@ -134,6 +129,7 @@ function run_search($query, $type, $direction, $start_id = 0)
 function retrieve_verses($verse_id, $direction)
 {
 	/// Quickly check to see if the verse_id is outside of the valid range.
+	///FIXME: Perhaps $verse_id < 1001001 should default to 1001001 and $verse_id > 66022021 to 66022021.
 	if ($verse_id < 1001001 || $verse_id > 66022021) {
 		echo '[[', VERSE_LOOKUP, ',', $direction, '],[],[],[0]]';
 		die();
@@ -150,7 +146,7 @@ function retrieve_verses($verse_id, $direction)
 		$order_by = ' ORDER BY id DESC';
 	}
 	
-	require 'functions/database.php';
+	require_once 'functions/database.php';
 	connect_to_database();
 	
 	$SQL_query = 'SELECT id, words FROM ' . bible_verses . ' WHERE id ' . $operator . (int)$verse_id . $order_by . ' LIMIT '. LIMIT;
@@ -197,10 +193,10 @@ function retrieve_verses($verse_id, $direction)
  */
 function simple_search($query, $direction, $start_id = 0)
 {
-	require 'functions/sphinxapi.php';
+	require_once 'functions/sphinxapi.php';
 	
 	$cl = new SphinxClient();
-	$cl->SetServer('127.0.0.1', SPHINX_PORT); /// SetServer(sphinx_server_address, sphinx_server_port)
+	$cl->SetServer(SPHINX_SERVER, SPHINX_PORT); /// SetServer(sphinx_server_address, sphinx_server_port)
 	$cl->SetLimits(0, LIMIT); /// SetLimits(starting_point, count, max_in_memory (optional), quit_after_x_found (optional))
 	
 	if ($start_id > 0) $cl->SetIDRange($start_id, 0); /// SetIDRange(start_id, stop_id (0 means no limit))
@@ -246,7 +242,7 @@ function simple_search($query, $direction, $start_id = 0)
 	
 	/// Get verses from the MySQL database.
 	
-	require 'functions/database.php';
+	require_once 'functions/database.php';
 	connect_to_database();
 	
 	$SQL_query = 'SELECT words FROM ' . bible_verses . ' WHERE id IN (' . $sphinx_res['matches'] . ' )';
