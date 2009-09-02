@@ -496,14 +496,14 @@ function determine_reference(ref)
 	
 	if (book == 0) return false;
 	
-	var chapter = "001", verse = "001", zeros = ["", "00", "0", ""];
+	var chapter = "001", verse = "001";
 	
 	/// Finally, we need to determine the chapter and/or verse reference is they are supplied.
 	var cv = ref.split(/\s*([0-9]{1,3})(?:[:.;,\s]([0-9]{0,3})[-0-9]*)?$/);
 	
 	if (cv.length > 1) {
 		if (cv[1] != "") chapter = cv[1] + "";
-		if (cv[2] != "") {
+		if (cv[2] != "" && typeof cv[2] != "undefined") {
 			verse = cv[2] + "";
 		} else {
 			/// For books with only 1 chapter, the chapter reference is optional (i.e., Jude 4 == Jude 1:4).
@@ -513,6 +513,7 @@ function determine_reference(ref)
 					chapter = "001";
 			}
 		}
+		var zeros = ["", "00", "0", ""];
 		chapter = zeros[chapter.length] + chapter;
 		verse = zeros[verse.length] + verse;
 	}

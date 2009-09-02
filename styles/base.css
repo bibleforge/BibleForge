@@ -103,7 +103,11 @@ body {
 	/* Bold makes some letters better, esp. "P" */
 	/*font-weight: bold;*/
 	/* This fixes the spacing problem with some letters, especially capital J's. */
-	margin-bottom:-15px;
+	margin-bottom:-11px;
+	/* Opera needs this
+	margin-bottom:0px;
+	padding: 1px;
+	*/
 }
 /* Fixes a bug where the last word of the first verse somtimes wraps. */
 .first_verse {
