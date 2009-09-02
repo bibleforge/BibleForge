@@ -1,5 +1,7 @@
 All BibleForge source code, images, and other data not mentioned below are copyrighted under the Reciprocal Public License which can be found in bf_rpl1.5.txt.
 
+The Sphinx API (sphinxapi.php) is licensed (with written permission from the author) under the LGPLv2.1, which can be found in lgpl-2.1.txt.
+
 
 Font licenses:
 
