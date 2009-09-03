@@ -1,6 +1,6 @@
 <?php
 /**
- * Bible Forge (alpha testing)
+ * BibleForge (alpha testing)
  *
  * @date    10-30-08
  * @version 0.1 alpha 2
