@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Bible Forge (alpha testing)
+ * BibleForge (alpha testing)
  *
  * @date    10-30-08
  * @version 0.1 alpha 2
@@ -15,7 +15,7 @@ error_reporting(E_ALL);
 <html>
 <head>
 	<meta http-equiv=content-type content="text/html; charset=UTF-8">
-	<title>Bible Forge</title>
+	<title>BibleForge</title>
 	<link rel=stylesheet type="text/css" href="styles/base.css">
 </head>
 <?php flush() ?>
@@ -23,7 +23,7 @@ error_reporting(E_ALL);
 <div id=topBar>
 	<div id=searchBar>
 		<form action="#" onsubmit="return prepare_new_search(true);">
-			Bible Forge
+			BibleForge
 			<input type=text name=q id=q>
 			<input type=submit name=Search>
 		</form>
