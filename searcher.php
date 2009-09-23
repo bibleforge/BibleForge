@@ -193,7 +193,9 @@ function retrieve_verses($verse_id, $direction)
  */
 function simple_search($query, $direction, $start_id = 0)
 {
-	require_once 'functions/sphinxapi.php';
+	require_once 'config.php';
+	
+	require_once 'functions/' . SPHINX_API . '.php';
 	
 	$cl = new SphinxClient();
 	$cl->SetServer(SPHINX_SERVER, SPHINX_PORT); /// SetServer(sphinx_server_address, sphinx_server_port)
@@ -235,7 +237,7 @@ function simple_search($query, $direction, $start_id = 0)
 	$sphinx_res = $cl->Query($query, 'test1');
 	
 	/// No results found?
-	if ($sphinx_res['matches'] == "") {
+	if ($sphinx_res['simple-matches'] == "") {
 		echo '[[', SEARCH, ',', $direction, '],[],[],[0]]';
 		die();
 	}
@@ -245,7 +247,7 @@ function simple_search($query, $direction, $start_id = 0)
 	require_once 'functions/database.php';
 	connect_to_database();
 	
-	$SQL_query = 'SELECT words FROM ' . bible_verses . ' WHERE id IN (' . $sphinx_res['matches'] . ' )';
+	$SQL_query = 'SELECT words FROM ' . bible_verses . ' WHERE id IN (' . $sphinx_res['simple-matches'] . ' )';
 	$SQL_res = mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
 	
 	/// Convert SQL results into one comma deliniated string.
@@ -258,7 +260,7 @@ function simple_search($query, $direction, $start_id = 0)
 	/// Array Format: [[action],[verse_ids,...],[verse_words,...],[number_of_matches]]
 	///NOTE: JSON should ignore trailing commas.
 	///TODO: It would be nice to indicate if there are no more verses to find when it gets to the end.
-	echo '[[', SEARCH, ',', $direction, '],[', $sphinx_res['matches'], '],[', $verses_str, '],[', $sphinx_res['total_found'], ']]';
+	echo '[[', SEARCH, ',', $direction, '],[', $sphinx_res['simple-matches'], '],[', $verses_str, '],[', $sphinx_res['total_found'], ']]';
 	die();
 }
 

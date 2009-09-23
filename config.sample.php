@@ -19,5 +19,6 @@ define('DB_PASSWORD', '');
 define('DB_NAME', 'bf');
 
 /// Sphinx
+define('SPHINX_API', 'sphinxapi');
 define('SPHINX_SERVER', '127.0.0.1');
 define('SPHINX_PORT', 3312);
