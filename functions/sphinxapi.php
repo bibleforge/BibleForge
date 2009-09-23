@@ -21,8 +21,6 @@
 // PHP version of Sphinx searchd client (PHP API)
 /////////////////////////////////////////////////////////////////////////////
 
-require_once 'config.php';
-
 /// known searchd commands
 define ( "SEARCHD_COMMAND_SEARCH",	0 );
 define ( "SEARCHD_COMMAND_EXCERPT",	1 );
@@ -775,8 +773,6 @@ class SphinxClient
 		$req = join ( "", $this->_reqs );
 		$len = 4+strlen($req);
 		$req = pack ( "nnNN", SEARCHD_COMMAND_SEARCH, VER_COMMAND_SEARCH, $len, $nreqs ) . $req; // add header
-//die("\n\n".unpack($req) ."~".strlen($req)."\n\n");
-//file_put_contents('stuff.txt',$req);
 
 		fwrite ( $fp, $req, $len+8 );
 		if (!( $response = $this->_GetResponse ( $fp, VER_COMMAND_SEARCH ) ))
@@ -823,46 +819,47 @@ class SphinxClient
 			}
 
 			// read schema
-//			$fields = array ();
-//			$attrs = array ();
+			$fields = array ();
+			$attrs = array ();
 
 			list(,$nfields) = unpack ( "N*", substr ( $response, $p, 4 ) ); $p += 4;
 			while ( $nfields-- > 0 && $p<$max )
 			{
 				list(,$len) = unpack ( "N*", substr ( $response, $p, 4 ) ); $p += 4;
-//				$fields[] = substr ( $response, $p, $len );
+				$fields[] = substr ( $response, $p, $len );
 				$p += $len;
 			}
-			//$result["fields"] = $fields;
+			$result["fields"] = $fields;
 
 			list(,$nattrs) = unpack ( "N*", substr ( $response, $p, 4 ) ); $p += 4;
 			while ( $nattrs-- > 0 && $p<$max  )
 			{
 				list(,$len) = unpack ( "N*", substr ( $response, $p, 4 ) ); $p += 4;
-//				$attr = substr ( $response, $p, $len );
+				$attr = substr ( $response, $p, $len );
 				$p += $len;
-//				list(,$type) = unpack ( "N*", substr ( $response, $p, 4 ) );
+				list(,$type) = unpack ( "N*", substr ( $response, $p, 4 ) );
 				$p += 4;
-//				$attrs[$attr] = $type;
+				$attrs[$attr] = $type;
 			}
-			//$result["attrs"] = $attrs;
+			$result["attrs"] = $attrs;
 
 			// read match count
 			list(,$count) = unpack ( "N*", substr ( $response, $p, 4 ) ); $p += 4;
 			list(,$id64) = unpack ( "N*", substr ( $response, $p, 4 ) ); $p += 4;
 
 			// read matches
-//			$idx = -1;
-			//$fix_str = $count > 0;
+			$idx = -1;
+			$fix_str = $count > 0;
+			$result["simple-matches"] = "";
 			while ($count-- > 0 && $p<$max)
 			{
 				// index into result array
-//				$idx++;
+				$idx++;
 
 				// parse document id and weight
 				if ($id64) {
 					$doc = sphUnpack64 ( substr ( $response, $p, 8 ) ); $p += 8;
-					//list(,$weight) = unpack ( "N*", substr ( $response, $p, 4 ) );
+					list(,$weight) = unpack ( "N*", substr ( $response, $p, 4 ) );
 					$p += 4;
 				} else {
 					list ( $doc, $weight ) = array_values ( unpack ( "N*N*",
@@ -877,21 +874,21 @@ class SphinxClient
 						$doc = sprintf ( "%u", $doc );
 					}
 				}
-				//$weight = sprintf ( "%u", $weight );
+				$weight = sprintf ( "%u", $weight );
 
 				// create match entry
-/*
+
 				if ( $this->_arrayresult )
 					$result["matches"][$idx] = array ( "id"=>$doc, "weight"=>$weight );
 				else
 					$result["matches"][$doc]["weight"] = $weight;
-*/
+
 //$result["matches"][]=$doc; // return array
 
 /// Hack to return comma delineated string faster.
-$result["matches"] .=$doc.','; /// return string
+$result["simple-matches"] .= $doc.','; /// return string
 				// parse and create attributes
-/*
+
 				$attrvals = array ();
 				foreach ( $attrs as $attr=>$type )
 				{
@@ -920,18 +917,18 @@ $result["matches"] .=$doc.','; /// return string
 						$attrvals[$attr] = sprintf ( "%u", $val );
 					}
 				}
-*/
-/*
+
+
 				if ( $this->_arrayresult )
 					$result["matches"][$idx]["attrs"] = $attrvals;
 				else
 					$result["matches"][$doc]["attrs"] = $attrvals;
-*/
+
 			}
 			//if ($fix_str) {
 			//	$result["matches"] = substr($result["matches"], 0, -1);
 			//}
-			$result["matches"] = trim($result["matches"], ',');
+			$result["simple-matches"] = trim($result["simple-matches"], ',');
 			list ( $total, $total_found, $msecs, $words ) =
 				array_values ( unpack ( "N*N*N*N*", substr ( $response, $p, 16 ) ) );
 			$result["total"] = sprintf ( "%u", $total );
