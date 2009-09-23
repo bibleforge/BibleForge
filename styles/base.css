@@ -39,7 +39,8 @@ body {
 	border-bottom: #EEE999 solid 1px;
 	width: 100%;
 	height: 18px;
-	text-overflow: ellipsis;
+	text-overflow: ellipsis; /* IE, WebKit might need "ellipsis-word" */
+	-o-text-overflow: ellipsis; /* Opera */
 	overflow: hidden;
 	font-size: 13px;
 }
