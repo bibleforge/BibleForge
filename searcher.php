@@ -215,28 +215,23 @@ function simple_search($query, $direction, $start_id = 0)
 		/// Phrases (words in quotes) require SPH_MATCH_EXTENDED mode.
 		///NOTE: SPH_MATCH_BOOLEAN is supposed to find more than 10 words too but doesn't seem to.
 		$cl->SetMatchMode(SPH_MATCH_EXTENDED); /// Most complex (and slowest?).
-		$cl->SetSortMode(SPH_SORT_EXTENDED, '@id ASC'); /// Order by id.
-	//} elseif (strpos($query, '"') || (substr_count($query, ' ') > 9 && preg_match('/([a-z-]+[^a-z-]+){11}/i', $query) == 1)) {
+		$cl->SetSortMode(SPH_SORT_EXTENDED, '@id ASC'); /// Order BY id.
 	} elseif (strpos($query, '&') !== false || strpos($query, '|') !== false || strpos($query, ' -') !== false || substr($query, 0, 1) == '-') {
 		/// Boolean opperators found.
 		$cl->SetMatchMode(SPH_MATCH_BOOLEAN);
-		$cl->SetSortMode(SPH_SORT_EXTENDED, '@id ASC'); /// Order by id.
+		$cl->SetSortMode(SPH_SORT_EXTENDED, '@id ASC'); /// Order BY id.
 	} else {
 		/// Multiple words are being searched for but nothing else special.
-		$cl->SetSortMode(SPH_SORT_EXTENDED, '@id ASC'); /// Order by id.
+		$cl->SetSortMode(SPH_SORT_EXTENDED, '@id ASC'); /// Order BY id.
 	}
 	
-	//$cl->SetMatchMode(SPH_MATCH_ANY); /// any matches, fast?
-	
-	//$cl->SetRankingMode(SPH_RANK_PROXIMITY_BM25); /// default, slowest
-	//$cl->SetRankingMode(SPH_RANK_BM25); /// slow
 	$cl->SetRankingMode(SPH_RANK_NONE); /// No ranking, fastest
 	
 	/// Run Sphinx search.
 	///TODO: Change test1 to something permanent.
 	$sphinx_res = $cl->Query($query, 'test1');
 	
-	/// No results found?
+	/// If no results found were found, send an empty JSON result.
 	if ($sphinx_res['simple-matches'] == "") {
 		echo '[[', SEARCH, ',', $direction, '],[],[],[0]]';
 		die();

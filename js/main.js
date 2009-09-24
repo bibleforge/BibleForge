@@ -42,11 +42,11 @@ var top_verse, bottom_verse;
 var scroll_pos = 0, scroll_check_count = 0;
 var checking_excess_content_top = false, checking_excess_content_bottom = false;
 var remove_content_top_interval, remove_content_bottom_interval;
-var buffer_add = 1000, buffer_rem = 30000;
+var buffer_add = 1000, buffer_rem = 10000;
 var cached_verses_top = [], cached_count_top = 0;
 var cached_verses_bottom = [], cached_count_bottom = 0;
 var scroll_maxed_top = true, scroll_maxed_bottom = false;
-var remove_speed = 1500; /// In miliseconds
+var lookup_speed_scrolling = 50, lookup_speed_sitting = 1000, remove_speed = 3000; /// In miliseconds
 
 /// Simple Event Registration
 ///NOTE: Could use wheel if the scroll bars are invisible.
@@ -77,7 +77,7 @@ function prepare_new_search() {
 	if (last_search_prepared.length == 0) return false;
 	
 	/// Stop any old requests since we have a new one.
-	/// readyState is between 0-4, and anything 1-3 needs to be aborted.
+	/// Is readyState > 0 and < 4?  Anything 1-3 needs to be aborted.
 	if (ajax_addtional.readyState % 4) ajax_addtional.abort();
 	if (ajax_previous.readyState % 4) ajax_previous.abort();
 	
@@ -195,11 +195,11 @@ function handle_new_verses(res)
 		/// Indicate to the user that more content may be loading, and check for more content.
 		if (direction == ADDITIONAL && res[1][res[1].length - 1] < 66022021) {
 			bottomLoader.style.visibility = "visible";
-			setTimeout("add_content_bottom()", 500);
+			setTimeout("add_content_bottom()", lookup_speed_sitting);
 		}
 		if ((direction == PREVIOUS || waiting_for_first_search) && res[1][0] > 1001001) {
 			topLoader.style.visibility = "visible";
-			setTimeout("add_content_top()", 500);
+			setTimeout("add_content_top()", lookup_speed_sitting);
 		}
 	} else {
 		if (direction == ADDITIONAL) {
@@ -209,7 +209,7 @@ function handle_new_verses(res)
 			bottomLoader.style.visibility = "hidden";
 		}
 		if (direction == PREVIOUS || waiting_for_first_search) {
-			/// Reached the top scrolling up Genesis 1:1 or no results.
+			/// Reached the top scrolling up: Genesis 1:1 or no results.
 			scroll_maxed_top = true;
 			topLoader.style.visibility = "hidden";
 		}
@@ -305,8 +305,7 @@ function write_verses(return_type, direction, verse_ids, verse_HTML)
 	///NOTE: If innerHTML disappears in the future (because it is not (yet) in the "standards"),
 	///      a simple (but slow) alternative is to use the innerDOM script from http://innerdom.sourceforge.net/ or BetterInnerHTML from http://www.optimalworks.net/resources/betterinnerhtml/.
 	///      Using range.createContextualFragment is also a posibility.
-	///NOTE: The surrounding <div> groups together a bunch of HTML for the scroller to remove it as a whole.
-	newEl.innerHTML = "<div>" + HTML_str + "</div>";
+	newEl.innerHTML = HTML_str;
 	
 	if (direction == ADDITIONAL) {
 		page.insertBefore(newEl, null);
@@ -606,7 +605,7 @@ function scrolling()
 	if (new_scroll_pos == scroll_pos) {
 		/// IE/Opera sometimes don't update page.scrollTop until after this function is run.
 		/// Mozilla/KHTML can get stuck here too.
-		if (++scroll_check_count < 5) {
+		if (++scroll_check_count < 10) {
 			setTimeout("scrolling()", 30);
 		} else { /// Stop it if it is stuck looping.
 			scroll_check_count = 0;
@@ -624,10 +623,10 @@ function scrolling()
 	if (waiting_for_first_search) return null;
 	
 	if (scrolling_down) {
-		setTimeout("add_content_bottom()", 50);
+		setTimeout("add_content_bottom()", lookup_speed_scrolling);
 		checking_excess_content_top = true;
 	} else {
-		setTimeout("add_content_top()", 50);
+		setTimeout("add_content_top()", lookup_speed_scrolling);
 		checking_excess_content_bottom = true;
 	}
 
@@ -754,7 +753,7 @@ function add_content_bottom()
 				win.scrollTo(0, scroll_pos);
 			@*/
 			/// Better check to see if we need to add more content.
-			setTimeout("add_content_bottom()", 50);
+			setTimeout("add_content_bottom()", lookup_speed_scrolling);
 		} else {
 			/// Check to see if we need to get new content.
 			if (scroll_maxed_bottom) {
@@ -796,7 +795,7 @@ function add_content_top()
 			win.scrollTo(0, scroll_pos = (win.pageYOffset + newEl.clientHeight));
 			
 			/// Better check to see if we need to add more content.
-			setTimeout("add_content_top()", 50);
+			setTimeout("add_content_top()", lookup_speed_scrolling);
 		} else {
 			/// Check to see if we need to get new content.
 			if (scroll_maxed_top) {
