@@ -186,6 +186,7 @@ class SphinxClient
 		$this->_sort = $mode;
 		$this->_sortby = $sortby;
 	}
+	
 	/// set ranking mode
 	function SetRankingMode($ranker)
 	{
@@ -194,10 +195,11 @@ class SphinxClient
 	
 	function Query($query, $index = "*", $comment = "")
 	{
+		$extra_regex = "";
+		
 		$options = " -q";
 		$options .= " -l " . $this->_limit;
 		$options .= ' -s "@id ASC"';
-		//$options .= " -f 'id' 1027014";
 		
 		if ($this->_mode == SPH_MATCH_ANY) {
 			$options .= " -a";
@@ -210,54 +212,38 @@ class SphinxClient
 		} elseif ($this->_mode == SPH_MATCH_EXTENDED2) {
 			$options .= " -e2";
 		}
-		$offset = " -o 0";
-		while (true) {
-			$cmd = $this->_path . $options . $offset . " -c " . $this->_config . " -i " . $index . " " . escapeshellarg($query);
-			//$this->_min_id
-			//echo "<pre>$cmd\n";
-			//echo system($cmd);
-			$res = shell_exec($cmd);
-			preg_match_all('/^(\d+)\. document=(\d+)/im', $res, $matches);
-			preg_match_all('/^\d+\. \'([^\']+)\': (\d+) documents, (\d+) /im', $res, $hits);
-			preg_match('/matches of (\d+) total in ([0-9.]+) sec/im', $res, $stats);
-			
-			///Debugging
-			//echo "<pre>$cmd\n";
-			
-			//print_r($matches);
-			//print_r($hits);
-			//print_r($stats);
-			//echo $res;
-			///HACK: The following is an unfortunate hack to handle the lack of specifying which id to start at via the search program.
-			if (count($matches[2]) == 0) break;
+		
+		if ($this->_min_id > 0 || $this->_max_id > 0) {
+			$sortexpr = ' -S "';
 			if ($this->_min_id > 0) {
-				/// Find the offset.
-				foreach ($matches[2] as $key => $id) {
-					if ($id >= $this->_min_id) {
-						if ($key == 0) {
-							break 2;
-						} else {
-							$offset = " -o " . ($matches[1][$key] - 1);
-							echo $offset;
-							continue 2;
-						}
-					}
-				}
-				if (count($matches[1]) < $this->_limit) {
-					/// It won't find anything, so stop now.
-					$matches = array(array(),array(),array());
-					break;
-				} else {
-					$offset = " -o " . $matches[1][$key]; /// This is the last document retrieved.
-				}
-				continue;
-			} else {
-				break;
+				$sortexpr .= '@id >= ' . $this->_min_id;
 			}
+			if ($this->_max_id > 0) {
+				if ($this->_min_id > 0) {
+					$sortexpr .= ' AND ';
+				}
+				$sortexpr .= '@id <= ' . $this->_max_id;
+			}
+			$options .= $sortexpr . '"';
+			$extra_regex = ", weight=\d+, @expr=1";
+			
 		}
-		//print_r($matches);
-		//print_r($hits);
-		//print_r($stats);
+		
+		$cmd = $this->_path . $options . " -c " . $this->_config . " -i " . $index . " " . escapeshellarg($query);
+		
+		$res = shell_exec($cmd);
+		preg_match_all('/^(\d+)\. document=(\d+)' . $extra_regex . '/im', $res, $matches);
+		preg_match_all('/^\d+\. \'([^\']+)\': (\d+) documents, (\d+) /im', $res, $hits);
+		preg_match('/matches of (\d+) total in ([0-9.]+) sec/im', $res, $stats);
+		
+		/*
+		/// Uncomment for debugging.
+		echo "<pre>$cmd\n";
+		print_r($matches);
+		print_r($hits);
+		print_r($stats);
+		echo $res;
+		*/
 		return array('simple-matches' => implode(',', $matches[2]), 'total_found' => $stats[1], 'time' => $stats[2]);
 	}
 }
@@ -270,7 +256,7 @@ class SphinxClient
 define("SPHINX_SERVER", 'C:\srv\www\bf\win-sphinx\search.exe');
 define("SPHINX_PORT", "C:\srv\www\bf\win-sphinx\sphinx_bf.conf");
 define("LIMIT", 40);
-$start_id = 0;
+$start_id = 41012030;
 
 $query = "love God";
 //$query = "love | God"; /// boolean
