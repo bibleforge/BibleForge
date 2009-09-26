@@ -614,6 +614,8 @@ function scrolling()
 	}
 	scroll_check_count = 0;
 	
+	setTimeout("find_current_range()", 200);
+	
 	var scrolling_down = (new_scroll_pos > scroll_pos);
 	
 	/// This keeps track of the current scroll position so we can tell the direction of the scroll.
@@ -654,7 +656,7 @@ function remove_excess_content_top()
 	
 	if (child == null) return null;
 	
-	///NOTE: Mozilla ignores .clientHeight, .offsetHeight, .scrollHeight for some objects (not <div> however) with a doctype in Mozilla.
+	///NOTE: Mozilla ignores .clientHeight, .offsetHeight, .scrollHeight for some objects (not <div> however) with a doctype.
 	///      If Mozilla has problems in the future, you can use this as a replacement:
 	///      child_height = parseInt(window.getComputedStyle(child, null).getPropertyValue("height"));
 	
@@ -805,6 +807,94 @@ function add_content_top()
 			run_search(PREVIOUS);
 		}
 	}
+}
+
+
+/**
+ * Find the verse that is at the top of the page and at the bottom.
+ *
+ * @return NULL.  The title is modified to reflect the verse range.
+ * @note Called by scrolling() via setTimeout().
+ */
+function find_current_range()
+{
+	//var verse_block = page.firstChild, el;
+	///TODO: Determine if there is a better way to calculate the topBar offset.
+	
+	//var top_pos = scroll_pos + topLoader.offsetHeight;
+	//var bottom_pos = scroll_pos + doc_docEl.clientHeight;
+	var verse_pos = [scroll_pos + topLoader.offsetHeight, scroll_pos + doc_docEl.clientHeight]; /// I.e., [top_verse_position, bottom_verse_position].
+	
+	alert(find_element_at_scroll_pos(verse_pos[0], page));
+	return null;
+	//var verse_block_start_at = Math.round(page.childNodes.length * (((verse_pos[0] + verse_pos[1]) / 2) / doc_docEl.scrollHeight));
+	var verse_block_start_at = Math.round(page.childNodes.length * (verse_pos[0] / doc_docEl.scrollHeight));
+	if (verse_block_start_at < 1) verse_block_start_at = 1;
+	
+	var verse_block = page.childNodes[verse_block_start_at - 1];
+	var verse_block_offset_top, verse_block_offset_height;
+	var verse_start_at;
+	for (var i = 0; i < 2; i++) {
+		do {
+			//doc.title = verse_pos[0] + "-" + verse_pos[1] + " : " + verse_block.offsetTop + "-" + (verse_block.offsetHeight  + verse_block.offsetTop) + " " + verse_block_start_at + "/" + page.childNodes.length + " " + (verse_pos[0] >= verse_block.offsetTop && verse_pos[0] <= (verse_block.offsetHeight + verse_block.offsetTop));
+			verse_block_offset_top = verse_block.offsetTop;
+			verse_block_offset_height = verse_block.offsetHeight + offset_top;
+			if (verse_pos[i] >= verse_block_offset_top && verse_pos[i] <= verse_block_offset_height) {
+				/// found
+				//temp += verse_pos[i] + " is in between " + verse_block.offsetTop + " and " + (verse_block.offsetHeight  + verse_block.offsetTop) + " ";
+				//doc.title = verse_block.childNodes.length;
+				verse_start_at = Math.round(verse_block.childNodes.length * ((verse_pos[0] - verse_block_offset_top) / (doc_docEl.scrollHeight - verse_block_offset_top)));
+				if (verse_start_at < 1) verse_start_at = 1;
+				
+				
+				break;
+			} else {
+				/// determine which was to go, next or prev sibling.
+				if (verse_pos[i] > verse_block.offsetTop) {
+					verse_block = verse_block.nextSibling
+				} else {
+					verse_block = verse_block.previousSibling;
+				}
+			}
+		} while (verse_block !== null);
+	}
+}
+
+/**
+ * Find an element that is within a certain position on the page.
+ *
+ * @example element = find_element_at_scroll_pos(scroll_pos, page);
+ * @param the_pos (number) The vertical position on the page.
+ * @param parent_el (DOM element) The element to search inside of.
+ * @return DOM element that is within the specified position of the page.
+ * @note Called by find_current_range().
+ * @note This is a helper function to find_current_range().
+ */
+function find_element_at_scroll_pos(the_pos, parent_el)
+{
+	/// Make a guess as to which element to start with to save time.
+	var el_start_at = Math.round(parent_el.childNodes.length * (the_pos / doc_docEl.scrollHeight));
+	if (el_start_at < 1) el_start_at = 1;
+	
+	var el_offset_top, el_offset_height;
+	var el = parent_el.childNodes[el_start_at - 1];
+	
+	do {
+		el_offset_top = el.offsetTop;
+		el_offset_height = el.offsetHeight + el_offset_top;
+		if (the_pos >= el_offset_top && the_pos <= el_offset_height) {
+			return el;
+			break;
+		} else {
+			if (the_pos > el_offset_top) {
+				 el =  el.nextSibling
+			} else {
+				 el =  el.previousSibling;
+			}
+		}
+	} while (el !== null);
+	///TODO: Figure out a better way of handling errors.
+	return null;
 }
 
 
