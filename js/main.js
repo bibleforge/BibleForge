@@ -24,9 +24,9 @@ var bottomLoader = doc.getElementById("bottomLoader");
 
 var highlight_re = []; /// Highlighter regex array
 var last_search  = "", last_search_encoded = ""; /// A cache of the last search query
-var last_type;
+var last_type; /// The type of lookup performed last (SEARCH || VERSE_LOOKUP)
 var waiting_for_first_search = false;
-var last_book = 0;
+var last_book = 0; /// The number of the last book of the Bible that was returned
 var highlight_limit = 20; /// Currently, we limit the unique number of search words to highlight.
 
 ///NOTE: window.XMLHttpRequest for Mozilla/KHTML/Opera/IE7+
@@ -45,7 +45,7 @@ var buffer_add = 1000, buffer_rem = 10000;
 var cached_verses_top = [], cached_count_top = 0;
 var cached_verses_bottom = [], cached_count_bottom = 0;
 var scroll_maxed_top = true, scroll_maxed_bottom = false;
-var lookup_speed_scrolling = 50, lookup_speed_sitting = 1000, remove_speed = 3000, look_up_range_speed = 300; /// In miliseconds
+var lookup_speed_scrolling = 50, lookup_speed_sitting = 800, remove_speed = 3000, look_up_range_speed = 300; /// In miliseconds
 var looking_up_verse_range = false;
 
 /// Simple Event Registration
@@ -54,9 +54,9 @@ win.onscroll = scrolling;
 win.onresize = resizing;
 
 
-/**
- * Start of search functions.
- */
+/*****************************
+ * Start of search functions *
+ *****************************/
 
 /**
  * Prepare for a the search.
@@ -67,7 +67,8 @@ win.onresize = resizing;
  * @return FALSE to prevent the form from submitting.
  * @note Called when clicking the submit button on the search bar in index.php.
  */
-function prepare_new_search() {
+function prepare_new_search()
+{
 	var raw_search_terms = q_obj.value, verse_id, last_search_prepared;
 	
 	waiting_for_first_search = true;
@@ -199,7 +200,7 @@ function handle_new_verses(res)
 		}
 		if ((direction == PREVIOUS || waiting_for_first_search) && res[1][0] > 1001001) {
 			topLoader.style.visibility = "visible";
-			setTimeout(add_content_top, lookup_speed_sitting);
+			setTimeout(add_content_top, lookup_speed_sitting + 200);
 		}
 	} else {
 		if (direction == ADDITIONAL) {
@@ -586,14 +587,14 @@ function format_number(num)
 	return num;
 }
 
-/**
- * End of search functions.
- */
+/***************************
+ * End of search functions *
+ ***************************/
 
 
-/**
- * Start of Scrolling functions.
- */
+/********************************
+ * Start of Scrolling functions *
+ ********************************/
 
 /**
  * The onscroll event.
@@ -855,8 +856,6 @@ function find_current_range()
 	var verse2 = find_element_at_scroll_pos(bottom_pos, bottom_verse_block).id.split("_");
 	var ref_range;
 	
-	/// The book of Psalms is refered to differently (e.g., Psalm 1:1).
-	verse1[0] = verse1[0] == 19 ? lang.psalm : books_short[verse1[0]];
 	/// The titles in the book of Psalms are referenced as verse zero (cf. Psalm 3).
 	verse1[2] = verse1[2] == 0 ? lang.title : verse1[2];
 	verse2[2] = verse2[2] == 0 ? lang.title : verse2[2];
@@ -864,6 +863,8 @@ function find_current_range()
 	///NOTE: \u2013 is unicode for the en dash (–) (HTML: &ndash;).
 	///TODO: Determine if the colons should be language specified.
 	if (verse1[0] == verse2[0]) {
+		/// The book of Psalms is refered to differently (e.g., Psalm 1:1).
+		verse1[0] = verse1[0] == 19 ? lang.psalm : books_short[verse1[0]];
 		if (verse1[1] == verse2[1]) {
 			if (verse1[2] == verse2[2]) {
 				ref_range = verse1[0] + " " + verse1[1] + ":" + verse1[2];;
@@ -874,12 +875,20 @@ function find_current_range()
 			ref_range = verse1[0] + " " + verse1[1] + ":" + verse1[2] + "\u2013" + verse2[1] + ":" + verse2[2];
 		}
 	} else {
+		/// The book of Psalms is refered to differently (e.g., Psalm 1:1).
+		verse1[0] = verse1[0] == 19 ? lang.psalm : books_short[verse1[0]];
 		verse2[0] = verse2[0] == 19 ? lang.psalm : books_short[verse2[0]];
 		ref_range = verse1[0] + " " + verse1[1] + ":" + verse1[2] + "\u2013" + verse2[0] + " " + verse2[1] + ":" + verse2[2];
 	}
 	
+	var new_title;
+	if (last_type == SEARCH) {
+		new_title = last_search +  " (" + ref_range + ") - " + lang.page_title;
+	} else {
+		new_title = ref_range + " - " + lang.page_title;
+	}
 	///FIXME: Display the verse range properly.
-	doc.title = ref_range;
+	doc.title = new_title;
 	
 	return null;
 }
@@ -943,14 +952,14 @@ function resizing()
 	setTimeout(find_current_range, look_up_range_speed);
 }
 
-/**
- * End of Scrolling functions.
- */
+/******************************
+ * End of Scrolling functions *
+ ******************************/
 
 
-/**
- * Start of AJAX functions.
- */
+/***************************
+ * Start of AJAX functions *
+ ***************************/
 
 /**
  * Send an AJAX request to the server.
@@ -1003,14 +1012,14 @@ function interpret_result(message)
 	handle_new_verses(res);
 }
 
-/**
- * End of AJAX functions
- */
+/*************************
+ * End of AJAX functions *
+ *************************/
 
 
-/**
- * Start of IE compatiblity functions.
- */
+/**************************************
+ * Start of IE compatiblity functions *
+ **************************************/
 
 ///NOTE: Conditional compilation code block only executes on IE.
 /// Make split() work correctly on IE.
@@ -1067,6 +1076,6 @@ String.prototype.split = function (s, limit) {
 };
 @*/
 
-/**
- * End of IE compatiblity functions.
- */
+/************************************
+ * End of IE compatiblity functions *
+ ************************************/
