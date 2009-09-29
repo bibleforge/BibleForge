@@ -53,6 +53,26 @@ var looking_up_verse_range = false;
 win.onscroll = scrolling;
 win.onresize = resizing;
 
+/// Prototypes
+///NOTE: Add trim() for older browsers.
+if (!"".trim) {
+	/**
+	 * Removes leading and trailing spaces.
+	 *
+	 * @example trimmed = trim("  God is &  good  "); /// Returns "God is &  good"
+	 * @param str (string) The string to trim.
+	 * @return A String with leading and trailing spaces removed.
+	 * @note This does not remove unusual white spaces.  It actually removes everything under character code 33.
+	 */
+	String.prototype.trim = function()
+	{
+		var start = -1, end = this.length;
+		while (str.charCodeAt(--end) < 33);
+		while (++start < end && this.charCodeAt(start) < 33);
+		return this.slice(start, end + 1);
+	}	
+}
+
 
 /*****************************
  * Start of search functions *
@@ -262,7 +282,7 @@ function write_verses(return_type, direction, verse_ids, verse_HTML)
 		v = num % 1000; /// Calculate the verse.
 		c = ((num - v) % 1000000) / 1000; /// Calculate the chapter.
 		b = (num - v - c * 1000) / 1000000; /// Calculate the book by number (e.g., Genesis == 1).
-		vcb_str = b + "_" + c + "_" + v;
+		bcv_str = b + "_" + c + "_" + v;
 		
 		if (return_type == SEARCH) {
 			/// Fix Psalm titles.
@@ -270,10 +290,10 @@ function write_verses(return_type, direction, verse_ids, verse_HTML)
 			
 			if (b != last_book) { /// Only display the book if it is different from the last verse.
 				last_book = b;
-				HTML_str += "<h1 class=book id=" + vcb_str + "_title>" + books_short[b] + "</h1>"; /// Convert the book number to text.
+				HTML_str += "<h1 class=book id=" + bcv_str + "_title>" + books_short[b] + "</h1>"; /// Convert the book number to text.
 			}
 			verse_str = verse_HTML[i];
-			HTML_str += "<div class=search_verse id=" + vcb_str + "_search>" + c + ":" + v + " " + verse_str + "</div>";
+			HTML_str += "<div class=search_verse id=" + bcv_str + "_search>" + c + ":" + v + " " + verse_str + "</div>";
 			
 			///TODO: Determine if it would be better to put this in an array and send it all at once, preferably without the implied eval().
 			/// Highlight the verse after 100 miliseconds.
@@ -282,7 +302,7 @@ function write_verses(return_type, direction, verse_ids, verse_HTML)
 		} else { /// VERSE_LOOKUP
 			if (v < 2) { /// I.e., 1 or 0 (title).
 				if (c == 1) {
-					HTML_str += "<div class=book id=" + vcb_str + "_title>" + books_long_pretitle[b] + "<h1>" + books_long_main[b] + "</h1>" + books_long_posttitle[b] + "</div>";
+					HTML_str += "<div class=book id=" + bcv_str + "_title>" + books_long_pretitle[b] + "<h1>" + books_long_main[b] + "</h1>" + books_long_posttitle[b] + "</div>";
 				} else if (b != 19 || v == 0 || psalm_title_re.test(c)) { /// Display chapter/psalm number (but not on verse 1 of psalms that have titles).
 					/// Psalms have a special name.
 					if (b == 19) {
@@ -290,15 +310,15 @@ function write_verses(return_type, direction, verse_ids, verse_HTML)
 					} else {
 						chapter_text = lang.chapter;
 					}
-					HTML_str += "<h3 class=chapter id=" + vcb_str + "_chapter>" + chapter_text + " " + c + "</h3>";
+					HTML_str += "<h3 class=chapter id=" + bcv_str + "_chapter>" + chapter_text + " " + c + "</h3>";
 				}
 				if (v == 0) {
-					HTML_str += "<div class=pslam_title id=" + vcb_str + "_verse>" + verse_HTML[i] + "</div>";
+					HTML_str += "<div class=pslam_title id=" + bcv_str + "_verse>" + verse_HTML[i] + "</div>";
 				} else {
-					HTML_str += "<div class=first_verse id=" + vcb_str + "_verse>" + verse_HTML[i] + "</div>";
+					HTML_str += "<div class=first_verse id=" + bcv_str + "_verse>" + verse_HTML[i] + "</div>";
 				}
 			} else {
-				HTML_str += "<div class=verse id=" + vcb_str + "_verse>" + v + " " + verse_HTML[i] + "</div>";
+				HTML_str += "<div class=verse id=" + bcv_str + "_verse>" + v + " " + verse_HTML[i] + "</div>";
 			}
 		}
 	}
@@ -550,24 +570,6 @@ function prepare_highlighter(search_terms)
 
 
 /**
- * Removes leading and trailing spaces.
- *
- * @example trimmed = trim("  God is &  good  "); /// Returns "God is &  good"
- * @param str (string) The string to trim.
- * @return A String with leading and trailing spaces removed.
- * @note This does not remove unusual white spaces.  It actually removes everything under character code 33.
- * @todo Many browsers now have native trim() support which should be used instead.
- */
-function trim(str)
-{
-	var start = -1, end = str.length;
-	while (str.charCodeAt(--end) < 33);
-	while (++start < end && str.charCodeAt(start) < 33);
-	return str.slice(start, end + 1);
-}
-
-
-/**
  * Format a positive number with appropriate commas.
  *
  * @example format_number(1000); /// Returns "1,000"
@@ -645,11 +647,11 @@ function scrolling()
 
 	if (checking_excess_content_top) {
 		clearInterval(remove_content_top_interval);
-		remove_content_top_interval = setInterval("remove_excess_content_top()", remove_speed);
+		remove_content_top_interval = setInterval(remove_excess_content_top, remove_speed);
 	}
 	if (checking_excess_content_bottom) {
 		clearInterval(remove_content_bottom_interval);
-		remove_content_bottom_interval = setInterval("remove_excess_content_bottom()", remove_speed);
+		remove_content_bottom_interval = setInterval(remove_excess_content_bottom, remove_speed);
 	}
 }
 
@@ -867,7 +869,7 @@ function find_current_range()
 		verse1[0] = verse1[0] == 19 ? lang.psalm : books_short[verse1[0]];
 		if (verse1[1] == verse2[1]) {
 			if (verse1[2] == verse2[2]) {
-				ref_range = verse1[0] + " " + verse1[1] + ":" + verse1[2];;
+				ref_range = verse1[0] + " " + verse1[1] + ":" + verse1[2];
 			} else {
 				ref_range = verse1[0] + " " + verse1[1] + ":" + verse1[2] + "\u2013" + verse2[2];
 			}
@@ -923,12 +925,11 @@ function find_element_at_scroll_pos(the_pos, parent_el, el)
 		el_offset_height = el.offsetHeight + el_offset_top;
 		if (the_pos >= el_offset_top && the_pos <= el_offset_height) {
 			return el;
-			break;
 		} else {
 			if (the_pos > el_offset_top) {
-				 el =  el.nextSibling
+				 el = el.nextSibling;
 			} else {
-				 el =  el.previousSibling;
+				 el = el.previousSibling;
 			}
 		}
 	} while (el !== null);
@@ -985,6 +986,7 @@ function post_to_server(server_URL, message, ajax)
 			} else {
 				/// Was the abort unintentional?
 				if (ajax.status != 0) {
+					///FIXME: Do meaningful error handling.
 					alert("Error " + ajax.status + ":\n" + ajax.responseText);
 				}
 			}
