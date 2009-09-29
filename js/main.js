@@ -316,6 +316,11 @@ function write_verses(return_type, direction, verse_ids, verse_HTML)
 		win.scrollTo(0, scroll_pos = (win.pageYOffset + newEl.clientHeight));
 		top_verse = verse_ids[0];
 	}
+	
+	if (!looking_up_verse_range) {
+		looking_up_verse_range = true;
+		setTimeout(find_current_range, look_up_range_speed);
+	}
 }
 /* FIXME this code greatly speeds up replacing an element in Mozilla using innerHTML if there are lots of elements in it.
 function replaceHtml(el, html) {
@@ -779,7 +784,7 @@ function add_content_bottom()
  *
  * @example add_content_top();
  * @return NULL.  Adds content to the page if needed.
- * @note Called by scrolling() via setTimeout().
+ * @note Called by scrolling(), resizing(), and write_verses() via setTimeout().
  * @note May call itself via setTimeout() if content is added.
  */
 function add_content_top()
@@ -935,6 +940,7 @@ function resizing()
 {
 	add_content_bottom();
 	add_content_top();
+	setTimeout(find_current_range, look_up_range_speed);
 }
 
 /**
