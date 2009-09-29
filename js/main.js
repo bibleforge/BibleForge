@@ -29,7 +29,6 @@ var waiting_for_first_search = false;
 var last_book = 0;
 var highlight_limit = 20; /// Currently, we limit the unique number of search words to highlight.
 
-/// AJAX variables
 ///NOTE: window.XMLHttpRequest for Mozilla/KHTML/Opera/IE7+
 /// ActiveXObject("Microsoft.XMLHTTP") for IE6-
 var ajax_addtional = win.XMLHttpRequest ? new win.XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
@@ -46,7 +45,8 @@ var buffer_add = 1000, buffer_rem = 10000;
 var cached_verses_top = [], cached_count_top = 0;
 var cached_verses_bottom = [], cached_count_bottom = 0;
 var scroll_maxed_top = true, scroll_maxed_bottom = false;
-var lookup_speed_scrolling = 50, lookup_speed_sitting = 1000, remove_speed = 3000; /// In miliseconds
+var lookup_speed_scrolling = 50, lookup_speed_sitting = 1000, remove_speed = 3000, look_up_range_speed = 300; /// In miliseconds
+var looking_up_verse_range = false;
 
 /// Simple Event Registration
 ///NOTE: Could use wheel if the scroll bars are invisible.
@@ -195,11 +195,11 @@ function handle_new_verses(res)
 		/// Indicate to the user that more content may be loading, and check for more content.
 		if (direction == ADDITIONAL && res[1][res[1].length - 1] < 66022021) {
 			bottomLoader.style.visibility = "visible";
-			setTimeout("add_content_bottom()", lookup_speed_sitting);
+			setTimeout(add_content_bottom, lookup_speed_sitting);
 		}
 		if ((direction == PREVIOUS || waiting_for_first_search) && res[1][0] > 1001001) {
 			topLoader.style.visibility = "visible";
-			setTimeout("add_content_top()", lookup_speed_sitting);
+			setTimeout(add_content_top, lookup_speed_sitting);
 		}
 	} else {
 		if (direction == ADDITIONAL) {
@@ -254,13 +254,14 @@ function handle_new_verses(res)
 function write_verses(return_type, direction, verse_ids, verse_HTML)
 {
 	///NOTE: psalm_title_re determines if a psalm does not have a title.
-	var i, num, b, c, v, verse_str, HTML_str = "", chapter_text = "", psalm_title_re = /^(?:1(?:0[4-7]?|1[1-9]|3[25-7]|4[6-9]|50)?|2|33|43|71|9[13-79])$/;
+	var i, num, b, c, v, bcv_str, verse_str, HTML_str = "", chapter_text = "", psalm_title_re = /^(?:1(?:0[4-7]?|1[1-9]|3[25-7]|4[6-9]|50)?|2|33|43|71|9[13-79])$/;
 	
 	for (i in verse_HTML) {
 		num = verse_ids[i];
 		v = num % 1000; /// Calculate the verse.
 		c = ((num - v) % 1000000) / 1000; /// Calculate the chapter.
 		b = (num - v - c * 1000) / 1000000; /// Calculate the book by number (e.g., Genesis == 1).
+		vcb_str = b + "_" + c + "_" + v;
 		
 		if (return_type == SEARCH) {
 			/// Fix Psalm titles.
@@ -268,10 +269,10 @@ function write_verses(return_type, direction, verse_ids, verse_HTML)
 			
 			if (b != last_book) { /// Only display the book if it is different from the last verse.
 				last_book = b;
-				HTML_str += "<h1 class=book>" + books_short[b] + "</h1>"; /// Convert the book number to text.
+				HTML_str += "<h1 class=book id=" + vcb_str + "_title>" + books_short[b] + "</h1>"; /// Convert the book number to text.
 			}
 			verse_str = verse_HTML[i];
-			HTML_str += "<div class=search_verse>" + c + ":" + v + " " + verse_str + "</div>";
+			HTML_str += "<div class=search_verse id=" + vcb_str + "_search>" + c + ":" + v + " " + verse_str + "</div>";
 			
 			///TODO: Determine if it would be better to put this in an array and send it all at once, preferably without the implied eval().
 			/// Highlight the verse after 100 miliseconds.
@@ -280,7 +281,7 @@ function write_verses(return_type, direction, verse_ids, verse_HTML)
 		} else { /// VERSE_LOOKUP
 			if (v < 2) { /// I.e., 1 or 0 (title).
 				if (c == 1) {
-					HTML_str += "<div class=book>" + books_long_pretitle[b] + "<h1>" + books_long_main[b] + "</h1>" + books_long_posttitle[b] + "</div>";
+					HTML_str += "<div class=book id=" + vcb_str + "_title>" + books_long_pretitle[b] + "<h1>" + books_long_main[b] + "</h1>" + books_long_posttitle[b] + "</div>";
 				} else if (b != 19 || v == 0 || psalm_title_re.test(c)) { /// Display chapter/psalm number (but not on verse 1 of psalms that have titles).
 					/// Psalms have a special name.
 					if (b == 19) {
@@ -288,15 +289,15 @@ function write_verses(return_type, direction, verse_ids, verse_HTML)
 					} else {
 						chapter_text = lang.chapter;
 					}
-					HTML_str += "<h3 class=chapter>" + chapter_text + " " + c + "</h3>";
+					HTML_str += "<h3 class=chapter id=" + vcb_str + "_chapter>" + chapter_text + " " + c + "</h3>";
 				}
 				if (v == 0) {
-					HTML_str += "<div class=pslam_title>" + verse_HTML[i] + "</div>";
+					HTML_str += "<div class=pslam_title id=" + vcb_str + "_verse>" + verse_HTML[i] + "</div>";
 				} else {
-					HTML_str += "<div class=first_verse>" + verse_HTML[i] + "</div>";
+					HTML_str += "<div class=first_verse id=" + vcb_str + "_verse>" + verse_HTML[i] + "</div>";
 				}
 			} else {
-				HTML_str += "<div class=verse>" + v + " " + verse_HTML[i] + "</div>";
+				HTML_str += "<div class=verse id=" + vcb_str + "_verse>" + v + " " + verse_HTML[i] + "</div>";
 			}
 		}
 	}
@@ -464,8 +465,8 @@ function prepare_highlighter(search_terms)
 		term = search_terms_arr[i];
 		len_before = term.length;
 		
-		///TODO: Move this to lang/en.js because it is language dependent.
-		/// Fix special unique words.
+		///FIXME: Move this to lang/en.js because it is language dependent.
+		/// Fix special/unique words that the stemmer won't.
 		switch (term) {
 			case "does": case "doth": case "do": case "doeth": case "doest":
 				stemmed_word = "do[esth]*";
@@ -502,11 +503,12 @@ function prepare_highlighter(search_terms)
 			default:
 				if (term.indexOf("*") != -1) {
 					/// The word has a wild card: don't stem, and change it to a regex compatible form.
+					/// Word breaks are found by looking for tag beginnings (<) or closings (>).
 					stemmed_word = term.replace(/\*/g, "[^<>]*");
 					no_morph = true;
 				} else {
 					/// Most words get stemmed.
-					///TODO: stemWord() is language dependent, and therefore is delcared in js/langs/LOCALE.js.
+					///NOTE: stemWord() is language dependent, and therefore is delcared in js/langs/LOCALE.js.
 					stemmed_word = stem_word(term);
 					no_morph = false;
 				}
@@ -526,7 +528,7 @@ function prepare_highlighter(search_terms)
 		///      The hyphen is to highlight hyphenated words that would otherwise be missed (matching first word only) (i.e., "Beth").
 		///      ([^>]+-)? finds words where the match is not the first of a hyphenated word (i.e., "Maachah").
 		///      The current English version (KJV) does not use square brackets ([]).
-		///TODO: The punctutation )(,.?!;: could be considered language specific and should be moved.
+		///FIXME: The punctutation )(,.?!;: could be considered language specific and should be moved.
 		///TODO: Bench mark different regex (creation and testing).
 		if (no_morph || (len_after == len_before && len_after < 3)) {
 			highlight_re[count++] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")[),.?!;:]*[<-]", "i");
@@ -606,7 +608,7 @@ function scrolling()
 		/// IE/Opera sometimes don't update page.scrollTop until after this function is run.
 		/// Mozilla/KHTML can get stuck here too.
 		if (++scroll_check_count < 10) {
-			setTimeout("scrolling()", 30);
+			setTimeout(scrolling, 30);
 		} else { /// Stop it if it is stuck looping.
 			scroll_check_count = 0;
 		}
@@ -614,7 +616,10 @@ function scrolling()
 	}
 	scroll_check_count = 0;
 	
-	setTimeout("find_current_range()", 200);
+	if (!looking_up_verse_range) {
+		looking_up_verse_range = true;
+		setTimeout(find_current_range, look_up_range_speed);
+	}
 	
 	var scrolling_down = (new_scroll_pos > scroll_pos);
 	
@@ -625,10 +630,10 @@ function scrolling()
 	if (waiting_for_first_search) return null;
 	
 	if (scrolling_down) {
-		setTimeout("add_content_bottom()", lookup_speed_scrolling);
+		setTimeout(add_content_bottom, lookup_speed_scrolling);
 		checking_excess_content_top = true;
 	} else {
-		setTimeout("add_content_top()", lookup_speed_scrolling);
+		setTimeout(add_content_top, lookup_speed_scrolling);
 		checking_excess_content_bottom = true;
 	}
 
@@ -666,7 +671,7 @@ function remove_excess_content_top()
 	
 	///NOTE: Mozilla also has window.scrollMaxY, which is slightly different than document.documentElement.scrollHeight (document.body.scrollHeight should work too).
 	
-	/// Is the object is in the remove zone, and is its height less than the remaining space to scroll to prevent jumping.
+	/// Is the object in the remove zone, and is its height less than the remaining space to scroll to prevent jumping?
 	if (child_height + buffer_rem < scroll_pos && child_height < doc_docEl.scrollHeight - scroll_pos - doc_docEl.clientHeight) {
 		
 		cached_verses_top[cached_count_top++] = child.innerHTML;
@@ -706,7 +711,8 @@ function remove_excess_content_bottom()
 	
 	page_height = doc_docEl.clientHeight;
 	
-	if (child_position > scroll_pos + page_height + buffer_rem) { /// The object is in the remove zone.
+	/// Is the object is in the remove zone?
+	if (child_position > scroll_pos + page_height + buffer_rem) {
 		cached_verses_bottom[cached_count_bottom++] = child.innerHTML;
 		page.removeChild(child);
 		
@@ -755,7 +761,7 @@ function add_content_bottom()
 				win.scrollTo(0, scroll_pos);
 			@*/
 			/// Better check to see if we need to add more content.
-			setTimeout("add_content_bottom()", lookup_speed_scrolling);
+			setTimeout(add_content_bottom, lookup_speed_scrolling);
 		} else {
 			/// Check to see if we need to get new content.
 			if (scroll_maxed_bottom) {
@@ -797,7 +803,7 @@ function add_content_top()
 			win.scrollTo(0, scroll_pos = (win.pageYOffset + newEl.clientHeight));
 			
 			/// Better check to see if we need to add more content.
-			setTimeout("add_content_top()", lookup_speed_scrolling);
+			setTimeout(add_content_top, lookup_speed_scrolling);
 		} else {
 			/// Check to see if we need to get new content.
 			if (scroll_maxed_top) {
@@ -813,52 +819,66 @@ function add_content_top()
 /**
  * Find the verse that is at the top of the page and at the bottom.
  *
- * @return NULL.  The title is modified to reflect the verse range.
- * @note Called by scrolling() via setTimeout().
+ * @return NULL.  The page is modified to reflect the verse range.
+ * @note Called by scrolling() or itself via setTimeout().
  */
 function find_current_range()
 {
-	//var verse_block = page.firstChild, el;
+	/// Allow for this function to be called again via setTimeout().  See scrolling().
+	looking_up_verse_range = false;
+	
 	///TODO: Determine if there is a better way to calculate the topBar offset.
+	var top_pos = scroll_pos + topLoader.offsetHeight + 8;
+	var bottom_pos = scroll_pos + doc_docEl.clientHeight - 14;
 	
-	//var top_pos = scroll_pos + topLoader.offsetHeight;
-	//var bottom_pos = scroll_pos + doc_docEl.clientHeight;
-	var verse_pos = [scroll_pos + topLoader.offsetHeight, scroll_pos + doc_docEl.clientHeight]; /// I.e., [top_verse_position, bottom_verse_position].
-	
-	alert(find_element_at_scroll_pos(verse_pos[0], page));
-	return null;
-	//var verse_block_start_at = Math.round(page.childNodes.length * (((verse_pos[0] + verse_pos[1]) / 2) / doc_docEl.scrollHeight));
-	var verse_block_start_at = Math.round(page.childNodes.length * (verse_pos[0] / doc_docEl.scrollHeight));
-	if (verse_block_start_at < 1) verse_block_start_at = 1;
-	
-	var verse_block = page.childNodes[verse_block_start_at - 1];
-	var verse_block_offset_top, verse_block_offset_height;
-	var verse_start_at;
-	for (var i = 0; i < 2; i++) {
-		do {
-			//doc.title = verse_pos[0] + "-" + verse_pos[1] + " : " + verse_block.offsetTop + "-" + (verse_block.offsetHeight  + verse_block.offsetTop) + " " + verse_block_start_at + "/" + page.childNodes.length + " " + (verse_pos[0] >= verse_block.offsetTop && verse_pos[0] <= (verse_block.offsetHeight + verse_block.offsetTop));
-			verse_block_offset_top = verse_block.offsetTop;
-			verse_block_offset_height = verse_block.offsetHeight + offset_top;
-			if (verse_pos[i] >= verse_block_offset_top && verse_pos[i] <= verse_block_offset_height) {
-				/// found
-				//temp += verse_pos[i] + " is in between " + verse_block.offsetTop + " and " + (verse_block.offsetHeight  + verse_block.offsetTop) + " ";
-				//doc.title = verse_block.childNodes.length;
-				verse_start_at = Math.round(verse_block.childNodes.length * ((verse_pos[0] - verse_block_offset_top) / (doc_docEl.scrollHeight - verse_block_offset_top)));
-				if (verse_start_at < 1) verse_start_at = 1;
-				
-				
-				break;
-			} else {
-				/// determine which was to go, next or prev sibling.
-				if (verse_pos[i] > verse_block.offsetTop) {
-					verse_block = verse_block.nextSibling
-				} else {
-					verse_block = verse_block.previousSibling;
-				}
-			}
-		} while (verse_block !== null);
+	var top_verse_block = find_element_at_scroll_pos(top_pos, page);
+	if (top_verse_block === null) {
+		looking_up_verse_range = true;
+		setTimeout(find_current_range, look_up_range_speed);
+		return null;
 	}
+	
+	var bottom_verse_block = find_element_at_scroll_pos(bottom_pos, null, top_verse_block);
+	if (bottom_verse_block === null) {
+		looking_up_verse_range = true;
+		setTimeout(find_current_range, look_up_range_speed);
+		return null;
+	}
+	
+	/// Each element should have an id like book_chapter_verse_type.  See write_verses().
+	var verse1 = find_element_at_scroll_pos(top_pos, top_verse_block).id.split("_");
+	var verse2 = find_element_at_scroll_pos(bottom_pos, bottom_verse_block).id.split("_");
+	var ref_range;
+	
+	/// The book of Psalms is refered to differently (e.g., Psalm 1:1).
+	verse1[0] = verse1[0] == 19 ? lang.psalm : books_short[verse1[0]];
+	/// The titles in the book of Psalms are referenced as verse zero (cf. Psalm 3).
+	verse1[2] = verse1[2] == 0 ? lang.title : verse1[2];
+	verse2[2] = verse2[2] == 0 ? lang.title : verse2[2];
+	
+	///NOTE: \u2013 is unicode for the en dash (–) (HTML: &ndash;).
+	///TODO: Determine if the colons should be language specified.
+	if (verse1[0] == verse2[0]) {
+		if (verse1[1] == verse2[1]) {
+			if (verse1[2] == verse2[2]) {
+				ref_range = verse1[0] + " " + verse1[1] + ":" + verse1[2];;
+			} else {
+				ref_range = verse1[0] + " " + verse1[1] + ":" + verse1[2] + "\u2013" + verse2[2];
+			}
+		} else {
+			ref_range = verse1[0] + " " + verse1[1] + ":" + verse1[2] + "\u2013" + verse2[1] + ":" + verse2[2];
+		}
+	} else {
+		verse2[0] = verse2[0] == 19 ? lang.psalm : books_short[verse2[0]];
+		ref_range = verse1[0] + " " + verse1[1] + ":" + verse1[2] + "\u2013" + verse2[0] + " " + verse2[1] + ":" + verse2[2];
+	}
+	
+	///FIXME: Display the verse range properly.
+	doc.title = ref_range;
+	
+	return null;
 }
+
 
 /**
  * Find an element that is within a certain position on the page.
@@ -870,14 +890,19 @@ function find_current_range()
  * @note Called by find_current_range().
  * @note This is a helper function to find_current_range().
  */
-function find_element_at_scroll_pos(the_pos, parent_el)
+function find_element_at_scroll_pos(the_pos, parent_el, el)
 {
-	/// Make a guess as to which element to start with to save time.
-	var el_start_at = Math.round(parent_el.childNodes.length * (the_pos / doc_docEl.scrollHeight));
-	if (el_start_at < 1) el_start_at = 1;
+	/// Is the starting element unknown?
+	if (!el) {
+		/// Make an educated guess as to which element to start with to save time.
+		var el_start_at = Math.round(parent_el.childNodes.length * (the_pos / doc_docEl.scrollHeight));
+		if (el_start_at < 1) el_start_at = 1;
+		
+		el = parent_el.childNodes[el_start_at - 1];
+	}
 	
+	if (!el) return null;
 	var el_offset_top, el_offset_height;
-	var el = parent_el.childNodes[el_start_at - 1];
 	
 	do {
 		el_offset_top = el.offsetTop;
@@ -893,7 +918,6 @@ function find_element_at_scroll_pos(the_pos, parent_el)
 			}
 		}
 	} while (el !== null);
-	///TODO: Figure out a better way of handling errors.
 	return null;
 }
 
@@ -941,12 +965,11 @@ function post_to_server(server_URL, message, ajax)
 	{
 		if (ajax.readyState == 4) {
 			if (ajax.status == 200) {
-				/// This is run when the results are returned.
+				/// This is run when the results are returned properly.
 				interpret_result(ajax.responseText);
-				
 			} else {
-				/// Query prematurely stopped.
-				if (ajax.status != 0) { /// The user/code did not abort the query.
+				/// Was the abort unintentional?
+				if (ajax.status != 0) {
 					alert("Error " + ajax.status + ":\n" + ajax.responseText);
 				}
 			}
