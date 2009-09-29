@@ -541,5 +541,5 @@ function prepare_search(search_terms)
 {
 	///NOTE: /\s+-\s+/g ensures that filter_array() will filter out negitive words like "this - that" ("that" does not need to be highlighted).
 	///NOTE: \u2011-\u2015 finds various hyphens, dashes, and minuses.
-	return trim(search_terms.replace(/\s{2,}/g, " ").replace(/\sAND\s/g, " & ").replace(/\sOR\s/g, " | ").replace(/\s-\s/g, " -").replace(/\s*\bNOT\s/g, " -").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[\u2011-\u2015]/g, "-").replace(/([0-9]+)[:.;,\s]title/ig, "$1:0"));
+	return search_terms.replace(/\s{2,}/g, " ").replace(/\sAND\s/g, " & ").replace(/\sOR\s/g, " | ").replace(/\s-\s/g, " -").replace(/\s*\bNOT\s/g, " -").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[\u2011-\u2015]/g, "-").replace(/([0-9]+)[:.;,\s]title/ig, "$1:0").trim();
 }
