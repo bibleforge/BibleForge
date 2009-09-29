@@ -884,6 +884,7 @@ function find_current_range()
 	}
 	
 	var new_title;
+	/// last_type set in prepare_new_search().
 	if (last_type == SEARCH) {
 		new_title = last_search +  " (" + ref_range + ") - " + lang.page_title;
 	} else {
@@ -913,12 +914,12 @@ function find_element_at_scroll_pos(the_pos, parent_el, el)
 		/// Make an educated guess as to which element to start with to save time.
 		var el_start_at = Math.round(parent_el.childNodes.length * (the_pos / doc_docEl.scrollHeight));
 		if (el_start_at < 1) el_start_at = 1;
-		
 		el = parent_el.childNodes[el_start_at - 1];
 	}
 	
 	if (!el) return null;
 	var el_offset_top, el_offset_height;
+	var looked_next = false, looked_previous = false;
 	
 	do {
 		el_offset_top = el.offsetTop;
@@ -928,9 +929,13 @@ function find_element_at_scroll_pos(the_pos, parent_el, el)
 		} else {
 			if (the_pos > el_offset_top) {
 				 el = el.nextSibling;
+				 looked_next = true;
 			} else {
 				 el = el.previousSibling;
+				 looked_previous = true
 			}
+			/// Did we get stuck in an infinite loop?
+			if (looked_next && looked_previous) return null;
 		}
 	} while (el !== null);
 	return null;
