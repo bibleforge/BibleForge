@@ -113,7 +113,8 @@ function run_search($query, $type, $direction, $start_id = 0)
 		/// $query ex: 1001001 || 43003016
 		retrieve_verses($query, $direction);
 	}
-	die(); /// Ensure execution ending.
+	/// Ensure execution ending.
+	die();
 }
 
 
@@ -153,9 +154,9 @@ function retrieve_verses($verse_id, $direction)
 	$SQL_res = mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
 	
 	/// Convert SQL results into one comma deliniated string for JSON.
-	
 	$verses_str = "";
 	$verses_num = "";
+	
 	if ($direction == ADDITIONAL) {
 		while ($row = mysql_fetch_assoc($SQL_res)) {
 			$verses_str .= '"' . $row['words'] . '",';
@@ -205,24 +206,26 @@ function simple_search($query, $direction, $start_id = 0)
 	
 	/// Determine the search mode.
 	/// Default is SPH_MATCH_ALL (i.e., all words are required: word1 & word2).
-	if (strpos($query, ' ') === false) {
-		/// There is only one word; therefore, skip all other checking to be faster.
-		/// Uses default SPH_MATCH_ALL which should be the fastest.  No sorting necessary.
-	} elseif (strpos($query, '"') !== false || substr_count($query, ' ') > 9) {
-		///NOTE: Could use the more accurate (preg_match('/([a-z-]+[^a-z-]+){11}/i', $query) == 1) to find word count, but it is slower.
-		/// There are more than 10 search terms in the query or the query contains double quotes (").
-		/// By default, other modes stop at 10, but SPH_MATCH_EXTENDED does more (256?).
-		/// Phrases (words in quotes) require SPH_MATCH_EXTENDED mode.
-		///NOTE: SPH_MATCH_BOOLEAN is supposed to find more than 10 words too but doesn't seem to.
-		$cl->SetMatchMode(SPH_MATCH_EXTENDED); /// Most complex (and slowest?).
-		$cl->SetSortMode(SPH_SORT_EXTENDED, '@id ASC'); /// Order BY id.
-	} elseif (strpos($query, '&') !== false || strpos($query, '|') !== false || strpos($query, ' -') !== false || substr($query, 0, 1) == '-') {
-		/// Boolean opperators found.
-		$cl->SetMatchMode(SPH_MATCH_BOOLEAN);
-		$cl->SetSortMode(SPH_SORT_EXTENDED, '@id ASC'); /// Order BY id.
-	} else {
-		/// Multiple words are being searched for but nothing else special.
-		$cl->SetSortMode(SPH_SORT_EXTENDED, '@id ASC'); /// Order BY id.
+	/// SPH_MATCH_ALL should be the fastest and needs no sorting.
+	
+	/// Is there more than one word?
+	if (strpos($query, ' ') !== false) {		
+		if (strpos($query, '"') !== false || substr_count($query, ' ') > 9) {
+			///NOTE: Could use the more accurate (preg_match('/([a-z-]+[^a-z-]+){11}/i', $query) == 1) to find word count, but it is slower.
+			/// There are more than 10 search terms in the query or the query contains double quotes (").
+			/// By default, other modes stop at 10, but SPH_MATCH_EXTENDED does more (256?).
+			/// Phrases (words in quotes) require SPH_MATCH_EXTENDED mode.
+			///NOTE: SPH_MATCH_BOOLEAN is supposed to find more than 10 words too but doesn't seem to.
+			$cl->SetMatchMode(SPH_MATCH_EXTENDED); /// Most complex (and slowest?).
+			$cl->SetSortMode(SPH_SORT_EXTENDED, '@id ASC'); /// Order BY id.
+		} elseif (strpos($query, '&') !== false || strpos($query, '|') !== false || strpos($query, ' -') !== false || substr($query, 0, 1) == '-') {
+			/// Boolean opperators found.
+			$cl->SetMatchMode(SPH_MATCH_BOOLEAN);
+			$cl->SetSortMode(SPH_SORT_EXTENDED, '@id ASC'); /// Order BY id.
+		} else {
+			/// Multiple words are being searched for but nothing else special.
+			$cl->SetSortMode(SPH_SORT_EXTENDED, '@id ASC'); /// Order BY id.
+		}
 	}
 	
 	$cl->SetRankingMode(SPH_RANK_NONE); /// No ranking, fastest
@@ -238,7 +241,6 @@ function simple_search($query, $direction, $start_id = 0)
 	}
 	
 	/// Get verses from the MySQL database.
-	
 	require_once 'functions/database.php';
 	connect_to_database();
 	
