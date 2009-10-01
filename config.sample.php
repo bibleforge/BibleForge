@@ -19,6 +19,6 @@ define('DB_PASSWORD', '');
 define('DB_NAME', 'bf');
 
 /// Sphinx
-define('SPHINX_API', 'sphinxapi');
-define('SPHINX_SERVER', '127.0.0.1');
-define('SPHINX_PORT', 3312);
+define('SPHINX_API', 'sphinxapi'); /// 'sphinxapi' OR 'sphinxapi_cli'
+define('SPHINX_SERVER', '127.0.0.1'); /// sphinx host address OR path to search executable
+define('SPHINX_PORT', 3312); /// port OR path to sphinx config file.
