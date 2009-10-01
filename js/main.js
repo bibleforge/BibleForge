@@ -6,11 +6,16 @@
  * @link http://www.BibleForge.com
  */
 
-/// Declare global constants
+/*****************************
+ * Declare global constants. *
+ *****************************/
+ 
 ///NOTE: Should be "const" instead of "var," but IE doesn't support constants yet.
 var SEARCH = 1, VERSE_LOOKUP = 2, ADDITIONAL = 1, PREVIOUS = 2;
 
-/// Declare global variables.
+/*****************************
+ * Declare global variables. *
+ *****************************/
 
 /// Common DOM/BOM Objects
 var doc = document, win = window, doc_docEl = doc.documentElement;
@@ -45,7 +50,7 @@ var buffer_add = 1000, buffer_rem = 10000;
 var cached_verses_top = [], cached_count_top = 0;
 var cached_verses_bottom = [], cached_count_bottom = 0;
 var scroll_maxed_top = true, scroll_maxed_bottom = false;
-var lookup_speed_scrolling = 50, lookup_speed_sitting = 800, remove_speed = 3000, look_up_range_speed = 300; /// In miliseconds
+var lookup_speed_scrolling = 50, lookup_speed_sitting = 800, lookup_delay = 200, remove_speed = 3000, look_up_range_speed = 300; /// In miliseconds
 var looking_up_verse_range = false;
 
 /// Simple Event Registration
@@ -220,7 +225,8 @@ function handle_new_verses(res)
 		}
 		if ((direction == PREVIOUS || waiting_for_first_search) && res[1][0] > 1001001) {
 			topLoader.style.visibility = "visible";
-			setTimeout(add_content_top, lookup_speed_sitting + 200);
+			/// A delay is added on to space out the requests.
+			setTimeout(add_content_top, lookup_speed_sitting + lookup_delay);
 		}
 	} else {
 		if (direction == ADDITIONAL) {
@@ -953,9 +959,12 @@ function find_element_at_scroll_pos(the_pos, parent_el, el)
  */
 function resizing()
 {
-	add_content_bottom();
-	add_content_top();
-	setTimeout(find_current_range, look_up_range_speed);
+	setTimeout(add_content_bottom, lookup_speed_scrolling);
+	setTimeout(add_content_top, lookup_speed_scrolling);
+	if (!looking_up_verse_range) {
+		looking_up_verse_range = true;
+		setTimeout(find_current_range, look_up_range_speed);
+	}
 }
 
 /******************************

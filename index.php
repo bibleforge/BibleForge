@@ -25,7 +25,7 @@ error_reporting(E_ALL);
 		<form action="#" onsubmit="return prepare_new_search(true);">
 			BibleForge
 			<input type=text name=q id=q>
-			<input type=submit name=Search>
+			<input type=submit name=Search value=Go>
 		</form>
 	</div>
 	<div id=infoBar></div>
