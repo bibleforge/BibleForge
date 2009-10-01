@@ -859,9 +859,17 @@ function find_current_range()
 		return null;
 	}
 	
+	var verse1_el = find_element_at_scroll_pos(top_pos, top_verse_block);
+	var verse2_el = find_element_at_scroll_pos(bottom_pos, bottom_verse_block);
+	if (verse1_el === null || verse2_el === null) {
+		looking_up_verse_range = true;
+		setTimeout(find_current_range, look_up_range_speed);
+		return null;
+	}
+	
 	/// Each element should have an id like book_chapter_verse_type.  See write_verses().
-	var verse1 = find_element_at_scroll_pos(top_pos, top_verse_block).id.split("_");
-	var verse2 = find_element_at_scroll_pos(bottom_pos, bottom_verse_block).id.split("_");
+	var verse1 = verse1_el.id.split("_");
+	var verse2 = verse2_el.id.split("_");
 	var ref_range;
 	
 	/// The titles in the book of Psalms are referenced as verse zero (cf. Psalm 3).
@@ -921,6 +929,9 @@ function find_element_at_scroll_pos(the_pos, parent_el, el)
 		var el_start_at = Math.round(parent_el.childNodes.length * (the_pos / doc_docEl.scrollHeight));
 		if (el_start_at < 1) el_start_at = 1;
 		el = parent_el.childNodes[el_start_at - 1];
+	} else {
+		/// We may need the parent_el if the_pos is below all of the elements.
+		parent_el = el.parentNode;
 	}
 	
 	if (!el) return null;
@@ -944,6 +955,11 @@ function find_element_at_scroll_pos(the_pos, parent_el, el)
 			if (looked_next && looked_previous) return null;
 		}
 	} while (el !== null);
+	
+	/// If there are no elements left (e.g., by scrolling all the way to the bottom) return the last element.
+	if (looked_next) {
+		return parent_el.lastChild;
+	}
 	return null;
 }
 
