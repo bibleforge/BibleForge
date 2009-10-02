@@ -50,7 +50,7 @@ var buffer_add = 1000, buffer_rem = 10000;
 var cached_verses_top = [], cached_count_top = 0;
 var cached_verses_bottom = [], cached_count_bottom = 0;
 var scroll_maxed_top = true, scroll_maxed_bottom = false;
-var lookup_speed_scrolling = 50, lookup_speed_sitting = 800, lookup_delay = 200, remove_speed = 3000, look_up_range_speed = 300; /// In miliseconds
+var lookup_speed_scrolling = 50, lookup_speed_sitting = 100, lookup_delay = 200, remove_speed = 3000, look_up_range_speed = 300; /// In miliseconds
 var looking_up_verse_range = false;
 
 /// Simple Event Registration
@@ -281,14 +281,13 @@ function handle_new_verses(res)
 function write_verses(return_type, direction, verse_ids, verse_HTML)
 {
 	///NOTE: psalm_title_re determines if a psalm does not have a title.
-	var i, num, b, c, v, bcv_str, verse_str, HTML_str = "", chapter_text = "", psalm_title_re = /^(?:1(?:0[4-7]?|1[1-9]|3[25-7]|4[6-9]|50)?|2|33|43|71|9[13-79])$/;
+	var i, num, b, c, v, verse_str, HTML_str = "", chapter_text = "", psalm_title_re = /^(?:1(?:0[4-7]?|1[1-9]|3[25-7]|4[6-9]|50)?|2|33|43|71|9[13-79])$/;
 	
 	for (i in verse_HTML) {
 		num = verse_ids[i];
 		v = num % 1000; /// Calculate the verse.
 		c = ((num - v) % 1000000) / 1000; /// Calculate the chapter.
 		b = (num - v - c * 1000) / 1000000; /// Calculate the book by number (e.g., Genesis == 1).
-		bcv_str = b + "_" + c + "_" + v;
 		
 		if (return_type == SEARCH) {
 			/// Fix Psalm titles.
@@ -296,10 +295,10 @@ function write_verses(return_type, direction, verse_ids, verse_HTML)
 			
 			if (b != last_book) { /// Only display the book if it is different from the last verse.
 				last_book = b;
-				HTML_str += "<h1 class=book id=" + bcv_str + "_title>" + books_short[b] + "</h1>"; /// Convert the book number to text.
+				HTML_str += "<h1 class=book id=" + num + "_title>" + books_short[b] + "</h1>"; /// Convert the book number to text.
 			}
 			verse_str = verse_HTML[i];
-			HTML_str += "<div class=search_verse id=" + bcv_str + "_search>" + c + ":" + v + " " + verse_str + "</div>";
+			HTML_str += "<div class=search_verse id=" + num + "_search>" + c + ":" + v + " " + verse_str + "</div>";
 			
 			///TODO: Determine if it would be better to put this in an array and send it all at once, preferably without the implied eval().
 			/// Highlight the verse after 100 miliseconds.
@@ -308,7 +307,7 @@ function write_verses(return_type, direction, verse_ids, verse_HTML)
 		} else { /// VERSE_LOOKUP
 			if (v < 2) { /// I.e., 1 or 0 (title).
 				if (c == 1) {
-					HTML_str += "<div class=book id=" + bcv_str + "_title>" + books_long_pretitle[b] + "<h1>" + books_long_main[b] + "</h1>" + books_long_posttitle[b] + "</div>";
+					HTML_str += "<div class=book id=" + num + "_title>" + books_long_pretitle[b] + "<h1>" + books_long_main[b] + "</h1>" + books_long_posttitle[b] + "</div>";
 				} else if (b != 19 || v == 0 || psalm_title_re.test(c)) { /// Display chapter/psalm number (but not on verse 1 of psalms that have titles).
 					/// Psalms have a special name.
 					if (b == 19) {
@@ -316,15 +315,15 @@ function write_verses(return_type, direction, verse_ids, verse_HTML)
 					} else {
 						chapter_text = lang.chapter;
 					}
-					HTML_str += "<h3 class=chapter id=" + bcv_str + "_chapter>" + chapter_text + " " + c + "</h3>";
+					HTML_str += "<h3 class=chapter id=" + num + "_chapter>" + chapter_text + " " + c + "</h3>";
 				}
 				if (v == 0) {
-					HTML_str += "<div class=pslam_title id=" + bcv_str + "_verse>" + verse_HTML[i] + "</div>";
+					HTML_str += "<div class=pslam_title id=" + num + "_verse>" + verse_HTML[i] + "</div>";
 				} else {
-					HTML_str += "<div class=first_verse id=" + bcv_str + "_verse>" + verse_HTML[i] + "</div>";
+					HTML_str += "<div class=first_verse id=" + num + "_verse>" + verse_HTML[i] + "</div>";
 				}
 			} else {
-				HTML_str += "<div class=verse id=" + bcv_str + "_verse>" + v + " " + verse_HTML[i] + "</div>";
+				HTML_str += "<div class=verse id=" + num + "_verse>" + v + " " + verse_HTML[i] + "</div>";
 			}
 		}
 	}
@@ -867,34 +866,41 @@ function find_current_range()
 		return null;
 	}
 	
-	/// Each element should have an id like book_chapter_verse_type.  See write_verses().
-	var verse1 = verse1_el.id.split("_");
-	var verse2 = verse2_el.id.split("_");
+	/// parseInt() is used to keep the number and remove the trailing string from the id.  See write_verses().
+	var verse1 = parseInt(verse1_el.id);
+	var v1 = verse1 % 1000;
+	var c1 = ((verse1 - v1) % 1000000) / 1000;
+	var b1 = (verse1 - v1 - c1 * 1000) / 1000000;
+	var verse2 = parseInt(verse2_el.id);
+	var v2 = verse2 % 1000;
+	var c2 = ((verse2 - v2) % 1000000) / 1000;
+	var b2 = (verse2 - v2 - c2 * 1000) / 1000000;
+	
 	var ref_range;
 	
 	/// The titles in the book of Psalms are referenced as verse zero (cf. Psalm 3).
-	verse1[2] = verse1[2] == 0 ? lang.title : verse1[2];
-	verse2[2] = verse2[2] == 0 ? lang.title : verse2[2];
+	v1 = v1 == 0 ? lang.title : v1;
+	v2 = v2 == 0 ? lang.title : v2;
 	
 	///NOTE: \u2013 is unicode for the en dash (–) (HTML: &ndash;).
 	///TODO: Determine if the colons should be language specified.
-	if (verse1[0] == verse2[0]) {
+	if (b1 == b2) {
 		/// The book of Psalms is refered to differently (e.g., Psalm 1:1).
-		verse1[0] = verse1[0] == 19 ? lang.psalm : books_short[verse1[0]];
-		if (verse1[1] == verse2[1]) {
-			if (verse1[2] == verse2[2]) {
-				ref_range = verse1[0] + " " + verse1[1] + ":" + verse1[2];
+		b1 = b1 == 19 ? lang.psalm : books_short[b1];
+		if (c1 == c2) {
+			if (v1 == v2) {
+				ref_range = b1 + " " + c1 + ":" + v1;
 			} else {
-				ref_range = verse1[0] + " " + verse1[1] + ":" + verse1[2] + "\u2013" + verse2[2];
+				ref_range = b1 + " " + c1 + ":" + v1 + "\u2013" + v2;
 			}
 		} else {
-			ref_range = verse1[0] + " " + verse1[1] + ":" + verse1[2] + "\u2013" + verse2[1] + ":" + verse2[2];
+			ref_range = b1 + " " + c1 + ":" + v1 + "\u2013" + c2 + ":" + v2;
 		}
 	} else {
 		/// The book of Psalms is refered to differently (e.g., Psalm 1:1).
-		verse1[0] = verse1[0] == 19 ? lang.psalm : books_short[verse1[0]];
-		verse2[0] = verse2[0] == 19 ? lang.psalm : books_short[verse2[0]];
-		ref_range = verse1[0] + " " + verse1[1] + ":" + verse1[2] + "\u2013" + verse2[0] + " " + verse2[1] + ":" + verse2[2];
+		b1 = b1 == 19 ? lang.psalm : books_short[b1];
+		b2 = b2 == 19 ? lang.psalm : books_short[b2];
+		ref_range = b1 + " " + c1 + ":" + v1 + "\u2013" + b2 + " " + c2 + ":" + v2;
 	}
 	
 	var new_title;
