@@ -72,7 +72,7 @@ if (!"".trim) {
 	String.prototype.trim = function()
 	{
 		var start = -1, end = this.length;
-		while (str.charCodeAt(--end) < 33);
+		while (this.charCodeAt(--end) < 33);
 		while (++start < end && this.charCodeAt(start) < 33);
 		return this.slice(start, end + 1);
 	}	
