@@ -75,7 +75,7 @@ if (!"".trim) {
 		while (this.charCodeAt(--end) < 33);
 		while (++start < end && this.charCodeAt(start) < 33);
 		return this.slice(start, end + 1);
-	}	
+	};
 }
 
 
