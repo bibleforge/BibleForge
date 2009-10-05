@@ -911,7 +911,9 @@ function find_current_range()
 		new_title = ref_range + " - " + lang.page_title;
 	}
 	///FIXME: Display the verse range properly.
-	doc.title = new_title;
+	if (doc.title != new_title) {
+		doc.title = new_title;
+	}
 	
 	return null;
 }
