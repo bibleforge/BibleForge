@@ -966,6 +966,8 @@ function find_element_at_scroll_pos(the_pos, parent_el, el)
 	if (looked_next) {
 		return parent_el.lastChild;
 	}
+	///TODO: Determine if we should return parent_el.firstChild if looked_previous or if that might cause bugs.
+	
 	return null;
 }
 
