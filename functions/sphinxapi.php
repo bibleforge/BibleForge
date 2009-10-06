@@ -1220,5 +1220,3 @@ $result["simple-matches"] .= $doc.','; /// return string
 //
 // $Id: sphinxapi.php 1365 2008-07-15 00:33:22Z shodan $
 //
-
-?>
