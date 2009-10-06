@@ -11,7 +11,7 @@
  *****************************/
  
 ///NOTE: Should be "const" instead of "var," but IE doesn't support constants yet.
-var SEARCH = 1, VERSE_LOOKUP = 2, ADDITIONAL = 1, PREVIOUS = 2;
+var VERSE_LOOKUP = 1, SEARCH = 2, MORPHOLOGICAL_SEARCH = 3, MIXED_SEARCH = 4, ADDITIONAL = 1, PREVIOUS = 2;
 
 /*****************************
  * Declare global variables. *

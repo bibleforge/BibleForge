@@ -9,6 +9,7 @@
 
 error_reporting(E_ALL);
 
+///NOTE: This is just for compatibilities sake.  Magic Quotes should be turned off and this code should be removed.
 if (get_magic_quotes_gpc()) {
     function stripslashes_deep($value)
     {
@@ -22,8 +23,10 @@ if (get_magic_quotes_gpc()) {
     $_REQUEST = array_map('stripslashes_deep', $_REQUEST);
 }
 
-define('SEARCH', 1);
-define('VERSE_LOOKUP', 2);
+define('VERSE_LOOKUP', 1);
+define('SEARCH', 2);
+define('MORPHOLOGICAL_SEARCH', 3);
+define('MIXED_SEARCH', 4);
 define('ADDITIONAL', 1);
 define('PREVIOUS', 2);
 
@@ -33,7 +36,7 @@ define('LIMIT', 40); ///FIXME: Where should this be defined?  Should it be defin
 
 ///TODO: POST vs GET vs REQEUST
 if (!isset($_REQUEST['q'])) {
-	/// $_REQUEST['q'] is required
+	/// $_REQUEST['q'] is required.
 	die();
 } else {
 	$query = $_REQUEST['q'];
@@ -42,9 +45,10 @@ if (!isset($_REQUEST['q'])) {
 if (isset($_REQUEST['t'])) {
 	$type = $_REQUEST['t'];
 } else {
-	/// The type is unknown, therefore attempt to determine what it should be.
-	///NOTE: The type should always be set by the requester since it is faster.
-	die(); ///NOTE: Not supported curently.
+	///NOTE: The type is unknown, therefore attempt to determine what it should be.
+	///      The type should always be set by the requester since it is faster.
+	///      Not supported curently.
+	die();
 	/*
 	$verse_id = parse_reference($query); ///FIXME Not implemented, and might not be needed.
 	if ($verse_id === false) {
@@ -79,7 +83,7 @@ if (isset($_REQUEST['d'])) {
 }
 
 
-/// Preform search or lookup and end execution.
+/// Preform search or lookup, and end execution.
 run_search($query, $type, $direction, $start_id);
 
 
@@ -96,6 +100,7 @@ run_search($query, $type, $direction, $start_id);
  * @param $direction (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
  * @param $start_id (integer) (optional) The verse_id from whence to start.
  * @return NULL.  Data is sent to the buffer.  Intended for AJAX requests.
+ * @note The script should stop execution before this function ends.
  */
 function run_search($query, $type, $direction, $start_id = 0)
 {	
@@ -104,7 +109,7 @@ function run_search($query, $type, $direction, $start_id = 0)
 	if ($type == SEARCH) {
 		///TODO: Determine and do other types of searches.
 		/// Preform a simple search.
-		/// $query ex: love || love AS NOUN
+		/// $query ex: love || God & love
 		simple_search($query, $direction, $start_id);
 	///TODO: Determine if ELSEIF is necessary.
 	//} elseif ($type == VERSE_LOOKUP) {
@@ -113,8 +118,6 @@ function run_search($query, $type, $direction, $start_id = 0)
 		/// $query ex: 1001001 || 43003016
 		retrieve_verses($query, $direction);
 	}
-	/// Ensure execution ending.
-	die();
 }
 
 
@@ -231,8 +234,7 @@ function simple_search($query, $direction, $start_id = 0)
 	$cl->SetRankingMode(SPH_RANK_NONE); /// No ranking, fastest
 	
 	/// Run Sphinx search.
-	///TODO: Change test1 to something permanent.
-	$sphinx_res = $cl->Query($query, 'test1');
+	$sphinx_res = $cl->Query($query, 'verse_text');
 	
 	/// If no results found were found, send an empty JSON result.
 	if ($sphinx_res['simple-matches'] == "") {
