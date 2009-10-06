@@ -27,5 +27,3 @@ function connect_to_database() {
 	mysql_select_db(DB_NAME, $db);
 	return $db;
 }
-
-?>
