@@ -25,8 +25,9 @@ if (get_magic_quotes_gpc()) {
 
 define('VERSE_LOOKUP', 1);
 define('SEARCH', 2);
-define('MORPHOLOGICAL_SEARCH', 3);
-define('MIXED_SEARCH', 4);
+define('STANDARD_SEARCH', 0);
+define('MIXED_SEARCH', 1);
+define('MORPHOLOGICAL_SEARCH', 2);
 define('ADDITIONAL', 1);
 define('PREVIOUS', 2);
 

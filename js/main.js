@@ -11,7 +11,7 @@
  *****************************/
  
 ///NOTE: Should be "const" instead of "var," but IE doesn't support constants yet.
-var VERSE_LOOKUP = 1, SEARCH = 2, MORPHOLOGICAL_SEARCH = 3, MIXED_SEARCH = 4, ADDITIONAL = 1, PREVIOUS = 2;
+var VERSE_LOOKUP = 1, SEARCH = 2, STANDARD_SEARCH = 0, MIXED_SEARCH = 1, MORPHOLOGICAL_SEARCH = 2, ADDITIONAL = 1, PREVIOUS = 2;
 
 /*****************************
  * Declare global variables. *
@@ -539,7 +539,7 @@ function prepare_highlighter(search_terms)
 					no_morph = true;
 				} else {
 					/// Most words get stemmed.
-					///NOTE: stemWord() is language dependent, and therefore is delcared in js/langs/LOCALE.js.
+					///NOTE: stem_word() is language dependent, and therefore is delcared in js/langs/LOCALE.js.
 					stemmed_word = stem_word(term);
 					no_morph = false;
 				}
