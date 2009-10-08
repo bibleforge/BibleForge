@@ -539,7 +539,7 @@ function prepare_highlighter(search_terms)
 					no_morph = true;
 				} else {
 					/// Most words get stemmed.
-					///NOTE: stemWord() is language dependent, and therefore is delcared in js/langs/LOCALE.js.
+					///NOTE: stem_word() is language dependent, and therefore is delcared in js/langs/LOCALE.js.
 					stemmed_word = stem_word(term);
 					no_morph = false;
 				}
