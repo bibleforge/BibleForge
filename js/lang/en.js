@@ -439,7 +439,7 @@ function determine_reference(ref)
 			} else if (book_arr_re[22].test(ref)) { /// Song of Songs (Canticles)
 				book = "22";
 				break;
-			} else if (book_arr_re[13].test(ref)) { /// 1 Chronicles | First Chronicles | I Chronicles
+			} else if (book_arr_re[13].test(ref)) { /// 1 Chronicles (Chronicles)
 				book = "13";
 				break;
 			}
@@ -539,7 +539,18 @@ function determine_reference(ref)
  */
 function prepare_search(search_terms)
 {
+	///NOTE: /\s{2,}/g gets rid of double spaces within the words (e.g., "here    there" becomes "here there").
 	///NOTE: /\s+-\s+/g ensures that filter_array() will filter out negitive words like "this - that" ("that" does not need to be highlighted).
 	///NOTE: \u2011-\u2015 finds various hyphens, dashes, and minuses.
 	return search_terms.replace(/\s{2,}/g, " ").replace(/\sAND\s/g, " & ").replace(/\sOR\s/g, " | ").replace(/\s-\s/g, " -").replace(/\s*\bNOT\s/g, " -").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[\u2011-\u2015]/g, "-").replace(/([0-9]+)[:.;,\s]title/ig, "$1:0").trim();
+}
+
+
+function determine_search_type(search_terms)
+{
+	if (search_terms.indexOf(' AS ') != -1) {
+	
+	} else {
+	
+	}
 }
