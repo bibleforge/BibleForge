@@ -11,7 +11,7 @@
  *****************************/
  
 ///NOTE: Should be "const" instead of "var," but IE doesn't support constants yet.
-var VERSE_LOOKUP = 1, SEARCH = 2, STANDARD_SEARCH = 0, MIXED_SEARCH = 1, MORPHOLOGICAL_SEARCH = 2, ADDITIONAL = 1, PREVIOUS = 2;
+var VERSE_LOOKUP = 1, MIXED_SEARCH = 2, STANDARD_SEARCH = 3, MORPHOLOGICAL_SEARCH = 4, ADDITIONAL = 1, PREVIOUS = 2;
 
 /*****************************
  * Declare global variables. *
@@ -29,7 +29,7 @@ var bottomLoader = doc.getElementById("bottomLoader");
 
 var highlight_re = []; /// Highlighter regex array
 var last_search  = "", last_search_encoded = ""; /// A cache of the last search query
-var last_type; /// The type of lookup performed last (SEARCH || VERSE_LOOKUP)
+var last_type; /// The type of lookup performed last (VERSE_LOOKUP || MIXED_SEARCH || STANDARD_SEARCH || MORPHOLOGICAL_SEARCH)
 var waiting_for_first_search = false;
 var last_book = 0; /// The number of the last book of the Bible that was returned
 var highlight_limit = 20; /// Currently, we limit the unique number of search words to highlight.
@@ -59,7 +59,7 @@ win.onscroll = scrolling;
 win.onresize = resizing;
 
 /// Prototypes
-///NOTE: Add trim() for older browsers.
+///NOTE: Add trim() for Opera/WebKit/IE and Mozilla 3.0-.
 if (!"".trim) {
 	/**
 	 * Removes leading and trailing spaces.
@@ -75,6 +75,15 @@ if (!"".trim) {
 		while (this.charCodeAt(--end) < 33);
 		while (++start < end && this.charCodeAt(start) < 33);
 		return this.slice(start, end + 1);
+	};
+}
+
+///Add JSON support for Opera and Mozilla 3.0-/WebKit 528-/IE 7-.
+if (!JSON) {
+	var JSON = {stringify:function(mixed_val)
+		{
+			
+		}
 	};
 }
 
@@ -116,7 +125,8 @@ function prepare_new_search()
 		last_type = VERSE_LOOKUP;
 		bottom_verse = verse_id - 1; /// NOTE: Subtract 1 because run_search() adds one.
 	} else {
-		last_type = SEARCH;
+		var search_type_array = determine_search_type(last_search_prepared);
+		last_type = search_type_array[0];
 		last_search_encoded = encodeURIComponent(last_search_prepared);
 		bottom_verse = 0;
 	}
@@ -251,7 +261,7 @@ function handle_new_verses(res)
 		
 		infoBar.innerHTML = "";
 		
-		if (return_type == SEARCH) {
+		if (return_type != VERSE_LOOKUP) {
 			/// Create the inital text.
 			infoBar.appendChild(doc.createTextNode(format_number(total) + lang["found_" + (total == 1 ? "singular" : "plural")]));
 			/// Create a <b> for the search terms.
@@ -269,8 +279,8 @@ function handle_new_verses(res)
 /**
  * Writes new verses to page.
  *
- * @example write_verses(SEARCH, ADDITIONAL, [1001001], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning...</b>"]);
- * @param return_type (integer) The type of query: SEARCH || VERSE_LOOKUP.
+ * @example write_verses(VERSE_LOOKUP, ADDITIONAL, [1001001], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning...</b>"]);
+ * @param return_type (integer) The type of query: VERSE_LOOKUP || MIXED_SEARCH || STANDARD_SEARCH || MORPHOLOGICAL_SEARCH.
  * @param direction (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS. 
  * @param verse_ids (array) An array of integers representing Bible verse references.
  * @param verse_HTML (array) An array of strings containing verses in HTML.
@@ -289,22 +299,7 @@ function write_verses(return_type, direction, verse_ids, verse_HTML)
 		c = ((num - v) % 1000000) / 1000; /// Calculate the chapter.
 		b = (num - v - c * 1000) / 1000000; /// Calculate the book by number (e.g., Genesis == 1).
 		
-		if (return_type == SEARCH) {
-			/// Fix Psalm titles.
-			if (v == 0) v = lang.title;
-			
-			if (b != last_book) { /// Only display the book if it is different from the last verse.
-				last_book = b;
-				HTML_str += "<h1 class=book id=" + num + "_title>" + books_short[b] + "</h1>"; /// Convert the book number to text.
-			}
-			verse_str = verse_HTML[i];
-			HTML_str += "<div class=search_verse id=" + num + "_search>" + c + ":" + v + " " + verse_str + "</div>";
-			
-			///TODO: Determine if it would be better to put this in an array and send it all at once, preferably without the implied eval().
-			/// Highlight the verse after 100 miliseconds.
-			/// The delay is so that the verse is displayed as quickly as possible.
-			setTimeout("highlight_results(\"" + verse_str + "\")", 100);
-		} else { /// VERSE_LOOKUP
+		if (return_type == VERSE_LOOKUP) {
 			if (v < 2) { /// I.e., 1 or 0 (title).
 				if (c == 1) {
 					HTML_str += "<div class=book id=" + num + "_title>" + books_long_pretitle[b] + "<h1>" + books_long_main[b] + "</h1>" + books_long_posttitle[b] + "</div>";
@@ -325,6 +320,21 @@ function write_verses(return_type, direction, verse_ids, verse_HTML)
 			} else {
 				HTML_str += "<div class=verse id=" + num + "_verse>" + v + " " + verse_HTML[i] + "</div>";
 			}
+		} else { /// Searching
+			/// Fix Psalm titles.
+			if (v == 0) v = lang.title;
+			
+			if (b != last_book) { /// Only display the book if it is different from the last verse.
+				last_book = b;
+				HTML_str += "<h1 class=book id=" + num + "_title>" + books_short[b] + "</h1>"; /// Convert the book number to text.
+			}
+			verse_str = verse_HTML[i];
+			HTML_str += "<div class=search_verse id=" + num + "_search>" + c + ":" + v + " " + verse_str + "</div>";
+			
+			///TODO: Determine if it would be better to put this in an array and send it all at once, preferably without the implied eval().
+			/// Highlight the verse after 100 miliseconds.
+			/// The delay is so that the verse is displayed as quickly as possible.
+			setTimeout("highlight_results(\"" + verse_str + "\")", 100);
 		}
 	}
 	
@@ -905,10 +915,10 @@ function find_current_range()
 	
 	var new_title;
 	/// last_type set in prepare_new_search().
-	if (last_type == SEARCH) {
-		new_title = last_search +  " (" + ref_range + ") - " + lang.page_title;
-	} else {
+	if (last_type == VERSE_LOOKUP) {
 		new_title = ref_range + " - " + lang.page_title;
+	} else {
+		new_title = last_search +  " (" + ref_range + ") - " + lang.page_title;
 	}
 	///FIXME: Display the verse range properly.
 	if (doc.title != new_title) {

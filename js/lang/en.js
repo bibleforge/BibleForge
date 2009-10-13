@@ -546,11 +546,39 @@ function prepare_search(search_terms)
 }
 
 
+/**
+ * Figure out what type of search is being attempted by the user.
+ *
+ * @example determine_search_type("love AS NOUN"); /// Returns [MORPHOLOGICAL_SEARCH, '["love\", \"NOUN\"]"]
+ * @example determine_search_type("God & love"); /// Returns [STANDARD_SEARCH]
+ * //@example determine_search_type("love AS NOUN & more | less -good AS ADJECTIVE"); /// Returns [MORPHOLOGICAL_SEARCH, [0, "love", "NOUN"], STANDARD_SEARCH, "& more | less -good", MORPHOLOGICAL_SEARCH, [0, "good", "ADJECTIVE"]]
+ * @param search_terms (string) The prepared terms to be examined.
+ * @note Called by run_search() in js/main.js.
+ * @note Only a partial implamentation currently.  Mixed searching is lacking.
+ */
 function determine_search_type(search_terms)
 {
-	if (search_terms.indexOf(' AS ') != -1) {
-	
-	} else {
-	
+	if (search_terms.indexOf(" AS ") != -1) {
+		//var split_terms = search_terms.split(/(-?)([^&|\s]+) AS ([A-Z]+)(\s[&|-])?/);
+		var split_terms = search_terms.split(/^(.+) AS ([A-Z]+)$/);
+		return [MORPHOLOGICAL_SEARCH, '["' + split_terms[1] + "," + split_terms[2] + "]"]
+		/*
+		var count = split_terms.length;
+		var search_type = MORPHOLOGICAL_SEARCH;
+		var search_array = [], search_array_count = 0;
+		
+		for (var i = 0; i < count; ++i) {
+			if (split_terms[i] == "-" || split_terms[i] == "") {
+				search_array[search_array_count++] = MORPHOLOGICAL_SEARCH;
+				search_array[search_array_count++] = [split_terms[i], split_terms[++i]];
+				
+			} else {
+				search_type = MIXED_SEARCH;
+			}
+		}
+		alert(split_terms + count);
+		return [];
+		*/
 	}
+	return [STANDARD_SEARCH];
 }
