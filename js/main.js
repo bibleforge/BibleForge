@@ -9,7 +9,7 @@
 /*****************************
  * Declare global constants. *
  *****************************/
- 
+
 ///NOTE: Should be "const" instead of "var," but IE doesn't support constants yet.
 var VERSE_LOOKUP = 1, MIXED_SEARCH = 2, STANDARD_SEARCH = 3, MORPHOLOGICAL_SEARCH = 4, ADDITIONAL = 1, PREVIOUS = 2;
 
@@ -21,9 +21,9 @@ var VERSE_LOOKUP = 1, MIXED_SEARCH = 2, STANDARD_SEARCH = 3, MORPHOLOGICAL_SEARC
 var doc = document, win = window, doc_docEl = doc.documentElement;
 
 /// DOM Objects
-var q_obj   = doc.getElementById("q"); /// The search input box object
-var page    = doc.getElementById("page"); /// The results div
-var infoBar = doc.getElementById("infoBar");
+var q_obj        = doc.getElementById("q"); /// The search input box object
+var page         = doc.getElementById("page"); /// The results div
+var infoBar      = doc.getElementById("infoBar");
 var topLoader    = doc.getElementById("topLoader");
 var bottomLoader = doc.getElementById("bottomLoader");
 
@@ -31,7 +31,7 @@ var highlight_re = []; /// Highlighter regex array
 var last_search  = "", last_search_encoded = ""; /// A cache of the last search query
 var last_type; /// The type of lookup performed last (VERSE_LOOKUP || MIXED_SEARCH || STANDARD_SEARCH || MORPHOLOGICAL_SEARCH)
 var waiting_for_first_search = false;
-var last_book = 0; /// The number of the last book of the Bible that was returned
+var last_book       =  0; /// The number of the last book of the Bible that was returned
 var highlight_limit = 20; /// Currently, we limit the unique number of search words to highlight.
 
 ///NOTE: window.XMLHttpRequest for Mozilla/KHTML/Opera/IE7+
@@ -47,7 +47,7 @@ var scroll_pos = 0, scroll_check_count = 0;
 var checking_excess_content_top = false, checking_excess_content_bottom = false;
 var remove_content_top_interval, remove_content_bottom_interval;
 var buffer_add = 1000, buffer_rem = 10000;
-var cached_verses_top = [], cached_count_top = 0;
+var cached_verses_top    = [], cached_count_top    = 0;
 var cached_verses_bottom = [], cached_count_bottom = 0;
 var scroll_maxed_top = true, scroll_maxed_bottom = false;
 var lookup_speed_scrolling = 50, lookup_speed_sitting = 100, lookup_delay = 200, remove_speed = 3000, look_up_range_speed = 300; /// In miliseconds
@@ -78,14 +78,63 @@ if (!"".trim) {
 	};
 }
 
-///Add JSON support for Opera and Mozilla 3.0-/WebKit 528-/IE 7-.
-if (!JSON) {
-	var JSON = {stringify:function(mixed_val)
-		{
-			
+/**
+ * Make split() work correctly on IE.
+ *
+ * @param s (regexp || string) The regular expresion or string with which to break the string.
+ * @param limit (int) The number of times to split the string.
+ * @return Returns an array of the string now broken into pieces.
+ * @see http://blog.stevenlevithan.com/archives/cross-browser-split.
+ */
+///NOTE: The following conditional compilation code block only executes on IE.
+/*@cc_on
+String.prototype._$$split = String.prototype._$$split || String.prototype.split;
+String.prototype.split = function (s, limit)
+{
+	if (!(s instanceof RegExp)) return String.prototype._$$split.apply(this, arguments);
+	var	flags = (s.global ? "g" : "") + (s.ignoreCase ? "i" : "") + (s.multiline ? "m" : ""), s2 = new RegExp("^" + s.source + "$", flags), output = [], origLastIndex = s.lastIndex, lastLastIndex = 0, i = 0, match, lastLength;
+	if (limit === undefined || +limit < 0) {
+		limit = false;
+	} else {
+		limit = Math.floor(+limit);
+		if (!limit) return [];
+	}
+	if (s.global) {
+		s.lastIndex = 0;
+	} else {
+		s = new RegExp(s.source, "g" + flags);
+	}
+	while ((!limit || i++ <= limit) && (match = s.exec(this))) {
+		var emptyMatch = !match[0].length;
+		if (emptyMatch && s.lastIndex > match.index) {
+			--s.lastIndex;
 		}
-	};
-}
+		if (s.lastIndex > lastLastIndex) {
+			if (match.length > 1) {
+				match[0].replace(s2, function()
+				{
+					for (var j = 1; j < arguments.length - 2; j++) {
+						if (arguments[j] === undefined) {
+							match[j] = undefined;
+						}
+					}
+				});
+			}
+			
+			output = output.concat(this.slice(lastLastIndex, match.index));
+			if (1 < match.length && match.index < this.length) {
+				output = output.concat(match.slice(1));
+			}
+			lastLength = match[0].length;
+			lastLastIndex = s.lastIndex;
+		}
+		if (emptyMatch)	++s.lastIndex;
+	}
+	output = lastLastIndex === this.length ? (s.test("") && !lastLength ? output : output.concat("")) : (limit ? output : output.concat(this.slice(lastLastIndex)));
+	s.lastIndex = origLastIndex;
+	return output;
+};
+@*/
 
 
 /*****************************
@@ -127,6 +176,9 @@ function prepare_new_search()
 	} else {
 		var search_type_array = determine_search_type(last_search_prepared);
 		last_type = search_type_array[0];
+		if (last_type == MORPHOLOGICAL_SEARCH) {
+			last_search_prepared = search_type_array[1];
+		}
 		last_search_encoded = encodeURIComponent(last_search_prepared);
 		bottom_verse = 0;
 	}
@@ -281,7 +333,7 @@ function handle_new_verses(res)
  *
  * @example write_verses(VERSE_LOOKUP, ADDITIONAL, [1001001], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning...</b>"]);
  * @param return_type (integer) The type of query: VERSE_LOOKUP || MIXED_SEARCH || STANDARD_SEARCH || MORPHOLOGICAL_SEARCH.
- * @param direction (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS. 
+ * @param direction (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
  * @param verse_ids (array) An array of integers representing Bible verse references.
  * @param verse_HTML (array) An array of strings containing verses in HTML.
  * @return NULL.  Writes HTML to the page.
@@ -449,7 +501,7 @@ function filter_array(arr)
 				/// Lastly, remove puncuation.
 				//tmp_arr2[count++] = val.split(/["',.?!;:&|\)\(\]\[]/).join("");		
 				///NOTE: Use this to filter correctly "one two"~3 || "one two" \ 4
-				///      val = val.split(/"\s*[~\\]\s*[0-9]+/i).join(""); 
+				///      val = val.split(/"\s*[~\\]\s*[0-9]+/i).join("");
 				///TODO: At the moment, we don't allow number searches (0-9), so we simply remove all numbers too for now.
 				///TODO: We don't want to filter out Greek and Hebrew characters.
 				///      Could do something like [^-\w], but that would filter Hebrew vowels and maybe other characters.
@@ -562,8 +614,6 @@ function prepare_highlighter(search_terms)
 		}
 		
 		stemmed_arr[count] = stemmed_word;
-		
-		//document.title=stemmed_word; /// Debugging: display last stemmed word.
 		
 		///NOTE: [<-] finds either the beginning of the close tag (</b>) or a hyphen (-).
 		///      The hyphen is to highlight hyphenated words that would otherwise be missed (matching first word only) (i.e., "Beth").
@@ -1067,67 +1117,3 @@ function interpret_result(message)
 /*************************
  * End of AJAX functions *
  *************************/
-
-
-/**************************************
- * Start of IE compatiblity functions *
- **************************************/
-
-///NOTE: Conditional compilation code block only executes on IE.
-/// Make split() work correctly on IE.
-/// See http://blog.stevenlevithan.com/archives/cross-browser-split.
-/*@cc_on
-String.prototype._$$split = String.prototype._$$split || String.prototype.split;
-
-String.prototype.split = function (s, limit) {
-	if (!(s instanceof RegExp)) return String.prototype._$$split.apply(this, arguments);
-	var	flags = (s.global ? "g" : "") + (s.ignoreCase ? "i" : "") + (s.multiline ? "m" : ""),
-		s2 = new RegExp("^" + s.source + "$", flags),
-		output = [],
-		origLastIndex = s.lastIndex,
-		lastLastIndex = 0,
-		i = 0, match, lastLength;
-	if (limit === undefined || +limit < 0) {
-		limit = false;
-	} else {
-		limit = Math.floor(+limit);
-		if (!limit) return [];
-	}
-	if (s.global)
-		s.lastIndex = 0;
-	else
-		s = new RegExp(s.source, "g" + flags);
-	while ((!limit || i++ <= limit) && (match = s.exec(this))) {
-		var emptyMatch = !match[0].length;
-		if (emptyMatch && s.lastIndex > match.index)
-			--s.lastIndex;
-		if (s.lastIndex > lastLastIndex) {
-			if (match.length > 1) {
-				match[0].replace(s2, function ()
-				{
-					for (var j = 1; j < arguments.length - 2; j++) {
-						if (arguments[j] === undefined)
-							match[j] = undefined;
-					}
-				});
-			}
-
-			output = output.concat(this.slice(lastLastIndex, match.index));
-			if (1 < match.length && match.index < this.length)
-				output = output.concat(match.slice(1));
-			lastLength = match[0].length;
-			lastLastIndex = s.lastIndex;
-		}
-		if (emptyMatch)	++s.lastIndex;
-	}
-	output = lastLastIndex === this.length ?
-		(s.test("") && !lastLength ? output : output.concat("")) :
-		(limit ? output : output.concat(this.slice(lastLastIndex)));
-	s.lastIndex = origLastIndex;
-	return output;
-};
-@*/
-
-/************************************
- * End of IE compatiblity functions *
- ************************************/
