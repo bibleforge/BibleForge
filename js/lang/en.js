@@ -63,10 +63,10 @@ function stem_word(w)
 	}
 	
 	/// Step 1b
-	/// "Present-day" English: re = /^(.+?)eed$/; 
+	/// "Present-day" English: re = /^(.+?)eed$/;
 	re = /^(.+?)ee$/; /// Early Modern English fix
 	
-	/// "Present-day" English: re2 = /^(.+?)(ingly|edly|ed|ing|ly)$/; 
+	/// "Present-day" English: re2 = /^(.+?)(ingly|edly|ed|ing|ly)$/;
 	re2 = /^(.+?)(ing(?:ly)?|ed(?:ly)?|ly|e(?:st|th))$/; /// Early Modern English fix
 	
 	if (re.test(w)) {
@@ -560,8 +560,8 @@ function determine_search_type(search_terms)
 {
 	if (search_terms.indexOf(" AS ") != -1) {
 		//var split_terms = search_terms.split(/(-?)([^&|\s]+) AS ([A-Z]+)(\s[&|-])?/);
-		var split_terms = search_terms.split(/^(.+) AS ([A-Z]+)$/);
-		return [MORPHOLOGICAL_SEARCH, '["' + split_terms[1] + "," + split_terms[2] + "]"]
+		var split_terms = search_terms.split(/^([a-zA-Z,.?!;:']+) AS ([A-Z]+)$/);
+		return [MORPHOLOGICAL_SEARCH, '["' + split_terms[1].replace(/(")/g, "\\$1") + '","' + split_terms[2].replace(/(")/g, "\\$1") + '"]']
 		/*
 		var count = split_terms.length;
 		var search_type = MORPHOLOGICAL_SEARCH;
