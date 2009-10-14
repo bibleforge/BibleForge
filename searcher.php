@@ -97,8 +97,8 @@ run_search($query, $type, $direction, $start_id);
  * @example run_search(40000101, VERSE_LOOKUP, PREVIOUS);
  * @example run_search("love", STANDARD_SEARCH, ADDITIONAL, 40000101);
  * @example run_search("God & love", STANDARD_SEARCH, ADDITIONAL);
- * @example run_search('["love","NOUN"]', MORPHOLOGICAL_SEARCH, ADDITIONAL);
- * @param $query (string) The input to be searched for.
+ * @example run_search('["love", "NOUN", 0]', MORPHOLOGICAL_SEARCH, ADDITIONAL);
+ * @param $query (string) The input to be searched for or a JSON strinigied array for advanced searching.
  * @param $type (integer) The type of query: SEARCH || VERSE_LOOKUP.
  * @param $direction (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
  * @param $start_id (integer) (optional) The verse_id from whence to start.
@@ -114,8 +114,9 @@ function run_search($query, $type, $direction, $start_id = 0)
 		/// $query example: love OR God & love OR this -that OR "in the beginning"
 		standard_search($query, $direction, $start_id);
 	} else { /// MORPHOLOGICAL_SEARCH
-		/// $query ex: '["love","NOUN"]' OR '["go","IMPERITIVE"]'
-		morphology_search($query_array[0], $query_array[1], $direction, $start_id);
+		/// $query ex: '["love","NOUN"]' OR '["go","IMPERITIVE",1]'
+		$query_array = json_decode($query);
+		morphology_search($query_array[0], $query_array[1], ($query_array[2] == 1), $direction, $start_id);
 	}
 }
 
@@ -264,14 +265,16 @@ function standard_search($query, $direction, $start_id = 0)
 /**
  * Perform a morphological Sphinx-based search.
  *
- * @example morphology_search($query, $direction, $start_id);
- * @param $query (string) The query to be searched for.
+ * @example morphology_search("love", "NOUN", 0, ADDITIONAL, 0);
+ * @param $word (string) The word to be searched for.
+ * @param $morphology (string) The morphological feature to be considered.
+ * @param $exclude (boolean) Whether or not to exclude results matching the morphological feature.
  * @param $direction (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
  * @param $start_id (integer) (optional) The verse_id whence to start.
  * @return NULL.  Data is sent to the buffer as a JSON array, and then execution ends.
  * @note Called by run_search().
  */
-function morphology_search($query, $direction, $start_id = 0)
+function morphology_search($word, $morphology, $exclude, $direction, $start_id = 0)
 {
 	require_once 'config.php';
 	
@@ -283,34 +286,20 @@ function morphology_search($query, $direction, $start_id = 0)
 	
 	if ($start_id > 0) $cl->SetIDRange($start_id, 0); /// SetIDRange(start_id, stop_id (0 means no limit))
 	
-	/// Determine the search mode.
-	/// Default is SPH_MATCH_ALL (i.e., all words are required: word1 & word2).
-	/// SPH_MATCH_ALL should be the fastest and needs no sorting.
-	
-	/// Is there more than one word?
-	if (strpos($query, ' ') !== false) {		
-		if (strpos($query, '"') !== false || substr_count($query, ' ') > 9) {
-			///NOTE: Could use the more accurate (preg_match('/([a-z-]+[^a-z-]+){11}/i', $query) == 1) to find word count, but it is slower.
-			/// There are more than 10 search terms in the query or the query contains double quotes (").
-			/// By default, other modes stop at 10, but SPH_MATCH_EXTENDED does more (256?).
-			/// Phrases (words in quotes) require SPH_MATCH_EXTENDED mode.
-			///NOTE: SPH_MATCH_BOOLEAN is supposed to find more than 10 words too but doesn't seem to.
-			$cl->SetMatchMode(SPH_MATCH_EXTENDED); /// Most complex (and slowest?).
-			$cl->SetSortMode(SPH_SORT_EXTENDED, '@id ASC'); /// Order BY id.
-		} elseif (strpos($query, '&') !== false || strpos($query, '|') !== false || strpos($query, ' -') !== false || substr($query, 0, 1) == '-') {
-			/// Boolean opperators found.
-			$cl->SetMatchMode(SPH_MATCH_BOOLEAN);
-			$cl->SetSortMode(SPH_SORT_EXTENDED, '@id ASC'); /// Order BY id.
-		} else {
-			/// Multiple words are being searched for but nothing else special.
-			$cl->SetSortMode(SPH_SORT_EXTENDED, '@id ASC'); /// Order BY id.
-		}
-	}
-	
 	$cl->SetRankingMode(SPH_RANK_NONE); /// No ranking, fastest
 	
+	$values = array();
+	
+	if ($morphology == "NOUN") {
+		$attribute = "part_of_speech";
+		$values[] = "1";
+	}
+	
+	$cl->SetFilter($attribute, $values, $exclude);
+	
+	
 	/// Run Sphinx search.
-	$sphinx_res = $cl->Query($query, 'verse_text');
+	$sphinx_res = $cl->Query($word, 'morphological');
 	
 	/// If no results found were found, send an empty JSON result.
 	if ($sphinx_res['simple-matches'] == "") {

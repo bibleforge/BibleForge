@@ -193,6 +193,15 @@ class SphinxClient
 		$this->_ranker = $ranker;
 	}
 	
+	/// set values set filter
+	/// only match records where $attribute value is in given set
+	function SetFilter($attribute, $values, $exclude = false)
+	{
+		if (is_array($values) && count($values)) {
+			$this->_filters[] = array("type" => SPH_FILTER_VALUES, "attr" => $attribute, "exclude" => $exclude, "values" => $values);
+		}
+	}
+	
 	function Query($query, $index = "*", $comment = "")
 	{
 		$extra_regex = "";
@@ -200,6 +209,12 @@ class SphinxClient
 		$options = " -q";
 		$options .= " -l " . $this->_limit;
 		$options .= ' -s "@id ASC"';
+		
+		if (isset($this->_filters) && is_array($this->_filters)) {
+			foreach ($this->_filters as $values) {
+				$options .= ' -f ' . $values['attr'] . ' ' . $values['values'][0];
+			}
+		}
 		
 		if ($this->_mode == SPH_MATCH_ANY) {
 			$options .= " -a";
