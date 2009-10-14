@@ -549,7 +549,8 @@ function prepare_search(search_terms)
 /**
  * Figure out what type of search is being attempted by the user.
  *
- * @example determine_search_type("love AS NOUN"); /// Returns [MORPHOLOGICAL_SEARCH, '["love\", \"NOUN\"]"]
+ * @example determine_search_type("love AS NOUN"); /// Returns [MORPHOLOGICAL_SEARCH, '["love\", \"NOUN\", 0]"]
+ * @example determine_search_type("go -AS IMPERITIVE"); /// Returns [MORPHOLOGICAL_SEARCH, '["love\", \"NOUN\", 1]"]
  * @example determine_search_type("God & love"); /// Returns [STANDARD_SEARCH]
  * //@example determine_search_type("love AS NOUN & more | less -good AS ADJECTIVE"); /// Returns [MORPHOLOGICAL_SEARCH, [0, "love", "NOUN"], STANDARD_SEARCH, "& more | less -good", MORPHOLOGICAL_SEARCH, [0, "good", "ADJECTIVE"]]
  * @param search_terms (string) The prepared terms to be examined.
@@ -558,10 +559,11 @@ function prepare_search(search_terms)
  */
 function determine_search_type(search_terms)
 {
-	if (search_terms.indexOf(" AS ") != -1) {
+	///NOTE: "-AS" may have originally been "NOT AS" before it was sent to prepare_search().
+	if (search_terms.indexOf(" AS ") != -1 || search_terms.indexOf(" -AS ") != -1) {
 		//var split_terms = search_terms.split(/(-?)([^&|\s]+) AS ([A-Z]+)(\s[&|-])?/);
-		var split_terms = search_terms.split(/^([a-zA-Z,.?!;:']+) AS ([A-Z]+)$/);
-		return [MORPHOLOGICAL_SEARCH, '["' + split_terms[1].replace(/(")/g, "\\$1") + '","' + split_terms[2].replace(/(")/g, "\\$1") + '"]']
+		var split_terms = search_terms.split(/^([a-zA-Z,.?!;:']+) (-)?AS ([A-Z]+)$/);
+		return [MORPHOLOGICAL_SEARCH, '["' + split_terms[1].replace(/(")/g, "\\$1") + '","' + split_terms[3].replace(/(")/g, "\\$1") + '",' + (split_terms[2] == "-" ? 1 : 0) + "]"]
 		/*
 		var count = split_terms.length;
 		var search_type = MORPHOLOGICAL_SEARCH;
