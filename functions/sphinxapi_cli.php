@@ -193,6 +193,15 @@ class SphinxClient
 		$this->_ranker = $ranker;
 	}
 	
+	/// set values set filter
+	/// only match records where $attribute value is in given set
+	function SetFilter($attribute, $values, $exclude = false)
+	{
+		if (is_array($values) && count($values)) {
+			$this->_filters[] = array("type" => SPH_FILTER_VALUES, "attr" => $attribute, "exclude" => $exclude, "values" => $values);
+		}
+	}
+	
 	function Query($query, $index = "*", $comment = "")
 	{
 		$extra_regex = "";
@@ -201,6 +210,12 @@ class SphinxClient
 		$options .= " -l " . $this->_limit;
 		$options .= ' -s "@id ASC"';
 		
+		if (isset($this->_filters) && is_array($this->_filters)) {
+			foreach ($this->_filters as $values) {
+				$options .= ' -f ' . $values['attr'] . ' ' . $values['values'][0];
+			}
+		}
+		
 		if ($this->_mode == SPH_MATCH_ANY) {
 			$options .= " -a";
 		} elseif ($this->_mode == SPH_MATCH_PHRASE) {
@@ -208,7 +223,7 @@ class SphinxClient
 		} elseif ($this->_mode == SPH_MATCH_BOOLEAN) {
 			$options .= " -b";
 		} elseif ($this->_mode == SPH_MATCH_EXTENDED) {
-			$options .= " -e";
+			$options .= " -e"; ///NOTE: It may be better to use -e2.
 		} elseif ($this->_mode == SPH_MATCH_EXTENDED2) {
 			$options .= " -e2";
 		}
@@ -229,9 +244,11 @@ class SphinxClient
 			
 		}
 		
-		$cmd = $this->_path . $options . " -c " . $this->_config . " -i " . $index . " " . escapeshellarg($query);
+		///TODO: Does this work in Linux?
+		$cmd = $this->_path . $options . " -c " . $this->_config . " -i " . $index . ' "' . str_replace('"', '\"', $query) . '"';
 		
 		$res = shell_exec($cmd);
+		
 		preg_match_all('/^(\d+)\. document=(\d+)' . $extra_regex . '/im', $res, $matches);
 		preg_match_all('/^\d+\. \'([^\']+)\': (\d+) documents, (\d+) /im', $res, $hits);
 		preg_match('/matches of (\d+) total in ([0-9.]+) sec/im', $res, $stats);
@@ -244,7 +261,7 @@ class SphinxClient
 		print_r($stats);
 		echo $res;
 		*/
-		return array('simple-matches' => implode(',', $matches[2]), 'total_found' => $stats[1], 'time' => $stats[2]);
+		return array('error' => "", 'warning' => "", 'simple-matches' => implode(',', $matches[2]), 'total_found' => $stats[1], 'time' => $stats[2]);
 	}
 }
 

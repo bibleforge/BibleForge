@@ -231,8 +231,7 @@ function simple_search($query, $direction, $start_id = 0)
 	$cl->SetRankingMode(SPH_RANK_NONE); /// No ranking, fastest
 	
 	/// Run Sphinx search.
-	///TODO: Change test1 to something permanent.
-	$sphinx_res = $cl->Query($query, 'test1');
+	$sphinx_res = $cl->Query($query, 'verse_text');
 	
 	/// If no results found were found, send an empty JSON result.
 	if ($sphinx_res['simple-matches'] == "") {
