@@ -233,19 +233,20 @@ function standard_search($query, $direction, $start_id = 0)
 	
 	/// Run Sphinx search.
 	$sphinx_res = $cl->Query($query, 'verse_text');
-	$sphinx_res['simple-matches'] = implode(',', array_keys($sphinx_res['matches']));
 	
 	/// If no results found were found, send an empty JSON result.
-	if ($sphinx_res['simple-matches'] == "") {
+	if (count($sphinx_res['matches']) == 0) {
 		echo '[[', STANDARD_SEARCH, ',', $direction, '],[],[],[0]]';
 		die();
 	}
+	
+	$simple_matches = implode(',', array_keys($sphinx_res['matches']));
 	
 	/// Get verses from the MySQL database.
 	require_once 'functions/database.php';
 	connect_to_database();
 	
-	$SQL_query = 'SELECT words FROM ' . bible_verses . ' WHERE id IN (' . $sphinx_res['simple-matches'] . ')';
+	$SQL_query = 'SELECT words FROM ' . bible_verses . ' WHERE id IN (' . $simple_matches . ')';
 	$SQL_res = mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
 	
 	/// Convert SQL results into one comma deliniated string.
@@ -258,7 +259,7 @@ function standard_search($query, $direction, $start_id = 0)
 	/// Array Format: [[action],[verse_ids,...],[verse_words,...],[number_of_matches]]
 	///NOTE: JSON should ignore trailing commas.
 	///TODO: It would be nice to indicate if there are no more verses to find when it gets to the end.
-	echo '[[', STANDARD_SEARCH, ',', $direction, '],[', $sphinx_res['simple-matches'], '],[', $verses_str, '],[', $sphinx_res['total_found'], ']]';
+	echo '[[', STANDARD_SEARCH, ',', $direction, '],[', $simple_matches, '],[', $verses_str, '],[', $sphinx_res['total_found'], ']]';
 	die();
 }
 
@@ -304,25 +305,26 @@ function morphology_search($word, $morphology, $exclude, $direction, $start_id =
 	/// Run Sphinx search.
 	$sphinx_res = $cl->Query($word, 'morphological');
 	
-	///FIXME: Find a better way to see if no results have been returned.
-	$word_ids = implode(',', array_keys($sphinx_res['matches']));
-	$sphinx_res['simple-matches'] = "";
-	foreach ($sphinx_res['matches'] as $value) {
-		$sphinx_res['simple-matches'] .= "," . $value['attrs']['verseid'];
-	}
-	$sphinx_res['simple-matches'] = substr($sphinx_res['simple-matches'], 1);
-	
 	/// If no results found were found, send an empty JSON result.
-	if ($sphinx_res['simple-matches'] == "") {
+	if (count($sphinx_res['matches']) == 0) {
 		echo '[[', MORPHOLOGICAL_SEARCH, ',', $direction, '],[],[],[0]]';
 		die();
 	}
 	
+	$verseid_arr = array();
+	foreach ($sphinx_res['matches'] as $value) {
+		$verseid_arr[] = $value['attrs']['verseid'];
+	}
+	
+	$simple_matches = implode(',', array_unique($verseid_arr));
+	
+	$word_ids = implode(',', array_keys($sphinx_res['matches']));
+		
 	/// Get verses from the MySQL database.
 	require_once 'functions/database.php';
 	connect_to_database();
 	
-	$SQL_query = 'SELECT words FROM ' . bible_verses . ' WHERE id IN (' . $sphinx_res['simple-matches'] . ')';
+	$SQL_query = 'SELECT words FROM ' . bible_verses . ' WHERE id IN (' . $simple_matches . ')';
 	$SQL_res = mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
 	
 	/// Convert SQL results into one comma deliniated string.
@@ -335,7 +337,7 @@ function morphology_search($word, $morphology, $exclude, $direction, $start_id =
 	/// Array Format: [[action],[verse_ids,...],[verse_words,...],[number_of_matches]]
 	///NOTE: JSON should ignore trailing commas.
 	///TODO: It would be nice to indicate if there are no more verses to find when it gets to the end.
-	echo '[[', MORPHOLOGICAL_SEARCH, ',', $direction, '],[', $sphinx_res['simple-matches'], '],[', $verses_str, '],[', $sphinx_res['total_found'], ']]';
+	echo '[[', MORPHOLOGICAL_SEARCH, ',', $direction, '],[', $simple_matches, '],[', $verses_str, '],[', $sphinx_res['total_found'], '],[', $word_ids ,']]';
 	die();
 }
 

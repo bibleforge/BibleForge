@@ -194,7 +194,8 @@ function prepare_new_search()
 		scroll_maxed_bottom = false;
 		/// We immediately prepare the highlighter so that when the results are returned via AJAX
 		/// the highlighter array will be ready to go.
-		if (raw_search_terms != last_search) { /// Already have the regex array?
+		/// Do we already have the regex array or do we not need because the highlighted words will be returned (morphological searching)?
+		if (raw_search_terms != last_search && last_type != MORPHOLOGICAL_SEARCH) {
 			prepare_highlighter(last_search_prepared);
 			last_search = raw_search_terms;
 		}
@@ -452,7 +453,7 @@ function clean_up_page() {
  * @example highlight_results("<b id=1>In</b> <b id=2>the</b> <b id=3>beginning...</b>");
  * @param search_str (string) The HTML to examine and highlight.
  * @return NULL.  Modifies objects className.
- * @note Called by write_search() via setTimeout() with a short delay.
+ * @note Called by write_verses() via setTimeout() with a short delay.
  */
 function highlight_results(search_str)
 {	
@@ -1110,7 +1111,7 @@ function interpret_result(message)
 	var res = eval(message);
 	
 	/// New search results.
-	//if (res[0] == 1) write_search(res); ///FIXME: Right now, there is only one command.
+	//if (res[0] == 1) handle_new_verses(res); ///FIXME: Right now, there is only one command.
 	handle_new_verses(res);
 }
 
