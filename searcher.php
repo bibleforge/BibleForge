@@ -291,12 +291,12 @@ function morphology_search($word, $morphology, $exclude, $direction, $start_id =
 	
 	$values = array();
 	
-	if ($morphology == "NOUN") {
-		$attribute = "part_of_speech";
-		$values[] = "1";
-	} elseif ($morphology == "VERB") {
-		$attribute = "part_of_speech";
-		$values[] = "2";
+	if ($morphology == 'NOUN') {
+		$attribute = 'part_of_speech';
+		$values[] = '1';
+	} elseif ($morphology == 'VERB') {
+		$attribute = 'part_of_speech';
+		$values[] = '2';
 	}
 	
 	$cl->SetFilter($attribute, $values, $exclude);

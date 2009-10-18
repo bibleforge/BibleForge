@@ -201,6 +201,7 @@ class SphinxClient
 		}
 	}
 	
+	/// execute the "search" executable, run the given query through the given indices, and return the result
 	function Query($query, $index = '*', $comment = "")
 	{
 		$extra_regex = "";
