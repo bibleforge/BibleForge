@@ -233,6 +233,7 @@ function standard_search($query, $direction, $start_id = 0)
 	
 	/// Run Sphinx search.
 	$sphinx_res = $cl->Query($query, 'verse_text');
+	$sphinx_res['simple-matches'] = implode(',', array_keys($sphinx_res['matches']));
 	
 	/// If no results found were found, send an empty JSON result.
 	if ($sphinx_res['simple-matches'] == "") {
@@ -293,13 +294,23 @@ function morphology_search($word, $morphology, $exclude, $direction, $start_id =
 	if ($morphology == "NOUN") {
 		$attribute = "part_of_speech";
 		$values[] = "1";
+	} elseif ($morphology == "VERB") {
+		$attribute = "part_of_speech";
+		$values[] = "2";
 	}
 	
 	$cl->SetFilter($attribute, $values, $exclude);
 	
-	
 	/// Run Sphinx search.
 	$sphinx_res = $cl->Query($word, 'morphological');
+	
+	///FIXME: Find a better way to see if no results have been returned.
+	$word_ids = implode(',', array_keys($sphinx_res['matches']));
+	$sphinx_res['simple-matches'] = "";
+	foreach ($sphinx_res['matches'] as $value) {
+		$sphinx_res['simple-matches'] .= "," . $value['attrs']['verseid'];
+	}
+	$sphinx_res['simple-matches'] = substr($sphinx_res['simple-matches'], 1);
 	
 	/// If no results found were found, send an empty JSON result.
 	if ($sphinx_res['simple-matches'] == "") {
