@@ -235,7 +235,7 @@ function standard_search($query, $direction, $start_id = 0)
 	$sphinx_res = $cl->Query($query, 'verse_text');
 	
 	/// If no results found were found, send an empty JSON result.
-	if (count($sphinx_res['matches']) == 0) {
+	if ($sphinx_res['total'] == 0) {
 		echo '[[', STANDARD_SEARCH, ',', $direction, '],[],[],[0]]';
 		die();
 	}
@@ -306,7 +306,7 @@ function morphology_search($word, $morphology, $exclude, $direction, $start_id =
 	$sphinx_res = $cl->Query($word, 'morphological');
 	
 	/// If no results found were found, send an empty JSON result.
-	if (count($sphinx_res['matches']) == 0) {
+	if ($sphinx_res['total'] == 0) {
 		echo '[[', MORPHOLOGICAL_SEARCH, ',', $direction, '],[],[],[0]]';
 		die();
 	}
