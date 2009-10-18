@@ -139,7 +139,7 @@ class SphinxClient
 		
 		$this->_error		= ""; /// per-reply fields (for single-query case)
 		$this->_warning		= "";
-		$this->_reqs		= array();	/// requests storage (for multi-query case)
+		$this->_reqs		= array(); /// requests storage (for multi-query case)
 		$this->_mbenc		= "";
 		$this->_arrayresult	= false;
 		$this->_timeout		= 0;
@@ -149,7 +149,7 @@ class SphinxClient
 	/// set search path (string) and sphinx config file (string)
 	function SetServer($path, $config)
 	{
-		$this->_path = $path;
+		$this->_path   = $path;
 		$this->_config = $config;
 	}
 	
@@ -166,11 +166,13 @@ class SphinxClient
 	function SetLimits($offset, $limit, $max = 0, $cutoff = 0)
 	{
 		$this->_offset = $offset;
-		$this->_limit = $limit;
-		if ($max > 0)
+		$this->_limit  = $limit;
+		if ($max > 0) {
 			$this->_maxmatches = $max;
-		if ($cutoff > 0)
+		}
+		if ($cutoff > 0) {
 			$this->_cutoff = $cutoff;
+		}
 	}
 	
 	/// set matching mode
@@ -182,7 +184,7 @@ class SphinxClient
 	/// set matches sorting mode
 	function SetSortMode($mode, $sortby = "")
 	{
-		$this->_sort = $mode;
+		$this->_sort   = $mode;
 		$this->_sortby = $sortby;
 	}
 	
@@ -206,6 +208,7 @@ class SphinxClient
 	{
 		$extra_regex = "";
 		
+		///FIXME: The options should be applied when the according functions are called, not when Query() is called.
 		$options = ' -q';
 		$options .= ' -l ' . $this->_limit;
 		$options .= ' -s "@id ASC"';
@@ -228,40 +231,58 @@ class SphinxClient
 			$options .= ' -e2';
 		}
 		
+		///NOTE: This is an ugly way to get around the issue of the search executable not being able to set the min and max ids.
 		if ($this->_min_id > 0 || $this->_max_id > 0) {
 			$sortexpr = ' -S "';
+			///FIXME: The program should send the word ID for morphological searches, not the verse ID.
+			if ($index == 'morphological') {
+				$sort_attribute = 'verseid';
+			} else {
+				$sort_attribute = '@id';
+			}
 			if ($this->_min_id > 0) {
-				$sortexpr .= '@id >= ' . $this->_min_id;
+				$sortexpr .= $sort_attribute . ' >= ' . $this->_min_id;
 			}
 			if ($this->_max_id > 0) {
 				if ($this->_min_id > 0) {
 					$sortexpr .= ' AND ';
 				}
-				$sortexpr .= '@id <= ' . $this->_max_id;
+				$sortexpr .= $sort_attribute . ' <= ' . $this->_max_id;
 			}
 			$options .= $sortexpr . '"';
+			/// The regular expressions that parse the result should only retreive results that match the sort expression and, therefore, have a value of one. 
 			$extra_regex = ', @expr=1';
 			
 		}
 		
-		///TODO: Does this work in Linux?
+		///TODO: Determine if this work on Linux?
 		$cmd = $this->_path . $options . ' -c ' . $this->_config . ' -i ' . $index . ' "' . str_replace('"', '\"', $query) . '"';
 		
 		$res = shell_exec($cmd);
 		
 		preg_match_all('/^\d+\. \'([^\']+)\': (\d+) documents, (\d+)/im', $res, $hits);
 		preg_match('/: returned (\d+) matches of (\d+) total in ([0-9.]+)/i', $res, $stats);
+		
 		preg_match_all('/ document=.*' . $extra_regex . '/', $res, $matches);
+		/// Convert the text into valid JSON.
 		$matches = preg_filter('/ ([^=]+)=/i', '"\1":', $matches[0]);
-		$mathces_attrs = array();
-		foreach($matches as $value) {
-			$tmp_arr = json_decode('{' . $value . '}', true);
-			$doc = $tmp_arr['document'];
-			$mathces_attrs[$doc]['weight'] = $tmp_arr['weight'];
-			unset($tmp_arr['document']);
-			unset($tmp_arr['weight']);
-			$mathces_attrs[$doc]['attrs'] = $tmp_arr;
+		if (count($matches) > 0) {
+			$mathces_attrs = array();
+			foreach($matches as $value) {
+				$tmp_arr = json_decode('{' . $value . '}', true);
+				$doc = $tmp_arr['document'];
+				$mathces_attrs[$doc]['weight'] = $tmp_arr['weight'];
+				unset($tmp_arr['document']);
+				unset($tmp_arr['weight']);
+				$mathces_attrs[$doc]['attrs'] = $tmp_arr;
+			}
+		} else {
+			/// Make sure to indicate that no valid results were found (i.e., valid results must match the sort expression).
+			$stats[1] = 0;
+			$stats[2] = 0;
+			$mathces_attrs = "";
 		}
+		
 		$hits_ret = array();
 		foreach ($hits[1] as $key => $value) {
 			$hits_ret[$value] = array('docs' => $hits[2][$key], 'hits' => $hits[3][$key]);
