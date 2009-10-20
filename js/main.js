@@ -281,6 +281,22 @@ function handle_new_verses(res)
 		///FIXME: When looking up the last few verses of Revelation (i.e., Revelation 22:21), the page jumps when more content is loaded above.
 		write_verses(return_type, direction, res[1], res[2]);
 		
+		///FIXME: Highlighting needs to be in its own function where each type and mixed highlighting will be done correctly.
+		if (return_type == STANDARD_SEARCH) {
+			///TODO: Determine if it would be better to put this in an array and send it all at once, preferably without the implied eval().
+			/// Highlight the verse after 100 miliseconds.
+			/// The delay is so that the verse is displayed as quickly as possible.
+			///TODO: Determine if it is bad to convert the array to a string like this.
+			setTimeout("highlight_search_results(\"" + res[2] + "\")", 100);
+		} else if (return_type == MORPHOLOGICAL_SEARCH) {
+			var i, count = res[4].length;
+			for (i = 0; i < count; ++i) {
+				///TODO: Determine if there is a downside to having a space at the start of the className.
+				///TODO: Determine if we ever need to replace an existing f* className.
+				doc.getElementById(res[4][i]).className += " f" + 1;
+			}
+		}
+		
 		/// Indicate to the user that more content may be loading, and check for more content.
 		if (direction == ADDITIONAL && res[1][res[1].length - 1] < 66022021) {
 			bottomLoader.style.visibility = "visible";
@@ -344,21 +360,21 @@ function handle_new_verses(res)
 function write_verses(return_type, direction, verse_ids, verse_HTML)
 {
 	///NOTE: psalm_title_re determines if a psalm does not have a title.
-	var i, num, b, c, v, verse_str, HTML_str = "", chapter_text = "", psalm_title_re = /^(?:1(?:0[4-7]?|1[1-9]|3[25-7]|4[6-9]|50)?|2|33|43|71|9[13-79])$/;
+	var i, total_verses = verse_ids.length, num, b, c, v, verse_str, HTML_str = "", chapter_text = "", psalm_title_re = /^(?:1(?:0[4-7]?|1[1-9]|3[25-7]|4[6-9]|50)?|2|33|43|71|9[13-79])$/;
 	
-	for (i in verse_HTML) {
+	for (i = 0; i < total_verses; ++i) {
 		num = verse_ids[i];
 		v = num % 1000; /// Calculate the verse.
 		c = ((num - v) % 1000000) / 1000; /// Calculate the chapter.
 		b = (num - v - c * 1000) / 1000000; /// Calculate the book by number (e.g., Genesis == 1).
-		
+		///TODO: Determine if it would be better to have two for loops instead of the if statement inside of this one.
 		if (return_type == VERSE_LOOKUP) {
 			if (v < 2) { /// I.e., 1 or 0 (title).
 				if (c == 1) {
 					HTML_str += "<div class=book id=" + num + "_title>" + books_long_pretitle[b] + "<h1>" + books_long_main[b] + "</h1>" + books_long_posttitle[b] + "</div>";
 				} else if (b != 19 || v == 0 || psalm_title_re.test(c)) { /// Display chapter/psalm number (but not on verse 1 of psalms that have titles).
-					/// Psalms have a special name.
 					if (b == 19) {
+						/// Psalms have a special name.
 						chapter_text = lang.psalm;
 					} else {
 						chapter_text = lang.chapter;
@@ -377,28 +393,23 @@ function write_verses(return_type, direction, verse_ids, verse_HTML)
 			/// Fix Psalm titles.
 			if (v == 0) v = lang.title;
 			
-			if (b != last_book) { /// Only display the book if it is different from the last verse.
+			if (b != last_book) { /// Only print out the book if it is different from the last verse.
 				last_book = b;
 				HTML_str += "<h1 class=book id=" + num + "_title>" + books_short[b] + "</h1>"; /// Convert the book number to text.
 			}
 			verse_str = verse_HTML[i];
 			HTML_str += "<div class=search_verse id=" + num + "_search>" + c + ":" + v + " " + verse_str + "</div>";
-			
-			///TODO: Determine if it would be better to put this in an array and send it all at once, preferably without the implied eval().
-			/// Highlight the verse after 100 miliseconds.
-			/// The delay is so that the verse is displayed as quickly as possible.
-			setTimeout("highlight_results(\"" + verse_str + "\")", 100);
 		}
 	}
 	
 	var newEl = doc.createElement("div");
 	///NOTE: If innerHTML disappears in the future (because it is not (yet) in the "standards"),
 	///      a simple (but slow) alternative is to use the innerDOM script from http://innerdom.sourceforge.net/ or BetterInnerHTML from http://www.optimalworks.net/resources/betterinnerhtml/.
-	///      Using range.createContextualFragment is also a posibility.
+	///      Also using "var range = doc.createRange();var newEl = range.createContextualFragment(HTML_str); is also a posibility.
 	newEl.innerHTML = HTML_str;
 	
 	if (direction == ADDITIONAL) {
-		page.insertBefore(newEl, null);
+		page.appendChild(newEl);
 		bottom_verse = num;
 	} else {
 		page.insertBefore(newEl, page.childNodes[0]);
@@ -411,21 +422,6 @@ function write_verses(return_type, direction, verse_ids, verse_HTML)
 		setTimeout(find_current_range, look_up_range_speed);
 	}
 }
-/* FIXME this code greatly speeds up replacing an element in Mozilla using innerHTML if there are lots of elements in it.
-function replaceHtml(el, html) {
-	var oldEl = typeof el === "string" ? document.getElementById(el) : el;
-	/ *@cc_on // Pure innerHTML is slightly faster in IE	<----------
-		oldEl.innerHTML = html;
-		return oldEl;
-	@* / <----------
-	var newEl = oldEl.cloneNode(false);
-	newEl.innerHTML = html;
-	oldEl.parentNode.replaceChild(newEl, oldEl);
-	/ * Since we just removed the old element from the DOM, return a reference <----------
-	to the new element, which can be used to restore variable references. * / <----------
-	return newEl;
-};
-*/
 
 
 /**
@@ -449,29 +445,26 @@ function clean_up_page() {
  * Highlights the words in the verses that match the search terms.
  * Highlighting is done by adding/changing the className of a word.
  *
- * @example setTimeout("highlight_results(\"" + res[2][i] + "\")", 100);
- * @example highlight_results("<b id=1>In</b> <b id=2>the</b> <b id=3>beginning...</b>");
+ * @example setTimeout("highlight_search_results(\"" + res[2][i] + "\")", 100);
+ * @example highlight_search_results("<b id=1>In</b> <b id=2>the</b> <b id=3>beginning...</b>");
  * @param search_str (string) The HTML to examine and highlight.
  * @return NULL.  Modifies objects className.
  * @note Called by write_verses() via setTimeout() with a short delay.
  */
-function highlight_results(search_str)
-{	
-	var tmp_found_ids = [], count = 1, regex_id, i, ids;
-
-	for (regex_id in highlight_re) {
-		
+function highlight_search_results(search_str)
+{
+	var tmp_found_ids = [], count = 1, regex_id, regex_length = highlight_re.length, i, ids;
+	
+	for (regex_id = 0; regex_id < regex_length; ++regex_id) {
 		tmp_found_ids = search_str.split(highlight_re[regex_id]);
-
+		
 		ids = tmp_found_ids.length;
 		///NOTE: search_str.split() creates an array of the HTML with the correct ids every third one.
 		for (i = 1; i < ids; i += 2) {
 			///TODO: Determine if there is a downside to having a space at the start of the className.
 			///TODO: Determine if we ever need to replace an existing f* className.
-			doc.getElementById(tmp_found_ids[i]).className += " f" + count;
+			doc.getElementById(tmp_found_ids[i]).className += " f" + (regex_id + 1);
 		}
-		///TODO: Is there a way around this limitation (limiting how many unique words can be highlighted with different colors)?
-		if (++count > highlight_limit) count = 1;
 	}
 }
 
@@ -500,7 +493,7 @@ function filter_array(arr)
 			//if (val.length != 0 && val != "&" && val != "|" && val.substr(0, 1) != "-") {
 			if (val.length != 0 && val.slice(0, 1) != "-") {
 				/// Lastly, remove puncuation.
-				//tmp_arr2[count++] = val.split(/["',.?!;:&|\)\(\]\[]/).join("");		
+				//tmp_arr2[count++] = val.split(/["',.?!;:&|\)\(\]\[]/).join("");
 				///NOTE: Use this to filter correctly "one two"~3 || "one two" \ 4
 				///      val = val.split(/"\s*[~\\]\s*[0-9]+/i).join("");
 				///TODO: At the moment, we don't allow number searches (0-9), so we simply remove all numbers too for now.
@@ -560,7 +553,7 @@ function prepare_highlighter(search_terms)
 		len_before = term.length;
 		
 		///FIXME: Move this to lang/en.js because it is language dependent.
-		/// Fix special/unique words that the stemmer won't.
+		/// Fix special/unique words that the stemmer won't stem correctly.
 		switch (term) {
 			case "does": case "doth": case "do": case "doeth": case "doest":
 				stemmed_word = "do[esth]*";
@@ -596,13 +589,13 @@ function prepare_highlighter(search_terms)
 				break;
 			default:
 				if (term.indexOf("*") != -1) {
-					/// The word has a wild card: don't stem, and change it to a regex compatible form.
-					/// Word breaks are found by looking for tag beginnings (<) or closings (>).
+					/// The word has a wild card: don't stem; change it to a regex compatible form.
+					/// Word breaks are found by looking for tag openings (<) or closings (>).
 					stemmed_word = term.replace(/\*/g, "[^<>]*");
 					no_morph = true;
 				} else {
 					/// Most words get stemmed.
-					///NOTE: stem_word() is language dependent, and therefore is delcared in js/langs/LOCALE.js.
+					///NOTE: stem_word() is language dependent and therefore is delcared in js/langs/LOCALE.js.
 					stemmed_word = stem_word(term);
 					no_morph = false;
 				}
@@ -631,7 +624,6 @@ function prepare_highlighter(search_terms)
 			highlight_re[count++] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")[^<]{0,7}[),.?!;:]*[<-]", "i");
 		}
 	}
-	
 }
 
 
@@ -710,7 +702,7 @@ function scrolling()
 		setTimeout(add_content_top, lookup_speed_scrolling);
 		checking_excess_content_bottom = true;
 	}
-
+	
 	if (checking_excess_content_top) {
 		clearInterval(remove_content_top_interval);
 		remove_content_top_interval = setInterval(remove_excess_content_top, remove_speed);
