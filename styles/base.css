@@ -45,6 +45,10 @@ body {
 	font-size: 13px;
 }
 
+#q {
+	background: transparent url("images/90-white.png");
+}
+
 /* Individual words in verses */
 #page b {
 	font-weight: normal;
