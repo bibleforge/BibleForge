@@ -476,12 +476,14 @@ function highlight_search_results(search_str)
  * @param needle (string) String to look for.
  * @param haystack (array) Array to examine.
  * @return TRUE if found; FALSE if not.
+ * @note Called by prepare_highlighter().
+ * @note The haystack array is assumed not to have any breaks.
  */
 function in_array(needle, haystack)
 {
-	for (var fkey in haystack) {
+	for (var fkey = 0, arr_len = haystack.length; fkey < arr_len; ++fkey) {
 		if (haystack[fkey] == needle) {
-			return fkey;
+			return true;
 		}
 	}
 	return false;
