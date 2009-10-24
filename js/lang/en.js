@@ -523,9 +523,9 @@ function determine_reference(ref)
 
 
 /**
- * Prepares search terms before submission.
+ * Prepares search terms to adhere to Sphinx syntax before submission to the server.
  *
- * Removes execess white space, converts special words to symbols, and converts certain characters to an acceptable format.
+ * Removes execess white space, converts special words to symbols, and converts certain characters to a format adhere to Sphinx syntax.
  *
  * @example search_terms = prepare_search("NOT in  the  AND good OR  beginning  "); /// Returns "-in the & good | beginning"
  * @example search_terms = prepare_search("ps 16:title"); /// Returns "ps 16:0"
@@ -533,7 +533,7 @@ function determine_reference(ref)
  * @param search_terms (string) The terms to be examined.
  * @return A prepared string with leading and trailing white space removed.
  * @note Called by run_search() in js/main.js.
- * @note Replaces AND, OR, NOT with &, |, and - respectively.
+ * @note Replaces AND, OR, and NOT with &, |, and - respectively.
  * @note Replaces curly quotes with straight.
  * @note Replaces various hypens, dashes, and minuses with the standard hyphen (-).
  */
@@ -545,6 +545,28 @@ function prepare_search(search_terms)
 	return search_terms.replace(/\s{2,}/g, " ").replace(/\sAND\s/g, " & ").replace(/\sOR\s/g, " | ").replace(/\s-\s/g, " -").replace(/\s*\bNOT\s/g, " -").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[\u2011-\u2015]/g, "-").replace(/([0-9]+)[:.;,\s]title/ig, "$1:0").trim();
 }
 
+
+function filter_terms_for_highlighter(search_terms)
+{
+	//search_terms.split(/(?:^|\s)-(?:"[^"]*"?|[^\s]*)/).join("").split(" ");
+	///What about trailing emdash?
+	//alert(search_terms.replace(/(?:^|\s)-(?:"[^"]*"?(?:[~\/]\d*)?|[^\s]*)/g, ""));
+	//alert(search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?(?:[~\/]\d*)?|[^\s]*)|["',.?!;:&|\)\(\]\[\/`{}<$^])/g, "").toLowerCase());
+	/// Remove punctuation, words that should not be found in the search results so that the highlighter can parse the words properly.
+	/// Change words to lower case and split them into an array in order to remove duplicates.
+	var initial_search_arr = search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?(?:[~\/]\d*)?|[^\s]*)|["',.?!;:&|\)\(\]\[\/`{}<$^])/g, "").toLowerCase().split(" ");
+	
+	var final_search_arr = [], arr_len = initial_search_arr.length, new_arr_len = 0, i, j;
+	
+	first_loop:for (i = 0; i < arr_len; ++i) {  
+		for (j = 0; j < new_arr_len; ++j) {
+			if (final_search_arr[j] == initial_search_arr[i]) continue first_loop; /// This words already exists; jump to the first loop and get the next word. (This would be the same as "continue 2" in PHP.) 
+		}
+		final_search_arr[new_arr_len++] = initial_search_arr[i];
+	}
+	
+	return final_search_arr;
+}
 
 /**
  * Figure out what type of search is being attempted by the user.

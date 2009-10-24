@@ -470,46 +470,6 @@ function highlight_search_results(search_str)
 
 
 /**
- * Filter multiple occurances and unnecessary characters.
- *
- * Remove multiple occurances of words, unnecessary characters or words (&, |, ", -anything, ...), and convert them all to lowercase.
- *
- * @example search_terms_arr = filter_array(search_terms.split(" "));
- * @example search_terms_arr = filter_array(["One", "two", "&", "one.", "-three"]); /// Returns: ["one", "two"];
- * @param arr (array) Array of words to filter.
- * @return Filtered array.
- * @note Called by prepare_highlighter().
- */
-function filter_array(arr)
-{
-	///FIXME: The regex filters out characters of other languages, e.g., Greek and Hebrew.
-	var key = "", tmp_arr1 = arr, tmp_arr2 = [], count = 0, val, re = /[^a-z*-]/ig;
-	
-	for (key in tmp_arr1) {
-		//val = stemWord(tmp_arr1[key]);
-		val = tmp_arr1[key].toLowerCase().replace(re, "");
-		if (in_array(val, tmp_arr2) === false) {
-			/// Filter out boolean operators and negitive words
-			//if (val.length != 0 && val != "&" && val != "|" && val.substr(0, 1) != "-") {
-			if (val.length != 0 && val.slice(0, 1) != "-") {
-				/// Lastly, remove puncuation.
-				//tmp_arr2[count++] = val.split(/["',.?!;:&|\)\(\]\[]/).join("");
-				///NOTE: Use this to filter correctly "one two"~3 || "one two" \ 4
-				///      val = val.split(/"\s*[~\\]\s*[0-9]+/i).join("");
-				///TODO: At the moment, we don't allow number searches (0-9), so we simply remove all numbers too for now.
-				///TODO: We don't want to filter out Greek and Hebrew characters.
-				///      Could do something like [^-\w], but that would filter Hebrew vowels and maybe other characters.
-				//tmp_arr2[count++] = val.split(re).join("");
-				tmp_arr2[count++] = val;
-			}
-		}
-		delete tmp_arr1[key];
-	}
-	return tmp_arr2;
-}
-
-
-/**
  * Determines if a value is in an array.
  *
  * @example in_array("word", ["is", "word", "here"]); /// Returns TRUE.
@@ -544,7 +504,7 @@ function prepare_highlighter(search_terms)
 	///TODO: Determine if this whole function should be in a language specific file.
 	highlight_re = [];
 	
-	var search_terms_arr = filter_array(search_terms.split(" "));
+	var search_terms_arr = filter_terms_for_highlighter(search_terms);
 	
 	var count = 0, len_before, len_after, stemmed_word, stemmed_arr = [], no_morph, term, i;
 	
