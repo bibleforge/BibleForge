@@ -7,25 +7,6 @@
  * @link http://www.BibleForge.com
  */
 
-
-/// known searchd commands
-define('SEARCHD_COMMAND_SEARCH', 0);
-define('SEARCHD_COMMAND_EXCERPT', 1);
-define('SEARCHD_COMMAND_UPDATE', 2);
-define('SEARCHD_COMMAND_KEYWORDS', 3);
-
-/// current client-side command implementation versions
-define('VER_COMMAND_SEARCH', 0x113);
-define('VER_COMMAND_EXCERPT', 0x100);
-define('VER_COMMAND_UPDATE', 0x101);
-define('VER_COMMAND_KEYWORDS', 0x100);
-
-/// known searchd status codes
-define('SEARCHD_OK', 0);
-define('SEARCHD_ERROR', 1);
-define('SEARCHD_RETRY', 2);
-define('SEARCHD_WARNING', 3);
-
 /// known match modes
 define('SPH_MATCH_ALL', 0);
 define('SPH_MATCH_ANY', 1);
@@ -70,7 +51,7 @@ define('SPH_GROUPBY_YEAR', 3);
 define('SPH_GROUPBY_ATTR', 4);
 define('SPH_GROUPBY_ATTRPAIR', 5);
 
-/// sphinx searchd client class
+/// sphinx search client class
 class SphinxClient
 {
 	var $_path;			///< search path (default is 'search')
