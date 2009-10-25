@@ -546,15 +546,22 @@ function prepare_search(search_terms)
 }
 
 
+/**
+ * Prepare the search terms for the highlighter.
+ *
+ * Removes punctuation, words which should not be found in the search results, duplicate words, and converts all words to lower case
+ * so that the highlighter can parse the words properly.
+ *
+ * @example filter_terms_for_highlighter('this one, -that one -"none of these" -"or these ones"~1 "but, these?"'); /// Returns ["this", "one", "but", "these"].
+ * @param search_terms (string) The terms to be filtered.
+ * @return An array of filtered words.
+ * @note Called by prepare_highlighter().
+ */
 function filter_terms_for_highlighter(search_terms)
 {
-	//search_terms.split(/(?:^|\s)-(?:"[^"]*"?|[^\s]*)/).join("").split(" ");
-	///What about trailing emdash?
-	//alert(search_terms.replace(/(?:^|\s)-(?:"[^"]*"?(?:[~\/]\d*)?|[^\s]*)/g, ""));
-	//alert(search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?(?:[~\/]\d*)?|[^\s]*)|["',.?!;:&|\)\(\]\[\/`{}<$^])/g, "").toLowerCase());
-	/// Remove punctuation, words that should not be found in the search results so that the highlighter can parse the words properly.
-	/// Change words to lower case and split them into an array in order to remove duplicates.
-	var initial_search_arr = search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?(?:[~\/]\d*)?|[^\s]*)|["',.?!;:&|\)\(\]\[\/`{}<$^])/g, "").toLowerCase().split(" ");
+	///NOTE: -\B removes trailing hyphens.
+	///TODO: Determine if there is a better was to filter out invalid characters without filtering out English, Greek, Hebrew and other characters.
+	var initial_search_arr = search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?(?:[~\/]\d*)?|[^\s]*)|["',.?!;:&|\)\(\]\[\/`{}<$^]|-\B)/g, "").toLowerCase().split(" ");
 	
 	var final_search_arr = [], arr_len = initial_search_arr.length, new_arr_len = 0, i, j;
 	
@@ -567,6 +574,7 @@ function filter_terms_for_highlighter(search_terms)
 	
 	return final_search_arr;
 }
+
 
 /**
  * Figure out what type of search is being attempted by the user.
