@@ -188,6 +188,7 @@ class SphinxClient
 	function Query($query, $index = '*', $comment = "")
 	{
 		$extra_regex = "";
+		$error_message = "";
 		
 		///FIXME: The options should be applied when the according functions are called, not when Query() is called.
 		$options = ' -q';
@@ -262,6 +263,15 @@ class SphinxClient
 			$stats[1] = 0;
 			$stats[2] = 0;
 			$mathces_attrs = "";
+			
+			/// If there was an error, all of the stats need to be set manually so they can be returned.
+			if (!isset($stats[3])) $stats[3] = "";
+			
+			/// Look for errors since no results were found.
+			preg_match('/: search error: (.*)$/i', $res, $error_match);
+			if (count($error_match) > 1) {
+				$error_message = $error_match[1];
+			}
 		}
 		
 		$hits_ret = array();
@@ -269,6 +279,6 @@ class SphinxClient
 			$hits_ret[$value] = array('docs' => $hits[2][$key], 'hits' => $hits[3][$key]);
 		}
 		
-		return array('error' => "", 'warning' => "", 'matches' => $mathces_attrs, 'total' => $stats[1], 'total_found' => $stats[2], 'time' => $stats[3], 'words' => $hits_ret);
+		return array('error' => $error_message, 'warning' => "", 'matches' => $mathces_attrs, 'total' => $stats[1], 'total_found' => $stats[2], 'time' => $stats[3], 'words' => $hits_ret);
 	}
 }
