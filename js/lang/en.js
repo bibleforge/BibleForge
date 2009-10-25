@@ -561,7 +561,7 @@ function filter_terms_for_highlighter(search_terms)
 {
 	///NOTE: -\B removes trailing hyphens.
 	///TODO: Determine if there is a better was to filter out invalid characters without filtering out English, Greek, Hebrew and other characters.
-	var initial_search_arr = search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?(?:[~\/]\d*)?|[^\s]*)|["',.?!;:&|\)\(\]\[\/`{}<$^]|-\B)/g, "").toLowerCase().split(" ");
+	var initial_search_arr = search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?(?:[~\/]\d*)?|[^\s]*)|["',.:?!;&|\)\(\]\[\/\\`{}<$^+]|-\B)/g, "").toLowerCase().split(" ");
 	
 	var final_search_arr = [], arr_len = initial_search_arr.length, new_arr_len = 0, i, j;
 	
