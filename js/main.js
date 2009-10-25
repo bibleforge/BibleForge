@@ -470,27 +470,6 @@ function highlight_search_results(search_str)
 
 
 /**
- * Determines if a value is in an array.
- *
- * @example in_array("word", ["is", "word", "here"]); /// Returns TRUE.
- * @param needle (string) String to look for.
- * @param haystack (array) Array to examine.
- * @return TRUE if found; FALSE if not.
- * @note Called by prepare_highlighter().
- * @note The haystack array is assumed not to have any breaks.
- */
-function in_array(needle, haystack)
-{
-	for (var fkey = 0, arr_len = haystack.length; fkey < arr_len; ++fkey) {
-		if (haystack[fkey] == needle) {
-			return true;
-		}
-	}
-	return false;
-}
-
-
-/**
  * Prepare search terms for highlighting.
  *
  * Create regex array to search through the verses that will soon be returned by the server.
@@ -508,9 +487,9 @@ function prepare_highlighter(search_terms)
 	
 	var search_terms_arr = filter_terms_for_highlighter(search_terms);
 	
-	var count = 0, len_before, len_after, stemmed_word, stemmed_arr = [], no_morph, term, i;
+	var count = 0, len_before, len_after, stemmed_word, stemmed_arr = [], no_morph, term, i, j;
 	
-	for (i in search_terms_arr) {
+	first_loop:for (i in search_terms_arr) {
 		term = search_terms_arr[i];
 		len_before = term.length;
 		
@@ -564,9 +543,9 @@ function prepare_highlighter(search_terms)
 		}
 		len_after = stemmed_word.length;
 		
-		if (count > 0) {
-			/// Skip words that are the same after stemming/regexing.
-			if (in_array(stemmed_word, stemmed_arr)) continue;
+		/// Skip words that are the same after stemming/regexing.
+		for (j = 0; j < count; ++j) {
+			if (stemmed_word == stemmed_arr[j]) continue first_loop; ///NOTE: This is the same as "continue 2" in PHP.
 		}
 		
 		stemmed_arr[count] = stemmed_word;
