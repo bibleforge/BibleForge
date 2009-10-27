@@ -246,8 +246,10 @@ class SphinxClient
 		preg_match('/: returned (\d+) matches of (\d+) total in ([0-9.]+)/i', $res, $stats);
 		
 		preg_match_all('/ document=.*' . $extra_regex . '/', $res, $matches);
+		
 		/// Convert the text into valid JSON.
-		$matches = preg_filter('/ ([^=]+)=/i', '"\1":', $matches[0]);
+		$matches = preg_replace('/ ([^=]+)=/i', '"\1":', $matches[0]);
+
 		if (count($matches) > 0) {
 			$mathces_attrs = array();
 			foreach($matches as $value) {
