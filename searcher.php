@@ -319,7 +319,7 @@ function morphology_search($word, $morphology, $exclude, $direction, $start_id =
 	$simple_matches = implode(',', array_unique($verseid_arr));
 	
 	$word_ids = implode(',', array_keys($sphinx_res['matches']));
-		
+	
 	/// Get verses from the MySQL database.
 	require_once 'functions/database.php';
 	connect_to_database();

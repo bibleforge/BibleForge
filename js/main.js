@@ -907,6 +907,14 @@ function find_current_range()
 	///FIXME: Display the verse range properly.
 	if (doc.title != new_title) {
 		doc.title = new_title;
+		
+		/// Display the verse range on the page if looking up verses.
+		///FIXME: There should be a variable that shows the current view mode and not rely on last_type.
+		if (last_type == VERSE_LOOKUP) {
+			///TODO: Find a better way to clear infoBar than innerHTML.
+			infoBar.innerHTML = "";
+			infoBar.appendChild(doc.createTextNode(ref_range));
+		}
 	}
 	
 	return null;
