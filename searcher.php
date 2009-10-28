@@ -210,7 +210,7 @@ function standard_search($query, $direction, $start_id = 0)
 	/// SPH_MATCH_ALL should be the fastest and needs no sorting.
 	
 	/// Is there more than one word?
-	if (strpos($query, ' ') !== false) {		
+	if (strpos($query, ' ') !== false) {
 		if (strpos($query, '"') !== false || substr_count($query, ' ') > 9) {
 			///NOTE: Could use the more accurate (preg_match('/([a-z-]+[^a-z-]+){11}/i', $query) == 1) to find word count, but it is slower.
 			/// There are more than 10 search terms in the query or the query contains double quotes (").
