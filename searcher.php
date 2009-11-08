@@ -350,7 +350,7 @@ function morphology_search($word, $morphology, $exclude, $direction, $start_id =
  * @example $verse_id = parse_reference($query);
  * @param $query (string) The input to be parsed.
  * @return Integer of book, chapter, and verses or FALSE if not a valid verse reference.
- * @note FIXME: Not yet implamented.  Handeled by Javascript; not needed?
+ * @note FIXME: Not yet implamented.  Handeled by Javascript.  Not needed?
  */
 function parse_reference($query)
 {
