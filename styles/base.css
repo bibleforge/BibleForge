@@ -29,12 +29,14 @@ body {
 
 #searchBar {
 	background-image: url("../images/90-white.png");
+	background: -moz-linear-gradient(top, bottom, from(rgba(255,255,255,.96)), to(rgba(255,255,255,.9)));
 	width: 100%;
 	height: 100%;
 }
 
 #infoBar {
 	background-image: url("../images/90-yellow.png");
+	background: -moz-linear-gradient(top, bottom, from(rgba(255,255,221,.90)), to(rgba(255,255,221,.89)));
 	border-top: #EEE999 solid 1px;
 	border-bottom: #EEE999 solid 1px;
 	width: 100%;
@@ -47,6 +49,9 @@ body {
 
 #q {
 	background: transparent url("images/90-white.png");
+	/* Gradients don't seem to work here.
+	background: -moz-linear-gradient(top, bottom, from(rgba(255,255,255,.96)), to(rgba(255,255,255,.9)));
+	*/
 }
 
 /* Individual words in verses */
@@ -80,8 +85,8 @@ body {
 
 
 /* Vereses created from a search. */
-.search_verse {
-	
+.search_verse {	
+	/* This gives reverse indent, but causes problems with margins (tested w/Mozilla).
 	/* This gives reverse indent, but causes problems with margins (tested w/Mozilla).
 	text-indent: -2em;
 	margin-left: 2em;
