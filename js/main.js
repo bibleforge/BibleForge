@@ -59,7 +59,7 @@ win.onscroll = scrolling;
 win.onresize = resizing;
 
 /// Prototypes
-///NOTE: Add trim() for Opera/WebKit/IE and Mozilla 3.0-.
+///NOTE: Adds trim() for Opera/WebKit/IE and Mozilla 3.0-.
 if (!"".trim) {
 	/**
 	 * Removes leading and trailing spaces.
@@ -76,6 +76,16 @@ if (!"".trim) {
 		while (++start < end && this.charCodeAt(start) < 33);
 		return this.slice(start, end + 1);
 	};
+}
+
+///NOTE: Adds JSON.parse() support for IE 7- and Firefox 3.0-
+///FIXME: The current verse format does not work with JSON.parse() because of \'.
+///NOTE: JSON.parse() is still about twice as slow as eval().
+if (!JSON && !JSON.parse) {
+	var JSON = {parse:function(jsonString)
+	{
+		return eval(jsonString);
+	}};
 }
 
 /**
@@ -1048,9 +1058,8 @@ function post_to_server(server_URL, message, ajax)
  */
 function interpret_result(message)
 {
-	///TODO: When a JSON parser is avaiable, use that if it is fast or the same speed.
-	var res = eval(message);
-	
+	///TODO: When a JSON parser is avaiable, use that if it is faster or the same speed.
+	var res = JSON.parse(message);
 	/// New search results.
 	//if (res[0] == 1) handle_new_verses(res); ///FIXME: Right now, there is only one command.
 	handle_new_verses(res);

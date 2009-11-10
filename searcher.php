@@ -258,8 +258,9 @@ function standard_search($query, $direction, $start_id = 0)
 	
 	/// Send results to the buffer as a JSON serialized array, and stop execution.
 	/// Array Format: [[action],[verse_ids,...],[verse_words,...],[number_of_matches]]
-	///NOTE: JSON should ignore trailing commas.
+	///NOTE: Javascript ignores trailing commas, but standard JSON does not.
 	///TODO: It would be nice to indicate if there are no more verses to find when it gets to the end.
+	///TODO: Make the JSON work with both eval() and JSON.parse().  The \' throws it off.  But \\' works.  To remove trailing slashes use rtrim(..., ',').
 	echo '[[', STANDARD_SEARCH, ',', $direction, '],[', $simple_matches, '],[', $verses_str, '],[', $sphinx_res['total_found'], ']]';
 	die();
 }
@@ -336,7 +337,7 @@ function morphology_search($word, $morphology, $exclude, $direction, $start_id =
 	
 	/// Send results to the buffer as a JSON serialized array, and stop execution.
 	/// Array Format: [[action],[verse_ids,...],[verse_words,...],[number_of_matches]]
-	///NOTE: JSON should ignore trailing commas.
+	///NOTE: Javascript ignores trailing commas, but JSON does not.
 	///TODO: It would be nice to indicate if there are no more verses to find when it gets to the end.
 	echo '[[', MORPHOLOGICAL_SEARCH, ',', $direction, '],[', $simple_matches, '],[', $verses_str, '],[', $sphinx_res['total_found'], '],[', $word_ids ,']]';
 	die();
