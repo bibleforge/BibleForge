@@ -121,3 +121,20 @@ define('AEOLIC', 75);
 /// Transitivity
 define('TRANSITIVE', 76);
 define('INTRANSITIVE', 77); ///TODO: Need to add this in.  Determine if there is bitransitive.
+
+
+function interpret_json($json, $sphinx)
+{
+	/// $json ex: '["love",[NOUN]]' OR '["go",[IMPERATIVE,SINGULAR],[1,1]]'
+	$query_array = json_decode($json);
+	foreach ($query_array[1] as $key => $morphology) {
+		switch ($morphology) {
+			case NOUN:
+				$sphinx->SetFilter('part_of_speech', array(1), $query_array[2][$key]);
+				break;
+			case VERB:
+				$sphinx->SetFilter('part_of_speech', array(2), $query_array[2][$key]);
+				break;
+		}
+	}
+}
