@@ -36,7 +36,7 @@ define('RED', 20);
 
 function interpret_json($json, $sphinx)
 {
-	/// $json '["WORD",[[GRAMMAR_TYPE,VALUE],[...]],[INCLUDE]]'
+	/// $json '["WORD",[[GRAMMAR_TYPE1,VALUE1],[...]],[INCLUDE]]'
 	/// $json ex1: '["love",[[PART_OF_SPEECH,1]],[1]]' == love AS NOUN
 	/// $json ex2: '["go",[[MOOD,3],[NUMBER,1]],[1,0]]' == go AS IMPERATIVE, NOT SINGULAR
 	
@@ -110,4 +110,5 @@ function interpret_json($json, $sphinx)
 		}
 		$sphinx->SetFilter($attr, array((int)$morphology_arr[1]), (bool)$query_array[2][$key]);
 	}
+	///TODO: Add the word to the query.  Something like $sphinx->AddQuery($WORD, 'morphological');
 }
