@@ -24,6 +24,7 @@ var book_arr_re = ["",/^g(?:e(?:n(?:asis?|esis?|isis?)?)?|n)[\s0-9:.;,-]*$/i,/^e
 var step2list = {"ational":"ate", "tional":"tion", "enci":"ence", "anci":"ance", "izer":"ize", "bli":"ble", "alli":"al", "entli":"ent", "eli":"e", "ousli":"ous", "ization":"ize", "ation":"ate", "ator":"ate", "alism":"al", "iveness":"ive", "fulness":"ful", "ousness":"ous", "aliti":"al", "iviti":"ive", "biliti":"ble", "logi":"log"};
 var step3list = {"icate":"ic", "ative":"", "alize":"al", "iciti":"ic", "ical":"ic", "ful":"", "ness":"", "self":""};
 
+///TODO: Determine if there is a faster way to do this.  E.g., using a simple in_array() or isset() function.
 /// Words to ignore that are already the root word but don't look like it.
 var stop_words_re = /^th[iu]s|h[ai]s|was|yes|succeed|proceed|e(?:arly|xceed)|only|news$/i;
 
@@ -573,11 +574,12 @@ function filter_terms_for_highlighter(search_terms)
 }
 
 
+///TODO: Determine how much this could be not language specific.
 /**
  * Figure out what type of search is being attempted by the user.
  *
  * @example determine_search_type("love AS NOUN"); /// Returns [MORPHOLOGICAL_SEARCH, '["love\", \"NOUN\", 0]"]
- * @example determine_search_type("go -AS IMPERITIVE"); /// Returns [MORPHOLOGICAL_SEARCH, '["love\", \"NOUN\", 1]"]
+ * @example determine_search_type("go AS IMPERITIVE, -SINGULAR"); /// Returns [MORPHOLOGICAL_SEARCH, '["love\", \"NOUN\", 1]"]
  * @example determine_search_type("God & love"); /// Returns [STANDARD_SEARCH]
  * //@example determine_search_type("love AS NOUN & more | less -good AS ADJECTIVE"); /// Returns [MORPHOLOGICAL_SEARCH, [0, "love", "NOUN"], STANDARD_SEARCH, "& more | less -good", MORPHOLOGICAL_SEARCH, [0, "good", "ADJECTIVE"]]
  * @param search_terms (string) The prepared terms to be examined.
@@ -586,28 +588,48 @@ function filter_terms_for_highlighter(search_terms)
  */
 function determine_search_type(search_terms)
 {
-	///NOTE: "-AS" may have originally been "NOT AS" before it was sent to prepare_search().
-	if (search_terms.indexOf(" AS ") != -1 || search_terms.indexOf(" -AS ") != -1) {
-		//var split_terms = search_terms.split(/(-?)([^&|\s]+) AS ([A-Z]+)(\s[&|-])?/);
-		var split_terms = search_terms.split(/^([a-zA-Z,.?!;:']+) (-)?AS ([A-Z]+)$/);
-		return [MORPHOLOGICAL_SEARCH, '["' + split_terms[1].replace(/(")/g, "\\$1") + '","' + split_terms[3].replace(/(")/g, "\\$1") + '",' + (split_terms[2] == "-" ? 1 : 0) + "]"]
-		/*
-		var count = split_terms.length;
-		var search_type = MORPHOLOGICAL_SEARCH;
-		var search_array = [], search_array_count = 0;
-		
-		for (var i = 0; i < count; ++i) {
-			if (split_terms[i] == "-" || split_terms[i] == "") {
-				search_array[search_array_count++] = MORPHOLOGICAL_SEARCH;
-				search_array[search_array_count++] = [split_terms[i], split_terms[++i]];
-				
+	var morph_marker = ' AS ';
+	var morph_marker_len = 4;
+	var morph_seperator = ',';
+	var morph_grammar = {'NOUN':'[1,1]','VERB':'[1,2]',};
+	var split_pos;
+	/// Did the user use the morphological keyword in his search?
+	if ((split_pos = search_terms.indexOf(morph_marker)) != -1) {
+		///TODO: Determine what is better: a JSON array or POST/GET string (i.e., word1=word&grammar_type1=1&value1=3&...).
+		/// A JSON array is used to contian the inforamtion about the search.
+		/// JSON format: '["WORD",[[GRAMMAR_TYPE1,VALUE1],[...]],[INCLUDE]]'
+		/// JSON example1: ["love",[[PART_OF_SPEECH,1]],[1]]' == love AS NOUN
+		/// JSON example2: '["go",[[MOOD,3],[NUMBER,1]],[1,0]]' == go AS IMPERATIVE, -SINGULAR
+		///FIXME: It needs to add slashes.
+		var include_json = "[";
+		var morph_json = '["' + search_terms.substr(0, split_pos) + '",[';
+		var moph_parameters = search_terms.substr(split_pos + morph_marker_len);
+		/// Loop to find all of the parameters.
+		var split_start = 0;
+		while ((split_pos = moph_parameters.indexOf(morph_seperator, split_start)) != -1) {
+			/// Trim leading white space.
+			if (moph_parameters.slice(split_start, split_start + 1) == " ") ++split_start;
+			/// Is this morphological feature to be excluded?
+			if (moph_parameters.slice(split_start, split_start + 1) == "-") {
+				/// Skip the hyphen.
+				++split_start;
+				include_json += "0,";
 			} else {
-				search_type = MIXED_SEARCH;
+				include_json += "1,";
 			}
+			morph_json += morph_grammar[moph_parameters.slice(split_start, split_pos).trim()] + ",";
+			split_start = split_pos + 1;
 		}
-		alert(split_terms + count);
-		return [];
-		*/
+		if (moph_parameters.slice(split_start, split_start + 1) == " ") ++split_start;
+		if (moph_parameters.slice(split_start, split_start + 1) == "-") {
+			/// Skip the hyphen.
+			++split_start;
+			include_json += "0";
+		} else {
+			include_json += "1";
+		}
+		morph_json += morph_grammar[moph_parameters.slice(split_start).trim()] + "],[" + include_json + "]";
+		return morph_json;
 	}
 	return [STANDARD_SEARCH];
 }
