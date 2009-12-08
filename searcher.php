@@ -1,11 +1,12 @@
 <?php
 
 /**
- * BibleForge (alpha testing)
+ * BibleForge
  *
  * @date    10-30-08
  * @version 0.1 alpha 2
- * @link http://www.BibleForge.com
+ * @link http://BibleForge.com
+ * @license Reciprocal Public License (RPL)
  */
 
 error_reporting(E_ALL);

@@ -12,7 +12,7 @@
 // received a copy of the LGPL license along with this program; if you
 // did not, you can find it at http://www.gnu.org/
 //
-// Modified and streamlined for BibleForge.
+// Modified and streamlined for BibleForge (http://BibleForge.com).
 //
 // Licensed under the LGPL with written permission by the original author.
 //
