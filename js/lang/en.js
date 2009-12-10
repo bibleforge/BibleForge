@@ -29,6 +29,11 @@ var step3list = {"icate":"ic", "ative":"", "alize":"al", "iciti":"ic", "ical":"i
 /// Words to ignore that are already the root word but don't look like it.
 var stop_words_re = /^th[iu]s|h[ai]s|was|yes|succeed|proceed|e(?:arly|xceed)|only|news$/i;
 
+/// Morphological variables
+var morph_marker = ' AS ';
+var morph_marker_len = 4;
+var morph_seperator = ',';
+var morph_grammar = {'NOUN':'[1,1]','VERB':'[1,2]',};
 
 /**
  * Convert an English word to its root form.
@@ -589,10 +594,6 @@ function filter_terms_for_highlighter(search_terms)
  */
 function determine_search_type(search_terms)
 {
-	var morph_marker = ' AS ';
-	var morph_marker_len = 4;
-	var morph_seperator = ',';
-	var morph_grammar = {'NOUN':'[1,1]','VERB':'[1,2]',};
 	var split_pos;
 	/// Did the user use the morphological keyword in his search?
 	if ((split_pos = search_terms.indexOf(morph_marker)) != -1) {
@@ -632,5 +633,7 @@ function determine_search_type(search_terms)
 		morph_json += morph_grammar[moph_parameters.slice(split_start).trim()] + "],[" + include_json + "]";
 		return morph_json;
 	}
+	
+	/// The search is just a normal search.
 	return [STANDARD_SEARCH];
 }
