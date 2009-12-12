@@ -37,7 +37,7 @@ var highlight_limit = 20; /// Currently, we limit the unique number of search wo
 
 ///NOTE: window.XMLHttpRequest for Mozilla/KHTML/Opera/IE7+
 /// ActiveXObject("Microsoft.XMLHTTP") for IE6-
-var ajax_addtional = win.XMLHttpRequest ? new win.XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+var ajax_additional = win.XMLHttpRequest ? new win.XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
 var ajax_previous  = win.XMLHttpRequest ? new win.XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
 
 /// Verse variables
@@ -51,7 +51,7 @@ var buffer_add = 1000, buffer_rem = 10000;
 var cached_verses_top    = [], cached_count_top    = 0;
 var cached_verses_bottom = [], cached_count_bottom = 0;
 var scroll_maxed_top = true, scroll_maxed_bottom = false;
-var lookup_speed_scrolling = 50, lookup_speed_sitting = 100, lookup_delay = 200, remove_speed = 3000, look_up_range_speed = 300; /// In miliseconds
+var lookup_speed_scrolling = 50, lookup_speed_sitting = 100, lookup_delay = 200, remove_speed = 3000, look_up_range_speed = 300; /// In milliseconds
 var looking_up_verse_range = false;
 
 /// Simple Event Registration
@@ -83,7 +83,7 @@ if (!"".trim) {
 /**
  * Make split() work correctly on IE.
  *
- * @param s (regexp || string) The regular expresion or string with which to break the string.
+ * @param s (regexp || string) The regular expression or string with which to break the string.
  * @param limit (int) The number of times to split the string.
  * @return Returns an array of the string now broken into pieces.
  * @see http://blog.stevenlevithan.com/archives/cross-browser-split.
@@ -144,7 +144,7 @@ String.prototype.split = function (s, limit)
  *****************************/
 
 /**
- * Prepare for a the search.
+ * Prepare for the search.
  *
  * Prepares the search query from the input box.
  *
@@ -164,7 +164,7 @@ function prepare_new_search()
 	
 	/// Stop any old requests since we have a new one.
 	/// Is readyState > 0 and < 4?  Anything 1-3 needs to be aborted.
-	if (ajax_addtional.readyState % 4) ajax_addtional.abort();
+	if (ajax_additional.readyState % 4) ajax_additional.abort();
 	if (ajax_previous.readyState % 4) ajax_previous.abort();
 	
 	/// Determine if the user is preforming a search or looking up a verse.
@@ -233,7 +233,7 @@ function run_search(direction)
 	/// last_type set in prepare_new_search().
 	var query = "t=" + last_type, ajax;
 	if (direction == ADDITIONAL) {
-		ajax = ajax_addtional;
+		ajax = ajax_additional;
 	} else {
 		ajax = ajax_previous;
 		query += "&d=" + direction;
@@ -270,7 +270,7 @@ function run_search(direction)
  *
  * @example prepare_verses(json_array);
  * @example prepare_verses([[1,1],[1001001],["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning...</b>"],[1]]);
- * @param res (array) JSON array from server.  Array format: [[action,direction],[verse_ids,...],[verse_HTML,...],[number_of_matches]].
+ * @param res (array) JSON array from the server.  Array format: [[action,direction],[verse_ids,...],[verse_HTML,...],[number_of_matches]].
  * @return NULL.  Writes HTML to the page.
  * @note Called by prepare_verses() after AJAX request.
  */
@@ -286,7 +286,7 @@ function handle_new_verses(res)
 		///FIXME: Highlighting needs to be in its own function where each type and mixed highlighting will be done correctly.
 		if (return_type == STANDARD_SEARCH) {
 			///TODO: Determine if it would be better to put this in an array and send it all at once, preferably without the implied eval().
-			/// Highlight the verse after 100 miliseconds.
+			/// Highlight the verse after 100 milliseconds.
 			/// The delay is so that the verse is displayed as quickly as possible.
 			///TODO: Determine if it is bad to convert the array to a string like this.
 			setTimeout("highlight_search_results(\"" + res[2] + "\")", 100);
@@ -407,7 +407,7 @@ function write_verses(return_type, direction, verse_ids, verse_HTML)
 	var newEl = doc.createElement("div");
 	///NOTE: If innerHTML disappears in the future (because it is not (yet) in the "standards"),
 	///      a simple (but slow) alternative is to use the innerDOM script from http://innerdom.sourceforge.net/ or BetterInnerHTML from http://www.optimalworks.net/resources/betterinnerhtml/.
-	///      Also using "var range = doc.createRange();var newEl = range.createContextualFragment(HTML_str); is also a posibility.
+	///      Also using "var range = doc.createRange();var newEl = range.createContextualFragment(HTML_str); is also a possibility.
 	newEl.innerHTML = HTML_str;
 	
 	if (direction == ADDITIONAL) {
@@ -556,7 +556,7 @@ function prepare_highlighter(search_terms)
 		///      The hyphen is to highlight hyphenated words that would otherwise be missed (matching first word only) (i.e., "Beth").
 		///      ([^>]+-)? finds words where the match is not the first of a hyphenated word (i.e., "Maachah").
 		///      The current English version (KJV) does not use square brackets ([]).
-		///FIXME: The punctutation )(,.?!;: could be considered language specific and should be moved.
+		///FIXME: The punctuation ,.?!;:)( could be considered language specific and should be moved.
 		///TODO: Bench mark different regex (creation and testing).
 		if (no_morph || (len_after == len_before && len_after < 3)) {
 			highlight_re[count++] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")[),.?!;:]*[<-]", "i");
@@ -576,7 +576,7 @@ function prepare_highlighter(search_terms)
  * @example format_number(1000); /// Returns "1,000"
  * @param num (positive number) The number to format.
  * @return A formatted number as a string.
- * @note To be faster, this will not format a negitive number.
+ * @note To be faster, this will not format a negative number.
  */
 function format_number(num)
 {
@@ -881,7 +881,7 @@ function find_current_range()
 	///NOTE: \u2013 is unicode for the en dash (–) (HTML: &ndash;).
 	///TODO: Determine if the colons should be language specified.
 	if (b1 == b2) {
-		/// The book of Psalms is refered to differently (e.g., Psalm 1:1).
+		/// The book of Psalms is refereed to differently (e.g., Psalm 1:1).
 		b1 = b1 == 19 ? lang.psalm : books_short[b1];
 		if (c1 == c2) {
 			if (v1 == v2) {
@@ -893,7 +893,7 @@ function find_current_range()
 			ref_range = b1 + " " + c1 + ":" + v1 + "\u2013" + c2 + ":" + v2;
 		}
 	} else {
-		/// The book of Psalms is refered to differently (e.g., Psalm 1:1).
+		/// The book of Psalms is refereed to differently (e.g., Psalm 1:1).
 		b1 = b1 == 19 ? lang.psalm : books_short[b1];
 		b2 = b2 == 19 ? lang.psalm : books_short[b2];
 		ref_range = b1 + " " + c1 + ":" + v1 + "\u2013" + b2 + " " + c2 + ":" + v2;
@@ -1014,7 +1014,7 @@ function resizing()
  * @param server_URL (string) The file on the server to run.
  * @param message (string) The variables to send.  URI format: "name1=value1&name2=value%202"
  * @param ajax (AJAX object) The object that preforms the query.
- * @return NULL.  Queries server and then performs an action with the recieved JSON array.
+ * @return NULL.  Queries server and then performs an action with the received JSON array.
  * @note Called by run_search().
  */
 function post_to_server(server_URL, message, ajax)
@@ -1041,10 +1041,10 @@ function post_to_server(server_URL, message, ajax)
 
 
 /**
- * Determines the action to preform with the recieved data.
+ * Determines the action to preform with the received data.
  *
  * @example interpret_result(ajax.responseText);
- * @param message (string) The recieved JSON array.
+ * @param message (string) The received JSON array.
  * @return NULL.  Preforms an action with the data.
  * @note Called by post_to_server().
  */

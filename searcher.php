@@ -50,7 +50,7 @@ if (isset($_REQUEST['t'])) {
 	die();
 }
 
-/// Which verse should searches start on?
+/// Which verse should the search start on?
 ///NOTE: Not used with VERSE_LOOKUP.
 if (isset($_REQUEST['s'])) {
 	$start_id = (int)$_REQUEST['s'];
@@ -58,7 +58,7 @@ if (isset($_REQUEST['s'])) {
 	$start_id = 0;
 }
 
-/// In what direction should the verses be retrived?
+/// In what direction should the verses be retrieved?
 if (isset($_REQUEST['d'])) {
 	$direction = (int)$_REQUEST['d'];
 } else {
@@ -81,10 +81,10 @@ run_search($query, $type, $direction, $start_id);
  * @example run_search("love", STANDARD_SEARCH, ADDITIONAL, 40000101);
  * @example run_search("God & love", STANDARD_SEARCH, ADDITIONAL);
  * @example run_search('["love", "NOUN", 0]', MORPHOLOGICAL_SEARCH, ADDITIONAL);
- * @param $query (string) The input to be searched for or a JSON strinigied array for advanced searching.
+ * @param $query (string) The input to be searched for or a stringified JSON array for advanced searching.
  * @param $type (integer) The type of query: SEARCH || VERSE_LOOKUP.
  * @param $direction (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
- * @param $start_id (integer) (optional) The verse_id from whence to start.
+ * @param $start_id (integer) (optional) The verse_id whence to start.
  * @return NULL.  Data is sent to the buffer.  Intended for AJAX requests.
  * @note The script should stop execution before this function ends.
  */
@@ -138,7 +138,7 @@ function retrieve_verses($verse_id, $direction)
 	$SQL_query = 'SELECT id, words FROM ' . bible_verses . ' WHERE id ' . $operator . (int)$verse_id . $order_by . ' LIMIT ' . LIMIT;
 	$SQL_res = mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
 	
-	/// Convert SQL results into one comma deliniated string for JSON.
+	/// Convert SQL results into one comma delineated string for JSON.
 	$verses_str = "";
 	$verses_num = "";
 	
@@ -231,7 +231,7 @@ function standard_search($query, $direction, $start_id = 0)
 	$SQL_query = 'SELECT words FROM ' . bible_verses . ' WHERE id IN (' . $simple_matches . ')';
 	$SQL_res = mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
 	
-	/// Convert SQL results into one comma deliniated string.
+	/// Convert SQL results into one comma delineated string.
 	$verses_str = "";
 	while ($row = mysql_fetch_assoc($SQL_res)) {
 		$verses_str .= '"' . $row['words'] . '",';
@@ -310,7 +310,7 @@ function morphology_search($json, $direction, $start_id = 0)
 	$SQL_query = 'SELECT words FROM ' . bible_verses . ' WHERE id IN (' . $simple_matches . ')';
 	$SQL_res = mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
 	
-	/// Convert SQL results into one comma deliniated string.
+	/// Convert SQL results into one comma delineated string.
 	$verses_str = "";
 	while ($row = mysql_fetch_assoc($SQL_res)) {
 		$verses_str .= '"' . $row['words'] . '",';

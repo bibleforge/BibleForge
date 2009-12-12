@@ -5,4 +5,4 @@ The Sphinx API (sphinxapi.php) is licensed (with written permission from the aut
 
 Font licenses:
 
-The Bitstream Vera Fonts fonts are copyrighted under a gernerous open source license as found in bitstream_font_license.txt.  The Tex Gyre Pagella fonts are also copyrighted under an open source copyright as found in gust_font_license.txt.
+The Bitstream Vera Fonts fonts are copyrighted under a generous open source license as found in bitstream_font_license.txt.  The Tex Gyre Pagella fonts are also copyrighted under an open source copyright as found in gust_font_license.txt.

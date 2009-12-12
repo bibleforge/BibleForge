@@ -13,7 +13,7 @@ require_once 'config.php';
 
 /// Define table constants.
 ///NOTE: Not used, I think.
-///FIXME: Should be set in a lanaguge file or something like that.
+///FIXME: Should be set in a language file or something like that.
 define('bible_english', 'bible_english');
 define('bible_verses', 'bible_english_html');
 /**

@@ -89,7 +89,7 @@ body {
 }
 
 
-/* Vereses created from a search. */
+/* Verses created from a search. */
 .search_verse {	
 	/* This gives reverse indent, but causes problems with margins (tested w/Mozilla).
 	/* This gives reverse indent, but causes problems with margins (tested w/Mozilla).
@@ -100,13 +100,13 @@ body {
 	width: 100%;
 }
 
-/* Vereses created from a verse lookup. */
+/* Verses created from a verse lookup. */
 .verse {
 	text-indent: 1em;
 	width: 100%;
 }
 
-/* Vereses created from a verse lookup. */
+/* Verses created from a verse lookup. */
 .pslam_title {
 	margin: 0px 2em 0px 2em;
 	padding-bottom: 19px;
@@ -125,10 +125,10 @@ body {
 	padding: 1px;
 	*/
 }
-/* Fixes a bug where the last word of the first verse somtimes wraps. */
+/* Fixes a bug where the last word of the first verse sometimes wraps. */
 .first_verse {
 	width: 100%;
-	/* This makes sure that the first line is atleast two lines long to give the drop caps just enough space. */
+	/* This makes sure that the first line is at least two lines long to give the drop caps just enough space. */
 	min-height: 38px;
 }
 

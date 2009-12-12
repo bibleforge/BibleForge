@@ -7,7 +7,7 @@
  * @license Reciprocal Public License (RPL)
  */
 
-/// Declare global varirables.
+/// Declare global variables.
 
 /// Book names
 var books_short = ["", "Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy", "Joshua", "Judges", "Ruth", "1 Samuel", "2 Samuel", "1 Kings", "2 Kings", "1 Chronicles", "2 Chronicles", "Ezra", "Nehemiah", "Esther", "Job", "Psalms", "Proverbs", "Ecclesiastes", "Song of Songs", "Isaiah", "Jeremiah", "Lamentations", "Ezekiel", "Daniel", "Hosea", "Joel", "Amos", "Obadiah", "Jonah", "Micah", "Nahum", "Habakkuk", "Zephaniah", "Haggai", "Zechariah", "Malachi", "Matthew", "Mark", "Luke", "John", "Acts", "Romans", "1 Corinthians", "2 Corinthians", "Galatians", "Ephesians", "Philippians", "Colossians", "1 Thessalonians", "2 Thessalonians", "1 Timothy", "2 Timothy", "Titus", "Philemon", "Hebrews", "James", "1 Peter", "2 Peter", "1 John", "2 John", "3 John", "Jude", "Revelation"];
@@ -32,7 +32,7 @@ var stop_words_re = /^th[iu]s|h[ai]s|was|yes|succeed|proceed|e(?:arly|xceed)|onl
 /// Morphological variables
 var morph_marker = ' AS ';
 var morph_marker_len = 4;
-var morph_seperator = ',';
+var morph_separator = ',';
 ///TODO: Add this to the forge so that it is compiled automatically.
 var morph_grammar = {'NOUN':'[1,1]','VERB':'[1,2]','ADJECTIVE':'[1,3]','ADVERB':'[1,4]','RELATIVE PRONOUN':'[1,5]',};
 
@@ -183,7 +183,7 @@ function stem_word(w)
  * Determines the id of a verse from a reference.
  *
  * Determines if a verse is a reference and then calculates the verse id.
- * It supports various abbrivated forms as well as misspellings.
+ * It supports various abbreviated forms as well as misspellings.
  * Only a book is required or checked for validity.
  * The verse id format is [B]BCCCVVV (e.g., Genesis 1:1 == 1001001).
  *
@@ -530,7 +530,7 @@ function determine_reference(ref)
 /**
  * Prepares search terms to adhere to Sphinx syntax before submission to the server.
  *
- * Removes execess white space, converts special words to symbols, and converts certain characters to a format adhere to Sphinx syntax.
+ * Removes excess whitespace, converts special words to symbols, and converts certain characters to a format adhere to Sphinx syntax.
  *
  * @example search_terms = prepare_search("NOT in  the  AND good OR  beginning  "); /// Returns "-in the & good | beginning"
  * @example search_terms = prepare_search("ps 16:title"); /// Returns "ps 16:0"
@@ -540,12 +540,12 @@ function determine_reference(ref)
  * @note Called by run_search() in js/main.js.
  * @note Replaces AND, OR, and NOT with &, |, and - respectively.
  * @note Replaces curly quotes with straight.
- * @note Replaces various hypens, dashes, and minuses with the standard hyphen (-).
+ * @note Replaces various hyphens, dashes, and minuses with the standard hyphen (-).
  */
 function prepare_search(search_terms)
 {
 	///NOTE: /\s{2,}/g gets rid of double spaces within the words (e.g., "here    there" becomes "here there").
-	///NOTE: /\s+-\s+/g ensures that filter_array() will filter out negitive words like "this - that" ("that" does not need to be highlighted).
+	///NOTE: /\s+-\s+/g ensures that filter_array() will filter out negative words like "this - that" ("that" does not need to be highlighted).
 	///NOTE: \u2011-\u2015 finds various hyphens, dashes, and minuses.
 	return search_terms.replace(/\s{2,}/g, " ").replace(/\sAND\s/g, " & ").replace(/\sOR\s/g, " | ").replace(/\s-\s/g, " -").replace(/\s*\bNOT\s/g, " -").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[\u2011-\u2015]/g, "-").replace(/([0-9]+)[:.;,\s]title/ig, "$1:0").trim();
 }
@@ -591,7 +591,7 @@ function filter_terms_for_highlighter(search_terms)
  * //@example determine_search_type("love AS NOUN & more | less -good AS ADJECTIVE"); /// Returns [MORPHOLOGICAL_SEARCH, [0, "love", "NOUN"], STANDARD_SEARCH, "& more | less -good", MORPHOLOGICAL_SEARCH, [0, "good", "ADJECTIVE"]]
  * @param search_terms (string) The prepared terms to be examined.
  * @note Called by run_search() in js/main.js.
- * @note Only a partial implamentation currently.  Mixed searching is lacking.
+ * @note Only a partial implementation currently.  Mixed searching is lacking.
  */
 function determine_search_type(search_terms)
 {
@@ -599,22 +599,22 @@ function determine_search_type(search_terms)
 	/// Did the user use the morphological keyword in his search?
 	if ((split_pos = search_terms.indexOf(morph_marker)) != -1) {
 		///TODO: Determine what is better: a JSON array or POST/GET string (i.e., word1=word&grammar_type1=1&value1=3&...).
-		/// A JSON array is used to contian the inforamtion about the search.
+		/// A JSON array is used to contain the information about the search.
 		/// JSON format: '["WORD",[[GRAMMAR_TYPE1,VALUE1],[...]],[INCLUDE]]'
 		/// JSON example1: ["love",[[PART_OF_SPEECH,1]],[1]]' == love AS NOUN
 		/// JSON example2: '["go",[[MOOD,3],[NUMBER,1]],[1,0]]' == go AS IMPERATIVE, -SINGULAR
 		///FIXME: It needs to add slashes.
 		var include_json = "";
 		var morph_json = '["' + search_terms.slice(0, split_pos) + '",[';
-		var moph_parameters = search_terms.slice(split_pos + morph_marker_len);
+		var morph_parameters = search_terms.slice(split_pos + morph_marker_len);
 		/// Loop to find all of the parameters.
 		var split_start = 0;
 		do {
-			split_pos = moph_parameters.indexOf(morph_seperator, split_start);
+			split_pos = morph_parameters.indexOf(morph_separator, split_start);
 			/// Trim leading white space.
-			if (moph_parameters.slice(split_start, split_start + 1) == " ") ++split_start;
+			if (morph_parameters.slice(split_start, split_start + 1) == " ") ++split_start;
 			/// Is this morphological feature to be excluded?
-			if (moph_parameters.slice(split_start, split_start + 1) == "-") {
+			if (morph_parameters.slice(split_start, split_start + 1) == "-") {
 				/// Skip the hyphen.
 				++split_start;
 				include_json += "0,";
@@ -622,10 +622,11 @@ function determine_search_type(search_terms)
 				include_json += "1,";
 			}
 			if (split_pos > -1) {
-				morph_json += morph_grammar[moph_parameters.slice(split_start, split_pos).trim()] + ",";
+				morph_json += morph_grammar[morph_parameters.slice(split_start, split_pos).trim()] + ",";
 				split_start = split_pos + 1;
 			} else {
-				return morph_json + morph_grammar[moph_parameters.slice(split_start).trim()] + "],[[" + include_json.slice(0, -1) + "]]";
+				///NOTE: include_json.slice(0, -1) is used to remove the trailing comma.  This could be unnecessary.
+				return morph_json + morph_grammar[morph_parameters.slice(split_start).trim()] + "],[[" + include_json.slice(0, -1) + "]]";
 			}
 		} while (true);
 	}
