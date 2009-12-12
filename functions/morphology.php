@@ -9,7 +9,7 @@
  * @license Reciprocal Public License (RPL)
  */
 
-///TODO: Figue out the best way to handle this.  Currently, there is a short list of constants
+///TODO: Figure out the best way to handle this.  Currently, there is a short list of constants
 ///      that is used to ensure that valid data is sent.  The downside is that an array must be
 ///      sent containing the general grammatical type plus the specific value.  It also requires
 ///      a long switch construct.
@@ -96,10 +96,10 @@ function interpret_json($json, $sphinx)
 				$attr = 'dialect';
 				break;
 			case TRANSITIVITY:
-				$attr = 'transitive'; ///FIXME: This should probalby be changed to match the constant.
+				$attr = 'transitive'; ///FIXME: This should probably be changed to match the constant.
 				break;
 			case MISCELLANEOUS:
-				$attr = 'extra'; ///FIXME: This should probalby be changed to match the constant.
+				$attr = 'extra'; ///FIXME: This should probably be changed to match the constant.
 				break;
 			case SECOND_FORM:
 				$attr = 'second_form';

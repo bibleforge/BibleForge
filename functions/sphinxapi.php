@@ -52,7 +52,7 @@ define ( "SPH_MATCH_EXTENDED2",		6 );	/// extended engine V2 (TEMPORARY, WILL BE
 define ( "SPH_RANK_PROXIMITY_BM25",	0 );	///< default mode, phrase proximity major factor and BM25 minor one
 define ( "SPH_RANK_BM25",		1 );	///< statistical mode, BM25 ranking only (faster but worse quality)
 define ( "SPH_RANK_NONE",		2 );	///< no ranking, all matches get a weight of 1
-define ( "SPH_RANK_WORDCOUNT",		3 );	///< simple word-count weighting, rank is a weighted sum of per-field keyword occurence counts
+define ( "SPH_RANK_WORDCOUNT",		3 );	///< simple word-count weighting, rank is a weighted sum of per-field keyword occurrence counts
 
 /// known sort modes
 define ( "SPH_SORT_RELEVANCE",		0 );
@@ -167,7 +167,7 @@ class SphinxClient
 	var $_mode;			///< query matching mode (default is SPH_MATCH_ALL)
 	var $_weights;		///< per-field weights (default is 1 for all fields)
 	var $_sort;			///< match sorting mode (default is SPH_SORT_RELEVANCE)
-	var $_sortby;		///< attribute to sort by (defualt is "")
+	var $_sortby;		///< attribute to sort by (default is "")
 	var $_min_id;		///< min ID to match (default is 0, which means no limit)
 	var $_max_id;		///< max ID to match (default is 0, which means no limit)
 	var $_filters;		///< search filters
@@ -499,7 +499,7 @@ class SphinxClient
 	}
 
 	/// set IDs range to match
-	/// only match records if document ID is beetwen $min and $max (inclusive)
+	/// only match records if document ID is between $min and $max (inclusive)
 	function SetIDRange ( $min, $max )
 	{
 		//assert ( is_numeric($min) );
@@ -529,7 +529,7 @@ class SphinxClient
 	}
 
 	/// set range filter
-	/// only match records if $attribute value is beetwen $min and $max (inclusive)
+	/// only match records if $attribute value is between $min and $max (inclusive)
 	function SetFilterRange ( $attribute, $min, $max, $exclude=false )
 	{
 		//assert ( is_string($attribute) );
@@ -541,7 +541,7 @@ class SphinxClient
 	}
 
 	/// set float range filter
-	/// only match records if $attribute value is beetwen $min and $max (inclusive)
+	/// only match records if $attribute value is between $min and $max (inclusive)
 	function SetFilterFloatRange ( $attribute, $min, $max, $exclude=false )
 	{
 		//assert ( is_string($attribute) );
@@ -955,8 +955,8 @@ $result["simple-matches"] .= $doc.','; /// return string
 	// excerpts generation
 	/////////////////////////////////////////////////////////////////////////////
 
-	/// connect to searchd server, and generate exceprts (snippets)
-	/// of given documents for given query. returns false on failure,
+	/// connect to searchd server, and generate excerpts (snippets)
+	/// of given documents for given query. Returns false on failure,
 	/// an array of snippets on success
 	function BuildExcerpts ( $docs, $index, $words, $opts=array() )
 	{

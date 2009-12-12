@@ -10,17 +10,17 @@
  */
 
 /**
- * Configure the constants to match your enviroment,
+ * Configure the constants to match your environment,
  * and then rename this file to config.php.
  */
 
 /// MySQL
-define('DB_SERVER', '127.0.0.1');
+define('DB_SERVER', '127.0.0.1'); ///NOTE: Use the typical MySQL sever format (hostname[:(port|socket)]).
 define('DB_USERNAME', 'root');
 define('DB_PASSWORD', '');
 define('DB_NAME', 'bf');
 
 /// Sphinx
-define('SPHINX_API', 'sphinxapi'); /// 'sphinxapi' OR 'sphinxapi_cli'
-define('SPHINX_SERVER', '127.0.0.1'); /// sphinx host address OR path to search executable
-define('SPHINX_PORT', 9312); /// port OR path to sphinx config file
+define('SPHINX_API', 'sphinxapi'); /// Which API to use (i.e., 'sphinxapi' or 'sphinxapi_cli')
+define('SPHINX_SERVER', '127.0.0.1'); /// The Sphinx host address (sphinxapi) or the path to search executable (sphinxapi_cli)
+define('SPHINX_PORT', 9312); /// Port number (sphinxapi) or path to sphinx config file (sphinxapi_cli)
