@@ -33,6 +33,7 @@ var stop_words_re = /^th[iu]s|h[ai]s|was|yes|succeed|proceed|e(?:arly|xceed)|onl
 var morph_marker = ' AS ';
 var morph_marker_len = 4;
 var morph_seperator = ',';
+///TODO: Add this to the forge so that it is compiled automatically.
 var morph_grammar = {'NOUN':'[1,1]','VERB':'[1,2]',};
 
 /**
@@ -594,46 +595,28 @@ function filter_terms_for_highlighter(search_terms)
  */
 function determine_search_type(search_terms)
 {
-	var split_pos;
-	/// Did the user use the morphological keyword in his search?
-	if ((split_pos = search_terms.indexOf(morph_marker)) != -1) {
-		///TODO: Determine what is better: a JSON array or POST/GET string (i.e., word1=word&grammar_type1=1&value1=3&...).
-		/// A JSON array is used to contian the inforamtion about the search.
-		/// JSON format: '["WORD",[[GRAMMAR_TYPE1,VALUE1],[...]],[INCLUDE]]'
-		/// JSON example1: ["love",[[PART_OF_SPEECH,1]],[1]]' == love AS NOUN
-		/// JSON example2: '["go",[[MOOD,3],[NUMBER,1]],[1,0]]' == go AS IMPERATIVE, -SINGULAR
-		///FIXME: It needs to add slashes.
-		var include_json = "[";
-		var morph_json = '["' + search_terms.substr(0, split_pos) + '",[';
-		var moph_parameters = search_terms.substr(split_pos + morph_marker_len);
-		/// Loop to find all of the parameters.
-		var split_start = 0;
-		while ((split_pos = moph_parameters.indexOf(morph_seperator, split_start)) != -1) {
-			/// Trim leading white space.
-			if (moph_parameters.slice(split_start, split_start + 1) == " ") ++split_start;
-			/// Is this morphological feature to be excluded?
-			if (moph_parameters.slice(split_start, split_start + 1) == "-") {
-				/// Skip the hyphen.
-				++split_start;
+	var morph_arr = search_terms.split(morph_marker);
+	
+	if (morph_arr.length > 1) {
+		var morph_json = '["' + morph_arr[0] + '",[';
+		var include_json = "";
+		
+		var terms = morph_arr[1].split(/, ?/);
+		
+		var count = terms.length;
+		
+		var term_str = "";
+		
+		for (var i = 0; i < count; ++i) {
+			if (terms[i].slice(0, 1) == "-") {
 				include_json += "0,";
+				terms[i] = terms[i].substr(1);
 			} else {
 				include_json += "1,";
 			}
-			morph_json += morph_grammar[moph_parameters.slice(split_start, split_pos).trim()] + ",";
-			split_start = split_pos + 1;
+			term_str += morph_grammar[terms[i]] + ",";
 		}
-		if (moph_parameters.slice(split_start, split_start + 1) == " ") ++split_start;
-		if (moph_parameters.slice(split_start, split_start + 1) == "-") {
-			/// Skip the hyphen.
-			++split_start;
-			include_json += "0";
-		} else {
-			include_json += "1";
-		}
-		morph_json += morph_grammar[moph_parameters.slice(split_start).trim()] + "],[" + include_json + "]";
-		return morph_json;
+		return morph_json + term_str.slice(0, -1) + "],[" + include_json.slice(0, -1) + "]]";
 	}
-	
-	/// The search is just a normal search.
 	return [STANDARD_SEARCH];
 }
