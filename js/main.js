@@ -8,6 +8,8 @@
  * @author BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
  */
 
+///TODO: Document which global variables (and global language variables) are used in which functions.
+
 /*****************************
  * Declare global constants. *
  *****************************/
@@ -223,12 +225,13 @@ function prepare_new_search()
 /**
  * Figure out what type of search is being attempted by the user.
  *
- * @example determine_search_type("love AS NOUN"); /// Returns ["love",[[1,1]],[1]]
- * @example determine_search_type("go AS IMPERITIVE, -SINGULAR"); /// Returns ["love",[[?,?],[?,1]],[1,0]]
- * @example determine_search_type("go AS VERB,PASSIVE, INDICATIVE,-PERFECT"); /// Returns ["love",[[?,?],[?,?],[?,?],[?,?]],[1,1,1,0]]
  * @example determine_search_type("God & love"); /// Returns [STANDARD_SEARCH]
+ * @example determine_search_type("love AS NOUN"); /// Returns [MORPHOLOGICAL_SEARCH,'["love",[[1,1]],[1]]']
+ * @example determine_search_type("go AS IMPERITIVE, -SINGULAR"); /// Returns [MORPHOLOGICAL_SEARCH,'["go",[[?,?],[?,1]],[1,0]]']
+ * @example determine_search_type("go AS VERB,PASSIVE, INDICATIVE,-PERFECT"); /// Returns [MORPHOLOGICAL_SEARCH,'["go",[[?,?],[?,?],[?,?],[?,?]],[1,1,1,0]]']
  * //@example determine_search_type("love AS NOUN & more | less -good AS ADJECTIVE"); /// Returns [MORPHOLOGICAL_SEARCH, [0, "love", "NOUN"], STANDARD_SEARCH, "& more | less -good", MORPHOLOGICAL_SEARCH, [0, "good", "ADJECTIVE"]]
  * @param search_terms (string) The prepared terms to be examined.
+ * @return An array describing the type of search.  Format: [(int)Type of search, (optional)(string)JSON array describing the search].
  * @note Called by run_search().
  * @note Only a partial implementation currently.  Mixed searching is lacking.
  */
@@ -238,19 +241,24 @@ function determine_search_type(search_terms)
 	var split_pos;
 	/// Did the user use the morphological keyword in his search?
 	if ((split_pos = search_terms.indexOf(morph_marker)) != -1) {
-		///TODO: Determine what is better: a JSON array or POST/GET string (i.e., word1=word&grammar_type1=1&value1=3&...).
+		///TODO: Determine what is better: a JSON array or POST/GET string (i.e., word1=word&grammar_type1=1&value1=3&include1=1&...).
 		/// A JSON array is used to contain the information about the search.
-		/// JSON format: '["WORD",[[GRAMMAR_TYPE1,VALUE1],[...]],[INCLUDE]]'
-		/// JSON example1: ["love",[[PART_OF_SPEECH,1]],[1]]' == love AS NOUN
-		/// JSON example2: '["go",[[MOOD,3],[NUMBER,1]],[1,0]]' == go AS IMPERATIVE, -SINGULAR
-		///FIXME: It needs to add slashes.
+		/// JSON format: '["WORD",[[GRAMMAR_TYPE1,VALUE1],[...]],[INCLUDE1,...]]'
+		/// replace(/(["'])/g, "\\$1") adds slashes to sanitize the data.
+		var morph_json = '["' + search_terms.slice(0, split_pos).replace(/(["'])/g, "\\$1") + '",[';
+		
+		/// These string will be used to concatenate data.
+		var morph_parameter_json = "";
 		var include_json = "";
-		var morph_json = '["' + search_terms.slice(0, split_pos) + '",[';
+		
 		var morph_parameters = search_terms.slice(split_pos + morph_marker_len);
-		/// Loop to find all of the parameters.
+		
 		var split_start = 0;
+		
+		///TODO: Determine if there is a benefit to useing do() over while().
+		///NOTE: An infinite loop is used because the data is returned when it reaches the end of the string.
 		do {
-			/// Find where the parameters separate (e.g., "NOUN, GENITIVE" would separate at character 5).
+			/// Find where the parameters separate (e.g., "NOUN, GENITIVE" would separate at character 4).
 			split_pos = morph_parameters.indexOf(morph_separator, split_start);
 			/// Trim leading white space.
 			if (morph_parameters.slice(split_start, split_start + 1) == " ") ++split_start;
@@ -264,16 +272,16 @@ function determine_search_type(search_terms)
 			}
 			if (split_pos > -1) {
 				///TODO: Determine if it would be faster to concatenate with morph_json only at the end.
-				morph_json += morph_grammar[morph_parameters.slice(split_start, split_pos).trim()] + ",";
+				morph_parameter_json += morph_grammar[morph_parameters.slice(split_start, split_pos).trim()] + ",";
 				split_start = split_pos + 1;
 			} else {
 				///TODO: Determine if trim() is necessary or if there is a better implementation.
 				///NOTE: include_json.slice(0, -1) is used to remove the trailing comma.  This could be unnecessary.
-				return morph_json + morph_grammar[morph_parameters.slice(split_start).trim()] + "],[[" + include_json.slice(0, -1) + "]]";
+				return [MORPHOLOGICAL_SEARCH, morph_json + morph_parameter_json + morph_grammar[morph_parameters.slice(split_start).trim()] + "],[[" + include_json.slice(0, -1) + "]]"];
 			}
 		} while (true);
 	}
-	/// The search is just a normal search.
+	/// The search is just a standard search.
 	return [STANDARD_SEARCH];
 }
 
