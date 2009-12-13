@@ -7,6 +7,7 @@
  * @version 0.1 alpha 2
  * @link http://BibleForge.com
  * @license Reciprocal Public License 1.5 (RPL1.5)
+ * @author BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
  */
 
 require_once 'config.php';
