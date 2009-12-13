@@ -218,6 +218,66 @@ function prepare_new_search()
 }
 
 
+///TODO: Make this work with run_search().
+///TODO: Finish filling out the example returns.
+/**
+ * Figure out what type of search is being attempted by the user.
+ *
+ * @example determine_search_type("love AS NOUN"); /// Returns ["love",[[1,1]],[1]]
+ * @example determine_search_type("go AS IMPERITIVE, -SINGULAR"); /// Returns ["love",[[?,?],[?,1]],[1,0]]
+ * @example determine_search_type("go AS VERB,PASSIVE, INDICATIVE,-PERFECT"); /// Returns ["love",[[?,?],[?,?],[?,?],[?,?]],[1,1,1,0]]
+ * @example determine_search_type("God & love"); /// Returns [STANDARD_SEARCH]
+ * //@example determine_search_type("love AS NOUN & more | less -good AS ADJECTIVE"); /// Returns [MORPHOLOGICAL_SEARCH, [0, "love", "NOUN"], STANDARD_SEARCH, "& more | less -good", MORPHOLOGICAL_SEARCH, [0, "good", "ADJECTIVE"]]
+ * @param search_terms (string) The prepared terms to be examined.
+ * @note Called by run_search().
+ * @note Only a partial implementation currently.  Mixed searching is lacking.
+ */
+function determine_search_type(search_terms)
+{
+	///NOTE: Global language variables used: morph_marker, morph_marker_len, morph_separator, morph_grammar.
+	var split_pos;
+	/// Did the user use the morphological keyword in his search?
+	if ((split_pos = search_terms.indexOf(morph_marker)) != -1) {
+		///TODO: Determine what is better: a JSON array or POST/GET string (i.e., word1=word&grammar_type1=1&value1=3&...).
+		/// A JSON array is used to contain the information about the search.
+		/// JSON format: '["WORD",[[GRAMMAR_TYPE1,VALUE1],[...]],[INCLUDE]]'
+		/// JSON example1: ["love",[[PART_OF_SPEECH,1]],[1]]' == love AS NOUN
+		/// JSON example2: '["go",[[MOOD,3],[NUMBER,1]],[1,0]]' == go AS IMPERATIVE, -SINGULAR
+		///FIXME: It needs to add slashes.
+		var include_json = "";
+		var morph_json = '["' + search_terms.slice(0, split_pos) + '",[';
+		var morph_parameters = search_terms.slice(split_pos + morph_marker_len);
+		/// Loop to find all of the parameters.
+		var split_start = 0;
+		do {
+			/// Find where the parameters separate (e.g., "NOUN, GENITIVE" would separate at character 5).
+			split_pos = morph_parameters.indexOf(morph_separator, split_start);
+			/// Trim leading white space.
+			if (morph_parameters.slice(split_start, split_start + 1) == " ") ++split_start;
+			/// Is this morphological feature to be excluded?
+			if (morph_parameters.slice(split_start, split_start + 1) == "-") {
+				/// Skip the hyphen.
+				++split_start;
+				include_json += "0,";
+			} else {
+				include_json += "1,";
+			}
+			if (split_pos > -1) {
+				///TODO: Determine if it would be faster to concatenate with morph_json only at the end.
+				morph_json += morph_grammar[morph_parameters.slice(split_start, split_pos).trim()] + ",";
+				split_start = split_pos + 1;
+			} else {
+				///TODO: Determine if trim() is necessary or if there is a better implementation.
+				///NOTE: include_json.slice(0, -1) is used to remove the trailing comma.  This could be unnecessary.
+				return morph_json + morph_grammar[morph_parameters.slice(split_start).trim()] + "],[[" + include_json.slice(0, -1) + "]]";
+			}
+		} while (true);
+	}
+	/// The search is just a normal search.
+	return [STANDARD_SEARCH];
+}
+
+
 /**
  * Submits a query via AJAX.
  *
