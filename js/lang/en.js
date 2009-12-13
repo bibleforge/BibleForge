@@ -32,10 +32,10 @@ var stop_words_re = /^th[iu]s|h[ai]s|was|yes|succeed|proceed|e(?:arly|xceed)|onl
 
 /// Morphological variables
 var morph_marker = ' AS ';
-var morph_marker_len = 4;
+var morph_marker_len = 4; /// The length of morph_marker.
 var morph_separator = ',';
 ///TODO: Add this to the forge so that it is compiled automatically.
-var morph_grammar = {'NOUN':'[1,1]','VERB':'[1,2]','ADJECTIVE':'[1,3]','ADVERB':'[1,4]','RELATIVE PRONOUN':'[1,5]',};
+var morph_grammar = {'NOUN':'[1,1]','VERB':'[1,2]','ADJECTIVE':'[1,3]','ADVERB':'[1,4]','RELATIVE_PRONOUN':'[1,5]',};
 
 /**
  * Convert an English word to its root form.
