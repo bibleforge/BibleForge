@@ -4,7 +4,7 @@
  * @date    10-30-08
  * @version 0.1 alpha 2
  * @link http://BibleForge.com
- * @license Reciprocal Public License (RPL)
+ * @license Reciprocal Public License 1.5 (RPL1.5)
  */
 
 /*****************************

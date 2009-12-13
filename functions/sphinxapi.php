@@ -8,13 +8,13 @@
 // Copyright (c) 2001-2008, Andrew Aksyonoff. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License. You should have
-// received a copy of the LGPL license along with this program; if you
-// did not, you can find it at http://www.gnu.org/
+// it under the terms of the GNU Lesser General Public License v2.1.
+// You should have received a copy of the LGPLv2.1 license along with 
+// this program; if you did not, you can find it at http://www.gnu.org/.
 //
 // Modified and streamlined for BibleForge (http://BibleForge.com).
 //
-// Licensed under the LGPL with written permission by the original author.
+// Licensed under the LGPLv2.1 with written permission by the original author.
 //
 
 /////////////////////////////////////////////////////////////////////////////
