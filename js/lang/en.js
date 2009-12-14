@@ -527,6 +527,7 @@ function determine_reference(ref)
 	return book + chapter + verse;
 }
 
+///TODO: Determine if these functions (prepare_search() and filter_terms_for_highlighter())could be moved out of the language Dependant file and just use some language dependent variables.
 
 /**
  * Prepares search terms to adhere to Sphinx syntax before submission to the server.
@@ -546,9 +547,10 @@ function determine_reference(ref)
 function prepare_search(search_terms)
 {
 	///NOTE: /\s{2,}/g gets rid of double spaces within the words (e.g., "here    there" becomes "here there").
-	///NOTE: /\s+-\s+/g ensures that filter_array() will filter out negative words like "this - that" ("that" does not need to be highlighted).
-	///NOTE: \u2011-\u2015 finds various hyphens, dashes, and minuses.
-	return search_terms.replace(/\s{2,}/g, " ").replace(/\sAND\s/g, " & ").replace(/\sOR\s/g, " | ").replace(/\s-\s/g, " -").replace(/\s*\bNOT\s/g, " -").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[\u2011-\u2015]/g, "-").replace(/([0-9]+)[:.;,\s]title/ig, "$1:0").trim();
+	///NOTE: /\s+-\s+/g ensures that filter_array() will filter out negative words like "this - that" (i.e., "that" does not need to be highlighted).
+	///NOTE: \u2011-\u2015 replaces various hyphens, dashes, and minuses with the standard hyphen (-).
+	///NOTE: replace(/([0-9]+)[:.;,\s]title/ig, "$1:0") replaces Psalm title references into an acceptable format (e.g., "Psalm 3:title" becomes "Psalm 3:0").
+	return search_terms.replace(/\s{2,}/g, " ").replace(/\sAND\s/g, " & ").replace(/\sOR\s/g, " | ").replace(/(?:\s-|\s*\bNOT)\s/g, " -").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[\u2011-\u2015]/g, "-").replace(/([0-9]+)[:.;,\s]title/ig, "$1:0").trim();
 }
 
 
@@ -565,15 +567,17 @@ function prepare_search(search_terms)
  */
 function filter_terms_for_highlighter(search_terms)
 {
-	///NOTE: -\B removes trailing hyphens.
-	///TODO: Determine if there is a better was to filter out invalid characters without filtering out English, Greek, Hebrew and other characters.
-	var initial_search_arr = search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?(?:[~\/]\d*)?|[^\s]*)|["',.:?!;&|\)\(\]\[\/\\`{}<$^+]|-\B)/g, "").toLowerCase().split(" ");
+	///NOTE: (?:^|\s) makes sure not to filter out hyphenated words.
+	///NOTE: (?:"[^"]*"?|[^\s]*) matches a single word or phrase starting with a double quote (").
+	///NOTE: [~\/]\d* removes characters used for Sphinx query syntax.  I.e., proximity searches ("this that"~10) and quorum matching ("at least three of these"/3).
+	///NOTE: -\B removes trailing hyphens.  (This might be unnecessary.)
+	var initial_search_arr = search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?|[^\s]*)|[~\/]\d*|["',.:?!;&|\)\(\]\[\/\\`{}<$^+]|-\B)/g, "").toLowerCase().split(" ");
 	
 	var final_search_arr = [], arr_len = initial_search_arr.length, new_arr_len = 0, i, j;
 	
-	first_loop:for (i = 0; i < arr_len; ++i) {  
+	first_loop:for (i = 0; i < arr_len; ++i) {
 		for (j = 0; j < new_arr_len; ++j) {
-			if (final_search_arr[j] == initial_search_arr[i]) continue first_loop; /// This words already exists; jump to the first loop and get the next word. (This would be the same as "continue 2" in PHP.) 
+			if (final_search_arr[j] == initial_search_arr[i]) continue first_loop; /// This words already exists; jump to the first loop and get the next word.  (This would be the same as "continue 2" in PHP.) 
 		}
 		final_search_arr[new_arr_len++] = initial_search_arr[i];
 	}
