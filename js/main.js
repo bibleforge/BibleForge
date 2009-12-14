@@ -255,7 +255,7 @@ function determine_search_type(search_terms)
 		
 		var split_start = 0;
 		
-		///TODO: Determine if there is a benefit to useing do() over while().
+		///TODO: Determine if there is a benefit to using do() over while().
 		///NOTE: An infinite loop is used because the data is returned when it reaches the end of the string.
 		do {
 			/// Find where the parameters separate (e.g., "NOUN, GENITIVE" would separate at character 4).
