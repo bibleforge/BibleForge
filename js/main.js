@@ -199,7 +199,7 @@ function prepare_new_search()
 		scroll_maxed_bottom = false;
 		/// We immediately prepare the highlighter so that when the results are returned via AJAX
 		/// the highlighter array will be ready to go.
-		/// Do we already have the regex array or do we not need because the highlighted words will be returned (morphological searching)?
+		/// Do we already have the regex array or do we not need because the highlighted words will be returned (e.g., morphological searching)?
 		if (raw_search_terms != last_search && last_type != MORPHOLOGICAL_SEARCH) {
 			prepare_highlighter(last_search_prepared);
 			last_search = raw_search_terms;
@@ -220,7 +220,6 @@ function prepare_new_search()
 }
 
 
-///TODO: Make this work with run_search().
 ///TODO: Finish filling out the example returns.
 /**
  * Figure out what type of search is being attempted by the user.
@@ -248,36 +247,36 @@ function determine_search_type(search_terms)
 		var morph_json = '["' + search_terms.slice(0, split_pos).replace(/(["'])/g, "\\$1") + '",[';
 		
 		/// These string will be used to concatenate data.
-		var morph_parameter_json = "";
+		var morph_attribute_json = "";
 		var include_json = "";
 		
-		var morph_parameters = search_terms.slice(split_pos + morph_marker_len);
+		var morph_attributes = search_terms.slice(split_pos + morph_marker_len);
 		
 		var split_start = 0;
 		
 		///TODO: Determine if there is a benefit to using do() over while().
 		///NOTE: An infinite loop is used because the data is returned when it reaches the end of the string.
 		do {
-			/// Find where the parameters separate (e.g., "NOUN, GENITIVE" would separate at character 4).
-			split_pos = morph_parameters.indexOf(morph_separator, split_start);
+			/// Find where the attributes separate (e.g., "NOUN, GENITIVE" would separate at character 4).
+			split_pos = morph_attributes.indexOf(morph_separator, split_start);
 			/// Trim leading white space.
-			if (morph_parameters.slice(split_start, split_start + 1) == " ") ++split_start;
+			if (morph_attributes.slice(split_start, split_start + 1) == " ") ++split_start;
 			/// Is this morphological feature to be excluded?
-			if (morph_parameters.slice(split_start, split_start + 1) == "-") {
+			if (morph_attributes.slice(split_start, split_start + 1) == "-") {
 				/// Skip the hyphen.
 				++split_start;
 				include_json += "0,";
 			} else {
 				include_json += "1,";
 			}
+			
 			if (split_pos > -1) {
-				///TODO: Determine if it would be faster to concatenate with morph_json only at the end.
-				morph_parameter_json += morph_grammar[morph_parameters.slice(split_start, split_pos).trim()] + ",";
+				morph_attribute_json += morph_grammar[morph_attributes.slice(split_start, split_pos).trim()] + ",";
 				split_start = split_pos + 1;
 			} else {
 				///TODO: Determine if trim() is necessary or if there is a better implementation.
 				///NOTE: include_json.slice(0, -1) is used to remove the trailing comma.  This could be unnecessary.
-				return [MORPHOLOGICAL_SEARCH, morph_json + morph_parameter_json + morph_grammar[morph_parameters.slice(split_start).trim()] + "],[[" + include_json.slice(0, -1) + "]]"];
+				return [MORPHOLOGICAL_SEARCH, morph_json + morph_attribute_json + morph_grammar[morph_attributes.slice(split_start).trim()] + "],[" + include_json.slice(0, -1) + "]]"];
 			}
 		} while (true);
 	}
