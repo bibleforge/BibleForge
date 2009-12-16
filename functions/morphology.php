@@ -36,22 +36,21 @@ define('DIVINE', 19);
 define('RED', 20);
 
 
-function interpret_json($json, $sphinx)
+function set_morphology_attributes($attribute_arr, $include_arr, $sphinx)
 {
 	/// $json '["WORD",[[GRAMMAR_TYPE1,VALUE1],[...]],[INCLUDE]]'
 	/// $json ex1: '["love",[[PART_OF_SPEECH,1]],[1]]' == love AS NOUN
 	/// $json ex2: '["go",[[MOOD,3],[NUMBER,1]],[1,0]]' == go AS IMPERATIVE, NOT SINGULAR
 	
-	$query_array = json_decode($json);
-	foreach ($query_array[1] as $key => $morphology_arr) {
+	foreach ($attribute_arr as $key => $morphology_arr) {
 		switch ($morphology_arr[0]) {
 			case ADDED:
 				$attr = 'added';
 				break;
-			case divine:
+			case DIVINE:
 				$attr = 'divine';
 				break;
-			case red:
+			case RED:
 				$attr = 'quotation'; ///TODO: Decide on a consistent name for this.
 				break;
 			case PART_OF_SPEECH:
@@ -110,7 +109,7 @@ function interpret_json($json, $sphinx)
 				/// Skip the invalid grammatical form.
 				continue 2;
 		}
-		$sphinx->SetFilter($attr, array((int)$morphology_arr[1]), (bool)$query_array[2][$key]);
+		$sphinx->SetFilter($attr, array((int)$morphology_arr[1]), (bool)$include_arr[$key]);
 	}
 	///TODO: Add the word to the query.  Something like $sphinx->AddQuery($WORD, 'morphological');
 }

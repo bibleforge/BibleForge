@@ -264,8 +264,8 @@ function morphology_search($json, $direction, $start_id = 0)
 {
 	require_once 'config.php';
 	
+	/// Prepare Sphinx.
 	require_once 'functions/' . SPHINX_API . '.php';
-	
 	$sphinx = new SphinxClient();
 	$sphinx->SetServer(SPHINX_SERVER, SPHINX_PORT); /// SetServer(sphinx_server_address, sphinx_server_port)
 	$sphinx->SetLimits(0, LIMIT); /// SetLimits(starting_point, count, max_in_memory (optional), quit_after_x_found (optional))
@@ -274,20 +274,14 @@ function morphology_search($json, $direction, $start_id = 0)
 	
 	$sphinx->SetRankingMode(SPH_RANK_NONE); /// No ranking, fastest
 	
-	$values = array();
+	/// Set the attributes and prepare to search.
+	$query_array = json_decode($json, true);
 	
-	if ($morphology == 'NOUN') {
-		$attribute = 'part_of_speech';
-		$values[] = '1';
-	} elseif ($morphology == 'VERB') {
-		$attribute = 'part_of_speech';
-		$values[] = '2';
-	}
-	
-	$sphinx->SetFilter($attribute, $values, $exclude);
+	require_once 'functions/morphology.php';
+	set_morphology_attributes($query_array[1], $query_array[2], $sphinx);
 	
 	/// Run Sphinx search.
-	$sphinx_res = $sphinx->Query($word, 'morphological');
+	$sphinx_res = $sphinx->Query($query_array[0], 'morphological');
 	
 	/// If no results found were found, send an empty JSON result.
 	if ($sphinx_res['total'] == 0) {
@@ -320,7 +314,7 @@ function morphology_search($json, $direction, $start_id = 0)
 	/// Send results to the buffer as a JSON serialized array, and stop execution.
 	/// Array Format: [[action],[verse_ids,...],[verse_words,...],[number_of_matches]]
 	///NOTE: Javascript ignores trailing commas, but JSON does not.
-	///TODO: It would be nice to indicate if there are no more verses to find when it gets to the end.
+	///TODO: Indicate if there are no more verses to find when it gets to the end.
 	echo '[[', MORPHOLOGICAL_SEARCH, ',', $direction, '],[', $simple_matches, '],[', $verses_str, '],[', $sphinx_res['total_found'], '],[', $word_ids ,']]';
 	die();
 }
