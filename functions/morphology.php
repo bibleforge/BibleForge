@@ -14,6 +14,7 @@
 ///      that is used to ensure that valid data is sent.  The downside is that an array must be
 ///      sent containing the general grammatical type plus the specific value.  It also requires
 ///      a long switch construct.
+///TODO: See if any of these categories can be combind with others, such as FORM with TYPE or MISCELLANEOUS.
 define('PART_OF_SPEECH', 1);
 define('NUMBER', 2);
 define('PERSON', 3);
@@ -26,10 +27,10 @@ define('DEGREE', 9);
 define('DECLINABILITY', 10);
 define('NUMERICAL', 11);
 define('NOUN_TYPE', 12);
-define('FORM', 13);
+define('TYPE', 13);
 define('DIALECT', 14);
 define('TRANSITIVITY', 15);
-define('SECOND_FORM', 16); ///TODO: See if second_form can or should be combined with FORM.
+define('FORM', 16);
 define('MISCELLANEOUS', 17);
 define('ADDED', 18);
 define('DIVINE', 19);
