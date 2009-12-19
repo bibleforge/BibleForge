@@ -8,6 +8,8 @@
  * @author BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
  */
 
+/* TODO: Completely document the CSS. */
+
 html, body {
 	margin: 0;
 	padding: 0;
@@ -119,7 +121,8 @@ body {
 	float: left;
 	/* Bold makes some letters better, esp. "P" */
 	/*font-weight: bold;*/
-	/* This fixes the spacing problem with some letters, especially capital J's. */
+	/* FIXME: Capital J's cover up characters in the third line of the first verse.  See 2 Kings 22:1 in a narrow window. */
+	/* This fixes the spacing problem with some letters, like W, but not quite capital J's. */
 	margin-bottom:-11px;
 	/* Opera needs this
 	margin-bottom:0px;
