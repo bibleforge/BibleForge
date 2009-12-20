@@ -157,7 +157,7 @@ function retrieve_verses($verse_id, $direction)
 	
 	/// Send results to the buffer as a JSON serialized array, and stop execution.
 	/// Array Format: [[action],[verse_ids,...],[verse_words,...],[success]]
-	///NOTE: Some Javascript engines ignore trailing commas (e.g, Firefox's), but standard JSON and some engines (e.g., IE's) do not.
+	///NOTE: rtrim(..., ',') removes trailing commas.  It seems to be slightly faster than substr(..., 0, -1).
 	///TODO: It would be nice to indicate if there are no more verses to find when it gets to the end.
 	echo '[[', VERSE_LOOKUP, ',', $direction, '],[', rtrim($verses_num, ','), '],[', rtrim($verses_str, ','), '],[1]]';
 	die();
@@ -240,7 +240,7 @@ function standard_search($query, $direction, $start_id = 0)
 	
 	/// Send results to the buffer as a JSON serialized array, and stop execution.
 	/// Array Format: [[action],[verse_ids,...],[verse_words,...],[number_of_matches]]
-	///NOTE: Some Javascript engines ignore trailing commas (e.g, Firefox's), but standard JSON and some engines (e.g., IE's) do not.
+	///NOTE: rtrim(..., ',') removes trailing commas.  It seems to be slightly faster than substr(..., 0, -1).
 	///TODO: It would be nice to indicate if there are no more verses to find when it gets to the end.
 	///TODO: Make the JSON work with both eval() and JSON.parse().  The \' throws it off.  But \\' works.  To remove trailing slashes use rtrim(..., ',').
 	echo '[[', STANDARD_SEARCH, ',', $direction, '],[', $simple_matches, '],[', rtrim($verses_str, ','), '],[', $sphinx_res['total_found'], ']]';
@@ -313,7 +313,7 @@ function morphology_search($json, $direction, $start_id = 0)
 	
 	/// Send results to the buffer as a JSON serialized array, and stop execution.
 	/// Array Format: [[action],[verse_ids,...],[verse_words,...],[number_of_matches]]
-	///NOTE: Some Javascript engines ignore trailing commas (e.g, Firefox's), but standard JSON and some engines (e.g., IE's) do not.
+	///NOTE: rtrim(..., ',') removes trailing commas.  It seems to be slightly faster than substr(..., 0, -1).
 	///TODO: Indicate if there are no more verses to find when it gets to the end.
 	echo '[[', MORPHOLOGICAL_SEARCH, ',', $direction, '],[', $simple_matches, '],[', rtrim($verses_str, ','), '],[', $sphinx_res['total_found'], '],[', $word_ids ,']]';
 	die();
