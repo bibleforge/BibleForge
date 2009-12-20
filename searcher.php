@@ -157,9 +157,9 @@ function retrieve_verses($verse_id, $direction)
 	
 	/// Send results to the buffer as a JSON serialized array, and stop execution.
 	/// Array Format: [[action],[verse_ids,...],[verse_words,...],[success]]
-	///NOTE: JSON should ignore trailing commas.
+	///NOTE: Some Javascript engines ignore trailing commas (e.g, Firefox's), but standard JSON and some engines (e.g., IE's) do not.
 	///TODO: It would be nice to indicate if there are no more verses to find when it gets to the end.
-	echo '[[', VERSE_LOOKUP, ',', $direction, '],[', $verses_num, '],[', $verses_str, '],[1]]';
+	echo '[[', VERSE_LOOKUP, ',', $direction, '],[', rtrim($verses_num, ','), '],[', rtrim($verses_str, ','), '],[1]]';
 	die();
 }
 
@@ -240,10 +240,10 @@ function standard_search($query, $direction, $start_id = 0)
 	
 	/// Send results to the buffer as a JSON serialized array, and stop execution.
 	/// Array Format: [[action],[verse_ids,...],[verse_words,...],[number_of_matches]]
-	///NOTE: Javascript ignores trailing commas, but standard JSON does not.
+	///NOTE: Some Javascript engines ignore trailing commas (e.g, Firefox's), but standard JSON and some engines (e.g., IE's) do not.
 	///TODO: It would be nice to indicate if there are no more verses to find when it gets to the end.
 	///TODO: Make the JSON work with both eval() and JSON.parse().  The \' throws it off.  But \\' works.  To remove trailing slashes use rtrim(..., ',').
-	echo '[[', STANDARD_SEARCH, ',', $direction, '],[', $simple_matches, '],[', $verses_str, '],[', $sphinx_res['total_found'], ']]';
+	echo '[[', STANDARD_SEARCH, ',', $direction, '],[', $simple_matches, '],[', rtrim($verses_str, ','), '],[', $sphinx_res['total_found'], ']]';
 	die();
 }
 
@@ -313,8 +313,8 @@ function morphology_search($json, $direction, $start_id = 0)
 	
 	/// Send results to the buffer as a JSON serialized array, and stop execution.
 	/// Array Format: [[action],[verse_ids,...],[verse_words,...],[number_of_matches]]
-	///NOTE: Javascript ignores trailing commas, but JSON does not.
+	///NOTE: Some Javascript engines ignore trailing commas (e.g, Firefox's), but standard JSON and some engines (e.g., IE's) do not.
 	///TODO: Indicate if there are no more verses to find when it gets to the end.
-	echo '[[', MORPHOLOGICAL_SEARCH, ',', $direction, '],[', $simple_matches, '],[', $verses_str, '],[', $sphinx_res['total_found'], '],[', $word_ids ,']]';
+	echo '[[', MORPHOLOGICAL_SEARCH, ',', $direction, '],[', $simple_matches, '],[', rtrim($verses_str, ','), '],[', $sphinx_res['total_found'], '],[', $word_ids ,']]';
 	die();
 }

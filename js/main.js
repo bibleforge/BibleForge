@@ -166,18 +166,21 @@ function prepare_new_search()
 	if (last_search_prepared.length == 0) return false;
 	
 	/// Stop any old requests since we have a new one.
-	/// Is readyState > 0 and < 4?  Anything 1-3 needs to be aborted.
+	/// Is readyState > 0 and < 4?  (Anything 1-3 needs to be aborted.)
 	if (ajax_additional.readyState % 4) ajax_additional.abort();
 	if (ajax_previous.readyState % 4) ajax_previous.abort();
 	
 	/// Determine if the user is preforming a search or looking up a verse.
 	verse_id = determine_reference(last_search_prepared);
+	
+	/// verse_id is false when the user is preforming a search.
 	if (verse_id !== false) {
 		/// To get the titles of Psalms, select verse 0 instead of verse 1.
 		if (verse_id < 19145002 && verse_id > 19003000 && verse_id % 1000 == 1) --verse_id;
 		
 		last_type = VERSE_LOOKUP;
-		bottom_verse = verse_id - 1; /// NOTE: Subtract 1 because run_search() adds one.
+		/// NOTE: Subtract 1 because run_search() adds one.
+		bottom_verse = verse_id - 1;
 	} else {
 		var search_type_array = determine_search_type(last_search_prepared);
 		last_type = search_type_array[0];
@@ -410,6 +413,7 @@ function handle_new_verses(res)
 			infoBar.appendChild(b_tag);
 		}
 		
+		/// Store the first verse reference for later.
 		top_verse = res[1][0];
 	}
 }
@@ -430,19 +434,27 @@ function handle_new_verses(res)
 function write_verses(return_type, direction, verse_ids, verse_HTML)
 {
 	///NOTE: psalm_title_re determines if a psalm does not have a title.
-	var i, total_verses = verse_ids.length, num, b, c, v, verse_str, HTML_str = "", chapter_text = "", psalm_title_re = /^(?:1(?:0[4-7]?|1[1-9]|3[25-7]|4[6-9]|50)?|2|33|43|71|9[13-79])$/;
+	///TODO: Determine if psalm_title_re should be global for performance reasons or otherwise.
+	var i, total_verses = verse_ids.length, num, b, c, v, HTML_str = "", chapter_text = "", psalm_title_re = /^(?:1(?:0[4-7]?|1[1-9]|3[25-7]|4[6-9]|50)?|2|33|43|71|9[13-79])$/;
 	
 	for (i = 0; i < total_verses; ++i) {
 		num = verse_ids[i];
-		v = num % 1000; /// Calculate the verse.
-		c = ((num - v) % 1000000) / 1000; /// Calculate the chapter.
-		b = (num - v - c * 1000) / 1000000; /// Calculate the book by number (e.g., Genesis == 1).
+		/// Calculate the verse.
+		v = num % 1000;
+		/// Calculate the chapter.
+		c = ((num - v) % 1000000) / 1000;
+		/// Calculate the book by number (e.g., Genesis == 1).
+		b = (num - v - c * 1000) / 1000000;
 		///TODO: Determine if it would be better to have two for loops instead of the if statement inside of this one.
+		
 		if (return_type == VERSE_LOOKUP) {
-			if (v < 2) { /// I.e., 1 or 0 (title).
+			/// Is this the first verse or the Psalm title?
+			if (v < 2) {
+				/// Is this chapter 1?
 				if (c == 1) {
 					HTML_str += "<div class=book id=" + num + "_title>" + books_long_pretitle[b] + "<h1>" + books_long_main[b] + "</h1>" + books_long_posttitle[b] + "</div>";
 				} else if (b != 19 || v == 0 || psalm_title_re.test(c)) { /// Display chapter/psalm number (but not on verse 1 of psalms that have titles).
+					/// Is this the book of Psalms?
 					if (b == 19) {
 						/// Psalms have a special name.
 						chapter_text = lang.psalm;
@@ -451,6 +463,7 @@ function write_verses(return_type, direction, verse_ids, verse_HTML)
 					}
 					HTML_str += "<h3 class=chapter id=" + num + "_chapter>" + chapter_text + " " + c + "</h3>";
 				}
+				/// Is this a Psalm title (i.e., verse 0)?
 				if (v == 0) {
 					HTML_str += "<div class=pslam_title id=" + num + "_verse>" + verse_HTML[i] + "</div>";
 				} else {
@@ -459,16 +472,20 @@ function write_verses(return_type, direction, verse_ids, verse_HTML)
 			} else {
 				HTML_str += "<div class=verse id=" + num + "_verse>" + v + " " + verse_HTML[i] + "</div>";
 			}
-		} else { /// Searching
-			/// Fix Psalm titles.
+			
+		/// Searching
+		} else {
+			/// Change verse 0 to "title" (i.e., Psalm titles).
 			if (v == 0) v = lang.title;
 			
-			if (b != last_book) { /// Only print out the book if it is different from the last verse.
+			/// Is this verse from a different book than the last verse?
+			if (b != last_book) {
+				/// We only need to print out the book if it is different from the last verse.
 				last_book = b;
 				HTML_str += "<h1 class=book id=" + num + "_title>" + books_short[b] + "</h1>"; /// Convert the book number to text.
 			}
-			verse_str = verse_HTML[i];
-			HTML_str += "<div class=search_verse id=" + num + "_search>" + c + ":" + v + " " + verse_str + "</div>";
+			
+			HTML_str += "<div class=search_verse id=" + num + "_search>" + c + ":" + v + " " + verse_HTML[i] + "</div>";
 		}
 	}
 	
@@ -487,6 +504,7 @@ function write_verses(return_type, direction, verse_ids, verse_HTML)
 		top_verse = verse_ids[0];
 	}
 	
+	/// If it is not going to already, figure out which verses are presently displayed on the screen.
 	if (!looking_up_verse_range) {
 		looking_up_verse_range = true;
 		setTimeout(find_current_range, look_up_range_speed);
@@ -563,7 +581,7 @@ function prepare_highlighter(search_terms)
 		term = search_terms_arr[i];
 		len_before = term.length;
 		
-		///FIXME: Move this to lang/en.js because it is language dependent.
+		///FIXME: Move this to the language specific file because it is language dependent.
 		/// Fix special/unique words that the stemmer won't stem correctly.
 		switch (term) {
 			case "does": case "doth": case "do": case "doeth": case "doest":
@@ -599,13 +617,14 @@ function prepare_highlighter(search_terms)
 				no_morph = true;
 				break;
 			default:
+				/// Does the word contain a wildcard symbol (*)?
 				if (term.indexOf("*") != -1) {
-					/// The word has a wild card: don't stem; change it to a regex compatible form.
-					/// Word breaks are found by looking for tag openings (<) or closings (>).
+					/// Don't stem; change it to a regex compatible form.
+					///NOTE: Word breaks are found by looking for tag openings (<) or closings (>).
 					stemmed_word = term.replace(/\*/g, "[^<>]*");
 					no_morph = true;
 				} else {
-					/// Most words get stemmed.
+					/// A normal word without a wildcard gets stemmed.
 					///NOTE: stem_word() is language dependent and therefore is delcared in js/langs/LOCALE.js.
 					stemmed_word = stem_word(term);
 					no_morph = false;
@@ -613,7 +632,7 @@ function prepare_highlighter(search_terms)
 		}
 		len_after = stemmed_word.length;
 		
-		/// Skip words that are the same after stemming/regexing.
+		/// Skip words that are the same after stemming or regexing.
 		for (j = 0; j < count; ++j) {
 			if (stemmed_word == stemmed_arr[j]) continue first_loop; ///NOTE: This is the same as "continue 2" in PHP.
 		}
@@ -624,13 +643,13 @@ function prepare_highlighter(search_terms)
 		///      The hyphen is to highlight hyphenated words that would otherwise be missed (matching first word only) (i.e., "Beth").
 		///      ([^>]+-)? finds words where the match is not the first of a hyphenated word (i.e., "Maachah").
 		///      The current English version (KJV) does not use square brackets ([]).
-		///FIXME: The punctuation ,.?!;:)( could be considered language specific and should be moved.
+		///FIXME: The punctuation ,.?!;:)( could be considered language specific.
 		///TODO: Bench mark different regex (creation and testing).
 		if (no_morph || (len_after == len_before && len_after < 3)) {
 			highlight_re[count++] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")[),.?!;:]*[<-]", "i");
 		} else {
 			/// Find most words based on stem morphology, but also can have false hits.
-			///TODO: Compare different regexes
+			///TODO: Compare different regexes.
 			//highlight_re[count++] = new RegExp("id=([0-9]+)>[(]*([^<]+-)?" + stemmed_word + "[a-z']{0,7}[),.?!;:]*[<-]", "i");
 			highlight_re[count++] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")[^<]{0,7}[),.?!;:]*[<-]", "i");
 		}
@@ -649,7 +668,8 @@ function prepare_highlighter(search_terms)
 function format_number(num)
 {
 	if (num < 1000) return num;
-	num += ""; /// Quickly converts a number to a string quickly.
+	/// Quickly converts a number to a string quickly.
+	num += "";
 	var rgx = /^([0-9]+)([0-9][0-9][0-9])/;
 	
 	while (rgx.test(num)) {
@@ -1087,6 +1107,7 @@ function resizing()
  */
 function post_to_server(server_URL, message, ajax)
 {
+	///TODO: Consider whether GET could be better than POST.
 	ajax.open("POST", server_URL, true);
 	ajax.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 	ajax.onreadystatechange = function ()
@@ -1118,7 +1139,7 @@ function post_to_server(server_URL, message, ajax)
  */
 function interpret_result(message)
 {
-	///NOTE: JSON.parse() is at least twice as slow as eval(), and it does not work because of problems parsing the character combination slash plus single quote (\').  Two slashes may work.
+	///NOTE: JSON.parse() is at least currently (November 2009) twice as slow as eval(), and it does not work because of problems parsing the character combination slash plus single quote (\').  Two slashes may work.
 	var res = eval(message);
 	/// New search results.
 	//if (res[0] == 1) handle_new_verses(res); ///FIXME: Right now, there is only one command.
