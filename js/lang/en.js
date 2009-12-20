@@ -31,11 +31,16 @@ var step3list = {"icate":"ic", "ative":"", "alize":"al", "iciti":"ic", "ical":"i
 var stop_words_re = /^th[iu]s|h[ai]s|was|yes|succeed|proceed|e(?:arly|xceed)|only|news$/i;
 
 /// Morphological variables
+/// Morphological search format: WORD morph_marker ATTRIBUTE1 morph_separator ATTRIBUTE2 morph_separator ...
+//  Morphological search example: love AS VERB, 3RD_PERSON
+/// The keyword that indicates a morphological search.
 var morph_marker = ' AS ';
-var morph_marker_len = 4; /// The length of morph_marker.
+/// The length of morph_marker.
+var morph_marker_len = 4;
+/// The punctuation that separates two attributes.
 var morph_separator = ',';
 ///TODO: Add this to the forge so that it is compiled automatically.
-var morph_grammar = {'NOUN':'[1,1]','VERB':'[1,2]','ADJECTIVE':'[1,3]','ADVERB':'[1,4]','RELATIVE_PRONOUN':'[1,5]',};
+var morph_grammar = {'NOUN':'[1,1]','VERB':'[1,2]','ADJECTIVE':'[1,3]','ADVERB':'[1,4]','RELATIVE_PRONOUN':'[1,5]'};
 
 /**
  * Convert an English word to its root form.
