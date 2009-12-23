@@ -10,106 +10,92 @@
  * @author BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
  */
 
-///TODO: Figure out the best way to handle this.  Currently, there is a short list of constants
-///      that is used to ensure that valid data is sent.  The downside is that an array must be
-///      sent containing the general grammatical type plus the specific value.  It also requires
-///      a long switch construct.
-///TODO: See if any of these categories can be combind with others, such as FORM with TYPE or MISCELLANEOUS.
-define('PART_OF_SPEECH', 1);
-define('NUMBER', 2);
-define('PERSON', 3);
-define('TENSE', 4);
-define('VOICE', 5);
-define('MOOD', 6);
-define('GENDER', 7);
-define('CASE_5', 8);
-define('DEGREE', 9);
-define('DECLINABILITY', 10);
-define('NUMERICAL', 11);
-define('NOUN_TYPE', 12);
-define('TYPE', 13);
-define('DIALECT', 14);
-define('TRANSITIVITY', 15);
-define('FORM', 16);
-define('MISCELLANEOUS', 17);
-define('ADDED', 18);
-define('DIVINE', 19);
-define('RED', 20);
 
-
+/**
+ * Set the attributes to filter in Sphinx.
+ * 
+ * @example set_morphology_attributes(array(array(3, 1), array(7, 3)), array(1, 0), $sphinx); /// Set Sphinx to only find words that are spoken by Jesus and not in the future tense.
+ * @param $attribute_arr (array) An array of arrays containing two integers indicating the attribute to filter and the value with which to filter accordingly.
+ * @param $include_arr (array) An array containing ones and zeros indicating whether to only find words that match the attributes (1) or never (0).
+ * @param $sphinx (class) The Sphinx API class to use to set the filters.
+ * @return NULL.  It sets the filters directly in Sphinx.
+ * @note Called by morphology_search() in search.php.
+ */
 function set_morphology_attributes($attribute_arr, $include_arr, $sphinx)
 {
-	/// $json '["WORD",[[GRAMMAR_TYPE1,VALUE1],[...]],[INCLUDE]]'
-	/// $json ex1: '["love",[[PART_OF_SPEECH,1]],[1]]' == love AS NOUN
-	/// $json ex2: '["go",[[MOOD,3],[NUMBER,1]],[1,0]]' == go AS IMPERATIVE, NOT SINGULAR
-	
-	foreach ($attribute_arr as $key => $morphology_arr) {
+	///TODO: Determine if it would be good to do error handing if $attribute_arr is not an array.
+	foreach ((array)$attribute_arr as $key => $morphology_arr) {
+		///NOTE: Created in the Forge via grammar_constants_parser.php on 12-22-2009 from Grammar Constants.txt
 		switch ($morphology_arr[0]) {
-			case ADDED:
-				$attr = 'added';
+			case 1:
+				$attr = 'implied';
 				break;
-			case DIVINE:
+			case 2:
 				$attr = 'divine';
 				break;
-			case RED:
-				$attr = 'quotation'; ///TODO: Decide on a consistent name for this.
+			case 3:
+				$attr = 'red';
 				break;
-			case PART_OF_SPEECH:
+			case 4:
 				$attr = 'part_of_speech';
 				break;
-			case NUMBER:
+			case 5:
 				$attr = 'number';
 				break;
-			case PERSON:
+			case 6:
 				$attr = 'person';
 				break;
-			case TENSE:
+			case 7:
 				$attr = 'tense';
 				break;
-			case VOICE:
+			case 8:
 				$attr = 'voice';
 				break;
-			case MOOD:
+			case 9:
 				$attr = 'mood';
 				break;
-			case GENDER:
+			case 10:
 				$attr = 'gender';
 				break;
-			case CASE_5:
+			case 11:
 				$attr = 'case_5';
 				break;
-			case DEGREE:
+			case 12:
+				$attr = 'pronoun_type';
+				break;
+			case 13:
 				$attr = 'degree';
 				break;
-			case DECLINABILITY:
-				$attr = 'indeclinable'; ///FIXME: This should probably be changed to 'declinability' and the values reversed.
+			case 14:
+				$attr = 'declinability';
 				break;
-			case NUMERICAL:
+			case 15:
 				$attr = 'numerical';
 				break;
-			case NOUN_TYPE:
+			case 16:
 				$attr = 'noun_type';
 				break;
-			case FORM:
-				$attr = 'form';
+			case 17:
+				$attr = 'type';
 				break;
-			case DIALECT:
+			case 18:
 				$attr = 'dialect';
 				break;
-			case TRANSITIVITY:
-				$attr = 'transitive'; ///FIXME: This should probably be changed to match the constant.
+			case 19:
+				$attr = 'transitivity';
 				break;
-			case MISCELLANEOUS:
-				$attr = 'extra'; ///FIXME: This should probably be changed to match the constant.
+			case 20:
+				$attr = 'form';
 				break;
-			case SECOND_FORM:
-				$attr = 'second_form';
+			case 21:
+				$attr = 'miscellaneous';
 				break;
 			default:
 				///TODO: Determine if an error should be thrown.
 				/// Skip the invalid grammatical form.
 				continue 2;
 		}
+		
 		$sphinx->SetFilter($attr, array((int)$morphology_arr[1]), (bool)$include_arr[$key]);
 	}
 	///TODO: When multiple morpholgical searches are allowed,
