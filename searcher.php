@@ -186,7 +186,9 @@ function standard_search($query, $direction, $start_id = 0)
 	$sphinx->SetServer(SPHINX_SERVER, SPHINX_PORT); /// SetServer(sphinx_server_address, sphinx_server_port)
 	$sphinx->SetLimits(0, LIMIT); /// SetLimits(starting_point, count, max_in_memory (optional), quit_after_x_found (optional))
 	
-	if ($start_id > 0) $sphinx->SetIDRange($start_id, 0); /// SetIDRange(start_id, stop_id (0 means no limit))
+	///NOTE: The stop_id is now required for sphinxapi and should be calculated by the Forge.
+	///TODO: Calculate the stop_id in the Forge.
+	if ($start_id > 0) $sphinx->SetIDRange($start_id, 99999999); /// SetIDRange(start_id, stop_id (0 means no limit))
 	
 	/// Determine the search mode.
 	/// Default is SPH_MATCH_ALL (i.e., all words are required: word1 & word2).
@@ -270,10 +272,11 @@ function morphology_search($json, $direction, $start_id = 0)
 	$sphinx->SetServer(SPHINX_SERVER, SPHINX_PORT); /// SetServer(sphinx_server_address, sphinx_server_port)
 	$sphinx->SetLimits(0, LIMIT); /// SetLimits(starting_point, count, max_in_memory (optional), quit_after_x_found (optional))
 	
-	if ($start_id > 0) $sphinx->SetIDRange($start_id, 0); /// SetIDRange(start_id, stop_id (0 means no limit))
+	///NOTE: The stop_id is now required for sphinxapi and should be calculated by the Forge.
+	///TODO: Calculate the stop_id in the Forge.
+	if ($start_id > 0) $sphinx->SetIDRange($start_id, 99999999); /// SetIDRange(start_id, stop_id)
 	
 	$sphinx->SetRankingMode(SPH_RANK_NONE); /// No ranking, fastest
-	
 	/// Set the attributes and prepare to search.
 	$query_array = json_decode($json, true);
 	
