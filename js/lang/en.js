@@ -2,7 +2,7 @@
  * BibleForge
  *
  * @date    10-30-08
- * @version 0.1 alpha 2
+ * @version 0.2 alpha
  * @link http://BibleForge.com
  * @license Reciprocal Public License 1.5 (RPL1.5)
  * @author BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
@@ -75,10 +75,10 @@ function stem_word(w)
 	}
 	
 	/// Step 1b
-	/// "Present-day" English: re = /^(.+?)eed$/; 
+	/// "Present-day" English: re = /^(.+?)eed$/;
 	re = /^(.+?)ee$/; /// Early Modern English fix
 	
-	/// "Present-day" English: re2 = /^(.+?)(ingly|edly|ed|ing|ly)$/; 
+	/// "Present-day" English: re2 = /^(.+?)(ingly|edly|ed|ing|ly)$/;
 	re2 = /^(.+?)(ing(?:ly)?|ed(?:ly)?|ly|e(?:st|th))$/; /// Early Modern English fix
 	
 	if (re.test(w)) {
@@ -451,7 +451,7 @@ function determine_reference(ref)
 			} else if (book_arr_re[22].test(ref)) { /// Song of Songs (Canticles)
 				book = "22";
 				break;
-			} else if (book_arr_re[13].test(ref)) { /// 1 Chronicles | First Chronicles | I Chronicles
+			} else if (book_arr_re[13].test(ref)) { /// 1 Chronicles (Chronicles)
 				book = "13";
 				break;
 			}
