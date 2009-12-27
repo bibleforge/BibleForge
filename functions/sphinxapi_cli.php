@@ -321,12 +321,8 @@ class SphinxClient
 			///      Then we can filter out verses not in this range by looking for the value of the @expr attribute.
 			///      If it has a value of 1 (@expr=1), then it is within the range.  A value of 0 (@expr=0) is outside of the range. 
 			$sortexpr = ' -S "';
-			///FIXME: The program should send the word ID for morphological searches, not the verse ID.
-			if ($index == 'morphological') {
-				$sort_attribute = 'verseid';
-			} else {
-				$sort_attribute = '@id';
-			}
+			$sort_attribute = '@id';
+			
 			if ($this->_min_id > 0) {
 				$sortexpr .= $sort_attribute . ' >= ' . $this->_min_id;
 			}

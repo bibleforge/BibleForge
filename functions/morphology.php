@@ -25,7 +25,7 @@ function set_morphology_attributes($attribute_arr, $include_arr, $sphinx)
 {
 	///TODO: Determine if it would be good to do error handing if $attribute_arr is not an array.
 	foreach ((array)$attribute_arr as $key => $morphology_arr) {
-		///NOTE: Created in the Forge via grammar_constants_parser.php on 12-22-2009 from Grammar Constants.txt
+		///NOTE: Created in the Forge via grammar_constants_parser.php on 12-22-2009 from Grammar Constants.txt.
 		switch ($morphology_arr[0]) {
 			case 1:
 				$attr = 'implied';
