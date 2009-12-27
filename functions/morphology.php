@@ -14,14 +14,14 @@
 /**
  * Set the attributes to filter in Sphinx.
  * 
- * @example set_morphology_attributes(array(array(3, 1), array(7, 3)), array(1, 0), $sphinx); /// Set Sphinx to only find words that are spoken by Jesus and not in the future tense.
+ * @example set_morphology_attributes(array(array(3, 1), array(7, 1)), array(0, 1), $sphinx); /// Set Sphinx to only find words that are spoken by Jesus and not in the present tense.
  * @param $attribute_arr (array) An array of arrays containing two integers indicating the attribute to filter and the value with which to filter accordingly.
- * @param $include_arr (array) An array containing ones and zeros indicating whether to only find words that match the attributes (1) or never (0).
+ * @param $exclude_arr (array) An array containing ones and zeros indicating whether to only find words that match the attributes (0) or exclude those words (1).
  * @param $sphinx (class) The Sphinx API class to use to set the filters.
  * @return NULL.  It sets the filters directly in Sphinx.
  * @note Called by morphology_search() in search.php.
  */
-function set_morphology_attributes($attribute_arr, $include_arr, $sphinx)
+function set_morphology_attributes($attribute_arr, $exclude_arr, $sphinx)
 {
 	///TODO: Determine if it would be good to do error handing if $attribute_arr is not an array.
 	foreach ((array)$attribute_arr as $key => $morphology_arr) {
@@ -96,7 +96,7 @@ function set_morphology_attributes($attribute_arr, $include_arr, $sphinx)
 				continue 2;
 		}
 		
-		$sphinx->SetFilter($attr, array((int)$morphology_arr[1]), (bool)$include_arr[$key]);
+		$sphinx->SetFilter($attr, array((int)$morphology_arr[1]), (bool)$exclude_arr[$key]);
 	}
 	///TODO: When multiple morpholgical searches are allowed,
 	///      add the word to the query.  Something like $sphinx->AddQuery($WORD, 'morphological');
