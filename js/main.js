@@ -253,9 +253,8 @@ function determine_search_type(search_terms)
 		/// replace(/(["'])/g, "\\$1") adds slashes to sanitize the data.
 		var morph_json = '["' + search_terms.slice(0, split_pos).replace(/(["'])/g, "\\$1") + '",[';
 		
-		/// These string will be used to concatenate data.
-		var morph_attribute_json = "";
-		var include_json = "";
+		/// These strings will be used to concatenate data.
+		var morph_attribute_json = "", exclude_json = "";
 		
 		var morph_attributes = search_terms.slice(split_pos + morph_marker_len);
 		
@@ -272,9 +271,9 @@ function determine_search_type(search_terms)
 			if (morph_attributes.slice(split_start, split_start + 1) == "-") {
 				/// Skip the hyphen.
 				++split_start;
-				include_json += "0,";
+				exclude_json += "1,";
 			} else {
-				include_json += "1,";
+				exclude_json += "0,";
 			}
 			
 			if (split_pos > -1) {
@@ -282,8 +281,8 @@ function determine_search_type(search_terms)
 				split_start = split_pos + 1;
 			} else {
 				///TODO: Determine if trim() is necessary or if there is a better implementation.
-				///NOTE: include_json.slice(0, -1) is used to remove the trailing comma.  This could be unnecessary.
-				return [MORPHOLOGICAL_SEARCH, morph_json + morph_attribute_json + morph_grammar[morph_attributes.slice(split_start).trim()] + "],[" + include_json.slice(0, -1) + "]]"];
+				///NOTE: exclude_json.slice(0, -1) is used to remove the trailing comma.  This could be unnecessary.
+				return [MORPHOLOGICAL_SEARCH, morph_json + morph_attribute_json + morph_grammar[morph_attributes.slice(split_start).trim()] + "],[" + exclude_json.slice(0, -1) + "]]"];
 			}
 		} while (true);
 	}
@@ -465,20 +464,19 @@ function write_verses(action, direction, verse_ids, verse_HTML)
 		if (action == VERSE_LOOKUP) {
 			/// Is this the first verse or the Psalm title?
 			if (v < 2) {
-				/// Is this chapter 1?
+				/// Is this chapter 1?  (We need to know if we should display the book name.)
 				if (c == 1) {
 					HTML_str += "<div class=book id=" + num + "_title>" + books_long_pretitle[b] + "<h1>" + books_long_main[b] + "</h1>" + books_long_posttitle[b] + "</div>";
 				} else if (b != 19 || v == 0 || psalm_title_re.test(c)) { /// Display chapter/psalm number (but not on verse 1 of psalms that have titles).
-					/// Is this the book of Psalms?
+					/// Is this the book of Psalms?  (Psalms have a special name.)
 					if (b == 19) {
-						/// Psalms have a special name.
 						chapter_text = lang.psalm;
 					} else {
 						chapter_text = lang.chapter;
 					}
 					HTML_str += "<h3 class=chapter id=" + num + "_chapter>" + chapter_text + " " + c + "</h3>";
 				}
-				/// Is this a Psalm title (i.e., verse 0)?
+				/// Is this a Psalm title (i.e., verse 0)?  (Psalm titles are displayed specially.)
 				if (v == 0) {
 					HTML_str += "<div class=pslam_title id=" + num + "_verse>" + verse_HTML[i] + "</div>";
 				} else {
@@ -490,7 +488,7 @@ function write_verses(action, direction, verse_ids, verse_HTML)
 			
 		/// Searching
 		} else {
-			/// Change verse 0 to "title" (i.e., Psalm titles).
+			/// Change verse 0 to "title" (i.e., Psalm titles).  (Display Psalm 3:title instead of Psalm 3:0.)
 			if (v == 0) v = lang.title;
 			
 			/// Is this verse from a different book than the last verse?

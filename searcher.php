@@ -81,7 +81,7 @@ run_search($query, $type, $direction, $start_id);
  * @example run_search(40000101, VERSE_LOOKUP, PREVIOUS);
  * @example run_search("love", STANDARD_SEARCH, ADDITIONAL, 40000101);
  * @example run_search("God & love", STANDARD_SEARCH, ADDITIONAL);
- * @example run_search('["love", "NOUN", 0]', MORPHOLOGICAL_SEARCH, ADDITIONAL);
+ * @example run_search('["love", [[4, 1]], [1]]', MORPHOLOGICAL_SEARCH, ADDITIONAL);
  * @param $query (string) The input to be searched for or a stringified JSON array for advanced searching.
  * @param $type (integer) The type of query: SEARCH || VERSE_LOOKUP.
  * @param $direction (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
@@ -98,7 +98,8 @@ function run_search($query, $type, $direction, $start_id = 0)
 		/// $query example: love OR God & love OR this -that OR "in the beginning"
 		standard_search($query, $direction, $start_id);
 	} else { /// MORPHOLOGICAL_SEARCH
-		/// $query ex: '["love",[NOUN]]' OR '["go",[IMPERATIVE,PLURAL],1]'
+		/// $query ex: '["love", [[4, 1]], [1]]' (love AS NOUN) OR '["love", [[3, 1], [7, 1]], [1, 0]]' (love AS RED, NOT PRESENT)
+		
 		morphology_search($query, $direction, $start_id);
 	}
 }
@@ -116,7 +117,7 @@ function run_search($query, $type, $direction, $start_id = 0)
 function retrieve_verses($verse_id, $direction)
 {
 	/// Quickly check to see if the verse_id is outside of the valid range.
-	///FIXME: Perhaps $verse_id < 1001001 should default to 1001001 and $verse_id > 66022021 to 66022021.
+	///TODO: Determine if $verse_id < 1001001 should default to 1001001 and $verse_id > 66022021 to 66022021.
 	if ($verse_id < 1001001 || $verse_id > 66022021) {
 		echo '[[', VERSE_LOOKUP, ',', $direction, '],[],[],[0]]';
 		die();
@@ -186,7 +187,7 @@ function standard_search($query, $direction, $start_id = 0)
 	$sphinx->SetServer(SPHINX_SERVER, SPHINX_PORT); /// SetServer(sphinx_server_address, sphinx_server_port)
 	$sphinx->SetLimits(0, LIMIT); /// SetLimits(starting_point, count, max_in_memory (optional), quit_after_x_found (optional))
 	
-	///NOTE: The stop_id is now required for sphinxapi and should be calculated by the Forge.
+	///NOTE: The stop_id is now required for sphinxapi and should be calculated by the Forge, and could be set as a constant so that sphinxapi_cli is not slowed down by it.
 	///TODO: Calculate the stop_id in the Forge.
 	if ($start_id > 0) $sphinx->SetIDRange($start_id, 99999999); /// SetIDRange(start_id, stop_id (0 means no limit))
 	
@@ -253,12 +254,12 @@ function standard_search($query, $direction, $start_id = 0)
 /**
  * Perform a morphological Sphinx-based search.
  *
- * @example morphology_search("love", "NOUN", 0, ADDITIONAL, 0);
- * @param $word (string) The word to be searched for.
- * @param $morphology (string) The morphological feature to be considered.
- * @param $exclude (boolean) Whether or not to exclude results matching the morphological feature.
+ * @example morphology_search('["love", [[4, 1]], [1]]', ADDITIONAL, 0); /// love AS NOUN
+ * @example morphology_search('["love", [[3, 1], [7, 1]], [1, 0]]', ADDITIONAL, 0); /// love AS RED, NOT PRESENT
+ * @param $json (string) A stringified JSON array containing the word to be searched for, the morphological attributes to be considered, and whether or not to exclude results matching the morphological attributes.  
+ *        Format: '["WORD", [[MORPHOLOGICAL_CLASS, ATTRIBUTE], [...]], [EXCLUDE, ...]]'
  * @param $direction (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
- * @param $start_id (integer) (optional) The verse_id whence to start.
+ * @param $start_id (integer) (optional) The morphological id whence to start.
  * @return NULL.  Data is sent to the buffer as a JSON array, and then execution ends.
  * @note Called by run_search().
  */
@@ -272,7 +273,7 @@ function morphology_search($json, $direction, $start_id = 0)
 	$sphinx->SetServer(SPHINX_SERVER, SPHINX_PORT); /// SetServer(sphinx_server_address, sphinx_server_port)
 	$sphinx->SetLimits(0, LIMIT); /// SetLimits(starting_point, count, max_in_memory (optional), quit_after_x_found (optional))
 	
-	///NOTE: The stop_id is now required for sphinxapi and should be calculated by the Forge.
+	///NOTE: The stop_id is now required for sphinxapi and should be calculated by the Forge, and could be set as a constant so that sphinxapi_cli is not slowed down by it.
 	///TODO: Calculate the stop_id in the Forge.
 	if ($start_id > 0) $sphinx->SetIDRange($start_id, 99999999); /// SetIDRange(start_id, stop_id)
 	
