@@ -38,13 +38,11 @@ var waiting_for_first_search = false;
 var last_book       =  0; /// The number of the last book of the Bible that was returned
 var highlight_limit = 20; /// Currently, we limit the unique number of search words to highlight.
 
-///NOTE: window.XMLHttpRequest for Mozilla/KHTML/Opera/IE7+
-/// ActiveXObject("Microsoft.XMLHTTP") for IE6-
-var ajax_additional = win.XMLHttpRequest ? new win.XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
-var ajax_previous  = win.XMLHttpRequest ? new win.XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+var ajax_additional = new win.XMLHttpRequest();
+var ajax_previous  = new win.XMLHttpRequest();
 
 /// Verse variables
-var top_verse, bottom_verse;
+var top_id, bottom_id;
 
 /// Scrolling variables
 var scroll_pos = 0, scroll_check_count = 0;
@@ -84,7 +82,7 @@ if (!"".trim) {
 
 
 /**
- * Make split() work correctly on IE.
+ * Make split() work correctly in IE.
  *
  * @param s (regexp || string) The regular expression or string with which to break the string.
  * @param limit (int) The number of times to split the string.
@@ -178,22 +176,23 @@ function prepare_new_search()
 	/// Determine if the user is preforming a search or looking up a verse.
 	verse_id = determine_reference(last_search_prepared);
 	
-	/// verse_id is false when the user is preforming a search.
+	/// Is the user looking up a verse? (verse_id is false when the user is preforming a search.)
 	if (verse_id !== false) {
 		/// To get the titles of Psalms, select verse 0 instead of verse 1.
 		if (verse_id < 19145002 && verse_id > 19003000 && verse_id % 1000 == 1) --verse_id;
 		
 		last_type = VERSE_LOOKUP;
 		/// NOTE: Subtract 1 because run_search() adds one.
-		bottom_verse = verse_id - 1;
-	} else {
+		bottom_id = verse_id - 1;
+	} else {/// The user is submitting a search request.
 		var search_type_array = determine_search_type(last_search_prepared);
 		last_type = search_type_array[0];
+		
 		if (last_type == MORPHOLOGICAL_SEARCH) {
 			last_search_prepared = search_type_array[1];
 		}
 		last_search_encoded = encodeURIComponent(last_search_prepared);
-		bottom_verse = 0;
+		bottom_id = 0;
 	}
 	
 	run_search(ADDITIONAL);
@@ -241,10 +240,10 @@ function prepare_new_search()
  * @return An array describing the type of search.  Format: [(int)Type of search, (optional)(string)JSON array describing the search].
  * @note Called by run_search().
  * @note Only a partial implementation currently.  Mixed searching is lacking.
+ * @note Global language variables used: morph_marker, morph_marker_len, morph_separator, morph_grammar.
  */
 function determine_search_type(search_terms)
 {
-	///NOTE: Global language variables used: morph_marker, morph_marker_len, morph_separator, morph_grammar.
 	var split_pos;
 	/// Did the user use the morphological keyword in his search?
 	if ((split_pos = search_terms.indexOf(morph_marker)) != -1) {
@@ -302,7 +301,7 @@ function determine_search_type(search_terms)
  * @return NULL.  Query is sent via AJAX.
  * @note Called by prepare_new_search() when the user submits a search.
  * @note Called by add_content_bottom() and add_content_top() when scrolling.
- * @note Assumes that global variables last_type and bottom_verse and/or top_verse are set.
+ * @note Global variables used: last_type and bottom_id and/or top_id.
  */
 function run_search(direction)
 {
@@ -315,25 +314,27 @@ function run_search(direction)
 		query += "&d=" + direction;
 	}
 	
-	/// Is the server is already working on the request?
-	///NOTE: readyState is between 0-4, and anything 1-3 means that the server is already working on the request.
+	/// Is the server is already working on this request?
+	///NOTE: readyState is between 0-4, and anything 1-3 means that the server is already working on this request.
 	if (ajax.readyState % 4) return null;
 	
 	if (last_type == VERSE_LOOKUP) {
 		if (direction == ADDITIONAL) {
-			query += "&q=" + (bottom_verse + 1);
+			query += "&q=" + (bottom_id + 1);
 		} else {
-			query += "&q=" + (top_verse - 1);
+			query += "&q=" + (top_id - 1);
 		}
 	} else {
 		query += "&q=" + last_search_encoded;
 		if (direction == ADDITIONAL) {
-			if (bottom_verse > 0) query += "&s=" + (bottom_verse + 1); /// Continue starting on the next verse.
+			/// Continue starting on the next verse.
+			///FIXME: not always a verse cf. morpholgical searching.
+			if (bottom_id > 0) query += "&s=" + (bottom_id + 1);
 		} else {
-			query += "&s=" + (top_verse + -1); /// Continue starting on the next verse.
+			/// Continue starting backwards on the previous verse.
+			query += "&s=" + (top_id + -1);
 		}
 	}
-	
 	post_to_server("searcher.php", query, ajax);
 }
 
@@ -344,34 +345,42 @@ function run_search(direction)
  * Writes new verses to the page, determines if more content is needed or available,
  * and writes initial information to the info bar.
  *
- * @example prepare_verses(json_array);
- * @example prepare_verses([[1,1],[1001001],["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning...</b>"],[1]]);
- * @param res (array) JSON array from the server.  Array format: [[action,direction],[verse_ids,...],[verse_HTML,...],[number_of_matches]].
- * @return NULL.  Writes HTML to the page.
- * @note Called by prepare_verses() after AJAX request.
+ * @example prepare_verses([[VERSE_LOOKUP, PREVIOUS], [1001001, 1001002], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>", "<b id="12">And</b> <b id="13">the</b> <b id="14">earth....</b>"], 2]);
+ * @example prepare_verses([[STANDARD_SEARCH, ADDITIONAL], [1001001], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>"], 1]);
+ * @example prepare_verses([[MORPHOLOGICAL_SEARCH, ADDITIONAL], [50004008], ["<b id=772635>Finally,</b> <b id=772636>brethren,</b> <b id=772637>whatsoever</b> <b id=772638>things....</b>"], 1, [772638]]);
+ * @param res (array) JSON array from the server.  Array format: [action, direction], [verse_ids, ...], [verse_HTML, ...], number_of_matches, [word_id, ...]].  /// NOTE: word_id is optional.
+ * @return NULL.  The function writes HTML to the page.
+ * @note Called by prepare_verses() after an AJAX request.
  */
 function handle_new_verses(res)
 {
 	///TODO: On a verse lookup that does not start with Genesis 1:1, scroll_maxed_top must be set to FALSE. (Has this been taken care of?)
-	var total = res[3], return_type = res[0][0], direction = res[0][1];
+	var total = res[3], action = res[0][0], direction = res[0][1];
 	
 	if (total > 0) {
 		///FIXME: When looking up the last few verses of Revelation (i.e., Revelation 22:21), the page jumps when more content is loaded above.
-		write_verses(return_type, direction, res[1], res[2]);
+		write_verses(action, direction, res[1], res[2]);
 		
 		///FIXME: Highlighting needs to be in its own function where each type and mixed highlighting will be done correctly.
-		if (return_type == STANDARD_SEARCH) {
+		if (action == STANDARD_SEARCH) {
 			///TODO: Determine if it would be better to put this in an array and send it all at once, preferably without the implied eval().
 			/// Highlight the verse after 100 milliseconds.
 			/// The delay is so that the verse is displayed as quickly as possible.
 			///TODO: Determine if it is bad to convert the array to a string like this.
 			setTimeout("highlight_search_results(\"" + res[2] + "\")", 100);
-		} else if (return_type == MORPHOLOGICAL_SEARCH) {
+		} else if (action == MORPHOLOGICAL_SEARCH) {
 			var i, count = res[4].length;
 			for (i = 0; i < count; ++i) {
 				///TODO: Determine if there is a downside to having a space at the start of the className.
 				///TODO: Determine if we ever need to replace an existing f* className.
 				doc.getElementById(res[4][i]).className += " f" + 1;
+			}
+			/// Record the last id found from the search so that we know where to start from for the next search as the user scrolls.
+			/// Do we need to record the bottom id?
+			if (direction == ADDITIONAL) {
+				bottom_id = res[4][count - 1];
+			} else {
+				top_id = res[4][0];
 			}
 		}
 		
@@ -408,7 +417,7 @@ function handle_new_verses(res)
 		
 		infoBar.innerHTML = "";
 		
-		if (return_type != VERSE_LOOKUP) {
+		if (action != VERSE_LOOKUP) {
 			/// Create the inital text.
 			infoBar.appendChild(doc.createTextNode(format_number(total) + lang["found_" + (total == 1 ? "singular" : "plural")]));
 			/// Create a <b> for the search terms.
@@ -419,7 +428,7 @@ function handle_new_verses(res)
 		}
 		
 		/// Store the first verse reference for later.
-		top_verse = res[1][0];
+		top_id = res[1][0];
 	}
 }
 
@@ -427,8 +436,9 @@ function handle_new_verses(res)
 /**
  * Writes new verses to page.
  *
- * @example write_verses(VERSE_LOOKUP, ADDITIONAL, [1001001], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning...</b>"]);
- * @param return_type (integer) The type of query: VERSE_LOOKUP || MIXED_SEARCH || STANDARD_SEARCH || MORPHOLOGICAL_SEARCH.
+ * @example write_verses(action, direction, [verse_ids, ...], [verse_HTML, ...]);
+ * @example write_verses(VERSE_LOOKUP, ADDITIONAL, [1001001], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>"]);
+ * @param action (integer) The type of query: VERSE_LOOKUP || MIXED_SEARCH || STANDARD_SEARCH || MORPHOLOGICAL_SEARCH.
  * @param direction (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
  * @param verse_ids (array) An array of integers representing Bible verse references.
  * @param verse_HTML (array) An array of strings containing verses in HTML.
@@ -436,7 +446,7 @@ function handle_new_verses(res)
  * @note Called by handle_new_verses().
  * @note verse_ids contains an array of verses in the following format: [B]BCCCVVV (e.g., Genesis 1:1 == 1001001).
  */
-function write_verses(return_type, direction, verse_ids, verse_HTML)
+function write_verses(action, direction, verse_ids, verse_HTML)
 {
 	///NOTE: psalm_title_re determines if a psalm does not have a title.
 	///TODO: Determine if psalm_title_re should be global for performance reasons or otherwise.
@@ -452,7 +462,7 @@ function write_verses(return_type, direction, verse_ids, verse_HTML)
 		b = (num - v - c * 1000) / 1000000;
 		///TODO: Determine if it would be better to have two for loops instead of the if statement inside of this one.
 		
-		if (return_type == VERSE_LOOKUP) {
+		if (action == VERSE_LOOKUP) {
 			/// Is this the first verse or the Psalm title?
 			if (v < 2) {
 				/// Is this chapter 1?
@@ -503,8 +513,10 @@ function write_verses(return_type, direction, verse_ids, verse_HTML)
 	if (direction == ADDITIONAL) {
 		page.appendChild(newEl);
 		
-		/// Store the bottom most verse reference for later.
-		bottom_verse = num;
+		/// Record the bottom most verse reference so that we know where to start from for the next search as the user scrolls.
+		///NOTE: This is only for VERSE_LOOKUP and STANDARD_SEARCH.  The id for MORPHOLOGICAL_SEARCH is recorded in handle_new_verses(), currently.
+		///TODO: Determine the pros/cons of using an if statement to prevent morphological searches from recording the id here, since it is overwritten later.
+		bottom_id = num;
 	} else {
 		page.insertBefore(newEl, page.childNodes[0]);
 		
@@ -512,8 +524,10 @@ function write_verses(return_type, direction, verse_ids, verse_HTML)
 		/// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was added.
 		win.scrollTo(0, scroll_pos = win.pageYOffset + newEl.clientHeight);
 		
-		/// Store the top most verse reference for later.
-		top_verse = verse_ids[0];
+		/// Record the top most verse reference so that we know where to start from for the next search as the user scrolls.
+		///NOTE: This is only for VERSE_LOOKUP and STANDARD_SEARCH.  The id for MORPHOLOGICAL_SEARCH is recorded in handle_new_verses(), currently.
+		///TODO: Determine the pros/cons of using an if statement to prevent morphological searches from recording the id here, since it is overwritten later.
+		top_id = verse_ids[0];
 	}
 	
 	/// If it is not going to already, figure out which verses are presently displayed on the screen.
@@ -964,7 +978,6 @@ function find_current_range()
 	///TODO: Determine if there is a better way to calculate the topBar offset.
 	var top_pos = scroll_pos + topLoader.offsetHeight + 8;
 	var bottom_pos = scroll_pos + doc_docEl.clientHeight - 14;
-	
 	
 	var top_verse_block = find_element_at_scroll_pos(top_pos, page);
 	

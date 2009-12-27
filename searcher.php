@@ -241,11 +241,11 @@ function standard_search($query, $direction, $start_id = 0)
 	}
 	
 	/// Send results to the buffer as a JSON serialized array, and stop execution.
-	/// Array Format: [[action],[verse_ids,...],[verse_words,...],[number_of_matches]]
+	/// Array Format: [[action,direction],[verse_ids,...],[verse_words,...],number_of_matches]
 	///NOTE: rtrim(..., ',') removes trailing commas.  It seems to be slightly faster than substr(..., 0, -1).
 	///TODO: It would be nice to indicate if there are no more verses to find when it gets to the end.
 	///TODO: Make the JSON work with both eval() and JSON.parse().  The \' throws it off.  But \\' works.  To remove trailing slashes use rtrim(..., ',').
-	echo '[[', STANDARD_SEARCH, ',', $direction, '],[', $simple_matches, '],[', rtrim($verses_str, ','), '],[', $sphinx_res['total_found'], ']]';
+	echo '[[', STANDARD_SEARCH, ',', $direction, '],[', $simple_matches, '],[', rtrim($verses_str, ','), '],', $sphinx_res['total_found'], ']';
 	die();
 }
 
@@ -315,9 +315,9 @@ function morphology_search($json, $direction, $start_id = 0)
 	}
 	
 	/// Send results to the buffer as a JSON serialized array, and stop execution.
-	/// Array Format: [[action],[verse_ids,...],[verse_words,...],[number_of_matches]]
+	/// Array Format: [[action,direction],[verse_ids,...],[verse_words,...],number_of_matches, [word_id,...]]
 	///NOTE: rtrim(..., ',') removes trailing commas.  It seems to be slightly faster than substr(..., 0, -1).
 	///TODO: Indicate if there are no more verses to find when it gets to the end.
-	echo '[[', MORPHOLOGICAL_SEARCH, ',', $direction, '],[', $simple_matches, '],[', rtrim($verses_str, ','), '],[', $sphinx_res['total_found'], '],[', $word_ids ,']]';
+	echo '[[', MORPHOLOGICAL_SEARCH, ',', $direction, '],[', $simple_matches, '],[', rtrim($verses_str, ','), '],', $sphinx_res['total_found'], ',[', $word_ids ,']]';
 	die();
 }
