@@ -1,6 +1,14 @@
 /**
- * BibleForge (alpha testing)
+ * BibleForge
+ *
+ * @version 0.1 alpha 2
+ * @date    10-30-08
+ * @link http://BibleForge.com
+ * @license Reciprocal Public License 1.5 (RPL1.5)
+ * @author BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
  */
+
+/* TODO: Completely document the CSS. */
 
 html, body {
 	margin: 0;
@@ -28,13 +36,22 @@ body {
 }
 
 #searchBar {
+	/* Transparent white background for browsers that don't support css gradients (Firefox 3.5-/IE/Opera). */
 	background-image: url("../images/90-white.png");
+	/* TODO: Make it work work with WebKit. */
+	/* Transparent white gradient (Firefox 3.6) */
+	/* NOTE: The gradient differs slightly from the image in that it has a quick fade to less transparent at the top. */
+	background: -moz-linear-gradient(top, rgba(255,255,255,.96), rgba(255,255,255,.92) 25%, rgba(255,255,255,.9));
 	width: 100%;
 	height: 100%;
 }
 
 #infoBar {
+	/* Transparent yellow background for browsers that don't support css gradients (Firefox 3.5-/IE/Opera). */
 	background-image: url("../images/90-yellow.png");
+	/* TODO: Make it work work with WebKit. */
+	/* Transparent yellow gradient (Firefox 3.6/WebKit?) */
+	background: -moz-linear-gradient(top, rgba(255,255,221,.90), rgba(255,255,221,.89));
 	border-top: #EEE999 solid 1px;
 	border-bottom: #EEE999 solid 1px;
 	width: 100%;
@@ -43,6 +60,13 @@ body {
 	-o-text-overflow: ellipsis; /* Opera */
 	overflow: hidden;
 	font-size: 13px;
+}
+
+#q {
+	background: transparent url("images/90-white.png");
+	/* Gradients don't seem to work here.
+	background: -moz-linear-gradient(top, bottom, from(rgba(255,255,255,.96)), to(rgba(255,255,255,.9)));
+	*/
 }
 
 /* Individual words in verses */
@@ -75,9 +99,9 @@ body {
 }
 
 
-/* Vereses created from a search. */
-.search_verse {
-	
+/* Verses created from a search. */
+.search_verse {	
+	/* This gives reverse indent, but causes problems with margins (tested w/Mozilla).
 	/* This gives reverse indent, but causes problems with margins (tested w/Mozilla).
 	text-indent: -2em;
 	margin-left: 2em;
@@ -86,13 +110,13 @@ body {
 	width: 100%;
 }
 
-/* Vereses created from a verse lookup. */
+/* Verses created from a verse lookup. */
 .verse {
 	text-indent: 1em;
 	width: 100%;
 }
 
-/* Vereses created from a verse lookup. */
+/* Verses created from a verse lookup. */
 .pslam_title {
 	margin: 0px 2em 0px 2em;
 	padding-bottom: 19px;
@@ -104,17 +128,18 @@ body {
 	float: left;
 	/* Bold makes some letters better, esp. "P" */
 	/*font-weight: bold;*/
-	/* This fixes the spacing problem with some letters, especially capital J's. */
+	/* FIXME: Capital J's cover up characters in the third line of the first verse.  See 2 Kings 22:1 in a narrow window. */
+	/* This fixes the spacing problem with some letters, like W, but not quite capital J's. */
 	margin-bottom:-11px;
 	/* Opera needs this
 	margin-bottom:0px;
 	padding: 1px;
 	*/
 }
-/* Fixes a bug where the last word of the first verse somtimes wraps. */
+/* Fixes a bug where the last word of the first verse sometimes wraps. */
 .first_verse {
 	width: 100%;
-	/* This makes sure that the first line is atleast two lines long to give the drop caps just enough space. */
+	/* This makes sure that the first line is at least two lines long to give the drop caps just enough space. */
 	min-height: 38px;
 }
 
