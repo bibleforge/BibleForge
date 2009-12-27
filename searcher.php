@@ -1,14 +1,18 @@
 <?php
+
 /**
- * BibleForge (alpha testing)
+ * BibleForge
  *
  * @date    10-30-08
  * @version 0.1 alpha 2
- * @link http://www.BibleForge.com
+ * @link http://BibleForge.com
+ * @license Reciprocal Public License 1.5 (RPL1.5)
+ * @author BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
  */
 
 error_reporting(E_ALL);
 
+///NOTE: This is just for compatibilities sake.  Magic Quotes should be turned off and this code should be removed.
 if (get_magic_quotes_gpc()) {
     function stripslashes_deep($value)
     {
@@ -22,8 +26,10 @@ if (get_magic_quotes_gpc()) {
     $_REQUEST = array_map('stripslashes_deep', $_REQUEST);
 }
 
-define('SEARCH', 1);
-define('VERSE_LOOKUP', 2);
+define('VERSE_LOOKUP', 1);
+define('MIXED_SEARCH', 2);
+define('STANDARD_SEARCH', 3);
+define('MORPHOLOGICAL_SEARCH', 4);
 define('ADDITIONAL', 1);
 define('PREVIOUS', 2);
 
@@ -33,7 +39,7 @@ define('LIMIT', 40); ///FIXME: Where should this be defined?  Should it be defin
 
 ///TODO: POST vs GET vs REQEUST
 if (!isset($_REQUEST['q'])) {
-	/// $_REQUEST['q'] is required
+	/// $_REQUEST['q'] is required.
 	die();
 } else {
 	$query = $_REQUEST['q'];
@@ -42,36 +48,18 @@ if (!isset($_REQUEST['q'])) {
 if (isset($_REQUEST['t'])) {
 	$type = $_REQUEST['t'];
 } else {
-	/// The type is unknown, therefore attempt to determine what it should be.
-	///NOTE: The type should always be set by the requester since it is faster.
-	die(); ///NOTE: Not supported curently.
-	/*
-	$verse_id = parse_reference($query); ///FIXME Not implemented, and might not be needed.
-	if ($verse_id === false) {
-		$type = SEARCH;
-		
-		/// Which verse should searches start on?
-		if (isset($_REQUEST['s'])) {
-			$start_id = (int)$_REQUEST['s'];
-		} else {
-			$start_id = 0;
-		}
-	} else {
-		$type = VERSE_LOOKUP;
-		$start_id = 0;
-	}
-	*/
+	die();
 }
 
-/// Which verse should searches start on?
-///NOTE: Only used with SEARCH.
+/// Which verse should the search start on?
+///NOTE: Not used with VERSE_LOOKUP.
 if (isset($_REQUEST['s'])) {
 	$start_id = (int)$_REQUEST['s'];
 } else {
 	$start_id = 0;
 }
 
-/// In what direction should the verses be retrived?
+/// In what direction should the verses be retrieved?
 if (isset($_REQUEST['d'])) {
 	$direction = (int)$_REQUEST['d'];
 } else {
@@ -79,9 +67,8 @@ if (isset($_REQUEST['d'])) {
 }
 
 
-/// Preform search or lookup and end execution.
+/// Preform search or lookup, and end execution.
 run_search($query, $type, $direction, $start_id);
-
 
 
 /**
@@ -90,31 +77,31 @@ run_search($query, $type, $direction, $start_id);
  * This is the first function to handle searches and verse lookups.
  * It figures out what type of search is being preformed and calls the corresponding functions.
  *
- * @example run_search($query, $type, $direction, $start_id);
- * @param $query (string) The input to be searched for.
+ * @example run_search(1001001, VERSE_LOOKUP, ADDITIONAL);
+ * @example run_search(40000101, VERSE_LOOKUP, PREVIOUS);
+ * @example run_search("love", STANDARD_SEARCH, ADDITIONAL, 40000101);
+ * @example run_search("God & love", STANDARD_SEARCH, ADDITIONAL);
+ * @example run_search('["love", [[4, 1]], [1]]', MORPHOLOGICAL_SEARCH, ADDITIONAL);
+ * @param $query (string) The input to be searched for or a stringified JSON array for advanced searching.
  * @param $type (integer) The type of query: SEARCH || VERSE_LOOKUP.
  * @param $direction (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
- * @param $start_id (integer) (optional) The verse_id from whence to start.
+ * @param $start_id (integer) (optional) The verse_id whence to start.
  * @return NULL.  Data is sent to the buffer.  Intended for AJAX requests.
+ * @note The script should stop execution before this function ends.
  */
 function run_search($query, $type, $direction, $start_id = 0)
-{	
-	/// Figure out what book, chapter, and/or verse to look up.
-
-	if ($type == SEARCH) {
-		///TODO: Determine and do other types of searches.
-		/// Preform a simple search.
-		/// $query ex: love || love AS NOUN
-		simple_search($query, $direction, $start_id);
-	///TODO: Determine if ELSEIF is necessary.
-	//} elseif ($type == VERSE_LOOKUP) {
-	} else {
-		/// Look up a verse
-		/// $query ex: 1001001 || 43003016
+{
+	if ($type == VERSE_LOOKUP) {
+		/// $query example: 1001001 OR 43003016
 		retrieve_verses($query, $direction);
+	} elseif ($type == STANDARD_SEARCH) {
+		/// $query example: love OR God & love OR this -that OR "in the beginning"
+		standard_search($query, $direction, $start_id);
+	} else { /// MORPHOLOGICAL_SEARCH
+		/// $query ex: '["love", [[4, 1]], [1]]' (love AS NOUN) OR '["love", [[3, 1], [7, 1]], [1, 0]]' (love AS RED, NOT PRESENT)
+		
+		morphology_search($query, $direction, $start_id);
 	}
-	/// Ensure execution ending.
-	die();
 }
 
 
@@ -130,14 +117,14 @@ function run_search($query, $type, $direction, $start_id = 0)
 function retrieve_verses($verse_id, $direction)
 {
 	/// Quickly check to see if the verse_id is outside of the valid range.
-	///FIXME: Perhaps $verse_id < 1001001 should default to 1001001 and $verse_id > 66022021 to 66022021.
+	///TODO: Determine if $verse_id < 1001001 should default to 1001001 and $verse_id > 66022021 to 66022021.
 	if ($verse_id < 1001001 || $verse_id > 66022021) {
 		echo '[[', VERSE_LOOKUP, ',', $direction, '],[],[],[0]]';
 		die();
 	}
 	
 	///NOTE: To get PREVIOUS verses, we need to sort the database by id in reverse order because
-	///      chapter and book boundaries are not predictable (i.e., we can't just say "WHERE  id >= id - LIMIT").
+	///      chapter and book boundaries are not predictable (i.e., we can't just say "WHERE id >= id - LIMIT").
 	
 	if ($direction == ADDITIONAL) {
 		$operator = '>=';
@@ -150,10 +137,10 @@ function retrieve_verses($verse_id, $direction)
 	require_once 'functions/database.php';
 	connect_to_database();
 	
-	$SQL_query = 'SELECT id, words FROM ' . bible_verses . ' WHERE id ' . $operator . (int)$verse_id . $order_by . ' LIMIT '. LIMIT;
+	$SQL_query = 'SELECT id, words FROM ' . bible_verses . ' WHERE id ' . $operator . (int)$verse_id . $order_by . ' LIMIT ' . LIMIT;
 	$SQL_res = mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
 	
-	/// Convert SQL results into one comma deliniated string for JSON.
+	/// Convert SQL results into one comma delineated string for JSON.
 	$verses_str = "";
 	$verses_num = "";
 	
@@ -165,113 +152,173 @@ function retrieve_verses($verse_id, $direction)
 	} else {
 		while ($row = mysql_fetch_assoc($SQL_res)) {
 			$verses_str = '"' . $row['words'] . '",' . $verses_str;
-			$verses_num = $row['id'] . ','. $verses_num;
+			$verses_num = $row['id'] . ',' . $verses_num;
 		}
 	}
 	
 	/// Send results to the buffer as a JSON serialized array, and stop execution.
-	/// Array Format: [[action],[verse_ids,...],[verse_words,...],[number_of_matches]]
-	///NOTE: JSON should ignore trailing commas.
+	/// Array Format: [[action],[verse_ids,...],[verse_words,...],[success]]
+	///NOTE: rtrim(..., ',') removes trailing commas.  It seems to be slightly faster than substr(..., 0, -1).
 	///TODO: It would be nice to indicate if there are no more verses to find when it gets to the end.
-	echo '[[', VERSE_LOOKUP, ',', $direction, '],[', $verses_num, '],[', $verses_str, '],[1]]';
+	echo '[[', VERSE_LOOKUP, ',', $direction, '],[', rtrim($verses_num, ','), '],[', rtrim($verses_str, ','), '],[1]]';
 	die();
 }
 
 
-
-
 /**
- * Perform a simple Sphinx-based search.
+ * Perform a standard Sphinx-based search.
  *
- * Query the Sphinx server, and get the verses from the MySQL server.
+ * This function queries the Sphinx server and retrieves the verses from the MySQL server.
  *
- * @example simple_search($query, $direction, $start_id);
+ * @example standard_search("love", ADDITIONAL, 0);
  * @param $query (string) The query to be searched for.
  * @param $direction (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
  * @param $start_id (integer) (optional) The verse_id whence to start.
  * @return NULL.  Data is sent to the buffer as a JSON array, and then execution ends.
  * @note Called by run_search().
  */
-function simple_search($query, $direction, $start_id = 0)
+function standard_search($query, $direction, $start_id = 0)
 {
 	require_once 'config.php';
 	
 	require_once 'functions/' . SPHINX_API . '.php';
 	
-	$cl = new SphinxClient();
-	$cl->SetServer(SPHINX_SERVER, SPHINX_PORT); /// SetServer(sphinx_server_address, sphinx_server_port)
-	$cl->SetLimits(0, LIMIT); /// SetLimits(starting_point, count, max_in_memory (optional), quit_after_x_found (optional))
+	$sphinx = new SphinxClient();
+	$sphinx->SetServer(SPHINX_SERVER, SPHINX_PORT); /// SetServer(sphinx_server_address, sphinx_server_port)
+	$sphinx->SetLimits(0, LIMIT); /// SetLimits(starting_point, count, max_in_memory (optional), quit_after_x_found (optional))
 	
-	if ($start_id > 0) $cl->SetIDRange($start_id, 0); /// SetIDRange(start_id, stop_id (0 means no limit))
+	///NOTE: The stop_id is now required for sphinxapi and should be calculated by the Forge, and could be set as a constant so that sphinxapi_cli is not slowed down by it.
+	///TODO: Calculate the stop_id in the Forge.
+	if ($start_id > 0) $sphinx->SetIDRange($start_id, 99999999); /// SetIDRange(start_id, stop_id (0 means no limit))
 	
 	/// Determine the search mode.
 	/// Default is SPH_MATCH_ALL (i.e., all words are required: word1 & word2).
 	/// SPH_MATCH_ALL should be the fastest and needs no sorting.
 	
 	/// Is there more than one word?
-	if (strpos($query, ' ') !== false) {		
+	if (strpos($query, ' ') !== false) {
 		if (strpos($query, '"') !== false || substr_count($query, ' ') > 9) {
 			///NOTE: Could use the more accurate (preg_match('/([a-z-]+[^a-z-]+){11}/i', $query) == 1) to find word count, but it is slower.
 			/// There are more than 10 search terms in the query or the query contains double quotes (").
 			/// By default, other modes stop at 10, but SPH_MATCH_EXTENDED does more (256?).
 			/// Phrases (words in quotes) require SPH_MATCH_EXTENDED mode.
 			///NOTE: SPH_MATCH_BOOLEAN is supposed to find more than 10 words too but doesn't seem to.
-			$cl->SetMatchMode(SPH_MATCH_EXTENDED); /// Most complex (and slowest?).
-			$cl->SetSortMode(SPH_SORT_EXTENDED, '@id ASC'); /// Order BY id.
+			$sphinx->SetMatchMode(SPH_MATCH_EXTENDED); /// Most complex (and slowest?).
+			$sphinx->SetSortMode(SPH_SORT_EXTENDED, '@id ASC'); /// Order BY id.
 		} elseif (strpos($query, '&') !== false || strpos($query, '|') !== false || strpos($query, ' -') !== false || substr($query, 0, 1) == '-') {
 			/// Boolean opperators found.
-			$cl->SetMatchMode(SPH_MATCH_BOOLEAN);
-			$cl->SetSortMode(SPH_SORT_EXTENDED, '@id ASC'); /// Order BY id.
+			$sphinx->SetMatchMode(SPH_MATCH_BOOLEAN);
+			$sphinx->SetSortMode(SPH_SORT_EXTENDED, '@id ASC'); /// Order BY id.
 		} else {
 			/// Multiple words are being searched for but nothing else special.
-			$cl->SetSortMode(SPH_SORT_EXTENDED, '@id ASC'); /// Order BY id.
+			$sphinx->SetSortMode(SPH_SORT_EXTENDED, '@id ASC'); /// Order BY id.
 		}
 	}
 	
-	$cl->SetRankingMode(SPH_RANK_NONE); /// No ranking, fastest
+	$sphinx->SetRankingMode(SPH_RANK_NONE); /// No ranking, fastest
 	
 	/// Run Sphinx search.
-	$sphinx_res = $cl->Query($query, 'verse_text');
+	$sphinx_res = $sphinx->Query($query, 'verse_text');
 	
 	/// If no results found were found, send an empty JSON result.
-	if ($sphinx_res['simple-matches'] == "") {
-		echo '[[', SEARCH, ',', $direction, '],[],[],[0]]';
+	if ($sphinx_res['total'] == 0) {
+		echo '[[', STANDARD_SEARCH, ',', $direction, '],[],[],[0]]';
 		die();
 	}
+	
+	$simple_matches = implode(',', array_keys($sphinx_res['matches']));
 	
 	/// Get verses from the MySQL database.
 	require_once 'functions/database.php';
 	connect_to_database();
 	
-	$SQL_query = 'SELECT words FROM ' . bible_verses . ' WHERE id IN (' . $sphinx_res['simple-matches'] . ' )';
+	$SQL_query = 'SELECT words FROM ' . bible_verses . ' WHERE id IN (' . $simple_matches . ')';
 	$SQL_res = mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
 	
-	/// Convert SQL results into one comma deliniated string.
+	/// Convert SQL results into one comma delineated string.
 	$verses_str = "";
 	while ($row = mysql_fetch_assoc($SQL_res)) {
 		$verses_str .= '"' . $row['words'] . '",';
 	}
 	
 	/// Send results to the buffer as a JSON serialized array, and stop execution.
-	/// Array Format: [[action],[verse_ids,...],[verse_words,...],[number_of_matches]]
-	///NOTE: JSON should ignore trailing commas.
+	/// Array Format: [[action,direction],[verse_ids,...],[verse_words,...],number_of_matches]
+	///NOTE: rtrim(..., ',') removes trailing commas.  It seems to be slightly faster than substr(..., 0, -1).
 	///TODO: It would be nice to indicate if there are no more verses to find when it gets to the end.
-	echo '[[', SEARCH, ',', $direction, '],[', $sphinx_res['simple-matches'], '],[', $verses_str, '],[', $sphinx_res['total_found'], ']]';
+	///TODO: Make the JSON work with both eval() and JSON.parse().  The \' throws it off.  But \\' works.  To remove trailing slashes use rtrim(..., ',').
+	echo '[[', STANDARD_SEARCH, ',', $direction, '],[', $simple_matches, '],[', rtrim($verses_str, ','), '],', $sphinx_res['total_found'], ']';
 	die();
 }
 
 
 /**
- * Parse a query to detime the book, chapter, and/or verse references.
+ * Perform a morphological Sphinx-based search.
  *
- * This is used to convert a query like "John 3:16" to the number 43003016.
- *
- * @example $verse_id = parse_reference($query);
- * @param $query (string) The input to be parsed.
- * @return Integer of book, chapter, and verses or FALSE if not a valid verse reference.
- * @note FIXME: Not yet implamented.  Handeled by Javascript; not needed?
+ * @example morphology_search('["love", [[4, 1]], [1]]', ADDITIONAL, 0); /// love AS NOUN
+ * @example morphology_search('["love", [[3, 1], [7, 1]], [1, 0]]', ADDITIONAL, 0); /// love AS RED, NOT PRESENT
+ * @param $json (string) A stringified JSON array containing the word to be searched for, the morphological attributes to be considered, and whether or not to exclude results matching the morphological attributes.  
+ *        Format: '["WORD", [[MORPHOLOGICAL_CLASS, ATTRIBUTE], [...]], [EXCLUDE, ...]]'
+ * @param $direction (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
+ * @param $start_id (integer) (optional) The morphological id whence to start.
+ * @return NULL.  Data is sent to the buffer as a JSON array, and then execution ends.
+ * @note Called by run_search().
  */
-function parse_reference($query)
+function morphology_search($json, $direction, $start_id = 0)
 {
-	return false;
+	require_once 'config.php';
+	
+	/// Prepare Sphinx.
+	require_once 'functions/' . SPHINX_API . '.php';
+	$sphinx = new SphinxClient();
+	$sphinx->SetServer(SPHINX_SERVER, SPHINX_PORT); /// SetServer(sphinx_server_address, sphinx_server_port)
+	$sphinx->SetLimits(0, LIMIT); /// SetLimits(starting_point, count, max_in_memory (optional), quit_after_x_found (optional))
+	
+	///NOTE: The stop_id is now required for sphinxapi and should be calculated by the Forge, and could be set as a constant so that sphinxapi_cli is not slowed down by it.
+	///TODO: Calculate the stop_id in the Forge.
+	if ($start_id > 0) $sphinx->SetIDRange($start_id, 99999999); /// SetIDRange(start_id, stop_id)
+	
+	$sphinx->SetRankingMode(SPH_RANK_NONE); /// No ranking, fastest
+	/// Set the attributes and prepare to search.
+	$query_array = json_decode($json, true);
+	
+	require_once 'functions/morphology.php';
+	set_morphology_attributes($query_array[1], $query_array[2], $sphinx);
+	
+	/// Run Sphinx search.
+	$sphinx_res = $sphinx->Query($query_array[0], 'morphological');
+	
+	/// If no results found were found, send an empty JSON result.
+	if ($sphinx_res['total'] == 0) {
+		echo '[[', MORPHOLOGICAL_SEARCH, ',', $direction, '],[],[],[0]]';
+		die();
+	}
+	
+	$verseid_arr = array();
+	foreach ($sphinx_res['matches'] as $value) {
+		$verseid_arr[] = $value['attrs']['verseid'];
+	}
+	
+	$simple_matches = implode(',', array_unique($verseid_arr));
+	
+	$word_ids = implode(',', array_keys($sphinx_res['matches']));
+	
+	/// Get verses from the MySQL database.
+	require_once 'functions/database.php';
+	connect_to_database();
+	
+	$SQL_query = 'SELECT words FROM ' . bible_verses . ' WHERE id IN (' . $simple_matches . ')';
+	$SQL_res = mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
+	
+	/// Convert SQL results into one comma delineated string.
+	$verses_str = "";
+	while ($row = mysql_fetch_assoc($SQL_res)) {
+		$verses_str .= '"' . $row['words'] . '",';
+	}
+	
+	/// Send results to the buffer as a JSON serialized array, and stop execution.
+	/// Array Format: [[action,direction],[verse_ids,...],[verse_words,...],number_of_matches, [word_id,...]]
+	///NOTE: rtrim(..., ',') removes trailing commas.  It seems to be slightly faster than substr(..., 0, -1).
+	///TODO: Indicate if there are no more verses to find when it gets to the end.
+	echo '[[', MORPHOLOGICAL_SEARCH, ',', $direction, '],[', $simple_matches, '],[', rtrim($verses_str, ','), '],', $sphinx_res['total_found'], ',[', $word_ids ,']]';
+	die();
 }

@@ -1,17 +1,21 @@
 /**
- * BibleForge (alpha testing)
+ * BibleForge
  *
  * @date    10-30-08
  * @version 0.1 alpha 2
- * @link http://www.BibleForge.com
+ * @link http://BibleForge.com
+ * @license Reciprocal Public License 1.5 (RPL1.5)
+ * @author BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
  */
+
+///TODO: Document which global variables (and global language variables) are used in which functions.
 
 /*****************************
  * Declare global constants. *
  *****************************/
- 
+
 ///NOTE: Should be "const" instead of "var," but IE doesn't support constants yet.
-var SEARCH = 1, VERSE_LOOKUP = 2, ADDITIONAL = 1, PREVIOUS = 2;
+var VERSE_LOOKUP = 1, MIXED_SEARCH = 2, STANDARD_SEARCH = 3, MORPHOLOGICAL_SEARCH = 4, ADDITIONAL = 1, PREVIOUS = 2;
 
 /*****************************
  * Declare global variables. *
@@ -21,36 +25,34 @@ var SEARCH = 1, VERSE_LOOKUP = 2, ADDITIONAL = 1, PREVIOUS = 2;
 var doc = document, win = window, doc_docEl = doc.documentElement;
 
 /// DOM Objects
-var q_obj   = doc.getElementById("q"); /// The search input box object
-var page    = doc.getElementById("page"); /// The results div
-var infoBar = doc.getElementById("infoBar");
+var q_obj        = doc.getElementById("q"); /// The search input box object
+var page         = doc.getElementById("page"); /// The results div
+var infoBar      = doc.getElementById("infoBar");
 var topLoader    = doc.getElementById("topLoader");
 var bottomLoader = doc.getElementById("bottomLoader");
 
 var highlight_re = []; /// Highlighter regex array
 var last_search  = "", last_search_encoded = ""; /// A cache of the last search query
-var last_type; /// The type of lookup performed last (SEARCH || VERSE_LOOKUP)
+var last_type; /// The type of lookup performed last (VERSE_LOOKUP || MIXED_SEARCH || STANDARD_SEARCH || MORPHOLOGICAL_SEARCH)
 var waiting_for_first_search = false;
-var last_book = 0; /// The number of the last book of the Bible that was returned
+var last_book       =  0; /// The number of the last book of the Bible that was returned
 var highlight_limit = 20; /// Currently, we limit the unique number of search words to highlight.
 
-///NOTE: window.XMLHttpRequest for Mozilla/KHTML/Opera/IE7+
-/// ActiveXObject("Microsoft.XMLHTTP") for IE6-
-var ajax_addtional = win.XMLHttpRequest ? new win.XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
-var ajax_previous  = win.XMLHttpRequest ? new win.XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+var ajax_additional = new win.XMLHttpRequest();
+var ajax_previous  = new win.XMLHttpRequest();
 
 /// Verse variables
-var top_verse, bottom_verse;
+var top_id, bottom_id;
 
 /// Scrolling variables
 var scroll_pos = 0, scroll_check_count = 0;
 var checking_excess_content_top = false, checking_excess_content_bottom = false;
 var remove_content_top_interval, remove_content_bottom_interval;
 var buffer_add = 1000, buffer_rem = 10000;
-var cached_verses_top = [], cached_count_top = 0;
+var cached_verses_top    = [], cached_count_top    = 0;
 var cached_verses_bottom = [], cached_count_bottom = 0;
 var scroll_maxed_top = true, scroll_maxed_bottom = false;
-var lookup_speed_scrolling = 50, lookup_speed_sitting = 100, lookup_delay = 200, remove_speed = 3000, look_up_range_speed = 300; /// In miliseconds
+var lookup_speed_scrolling = 50, lookup_speed_sitting = 100, lookup_delay = 200, remove_speed = 3000, look_up_range_speed = 300; /// In milliseconds
 var looking_up_verse_range = false;
 
 /// Simple Event Registration
@@ -59,7 +61,7 @@ win.onscroll = scrolling;
 win.onresize = resizing;
 
 /// Prototypes
-///NOTE: Add trim() for older browsers.
+///NOTE: Adds trim() for Opera/WebKit/IE and Mozilla 3.0-.
 if (!"".trim) {
 	/**
 	 * Removes leading and trailing spaces.
@@ -79,12 +81,76 @@ if (!"".trim) {
 }
 
 
+/**
+ * Make split() work correctly in IE.
+ *
+ * @param s (regexp || string) The regular expression or string with which to break the string.
+ * @param limit (int) The number of times to split the string.
+ * @return Returns an array of the string now broken into pieces.
+ * @see http://blog.stevenlevithan.com/archives/cross-browser-split.
+ */
+///NOTE: The following conditional compilation code blocks only executes on IE.
+/*@cc_on
+	String.prototype._$$split = String.prototype._$$split || String.prototype.split;
+	String.prototype.split = function (s, limit)
+	{
+		if (!(s instanceof RegExp)) return String.prototype._$$split.apply(this, arguments);
+		var	flags = (s.global ? "g" : "") + (s.ignoreCase ? "i" : "") + (s.multiline ? "m" : ""), s2 = new RegExp("^" + s.source + "$", flags), output = [], origLastIndex = s.lastIndex, lastLastIndex = 0, i = 0, match, lastLength;
+		if (limit === undefined || +limit < 0) {
+			limit = false;
+		} else {
+			limit = Math.floor(+limit);
+			if (!limit) return [];
+		}
+		if (s.global) {
+			s.lastIndex = 0;
+		} else {
+			s = new RegExp(s.source, "g" + flags);
+		}
+		while ((!limit || i++ <= limit) && (match = s.exec(this))) {
+			var emptyMatch = !match[0].length;
+			if (emptyMatch && s.lastIndex > match.index) {
+				--s.lastIndex;
+			}
+			if (s.lastIndex > lastLastIndex) {
+				if (match.length > 1) {
+					match[0].replace(s2, function()
+					{
+						for (var j = 1; j < arguments.length - 2; j++) {
+							if (arguments[j] === undefined) {
+								match[j] = undefined;
+							}
+						}
+					});
+				}
+				
+				output = output.concat(this.slice(lastLastIndex, match.index));
+				if (1 < match.length && match.index < this.length) {
+					output = output.concat(match.slice(1));
+				}
+				lastLength = match[0].length;
+				lastLastIndex = s.lastIndex;
+			}
+			if (emptyMatch)	++s.lastIndex;
+		}
+		output = lastLastIndex === this.length ? (s.test("") && !lastLength ? output : output.concat("")) : (limit ? output : output.concat(this.slice(lastLastIndex)));
+		s.lastIndex = origLastIndex;
+		return output;
+	};
+@*/
+/*@cc_on
+	/// Trick IE into understanding win.pageYOffset.
+	/// The initial value so that it is not undefined.
+	/// See scrolling().
+	win.pageYOffset = doc_docEl.scrollTop;
+@*/
+
 /*****************************
  * Start of search functions *
  *****************************/
 
 /**
- * Prepare for a the search.
+ * Prepare for the search.
  *
  * Prepares the search query from the input box.
  *
@@ -103,22 +169,30 @@ function prepare_new_search()
 	if (last_search_prepared.length == 0) return false;
 	
 	/// Stop any old requests since we have a new one.
-	/// Is readyState > 0 and < 4?  Anything 1-3 needs to be aborted.
-	if (ajax_addtional.readyState % 4) ajax_addtional.abort();
+	/// Is readyState > 0 and < 4?  (Anything 1-3 needs to be aborted.)
+	if (ajax_additional.readyState % 4) ajax_additional.abort();
 	if (ajax_previous.readyState % 4) ajax_previous.abort();
 	
 	/// Determine if the user is preforming a search or looking up a verse.
 	verse_id = determine_reference(last_search_prepared);
+	
+	/// Is the user looking up a verse? (verse_id is false when the user is preforming a search.)
 	if (verse_id !== false) {
 		/// To get the titles of Psalms, select verse 0 instead of verse 1.
 		if (verse_id < 19145002 && verse_id > 19003000 && verse_id % 1000 == 1) --verse_id;
 		
 		last_type = VERSE_LOOKUP;
-		bottom_verse = verse_id - 1; /// NOTE: Subtract 1 because run_search() adds one.
-	} else {
-		last_type = SEARCH;
+		/// NOTE: Subtract 1 because run_search() adds one.
+		bottom_id = verse_id - 1;
+	} else {/// The user is submitting a search request.
+		var search_type_array = determine_search_type(last_search_prepared);
+		last_type = search_type_array[0];
+		
+		if (last_type == MORPHOLOGICAL_SEARCH) {
+			last_search_prepared = search_type_array[1];
+		}
 		last_search_encoded = encodeURIComponent(last_search_prepared);
-		bottom_verse = 0;
+		bottom_id = 0;
 	}
 	
 	run_search(ADDITIONAL);
@@ -132,7 +206,8 @@ function prepare_new_search()
 		scroll_maxed_bottom = false;
 		/// We immediately prepare the highlighter so that when the results are returned via AJAX
 		/// the highlighter array will be ready to go.
-		if (raw_search_terms != last_search) { /// Already have the regex array?
+		/// Do we already have the regex array or do we not need because the highlighted words will be returned (e.g., morphological searching)?
+		if (raw_search_terms != last_search && last_type != MORPHOLOGICAL_SEARCH) {
 			prepare_highlighter(last_search_prepared);
 			last_search = raw_search_terms;
 		}
@@ -152,6 +227,70 @@ function prepare_new_search()
 }
 
 
+///TODO: Finish filling out the example returns.
+/**
+ * Figure out what type of search is being attempted by the user.
+ *
+ * @example determine_search_type("God & love"); /// Returns [STANDARD_SEARCH]
+ * @example determine_search_type("love AS NOUN"); /// Returns [MORPHOLOGICAL_SEARCH,'["love",[[1,1]],[1]]']
+ * @example determine_search_type("go AS IMPERITIVE, -SINGULAR"); /// Returns [MORPHOLOGICAL_SEARCH,'["go",[[?,?],[?,1]],[1,0]]']
+ * @example determine_search_type("go AS VERB,PASSIVE, INDICATIVE,-PERFECT"); /// Returns [MORPHOLOGICAL_SEARCH,'["go",[[?,?],[?,?],[?,?],[?,?]],[1,1,1,0]]']
+ * //@example determine_search_type("love AS NOUN & more | less -good AS ADJECTIVE"); /// Returns [MORPHOLOGICAL_SEARCH, [0, "love", "NOUN"], STANDARD_SEARCH, "& more | less -good", MORPHOLOGICAL_SEARCH, [0, "good", "ADJECTIVE"]]
+ * @param search_terms (string) The prepared terms to be examined.
+ * @return An array describing the type of search.  Format: [(int)Type of search, (optional)(string)JSON array describing the search].
+ * @note Called by run_search().
+ * @note Only a partial implementation currently.  Mixed searching is lacking.
+ * @note Global language variables used: morph_marker, morph_marker_len, morph_separator, morph_grammar.
+ */
+function determine_search_type(search_terms)
+{
+	var split_pos;
+	/// Did the user use the morphological keyword in his search?
+	if ((split_pos = search_terms.indexOf(morph_marker)) != -1) {
+		///TODO: Determine what is better: a JSON array or POST/GET string (i.e., word1=word&grammar_type1=1&value1=3&include1=1&...).
+		/// A JSON array is used to contain the information about the search.
+		/// JSON format: '["WORD",[[GRAMMAR_TYPE1,VALUE1],[...]],[INCLUDE1,...]]'
+		/// replace(/(["'])/g, "\\$1") adds slashes to sanitize the data.
+		var morph_json = '["' + search_terms.slice(0, split_pos).replace(/(["'])/g, "\\$1") + '",[';
+		
+		/// These strings will be used to concatenate data.
+		var morph_attribute_json = "", exclude_json = "";
+		
+		var morph_attributes = search_terms.slice(split_pos + morph_marker_len);
+		
+		var split_start = 0;
+		
+		///TODO: Determine if there is a benefit to using do() over while().
+		///NOTE: An infinite loop is used because the data is returned when it reaches the end of the string.
+		do {
+			/// Find where the attributes separate (e.g., "NOUN, GENITIVE" would separate at character 4).
+			split_pos = morph_attributes.indexOf(morph_separator, split_start);
+			/// Trim leading white space.
+			if (morph_attributes.slice(split_start, split_start + 1) == " ") ++split_start;
+			/// Is this morphological feature to be excluded?
+			if (morph_attributes.slice(split_start, split_start + 1) == "-") {
+				/// Skip the hyphen.
+				++split_start;
+				exclude_json += "1,";
+			} else {
+				exclude_json += "0,";
+			}
+			
+			if (split_pos > -1) {
+				morph_attribute_json += morph_grammar[morph_attributes.slice(split_start, split_pos).trim()] + ",";
+				split_start = split_pos + 1;
+			} else {
+				///TODO: Determine if trim() is necessary or if there is a better implementation.
+				///NOTE: exclude_json.slice(0, -1) is used to remove the trailing comma.  This could be unnecessary.
+				return [MORPHOLOGICAL_SEARCH, morph_json + morph_attribute_json + morph_grammar[morph_attributes.slice(split_start).trim()] + "],[" + exclude_json.slice(0, -1) + "]]"];
+			}
+		} while (true);
+	}
+	/// The search is just a standard search.
+	return [STANDARD_SEARCH];
+}
+
+
 /**
  * Submits a query via AJAX.
  *
@@ -161,38 +300,40 @@ function prepare_new_search()
  * @return NULL.  Query is sent via AJAX.
  * @note Called by prepare_new_search() when the user submits a search.
  * @note Called by add_content_bottom() and add_content_top() when scrolling.
- * @note Assumes that global variables last_type and bottom_verse and/or top_verse are set.
+ * @note Global variables used: last_type and bottom_id and/or top_id.
  */
 function run_search(direction)
 {
 	/// last_type set in prepare_new_search().
 	var query = "t=" + last_type, ajax;
 	if (direction == ADDITIONAL) {
-		ajax = ajax_addtional;
+		ajax = ajax_additional;
 	} else {
 		ajax = ajax_previous;
 		query += "&d=" + direction;
 	}
 	
-	/// Is the server is already working on the request?
-	///NOTE: readyState is between 0-4, and anything 1-3 means that the server is already working on the request.
+	/// Is the server is already working on this request?
+	///NOTE: readyState is between 0-4, and anything 1-3 means that the server is already working on this request.
 	if (ajax.readyState % 4) return null;
 	
 	if (last_type == VERSE_LOOKUP) {
 		if (direction == ADDITIONAL) {
-			query += "&q=" + (bottom_verse + 1);
+			query += "&q=" + (bottom_id + 1);
 		} else {
-			query += "&q=" + (top_verse - 1);
+			query += "&q=" + (top_id - 1);
 		}
 	} else {
 		query += "&q=" + last_search_encoded;
 		if (direction == ADDITIONAL) {
-			if (bottom_verse > 0) query += "&s=" + (bottom_verse + 1); /// Continue starting on the next verse.
+			/// Continue starting on the next verse.
+			///FIXME: not always a verse cf. morpholgical searching.
+			if (bottom_id > 0) query += "&s=" + (bottom_id + 1);
 		} else {
-			query += "&s=" + (top_verse + -1); /// Continue starting on the next verse.
+			/// Continue starting backwards on the previous verse.
+			query += "&s=" + (top_id + -1);
 		}
 	}
-	
 	post_to_server("searcher.php", query, ajax);
 }
 
@@ -203,20 +344,44 @@ function run_search(direction)
  * Writes new verses to the page, determines if more content is needed or available,
  * and writes initial information to the info bar.
  *
- * @example prepare_verses(json_array);
- * @example prepare_verses([[1,1],[1001001],["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning...</b>"],[1]]);
- * @param res (array) JSON array from server.  Array format: [[action,direction],[verse_ids,...],[verse_HTML,...],[number_of_matches]].
- * @return NULL.  Writes HTML to the page.
- * @note Called by prepare_verses() after AJAX request.
+ * @example prepare_verses([[VERSE_LOOKUP, PREVIOUS], [1001001, 1001002], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>", "<b id="12">And</b> <b id="13">the</b> <b id="14">earth....</b>"], 2]);
+ * @example prepare_verses([[STANDARD_SEARCH, ADDITIONAL], [1001001], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>"], 1]);
+ * @example prepare_verses([[MORPHOLOGICAL_SEARCH, ADDITIONAL], [50004008], ["<b id=772635>Finally,</b> <b id=772636>brethren,</b> <b id=772637>whatsoever</b> <b id=772638>things....</b>"], 1, [772638]]);
+ * @param res (array) JSON array from the server.  Array format: [action, direction], [verse_ids, ...], [verse_HTML, ...], number_of_matches, [word_id, ...]].  /// NOTE: word_id is optional.
+ * @return NULL.  The function writes HTML to the page.
+ * @note Called by prepare_verses() after an AJAX request.
  */
 function handle_new_verses(res)
 {
 	///TODO: On a verse lookup that does not start with Genesis 1:1, scroll_maxed_top must be set to FALSE. (Has this been taken care of?)
-	var total = res[3], return_type = res[0][0], direction = res[0][1];
+	var total = res[3], action = res[0][0], direction = res[0][1];
 	
 	if (total > 0) {
 		///FIXME: When looking up the last few verses of Revelation (i.e., Revelation 22:21), the page jumps when more content is loaded above.
-		write_verses(return_type, direction, res[1], res[2]);
+		write_verses(action, direction, res[1], res[2]);
+		
+		///FIXME: Highlighting needs to be in its own function where each type and mixed highlighting will be done correctly.
+		if (action == STANDARD_SEARCH) {
+			///TODO: Determine if it would be better to put this in an array and send it all at once, preferably without the implied eval().
+			/// Highlight the verse after 100 milliseconds.
+			/// The delay is so that the verse is displayed as quickly as possible.
+			///TODO: Determine if it is bad to convert the array to a string like this.
+			setTimeout("highlight_search_results(\"" + res[2] + "\")", 100);
+		} else if (action == MORPHOLOGICAL_SEARCH) {
+			var i, count = res[4].length;
+			for (i = 0; i < count; ++i) {
+				///TODO: Determine if there is a downside to having a space at the start of the className.
+				///TODO: Determine if we ever need to replace an existing f* className.
+				doc.getElementById(res[4][i]).className += " f" + 1;
+			}
+			/// Record the last id found from the search so that we know where to start from for the next search as the user scrolls.
+			/// Do we need to record the bottom id?
+			if (direction == ADDITIONAL) {
+				bottom_id = res[4][count - 1];
+			} else {
+				top_id = res[4][0];
+			}
+		}
 		
 		/// Indicate to the user that more content may be loading, and check for more content.
 		if (direction == ADDITIONAL && res[1][res[1].length - 1] < 66022021) {
@@ -251,7 +416,7 @@ function handle_new_verses(res)
 		
 		infoBar.innerHTML = "";
 		
-		if (return_type == SEARCH) {
+		if (action != VERSE_LOOKUP) {
 			/// Create the inital text.
 			infoBar.appendChild(doc.createTextNode(format_number(total) + lang["found_" + (total == 1 ? "singular" : "plural")]));
 			/// Create a <b> for the search terms.
@@ -261,7 +426,8 @@ function handle_new_verses(res)
 			infoBar.appendChild(b_tag);
 		}
 		
-		top_verse = res[1][0];
+		/// Store the first verse reference for later.
+		top_id = res[1][0];
 	}
 }
 
@@ -269,47 +435,40 @@ function handle_new_verses(res)
 /**
  * Writes new verses to page.
  *
- * @example write_verses(SEARCH, ADDITIONAL, [1001001], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning...</b>"]);
- * @param return_type (integer) The type of query: SEARCH || VERSE_LOOKUP.
- * @param direction (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS. 
+ * @example write_verses(action, direction, [verse_ids, ...], [verse_HTML, ...]);
+ * @example write_verses(VERSE_LOOKUP, ADDITIONAL, [1001001], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>"]);
+ * @param action (integer) The type of query: VERSE_LOOKUP || MIXED_SEARCH || STANDARD_SEARCH || MORPHOLOGICAL_SEARCH.
+ * @param direction (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
  * @param verse_ids (array) An array of integers representing Bible verse references.
  * @param verse_HTML (array) An array of strings containing verses in HTML.
  * @return NULL.  Writes HTML to the page.
  * @note Called by handle_new_verses().
  * @note verse_ids contains an array of verses in the following format: [B]BCCCVVV (e.g., Genesis 1:1 == 1001001).
  */
-function write_verses(return_type, direction, verse_ids, verse_HTML)
+function write_verses(action, direction, verse_ids, verse_HTML)
 {
 	///NOTE: psalm_title_re determines if a psalm does not have a title.
-	var i, num, b, c, v, verse_str, HTML_str = "", chapter_text = "", psalm_title_re = /^(?:1(?:0[4-7]?|1[1-9]|3[25-7]|4[6-9]|50)?|2|33|43|71|9[13-79])$/;
+	///TODO: Determine if psalm_title_re should be global for performance reasons or otherwise.
+	var i, total_verses = verse_ids.length, num, b, c, v, HTML_str = "", chapter_text = "", psalm_title_re = /^(?:1(?:0[4-7]?|1[1-9]|3[25-7]|4[6-9]|50)?|2|33|43|71|9[13-79])$/;
 	
-	for (i in verse_HTML) {
+	for (i = 0; i < total_verses; ++i) {
 		num = verse_ids[i];
-		v = num % 1000; /// Calculate the verse.
-		c = ((num - v) % 1000000) / 1000; /// Calculate the chapter.
-		b = (num - v - c * 1000) / 1000000; /// Calculate the book by number (e.g., Genesis == 1).
+		/// Calculate the verse.
+		v = num % 1000;
+		/// Calculate the chapter.
+		c = ((num - v) % 1000000) / 1000;
+		/// Calculate the book by number (e.g., Genesis == 1).
+		b = (num - v - c * 1000) / 1000000;
+		///TODO: Determine if it would be better to have two for loops instead of the if statement inside of this one.
 		
-		if (return_type == SEARCH) {
-			/// Fix Psalm titles.
-			if (v == 0) v = lang.title;
-			
-			if (b != last_book) { /// Only display the book if it is different from the last verse.
-				last_book = b;
-				HTML_str += "<h1 class=book id=" + num + "_title>" + books_short[b] + "</h1>"; /// Convert the book number to text.
-			}
-			verse_str = verse_HTML[i];
-			HTML_str += "<div class=search_verse id=" + num + "_search>" + c + ":" + v + " " + verse_str + "</div>";
-			
-			///TODO: Determine if it would be better to put this in an array and send it all at once, preferably without the implied eval().
-			/// Highlight the verse after 100 miliseconds.
-			/// The delay is so that the verse is displayed as quickly as possible.
-			setTimeout("highlight_results(\"" + verse_str + "\")", 100);
-		} else { /// VERSE_LOOKUP
-			if (v < 2) { /// I.e., 1 or 0 (title).
+		if (action == VERSE_LOOKUP) {
+			/// Is this the first verse or the Psalm title?
+			if (v < 2) {
+				/// Is this chapter 1?  (We need to know if we should display the book name.)
 				if (c == 1) {
 					HTML_str += "<div class=book id=" + num + "_title>" + books_long_pretitle[b] + "<h1>" + books_long_main[b] + "</h1>" + books_long_posttitle[b] + "</div>";
 				} else if (b != 19 || v == 0 || psalm_title_re.test(c)) { /// Display chapter/psalm number (but not on verse 1 of psalms that have titles).
-					/// Psalms have a special name.
+					/// Is this the book of Psalms?  (Psalms have a special name.)
 					if (b == 19) {
 						chapter_text = lang.psalm;
 					} else {
@@ -317,6 +476,7 @@ function write_verses(return_type, direction, verse_ids, verse_HTML)
 					}
 					HTML_str += "<h3 class=chapter id=" + num + "_chapter>" + chapter_text + " " + c + "</h3>";
 				}
+				/// Is this a Psalm title (i.e., verse 0)?  (Psalm titles are displayed specially.)
 				if (v == 0) {
 					HTML_str += "<div class=pslam_title id=" + num + "_verse>" + verse_HTML[i] + "</div>";
 				} else {
@@ -325,44 +485,55 @@ function write_verses(return_type, direction, verse_ids, verse_HTML)
 			} else {
 				HTML_str += "<div class=verse id=" + num + "_verse>" + v + " " + verse_HTML[i] + "</div>";
 			}
+			
+		/// Searching
+		} else {
+			/// Change verse 0 to "title" (i.e., Psalm titles).  (Display Psalm 3:title instead of Psalm 3:0.)
+			if (v == 0) v = lang.title;
+			
+			/// Is this verse from a different book than the last verse?
+			if (b != last_book) {
+				/// We only need to print out the book if it is different from the last verse.
+				last_book = b;
+				HTML_str += "<h1 class=book id=" + num + "_title>" + books_short[b] + "</h1>"; /// Convert the book number to text.
+			}
+			
+			HTML_str += "<div class=search_verse id=" + num + "_search>" + c + ":" + v + " " + verse_HTML[i] + "</div>";
 		}
 	}
 	
 	var newEl = doc.createElement("div");
 	///NOTE: If innerHTML disappears in the future (because it is not (yet) in the "standards"),
 	///      a simple (but slow) alternative is to use the innerDOM script from http://innerdom.sourceforge.net/ or BetterInnerHTML from http://www.optimalworks.net/resources/betterinnerhtml/.
-	///      Using range.createContextualFragment is also a posibility.
+	///      Also using "var range = doc.createRange();var newEl = range.createContextualFragment(HTML_str); is also a possibility.
 	newEl.innerHTML = HTML_str;
 	
 	if (direction == ADDITIONAL) {
-		page.insertBefore(newEl, null);
-		bottom_verse = num;
+		page.appendChild(newEl);
+		
+		/// Record the bottom most verse reference so that we know where to start from for the next search as the user scrolls.
+		///NOTE: This is only for VERSE_LOOKUP and STANDARD_SEARCH.  The id for MORPHOLOGICAL_SEARCH is recorded in handle_new_verses(), currently.
+		///TODO: Determine the pros/cons of using an if statement to prevent morphological searches from recording the id here, since it is overwritten later.
+		bottom_id = num;
 	} else {
 		page.insertBefore(newEl, page.childNodes[0]);
-		win.scrollTo(0, scroll_pos = (win.pageYOffset + newEl.clientHeight));
-		top_verse = verse_ids[0];
+		
+		/// The new content that was just added to the top of the page will push the other contents downward.
+		/// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was added.
+		win.scrollTo(0, scroll_pos = win.pageYOffset + newEl.clientHeight);
+		
+		/// Record the top most verse reference so that we know where to start from for the next search as the user scrolls.
+		///NOTE: This is only for VERSE_LOOKUP and STANDARD_SEARCH.  The id for MORPHOLOGICAL_SEARCH is recorded in handle_new_verses(), currently.
+		///TODO: Determine the pros/cons of using an if statement to prevent morphological searches from recording the id here, since it is overwritten later.
+		top_id = verse_ids[0];
 	}
 	
+	/// If it is not going to already, figure out which verses are presently displayed on the screen.
 	if (!looking_up_verse_range) {
 		looking_up_verse_range = true;
 		setTimeout(find_current_range, look_up_range_speed);
 	}
 }
-/* FIXME this code greatly speeds up replacing an element in Mozilla using innerHTML if there are lots of elements in it.
-function replaceHtml(el, html) {
-	var oldEl = typeof el === "string" ? document.getElementById(el) : el;
-	/ *@cc_on // Pure innerHTML is slightly faster in IE	<----------
-		oldEl.innerHTML = html;
-		return oldEl;
-	@* / <----------
-	var newEl = oldEl.cloneNode(false);
-	newEl.innerHTML = html;
-	oldEl.parentNode.replaceChild(newEl, oldEl);
-	/ * Since we just removed the old element from the DOM, return a reference <----------
-	to the new element, which can be used to restore variable references. * / <----------
-	return newEl;
-};
-*/
 
 
 /**
@@ -386,89 +557,27 @@ function clean_up_page() {
  * Highlights the words in the verses that match the search terms.
  * Highlighting is done by adding/changing the className of a word.
  *
- * @example setTimeout("highlight_results(\"" + res[2][i] + "\")", 100);
- * @example highlight_results("<b id=1>In</b> <b id=2>the</b> <b id=3>beginning...</b>");
+ * @example setTimeout("highlight_search_results(\"" + res[2][i] + "\")", 100);
+ * @example highlight_search_results("<b id=1>In</b> <b id=2>the</b> <b id=3>beginning...</b>");
  * @param search_str (string) The HTML to examine and highlight.
  * @return NULL.  Modifies objects className.
- * @note Called by write_search() via setTimeout() with a short delay.
+ * @note Called by write_verses() via setTimeout() with a short delay.
  */
-function highlight_results(search_str)
-{	
-	var tmp_found_ids = [], count = 1, regex_id, i, ids;
-
-	for (regex_id in highlight_re) {
-		
+function highlight_search_results(search_str)
+{
+	var tmp_found_ids = [], count = 1, regex_id, regex_length = highlight_re.length, i, ids;
+	
+	for (regex_id = 0; regex_id < regex_length; ++regex_id) {
 		tmp_found_ids = search_str.split(highlight_re[regex_id]);
-
+		
 		ids = tmp_found_ids.length;
 		///NOTE: search_str.split() creates an array of the HTML with the correct ids every third one.
 		for (i = 1; i < ids; i += 2) {
 			///TODO: Determine if there is a downside to having a space at the start of the className.
 			///TODO: Determine if we ever need to replace an existing f* className.
-			doc.getElementById(tmp_found_ids[i]).className += " f" + count;
-		}
-		///TODO: Is there a way around this limitation (limiting how many unique words can be highlighted with different colors)?
-		if (++count > highlight_limit) count = 1;
-	}
-}
-
-
-/**
- * Filter multiple occurances and unnecessary characters.
- *
- * Remove multiple occurances of words, unnecessary characters or words (&, |, ", -anything, ...), and convert them all to lowercase.
- *
- * @example search_terms_arr = filter_array(search_terms.split(" "));
- * @example search_terms_arr = filter_array(["One", "two", "&", "one.", "-three"]); /// Returns: ["one", "two"];
- * @param arr (array) Array of words to filter.
- * @return Filtered array.
- * @note Called by prepare_highlighter().
- */
-function filter_array(arr)
-{
-	///FIXME: The regex filters out characters of other languages, e.g., Greek and Hebrew.
-	var key = "", tmp_arr1 = arr, tmp_arr2 = [], count = 0, val, re = /[^a-z*-]/ig;
-	
-	for (key in tmp_arr1) {
-		//val = stemWord(tmp_arr1[key]);
-		val = tmp_arr1[key].toLowerCase().replace(re, "");
-		if (in_array(val, tmp_arr2) === false) {
-			/// Filter out boolean operators and negitive words
-			//if (val.length != 0 && val != "&" && val != "|" && val.substr(0, 1) != "-") {
-			if (val.length != 0 && val.slice(0, 1) != "-") {
-				/// Lastly, remove puncuation.
-				//tmp_arr2[count++] = val.split(/["',.?!;:&|\)\(\]\[]/).join("");		
-				///NOTE: Use this to filter correctly "one two"~3 || "one two" \ 4
-				///      val = val.split(/"\s*[~\\]\s*[0-9]+/i).join(""); 
-				///TODO: At the moment, we don't allow number searches (0-9), so we simply remove all numbers too for now.
-				///TODO: We don't want to filter out Greek and Hebrew characters.
-				///      Could do something like [^-\w], but that would filter Hebrew vowels and maybe other characters.
-				//tmp_arr2[count++] = val.split(re).join("");
-				tmp_arr2[count++] = val;
-			}
-		}
-		delete tmp_arr1[key];
-	}
-	return tmp_arr2;
-}
-
-
-/**
- * Determines if a value is in an array.
- *
- * @example in_array("word", ["is", "word", "here"]); /// Returns TRUE.
- * @param needle (string) String to look for.
- * @param haystack (array) Array to examine.
- * @return TRUE if found; FALSE if not.
- */
-function in_array(needle, haystack)
-{
-	for (var fkey in haystack) {
-		if (haystack[fkey] == needle) {
-			return fkey;
+			doc.getElementById(tmp_found_ids[i]).className += " f" + (regex_id + 1);
 		}
 	}
-	return false;
 }
 
 
@@ -488,16 +597,16 @@ function prepare_highlighter(search_terms)
 	///TODO: Determine if this whole function should be in a language specific file.
 	highlight_re = [];
 	
-	var search_terms_arr = filter_array(search_terms.split(" "));
+	var search_terms_arr = filter_terms_for_highlighter(search_terms);
 	
-	var count = 0, len_before, len_after, stemmed_word, stemmed_arr = [], no_morph, term, i;
+	var count = 0, len_before, len_after, stemmed_word, stemmed_arr = [], no_morph, term, i, j;
 	
-	for (i in search_terms_arr) {
+	first_loop:for (i in search_terms_arr) {
 		term = search_terms_arr[i];
 		len_before = term.length;
 		
-		///FIXME: Move this to lang/en.js because it is language dependent.
-		/// Fix special/unique words that the stemmer won't.
+		///FIXME: Move this to the language specific file because it is language dependent.
+		/// Fix special/unique words that the stemmer won't stem correctly.
 		switch (term) {
 			case "does": case "doth": case "do": case "doeth": case "doest":
 				stemmed_word = "do[esth]*";
@@ -532,45 +641,43 @@ function prepare_highlighter(search_terms)
 				no_morph = true;
 				break;
 			default:
+				/// Does the word contain a wildcard symbol (*)?
 				if (term.indexOf("*") != -1) {
-					/// The word has a wild card: don't stem, and change it to a regex compatible form.
-					/// Word breaks are found by looking for tag beginnings (<) or closings (>).
+					/// Don't stem; change it to a regex compatible form.
+					///NOTE: Word breaks are found by looking for tag openings (<) or closings (>).
 					stemmed_word = term.replace(/\*/g, "[^<>]*");
 					no_morph = true;
 				} else {
-					/// Most words get stemmed.
-					///NOTE: stem_word() is language dependent, and therefore is delcared in js/langs/LOCALE.js.
+					/// A normal word without a wildcard gets stemmed.
+					///NOTE: stem_word() is language dependent and therefore is delcared in js/langs/LOCALE.js.
 					stemmed_word = stem_word(term);
 					no_morph = false;
 				}
 		}
 		len_after = stemmed_word.length;
 		
-		if (count > 0) {
-			/// Skip words that are the same after stemming/regexing.
-			if (in_array(stemmed_word, stemmed_arr)) continue;
+		/// Skip words that are the same after stemming or regexing.
+		for (j = 0; j < count; ++j) {
+			if (stemmed_word == stemmed_arr[j]) continue first_loop; ///NOTE: This is the same as "continue 2" in PHP.
 		}
 		
 		stemmed_arr[count] = stemmed_word;
-		
-		//document.title=stemmed_word; /// Debugging: display last stemmed word.
 		
 		///NOTE: [<-] finds either the beginning of the close tag (</b>) or a hyphen (-).
 		///      The hyphen is to highlight hyphenated words that would otherwise be missed (matching first word only) (i.e., "Beth").
 		///      ([^>]+-)? finds words where the match is not the first of a hyphenated word (i.e., "Maachah").
 		///      The current English version (KJV) does not use square brackets ([]).
-		///FIXME: The punctutation )(,.?!;: could be considered language specific and should be moved.
+		///FIXME: The punctuation ,.?!;:)( could be considered language specific.
 		///TODO: Bench mark different regex (creation and testing).
 		if (no_morph || (len_after == len_before && len_after < 3)) {
 			highlight_re[count++] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")[),.?!;:]*[<-]", "i");
 		} else {
 			/// Find most words based on stem morphology, but also can have false hits.
-			///TODO: Compare different regexes
+			///TODO: Compare different regexes.
 			//highlight_re[count++] = new RegExp("id=([0-9]+)>[(]*([^<]+-)?" + stemmed_word + "[a-z']{0,7}[),.?!;:]*[<-]", "i");
 			highlight_re[count++] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")[^<]{0,7}[),.?!;:]*[<-]", "i");
 		}
 	}
-	
 }
 
 
@@ -580,12 +687,13 @@ function prepare_highlighter(search_terms)
  * @example format_number(1000); /// Returns "1,000"
  * @param num (positive number) The number to format.
  * @return A formatted number as a string.
- * @note To be faster, this will not format a negitive number.
+ * @note To be faster, this will not format a negative number.
  */
 function format_number(num)
 {
 	if (num < 1000) return num;
-	num += ""; /// Quickly converts a number to a string quickly.
+	/// Quickly converts a number to a string quickly.
+	num += "";
 	var rgx = /^([0-9]+)([0-9][0-9][0-9])/;
 	
 	while (rgx.test(num)) {
@@ -615,8 +723,12 @@ function format_number(num)
  */
 function scrolling()
 {
-	///NOTE: Opera doesn't understand window.scrollY.
+	/// Trick IE into understanding win.pageYOffset.
+	/*@cc_on
+	win.pageYOffset = doc_docEl.scrollTop;
+	@*/
 	var new_scroll_pos = win.pageYOffset;
+	
 	if (new_scroll_pos == scroll_pos) {
 		/// IE/Opera sometimes don't update page.scrollTop until after this function is run.
 		/// Mozilla/KHTML can get stuck here too.
@@ -642,6 +754,8 @@ function scrolling()
 	/// Don't look up more data until the first results come.
 	if (waiting_for_first_search) return null;
 	
+	/// Since the page is scrolling, we need to determine if more content needs to be added or if some content should be hidden.
+	
 	if (scrolling_down) {
 		setTimeout(add_content_bottom, lookup_speed_scrolling);
 		checking_excess_content_top = true;
@@ -649,7 +763,7 @@ function scrolling()
 		setTimeout(add_content_top, lookup_speed_scrolling);
 		checking_excess_content_bottom = true;
 	}
-
+	
 	if (checking_excess_content_top) {
 		clearInterval(remove_content_top_interval);
 		remove_content_top_interval = setInterval(remove_excess_content_top, remove_speed);
@@ -670,7 +784,7 @@ function scrolling()
  */
 function remove_excess_content_top()
 {
-	var child = page.firstChild, child_height;
+	var child = page.firstChild;
 	
 	if (child == null) return null;
 	
@@ -680,28 +794,31 @@ function remove_excess_content_top()
 	
 	///NOTE: Opera wrongly subtracts the scroll position from .offsetTop.
 	
-	child_height = child.clientHeight;
+	var child_height = child.clientHeight;
 	
 	///NOTE: Mozilla also has window.scrollMaxY, which is slightly different than document.documentElement.scrollHeight (document.body.scrollHeight should work too).
 	
 	/// Is the object in the remove zone, and is its height less than the remaining space to scroll to prevent jumping?
 	if (child_height + buffer_rem < scroll_pos && child_height < doc_docEl.scrollHeight - scroll_pos - doc_docEl.clientHeight) {
-		
+		/// Store the content in cache, and then add 1 to the global counter variable so that we know how much cache we have.
 		cached_verses_top[cached_count_top++] = child.innerHTML;
+		///TODO: Determine if setting the display to "none" actually helps at all.
 		/// Remove quickly from page.
 		child.style.display = "none";
 		/// Calculate and set the new scroll position
-		
+		/// Because content is being removed from the top of the page, the rest of the content will be shifted upward.
+		/// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was removed.
 		win.scrollTo(0, scroll_pos = (win.pageYOffset - child_height));
 		
 		page.removeChild(child);
 		
 		/// Indicates to the user that content will load if they scroll to the top of the screen.
 		topLoader.style.visibility = "visible";
-		/// End execution to keep the checking_content_top_interval running.
+		/// End execution to keep the checking_content_top_interval running because there could be even more content that should be removed.
 		return null;
 	}
 	
+	/// Since no content needs to be removed, there is no need to check again.
 	clearInterval(remove_content_top_interval);
 	checking_excess_content_top = false;
 }
@@ -716,28 +833,30 @@ function remove_excess_content_top()
  */
 function remove_excess_content_bottom()
 {
-	var child = page.lastChild, child_position, page_height;
+	var child = page.lastChild;
 	
 	if (child == null) return null;
 	
-	child_position = child.offsetTop;
+	var child_position = child.offsetTop;
+	var page_height = doc_docEl.clientHeight;
 	
-	page_height = doc_docEl.clientHeight;
-	
-	/// Is the object is in the remove zone?
+	/// Is the element is in the remove zone?
 	if (child_position > scroll_pos + page_height + buffer_rem) {
+		/// Store the content in cache, and then add 1 to the global counter variable so that we know how much cache we have.
 		cached_verses_bottom[cached_count_bottom++] = child.innerHTML;
+		
 		page.removeChild(child);
 		
 		/// This fixes an IE7+ bug that causes the page to scroll needlessly when an element is added.
 		/*@cc_on
 			win.scrollTo(0, scroll_pos);
 		@*/
-		/// End execution to keep the checking_content_top_interval running.
+		/// End execution to keep the checking_content_top_interval running because there might be even more content that should be removed.
 		bottomLoader.style.visibility = "visible";
 		return null;
 	}
 	
+	/// Since no content needs to be removed, there is no need to check again.
 	clearInterval(remove_content_bottom_interval);
 	checking_excess_content_bottom = false;
 }
@@ -753,20 +872,22 @@ function remove_excess_content_bottom()
  */
 function add_content_bottom()
 {
-	var child = page.lastChild, child_position, page_height;
+	var child = page.lastChild;
 	
 	if (child == null) return null;
 	
-	child_position = child.offsetTop + child.clientHeight;
+	var child_position = child_position = child.offsetTop + child.clientHeight;
+	var page_height = page_height = doc_docEl.clientHeight;
 	
-	page_height = doc_docEl.clientHeight;
-	
+	/// Is the user scrolling close to the bottom of the page?
 	if (child_position < scroll_pos + page_height + buffer_add) {
+		/// Can the content be grabbed from cache?
 		if (cached_count_bottom > 0) {
 			var newEl = doc.createElement("div");
+			/// First subtract 1 from the global counter variable to point to the last cached passage, and then retrieve the cached content.
 			newEl.innerHTML = cached_verses_bottom[--cached_count_bottom];
 			///NOTE: This is actually works like insertAfter() (if such a function existed).
-			///      By using "null" as the second parameter, it tell it to add the element to the end.
+			///      By using "null" as the second parameter, it tells it to add the element to the end.
 			page.insertBefore(newEl, null);
 			
 			/// This fixes an IE7+ bug that causes the page to scroll needlessly when an element is added.
@@ -776,11 +897,12 @@ function add_content_bottom()
 			/// Better check to see if we need to add more content.
 			setTimeout(add_content_bottom, lookup_speed_scrolling);
 		} else {
-			/// Check to see if we need to get new content.
+			/// Did the user scroll all the way to the very bottom?  (If so, then there is no more content to be gotten.)
 			if (scroll_maxed_bottom) {
 				bottomLoader.style.visibility = "hidden";
 				return null;
 			}
+			/// Get more content.
 			run_search(ADDITIONAL);
 		}
 	}
@@ -805,24 +927,30 @@ function add_content_top()
 	
 	child_position = child_height;
 	
+	/// Is the user scrolling close to the top of the page?
 	if (child_position + buffer_add > scroll_pos) {
-		/// Can we get content from the cache?
+		/// Can the content be grabbed from cache?
 		if (cached_count_top > 0) {
 			var newEl = doc.createElement("div");
+			
+			/// First subtract 1 from the global counter variable to point to the last cached passage, and then retrieve the cached content.
 			newEl.innerHTML = cached_verses_top[--cached_count_top];
 			
 			page.insertBefore(newEl, child);
 			
+			/// The new content that was just added to the top of the page will push the other contents downward.
+			/// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was added.
 			win.scrollTo(0, scroll_pos = (win.pageYOffset + newEl.clientHeight));
 			
-			/// Better check to see if we need to add more content.
+			/// Check to see if we need to add more content.
 			setTimeout(add_content_top, lookup_speed_scrolling);
 		} else {
-			/// Check to see if we need to get new content.
+			/// Did the user scroll all the way to the very top?  (If so, then there is no more content to be gotten.)
 			if (scroll_maxed_top) {
 				topLoader.style.visibility = "hidden";
 				return null;
 			}
+			/// Get more content.
 			run_search(PREVIOUS);
 		}
 	}
@@ -830,10 +958,15 @@ function add_content_top()
 
 
 /**
- * Find the verse that is at the top of the page and at the bottom.
+ * Finds and displays the range of verses visible on the screen.
  *
+ * Find the verse that is at the top of the page and at the bottom of the page window and
+ * display that range on the page and change the page title to indicate the verse range as well.
+ *
+ * @example setTimeout(find_current_range, look_up_range_speed);
  * @return NULL.  The page is modified to reflect the verse range.
- * @note Called by scrolling() or itself via setTimeout().
+ * @note Called by scrolling(), resizing(), write_verses(), or itself via setTimeout().
+ * @note This function should be called every time the page is resized or scrolled or when visible content is added.
  */
 function find_current_range()
 {
@@ -845,22 +978,35 @@ function find_current_range()
 	var bottom_pos = scroll_pos + doc_docEl.clientHeight - 14;
 	
 	var top_verse_block = find_element_at_scroll_pos(top_pos, page);
+	
+	/// Is the top verse block not found?
 	if (top_verse_block === null) {
+		/// NOTE: There appears to be no verses displayed on the screen.
+		///       Since they may still be being retrieved, so run this function again a little later.
 		looking_up_verse_range = true;
 		setTimeout(find_current_range, look_up_range_speed);
 		return null;
 	}
 	
 	var bottom_verse_block = find_element_at_scroll_pos(bottom_pos, null, top_verse_block);
+	
+	/// Is the bottom verse block not found?
 	if (bottom_verse_block === null) {
+		///NOTE: There are no verses at the bottom of the screen.
+		///      Since they may still be being retrieved, so run this function again a little later.
 		looking_up_verse_range = true;
 		setTimeout(find_current_range, look_up_range_speed);
 		return null;
 	}
 	
+	/// Find the verse elements.
 	var verse1_el = find_element_at_scroll_pos(top_pos, top_verse_block);
 	var verse2_el = find_element_at_scroll_pos(bottom_pos, bottom_verse_block);
+	
+	/// Are either of the verses not found?
 	if (verse1_el === null || verse2_el === null) {
+		///NOTE: It is possible for some padding to separate the verses.
+		///      This is probably a temporary issue, so run this function again a little later.
 		looking_up_verse_range = true;
 		setTimeout(find_current_range, look_up_range_speed);
 		return null;
@@ -882,12 +1028,15 @@ function find_current_range()
 	v1 = v1 == 0 ? lang.title : v1;
 	v2 = v2 == 0 ? lang.title : v2;
 	
-	///NOTE: \u2013 is unicode for the en dash (–) (HTML: &ndash;).
+	///NOTE: \u2013 is Unicode for the en dash (–) (HTML: &ndash;).
 	///TODO: Determine if the colons should be language specified.
+	/// Are the books the same?
 	if (b1 == b2) {
-		/// The book of Psalms is refered to differently (e.g., Psalm 1:1).
+		/// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
 		b1 = b1 == 19 ? lang.psalm : books_short[b1];
+		/// Are the chapters the same?
 		if (c1 == c2) {
+			/// Are the verses the same?
 			if (v1 == v2) {
 				ref_range = b1 + " " + c1 + ":" + v1;
 			} else {
@@ -897,22 +1046,33 @@ function find_current_range()
 			ref_range = b1 + " " + c1 + ":" + v1 + "\u2013" + c2 + ":" + v2;
 		}
 	} else {
-		/// The book of Psalms is refered to differently (e.g., Psalm 1:1).
+		/// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
 		b1 = b1 == 19 ? lang.psalm : books_short[b1];
 		b2 = b2 == 19 ? lang.psalm : books_short[b2];
 		ref_range = b1 + " " + c1 + ":" + v1 + "\u2013" + b2 + " " + c2 + ":" + v2;
 	}
 	
 	var new_title;
-	/// last_type set in prepare_new_search().
-	if (last_type == SEARCH) {
-		new_title = last_search +  " (" + ref_range + ") - " + lang.page_title;
-	} else {
+	/// last_type is set in prepare_new_search().
+	/// The verse range is displayed differently based on the type of search (i.e., a verse look up or a regular search).
+	if (last_type == VERSE_LOOKUP) {
 		new_title = ref_range + " - " + lang.page_title;
+	} else {
+		new_title = last_search +  " (" + ref_range + ") - " + lang.page_title;
 	}
-	///FIXME: Display the verse range properly.
+	
+	/// Is the new verse range the same as the old one?
+	/// If they are the same, updating it would just waste resources.
 	if (doc.title != new_title) {
 		doc.title = new_title;
+		
+		/// Display the verse range on the page if looking up verses.
+		///FIXME: There should be a variable that shows the current view mode and not rely on last_type.
+		if (last_type == VERSE_LOOKUP) {
+			///TODO: Find a better way to clear infoBar than innerHTML.
+			infoBar.innerHTML = "";
+			infoBar.appendChild(doc.createTextNode(ref_range));
+		}
 	}
 	
 	return null;
@@ -920,7 +1080,7 @@ function find_current_range()
 
 
 /**
- * Find an element that is within a certain position on the page.
+ * Find an element that is within a certain Y position on the page.
  *
  * @example element = find_element_at_scroll_pos(scroll_pos, page);
  * @param the_pos (number) The vertical position on the page.
@@ -942,16 +1102,22 @@ function find_element_at_scroll_pos(the_pos, parent_el, el)
 		parent_el = el.parentNode;
 	}
 	
+	/// Were no elements found?  (If so, then there is nothing to do.)
 	if (!el) return null;
+	
 	var el_offset_top, el_offset_height;
 	var looked_next = false, looked_previous = false;
 	
 	do {
 		el_offset_top = el.offsetTop;
 		el_offset_height = el.offsetHeight + el_offset_top;
+		
+		/// Is the element somewhere between the position in question?
 		if (the_pos >= el_offset_top && the_pos <= el_offset_height) {
+			/// The element was found.
 			return el;
 		} else {
+			/// Is the position in question lower?
 			if (the_pos > el_offset_top) {
 				 el = el.nextSibling;
 				 looked_next = true;
@@ -959,17 +1125,18 @@ function find_element_at_scroll_pos(the_pos, parent_el, el)
 				 el = el.previousSibling;
 				 looked_previous = true
 			}
-			/// Did we get stuck in an infinite loop?
+			/// Is it stuck in an infinite loop?  (If so, then give up.)
 			if (looked_next && looked_previous) return null;
 		}
 	} while (el !== null);
 	
-	/// If there are no elements left (e.g., by scrolling all the way to the bottom) return the last element.
+	/// Was the position in question to high for all of the elements?
 	if (looked_next) {
+		/// If there are no elements left (e.g., by scrolling all the way to the bottom) return the last element.
 		return parent_el.lastChild;
 	}
-	///TODO: Determine if we should return parent_el.firstChild if looked_previous or if that might cause bugs.
 	
+	///TODO: Determine if we should return parent_el.firstChild if looked_previous or if that might cause bugs.
 	return null;
 }
 
@@ -987,6 +1154,8 @@ function resizing()
 {
 	setTimeout(add_content_bottom, lookup_speed_scrolling);
 	setTimeout(add_content_top, lookup_speed_scrolling);
+	
+	/// If it is not doing so already, check to see if the range of visible verses has changed.
 	if (!looking_up_verse_range) {
 		looking_up_verse_range = true;
 		setTimeout(find_current_range, look_up_range_speed);
@@ -1010,11 +1179,12 @@ function resizing()
  * @param server_URL (string) The file on the server to run.
  * @param message (string) The variables to send.  URI format: "name1=value1&name2=value%202"
  * @param ajax (AJAX object) The object that preforms the query.
- * @return NULL.  Queries server and then performs an action with the recieved JSON array.
+ * @return NULL.  Queries server and then performs an action with the received JSON array.
  * @note Called by run_search().
  */
 function post_to_server(server_URL, message, ajax)
 {
+	///TODO: Consider whether GET could be better than POST.
 	ajax.open("POST", server_URL, true);
 	ajax.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 	ajax.onreadystatechange = function ()
@@ -1037,87 +1207,22 @@ function post_to_server(server_URL, message, ajax)
 
 
 /**
- * Determines the action to preform with the recieved data.
+ * Determines the action to preform with the received data.
  *
  * @example interpret_result(ajax.responseText);
- * @param message (string) The recieved JSON array.
+ * @param message (string) The received JSON array.
  * @return NULL.  Preforms an action with the data.
  * @note Called by post_to_server().
  */
 function interpret_result(message)
 {
-	///TODO: When a JSON parser is avaiable, use that if it is fast or the same speed.
+	///NOTE: JSON.parse() is at least currently (November 2009) twice as slow as eval(), and it does not work because of problems parsing the character combination slash plus single quote (\').  Two slashes may work.
 	var res = eval(message);
-	
 	/// New search results.
-	//if (res[0] == 1) write_search(res); ///FIXME: Right now, there is only one command.
+	//if (res[0] == 1) handle_new_verses(res); ///FIXME: Right now, there is only one command.
 	handle_new_verses(res);
 }
 
 /*************************
  * End of AJAX functions *
  *************************/
-
-
-/**************************************
- * Start of IE compatiblity functions *
- **************************************/
-
-///NOTE: Conditional compilation code block only executes on IE.
-/// Make split() work correctly on IE.
-/// See http://blog.stevenlevithan.com/archives/cross-browser-split.
-/*@cc_on
-String.prototype._$$split = String.prototype._$$split || String.prototype.split;
-
-String.prototype.split = function (s, limit) {
-	if (!(s instanceof RegExp)) return String.prototype._$$split.apply(this, arguments);
-	var	flags = (s.global ? "g" : "") + (s.ignoreCase ? "i" : "") + (s.multiline ? "m" : ""),
-		s2 = new RegExp("^" + s.source + "$", flags),
-		output = [],
-		origLastIndex = s.lastIndex,
-		lastLastIndex = 0,
-		i = 0, match, lastLength;
-	if (limit === undefined || +limit < 0) {
-		limit = false;
-	} else {
-		limit = Math.floor(+limit);
-		if (!limit) return [];
-	}
-	if (s.global)
-		s.lastIndex = 0;
-	else
-		s = new RegExp(s.source, "g" + flags);
-	while ((!limit || i++ <= limit) && (match = s.exec(this))) {
-		var emptyMatch = !match[0].length;
-		if (emptyMatch && s.lastIndex > match.index)
-			--s.lastIndex;
-		if (s.lastIndex > lastLastIndex) {
-			if (match.length > 1) {
-				match[0].replace(s2, function ()
-				{
-					for (var j = 1; j < arguments.length - 2; j++) {
-						if (arguments[j] === undefined)
-							match[j] = undefined;
-					}
-				});
-			}
-
-			output = output.concat(this.slice(lastLastIndex, match.index));
-			if (1 < match.length && match.index < this.length)
-				output = output.concat(match.slice(1));
-			lastLength = match[0].length;
-			lastLastIndex = s.lastIndex;
-		}
-		if (emptyMatch)	++s.lastIndex;
-	}
-	output = lastLastIndex === this.length ?
-		(s.test("") && !lastLength ? output : output.concat("")) :
-		(limit ? output : output.concat(this.slice(lastLastIndex)));
-	s.lastIndex = origLastIndex;
-	return output;
-};
-@*/
-
-/************************************
- * End of IE compatiblity functions *
- ************************************/
