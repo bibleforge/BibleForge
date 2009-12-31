@@ -16,9 +16,10 @@ error_reporting(E_ALL);
 <!doctype html>
 <html>
 <head>
-	<meta http-equiv=content-type content="text/html; charset=UTF-8">
+	<meta http-equiv=content-type content="text/html;charset=UTF-8">
 	<title>BibleForge</title>
 	<link rel=stylesheet type="text/css" href="styles/base.css">
+	<meta name=viewport content="width=480,maximum-scale=0.6667">
 </head>
 <?php flush() ?>
 <body>
