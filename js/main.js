@@ -42,6 +42,11 @@ var ajax_additional = new win.XMLHttpRequest();
 var ajax_previous  = new win.XMLHttpRequest();
 
 /// Verse variables
+/// top_verse and bottom_verse are the last verses displayed on the screen so that the same verse is not displayed twice when more search data is returned (currently just used for MORPHOLOGICAL_SEARCH).
+var top_verse = 0, bottom_verse = 0;
+/// top_id and bottom_id are the last ids (either verse or word id) returned from a search or verse lookup.
+/// These are the same as bottom_id and top_id for VERSE_LOOKUP and STANDARD_SEARCH since these deal with entire verses as a whole, not individual words.
+/// For MORPHOLOGICAL_SEARCH, the last word id is stored.
 var top_id, bottom_id;
 
 /// Scrolling variables
@@ -365,7 +370,7 @@ function handle_new_verses(res)
 			///TODO: Determine if it would be better to put this in an array and send it all at once, preferably without the implied eval().
 			/// Highlight the verse after 100 milliseconds.
 			/// The delay is so that the verse is displayed as quickly as possible.
-			///TODO: Determine if it is bad to convert the array to a string like this.
+			///TODO: Determine if it is bad to convert the array to a string like this and if there is a way to use setTimeout as an anonymous function without the implied eval.
 			setTimeout("highlight_search_results(\"" + res[2] + "\")", 100);
 		} else if (action == MORPHOLOGICAL_SEARCH) {
 			var i, count = res[4].length;
@@ -449,9 +454,24 @@ function write_verses(action, direction, verse_ids, verse_HTML)
 {
 	///NOTE: psalm_title_re determines if a psalm does not have a title.
 	///TODO: Determine if psalm_title_re should be global for performance reasons or otherwise.
-	var i, total_verses = verse_ids.length, num, b, c, v, HTML_str = "", chapter_text = "", psalm_title_re = /^(?:1(?:0[4-7]?|1[1-9]|3[25-7]|4[6-9]|50)?|2|33|43|71|9[13-79])$/;
+	var i, num, b, c, v;
+	var HTML_str = "", chapter_text = "";
+	///TODO: Determine if this should be a global variable.
+	var psalm_title_re = /^(?:1(?:0[4-7]?|1[1-9]|3[25-7]|4[6-9]|50)?|2|33|43|71|9[13-79])$/;
+	var start_key = 0, stop_key = verse_ids.length;
 	
-	for (i = 0; i < total_verses; ++i) {
+	/// Currently only MORPHOLOGICAL_SEARCH searches data at the word level, so it is the only action that might stop in the middle of a verse and find more words in the same verse as the user scrolls.
+	if (action == MORPHOLOGICAL_SEARCH) {
+		if (direction == ADDITIONAL) {
+			/// Is the first verse returned the same as the bottom verse on the page?
+			if (bottom_verse == verse_ids[0]) start_key = 1;
+		} else {
+			/// Is the last verse returned the same as the top verse on the page?
+			if (top_verse == verse_ids[stop_key - 1]) --start_key;
+		}
+	}
+	
+	for (i = start_key; i < stop_key; ++i) {
 		num = verse_ids[i];
 		/// Calculate the verse.
 		v = num % 1000;
@@ -511,10 +531,12 @@ function write_verses(action, direction, verse_ids, verse_HTML)
 	if (direction == ADDITIONAL) {
 		page.appendChild(newEl);
 		
-		/// Record the bottom most verse reference so that we know where to start from for the next search as the user scrolls.
-		///NOTE: This is only for VERSE_LOOKUP and STANDARD_SEARCH.  The id for MORPHOLOGICAL_SEARCH is recorded in handle_new_verses(), currently.
+		/// Record the bottom most verse reference and id so that we know where to start from for the next search or verse lookup as the user scrolls.
+		///NOTE: For VERSE_LOOKUP and STANDARD_SEARCH, the bottom_id and bottom_verse are the same because the search is preformed at the verse level.
+		///      MORPHOLOGICAL_SEARCH is performed at the word level, so the id is different from the verse.
+		///      The id for MORPHOLOGICAL_SEARCH is recorded in handle_new_verses(), currently.
 		///TODO: Determine the pros/cons of using an if statement to prevent morphological searches from recording the id here, since it is overwritten later.
-		bottom_id = num;
+		bottom_id = bottom_verse = num;
 	} else {
 		page.insertBefore(newEl, page.childNodes[0]);
 		
@@ -522,10 +544,12 @@ function write_verses(action, direction, verse_ids, verse_HTML)
 		/// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was added.
 		win.scrollTo(0, scroll_pos = win.pageYOffset + newEl.clientHeight);
 		
-		/// Record the top most verse reference so that we know where to start from for the next search as the user scrolls.
-		///NOTE: This is only for VERSE_LOOKUP and STANDARD_SEARCH.  The id for MORPHOLOGICAL_SEARCH is recorded in handle_new_verses(), currently.
+		/// Record the top most verse reference and id so that we know where to start from for the next search or verse lookup as the user scrolls.
+		///NOTE: For VERSE_LOOKUP and STANDARD_SEARCH, the top_id and top_verse are the same because the search is preformed at the verse level.
+		///      MORPHOLOGICAL_SEARCH is performed at the word level, so the id is different from the verse.
+		///      The id for MORPHOLOGICAL_SEARCH is recorded in handle_new_verses(), currently.
 		///TODO: Determine the pros/cons of using an if statement to prevent morphological searches from recording the id here, since it is overwritten later.
-		top_id = verse_ids[0];
+		top_id = top_verse = verse_ids[0];
 	}
 	
 	/// If it is not going to already, figure out which verses are presently displayed on the screen.
