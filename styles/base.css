@@ -29,35 +29,36 @@ body {
 
 #topBar {
 	position: fixed;
-	top:0px;
-	left:0px;
+	top: 0px;
+	left: 0px;
 	width: 100%;
 	height: 30px;
 }
 
 #searchBar {
-	/* Transparent white background for browsers that don't support css gradients (Firefox 3.5-/IE/Opera). */
-	background-image: url("../images/90-white.png");
-	/* TODO: Make it work work with WebKit. */
-	/* Transparent white gradient (Firefox 3.6) */
-	/* NOTE: The gradient differs slightly from the image in that it has a quick fade to less transparent at the top. */
+	/* Transparent white background for Firefox 3.5-/IE/Opera/WebKit */
+	background: rgba(255,255,255,.9);
+	/* TODO: Determine if gradients increase CPU usage significantly? */
+	/* Transparent white gradient for Firefox 3.6+ */
 	background: -moz-linear-gradient(top, rgba(255,255,255,.96), rgba(255,255,255,.92) 25%, rgba(255,255,255,.9));
+	/* Transparent white gradient for WebKit */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(255,255,255,.96)), color-stop(.25, rgba(255,255,255,.92)), color-stop(1, rgba(255,255,255,.9)));
 	width: 100%;
 	height: 100%;
 }
 
 #infoBar {
-	/* Transparent yellow background for browsers that don't support css gradients (Firefox 3.5-/IE/Opera). */
-	background-image: url("../images/90-yellow.png");
-	/* TODO: Make it work work with WebKit. */
-	/* Transparent yellow gradient (Firefox 3.6/WebKit?) */
-	background: -moz-linear-gradient(top, rgba(255,255,221,.90), rgba(255,255,221,.89));
+	/* Transparent yellow background */
+	background: rgba(255,255,221,.9);
 	border-top: #EEE999 solid 1px;
 	border-bottom: #EEE999 solid 1px;
 	width: 100%;
 	height: 18px;
-	text-overflow: ellipsis; /* IE, WebKit might need "ellipsis-word" */
+	/* Prevent a long search string from overflowing the info bar by cutting it short and adding an ellipsis. (Mozilla has no support for this yet.) */
+	/* FIXME: This does not work yet. */
+	text-overflow: ellipsis;
 	-o-text-overflow: ellipsis; /* Opera */
+	/* This is what actually hides the text, currently. */
 	overflow: hidden;
 	font-size: 13px;
 }
