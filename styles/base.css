@@ -63,10 +63,8 @@ body {
 }
 
 #q {
-	background: transparent url("images/90-white.png");
-	/* Gradients don't seem to work here.
-	background: -moz-linear-gradient(top, bottom, from(rgba(255,255,255,.96)), to(rgba(255,255,255,.9)));
-	*/
+	/* Remove the background of the text box to see the transparent info bar below. */
+	background: transparent;
 }
 
 /* Individual words in verses */
@@ -101,7 +99,6 @@ body {
 
 /* Verses created from a search. */
 .search_verse {	
-	/* This gives reverse indent, but causes problems with margins (tested w/Mozilla).
 	/* This gives reverse indent, but causes problems with margins (tested w/Mozilla).
 	text-indent: -2em;
 	margin-left: 2em;
@@ -158,18 +155,18 @@ body {
 	margin: 0;
 }
 
-/* Short Title */
+/* Short book titles */
 h1.book {
 	padding: 10px;
 }
 
 
-/* Long Title */
+/* Long book titles */
 div.book {
 	padding: 60px 0px 20px 0px;
 }
 
-/* Main name for long title */
+/* Main name for long book titles */
 h1 {
 	padding-top: 5px;
 	margin: 0;
@@ -194,6 +191,7 @@ h1 {
 	color: #D00;
 }
 
+/* Highlighted found words from searches */
 .f1 {background: #FF6;}
 .f2 {background: #AFF;}
 .f3 {background: #9F9;}
