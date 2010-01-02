@@ -162,6 +162,7 @@ if (!"".trim) {
  * @example prepare_new_search();
  * @return FALSE to prevent the form from submitting.
  * @note Called when clicking the submit button on the search bar in index.php.
+ * @note Global variables used: waiting_for_first_search, ajax_additional, ajax_previous, last_type, bottom_id, last_search_encoded, last_search.
  */
 function prepare_new_search()
 {
@@ -187,13 +188,20 @@ function prepare_new_search()
 		if (verse_id < 19145002 && verse_id > 19003000 && verse_id % 1000 == 1) --verse_id;
 		
 		last_type = VERSE_LOOKUP;
-		/// NOTE: Subtract 1 because run_search() adds one.
+		///TODO: Determine if there is a better way of doing this.
+		///NOTE: Subtract 1 because run_search() adds one.
 		bottom_id = verse_id - 1;
-	} else {/// The user is submitting a search request.
+		
+	/// The user is submitting a search request.
+	} else {
+		/// The type of search must be determined (i.e., MIXED_SEARCH or STANDARD_SEARCH or MORPHOLOGICAL_SEARCH).
 		var search_type_array = determine_search_type(last_search_prepared);
+		
+		/// The type of search is stored in the first index of the array.
 		last_type = search_type_array[0];
 		
 		if (last_type == MORPHOLOGICAL_SEARCH) {
+			/// MORPHOLOGICAL_SEARCH uses a JSON array which is stored as text in the second index of the array.
 			last_search_prepared = search_type_array[1];
 		}
 		last_search_encoded = encodeURIComponent(last_search_prepared);
@@ -212,8 +220,9 @@ function prepare_new_search()
 		/// We immediately prepare the highlighter so that when the results are returned via AJAX
 		/// the highlighter array will be ready to go.
 		/// Do we already have the regex array or do we not need because the highlighted words will be returned (e.g., morphological searching)?
-		if (raw_search_terms != last_search && last_type != MORPHOLOGICAL_SEARCH) {
+		if (raw_search_terms != last_search) {
 			prepare_highlighter(last_search_prepared);
+			/// This global variable is used to display the last search on the info bar.
 			last_search = raw_search_terms;
 		}
 	}
@@ -232,14 +241,14 @@ function prepare_new_search()
 }
 
 
-///TODO: Finish filling out the example returns.
 /**
  * Figure out what type of search is being attempted by the user.
  *
  * @example determine_search_type("God & love"); /// Returns [STANDARD_SEARCH]
  * @example determine_search_type("love AS NOUN"); /// Returns [MORPHOLOGICAL_SEARCH,'["love",[[1,1]],[1]]']
- * @example determine_search_type("go AS IMPERITIVE, -SINGULAR"); /// Returns [MORPHOLOGICAL_SEARCH,'["go",[[?,?],[?,1]],[1,0]]']
- * @example determine_search_type("go AS VERB,PASSIVE, INDICATIVE,-PERFECT"); /// Returns [MORPHOLOGICAL_SEARCH,'["go",[[?,?],[?,?],[?,?],[?,?]],[1,1,1,0]]']
+ * @example determine_search_type("go AS IMPERATIVE, -SINGULAR"); /// Returns [MORPHOLOGICAL_SEARCH,'["go",[[9,3],[5,1]],[0,1]]']
+ * @example determine_search_type("go* AS PASSIVE, -PERFECT,INDICATIVE"); /// Returns [MORPHOLOGICAL_SEARCH,'["go*",[[8,3],[7,5],[9,1]],[0,1,0]]']
+ * @example determine_search_type("* AS RED, IMPERATIVE"); /// Returns [MORPHOLOGICAL_SEARCH,'["",[[3,1],[9,3]],[0,0]]']
  * //@example determine_search_type("love AS NOUN & more | less -good AS ADJECTIVE"); /// Returns [MORPHOLOGICAL_SEARCH, [0, "love", "NOUN"], STANDARD_SEARCH, "& more | less -good", MORPHOLOGICAL_SEARCH, [0, "good", "ADJECTIVE"]]
  * @param search_terms (string) The prepared terms to be examined.
  * @return An array describing the type of search.  Format: [(int)Type of search, (optional)(string)JSON array describing the search].
