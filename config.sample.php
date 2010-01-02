@@ -11,17 +11,26 @@
  */
 
 /**
+ * INSTRUCTIONS:
  * Configure the constants to match your environment,
  * and then rename this file to config.php.
  */
 
-/// MySQL
-define('DB_SERVER', '127.0.0.1'); ///NOTE: Use the typical MySQL sever format (hostname[:(port|socket)]).
-define('DB_USERNAME', 'root');
-define('DB_PASSWORD', '');
-define('DB_NAME', 'bf');
+/********************
+ * MySQL Constants *
+ *******************/
+///NOTE: Use the typical MySQL sever format (hostname[:(port|socket)]).
+define('DB_SERVER',		'127.0.0.1');
+define('DB_USERNAME',	'root');
+define('DB_PASSWORD',	'');
+define('DB_NAME',		'bf');
 
-/// Sphinx
-define('SPHINX_API', 'sphinxapi'); /// Which API to use (i.e., 'sphinxapi' or 'sphinxapi_cli')
-define('SPHINX_SERVER', '127.0.0.1'); /// The Sphinx host address (sphinxapi) or the path to search executable (sphinxapi_cli)
-define('SPHINX_PORT', 9312); /// Port number (sphinxapi) or path to sphinx config file (sphinxapi_cli)
+/********************
+ * Sphinx Constants *
+ ********************/
+/// Which API to use (i.e., 'sphinxapi' or 'sphinxapi_cli')?
+define('SPHINX_API', 'sphinxapi');
+/// The Sphinx host address (if using sphinxapi) or the path to search executable (if using sphinxapi_cli)
+define('SPHINX_SERVER', '127.0.0.1');
+/// Port number (if using sphinxapi) or path to sphinx configuration file (if using sphinxapi_cli)
+define('SPHINX_PORT', 9312);

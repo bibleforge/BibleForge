@@ -333,13 +333,23 @@ class SphinxClient
 				$sortexpr .= $sort_attribute . ' <= ' . $this->_max_id;
 			}
 			$options .= $sortexpr . '"';
-			/// The regular expressions that parse the result should only retreive results that match the sort expression and, therefore, have a value of one. 
+			/// The regular expressions that parse the result should only retrieve results that match the sort expression and, therefore, have a value of one. 
 			$extra_regex = ', @expr=1';
 			
 		}
 		
+		/// Is the user searching for a specific word?
+		///NOTE: If the user is looking for all words that match some morphological attributes, then we do not send anything for the query (not even empty double quotes).
+		if ($query != "") {
+			/// Since the data is being sent to the command line, it needs to be wrapped in double quotes and sanitized.
+			$query = ' "' . str_replace('"', '\"', $query) . '"';
+		}
+		
 		///TODO: Determine if this work on Linux?
-		$cmd = $this->_path . $options . ' -c ' . $this->_config . ' -i ' . $index . ' "' . str_replace('"', '\"', $query) . '"';
+		///FIXME: If there is a space in the $this->path on Windows, then we have to use the cmd executable to run the query.
+		///       E.g., exec('cmd /c "' . ... . '"');
+		///TODO: Determine if the problem with spaces on Windows is a PHP bug, and report it if it is.
+		$cmd = $this->_path . $options . ' -c "' . str_replace('"', '\"', $this->_config) . '" -i ' . $index . $query;
 		
 		/// Run the search.
 		$res = shell_exec($cmd);

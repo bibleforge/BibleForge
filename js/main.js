@@ -256,7 +256,15 @@ function determine_search_type(search_terms)
 		/// A JSON array is used to contain the information about the search.
 		/// JSON format: '["WORD",[[GRAMMAR_TYPE1,VALUE1],[...]],[INCLUDE1,...]]'
 		/// replace(/(["'])/g, "\\$1") adds slashes to sanitize the data.
-		var morph_json = '["' + search_terms.slice(0, split_pos).replace(/(["'])/g, "\\$1") + '",[';
+		var morph_search_term = search_terms.slice(0, split_pos);
+		
+		/// Is the user trying to find all words that match the morphological attributes?
+		if (morph_search_term == "*") {
+			/// Sphinx will find all words if no query is present, so we need to send a blank search request.
+			morph_search_term = ""
+		}
+		
+		var morph_json = '["' + morph_search_term.replace(/(["'])/g, "\\$1") + '",[';
 		
 		/// These strings will be used to concatenate data.
 		var morph_attribute_json = "", exclude_json = "";
