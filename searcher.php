@@ -98,7 +98,7 @@ function run_search($query, $type, $direction, $start_id = 0)
 		/// $query example: love OR God & love OR this -that OR "in the beginning"
 		standard_search($query, $direction, $start_id);
 	} else { /// MORPHOLOGICAL_SEARCH
-		/// $query ex: '["love", [[4, 1]], [1]]' (love AS NOUN) OR '["love", [[3, 1], [7, 1]], [1, 0]]' (love AS RED, NOT PRESENT)
+		/// $query ex: '["love", [[4,1]], [1]]' (love AS NOUN) OR '["love", [[3,1], [7,1]], [1,0]]' (love AS RED, NOT PRESENT)
 		
 		morphology_search($query, $direction, $start_id);
 	}
@@ -165,6 +165,7 @@ function retrieve_verses($verse_id, $direction)
 }
 
 
+///TODO: Determine the performance cost of creating functions for the code overlap between the two function (standard_search() and morphology_search()).
 /**
  * Perform a standard Sphinx-based search.
  *
@@ -196,17 +197,19 @@ function standard_search($query, $direction, $start_id = 0)
 	/// SPH_MATCH_ALL should be the fastest and needs no sorting.
 	
 	/// Is there more than one word?
+	///FIXME: These could be one word with a hyphen (e.g., -bad).  However, this search would cause an error, currently.
 	if (strpos($query, ' ') !== false) {
+			/// Are there more than 10 search terms in the query, or does the query contains double quotes (")?
 		if (strpos($query, '"') !== false || substr_count($query, ' ') > 9) {
 			///NOTE: Could use the more accurate (preg_match('/([a-z-]+[^a-z-]+){11}/i', $query) == 1) to find word count, but it is slower.
-			/// There are more than 10 search terms in the query or the query contains double quotes (").
 			/// By default, other modes stop at 10, but SPH_MATCH_EXTENDED does more (256?).
 			/// Phrases (words in quotes) require SPH_MATCH_EXTENDED mode.
 			///NOTE: SPH_MATCH_BOOLEAN is supposed to find more than 10 words too but doesn't seem to.
 			$sphinx->SetMatchMode(SPH_MATCH_EXTENDED); /// Most complex (and slowest?).
 			$sphinx->SetSortMode(SPH_SORT_EXTENDED, '@id ASC'); /// Order BY id.
-		} elseif (strpos($query, '&') !== false || strpos($query, '|') !== false || strpos($query, ' -') !== false || substr($query, 0, 1) == '-') {
-			/// Boolean opperators found.
+		/// Are boolean operators present.
+		///NOTE: The query string must have at least one character in order to use $query[0]; otherwise isset($query[0]) is needed.
+		} elseif (strpos($query, '&') !== false || strpos($query, '|') !== false || strpos($query, ' -') !== false || $query[0] == '-') {
 			$sphinx->SetMatchMode(SPH_MATCH_BOOLEAN);
 			$sphinx->SetSortMode(SPH_SORT_EXTENDED, '@id ASC'); /// Order BY id.
 		} else {
@@ -233,6 +236,7 @@ function standard_search($query, $direction, $start_id = 0)
 	connect_to_database();
 	
 	$SQL_query = 'SELECT words FROM ' . bible_verses . ' WHERE id IN (' . $simple_matches . ')';
+	
 	$SQL_res = mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
 	
 	/// Convert SQL results into one comma delineated string.
@@ -254,8 +258,9 @@ function standard_search($query, $direction, $start_id = 0)
 /**
  * Perform a morphological Sphinx-based search.
  *
- * @example morphology_search('["love", [[4, 1]], [1]]', ADDITIONAL, 0); /// love AS NOUN
- * @example morphology_search('["love", [[3, 1], [7, 1]], [1, 0]]', ADDITIONAL, 0); /// love AS RED, NOT PRESENT
+ * @example morphology_search('["love", [[4,1]], [1]]', ADDITIONAL, 0); /// love AS NOUN
+ * @example morphology_search('["love", [[3,1], [7,1]], [1,0]]', ADDITIONAL, 0); /// love AS RED, NOT PRESENT
+ * @example morphology_search('["", [[3,1], [9,3], [7,5]], [0,0,0]]', ADDITIONAL, 0); /// * AS RED, IMPERATIVE, PERFECT
  * @param $json (string) A stringified JSON array containing the word to be searched for, the morphological attributes to be considered, and whether or not to exclude results matching the morphological attributes.  
  *        Format: '["WORD", [[MORPHOLOGICAL_CLASS, ATTRIBUTE], [...]], [EXCLUDE, ...]]'
  * @param $direction (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.

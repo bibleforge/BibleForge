@@ -342,7 +342,8 @@ class SphinxClient
 		///NOTE: If the user is looking for all words that match some morphological attributes, then we do not send anything for the query (not even empty double quotes).
 		if ($query != "") {
 			/// Since the data is being sent to the command line, it needs to be wrapped in double quotes and sanitized.
-			$query = ' "' . str_replace('"', '\"', $query) . '"';
+			///NOTE: A space is needed after the first double quote; otherwise Sphinx throws an error.
+			$query = ' " ' . str_replace('"', '\"', $query) . '"';
 		}
 		
 		///TODO: Determine if this work on Linux?

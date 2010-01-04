@@ -322,7 +322,7 @@ function determine_search_type(search_terms)
  * @return NULL.  Query is sent via AJAX.
  * @note Called by prepare_new_search() when the user submits a search.
  * @note Called by add_content_bottom() and add_content_top() when scrolling.
- * @note Global variables used: last_type and bottom_id and/or top_id.
+ * @note Global variables used: last_type and bottom_id, top_id, last_search_encoded.
  */
 function run_search(direction)
 {
@@ -335,7 +335,7 @@ function run_search(direction)
 		query += "&d=" + direction;
 	}
 	
-	/// Is the server is already working on this request?
+	/// Is the server already working on this request?
 	///NOTE: readyState is between 0-4, and anything 1-3 means that the server is already working on this request.
 	if (ajax.readyState % 4) return null;
 	
@@ -349,7 +349,6 @@ function run_search(direction)
 		query += "&q=" + last_search_encoded;
 		if (direction == ADDITIONAL) {
 			/// Continue starting on the next verse.
-			///FIXME: not always a verse cf. morpholgical searching.
 			if (bottom_id > 0) query += "&s=" + (bottom_id + 1);
 		} else {
 			/// Continue starting backwards on the previous verse.
@@ -418,13 +417,13 @@ function handle_new_verses(res)
 		}
 	} else {
 		if (direction == ADDITIONAL) {
-			/// Reached the bottom scrolling down (RETURNED_SEARCH || RETURNED_VERSES_PREVIOUS).
-			/// Either Revelation 22:21 or end of search or no results.
+			/// The user has reached the bottom by scrolling down (either RETURNED_SEARCH or RETURNED_VERSES_PREVIOUS), so we need to hide the loading graphic.
+			/// This is cause by scrolling to Revelation 22:21 or end of search or there were no results.
 			scroll_maxed_bottom = true;
 			bottomLoader.style.visibility = "hidden";
 		}
 		if (direction == PREVIOUS || waiting_for_first_search) {
-			/// Reached the top scrolling up: Genesis 1:1 or no results.
+			/// The user has readed the top of the page by scrolling up (either Genesis 1:1 or there were no search results), so we need to hide the loading graphic
 			scroll_maxed_top = true;
 			topLoader.style.visibility = "hidden";
 		}
@@ -432,7 +431,8 @@ function handle_new_verses(res)
 	
 	/// If this is the first results, update the info bar.
 	if (waiting_for_first_search) {
-		/// Stop the browser from trying to reset the scroll position after a page refresh.
+		/// If the user had scrolled down the page and then pressed the refresh button,
+		/// the page will keep scrolling down as content is loaded, so to prevent this, force the window to scroll to the top of the page.
 		win.scrollTo(0, 0);
 		
 		waiting_for_first_search = false;
