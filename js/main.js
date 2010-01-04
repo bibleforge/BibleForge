@@ -100,7 +100,7 @@ if (!"".trim) {
 	String.prototype.split = function (s, limit)
 	{
 		if (!(s instanceof RegExp)) return String.prototype._$$split.apply(this, arguments);
-		var	flags = (s.global ? "g" : "") + (s.ignoreCase ? "i" : "") + (s.multiline ? "m" : ""), s2 = new RegExp("^" + s.source + "$", flags), output = [], origLastIndex = s.lastIndex, lastLastIndex = 0, i = 0, match, lastLength;
+		var flags = (s.global ? "g" : "") + (s.ignoreCase ? "i" : "") + (s.multiline ? "m" : ""), s2 = new RegExp("^" + s.source + "$", flags), output = [], origLastIndex = s.lastIndex, lastLastIndex = 0, i = 0, match, lastLength;
 		if (limit === undefined || +limit < 0) {
 			limit = false;
 		} else {
@@ -136,7 +136,7 @@ if (!"".trim) {
 				lastLength = match[0].length;
 				lastLastIndex = s.lastIndex;
 			}
-			if (emptyMatch)	++s.lastIndex;
+			if (emptyMatch) ++s.lastIndex;
 		}
 		output = lastLastIndex === this.length ? (s.test("") && !lastLength ? output : output.concat("")) : (limit ? output : output.concat(this.slice(lastLastIndex)));
 		s.lastIndex = origLastIndex;
@@ -384,10 +384,11 @@ function handle_new_verses(res)
 		
 		///FIXME: Highlighting needs to be in its own function where each type and mixed highlighting will be done correctly.
 		if (action == STANDARD_SEARCH) {
-			///TODO: Determine if it would be better to put this in an array and send it all at once, preferably without the implied eval().
 			/// Highlight the verse after 100 milliseconds.
 			/// The delay is so that the verse is displayed as quickly as possible.
-			///TODO: Determine if it is bad to convert the array to a string like this and if there is a way to use setTimeout as an anonymous function without the implied eval.
+			///TODO: Determine if it would be better to put this in an array and send it all at once, preferably without the implied eval().
+			///TODO: Determine if it is bad to convert the array to a string like this
+			///TODO: Determine if there is a way to use setTimeout as an anonymous function without the implied eval.
 			setTimeout("highlight_search_results(\"" + res[2] + "\")", 100);
 		} else if (action == MORPHOLOGICAL_SEARCH) {
 			var i, count = res[4].length;
