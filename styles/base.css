@@ -179,7 +179,8 @@ h1 {
 .d {
 	font-variant: small-caps;
 	font-size: 16px;
-	vertical-align: 0;
+	/* Different fonts have different line-heights.  This eliminates the inconsistency. */
+	line-height: 1px!important;
 }
 
 /* Added (implied) words */
