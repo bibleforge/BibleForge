@@ -122,14 +122,13 @@ body {
 
 /* Drop caps for the first letter of a chapter */
 .first_verse:first-letter {
-	font-size: 55px;
+	/* FIXME: Capital J's can cover up part of characters in the third line of the first verse.  See 2 Kings 22:1 in a narrow window. */
+	font-size: 51px;
 	float: left;
-	/* Bold makes some letters better, esp. "P" */
-	/*font-weight: bold;*/
-	/* FIXME: Capital J's cover up characters in the third line of the first verse.  See 2 Kings 22:1 in a narrow window. */
+	/* Bold makes some letters better, especially P's. */
 	/* This fixes the spacing problem with some letters, like W, but not quite capital J's. */
-	margin-bottom:-11px;
-	/* Opera needs this
+	margin-bottom:-9px;
+	/* FIXME: Opera needs this:
 	margin-bottom:0px;
 	padding: 1px;
 	*/
