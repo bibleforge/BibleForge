@@ -142,8 +142,8 @@ if (!"".trim) {
 		s.lastIndex = origLastIndex;
 		return output;
 	};
-@*/
-/*@cc_on
+
+
 	/// Trick IE into understanding win.pageYOffset.
 	/// The initial value so that it is not undefined.
 	/// See scrolling().

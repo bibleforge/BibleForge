@@ -36,7 +36,9 @@ body {
 }
 
 #searchBar {
-	/* Transparent white background for Firefox 3.5-/IE/Opera/WebKit */
+	/* A solid background for IE/Mozilla 2-/Opera 9.6- */
+	background: rgb(255,255,255);
+	/* Transparent white background for Firefox 3.5-/Opera 10 */
 	background: rgba(255,255,255,.9);
 	/* TODO: Determine if gradients increase CPU usage significantly? */
 	/* Transparent white gradient for Firefox 3.6+ */
@@ -48,6 +50,8 @@ body {
 }
 
 #infoBar {
+	/* A solid background for IE/Mozilla 2-/Opera 9.6- */
+	background: rgb(255,255,221);
 	/* Transparent yellow background */
 	background: rgba(255,255,221,.9);
 	border-top: #EEE999 solid 1px;
