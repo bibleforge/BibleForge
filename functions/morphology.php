@@ -97,6 +97,6 @@ function set_morphology_attributes($attribute_arr, $exclude_arr, $sphinx)
 		
 		$sphinx->SetFilter($attr, array((int)$morphology_arr[1]), (bool)$exclude_arr[$key]);
 	}
-	///TODO: When multiple morpholgical searches are allowed,
-	///      add the word to the query.  Something like $sphinx->AddQuery($WORD, 'morphological');
+	///TODO: When multiple morphological searches are allowed, add the word to the query.
+	///      Something like this: $sphinx->AddQuery($WORD, 'morphological');
 }

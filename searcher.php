@@ -26,6 +26,9 @@ if (get_magic_quotes_gpc()) {
     $_REQUEST = array_map('stripslashes_deep', $_REQUEST);
 }
 
+///FIXME: The language needs to be determined somehow (probably by the client).
+define('BIBLE_VERSES', 'bible_english_html');
+
 define('VERSE_LOOKUP', 1);
 define('MIXED_SEARCH', 2);
 define('STANDARD_SEARCH', 3);
@@ -77,11 +80,11 @@ run_search($query, $type, $direction, $start_id);
  * This is the first function to handle searches and verse lookups.
  * It figures out what type of search is being preformed and calls the corresponding functions.
  *
- * @example run_search(1001001, VERSE_LOOKUP, ADDITIONAL);
- * @example run_search(40000101, VERSE_LOOKUP, PREVIOUS);
- * @example run_search("love", STANDARD_SEARCH, ADDITIONAL, 40000101);
- * @example run_search("God & love", STANDARD_SEARCH, ADDITIONAL);
- * @example run_search('["love", [[4, 1]], [1]]', MORPHOLOGICAL_SEARCH, ADDITIONAL);
+ * @example run_search(1001001, VERSE_LOOKUP, ADDITIONAL); /// Find verses starting with Genesis 1:1.
+ * @example run_search(40000100, VERSE_LOOKUP, PREVIOUS); /// Find verses before the book of Matthew.
+ * @example run_search("love", STANDARD_SEARCH, ADDITIONAL, 40000101); /// Search for the word "love" starting at Matthew 1:1.
+ * @example run_search("God & love", STANDARD_SEARCH, ADDITIONAL); /// Find both words "God" and "love" in the same verse.
+ * @example run_search('["love", [[4,1]], [0]]', MORPHOLOGICAL_SEARCH, ADDITIONAL); /// Find the word "love" only when it is used as a noun.
  * @param $query (string) The input to be searched for or a stringified JSON array for advanced searching.
  * @param $type (integer) The type of query: SEARCH || VERSE_LOOKUP.
  * @param $direction (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
@@ -99,7 +102,6 @@ function run_search($query, $type, $direction, $start_id = 0)
 		standard_search($query, $direction, $start_id);
 	} else { /// MORPHOLOGICAL_SEARCH
 		/// $query ex: '["love", [[4,1]], [1]]' (love AS NOUN) OR '["love", [[3,1], [7,1]], [1,0]]' (love AS RED, NOT PRESENT)
-		
 		morphology_search($query, $direction, $start_id);
 	}
 }
@@ -137,7 +139,7 @@ function retrieve_verses($verse_id, $direction)
 	require_once 'functions/database.php';
 	connect_to_database();
 	
-	$SQL_query = 'SELECT id, words FROM ' . bible_verses . ' WHERE id ' . $operator . (int)$verse_id . $order_by . ' LIMIT ' . LIMIT;
+	$SQL_query = 'SELECT id, words FROM ' . BIBLE_VERSES . ' WHERE id ' . $operator . (int)$verse_id . $order_by . ' LIMIT ' . LIMIT;
 	$SQL_res = mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
 	
 	/// Convert SQL results into one comma delineated string for JSON.
@@ -235,7 +237,7 @@ function standard_search($query, $direction, $start_id = 0)
 	require_once 'functions/database.php';
 	connect_to_database();
 	
-	$SQL_query = 'SELECT words FROM ' . bible_verses . ' WHERE id IN (' . $simple_matches . ')';
+	$SQL_query = 'SELECT words FROM ' . BIBLE_VERSES . ' WHERE id IN (' . $simple_matches . ')';
 	
 	$SQL_res = mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
 	
@@ -311,7 +313,7 @@ function morphology_search($json, $direction, $start_id = 0)
 	require_once 'functions/database.php';
 	connect_to_database();
 	
-	$SQL_query = 'SELECT words FROM ' . bible_verses . ' WHERE id IN (' . $simple_matches . ')';
+	$SQL_query = 'SELECT words FROM ' . BIBLE_VERSES . ' WHERE id IN (' . $simple_matches . ')';
 	$SQL_res = mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
 	
 	/// Convert SQL results into one comma delineated string.
