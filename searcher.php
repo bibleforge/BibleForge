@@ -43,7 +43,7 @@ define('LIMIT', 40); ///FIXME: Where should this be defined?  Should it be defin
 ///TODO: POST vs GET vs REQEUST
 if (!isset($_REQUEST['q'])) {
 	/// $_REQUEST['q'] is required.
-	die();
+	die;
 } else {
 	$query = $_REQUEST['q'];
 }
@@ -51,7 +51,7 @@ if (!isset($_REQUEST['q'])) {
 if (isset($_REQUEST['t'])) {
 	$type = $_REQUEST['t'];
 } else {
-	die();
+	die;
 }
 
 /// Which verse should the search start on?
@@ -122,7 +122,7 @@ function retrieve_verses($verse_id, $direction)
 	///TODO: Determine if $verse_id < 1001001 should default to 1001001 and $verse_id > 66022021 to 66022021.
 	if ($verse_id < 1001001 || $verse_id > 66022021) {
 		echo '[[', VERSE_LOOKUP, ',', $direction, '],[],[],[0]]';
-		die();
+		die;
 	}
 	
 	///NOTE: To get PREVIOUS verses, we need to sort the database by id in reverse order because
@@ -163,7 +163,7 @@ function retrieve_verses($verse_id, $direction)
 	///NOTE: rtrim(..., ',') removes trailing commas.  It seems to be slightly faster than substr(..., 0, -1).
 	///TODO: It would be nice to indicate if there are no more verses to find when it gets to the end.
 	echo '[[', VERSE_LOOKUP, ',', $direction, '],[', rtrim($verses_num, ','), '],[', rtrim($verses_str, ','), '],[1]]';
-	die();
+	die;
 }
 
 
@@ -228,7 +228,7 @@ function standard_search($query, $direction, $start_id = 0)
 	/// If no results found were found, send an empty JSON result.
 	if ($sphinx_res['total'] == 0) {
 		echo '[[', STANDARD_SEARCH, ',', $direction, '],[],[],[0]]';
-		die();
+		die;
 	}
 	
 	$simple_matches = implode(',', array_keys($sphinx_res['matches']));
@@ -253,7 +253,7 @@ function standard_search($query, $direction, $start_id = 0)
 	///TODO: It would be nice to indicate if there are no more verses to find when it gets to the end.
 	///TODO: Make the JSON work with both eval() and JSON.parse().  The \' throws it off.  But \\' works.
 	echo '[[', STANDARD_SEARCH, ',', $direction, '],[', $simple_matches, '],[', rtrim($verses_str, ','), '],', $sphinx_res['total_found'], ']';
-	die();
+	die;
 }
 
 
@@ -297,7 +297,7 @@ function morphology_search($json, $direction, $start_id = 0)
 	/// If no results found were found, send an empty JSON result.
 	if ($sphinx_res['total'] == 0) {
 		echo '[[', MORPHOLOGICAL_SEARCH, ',', $direction, '],[],[],[0]]';
-		die();
+		die;
 	}
 	
 	$verseid_arr = array();
@@ -327,5 +327,5 @@ function morphology_search($json, $direction, $start_id = 0)
 	///NOTE: rtrim(..., ',') removes trailing commas.  It seems to be slightly faster than substr(..., 0, -1).
 	///TODO: Indicate if there are no more verses to find when it gets to the end.
 	echo '[[', MORPHOLOGICAL_SEARCH, ',', $direction, '],[', $simple_matches, '],[', rtrim($verses_str, ','), '],', $sphinx_res['total_found'], ',[', $word_ids ,']]';
-	die();
+	die;
 }
