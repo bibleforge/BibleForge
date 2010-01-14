@@ -12,7 +12,7 @@
  */
  
 //
-// $Id: sphinxapi.php 1775 2009-04-06 22:15:58Z shodan $
+// $Id: sphinxapi.php 2055 2009-11-06 23:09:58Z shodan $
 //
 
 //
@@ -79,7 +79,7 @@ define ( "SPH_SORT_ATTR_DESC",		1 );
 define ( "SPH_SORT_ATTR_ASC",		2 );
 define ( "SPH_SORT_TIME_SEGMENTS", 	3 );
 define ( "SPH_SORT_EXTENDED", 		4 );
-define ( "SPH_SORT_EXPR", 		5 );
+define ( "SPH_SORT_EXPR", 			5 );
 
 /// known filter types
 define ( "SPH_FILTER_VALUES",		0 );
@@ -96,7 +96,7 @@ define ( "SPH_ATTR_BIGINT",			6 );
 define ( "SPH_ATTR_MULTI",			0x40000000 );
 
 /// known grouping functions
-define ( "SPH_GROUPBY_DAY",		0 );
+define ( "SPH_GROUPBY_DAY",			0 );
 define ( "SPH_GROUPBY_WEEK",		1 );
 define ( "SPH_GROUPBY_MONTH",		2 );
 define ( "SPH_GROUPBY_YEAR",		3 );
@@ -359,6 +359,11 @@ function sphUnpackI64 ( $v )
 	$mq = floor($m/10000000.0);
 	$l = $m - $mq*10000000.0 + $c;
 	$h = $q*4294967296.0 + $r*429.0 + $mq;
+	if ( $l==10000000 )
+	{
+		$l = 0;
+		$h += 1;
+	}
 
 	$h = sprintf ( "%.0f", $h );
 	$l = sprintf ( "%07.0f", $l );
@@ -368,11 +373,27 @@ function sphUnpackI64 ( $v )
 }
 
 
+function sphFixUint ( $value )
+{
+	if ( PHP_INT_SIZE>=8 )
+	{
+		// x64 route, workaround broken unpack() in 5.2.2+
+		if ( $value<0 ) $value += (1<<32);
+		return $value;
+	}
+	else
+	{
+		// x32 route, workaround php signed/unsigned braindamage
+		return sprintf ( "%u", $value );
+	}
+}
+
+
 /// sphinx searchd client class
 class SphinxClient
 {
 	var $_host;			///< searchd host (default is "localhost")
-	var $_port;			///< searchd port (default is 3312)
+	var $_port;			///< searchd port (default is 9312)
 	var $_offset;		///< how many records to seek from result-set start (default is 0)
 	var $_limit;		///< how many records to return from result-set starting at offset (default is 20)
 	var $_mode;			///< query matching mode (default is SPH_MATCH_ALL)
@@ -416,7 +437,7 @@ class SphinxClient
 	{
 		// per-client-object settings
 		$this->_host		= "localhost";
-		$this->_port		= 3312;
+		$this->_port		= 9312;
 		$this->_path		= false;
 		$this->_socket		= false;
 
@@ -544,8 +565,16 @@ class SphinxClient
 	/// connect to searchd server
 	function _Connect ()
 	{
-		if ( $this->_socket !== false )
-			return $this->_socket;
+		if ( $this->_socket!==false )
+		{
+			// we are in persistent connection mode, so we have a socket
+			// however, need to check whether it's still alive
+			if ( !@feof ( $this->_socket ) )
+				return $this->_socket;
+
+			// force reopen
+			$this->_socket = false;
+		}
 
 		$errno = 0;
 		$errstr = "";
@@ -1186,16 +1215,7 @@ class SphinxClient
 					list ( $doc, $weight ) = array_values ( unpack ( "N*N*",
 						substr ( $response, $p, 8 ) ) );
 					$p += 8;
-
-					if ( PHP_INT_SIZE>=8 )
-					{
-						// x64 route, workaround broken unpack() in 5.2.2+
-						if ( $doc<0 ) $doc += (1<<32);
-					} else
-					{
-						// x32 route, workaround php signed/unsigned braindamage
-						$doc = sprintf ( "%u", $doc );
-					}
+					$doc = sphFixUint($doc);
 				}
 				$weight = sprintf ( "%u", $weight );
 
@@ -1234,11 +1254,11 @@ class SphinxClient
 						while ( $nvalues-->0 && $p<$max )
 						{
 							list(,$val) = unpack ( "N*", substr ( $response, $p, 4 ) ); $p += 4;
-							$attrvals[$attr][] = sprintf ( "%u", $val );
+							$attrvals[$attr][] = sphFixUint($val);
 						}
 					} else
 					{
-						$attrvals[$attr] = sprintf ( "%u", $val );
+						$attrvals[$attr] = sphFixUint($val);
 					}
 				}
 
@@ -1617,5 +1637,5 @@ class SphinxClient
 }
 
 //
-// $Id: sphinxapi.php 1775 2009-04-06 22:15:58Z shodan $
+// $Id: sphinxapi.php 2055 2009-11-06 23:09:58Z shodan $
 //

@@ -208,6 +208,7 @@ function standard_search($query, $direction, $start_id = 0)
 			/// Phrases (words in quotes) require SPH_MATCH_EXTENDED mode.
 			///NOTE: SPH_MATCH_BOOLEAN is supposed to find more than 10 words too but doesn't seem to.
 			$sphinx->SetMatchMode(SPH_MATCH_EXTENDED); /// Most complex (and slowest?).
+			/// Since we want the verses in cannonical order, we need to sort the results by id, not based on weight.
 			$sphinx->SetSortMode(SPH_SORT_EXTENDED, '@id ASC'); /// Order BY id.
 		/// Are boolean operators present.
 		///NOTE: The query string must have at least one character in order to use $query[0]; otherwise isset($query[0]) is needed.
