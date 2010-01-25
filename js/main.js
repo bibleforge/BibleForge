@@ -60,21 +60,32 @@ var scroll_maxed_top = true, scroll_maxed_bottom = false;
 var lookup_speed_scrolling = 50, lookup_speed_sitting = 100, lookup_delay = 200, remove_speed = 3000, look_up_range_speed = 300; /// In milliseconds
 var looking_up_verse_range = false;
 
+/// Auto Suggest variables
+var last_suggestion_text = "";
+var suggestion_cache = {};
+var ajax_suggestions = new win.XMLHttpRequest();
+
 /// Simple Event Registration
 ///NOTE: Could use wheel if the scroll bars are invisible.
 win.onscroll = scrolling;
 win.onresize = resizing;
+/// Set events for suggestions.
+q_obj.onkeypress = q_keypress;
+
+
+/// Disable autocomplete for Javascript enabled browsers because they can use the auto suggestions.
+q_obj.setAttribute("autocomplete", "off"); 
 
 /// Prototypes
-///NOTE: Adds trim() for Opera/WebKit/IE and Mozilla 3.0-.
+///NOTE: Adds trim() to Strings for IE/Opera/WebKit/Mozilla 3.0-.
 if (!"".trim) {
 	/**
 	 * Removes leading and trailing spaces.
 	 *
-	 * @example trimmed = trim("  God is &  good  "); /// Returns "God is &  good"
+	 * @example trimmed = trim("  God is   good  "); /// Returns "God is   good"
 	 * @param str (string) The string to trim.
 	 * @return A String with leading and trailing spaces removed.
-	 * @note This does not remove unusual white spaces.  It actually removes everything under character code 33.
+	 * @note This does not remove all types of whitespace.  It actually removes anything under character code 33.
 	 */
 	String.prototype.trim = function()
 	{
@@ -94,7 +105,7 @@ if (!"".trim) {
  * @return Returns an array of the string now broken into pieces.
  * @see http://blog.stevenlevithan.com/archives/cross-browser-split.
  */
-///NOTE: The following conditional compilation code blocks only executes on IE.
+///NOTE: The following conditional compilation code blocks only executes in IE.
 /*@cc_on
 	String.prototype._$$split = String.prototype._$$split || String.prototype.split;
 	String.prototype.split = function (s, limit)
@@ -142,13 +153,14 @@ if (!"".trim) {
 		s.lastIndex = origLastIndex;
 		return output;
 	};
-
-
+	
+	
 	/// Trick IE into understanding win.pageYOffset.
 	/// The initial value so that it is not undefined.
 	/// See scrolling().
 	win.pageYOffset = doc_docEl.scrollTop;
 @*/
+
 
 /*****************************
  * Start of search functions *
@@ -767,13 +779,13 @@ function scrolling()
 {
 	/// Trick IE into understanding win.pageYOffset.
 	/*@cc_on
-	win.pageYOffset = doc_docEl.scrollTop;
+		win.pageYOffset = doc_docEl.scrollTop;
 	@*/
 	var new_scroll_pos = win.pageYOffset;
 	
 	if (new_scroll_pos == scroll_pos) {
 		/// IE/Opera sometimes don't update page.scrollTop until after this function is run.
-		/// Mozilla/KHTML can get stuck here too.
+		/// Mozilla/WebKit can get stuck here too.
 		if (++scroll_check_count < 10) {
 			setTimeout(scrolling, 30);
 		} else { /// Stop it if it is stuck looping.
@@ -1268,3 +1280,49 @@ function interpret_result(message)
 /*************************
  * End of AJAX functions *
  *************************/
+ 
+ 
+/*********************************
+ * Start of Suggestion functions *
+ *********************************/
+
+/**
+ *
+ */
+function q_keypress(event)
+{
+	if (!event) event = win.event;
+	
+	/// keyCode meanings:
+	/// 0	(any letter)
+	///	13	enter
+	///	8	backspace
+	/// 38	up
+	/// 40	down
+	switch (event.keyCode) {
+		case 0:
+			break;
+		
+	}
+	//doc.title=event.keyCode;
+}
+
+
+function request_suggestions()
+{
+	if (q_obj.value == last_suggestion_text) return;
+	///TODO: Determine if there is a better way to write this code so that we don't need to use q_obj twice.
+	last_suggestion_text = q_obj.value;
+	
+	/// Stop a previous, unfinished request.
+	if (ajax_suggestions.readyState % 4) ajax_suggestions.abort();
+	
+	/// Check to see if we already have this in the cache.
+	
+	/// Do we need to request the suggestions from the server?
+	if (suggestion_cache[last_suggestion_text] typeof == "undefined") {
+		post_to_server("suggestions.php", "q=" + encodeURIComponent(last_suggestion_text), ajax_suggestions);
+	} else {
+		show_suggestions(suggestion_cache[last_suggestion_text]);
+	}
+}
