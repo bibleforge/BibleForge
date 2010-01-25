@@ -1320,7 +1320,7 @@ function request_suggestions()
 	/// Check to see if we already have this in the cache.
 	
 	/// Do we need to request the suggestions from the server?
-	if (suggestion_cache[last_suggestion_text] typeof == "undefined") {
+	if (typeof suggestion_cache[last_suggestion_text] == "undefined") {
 		post_to_server("suggestions.php", "q=" + encodeURIComponent(last_suggestion_text), ajax_suggestions);
 	} else {
 		show_suggestions(suggestion_cache[last_suggestion_text]);
