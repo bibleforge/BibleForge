@@ -1287,7 +1287,7 @@ function interpret_result(message)
  *********************************/
 
 /**
- *
+ * 
  */
 function q_keypress(event)
 {
@@ -1300,14 +1300,23 @@ function q_keypress(event)
 	/// 38	up
 	/// 40	down
 	switch (event.keyCode) {
-		case 0:
+		case 38:
+			///TODO: Move the highlighting up.
 			break;
-		
+		case 40:
+			///TODO: Move the highlighting down.
+			break;
+		default:
+			setTimeout(request_suggestions, 10);
+			break;
 	}
-	//doc.title=event.keyCode;
+	return true;
 }
 
 
+/**
+ * 
+ */
 function request_suggestions()
 {
 	if (q_obj.value == last_suggestion_text) return;
@@ -1318,10 +1327,9 @@ function request_suggestions()
 	if (ajax_suggestions.readyState % 4) ajax_suggestions.abort();
 	
 	/// Check to see if we already have this in the cache.
-	
 	/// Do we need to request the suggestions from the server?
 	if (typeof suggestion_cache[last_suggestion_text] == "undefined") {
-		post_to_server("suggestions.php", "q=" + encodeURIComponent(last_suggestion_text), ajax_suggestions);
+		post_to_server("suggest.php", "q=" + encodeURIComponent(last_suggestion_text), ajax_suggestions);
 	} else {
 		show_suggestions(suggestion_cache[last_suggestion_text]);
 	}

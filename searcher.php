@@ -26,6 +26,7 @@ if (get_magic_quotes_gpc()) {
     $_REQUEST = array_map('stripslashes_deep', $_REQUEST);
 }
 
+///FIXME: The Sphinx indices also need to determined for multiple languages.
 ///FIXME: The language needs to be determined somehow (probably by the client).
 define('BIBLE_VERSES', 'bible_english_html');
 
