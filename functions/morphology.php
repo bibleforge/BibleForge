@@ -11,6 +11,80 @@
  */
 
 /**
+ * Perform a morphological Sphinx-based search.
+ *
+ * @example morphology_search('["love", [[4,1]], [1]]', ADDITIONAL, 0); /// love AS NOUN
+ * @example morphology_search('["love", [[3,1], [7,1]], [1,0]]', ADDITIONAL, 0); /// love AS RED, NOT PRESENT
+ * @example morphology_search('["", [[3,1], [9,3], [7,5]], [0,0,0]]', ADDITIONAL, 0); /// * AS RED, IMPERATIVE, PERFECT
+ * @param $json (string) A stringified JSON array containing the word to be searched for, the morphological attributes to be considered, and whether or not to exclude results matching the morphological attributes.  
+ *        Format: '["WORD", [[MORPHOLOGICAL_CLASS, ATTRIBUTE], [...]], [EXCLUDE, ...]]'
+ * @param $direction (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
+ * @param $start_id (integer) (optional) The morphological id whence to start.
+ * @return NULL.  Data is sent to the buffer as a JSON array, and then execution ends.
+ * @note Called in search.php.
+ */
+function morphology_search($json, $direction, $start_id = 0)
+{
+	require_once 'config.php';
+	
+	/// Prepare Sphinx.
+	require_once 'functions/' . SPHINX_API . '.php';
+	$sphinx = new SphinxClient();
+	$sphinx->SetServer(SPHINX_SERVER, SPHINX_PORT); /// SetServer(sphinx_server_address, sphinx_server_port)
+	$sphinx->SetLimits(0, LIMIT); /// SetLimits(starting_point, count, max_in_memory (optional), quit_after_x_found (optional))
+	
+	///NOTE: The stop_id is now required for sphinxapi and should be calculated by the Forge, and could be set as a constant so that sphinxapi_cli is not slowed down by it.
+	///TODO: Calculate the stop_id in the Forge.
+	if ($start_id > 0) $sphinx->SetIDRange($start_id, 99999999); /// SetIDRange(start_id, stop_id)
+	
+	$sphinx->SetRankingMode(SPH_RANK_NONE); /// No ranking, fastest
+	/// Set the attributes and prepare to search.
+	$query_array = json_decode($json, true);
+	
+	set_morphology_attributes($query_array[1], $query_array[2], $sphinx);
+	
+	/// Run Sphinx search.
+	$sphinx_res = $sphinx->Query($query_array[0], 'morphological');
+	
+	/// If no results found were found, send an empty JSON result.
+	///FIXME: Sending an empty JSON is actually unnecesary if post_to_server() in main.js keeps track of the query.
+	if ($sphinx_res['total'] == 0) {
+		echo '[[', MORPHOLOGICAL_SEARCH, ',', $direction, '],[],[],[0]]';
+		die;
+	}
+	
+	$verseid_arr = array();
+	foreach ($sphinx_res['matches'] as $value) {
+		$verseid_arr[] = $value['attrs']['verseid'];
+	}
+	
+	$simple_matches = implode(',', array_unique($verseid_arr));
+	
+	$word_ids = implode(',', array_keys($sphinx_res['matches']));
+	
+	/// Get verses from the MySQL database.
+	require_once 'functions/database.php';
+	connect_to_database();
+	
+	$SQL_query = 'SELECT words FROM ' . BIBLE_VERSES . ' WHERE id IN (' . $simple_matches . ')';
+	$SQL_res = mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
+	
+	/// Convert SQL results into one comma delineated string.
+	$verses_str = "";
+	while ($row = mysql_fetch_assoc($SQL_res)) {
+		$verses_str .= '"' . $row['words'] . '",';
+	}
+	
+	/// Send results to the buffer as a JSON serialized array, and stop execution.
+	/// Array Format: [[action,direction],[verse_ids,...],[verse_words,...],number_of_matches,[word_id,...]]
+	///NOTE: rtrim(..., ',') removes trailing commas.  It seems to be slightly faster than substr(..., 0, -1).
+	///TODO: Indicate if there are no more verses to find when it gets to the end.
+	echo '[[', MORPHOLOGICAL_SEARCH, ',', $direction, '],[', $simple_matches, '],[', rtrim($verses_str, ','), '],', $sphinx_res['total_found'], ',[', $word_ids ,']]';
+	die;
+}
+
+
+/**
  * Set the attributes to filter in Sphinx.
  * 
  * @example set_morphology_attributes(array(array(3, 1), array(7, 1)), array(0, 1), $sphinx); /// Set Sphinx to only find words that are spoken by Jesus and not in the present tense.
@@ -18,7 +92,7 @@
  * @param $exclude_arr (array) An array containing ones and zeros indicating whether to only find words that match the attributes (0) or exclude those words (1).
  * @param $sphinx (class) The Sphinx API class to use to set the filters.
  * @return NULL.  It sets the filters directly in Sphinx.
- * @note Called by morphology_search() in search.php.
+ * @note Called by morphology_search().
  */
 function set_morphology_attributes($attribute_arr, $exclude_arr, $sphinx)
 {

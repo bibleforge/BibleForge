@@ -59,7 +59,7 @@ define('SPH_GROUPBY_ATTRPAIR', 5);
  * The Sphinx search client class
  * 
  * @example $sphinx = new SphinxClient();
- * @note Called by standard_search() and morphology_search() in search.php.
+ * @note Called by standard_search() in functions/standard_search.php and morphology_search() in functions/morphology.php.
  */
 class SphinxClient
 {

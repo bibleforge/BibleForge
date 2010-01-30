@@ -17,7 +17,7 @@ require_once 'config.php';
  *
  * @example connect_to_database();
  * @return Database resource.
- * @note Called by retrieve_verses(), standard_search(), and morphology_search() in searcher.php.
+ * @note Called by retrieve_verses() in functions/database_lookup.php, standard_search() in functions/standard_search.php, and morphology_search() in functions/morphology.php.
  */
 function connect_to_database()
 {

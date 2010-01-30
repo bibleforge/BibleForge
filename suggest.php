@@ -19,7 +19,7 @@ if (($break_point = strpos($_REQUEST['q'], ' ')) === false) {
 	//$query = substr($_REQUEST['q'], 0, $break_point) . ' "' . substr($_REQUEST['q'], $break_point + 1) . '*"';
 	$query = substr($_REQUEST['q'], 0, $break_point) . ' "' . $_REQUEST['q'] . '*"';
 }
-echo $query;
+//echo $query;
 
 $start_id = 0;
 require_once 'config.php';
@@ -48,7 +48,7 @@ $sphinx_res = $sphinx->Query('^' . $query, 'suggestions_english');
 //echo "<pre>";print_r($sphinx_res);
 /// If no results found were found, send an empty JSON result.
 if ($sphinx_res['total'] == 0) {
-	echo '[[', 'suggest', '],[],[],[0]]';
+	echo '[[', 3, '],[],[],[0]]';
 	die;
 }
 

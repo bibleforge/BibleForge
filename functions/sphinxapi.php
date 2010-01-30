@@ -389,7 +389,12 @@ function sphFixUint ( $value )
 }
 
 
-/// sphinx searchd client class
+/**
+ * The Sphinx searchd client class
+ * 
+ * @example $sphinx = new SphinxClient();
+ * @note Called by standard_search() in functions/standard_search.php and morphology_search() in functions/morphology.php.
+ */
 class SphinxClient
 {
 	var $_host;			///< searchd host (default is "localhost")

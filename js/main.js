@@ -63,6 +63,8 @@ var looking_up_verse_range = false;
 /// Auto Suggest variables
 var last_suggestion_text = "";
 var suggestion_cache = {};
+var suggest_intverval;
+var suggest_delay = 250;
 var ajax_suggestions = new win.XMLHttpRequest();
 
 /// Simple Event Registration
@@ -367,7 +369,7 @@ function run_search(direction)
 			query += "&s=" + (top_id + -1);
 		}
 	}
-	post_to_server("searcher.php", query, ajax);
+	post_to_server("search.php", query, ajax);
 }
 
 
@@ -1228,8 +1230,8 @@ function resizing()
 /**
  * Send an AJAX request to the server.
  *
- * @example post_to_server("searcher.php", "q=search", ajax);
- * @example post_to_server("searcher.php", "q=search&s=48003027", ajax);
+ * @example post_to_server("search.php", "q=search", ajax);
+ * @example post_to_server("search.php", "q=search&s=48003027", ajax);
  * @param server_URL (string) The file on the server to run.
  * @param message (string) The variables to send.  URI format: "name1=value1&name2=value%202"
  * @param ajax (AJAX object) The object that preforms the query.
@@ -1307,7 +1309,8 @@ function q_keypress(event)
 			///TODO: Move the highlighting down.
 			break;
 		default:
-			setTimeout(request_suggestions, 10);
+			clearInterval(suggest_intverval);
+			suggest_intverval = setInterval(request_suggestions, suggest_delay);
 			break;
 	}
 	return true;
@@ -1319,9 +1322,12 @@ function q_keypress(event)
  */
 function request_suggestions()
 {
+	clearInterval(suggest_intverval);
 	if (q_obj.value == last_suggestion_text) return;
 	///TODO: Determine if there is a better way to write this code so that we don't need to use q_obj twice.
-	last_suggestion_text = q_obj.value;
+	last_suggestion_text = q_obj.value.trim();
+	
+	if (last_suggestion_text == "") return;
 	
 	/// Stop a previous, unfinished request.
 	if (ajax_suggestions.readyState % 4) ajax_suggestions.abort();
