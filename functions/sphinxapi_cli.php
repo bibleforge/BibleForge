@@ -3,7 +3,7 @@
 /**
  * BibleForge
  *
- * @date    09-23-09
+ * @date 09-23-09
  * @version 0.2 alpha
  * @link http://BibleForge.com
  * @license Reciprocal Public License 1.5 (RPL1.5)

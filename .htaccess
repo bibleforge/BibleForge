@@ -1,7 +1,7 @@
 #
 # BibleForge
 # 
-# @date    09-01-09
+# @date 09-01-09
 # @version 0.2 alpha
 # @link http://BibleForge.com
 # @license Reciprocal Public License 1.5 (RPL1.5)
@@ -36,3 +36,7 @@
 	</FilesMatch>
 </IfModule>
 AddOutputFilterByType DEFLATE text/html text/plain text/xml text/javascript text/css application/javascript
+
+
+# Hide the .git directory and .gitignore from the client.
+#RedirectMatch 404 /\\.git

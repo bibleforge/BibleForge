@@ -3,7 +3,7 @@
 /**
  * BibleForge
  *
- * @date    08-25-09
+ * @date 08-25-09
  * @version 0.2 alpha
  * @link http://BibleForge.com
  * @license GNU Lesser General Public License v2.1 (LGPLv2.1)
