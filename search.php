@@ -3,7 +3,7 @@
 /**
  * BibleForge
  *
- * @date    10-30-08
+ * @date 10-30-08
  * @version 0.2 alpha
  * @link http://BibleForge.com
  * @license Reciprocal Public License 1.5 (RPL1.5)
@@ -12,6 +12,14 @@
 
 ///NOTE: This is just for compatibilities sake.  Magic Quotes should be turned off and this code should be removed.
 if (get_magic_quotes_gpc()) {
+	/**
+	 * Remove slashes inserted by Magic Quotes.
+	 * 
+	 * @example $_POST = stripslashes_deep($_POST);
+	 * @param $value (array) The array to remove slashes from.
+	 * @return The array with slashes removed.
+	 * @note This is ultimately should be removed and Magic Quotes should be turned off.
+	 */
     function stripslashes_deep($value)
     {
         $value = is_array($value) ? array_map('stripslashes_deep', $value) : stripslashes($value);
@@ -24,21 +32,10 @@ if (get_magic_quotes_gpc()) {
     $_REQUEST = array_map('stripslashes_deep', $_REQUEST);
 }
 
-///FIXME: The Sphinx indices also need to determined for multiple languages.
-///FIXME: The language needs to be determined somehow (probably by the client).
-define('BIBLE_VERSES', 'bible_english_html');
-
-define('VERSE_LOOKUP', 1);
-define('MIXED_SEARCH', 2);
-define('STANDARD_SEARCH', 3);
-define('MORPHOLOGICAL_SEARCH', 4);
-define('ADDITIONAL', 1);
-define('PREVIOUS', 2);
-
-define('LIMIT', 40); ///FIXME: Where should this be defined?  Should it be defined?
+/// Load constants.
+require_once 'config.php';
 
 /// Prepare for search.
-
 ///TODO: POST vs GET vs REQEUST
 if (!isset($_REQUEST['q'])) {
 	/// $_REQUEST['q'] is required.
@@ -90,13 +87,13 @@ if (isset($_REQUEST['d'])) {
 if ($type == VERSE_LOOKUP) {
 	/// $query example: 1001001 OR 43003016
 	require_once 'functions/database_lookup.php';
-	retrieve_verses($query, $direction);
+	retrieve_verses($query, $direction, LIMIT);
 } elseif ($type == STANDARD_SEARCH) {
 	/// $query example: love OR God & love OR this -that OR "in the beginning"
 	require_once 'functions/standard_search.php';
-	standard_search($query, $direction, $start_id);
+	standard_search($query, $direction, LIMIT, $start_id);
 } else { /// MORPHOLOGICAL_SEARCH
 	/// $query ex: '["love", [[4,1]], [1]]' (love AS NOUN) OR '["love", [[3,1], [7,1]], [1,0]]' (love AS RED, NOT PRESENT)
 	require_once 'functions/morphology.php';
-	morphology_search($query, $direction, $start_id);
+	morphology_search($query, $direction, LIMIT, $start_id);
 }

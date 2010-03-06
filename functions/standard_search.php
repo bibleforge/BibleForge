@@ -3,7 +3,7 @@
 /**
  * BibleForge
  *
- * @date    1-30-10
+ * @date 1-30-10
  * @version 0.2 alpha
  * @link http://BibleForge.com
  * @license Reciprocal Public License 1.5 (RPL1.5)
@@ -16,22 +16,22 @@
  *
  * This function queries the Sphinx server and retrieves the verses from the MySQL server.
  *
- * @example standard_search("love", ADDITIONAL, 0);
+ * @example standard_search("love", ADDITIONAL, 40, 0);
+ * @example standard_search("lov*", ADDITIONAL, 10, 0, false);
  * @param $query (string) The query to be searched for.
  * @param $direction (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
+ * @param $limit (integer) The maximum number of verses to return.
  * @param $start_id (integer) (optional) The verse_id whence to start.
  * @return NULL.  Data is sent to the buffer as a JSON array, and then execution ends.
  * @note Called in search.php.
  */
-function standard_search($query, $direction, $start_id = 0, $output_JSON = true)
+function standard_search($query, $direction, $limit, $start_id = 0, $output_JSON = true)
 {
-	require_once 'config.php';
-	
 	require_once 'functions/' . SPHINX_API . '.php';
 	
 	$sphinx = new SphinxClient();
 	$sphinx->SetServer(SPHINX_SERVER, SPHINX_PORT); /// SetServer(sphinx_server_address, sphinx_server_port)
-	$sphinx->SetLimits(0, LIMIT); /// SetLimits(starting_point, count, max_in_memory (optional), quit_after_x_found (optional))
+	$sphinx->SetLimits(0, $limit); /// SetLimits(starting_point, count, max_in_memory (optional), quit_after_x_found (optional))
 	
 	///NOTE: The stop_id is now required for sphinxapi and should be calculated by the Forge, and could be set as a constant so that sphinxapi_cli is not slowed down by it.
 	///TODO: Calculate the stop_id in the Forge.
@@ -91,6 +91,7 @@ function standard_search($query, $direction, $start_id = 0, $output_JSON = true)
 	while ($row = mysql_fetch_assoc($SQL_res)) {
 		$verses_str .= '"' . $row['words'] . '",';
 	}
+	$verses_str = rtrim($verses_str, ',');
 	
 	if ($output_JSON) {
 		/// Send results to the buffer as a JSON serialized array, and stop execution.
@@ -98,9 +99,9 @@ function standard_search($query, $direction, $start_id = 0, $output_JSON = true)
 		///NOTE: rtrim(..., ',') removes trailing commas.  It seems to be slightly faster than substr(..., 0, -1).
 		///TODO: It would be nice to indicate if there are no more verses to find when it gets to the end.
 		///TODO: Make the JSON work with both eval() and JSON.parse().  The \' throws it off.  But \\' works.
-		echo '[[', STANDARD_SEARCH, ',', $direction, '],[', $simple_matches, '],[', rtrim($verses_str, ','), '],', $sphinx_res['total_found'], ']';
+		echo '[[', STANDARD_SEARCH, ',', $direction, '],[', $simple_matches, '],[', $verses_str, '],', $sphinx_res['total_found'], ']';
 		die;
 	} else {
-		return array($simple_matches, rtrim($verses_str, ','));
+		return array($simple_matches, $verses_str, $sphinx_res['total_found']);
 	}
 }

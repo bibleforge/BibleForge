@@ -3,7 +3,7 @@
 /**
  * BibleForge
  *
- * @date    1-30-10
+ * @date 1-30-10
  * @version 0.2 alpha
  * @link http://BibleForge.com
  * @license Reciprocal Public License 1.5 (RPL1.5)
@@ -13,13 +13,15 @@
 /**
  * Retrieve verses from the MySQL database.
  *
- * @example retrieve_verses($query, $direction);
+ * @example retrieve_verses(1001001, ADDITIONAL, 40);
+ * @example retrieve_verses(40000100, PREVIOUS, LIMIT);
  * @param $verse_id (integer) The verse id from which to begin retrieving.
  * @param $direction (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
+ * @param $limit (integer) The maximum number of verses to return.
  * @return NULL.  Data is sent to the buffer as a JSON array, and then execution ends.
  * @note Called by run_search().
  */
-function retrieve_verses($verse_id, $direction)
+function retrieve_verses($verse_id, $direction, $limit)
 {
 	/// Quickly check to see if the verse_id is outside of the valid range.
 	///TODO: Determine if $verse_id < 1001001 should default to 1001001 and $verse_id > 66022021 to 66022021.
@@ -42,7 +44,7 @@ function retrieve_verses($verse_id, $direction)
 	require_once 'functions/database.php';
 	connect_to_database();
 	
-	$SQL_query = 'SELECT id, words FROM ' . BIBLE_VERSES . ' WHERE id ' . $operator . (int)$verse_id . $order_by . ' LIMIT ' . LIMIT;
+	$SQL_query = 'SELECT id, words FROM ' . BIBLE_VERSES . ' WHERE id ' . $operator . (int)$verse_id . $order_by . ' LIMIT ' . $limit;
 	$SQL_res = mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
 	
 	/// Convert SQL results into one comma delineated string for JSON.

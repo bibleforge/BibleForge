@@ -3,7 +3,7 @@
 /**
  * BibleForge
  *
- * @date    11-08-09
+ * @date 11-08-09
  * @version 0.2 alpha
  * @link http://BibleForge.com
  * @license Reciprocal Public License 1.5 (RPL1.5)
@@ -13,25 +13,24 @@
 /**
  * Perform a morphological Sphinx-based search.
  *
- * @example morphology_search('["love", [[4,1]], [1]]', ADDITIONAL, 0); /// love AS NOUN
- * @example morphology_search('["love", [[3,1], [7,1]], [1,0]]', ADDITIONAL, 0); /// love AS RED, NOT PRESENT
- * @example morphology_search('["", [[3,1], [9,3], [7,5]], [0,0,0]]', ADDITIONAL, 0); /// * AS RED, IMPERATIVE, PERFECT
+ * @example morphology_search('["love", [[4,1]], [1]]', ADDITIONAL, 40, 0); /// love AS NOUN
+ * @example morphology_search('["love", [[3,1], [7,1]], [1,0]]', ADDITIONAL, LIMIT, 0); /// love AS RED, NOT PRESENT
+ * @example morphology_search('["", [[3,1], [9,3], [7,5]], [0,0,0]]', ADDITIONAL, 40, 0); /// * AS RED, IMPERATIVE, PERFECT
  * @param $json (string) A stringified JSON array containing the word to be searched for, the morphological attributes to be considered, and whether or not to exclude results matching the morphological attributes.  
  *        Format: '["WORD", [[MORPHOLOGICAL_CLASS, ATTRIBUTE], [...]], [EXCLUDE, ...]]'
  * @param $direction (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
+ * @param $limit (integer) The maximum number of verses to return.
  * @param $start_id (integer) (optional) The morphological id whence to start.
  * @return NULL.  Data is sent to the buffer as a JSON array, and then execution ends.
  * @note Called in search.php.
  */
-function morphology_search($json, $direction, $start_id = 0)
+function morphology_search($json, $direction, $limit, $start_id = 0)
 {
-	require_once 'config.php';
-	
 	/// Prepare Sphinx.
 	require_once 'functions/' . SPHINX_API . '.php';
 	$sphinx = new SphinxClient();
 	$sphinx->SetServer(SPHINX_SERVER, SPHINX_PORT); /// SetServer(sphinx_server_address, sphinx_server_port)
-	$sphinx->SetLimits(0, LIMIT); /// SetLimits(starting_point, count, max_in_memory (optional), quit_after_x_found (optional))
+	$sphinx->SetLimits(0, $limit); /// SetLimits(starting_point, count, max_in_memory (optional), quit_after_x_found (optional))
 	
 	///NOTE: The stop_id is now required for sphinxapi and should be calculated by the Forge, and could be set as a constant so that sphinxapi_cli is not slowed down by it.
 	///TODO: Calculate the stop_id in the Forge.

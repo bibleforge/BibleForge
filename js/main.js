@@ -1282,7 +1282,7 @@ function interpret_result(message)
 /*************************
  * End of AJAX functions *
  *************************/
- 
+
  
 /*********************************
  * Start of Suggestion functions *
