@@ -489,7 +489,7 @@ function write_verses(action, direction, verse_ids, verse_HTML)
 	var i, num, b, c, v;
 	var HTML_str = "", chapter_text = "";
 	///TODO: Determine if this should be a global variable.
-	var psalm_title_re = /^(?:1(?:0[4-7]?|1[1-9]|3[25-7]|4[6-9]|50)?|2|33|43|71|9[13-79])$/;
+	var psalm_title_re = /^(?:1(?:0[4-7]?|1[1-9]|3[5-7]|4[6-9]|50)?|2|33|43|71|9[13-79])$/;
 	var start_key = 0, stop_key = verse_ids.length;
 	
 	/// Currently only MORPHOLOGICAL_SEARCH searches data at the word level, so it is the only action that might stop in the middle of a verse and find more words in the same verse as the user scrolls.
