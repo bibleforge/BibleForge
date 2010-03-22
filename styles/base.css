@@ -73,8 +73,7 @@ body {
 }
 
 /* Individual words in verses */
-#page b {
-	font-weight: normal;
+#page a {
 	line-height: 19px;
 	height: 19px;
 }
