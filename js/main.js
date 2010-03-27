@@ -254,7 +254,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		
 		waiting_for_first_search = true;
 		
-		last_search_prepared = prepare_search(raw_search_terms);
+		last_search_prepared = lang.prepare_search(raw_search_terms);
 		
 		if (last_search_prepared.length == 0) return false;
 		
@@ -264,7 +264,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		if (ajax_previous.readyState % 4) ajax_previous.abort();
 		
 		/// Determine if the user is preforming a search or looking up a verse.
-		verse_id = determine_reference(last_search_prepared);
+		verse_id = lang.determine_reference(last_search_prepared);
 		
 		/// Is the user looking up a verse? (verse_id is false when the user is preforming a search.)
 		if (verse_id !== false) {
@@ -588,7 +588,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 				if (v < 2) {
 					/// Is this chapter 1?  (We need to know if we should display the book name.)
 					if (c == 1) {
-						HTML_str += "<div class=book id=" + num + "_title>" + books_long_pretitle[b] + "<h1>" + books_long_main[b] + "</h1>" + books_long_posttitle[b] + "</div>";
+						HTML_str += "<div class=book id=" + num + "_title>" + lang.books_long_pretitle[b] + "<h1>" + lang.books_long_main[b] + "</h1>" + lang.books_long_posttitle[b] + "</div>";
 					} else if (b != 19 || v == 0 || psalm_title_re.test(c)) { /// Display chapter/psalm number (but not on verse 1 of psalms that have titles).
 						/// Is this the book of Psalms?  (Psalms have a special name.)
 						if (b == 19) {
@@ -617,7 +617,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 				if (b != last_book) {
 					/// We only need to print out the book if it is different from the last verse.
 					last_book = b;
-					HTML_str += "<h1 class=book id=" + num + "_title>" + books_short[b] + "</h1>"; /// Convert the book number to text.
+					HTML_str += "<h1 class=book id=" + num + "_title>" + lang.books_short[b] + "</h1>"; /// Convert the book number to text.
 				}
 				
 				HTML_str += "<div class=search_verse id=" + num + "_search>" + c + ":" + v + " " + verse_HTML[i] + "</div>";
@@ -723,7 +723,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		///TODO: Determine if this whole function should be in a language specific file.
 		highlight_re = [];
 		
-		var search_terms_arr = filter_terms_for_highlighter(search_terms);
+		var search_terms_arr = lang.filter_terms_for_highlighter(search_terms);
 		
 		var count = 0, len_before, len_after, stemmed_word, stemmed_arr = [], no_morph, term, i, j;
 		
@@ -775,8 +775,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 						no_morph = true;
 					} else {
 						/// A normal word without a wildcard gets stemmed.
-						///NOTE: stem_word() is language dependent and therefore is delcared in js/langs/LOCALE.js.
-						stemmed_word = stem_word(term);
+						stemmed_word = lang.stem_word(term);
 						no_morph = false;
 					}
 			}
@@ -1158,7 +1157,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		/// Are the books the same?
 		if (b1 == b2) {
 			/// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
-			b1 = b1 == 19 ? lang.psalm : books_short[b1];
+			b1 = b1 == 19 ? lang.psalm : lang.books_short[b1];
 			/// Are the chapters the same?
 			if (c1 == c2) {
 				/// Are the verses the same?
@@ -1172,8 +1171,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			}
 		} else {
 			/// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
-			b1 = b1 == 19 ? lang.psalm : books_short[b1];
-			b2 = b2 == 19 ? lang.psalm : books_short[b2];
+			b1 = b1 == 19 ? lang.psalm : lang.books_short[b1];
+			b2 = b2 == 19 ? lang.psalm : lang.books_short[b2];
 			ref_range = b1 + " " + c1 + ":" + v1 + "\u2013" + b2 + " " + c2 + ":" + v2;
 		}
 		
