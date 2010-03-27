@@ -72,8 +72,12 @@ function standard_search($query, $direction, $limit, $start_id = 0, $output_JSON
 	/// If no results found were found, send an empty JSON result.
 	///FIXME: Sending an empty JSON is actually unnecesary if post_to_server() in main.js keeps track of the query.
 	if ($sphinx_res['total'] == 0) {
-		echo '[[', STANDARD_SEARCH, ',', $direction, '],[],[],[0]]';
-		die;
+		if ($output_JSON) {
+			echo '[[', STANDARD_SEARCH, ',', $direction, '],[],[],[0]]';
+			die;
+		} else {
+			return array("", "", 0);
+		}
 	}
 	
 	$simple_matches = implode(',', array_keys($sphinx_res['matches']));
