@@ -24,12 +24,17 @@ var VERSE_LOOKUP = 1, MIXED_SEARCH = 2, STANDARD_SEARCH = 3, MORPHOLOGICAL_SEARC
 /// Common DOM/BOM Objects
 var doc = document, win = window, doc_docEl = doc.documentElement;
 
+
+
 /// DOM Objects
-var q_obj        = doc.getElementById("q"); /// The search input box object
-var page         = doc.getElementById("page"); /// The results div
-var infoBar      = doc.getElementById("infoBar");
-var topLoader    = doc.getElementById("topLoader");
-var bottomLoader = doc.getElementById("bottomLoader");
+var q_obj        = doc.getElementById("q1"); /// The search input box object
+var page         = doc.getElementById("scroll1"); /// The results div
+var infoBar      = doc.getElementById("infoBar1");
+var topLoader    = doc.getElementById("topLoader1");
+var bottomLoader = doc.getElementById("bottomLoader1");
+
+/// Capture form submit events.
+doc.getElementById("searchForm1").onsubmit = prepare_new_search;
 
 var highlight_re = []; /// Highlighter regex array
 var last_search  = "", last_search_encoded = ""; /// A cache of the last search query
@@ -38,8 +43,8 @@ var waiting_for_first_search = false;
 var last_book       =  0; /// The number of the last book of the Bible that was returned
 var highlight_limit = 20; /// Currently, we limit the unique number of search words to highlight.
 
-var ajax_additional = new win.XMLHttpRequest();
-var ajax_previous  = new win.XMLHttpRequest();
+var ajax_additional	= new win.XMLHttpRequest();
+var ajax_previous	= new win.XMLHttpRequest();
 
 /// Verse variables
 /// top_verse and bottom_verse are the last verses displayed on the screen so that the same verse is not displayed twice when more search data is returned (currently just used for MORPHOLOGICAL_SEARCH).
@@ -934,7 +939,6 @@ function add_content_bottom()
 	
 	var child_position = child_position = child.offsetTop + child.clientHeight;
 	var page_height = page_height = doc_docEl.clientHeight;
-	
 	/// Is the user scrolling close to the bottom of the page?
 	if (child_position < scroll_pos + page_height + buffer_add) {
 		/// Can the content be grabbed from cache?

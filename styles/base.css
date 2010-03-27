@@ -27,7 +27,8 @@ body {
 	overflow: hidden;
 }
 
-#topBar {
+
+.topBars {
 	position: fixed;
 	top: 0px;
 	left: 0px;
@@ -35,7 +36,7 @@ body {
 	height: 30px;
 }
 
-#searchBar {
+.searchBars {
 	/* A solid background for IE/Mozilla 2-/Opera 9.6- */
 	background: rgb(255,255,255);
 	/* Transparent white background for Firefox 3.5-/Opera 10 */
@@ -49,7 +50,7 @@ body {
 	height: 100%;
 }
 
-#infoBar {
+.infoBars {
 	/* A solid background for IE/Mozilla 2-/Opera 9.6- */
 	background: rgb(255,255,221);
 	/* Transparent yellow background */
@@ -67,18 +68,18 @@ body {
 	font-size: 13px;
 }
 
-#q {
+.textInputs {
 	/* Remove the background of the text box to see the transparent info bar below. */
 	background: transparent;
 }
 
 /* Individual words in verses */
-#page a {
+.scrolls a {
 	line-height: 19px;
 	height: 19px;
 }
 
-#page {
+.scrolls {
 	overflow: hidden;
 	max-width: 800px;
 	min-width: 200px;
@@ -88,12 +89,12 @@ body {
 }
 
 /* Verse blocks */
-#page div {
+.scrolls div {
 	/* display: inline-block; is required for IE to use .clientHeight for an object. */
 	display: inline-block;
 }
 
-.loader {
+.loaders {
 	height: 50px;
 	width: 100%;
 	background: url("../images/loader.gif") no-repeat center;
