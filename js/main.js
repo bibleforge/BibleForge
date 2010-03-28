@@ -8,21 +8,21 @@
  * @author BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
  */
 
-///TODO: Document which global variables (and global language variables) are used in which functions.
+///TODO: Document which global variables are used in which functions.
 
 /*****************************
  * Declare global constants. *
  *****************************/
 
 ///NOTE: Should be "const" instead of "var," but IE doesn't support constants yet.
-var VERSE_LOOKUP = 1, MIXED_SEARCH = 2, STANDARD_SEARCH = 3, MORPHOLOGICAL_SEARCH = 4, ADDITIONAL = 1, PREVIOUS = 2;
+var VERSE_LOOKUP = 1, MIXED_SEARCH = 2, STANDARD_SEARCH = 3, MORPHOLOGICAL_SEARCH = 4, ADDITIONAL = 1, PREVIOUS = 2,
 
 /*****************************
  * Declare global variables. *
  *****************************/
 
 /// Common DOM/BOM Objects
-var doc = document, win = window, doc_docEl = doc.documentElement;
+	doc = document, win = window, doc_docEl = doc.documentElement;
 
 
 create_viewport(doc.getElementById("viewPort1"), doc.getElementById("searchForm1"), doc.getElementById("q1"),
@@ -32,45 +32,37 @@ create_viewport(doc.getElementById("viewPort1"), doc.getElementById("searchForm1
 //function create_viewport(viewPort, qObj, scrollObj, infoBarObj, topLoaderObj, bottomLoaderObj)
 function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, bottomLoader)
 {
-	/// DOM Objects
-	//var q_obj        = doc.getElementById("q1"); /// The search input box object
-	//var page         = doc.getElementById("scroll1"); /// The results div
-	//var infoBar      = doc.getElementById("infoBar1");
-	//var topLoader    = doc.getElementById("topLoader1");
-	//var bottomLoader = doc.getElementById("bottomLoader1");
-
-	/// Capture form submit events.
-	//doc.getElementById("searchForm1").onsubmit = prepare_new_search;
+	/// Capture form submit event.
 	searchForm.onsubmit = prepare_new_search;
 
-	var highlight_re = []; /// Highlighter regex array
-	var last_search  = "", last_search_encoded = ""; /// A cache of the last search query
-	var last_type; /// The type of lookup performed last (VERSE_LOOKUP || MIXED_SEARCH || STANDARD_SEARCH || MORPHOLOGICAL_SEARCH)
-	var waiting_for_first_search = false;
-	var last_book       =  0; /// The number of the last book of the Bible that was returned
-	var highlight_limit = 20; /// Currently, we limit the unique number of search words to highlight.
+	var highlight_re = [], /// Highlighter regex array
+		last_search  = "", last_search_encoded = "", /// A cache of the last search query
+		last_type, /// The type of lookup performed last (VERSE_LOOKUP || MIXED_SEARCH || STANDARD_SEARCH || MORPHOLOGICAL_SEARCH)
+		waiting_for_first_search = false,
+		last_book       =  0, /// The number of the last book of the Bible that was returned
+		highlight_limit = 20, /// Currently, we limit the unique number of search words to highlight.
 
-	var ajax_additional	= new win.XMLHttpRequest();
-	var ajax_previous	= new win.XMLHttpRequest();
+		ajax_additional	= new win.XMLHttpRequest(),
+		ajax_previous	= new win.XMLHttpRequest(),
 
-	/// Verse variables
-	/// top_verse and bottom_verse are the last verses displayed on the screen so that the same verse is not displayed twice when more search data is returned (currently just used for MORPHOLOGICAL_SEARCH).
-	var top_verse = 0, bottom_verse = 0;
-	/// top_id and bottom_id are the last ids (either verse or word id) returned from a search or verse lookup.
-	/// These are the same as bottom_id and top_id for VERSE_LOOKUP and STANDARD_SEARCH since these deal with entire verses as a whole, not individual words.
-	/// For MORPHOLOGICAL_SEARCH, the last word id is stored.
-	var top_id, bottom_id;
+		/// Verse variables
+		/// top_verse and bottom_verse are the last verses displayed on the screen so that the same verse is not displayed twice when more search data is returned (currently just used for MORPHOLOGICAL_SEARCH).
+		top_verse = 0, bottom_verse = 0,
+		/// top_id and bottom_id are the last ids (either verse or word id) returned from a search or verse lookup.
+		/// These are the same as bottom_id and top_id for VERSE_LOOKUP and STANDARD_SEARCH since these deal with entire verses as a whole, not individual words.
+		/// For MORPHOLOGICAL_SEARCH, the last word id is stored.
+		top_id, bottom_id,
 
-	/// Scrolling variables
-	var scroll_pos = 0, scroll_check_count = 0;
-	var checking_excess_content_top = false, checking_excess_content_bottom = false;
-	var remove_content_top_interval, remove_content_bottom_interval;
-	var buffer_add = 1000, buffer_rem = 10000;
-	var cached_verses_top    = [], cached_count_top    = 0;
-	var cached_verses_bottom = [], cached_count_bottom = 0;
-	var scroll_maxed_top = true, scroll_maxed_bottom = false;
-	var lookup_speed_scrolling = 50, lookup_speed_sitting = 100, lookup_delay = 200, remove_speed = 3000, look_up_range_speed = 300; /// In milliseconds
-	var looking_up_verse_range = false;
+		/// Scrolling variables
+		scroll_pos = 0, scroll_check_count = 0,
+		checking_excess_content_top = false, checking_excess_content_bottom = false,
+		remove_content_top_interval, remove_content_bottom_interval,
+		buffer_add = 1000, buffer_rem = 10000,
+		cached_verses_top    = [], cached_count_top    = 0,
+		cached_verses_bottom = [], cached_count_bottom = 0,
+		scroll_maxed_top = true, scroll_maxed_bottom = false,
+		lookup_speed_scrolling = 50, lookup_speed_sitting = 100, lookup_delay = 200, remove_speed = 3000, look_up_range_speed = 300, /// In milliseconds
+		looking_up_verse_range = false;
 	
 	/// Simple Event Registration
 	///NOTE: Could use wheel if the scroll bars are invisible.
@@ -85,11 +77,11 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	q_obj.onkeypress = (function ()
 	{
 		/// Auto Suggest variables
-		var last_suggestion_text = "";
-		var suggestion_cache = {};
-		var suggest_intverval;
-		var suggest_delay = 250;
-		var ajax_suggestions = new win.XMLHttpRequest();
+		var last_suggestion_text = "",
+			suggestion_cache = {},
+			suggest_intverval,
+			suggest_delay = 250
+			ajax_suggestions = new win.XMLHttpRequest();
 		
 		/**
 		 * 
@@ -129,16 +121,16 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			/// 38	up
 			/// 40	down
 			switch (event.keyCode) {
-				case 38:
-					///TODO: Move the highlighting up.
-					break;
-				case 40:
-					///TODO: Move the highlighting down.
-					break;
-				default:
-					clearInterval(suggest_intverval);
-					suggest_intverval = setInterval(request_suggestions, suggest_delay);
-					break;
+			case 38:
+				///TODO: Move the highlighting up.
+				break;
+			case 40:
+				///TODO: Move the highlighting down.
+				break;
+			default:
+				clearInterval(suggest_intverval);
+				suggest_intverval = setInterval(request_suggestions, suggest_delay);
+				break;
 			}
 			return true;
 		};
@@ -182,8 +174,17 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		String.prototype._$$split = String.prototype._$$split || String.prototype.split;
 		String.prototype.split = function (s, limit)
 		{
+			var flags, s2, output, origLastIndex, lastLastIndex, i, match, lastLength, emptyMatch, j;
+			
 			if (!(s instanceof RegExp)) return String.prototype._$$split.apply(this, arguments);
-			var flags = (s.global ? "g" : "") + (s.ignoreCase ? "i" : "") + (s.multiline ? "m" : ""), s2 = new RegExp("^" + s.source + "$", flags), output = [], origLastIndex = s.lastIndex, lastLastIndex = 0, i = 0, match, lastLength;
+			
+			flags = (s.global ? "g" : "") + (s.ignoreCase ? "i" : "") + (s.multiline ? "m" : "");
+			s2 = new RegExp("^" + s.source + "$", flags);
+			output = [];
+			origLastIndex = s.lastIndex;
+			lastLastIndex = 0;
+			i = 0;
+			
 			if (limit === undefined || +limit < 0) {
 				limit = false;
 			} else {
@@ -196,7 +197,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 				s = new RegExp(s.source, "g" + flags);
 			}
 			while ((!limit || i++ <= limit) && (match = s.exec(this))) {
-				var emptyMatch = !match[0].length;
+				emptyMatch = !match[0].length;
 				if (emptyMatch && s.lastIndex > match.index) {
 					--s.lastIndex;
 				}
@@ -204,7 +205,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 					if (match.length > 1) {
 						match[0].replace(s2, function()
 						{
-							for (var j = 1; j < arguments.length - 2; j++) {
+							for (j = 1; j < arguments.length - 2; j++) {
 								if (arguments[j] === undefined) {
 									match[j] = undefined;
 								}
@@ -250,7 +251,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 */
 	function prepare_new_search()
 	{
-		var raw_search_terms = q_obj.value, verse_id, last_search_prepared;
+		var raw_search_terms = q_obj.value, verse_id, last_search_prepared, search_type_array;
 		
 		waiting_for_first_search = true;
 		
@@ -279,7 +280,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		/// The user is submitting a search request.
 		} else {
 			/// The type of search must be determined (i.e., MIXED_SEARCH or STANDARD_SEARCH or MORPHOLOGICAL_SEARCH).
-			var search_type_array = determine_search_type(last_search_prepared);
+			search_type_array = determine_search_type(last_search_prepared);
 			
 			/// The type of search is stored in the first index of the array.
 			last_type = search_type_array[0];
@@ -338,18 +339,17 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 * @return An array describing the type of search.  Format: [(int)Type of search, (optional)(string)JSON array describing the search].
 	 * @note Called by run_search().
 	 * @note Only a partial implementation currently.  Mixed searching is lacking.
-	 * @note Global language variables used: morph_marker, morph_marker_len, morph_separator, morph_grammar.
 	 */
 	function determine_search_type(search_terms)
 	{
-		var split_pos;
+		var split_pos, morph_json, morph_attribute_json, morph_attributes, split_start, morph_search_term;
 		/// Did the user use the morphological keyword in his search?
-		if ((split_pos = search_terms.indexOf(morph_marker)) != -1) {
+		if ((split_pos = search_terms.indexOf(lang.morph_marker)) != -1) {
 			///TODO: Determine what is better: a JSON array or POST/GET string (i.e., word1=word&grammar_type1=1&value1=3&include1=1&...).
 			/// A JSON array is used to contain the information about the search.
 			/// JSON format: '["WORD",[[GRAMMAR_TYPE1,VALUE1],[...]],[INCLUDE1,...]]'
 			/// replace(/(["'])/g, "\\$1") adds slashes to sanitize the data.
-			var morph_search_term = search_terms.slice(0, split_pos);
+			morph_search_term = search_terms.slice(0, split_pos);
 			
 			/// Is the user trying to find all words that match the morphological attributes?
 			if (morph_search_term == "*") {
@@ -357,25 +357,25 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 				morph_search_term = ""
 			}
 			
-			var morph_json = '["' + morph_search_term.replace(/(["'])/g, "\\$1") + '",[';
+			morph_json = '["' + morph_search_term.replace(/(["'])/g, "\\$1") + '",[';
 			
 			/// These strings will be used to concatenate data.
-			var morph_attribute_json = "", exclude_json = "";
+			morph_attribute_json = "", exclude_json = "";
 			
-			var morph_attributes = search_terms.slice(split_pos + morph_marker_len);
+			morph_attributes = search_terms.slice(split_pos + lang.morph_marker_len);
 			
-			var split_start = 0;
+			split_start = 0;
 			
 			///TODO: Determine if there is a benefit to using do() over while().
 			///NOTE: An infinite loop is used because the data is returned when it reaches the end of the string.
 			do {
 				/// Find where the attributes separate (e.g., "NOUN, GENITIVE" would separate at character 4).
-				split_pos = morph_attributes.indexOf(morph_separator, split_start);
+				split_pos = morph_attributes.indexOf(lang.morph_separator, split_start);
 				/// Trim leading white space.
 				if (morph_attributes.slice(split_start, split_start + 1) == " ") ++split_start;
 				/// Is this morphological feature to be excluded?
 				if (morph_attributes.slice(split_start, split_start + 1) == "-") {
-					/// Skip the hyphen.
+					/// Skip the hyphen so that we just get the grammatical word (e.g., "love AS -NOUN" we just want "NOUN").
 					++split_start;
 					exclude_json += "1,";
 				} else {
@@ -383,12 +383,12 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 				}
 				
 				if (split_pos > -1) {
-					morph_attribute_json += morph_grammar[morph_attributes.slice(split_start, split_pos).trim()] + ",";
+					morph_attribute_json += lang.morph_grammar[morph_attributes.slice(split_start, split_pos).trim()] + ",";
 					split_start = split_pos + 1;
 				} else {
 					///TODO: Determine if trim() is necessary or if there is a better implementation.
 					///NOTE: exclude_json.slice(0, -1) is used to remove the trailing comma.  This could be unnecessary.
-					return [MORPHOLOGICAL_SEARCH, morph_json + morph_attribute_json + morph_grammar[morph_attributes.slice(split_start).trim()] + "],[" + exclude_json.slice(0, -1) + "]]"];
+					return [MORPHOLOGICAL_SEARCH, morph_json + morph_attribute_json + lang.morph_grammar[morph_attributes.slice(split_start).trim()] + "],[" + exclude_json.slice(0, -1) + "]]"];
 				}
 			} while (true);
 		}
@@ -459,7 +459,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	function handle_new_verses(res)
 	{
 		///TODO: On a verse lookup that does not start with Genesis 1:1, scroll_maxed_top must be set to FALSE. (Has this been taken care of?)
-		var total = res[3], action = res[0][0], direction = res[0][1];
+		var total = res[3], action = res[0][0], direction = res[0][1], i, count, b_tag;
 		
 		if (total > 0) {
 			///FIXME: When looking up the last few verses of Revelation (i.e., Revelation 22:21), the page jumps when more content is loaded above.
@@ -474,7 +474,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 				///TODO: Determine if there is a way to use setTimeout as an anonymous function without the implied eval.
 				setTimeout("highlight_search_results(\"" + res[2] + "\")", 100);
 			} else if (action == MORPHOLOGICAL_SEARCH) {
-				var i, count = res[4].length;
+				count = res[4].length;
 				for (i = 0; i < count; ++i) {
 					///TODO: Determine if there is a downside to having a space at the start of the className.
 					///TODO: Determine if we ever need to replace an existing f* className.
@@ -527,7 +527,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 				/// Create the inital text.
 				infoBar.appendChild(doc.createTextNode(format_number(total) + lang["found_" + (total == 1 ? "singular" : "plural")]));
 				/// Create a <b> for the search terms.
-				var b_tag = doc.createElement("b");
+				b_tag = doc.createElement("b");
 				///NOTE: We use this method instead of straight innerHTML to prevent HTML elements from appearing inside the <b></b>.
 				b_tag.appendChild(doc.createTextNode(last_search));
 				infoBar.appendChild(b_tag);
@@ -556,11 +556,11 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	{
 		///NOTE: psalm_title_re determines if a psalm does not have a title.
 		///TODO: Determine if psalm_title_re should be global for performance reasons or otherwise.
-		var i, num, b, c, v;
-		var HTML_str = "", chapter_text = "";
-		///TODO: Determine if this should be a global variable.
-		var psalm_title_re = /^(?:1(?:0[4-7]?|1[1-9]|3[5-7]|4[6-9]|50)?|2|33|43|71|9[13-79])$/;
-		var start_key = 0, stop_key = verse_ids.length;
+		var i, num, b, c, v, newEl,
+			HTML_str = "", chapter_text = "",
+			///TODO: Determine if this should be a global variable.
+			psalm_title_re = /^(?:1(?:0[4-7]?|1[1-9]|3[5-7]|4[6-9]|50)?|2|33|43|71|9[13-79])$/,
+			start_key = 0, stop_key = verse_ids.length;
 		
 		/// Currently only MORPHOLOGICAL_SEARCH searches data at the word level, so it is the only action that might stop in the middle of a verse and find more words in the same verse as the user scrolls.
 		if (action == MORPHOLOGICAL_SEARCH) {
@@ -624,7 +624,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			}
 		}
 		
-		var newEl = doc.createElement("div");
+		newEl = doc.createElement("div");
 		///NOTE: If innerHTML disappears in the future (because it is not (yet) in the "standards"),
 		///      a simple (but slow) alternative is to use the innerDOM script from http://innerdom.sourceforge.net/ or BetterInnerHTML from http://www.optimalworks.net/resources/betterinnerhtml/.
 		///      Also using "var range = doc.createRange();var newEl = range.createContextualFragment(HTML_str); is also a possibility.
@@ -723,9 +723,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		///TODO: Determine if this whole function should be in a language specific file.
 		highlight_re = [];
 		
-		var search_terms_arr = lang.filter_terms_for_highlighter(search_terms);
-		
-		var count = 0, len_before, len_after, stemmed_word, stemmed_arr = [], no_morph, term, i, j;
+		var search_terms_arr = lang.filter_terms_for_highlighter(search_terms),
+			count = 0, len_before, len_after, stemmed_word, stemmed_arr = [], no_morph, term, i, j;
 		
 		first_loop:for (i in search_terms_arr) {
 			term = search_terms_arr[i];
@@ -734,50 +733,50 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			///FIXME: Move this to the language specific file because it is language dependent.
 			/// Fix special/unique words that the stemmer won't stem correctly.
 			switch (term) {
-				case "does": case "doth": case "do": case "doeth": case "doest":
-					stemmed_word = "do[esth]*";
+			case "does": case "doth": case "do": case "doeth": case "doest":
+				stemmed_word = "do[esth]*";
+				no_morph = true;
+				break;
+			case "haste": case "hasted":
+				stemmed_word = "haste";
+				no_morph = false;
+				break;
+			case "shalt": case "shall":
+				stemmed_word = "shal[lt]";
+				no_morph = true;
+				break;
+			case "wilt": case "will":
+				stemmed_word = "wil[lt]";
+				no_morph = true;
+				break;
+			case "have": case "hast": case "hath":
+				stemmed_word = "ha[vesth]+";
+				no_morph = true;
+				break;
+			case "the":
+				stemmed_word = "the";
+				no_morph = true;
+				break;
+			case "for":
+				stemmed_word = "for";
+				no_morph = true;
+				break;
+			case "not":
+				stemmed_word = "not";
+				no_morph = true;
+				break;
+			default:
+				/// Does the word contain a wildcard symbol (*)?
+				if (term.indexOf("*") != -1) {
+					/// Don't stem; change it to a regex compatible form.
+					///NOTE: Word breaks are found by looking for tag openings (<) or closings (>).
+					stemmed_word = term.replace(/\*/g, "[^<>]*");
 					no_morph = true;
-					break;
-				case "haste": case "hasted":
-					stemmed_word = "haste";
+				} else {
+					/// A normal word without a wildcard gets stemmed.
+					stemmed_word = lang.stem_word(term);
 					no_morph = false;
-					break;
-				case "shalt": case "shall":
-					stemmed_word = "shal[lt]";
-					no_morph = true;
-					break;
-				case "wilt": case "will":
-					stemmed_word = "wil[lt]";
-					no_morph = true;
-					break;
-				case "have": case "hast": case "hath":
-					stemmed_word = "ha[vesth]+";
-					no_morph = true;
-					break;
-				case "the":
-					stemmed_word = "the";
-					no_morph = true;
-					break;
-				case "for":
-					stemmed_word = "for";
-					no_morph = true;
-					break;
-				case "not":
-					stemmed_word = "not";
-					no_morph = true;
-					break;
-				default:
-					/// Does the word contain a wildcard symbol (*)?
-					if (term.indexOf("*") != -1) {
-						/// Don't stem; change it to a regex compatible form.
-						///NOTE: Word breaks are found by looking for tag openings (<) or closings (>).
-						stemmed_word = term.replace(/\*/g, "[^<>]*");
-						no_morph = true;
-					} else {
-						/// A normal word without a wildcard gets stemmed.
-						stemmed_word = lang.stem_word(term);
-						no_morph = false;
-					}
+				}
 			}
 			len_after = stemmed_word.length;
 			
@@ -816,10 +815,11 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 */
 	function format_number(num)
 	{
+		var rgx;
 		if (num < 1000) return num;
 		/// Quickly converts a number to a string quickly.
 		num += "";
-		var rgx = /^([0-9]+)([0-9][0-9][0-9])/;
+		rgx = /^([0-9]+)([0-9][0-9][0-9])/;
 		
 		while (rgx.test(num)) {
 			num = num.replace(rgx, "$1,$2");
@@ -852,7 +852,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		/*@cc_on
 			win.pageYOffset = doc_docEl.scrollTop;
 		@*/
-		var new_scroll_pos = win.pageYOffset;
+		var new_scroll_pos = win.pageYOffset, scrolling_down;
 		
 		if (new_scroll_pos == scroll_pos) {
 			/// IE/Opera sometimes don't update page.scrollTop until after this function is run.
@@ -871,7 +871,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			setTimeout(find_current_range, look_up_range_speed);
 		}
 		
-		var scrolling_down = (new_scroll_pos > scroll_pos);
+		scrolling_down = (new_scroll_pos > scroll_pos);
 		
 		/// This keeps track of the current scroll position so we can tell the direction of the scroll.
 		scroll_pos = new_scroll_pos;
@@ -909,7 +909,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 */
 	function remove_excess_content_top()
 	{
-		var child = page.firstChild;
+		var child = page.firstChild, child_height;
 		
 		if (child == null) return null;
 		
@@ -919,7 +919,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		
 		///NOTE: Opera wrongly subtracts the scroll position from .offsetTop.
 		
-		var child_height = child.clientHeight;
+		child_height = child.clientHeight;
 		
 		///NOTE: Mozilla also has window.scrollMaxY, which is slightly different than document.documentElement.scrollHeight (document.body.scrollHeight should work too).
 		
@@ -958,12 +958,12 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 */
 	function remove_excess_content_bottom()
 	{
-		var child = page.lastChild;
+		var child = page.lastChild, child_position, page_height;
 		
 		if (child == null) return null;
 		
-		var child_position = child.offsetTop;
-		var page_height = doc_docEl.clientHeight;
+		child_position = child.offsetTop;
+		page_height = doc_docEl.clientHeight;
 		
 		/// Is the element is in the remove zone?
 		if (child_position > scroll_pos + page_height + buffer_rem) {
@@ -997,17 +997,17 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 */
 	function add_content_bottom()
 	{
-		var child = page.lastChild;
+		var child = page.lastChild, child_position, page_height, newEl;
 		
 		if (child == null) return null;
 		
-		var child_position = child_position = child.offsetTop + child.clientHeight;
-		var page_height = page_height = doc_docEl.clientHeight;
+		child_position = child_position = child.offsetTop + child.clientHeight;
+		page_height = page_height = doc_docEl.clientHeight;
 		/// Is the user scrolling close to the bottom of the page?
 		if (child_position < scroll_pos + page_height + buffer_add) {
 			/// Can the content be grabbed from cache?
 			if (cached_count_bottom > 0) {
-				var newEl = doc.createElement("div");
+				newEl = doc.createElement("div");
 				/// First subtract 1 from the global counter variable to point to the last cached passage, and then retrieve the cached content.
 				newEl.innerHTML = cached_verses_bottom[--cached_count_bottom];
 				///NOTE: This is actually works like insertAfter() (if such a function existed).
@@ -1043,7 +1043,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 */
 	function add_content_top()
 	{
-		var child = page.firstChild, child_height, child_position;
+		var child = page.firstChild, child_height, child_position, newEl;
 		
 		if (child == null) return null;
 		
@@ -1055,7 +1055,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		if (child_position + buffer_add > scroll_pos) {
 			/// Can the content be grabbed from cache?
 			if (cached_count_top > 0) {
-				var newEl = doc.createElement("div");
+				newEl = doc.createElement("div");
 				
 				/// First subtract 1 from the global counter variable to point to the last cached passage, and then retrieve the cached content.
 				newEl.innerHTML = cached_verses_top[--cached_count_top];
@@ -1098,10 +1098,11 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		looking_up_verse_range = false;
 		
 		///TODO: Determine if there is a better way to calculate the topBar offset.
-		var top_pos = scroll_pos + topLoader.offsetHeight + 8;
-		var bottom_pos = scroll_pos + doc_docEl.clientHeight - 14;
-		
-		var top_verse_block = find_element_at_scroll_pos(top_pos, page);
+		var top_pos = scroll_pos + topLoader.offsetHeight + 8,
+			bottom_pos = scroll_pos + doc_docEl.clientHeight - 14,
+			top_verse_block = find_element_at_scroll_pos(top_pos, page),
+			verse1_el, verse2_el, verse1, v1, c1, b1, verse2, v2, c2, b2,
+			bottom_verse_block, ref_range, new_title;
 		
 		/// Is the top verse block not found?
 		if (top_verse_block === null) {
@@ -1112,7 +1113,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			return null;
 		}
 		
-		var bottom_verse_block = find_element_at_scroll_pos(bottom_pos, null, top_verse_block);
+		bottom_verse_block = find_element_at_scroll_pos(bottom_pos, null, top_verse_block);
 		
 		/// Is the bottom verse block not found?
 		if (bottom_verse_block === null) {
@@ -1124,8 +1125,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		}
 		
 		/// Find the verse elements.
-		var verse1_el = find_element_at_scroll_pos(top_pos, top_verse_block);
-		var verse2_el = find_element_at_scroll_pos(bottom_pos, bottom_verse_block);
+		verse1_el = find_element_at_scroll_pos(top_pos, top_verse_block);
+		verse2_el = find_element_at_scroll_pos(bottom_pos, bottom_verse_block);
 		
 		/// Are either of the verses not found?
 		if (verse1_el === null || verse2_el === null) {
@@ -1137,16 +1138,14 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		}
 		
 		/// parseInt() is used to keep the number and remove the trailing string from the id.  See write_verses().
-		var verse1 = parseInt(verse1_el.id);
-		var v1 = verse1 % 1000;
-		var c1 = ((verse1 - v1) % 1000000) / 1000;
-		var b1 = (verse1 - v1 - c1 * 1000) / 1000000;
-		var verse2 = parseInt(verse2_el.id);
-		var v2 = verse2 % 1000;
-		var c2 = ((verse2 - v2) % 1000000) / 1000;
-		var b2 = (verse2 - v2 - c2 * 1000) / 1000000;
-		
-		var ref_range;
+		verse1 = parseInt(verse1_el.id);
+		v1 = verse1 % 1000;
+		c1 = ((verse1 - v1) % 1000000) / 1000;
+		b1 = (verse1 - v1 - c1 * 1000) / 1000000;
+		verse2 = parseInt(verse2_el.id);
+		v2 = verse2 % 1000;
+		c2 = ((verse2 - v2) % 1000000) / 1000;
+		b2 = (verse2 - v2 - c2 * 1000) / 1000000;
 		
 		/// The titles in the book of Psalms are referenced as verse zero (cf. Psalm 3).
 		v1 = v1 == 0 ? lang.title : v1;
@@ -1176,7 +1175,6 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			ref_range = b1 + " " + c1 + ":" + v1 + "\u2013" + b2 + " " + c2 + ":" + v2;
 		}
 		
-		var new_title;
 		/// last_type is set in prepare_new_search().
 		/// The verse range is displayed differently based on the type of search (i.e., a verse look up or a regular search).
 		if (last_type == VERSE_LOOKUP) {
@@ -1215,10 +1213,11 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 */
 	function find_element_at_scroll_pos(the_pos, parent_el, el)
 	{
+		var el_start_at, el_offset_top, el_offset_height, looked_next, looked_previous;
 		/// Is the starting element unknown?
 		if (!el) {
 			/// Make an educated guess as to which element to start with to save time.
-			var el_start_at = Math.round(parent_el.childNodes.length * (the_pos / doc_docEl.scrollHeight));
+			el_start_at = Math.round(parent_el.childNodes.length * (the_pos / doc_docEl.scrollHeight));
 			if (el_start_at < 1) el_start_at = 1;
 			el = parent_el.childNodes[el_start_at - 1];
 		} else {
@@ -1229,8 +1228,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		/// Were no elements found?  (If so, then there is nothing to do.)
 		if (!el) return null;
 		
-		var el_offset_top, el_offset_height;
-		var looked_next = false, looked_previous = false;
+		looked_next = false;
+		looked_previous = false;
 		
 		do {
 			el_offset_top = el.offsetTop;
