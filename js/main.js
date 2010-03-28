@@ -24,27 +24,26 @@ var VERSE_LOOKUP = 1, MIXED_SEARCH = 2, STANDARD_SEARCH = 3, MORPHOLOGICAL_SEARC
 /// Common DOM/BOM Objects
 	doc = document, win = window, doc_docEl = doc.documentElement;
 
-
+/// Initialize the JavaScript frontend of BibleForge.
 create_viewport(doc.getElementById("viewPort1"), doc.getElementById("searchForm1"), doc.getElementById("q1"),
 	doc.getElementById("scroll1"), doc.getElementById("infoBar1"), doc.getElementById("topLoader1"),
 	doc.getElementById("bottomLoader1"));
 
-//function create_viewport(viewPort, qObj, scrollObj, infoBarObj, topLoaderObj, bottomLoaderObj)
 function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, bottomLoader)
 {
 	/// Capture form submit event.
 	searchForm.onsubmit = prepare_new_search;
-
+	
 	var highlight_re = [], /// Highlighter regex array
 		last_search  = "", last_search_encoded = "", /// A cache of the last search query
 		last_type, /// The type of lookup performed last (VERSE_LOOKUP || MIXED_SEARCH || STANDARD_SEARCH || MORPHOLOGICAL_SEARCH)
 		waiting_for_first_search = false,
 		last_book       =  0, /// The number of the last book of the Bible that was returned
 		highlight_limit = 20, /// Currently, we limit the unique number of search words to highlight.
-
+		
 		ajax_additional	= new win.XMLHttpRequest(),
 		ajax_previous	= new win.XMLHttpRequest(),
-
+		
 		/// Verse variables
 		/// top_verse and bottom_verse are the last verses displayed on the screen so that the same verse is not displayed twice when more search data is returned (currently just used for MORPHOLOGICAL_SEARCH).
 		top_verse = 0, bottom_verse = 0,
@@ -52,7 +51,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		/// These are the same as bottom_id and top_id for VERSE_LOOKUP and STANDARD_SEARCH since these deal with entire verses as a whole, not individual words.
 		/// For MORPHOLOGICAL_SEARCH, the last word id is stored.
 		top_id, bottom_id,
-
+		
 		/// Scrolling variables
 		scroll_pos = 0, scroll_check_count = 0,
 		checking_excess_content_top = false, checking_excess_content_bottom = false,
@@ -135,11 +134,11 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			return true;
 		};
 	}());
-
-
+	
+	
 	/// Disable autocomplete for Javascript enabled browsers because they can use the auto suggestions.
 	q_obj.setAttribute("autocomplete", "off"); 
-
+	
 	/// Prototypes
 	///NOTE: Adds trim() to Strings for IE/Opera/WebKit/Mozilla 3.0-.
 	if (!"".trim) {
@@ -159,8 +158,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			return this.slice(start, end + 1);
 		};
 	}
-
-
+	
+	
 	/**
 	 * Make split() work correctly in IE.
 	 *
@@ -233,12 +232,12 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		/// See scrolling().
 		win.pageYOffset = doc_docEl.scrollTop;
 	@*/
-
-
+	
+	
 	/*****************************
 	 * Start of search functions *
 	 *****************************/
-
+	
 	/**
 	 * Prepare for the search.
 	 *
@@ -324,8 +323,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		doc.title = raw_search_terms + " - " + lang.page_title;
 		return false;
 	}
-
-
+	
+	
 	/**
 	 * Figure out what type of search is being attempted by the user.
 	 *
@@ -395,8 +394,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		/// The search is just a standard search.
 		return [STANDARD_SEARCH];
 	}
-
-
+	
+	
 	/**
 	 * Submits a query via AJAX.
 	 *
@@ -441,8 +440,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		}
 		post_to_server("search.php", query, ajax, handle_new_verses);
 	}
-
-
+	
+	
 	/**
 	 * Handles new verses from the server.
 	 *
@@ -471,8 +470,10 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 				/// The delay is so that the verse is displayed as quickly as possible.
 				///TODO: Determine if it would be better to put this in an array and send it all at once, preferably without the implied eval().
 				///TODO: Determine if it is bad to convert the array to a string like this
-				///TODO: Determine if there is a way to use setTimeout as an anonymous function without the implied eval.
-				setTimeout("highlight_search_results(\"" + res[2] + "\")", 100);
+				setTimeout(function ()
+				{
+					highlight_search_results('"' + res[2] + '"');
+				}, 100);
 			} else if (action == MORPHOLOGICAL_SEARCH) {
 				count = res[4].length;
 				for (i = 0; i < count; ++i) {
@@ -537,8 +538,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			top_id = res[1][0];
 		}
 	}
-
-
+	
+	
 	/**
 	 * Writes new verses to page.
 	 *
@@ -660,8 +661,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			setTimeout(find_current_range, look_up_range_speed);
 		}
 	}
-
-
+	
+	
 	/**
 	 * Prepares the page for new verses.
 	 *
@@ -675,15 +676,15 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		topLoader.style.visibility = "hidden";
 		page.innerHTML = "";
 	}
-
-
+	
+	
 	/**
 	 * Highlight the verses.
 	 *
 	 * Highlights the words in the verses that match the search terms.
 	 * Highlighting is done by adding/changing the className of a word.
 	 *
-	 * @example setTimeout("highlight_search_results(\"" + res[2][i] + "\")", 100);
+	 * @example setTimeout(function () {highlight_search_results('"' + res[2] + '"');}, 100);
 	 * @example highlight_search_results("<b id=1>In</b> <b id=2>the</b> <b id=3>beginning...</b>");
 	 * @param search_str (string) The HTML to examine and highlight.
 	 * @return NULL.  Modifies objects className.
@@ -705,8 +706,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			}
 		}
 	}
-
-
+	
+	
 	/**
 	 * Prepare search terms for highlighting.
 	 *
@@ -803,8 +804,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			}
 		}
 	}
-
-
+	
+	
 	/**
 	 * Format a positive number with appropriate commas.
 	 *
@@ -826,16 +827,16 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		}
 		return num;
 	}
-
+	
 	/***************************
 	 * End of search functions *
 	 ***************************/
-
-
+	
+	
 	/********************************
 	 * Start of Scrolling functions *
 	 ********************************/
-
+	
 	/**
 	 * The onscroll event.
 	 *
@@ -898,8 +899,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			remove_content_bottom_interval = setInterval(remove_excess_content_bottom, remove_speed);
 		}
 	}
-
-
+	
+	
 	/**
 	 * Remove content that is past the top of screen and store in cache.
 	 *
@@ -947,8 +948,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		clearInterval(remove_content_top_interval);
 		checking_excess_content_top = false;
 	}
-
-
+	
+	
 	/**
 	 * Remove content from below the screen and store in cache.
 	 *
@@ -985,8 +986,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		clearInterval(remove_content_bottom_interval);
 		checking_excess_content_bottom = false;
 	}
-
-
+	
+	
 	/**
 	 * Add content to bottom of the page (off the screen)
 	 *
@@ -1031,8 +1032,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			}
 		}
 	}
-
-
+	
+	
 	/**
 	 * Add content to top of the page (off the screen)
 	 *
@@ -1079,8 +1080,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			}
 		}
 	}
-
-
+	
+	
 	/**
 	 * Finds and displays the range of verses visible on the screen.
 	 *
@@ -1199,8 +1200,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		
 		return null;
 	}
-
-
+	
+	
 	/**
 	 * Find an element that is within a certain Y position on the page.
 	 *
@@ -1262,8 +1263,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		///TODO: Determine if we should return parent_el.firstChild if looked_previous or if that might cause bugs.
 		return null;
 	}
-
-
+	
+	
 	/**
 	 * The onresize event.
 	 *
@@ -1284,12 +1285,12 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			setTimeout(find_current_range, look_up_range_speed);
 		}
 	}
-
+	
 	/******************************
 	 * End of Scrolling functions *
 	 ******************************/
 	
-
+	
 	/**
 	 * Send an AJAX request to the server.
 	 *
