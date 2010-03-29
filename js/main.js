@@ -11,24 +11,44 @@
 ///TODO: Document which global variables are used in which functions.
 
 /*****************************
- * Declare global constants. *
- *****************************/
-
-///NOTE: Should be "const" instead of "var," but IE doesn't support constants yet.
-var VERSE_LOOKUP = 1, MIXED_SEARCH = 2, STANDARD_SEARCH = 3, MORPHOLOGICAL_SEARCH = 4, ADDITIONAL = 1, PREVIOUS = 2,
-
-/*****************************
  * Declare global variables. *
  *****************************/
 
-/// Common DOM/BOM Objects
-	doc = document, win = window, doc_docEl = doc.documentElement;
+///NOTE: This should be "const" instead of "var," but IE doesn't support constants yet.
+var VERSE_LOOKUP 			= 1,
+	MIXED_SEARCH 			= 2,
+	STANDARD_SEARCH			= 3,
+	MORPHOLOGICAL_SEARCH	= 4,
+	
+	/// Direction constants
+	ADDITIONAL	= 1,
+	PREVIOUS	= 2,
+	
+	/// Common DOM/BOM Objects
+	doc			= document,
+	doc_docEl	= doc.documentElement,
+	win			= window;
 
 /// Initialize the JavaScript frontend of BibleForge.
 create_viewport(doc.getElementById("viewPort1"), doc.getElementById("searchForm1"), doc.getElementById("q1"),
 	doc.getElementById("scroll1"), doc.getElementById("infoBar1"), doc.getElementById("topLoader1"),
 	doc.getElementById("bottomLoader1"));
 
+
+/**
+ * Create the BibleForge environment.
+ * 
+ * This function is used to house all of the code used by BibleForge,
+ * expect for language specific code, which is stored in js/lang/LOCALE.js.
+ * 
+ * @param viewPort (object) The HTML object which encapsulates all of the other objects.
+ * @param searchForm (object) The <form> object which contains the text box and button.
+ * @param q_obj (object) The <input> object the user types into.
+ * @param infoBar (object) The HTML object that displays information about the lookups and searches.
+ * @param topLoader (object) The HTML object which displays the loading image above the text.
+ * @param bottomLoader (object) The HTML object which displays the loading image below the text.
+ * @return NULL. Some functions are attached to events and the rest accompany them via closure.
+ */
 function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, bottomLoader)
 {
 	/// Capture form submit event.
@@ -78,8 +98,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		/// Auto Suggest variables
 		var last_suggestion_text = "",
 			suggestion_cache = {},
-			suggest_intverval,
-			suggest_delay = 250
+			suggest_interval,
+			suggest_delay = 250,
 			ajax_suggestions = new win.XMLHttpRequest();
 		
 		/**
@@ -87,7 +107,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		 */
 		function request_suggestions()
 		{
-			clearInterval(suggest_intverval);
+			clearInterval(suggest_interval);
 			if (q_obj.value == last_suggestion_text) return;
 			///TODO: Determine if there is a better way to write this code so that we don't need to use q_obj twice.
 			last_suggestion_text = q_obj.value.trim();
@@ -100,7 +120,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			/// Check to see if we already have this in the cache.
 			/// Do we need to request the suggestions from the server?
 			if (typeof suggestion_cache[last_suggestion_text] == "undefined") {
-				post_to_server("suggest.php", "q=" + encodeURIComponent(last_suggestion_text), ajax_suggestions, handle_new_verses);
+				post_to_server("suggest.php", "q=" + encodeURIComponent(last_suggestion_text), ajax_suggestions, handle_suggest);
 			} else {
 				show_suggestions(suggestion_cache[last_suggestion_text]);
 			}
@@ -109,9 +129,26 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		/**
 		 * 
 		 */
+		function handle_suggest(res)
+		{
+			
+		}
+		
+		
+		/**
+		 * Handle keyboard events (onkeypress).
+		 * 
+		 * This function is called as the user types in the input box.
+		 * It then analyzes the type of key strokes and determines if 
+		 * BibleForge needs to look up suggestions for the user.
+		 *
+		 * @param event (event object) (optional) The event object (Mozilla/Safari/Opera).
+		 * @return ???
+		 * @note This function is returned into the window.onkeypress event.
+		 */
 		return function (event)
 		{
-			if (!event) event = win.event;
+			if (!event) event = win.event; /// IE does not send the event object.
 			
 			/// keyCode meanings:
 			/// 0	(any letter)
@@ -127,8 +164,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 				///TODO: Move the highlighting down.
 				break;
 			default:
-				clearInterval(suggest_intverval);
-				suggest_intverval = setInterval(request_suggestions, suggest_delay);
+				clearInterval(suggest_interval);
+				suggest_interval = setInterval(request_suggestions, suggest_delay);
 				break;
 			}
 			return true;
@@ -260,8 +297,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		
 		/// Stop any old requests since we have a new one.
 		/// Is readyState > 0 and < 4?  (Anything 1-3 needs to be aborted.)
-		if (ajax_additional.readyState % 4) ajax_additional.abort();
-		if (ajax_previous.readyState % 4) ajax_previous.abort();
+		if (ajax_additional.readyState % 4)	ajax_additional.abort();
+		if (ajax_previous.readyState % 4)	ajax_previous.abort();
 		
 		/// Determine if the user is preforming a search or looking up a verse.
 		verse_id = lang.determine_reference(last_search_prepared);
@@ -315,10 +352,11 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		last_book = 0;
 		
 		/// Clear cache.
-		cached_verses_top = [];
-		cached_count_top  = 0;
-		cached_verses_bottom = [];
-		cached_count_bottom  = 0;
+		///TODO: Determine a way to store the cache in a way that it can be used later.
+		cached_verses_top		= [];
+		cached_count_top 		= 0;
+		cached_verses_bottom	= [];
+		cached_count_bottom 	= 0;
 		
 		doc.title = raw_search_terms + " - " + lang.page_title;
 		return false;
@@ -410,7 +448,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	function run_search(direction)
 	{
 		/// last_type set in prepare_new_search().
-		var query = "t=" + last_type, ajax;
+		var ajax, query = "t=" + last_type;
 		if (direction == ADDITIONAL) {
 			ajax = ajax_additional;
 		} else {
