@@ -22,19 +22,7 @@ var lang = (function ()
 
 		///TODO: Determine if there is a faster way to do this.  E.g., using a in_array() or isset() function.
 		/// Words to ignore that are already the root word but don't look like it.
-		stop_words_re = /^th[iu]s|h[ai]s|was|yes|succeed|proceed|e(?:arly|xceed)|only|news$/i,
-
-		/// Morphological variables
-		/// Morphological search format: WORD morph_marker ATTRIBUTE1 morph_separator ATTRIBUTE2 morph_separator ...
-		/// Morphological search example: love AS VERB, THIRD_PERSON
-		/// The keyword that indicates a morphological search.
-		morph_marker = " AS ",
-		/// The length of morph_marker.
-		morph_marker_len = 4,
-		/// The punctuation that separates two attributes.
-		morph_separator = ",",
-		///NOTE: Created in the Forge via grammar_constants_parser.php on 12-22-2009 from Grammar Constants.txt.
-		morph_grammar = {"IMPLIED":"[1,1]","DIVINE":"[2,1]","RED":"[3,1]","NOUN":"[4,1]","VERB":"[4,2]","ADJECTIVE":"[4,3]","ADVERB":"[4,4]","PRONOUN":"[4,5]","DEFINITE_ARTICLE":"[4,6]","CONJUNCTION":"[4,7]","CONDITIONAL":"[4,8]","PARTICLE":"[4,9]","PREPOSITION":"[4,10]","INJECTIVE":"[4,11]","HEBREW":"[4,12]","ARAMAIC":"[4,13]","SINGULAR":"[5,1]","PLURAL":"[5,2]","FIRST_PERSON":"[6,1]","SECOND_PERSON":"[6,2]","THIRD_PERSON":"[6,3]","PRESENT":"[7,1]","IMPERFECT":"[7,2]","FUTURE":"[7,3]","AORIST":"[7,4]","PERFECT":"[7,5]","PLUPERFECT":"[7,6]","NO_TENSE_STATED":"[7,99]","ACTIVE":"[8,1]","MIDDLE":"[8,2]","PASSIVE":"[8,3]","MIDDLE_DEPONENT":"[8,4]","PASSIVE_DEPONENT":"[8,5]","IMPERSONAL_ACTIVE":"[8,6]","AMBIGUOUS_MIDDLE_PASSIVE":"[8,77]","AMBIGUOUS_MIDDLE_PASSIVE_DEPONENT":"[8,88]","NO_VOICE_STATED":"[8,99]","INDICATIVE":"[9,1]","SUBJUNCTIVE":"[9,2]","IMPERATIVE":"[9,3]","INFINITIVE":"[9,4]","OPTATIVE":"[9,5]","PARTICIPLE":"[9,6]","IMPERATIVE_SENSE_PARTICIPLE":"[9,7]","MASCULINE":"[10,1]","FEMININE":"[10,2]","NEUTER":"[10,3]","NOMINATIVE":"[11,1]","GENITIVE":"[11,2]","ACCUSATIVE":"[11,3]","DATIVE":"[11,4]","VOCATIVE":"[11,5]","PERSONAL_PRONOUN":"[12,1]","RELATIVE_PRONOUN":"[12,2]","RECIPROCAL_PRONOUN":"[12,3]","DEMONSTRATIVE_PRONOUN":"[12,4]","CORRELATIVE_PRONOUN":"[12,5]","INTERROGATIVE_PRONOUN":"[12,6]","INDEFINITE_PRONOUN":"[12,7]","REFLEXIVE_PRONOUN":"[12,8]","POSESSIVE_PRONOUN":"[12,9]","AMBIGUOUS_CORRELATIVE_INTERROGATIVE_PRONOUN":"[12,10]","COMPARATIVE":"[13,1]","SUPERLATIVE":"[13,2]","INDECLINABLE":"[14,1]","NUMERICAL":"[15,1]","NORMAL_NOUN":"[16,1]","PROPER_NOUN":"[16,2]","LETTER":"[16,3]","OTHER":"[16,4]","ABBREVIATED":"[17,1]","CONTRACTED":"[17,2]","APOCOPATED":"[17,3]","IRREGULAR":"[17,4]","ATTIC":"[18,1]","AEOLIC":"[18,2]","TRANSITIVE":"[19,1]","FIRST_FORM":"[20,1]","SECOND_FORM":"[20,2]","INTERROGATIVE":"[21,1]","NEGATIVE":"[21,2]","PARTICLE_ATTACHED":"[21,3]","MIDDLE_SIGNIFICANCE":"[21,4]"};
+		stop_words_re = /^th[iu]s|h[ai]s|was|yes|succeed|proceed|e(?:arly|xceed)|only|news$/i;
 	
 	
 	/// Return the language constants and functions.
@@ -48,6 +36,18 @@ var lang = (function ()
 		/// Miscelaneous Text
 		page_title:		"BibleForge", chapter: "Chapter", psalm: "Psalm", found_singular: " verse found for ",
 		found_plural:	" verses found for ", title: "title",
+		
+		/// Morphological variables
+		/// Morphological search format: WORD morph_marker ATTRIBUTE1 morph_separator ATTRIBUTE2 morph_separator ...
+		/// Morphological search example: love AS VERB, THIRD_PERSON
+		/// The keyword that indicates a morphological search.
+		morph_marker: " AS ",
+		/// The length of morph_marker.
+		morph_marker_len: 4,
+		/// The punctuation that separates two attributes.
+		morph_separator: ",",
+		///NOTE: Created in the Forge via grammar_constants_parser.php on 12-22-2009 from Grammar Constants.txt.
+		morph_grammar: {"IMPLIED":"[1,1]","DIVINE":"[2,1]","RED":"[3,1]","NOUN":"[4,1]","VERB":"[4,2]","ADJECTIVE":"[4,3]","ADVERB":"[4,4]","PRONOUN":"[4,5]","DEFINITE_ARTICLE":"[4,6]","CONJUNCTION":"[4,7]","CONDITIONAL":"[4,8]","PARTICLE":"[4,9]","PREPOSITION":"[4,10]","INJECTIVE":"[4,11]","HEBREW":"[4,12]","ARAMAIC":"[4,13]","SINGULAR":"[5,1]","PLURAL":"[5,2]","FIRST_PERSON":"[6,1]","SECOND_PERSON":"[6,2]","THIRD_PERSON":"[6,3]","PRESENT":"[7,1]","IMPERFECT":"[7,2]","FUTURE":"[7,3]","AORIST":"[7,4]","PERFECT":"[7,5]","PLUPERFECT":"[7,6]","NO_TENSE_STATED":"[7,99]","ACTIVE":"[8,1]","MIDDLE":"[8,2]","PASSIVE":"[8,3]","MIDDLE_DEPONENT":"[8,4]","PASSIVE_DEPONENT":"[8,5]","IMPERSONAL_ACTIVE":"[8,6]","AMBIGUOUS_MIDDLE_PASSIVE":"[8,77]","AMBIGUOUS_MIDDLE_PASSIVE_DEPONENT":"[8,88]","NO_VOICE_STATED":"[8,99]","INDICATIVE":"[9,1]","SUBJUNCTIVE":"[9,2]","IMPERATIVE":"[9,3]","INFINITIVE":"[9,4]","OPTATIVE":"[9,5]","PARTICIPLE":"[9,6]","IMPERATIVE_SENSE_PARTICIPLE":"[9,7]","MASCULINE":"[10,1]","FEMININE":"[10,2]","NEUTER":"[10,3]","NOMINATIVE":"[11,1]","GENITIVE":"[11,2]","ACCUSATIVE":"[11,3]","DATIVE":"[11,4]","VOCATIVE":"[11,5]","PERSONAL_PRONOUN":"[12,1]","RELATIVE_PRONOUN":"[12,2]","RECIPROCAL_PRONOUN":"[12,3]","DEMONSTRATIVE_PRONOUN":"[12,4]","CORRELATIVE_PRONOUN":"[12,5]","INTERROGATIVE_PRONOUN":"[12,6]","INDEFINITE_PRONOUN":"[12,7]","REFLEXIVE_PRONOUN":"[12,8]","POSESSIVE_PRONOUN":"[12,9]","AMBIGUOUS_CORRELATIVE_INTERROGATIVE_PRONOUN":"[12,10]","COMPARATIVE":"[13,1]","SUPERLATIVE":"[13,2]","INDECLINABLE":"[14,1]","NUMERICAL":"[15,1]","NORMAL_NOUN":"[16,1]","PROPER_NOUN":"[16,2]","LETTER":"[16,3]","OTHER":"[16,4]","ABBREVIATED":"[17,1]","CONTRACTED":"[17,2]","APOCOPATED":"[17,3]","IRREGULAR":"[17,4]","ATTIC":"[18,1]","AEOLIC":"[18,2]","TRANSITIVE":"[19,1]","FIRST_FORM":"[20,1]","SECOND_FORM":"[20,2]","INTERROGATIVE":"[21,1]","NEGATIVE":"[21,2]","PARTICLE_ATTACHED":"[21,3]","MIDDLE_SIGNIFICANCE":"[21,4]"},
 		
 		///TODO: Review stem_word() for optimizations.
 		///TODO: Document stem_word() better.
