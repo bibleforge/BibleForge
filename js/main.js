@@ -8,82 +8,88 @@
  * @author BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
  */
 
-///TODO: Document which global variables are used in which functions.
-
-/*****************************
- * Declare global variables. *
- *****************************/
-
-///NOTE: This should be "const" instead of "var," but IE doesn't support constants yet.
-var VERSE_LOOKUP 			= 1,
-	MIXED_SEARCH 			= 2,
-	STANDARD_SEARCH			= 3,
-	MORPHOLOGICAL_SEARCH	= 4,
-	
-	/// Direction constants
-	ADDITIONAL	= 1,
-	PREVIOUS	= 2,
-	
-	/// Common DOM/BOM Objects
-	doc			= document,
-	doc_docEl	= doc.documentElement,
-	win			= window;
-
 /// Initialize the JavaScript frontend of BibleForge.
 create_viewport(doc.getElementById("viewPort1"), doc.getElementById("searchForm1"), doc.getElementById("q1"),
 	doc.getElementById("scroll1"), doc.getElementById("infoBar1"), doc.getElementById("topLoader1"),
-	doc.getElementById("bottomLoader1"));
-
+	doc.getElementById("bottomLoader1"), document, document.documentElement, window);
 
 /**
  * Create the BibleForge environment.
- * 
+ *
  * This function is used to house all of the code used by BibleForge,
  * expect for language specific code, which is stored in js/lang/LOCALE.js.
- * 
- * @param viewPort (object) The HTML object which encapsulates all of the other objects.
- * @param searchForm (object) The <form> object which contains the text box and button.
- * @param q_obj (object) The <input> object the user types into.
- * @param infoBar (object) The HTML object that displays information about the lookups and searches.
- * @param topLoader (object) The HTML object which displays the loading image above the text.
- * @param bottomLoader (object) The HTML object which displays the loading image below the text.
- * @return NULL. Some functions are attached to events and the rest accompany them via closure.
+ *
+ * @param	viewPort		(object) The HTML object which encapsulates all of the other objects.
+ * @param	searchForm		(object) The <form> object which contains the text box and button.
+ * @param	q_obj			(object) The <input> object the user types into.
+ * @param	infoBar			(object) The HTML object that displays information about the lookups and searches.
+ * @param	topLoader		(object) The HTML object which displays the loading image above the text.
+ * @param	bottomLoader	(object) The HTML object which displays the loading image below the text.
+ * @param	doc				(object) The document element.
+ * @param	doc_docEl		(object) The document.documentElement element (the HTML element).
+ * @param	win				(object) The window element.
+ * @return	NULL.  Some functions are attached to events and the rest accompany them via closure.
  */
-function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, bottomLoader)
+function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, bottomLoader, doc, doc_docEl, win)
 {
-	/// Capture form submit event.
-	searchForm.onsubmit = prepare_new_search;
-	
-	var highlight_re = [], /// Highlighter regex array
-		last_search  = "", last_search_encoded = "", /// A cache of the last search query
-		last_type, /// The type of lookup performed last (VERSE_LOOKUP || MIXED_SEARCH || STANDARD_SEARCH || MORPHOLOGICAL_SEARCH)
-		waiting_for_first_search = false,
-		last_book       =  0, /// The number of the last book of the Bible that was returned
-		highlight_limit = 20, /// Currently, we limit the unique number of search words to highlight.
+	///NOTE: This should be "const" instead of "var," but IE doesn't support constants yet.
+	var VERSE_LOOKUP 			= 1,
+		MIXED_SEARCH 			= 2,
+		STANDARD_SEARCH			= 3,
+		MORPHOLOGICAL_SEARCH	= 4,
 		
+		/// Direction constants
+		ADDITIONAL	= 1,
+		PREVIOUS	= 2,
+		
+		highlight_re				= [],	/// Highlighter regex array
+		last_search					= "",
+		last_search_encoded			= "",	/// A cache of the last search query
+		last_type,							/// The type of lookup performed last (VERSE_LOOKUP || MIXED_SEARCH || STANDARD_SEARCH || MORPHOLOGICAL_SEARCH)
+		waiting_for_first_search	= false,
+		last_book					= 0,	/// The number of the last book of the Bible that was returned
+		highlight_limit				= 20,	/// Currently, we limit the unique number of search words to highlight.
+		
+		/// Ajax objects
 		ajax_additional	= new win.XMLHttpRequest(),
 		ajax_previous	= new win.XMLHttpRequest(),
 		
 		/// Verse variables
 		/// top_verse and bottom_verse are the last verses displayed on the screen so that the same verse is not displayed twice when more search data is returned (currently just used for MORPHOLOGICAL_SEARCH).
-		top_verse = 0, bottom_verse = 0,
+		top_verse		= 0,
+		bottom_verse	= 0,
 		/// top_id and bottom_id are the last ids (either verse or word id) returned from a search or verse lookup.
 		/// These are the same as bottom_id and top_id for VERSE_LOOKUP and STANDARD_SEARCH since these deal with entire verses as a whole, not individual words.
 		/// For MORPHOLOGICAL_SEARCH, the last word id is stored.
-		top_id, bottom_id,
+		top_id,
+		bottom_id,
 		
 		/// Scrolling variables
-		scroll_pos = 0, scroll_check_count = 0,
-		checking_excess_content_top = false, checking_excess_content_bottom = false,
-		remove_content_top_interval, remove_content_bottom_interval,
-		buffer_add = 1000, buffer_rem = 10000,
-		cached_verses_top    = [], cached_count_top    = 0,
-		cached_verses_bottom = [], cached_count_bottom = 0,
-		scroll_maxed_top = true, scroll_maxed_bottom = false,
-		lookup_speed_scrolling = 50, lookup_speed_sitting = 100, lookup_delay = 200, remove_speed = 3000, look_up_range_speed = 300, /// In milliseconds
-		looking_up_verse_range = false;
-	
+		scroll_pos						= 0,
+		scroll_check_count				= 0,
+		checking_excess_content_top		= false,
+		checking_excess_content_bottom	= false,
+		remove_content_top_interval,
+		remove_content_bottom_interval,
+		buffer_add						= 1000,
+		buffer_rem						= 10000,
+		cached_verses_top				= [],
+		cached_count_top				= 0,
+		cached_verses_bottom			= [],
+		cached_count_bottom				= 0,
+		scroll_maxed_top				= true,
+		scroll_maxed_bottom				= false,
+		lookup_speed_scrolling			= 50,
+		lookup_speed_sitting			= 100,
+		lookup_delay					= 200,
+		remove_speed					= 3000,
+		look_up_range_speed				= 300,	/// In milliseconds
+		looking_up_verse_range			= false;
+		
 	/// Simple Event Registration
+	/// Capture form submit event.
+	searchForm.onsubmit = prepare_new_search;
+	
 	///NOTE: Could use wheel if the scroll bars are invisible.
 	win.onscroll = scrolling;
 	win.onresize = resizing;
@@ -93,6 +99,9 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 *********************************/
 	/// Create suggest and attach it to the keypress event.
 	///TODO: Determine if using closure here is helpful.
+	/**
+	 *
+	 */
 	q_obj.onkeypress = (function ()
 	{
 		/// Auto Suggest variables
@@ -137,14 +146,14 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		
 		/**
 		 * Handle keyboard events (onkeypress).
-		 * 
+		 *
 		 * This function is called as the user types in the input box.
-		 * It then analyzes the type of key strokes and determines if 
+		 * It then analyzes the type of key strokes and determines if
 		 * BibleForge needs to look up suggestions for the user.
 		 *
-		 * @param event (event object) (optional) The event object (Mozilla/Safari/Opera).
-		 * @return ???
-		 * @note This function is returned into the window.onkeypress event.
+		 * @param	event (event object) (optional) The event object (Mozilla/Safari/Opera).
+		 * @return	???
+		 * @note	This function is returned into the window.onkeypress event.
 		 */
 		return function (event)
 		{
@@ -174,7 +183,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	
 	
 	/// Disable autocomplete for Javascript enabled browsers because they can use the auto suggestions.
-	q_obj.setAttribute("autocomplete", "off"); 
+	q_obj.setAttribute("autocomplete", "off");
 	
 	/// Prototypes
 	///NOTE: Adds trim() to Strings for IE/Opera/WebKit/Mozilla 3.0-.
@@ -182,10 +191,10 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		/**
 		 * Removes leading and trailing spaces.
 		 *
-		 * @example trimmed = trim("  God is   good  "); /// Returns "God is   good"
-		 * @param str (string) The string to trim.
-		 * @return A String with leading and trailing spaces removed.
-		 * @note This does not remove all types of whitespace.  It actually removes anything under character code 33.
+		 * @example	trimmed = trim("  God is   good  "); /// Returns "God is   good"
+		 * @param	str (string) The string to trim.
+		 * @return	A String with leading and trailing spaces removed.
+		 * @note	This does not remove all types of whitespace.  It actually removes anything under character code 33.
 		 */
 		String.prototype.trim = function()
 		{
@@ -200,10 +209,10 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	/**
 	 * Make split() work correctly in IE.
 	 *
-	 * @param s (regexp || string) The regular expression or string with which to break the string.
-	 * @param limit (int) The number of times to split the string.
-	 * @return Returns an array of the string now broken into pieces.
-	 * @see http://blog.stevenlevithan.com/archives/cross-browser-split.
+	 * @param	s		(regexp || string)	The regular expression or string with which to break the string.
+	 * @param	limit	(int)				The number of times to split the string.
+	 * @return	Returns an array of the string now broken into pieces.
+	 * @see		http://blog.stevenlevithan.com/archives/cross-browser-split.
 	 */
 	///NOTE: The following conditional compilation code blocks only executes in IE.
 	/*@cc_on
@@ -278,12 +287,12 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	/**
 	 * Prepare for the search.
 	 *
-	 * Prepares the search query from the input box.
+	 * Evaluates the query from the user and deterim the search query from the input box.
 	 *
-	 * @example prepare_new_search();
-	 * @return FALSE to prevent the form from submitting.
-	 * @note Called when clicking the submit button on the search bar in index.php.
-	 * @note Global variables used: waiting_for_first_search, ajax_additional, ajax_previous, last_type, bottom_id, last_search_encoded, last_search.
+	 * @example	prepare_new_search();
+	 * @return	FALSE to prevent the form from submitting.
+	 * @note	Called when clicking the submit button on the search bar in index.php.
+	 * @note	Global variables used: waiting_for_first_search, ajax_additional, ajax_previous, last_type, bottom_id, last_search_encoded, last_search.
 	 */
 	function prepare_new_search()
 	{
@@ -301,6 +310,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		if (ajax_previous.readyState % 4)	ajax_previous.abort();
 		
 		/// Determine if the user is preforming a search or looking up a verse.
+		/// If the query is a verse reference, a number is returned, if it is a search, then FALSE is returned.
 		verse_id = lang.determine_reference(last_search_prepared);
 		
 		/// Is the user looking up a verse? (verse_id is false when the user is preforming a search.)
@@ -338,7 +348,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		} else {
 			scroll_maxed_top = true;
 			scroll_maxed_bottom = false;
-			/// We immediately prepare the highlighter so that when the results are returned via AJAX
+			/// We immediately prepare the highlighter so that when the results are returned via Ajax.
 			/// the highlighter array will be ready to go.
 			/// Do we already have the regex array or do we not need because the highlighted words will be returned (e.g., morphological searching)?
 			if (raw_search_terms != last_search) {
@@ -358,7 +368,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		cached_verses_bottom	= [];
 		cached_count_bottom 	= 0;
 		
-		doc.title = raw_search_terms + " - " + lang.page_title;
+		doc.title = raw_search_terms + " - " + lang.app_name;
 		return false;
 	}
 	
@@ -366,16 +376,16 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	/**
 	 * Figure out what type of search is being attempted by the user.
 	 *
-	 * @example determine_search_type("God & love"); /// Returns [STANDARD_SEARCH]
-	 * @example determine_search_type("love AS NOUN"); /// Returns [MORPHOLOGICAL_SEARCH,'["love",[[1,1]],[1]]']
-	 * @example determine_search_type("go AS IMPERATIVE, -SINGULAR"); /// Returns [MORPHOLOGICAL_SEARCH,'["go",[[9,3],[5,1]],[0,1]]']
-	 * @example determine_search_type("go* AS PASSIVE, -PERFECT,INDICATIVE"); /// Returns [MORPHOLOGICAL_SEARCH,'["go*",[[8,3],[7,5],[9,1]],[0,1,0]]']
-	 * @example determine_search_type("* AS RED, IMPERATIVE"); /// Returns [MORPHOLOGICAL_SEARCH,'["",[[3,1],[9,3]],[0,0]]']
+	 * @example	determine_search_type("God & love");							/// Returns [STANDARD_SEARCH]
+	 * @example	determine_search_type("love AS NOUN");							/// Returns [MORPHOLOGICAL_SEARCH,'["love",[[1,1]],[1]]']
+	 * @example	determine_search_type("go AS IMPERATIVE, -SINGULAR");			/// Returns [MORPHOLOGICAL_SEARCH,'["go",[[9,3],[5,1]],[0,1]]']
+	 * @example	determine_search_type("go* AS PASSIVE, -PERFECT,INDICATIVE");	/// Returns [MORPHOLOGICAL_SEARCH,'["go*",[[8,3],[7,5],[9,1]],[0,1,0]]']
+	 * @example	determine_search_type("* AS RED, IMPERATIVE");					/// Returns [MORPHOLOGICAL_SEARCH,'["",[[3,1],[9,3]],[0,0]]']
 	 * //@example determine_search_type("love AS NOUN & more | less -good AS ADJECTIVE"); /// Returns [MORPHOLOGICAL_SEARCH, [0, "love", "NOUN"], STANDARD_SEARCH, "& more | less -good", MORPHOLOGICAL_SEARCH, [0, "good", "ADJECTIVE"]]
-	 * @param search_terms (string) The prepared terms to be examined.
-	 * @return An array describing the type of search.  Format: [(int)Type of search, (optional)(string)JSON array describing the search].
-	 * @note Called by run_search().
-	 * @note Only a partial implementation currently.  Mixed searching is lacking.
+	 * @param	search_terms (string) The prepared terms to be examined.
+	 * @return	An array describing the type of search.  Format: [(int)Type of search, (optional)(string)JSON array describing the search].
+	 * @note	Called by run_search().
+	 * @note	Only a partial implementation currently.  Mixed searching is lacking.
 	 */
 	function determine_search_type(search_terms)
 	{
@@ -435,15 +445,15 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	
 	
 	/**
-	 * Submits a query via AJAX.
+	 * Submits a query via Ajax.
 	 *
-	 * @example run_search(ADDITIONAL); /// Will add verses to the bottom.
-	 * @example run_search(PREVIOUS); /// Will add verses to the top.
-	 * @param direction (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
-	 * @return NULL.  Query is sent via AJAX.
-	 * @note Called by prepare_new_search() when the user submits a search.
-	 * @note Called by add_content_bottom() and add_content_top() when scrolling.
-	 * @note Global variables used: last_type and bottom_id, top_id, last_search_encoded.
+	 * @example	run_search(ADDITIONAL);	/// Will add verses to the bottom.
+	 * @example	run_search(PREVIOUS);	/// Will add verses to the top.
+	 * @param	direction (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
+	 * @return	NULL.  Query is sent via Ajax.
+	 * @note	Called by prepare_new_search() when the user submits a search.
+	 * @note	Called by add_content_bottom() and add_content_top() when scrolling.
+	 * @note	Global variables used: last_type and bottom_id, top_id, last_search_encoded.
 	 */
 	function run_search(direction)
 	{
@@ -486,12 +496,12 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 * Writes new verses to the page, determines if more content is needed or available,
 	 * and writes initial information to the info bar.
 	 *
-	 * @example prepare_verses([[VERSE_LOOKUP, PREVIOUS], [1001001, 1001002], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>", "<b id="12">And</b> <b id="13">the</b> <b id="14">earth....</b>"], 2]);
-	 * @example prepare_verses([[STANDARD_SEARCH, ADDITIONAL], [1001001], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>"], 1]);
-	 * @example prepare_verses([[MORPHOLOGICAL_SEARCH, ADDITIONAL], [50004008], ["<b id=772635>Finally,</b> <b id=772636>brethren,</b> <b id=772637>whatsoever</b> <b id=772638>things....</b>"], 1, [772638]]);
-	 * @param res (array) JSON array from the server.  Array format: [action, direction], [verse_ids, ...], [verse_HTML, ...], number_of_matches, [word_id, ...]].  /// NOTE: word_id is optional.
-	 * @return NULL.  The function writes HTML to the page.
-	 * @note Called by prepare_verses() after an AJAX request.
+	 * @example	prepare_verses([[VERSE_LOOKUP, PREVIOUS], [1001001, 1001002], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>", "<b id="12">And</b> <b id="13">the</b> <b id="14">earth....</b>"], 2]);
+	 * @example	prepare_verses([[STANDARD_SEARCH, ADDITIONAL], [1001001], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>"], 1]);
+	 * @example	prepare_verses([[MORPHOLOGICAL_SEARCH, ADDITIONAL], [50004008], ["<b id=772635>Finally,</b> <b id=772636>brethren,</b> <b id=772637>whatsoever</b> <b id=772638>things....</b>"], 1, [772638]]);
+	 * @param	res (array) JSON array from the server.  Array format: [action, direction], [verse_ids, ...], [verse_HTML, ...], number_of_matches, [word_id, ...]].  ///NOTE: word_id is optional.
+	 * @return	NULL.  The function writes HTML to the page.
+	 * @note	Called by prepare_verses() after an Ajax request.
 	 */
 	function handle_new_verses(res)
 	{
@@ -581,15 +591,15 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	/**
 	 * Writes new verses to page.
 	 *
-	 * @example write_verses(action, direction, [verse_ids, ...], [verse_HTML, ...]);
-	 * @example write_verses(VERSE_LOOKUP, ADDITIONAL, [1001001], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>"]);
-	 * @param action (integer) The type of query: VERSE_LOOKUP || MIXED_SEARCH || STANDARD_SEARCH || MORPHOLOGICAL_SEARCH.
-	 * @param direction (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
-	 * @param verse_ids (array) An array of integers representing Bible verse references.
-	 * @param verse_HTML (array) An array of strings containing verses in HTML.
-	 * @return NULL.  Writes HTML to the page.
-	 * @note Called by handle_new_verses().
-	 * @note verse_ids contains an array of verses in the following format: [B]BCCCVVV (e.g., Genesis 1:1 == 1001001).
+	 * @example	write_verses(action, direction, [verse_ids, ...], [verse_HTML, ...]);
+	 * @example	write_verses(VERSE_LOOKUP, ADDITIONAL, [1001001], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>"]);
+	 * @param	action		(integer)	The type of query: VERSE_LOOKUP || MIXED_SEARCH || STANDARD_SEARCH || MORPHOLOGICAL_SEARCH.
+	 * @param	direction	(integer)	The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
+	 * @param	verse_ids	(array)		An array of integers representing Bible verse references.
+	 * @param	verse_HTML	(array)		An array of strings containing verses in HTML.
+	 * @return	NULL.  Writes HTML to the page.
+	 * @note	Called by handle_new_verses().
+	 * @note	verse_ids contains an array of verses in the following format: [B]BCCCVVV (e.g., Genesis 1:1 == 1001001).
 	 */
 	function write_verses(action, direction, verse_ids, verse_HTML)
 	{
@@ -704,9 +714,9 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	/**
 	 * Prepares the page for new verses.
 	 *
-	 * @example clean_up_page();
-	 * @return NULL.  The page is prepared for new verses.
-	 * @note Called by prepare_new_search().
+	 * @example	clean_up_page();
+	 * @return	NULL.  The page is prepared for new verses.
+	 * @note	Called by prepare_new_search().
 	 */
 	function clean_up_page() {
 		///TODO: This should have smooth scrolling effects, etc.
@@ -722,11 +732,11 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 * Highlights the words in the verses that match the search terms.
 	 * Highlighting is done by adding/changing the className of a word.
 	 *
-	 * @example setTimeout(function () {highlight_search_results('"' + res[2] + '"');}, 100);
-	 * @example highlight_search_results("<b id=1>In</b> <b id=2>the</b> <b id=3>beginning...</b>");
-	 * @param search_str (string) The HTML to examine and highlight.
-	 * @return NULL.  Modifies objects className.
-	 * @note Called by write_verses() via setTimeout() with a short delay.
+	 * @example	setTimeout(function () {highlight_search_results('"' + res[2] + '"');}, 100);
+	 * @example	highlight_search_results("<b id=1>In</b> <b id=2>the</b> <b id=3>beginning...</b>");
+	 * @param	search_str (string) The HTML to examine and highlight.
+	 * @return	NULL.  Modifies objects className.
+	 * @note	Called by write_verses() via setTimeout() with a short delay.
 	 */
 	function highlight_search_results(search_str)
 	{
@@ -746,24 +756,33 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	}
 	
 	
+	///TODO: Determine if this whole function should be in a language specific file.
 	/**
 	 * Prepare search terms for highlighting.
 	 *
 	 * Create regex array to search through the verses that will soon be returned by the server.
 	 *
-	 * @example prepare_highlighter(q_obj.value);
-	 * @example prepare_highlighter("search terms");
-	 * @param search_terms (string) The terms to look for.
-	 * @return NULL.  A regex array is created and stored in the global variable highlight_re[].
-	 * @note Called by run_search().
+	 * @example	prepare_highlighter(q_obj.value);
+	 * @example	prepare_highlighter("search terms");
+	 * @param	search_terms (string) The terms to look for.
+	 * @return	NULL.  A regex array is created and stored in the global variable highlight_re[].
+	 * @note	Called by run_search().
 	 */
 	function prepare_highlighter(search_terms)
 	{
-		///TODO: Determine if this whole function should be in a language specific file.
+		var count			= 0,
+			i,
+			j,
+			len_before,
+			len_after,
+			no_morph, term,
+			stemmed_arr		= [],
+			search_terms_arr,
+			stemmed_word;
+		
 		highlight_re = [];
 		
-		var search_terms_arr = lang.filter_terms_for_highlighter(search_terms),
-			count = 0, len_before, len_after, stemmed_word, stemmed_arr = [], no_morph, term, i, j;
+		search_terms_arr = lang.filter_terms_for_highlighter(search_terms)
 		
 		first_loop:for (i in search_terms_arr) {
 			term = search_terms_arr[i];
@@ -847,10 +866,10 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	/**
 	 * Format a positive number with appropriate commas.
 	 *
-	 * @example format_number(1000); /// Returns "1,000"
-	 * @param num (positive number) The number to format.
-	 * @return A formatted number as a string.
-	 * @note To be faster, this will not format a negative number.
+	 * @example	format_number(1000); /// Returns "1,000"
+	 * @param	num (positive number) The number to format.
+	 * @return	A formatted number as a string.
+	 * @note	To be faster, this will not format a negative number.
 	 */
 	function format_number(num)
 	{
@@ -881,9 +900,9 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 * When the page scrolls this figures out the direction of the scroll and
 	 * calls specific functions to determine whether content should be added or removed.
 	 *
-	 * @return NULL.  May call other functions via setTimeout() or setInterval().
-	 * @note Called when the window scrolls.
-	 * @note Set via "window.onscroll = scrolling;".
+	 * @return	NULL.  May call other functions via setTimeout() or setInterval().
+	 * @note	Called when the window scrolls.
+	 * @note	Set via "window.onscroll = scrolling;".
 	 */
 	function scrolling()
 	{
@@ -942,9 +961,9 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	/**
 	 * Remove content that is past the top of screen and store in cache.
 	 *
-	 * @example remove_excess_content_top();
-	 * @return NULL.  Removes content from the page if required.
-	 * @note Called by scrolling() via setInterval().
+	 * @example	remove_excess_content_top();
+	 * @return	NULL.  Removes content from the page if required.
+	 * @note	Called by scrolling() via setInterval().
 	 */
 	function remove_excess_content_top()
 	{
@@ -991,9 +1010,9 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	/**
 	 * Remove content from below the screen and store in cache.
 	 *
-	 * @example remove_excess_content_bottom();
-	 * @return NULL.  Removes content from the page if required.
-	 * @note Called by scrolling() via setInterval().
+	 * @example	remove_excess_content_bottom();
+	 * @return	NULL.  Removes content from the page if required.
+	 * @note	Called by scrolling() via setInterval().
 	 */
 	function remove_excess_content_bottom()
 	{
@@ -1029,10 +1048,10 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	/**
 	 * Add content to bottom of the page (off the screen)
 	 *
-	 * @example add_content_bottom();
-	 * @return NULL.  Adds content to the page if needed.
-	 * @note Called by scrolling() via setTimeout().
-	 * @note May call itself via setTimeout() if content is added.
+	 * @example	add_content_bottom();
+	 * @return	NULL.  Adds content to the page if needed.
+	 * @note	Called by scrolling() via setTimeout().
+	 * @note	May call itself via setTimeout() if content is added.
 	 */
 	function add_content_bottom()
 	{
@@ -1075,10 +1094,10 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	/**
 	 * Add content to top of the page (off the screen)
 	 *
-	 * @example add_content_top();
-	 * @return NULL.  Adds content to the page if needed.
-	 * @note Called by scrolling(), resizing(), and write_verses() via setTimeout().
-	 * @note May call itself via setTimeout() if content is added.
+	 * @example	add_content_top();
+	 * @return	NULL.  Adds content to the page if needed.
+	 * @note	Called by scrolling(), resizing(), and write_verses() via setTimeout().
+	 * @note	May call itself via setTimeout() if content is added.
 	 */
 	function add_content_top()
 	{
@@ -1126,10 +1145,10 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 * Find the verse that is at the top of the page and at the bottom of the page window and
 	 * display that range on the page and change the page title to indicate the verse range as well.
 	 *
-	 * @example setTimeout(find_current_range, look_up_range_speed);
-	 * @return NULL.  The page is modified to reflect the verse range.
-	 * @note Called by scrolling(), resizing(), write_verses(), or itself via setTimeout().
-	 * @note This function should be called every time the page is resized or scrolled or when visible content is added.
+	 * @example	setTimeout(find_current_range, look_up_range_speed);
+	 * @return	NULL.  The page is modified to reflect the verse range.
+	 * @note	Called by scrolling(), resizing(), write_verses(), or itself via setTimeout().
+	 * @note	This function should be called every time the page is resized or scrolled or when visible content is added.
 	 */
 	function find_current_range()
 	{
@@ -1145,8 +1164,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		
 		/// Is the top verse block not found?
 		if (top_verse_block === null) {
-			/// NOTE: There appears to be no verses displayed on the screen.
-			///       Since they may still be being retrieved, so run this function again a little later.
+			///NOTE: There appears to be no verses displayed on the screen.
+			///      Since they may still be being retrieved, so run this function again a little later.
 			looking_up_verse_range = true;
 			setTimeout(find_current_range, look_up_range_speed);
 			return null;
@@ -1217,9 +1236,9 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		/// last_type is set in prepare_new_search().
 		/// The verse range is displayed differently based on the type of search (i.e., a verse look up or a regular search).
 		if (last_type == VERSE_LOOKUP) {
-			new_title = ref_range + " - " + lang.page_title;
+			new_title = ref_range + " - " + lang.app_name;
 		} else {
-			new_title = last_search +  " (" + ref_range + ") - " + lang.page_title;
+			new_title = last_search + " (" + ref_range + ") - " + lang.app_name;
 		}
 		
 		/// Is the new verse range the same as the old one?
@@ -1243,12 +1262,12 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	/**
 	 * Find an element that is within a certain Y position on the page.
 	 *
-	 * @example element = find_element_at_scroll_pos(scroll_pos, page);
-	 * @param the_pos (number) The vertical position on the page.
-	 * @param parent_el (DOM element) The element to search inside of.
-	 * @return DOM element that is within the specified position of the page.
-	 * @note Called by find_current_range().
-	 * @note This is a helper function to find_current_range().
+	 * @example	element = find_element_at_scroll_pos(scroll_pos, page);
+	 * @param	the_pos		(number) The vertical position on the page.
+	 * @param	parent_el	(object) The DOM element to search inside of.
+	 * @return	DOM element that is within the specified position of the page.
+	 * @note	Called by find_current_range().
+	 * @note	This is a helper function to find_current_range().
 	 */
 	function find_element_at_scroll_pos(the_pos, parent_el, el)
 	{
@@ -1308,9 +1327,9 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 *
 	 * When the page is resized, check to see if more content should be loaded.
 	 *
-	 * @return NULL.  Calls other functions
-	 * @note Called when the window is resized.
-	 * @note Set via window.onresize = resizing.
+	 * @return	NULL.  Calls other functions
+	 * @note	Called when the window is resized.
+	 * @note	Set via window.onresize = resizing.
 	 */
 	function resizing()
 	{
@@ -1330,15 +1349,15 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	
 	
 	/**
-	 * Send an AJAX request to the server.
+	 * Send an Ajax request to the server.
 	 *
-	 * @example post_to_server("search.php", "q=search", ajax);
-	 * @example post_to_server("search.php", "q=search&s=48003027", ajax);
-	 * @param server_URL (string) The file on the server to run.
-	 * @param message (string) The variables to send.  URI format: "name1=value1&name2=value%202"
-	 * @param ajax (AJAX object) The object that preforms the query.
-	 * @return NULL.  Queries server and then performs an action with the received JSON array.
-	 * @note Called by run_search().
+	 * @example	post_to_server("search.php", "q=search", ajax);
+	 * @example	post_to_server("search.php", "q=search&s=48003027", ajax);
+	 * @param	server_URL	(string) The file on the server to run.
+	 * @param	message		(string) The variables to send.  URI format: "name1=value1&name2=value%202"
+	 * @param	ajax		(object) The Ajax object that preforms the query.
+	 * @return	NULL.  Queries server and then performs an action with the received JSON array.
+	 * @note	Called by run_search().
 	 */
 	function post_to_server(server_URL, message, ajax, handler)
 	{
