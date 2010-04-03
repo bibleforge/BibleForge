@@ -3,25 +3,25 @@
 /**
  * BibleForge
  *
- * @date 11-08-09
- * @version 0.2 alpha
- * @link http://BibleForge.com
- * @license Reciprocal Public License 1.5 (RPL1.5)
- * @author BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
+ * @date	11-08-09
+ * @version	0.2 alpha
+ * @link	http://BibleForge.com
+ * @license	Reciprocal Public License 1.5 (RPL1.5)
+ * @author	BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
  */
 
 /**
  * Perform a morphological Sphinx-based search.
  *
- * @example morphology_search('["love", [[4,1]], [1]]', ADDITIONAL, 40, 0); /// love AS NOUN
- * @example morphology_search('["love", [[3,1], [7,1]], [1,0]]', ADDITIONAL, LIMIT, 0); /// love AS RED, NOT PRESENT
- * @example morphology_search('["", [[3,1], [9,3], [7,5]], [0,0,0]]', ADDITIONAL, 40, 0); /// * AS RED, IMPERATIVE, PERFECT
- * @param $json (string) A stringified JSON array containing the word to be searched for, the morphological attributes to be considered, and whether or not to exclude results matching the morphological attributes.  
- *        Format: '["WORD", [[MORPHOLOGICAL_CLASS, ATTRIBUTE], [...]], [EXCLUDE, ...]]'
- * @param $direction (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
- * @param $limit (integer) The maximum number of verses to return.
- * @param $start_id (integer) (optional) The morphological id whence to start.
- * @return NULL.  Data is sent to the buffer as a JSON array, and then execution ends.
+ * @example	morphology_search('["love", [[4,1]], [1]]', ADDITIONAL, 40, 0); /// love AS NOUN
+ * @example	morphology_search('["love", [[3,1], [7,1]], [1,0]]', ADDITIONAL, LIMIT, 0); /// love AS RED, NOT PRESENT
+ * @example	morphology_search('["", [[3,1], [9,3], [7,5]], [0,0,0]]', ADDITIONAL, 40, 0); /// * AS RED, IMPERATIVE, PERFECT
+ * @param	$json		(string)				A stringified JSON array containing the word to be searched for, the morphological attributes to be considered, and whether or not to exclude results matching the morphological attributes.
+ *												Format: '["WORD", [[MORPHOLOGICAL_CLASS, ATTRIBUTE], [...]], [EXCLUDE, ...]]'
+ * @param	$direction	(integer)				The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
+ * @param	$limit		(integer)				The maximum number of verses to return.
+ * @param	$start_id	(integer) (optional)	The morphological id whence to start.
+ * @return	NULL.  Data is sent to the buffer as a JSON array, and then execution ends.
  * @note Called in search.php.
  */
 function morphology_search($json, $direction, $limit, $start_id = 0)
@@ -86,12 +86,12 @@ function morphology_search($json, $direction, $limit, $start_id = 0)
 /**
  * Set the attributes to filter in Sphinx.
  * 
- * @example set_morphology_attributes(array(array(3, 1), array(7, 1)), array(0, 1), $sphinx); /// Set Sphinx to only find words that are spoken by Jesus and not in the present tense.
- * @param $attribute_arr (array) An array of arrays containing two integers indicating the attribute to filter and the value with which to filter accordingly.
- * @param $exclude_arr (array) An array containing ones and zeros indicating whether to only find words that match the attributes (0) or exclude those words (1).
- * @param $sphinx (class) The Sphinx API class to use to set the filters.
- * @return NULL.  It sets the filters directly in Sphinx.
- * @note Called by morphology_search().
+ * @example	set_morphology_attributes(array(array(3, 1), array(7, 1)), array(0, 1), $sphinx); /// Set Sphinx to only find words that are spoken by Jesus and not in the present tense.
+ * @param	$attribute_arr	(array) An array of arrays containing two integers indicating the attribute to filter and the value with which to filter accordingly.
+ * @param	$exclude_arr	(array) An array containing ones and zeros indicating whether to only find words that match the attributes (0) or exclude those words (1).
+ * @param	$sphinx			(class) The Sphinx API class to use to set the filters.
+ * @return	NULL.  It sets the filters directly in Sphinx.
+ * @note	Called by morphology_search().
  */
 function set_morphology_attributes($attribute_arr, $exclude_arr, $sphinx)
 {

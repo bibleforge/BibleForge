@@ -1,14 +1,16 @@
 #
 # BibleForge
 # 
-# @date 09-01-09
-# @version 0.2 alpha
-# @link http://BibleForge.com
-# @license Reciprocal Public License 1.5 (RPL1.5)
-# @author BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
+# @date		09-01-09
+# @version	0.2 alpha
+# @link		http://BibleForge.com
+# @license	Reciprocal Public License 1.5 (RPL1.5)
+# @author	BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
 #
 
+#
 # Cache
+#
 <IfModule mod_headers.c>
 	Header unset Pragma
 	# Remove ETags
@@ -21,13 +23,15 @@
 	<FilesMatch "\.(ico|jpg|png|gif)$">
 		Header set Cache-Control "public"
 		Header set Expires "Mon, 15 Apr 2030 20:00:00 GMT"
-		# This eliminates If-Modified-Since and If-None-Match requests.
+		# This eliminates If-Modified-Since and If-None-Match requests for speed improvements.
 		Header unset Last-Modified
 	</FilesMatch>
 </IfModule>
 
 
+#
 # Gzip
+#
 #NOTE: Compression should not be used when being used only on the localhost.
 #TODO: The Forge should determine if compression is needed.
 <IfModule mod_deflate.c>
@@ -38,5 +42,8 @@
 AddOutputFilterByType DEFLATE text/html text/plain text/xml text/javascript text/css application/javascript
 
 
+#
+# Redirects
+#
 # Hide the .git directory and .gitignore from the client.
 #RedirectMatch 404 /\\.git

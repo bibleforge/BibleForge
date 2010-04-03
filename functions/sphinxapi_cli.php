@@ -3,56 +3,56 @@
 /**
  * BibleForge
  *
- * @date 09-23-09
- * @version 0.2 alpha
- * @link http://BibleForge.com
- * @license Reciprocal Public License 1.5 (RPL1.5)
- * @author BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
+ * @date	09-23-09
+ * @version	0.2 alpha
+ * @link	http://BibleForge.com
+ * @license	Reciprocal Public License 1.5 (RPL1.5)
+ * @author	BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
  */
 
 /// Match modes
-define('SPH_MATCH_ALL', 0);
-define('SPH_MATCH_ANY', 1);
-define('SPH_MATCH_PHRASE', 2);
-define('SPH_MATCH_BOOLEAN', 3);
-define('SPH_MATCH_EXTENDED', 4);
-define('SPH_MATCH_FULLSCAN', 5);
-define('SPH_MATCH_EXTENDED2', 6); /// Extended engine V2 (TEMPORARY, WILL BE REMOVED)
+define('SPH_MATCH_ALL',			0);
+define('SPH_MATCH_ANY',			1);
+define('SPH_MATCH_PHRASE',		2);
+define('SPH_MATCH_BOOLEAN',		3);
+define('SPH_MATCH_EXTENDED',	4);
+define('SPH_MATCH_FULLSCAN',	5);
+define('SPH_MATCH_EXTENDED2',	6); /// Extended engine V2 (TEMPORARY, WILL BE REMOVED)
 
 /// Ranking modes (ext2 only)
-define('SPH_RANK_PROXIMITY_BM25', 0);	/// Default mode, phrase proximity major factor and BM25 minor one
-define('SPH_RANK_BM25', 1);				/// Statistical mode, BM25 ranking only (faster but worse quality)
-define('SPH_RANK_NONE', 2);				/// No ranking, all matches get a weight of 1
-define('SPH_RANK_WORDCOUNT', 3);		///  Simple word-count weighting, rank is a weighted sum of per-field keyword occurrence counts
+define('SPH_RANK_PROXIMITY_BM25',	0);	/// Default mode, phrase proximity major factor and BM25 minor one
+define('SPH_RANK_BM25',				1);	/// Statistical mode, BM25 ranking only (faster but worse quality)
+define('SPH_RANK_NONE',				2);	/// No ranking, all matches get a weight of 1
+define('SPH_RANK_WORDCOUNT',		3);	/// Simple word-count weighting, rank is a weighted sum of per-field keyword occurrence counts
 
 /// Sort modes
-define('SPH_SORT_RELEVANCE', 0);
-define('SPH_SORT_ATTR_DESC', 1);
-define('SPH_SORT_ATTR_ASC', 2);
-define('SPH_SORT_TIME_SEGMENTS', 3);
-define('SPH_SORT_EXTENDED', 4);
-define('SPH_SORT_EXPR', 5);
+define('SPH_SORT_RELEVANCE',		0);
+define('SPH_SORT_ATTR_DESC',		1);
+define('SPH_SORT_ATTR_ASC',			2);
+define('SPH_SORT_TIME_SEGMENTS',	3);
+define('SPH_SORT_EXTENDED',			4);
+define('SPH_SORT_EXPR',				5);
 
 /// Filter types
-define('SPH_FILTER_VALUES', 0);
-define('SPH_FILTER_RANGE', 1);
-define('SPH_FILTER_FLOATRANGE', 2);
+define('SPH_FILTER_VALUES',		0);
+define('SPH_FILTER_RANGE',		1);
+define('SPH_FILTER_FLOATRANGE',	2);
 
 /// Attribute types
-define('SPH_ATTR_INTEGER', 1);
-define('SPH_ATTR_TIMESTAMP', 2);
-define('SPH_ATTR_ORDINAL', 3);
-define('SPH_ATTR_BOOL', 4);
-define('SPH_ATTR_FLOAT', 5);
-define('SPH_ATTR_MULTI', 0x40000000);
+define('SPH_ATTR_INTEGER',		1);
+define('SPH_ATTR_TIMESTAMP',	2);
+define('SPH_ATTR_ORDINAL',		3);
+define('SPH_ATTR_BOOL',			4);
+define('SPH_ATTR_FLOAT',		5);
+define('SPH_ATTR_MULTI',		0x40000000);
 
 /// Grouping functions
-define('SPH_GROUPBY_DAY', 0);
-define('SPH_GROUPBY_WEEK', 1);
-define('SPH_GROUPBY_MONTH', 2);
-define('SPH_GROUPBY_YEAR', 3);
-define('SPH_GROUPBY_ATTR', 4);
-define('SPH_GROUPBY_ATTRPAIR', 5);
+define('SPH_GROUPBY_DAY',		0);
+define('SPH_GROUPBY_WEEK',		1);
+define('SPH_GROUPBY_MONTH',		2);
+define('SPH_GROUPBY_YEAR',		3);
+define('SPH_GROUPBY_ATTR',		4);
+define('SPH_GROUPBY_ATTRPAIR',	5);
 
 
 /**
@@ -112,28 +112,28 @@ class SphinxClient
 		$this->_config		= "";
 		
 		/// Per-query settings
-		$this->_offset		= 0;
-		$this->_limit		= 20;
-		$this->_mode		= SPH_MATCH_ALL;
-		$this->_weights		= array();
-		$this->_sort		= SPH_SORT_RELEVANCE;
-		$this->_sortby		= "";
-		$this->_min_id		= 0;
-		$this->_max_id		= 0;
-		$this->_filters		= array();
-		$this->_groupby		= "";
-		$this->_groupfunc	= SPH_GROUPBY_DAY;
-		$this->_groupsort	= '@group desc';
-		$this->_groupdistinct= "";
-		$this->_maxmatches	= 1000;
-		$this->_cutoff		= 0;
-		$this->_retrycount	= 0;
-		$this->_retrydelay	= 0;
-		$this->_anchor		= array();
-		$this->_indexweights= array();
-		$this->_ranker		= SPH_RANK_PROXIMITY_BM25;
-		$this->_maxquerytime= 0;
-		$this->_fieldweights= array();
+		$this->_offset			= 0;
+		$this->_limit			= 20;
+		$this->_mode			= SPH_MATCH_ALL;
+		$this->_weights			= array();
+		$this->_sort			= SPH_SORT_RELEVANCE;
+		$this->_sortby			= "";
+		$this->_min_id			= 0;
+		$this->_max_id			= 0;
+		$this->_filters			= array();
+		$this->_groupby			= "";
+		$this->_groupfunc		= SPH_GROUPBY_DAY;
+		$this->_groupsort		= '@group desc';
+		$this->_groupdistinct	= "";
+		$this->_maxmatches		= 1000;
+		$this->_cutoff			= 0;
+		$this->_retrycount		= 0;
+		$this->_retrydelay		= 0;
+		$this->_anchor			= array();
+		$this->_indexweights	= array();
+		$this->_ranker			= SPH_RANK_PROXIMITY_BM25;
+		$this->_maxquerytime	= 0;
+		$this->_fieldweights	= array();
 		
 		/// Per-reply fields (for single-query case)
 		$this->_error		= "";
@@ -148,12 +148,12 @@ class SphinxClient
 	/**
 	 * Set the search path and sphinx config file.
 	 * 
-	 * @example $sphinx->SetServer(SPHINX_SERVER, SPHINX_PORT);
-	 * @example $sphinx->SetServer('search', 'sphinx.conf');
-	 * @param $path (string) The path to the search executable file.  Default is "search."
-	 * @param $config (string) The path to the config file for Sphinx.
-	 * @return NULL.
-	 * @note Called by standard_search() and morphology_search() in search.php.
+	 * @example	$sphinx->SetServer(SPHINX_SERVER, SPHINX_PORT);
+	 * @example	$sphinx->SetServer('search', 'sphinx.conf');
+	 * @param	$path	(string) The path to the search executable file.  Default is "search."
+	 * @param	$config	(string) The path to the config file for Sphinx.
+	 * @return	NULL.
+	 * @note	Called by standard_search() and morphology_search() in search.php.
 	 */
 	function SetServer($path, $config)
 	{
@@ -169,11 +169,11 @@ class SphinxClient
 	 * 
 	 * Only match records if document ID is between $min and $max (inclusive).
 	 * 
-	 * @example $sphinx->SetIDRange($start_id, 0);
-	 * @param $min (integer) The lowest id to be returned.
-	 * @param $max (integer) The highest id to be returned.  If 0 then there is no upper limit.
-	 * @return NULL.
-	 * @note Called by standard_search() and morphology_search() in search.php.
+	 * @example	$sphinx->SetIDRange($start_id, 0);
+	 * @param	$min (integer) The lowest id to be returned.
+	 * @param	$max (integer) The highest id to be returned.  If 0 then there is no upper limit.
+	 * @return	NULL.
+	 * @note	Called by standard_search() and morphology_search() in search.php.
 	 */
 	function SetIDRange($min, $max)
 	{
@@ -185,13 +185,13 @@ class SphinxClient
 	/**
 	 * Set offset and count into result set, and optionally set max-matches and cutoff limits.
 	 * 
-	 * @example $sphinx->SetLimits(0, LIMIT);
-	 * @param $offset (integer) The result to start at.
-	 * @param $limit (integer) The number of results to return.
-	 * @param $max (integer) (optional) The maximum overall number of results to find internally in Sphinx.
-	 * @param $cutoff (integer) (optional) The threshold of results to stop searching after.
-	 * @return NULL.
-	 * @note Called by standard_search() and morphology_search() in search.php.
+	 * @example	$sphinx->SetLimits(0, LIMIT);
+	 * @param	$offset	(integer) 				The result to start at.
+	 * @param	$limit	(integer)				The number of results to return.
+	 * @param	$max	(integer) (optional)	The maximum overall number of results to find internally in Sphinx.
+	 * @param	$cutoff	(integer) (optional)	The threshold of results to stop searching after.
+	 * @return	NULL.
+	 * @note	Called by standard_search() and morphology_search() in search.php.
 	 */
 	function SetLimits($offset, $limit, $max = 0, $cutoff = 0)
 	{
@@ -209,10 +209,10 @@ class SphinxClient
 	/**
 	 * Set the matching mode.
 	 * 
-	 * @example $sphinx->SetMatchMode(SPH_MATCH_EXTENDED);
-	 * @param $mode (integer) The mode to search with.  The default is SPH_MATCH_ALL.
-	 * @return NULL.
-	 * @note Called by standard_search() and morphology_search() in search.php.
+	 * @example	$sphinx->SetMatchMode(SPH_MATCH_EXTENDED);
+	 * @param	$mode (integer) The mode to search with.  The default is SPH_MATCH_ALL.
+	 * @return	NULL.
+	 * @note	Called by standard_search() and morphology_search() in search.php.
 	 */
 	function SetMatchMode($mode)
 	{
@@ -223,11 +223,11 @@ class SphinxClient
 	/**
 	 * Set the sorting mode.
 	 * 
-	 * @example $sphinx->SetSortMode(SPH_SORT_EXTENDED, '@id ASC');
-	 * @param $mode (integer) The search mode to use.  The default is SPH_SORT_RELEVANCE.
-	 * @param $sortby (string) (optional) The search expression to use.
-	 * @return NULL.
-	 * @note Called by standard_search() in search.php.
+	 * @example	$sphinx->SetSortMode(SPH_SORT_EXTENDED, '@id ASC');
+	 * @param	$mode	(integer)			The search mode to use.  The default is SPH_SORT_RELEVANCE.
+	 * @param	$sortby	(string) (optional)	The search expression to use.
+	 * @return	NULL.
+	 * @note	Called by standard_search() in search.php.
 	 */
 	function SetSortMode($mode, $sortby = "")
 	{
@@ -239,10 +239,10 @@ class SphinxClient
 	/**
 	 * Set the ranking mode.
 	 *  
-	 * @example $sphinx->SetRankingMode(SPH_RANK_NONE);
-	 * @param $ranker (integer) The ranking mode to use.  The default is SPH_RANK_PROXIMITY_BM25.
-	 * @return NULL.
-	 * @note Called by standard_search() and morphology_search() in search.php.
+	 * @example	$sphinx->SetRankingMode(SPH_RANK_NONE);
+	 * @param	$ranker (integer) The ranking mode to use.  The default is SPH_RANK_PROXIMITY_BM25.
+	 * @return	NULL.
+	 * @note	Called by standard_search() and morphology_search() in search.php.
 	 */
 	function SetRankingMode($ranker)
 	{
@@ -255,13 +255,13 @@ class SphinxClient
 	 * 
 	 * Only match records where $attribute value is in given set.
 	 * 
-	 * @example $sphinx->SetFilter($attr, array((int)$morphology_arr[1]), (bool)$include_arr[$key]);
-	 * @example $sphinx->SetFilter('tense', array(1), false);  /// This finds words that are in the present tense.
-	 * @param $attribute (string) The attribute to filter.
-	 * @param $values (array) An array of values (integers) to filter the attribute with.
-	 * @param $exclude (boolean) (optional) Whether to find only words that match the values or only words that do not match.
-	 * @return NULL.
-	 * @note Called by set_morphology_attributes() in functions/morphology.php.
+	 * @example	$sphinx->SetFilter($attr, array((int)$morphology_arr[1]), (bool)$include_arr[$key]);
+	 * @example	$sphinx->SetFilter('tense', array(1), false); /// This finds words that are in the present tense.
+	 * @param	$attribute	(string)				The attribute to filter.
+	 * @param	$values		(array)					An array of values (integers) to filter the attribute with.
+	 * @param	$exclude	(boolean) (optional)	Whether to find only words that match the values or only words that do not match.
+	 * @return	NULL.
+	 * @note	Called by set_morphology_attributes() in functions/morphology.php.
 	 */
 	function SetFilter($attribute, $values, $exclude = false)
 	{
@@ -276,13 +276,13 @@ class SphinxClient
 	 * 
 	 * Only match records where $attribute value is in given set.
 	 * 
-	 * @example $sphinx_res = $sphinx->Query($query, 'index');
-	 * @example $sphinx_res = $sphinx->Query('love', 'verse_text');  /// Do a simple search for the word "love."
-	 * @param $query (string) The string to search for.
-	 * @param $index (string) (optional) The index to use.  The default is "*" which searches through all indices.
-	 * @param $comment (string) (optional) Comments are recorded in the query log and are placed in square brackets to be used for debugging purposes.
-	 * @return NULL.
-	 * @note Called by standard_search() and morphology_search() in search.php.
+	 * @example	$sphinx_res = $sphinx->Query($query, 'index');
+	 * @example	$sphinx_res = $sphinx->Query('love', 'verse_text');  /// Do a simple search for the word "love."
+	 * @param	$query		(string)			The string to search for.
+	 * @param	$index		(string) (optional)	The index to use.  The default is "*" which searches through all indices.
+	 * @param	$comment	(string) (optional)	Comments are recorded in the query log and are placed in square brackets to be used for debugging purposes.
+	 * @return	NULL.
+	 * @note	Called by standard_search() and morphology_search() in search.php.
 	 */
 	function Query($query, $index = '*', $comment = "")
 	{

@@ -3,11 +3,11 @@
 /**
  * BibleForge
  *
- * @date 10-30-08
- * @version 0.2 alpha
- * @link http://BibleForge.com
- * @license Reciprocal Public License 1.5 (RPL1.5)
- * @author BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
+ * @date	10-30-08
+ * @version	0.2 alpha
+ * @link	http://BibleForge.com
+ * @license	Reciprocal Public License 1.5 (RPL1.5)
+ * @author	BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
  */
 
 ///NOTE: This is just for compatibilities sake.  Magic Quotes should be turned off and this code should be removed.
@@ -15,10 +15,10 @@ if (get_magic_quotes_gpc()) {
 	/**
 	 * Remove slashes inserted by Magic Quotes.
 	 * 
-	 * @example $_POST = stripslashes_deep($_POST);
-	 * @param $value (array) The array to remove slashes from.
-	 * @return The array with slashes removed.
-	 * @note This is ultimately should be removed and Magic Quotes should be turned off.
+	 * @example	$_POST = stripslashes_deep($_POST);
+	 * @param	$value (array) The array to remove slashes from.
+	 * @return	The array with slashes removed.
+	 * @note	This is ultimately should be removed and Magic Quotes should be turned off.
 	 */
     function stripslashes_deep($value)
     {
@@ -26,10 +26,10 @@ if (get_magic_quotes_gpc()) {
         return $value;
     }
 
-    $_POST = array_map('stripslashes_deep', $_POST);
-    $_GET = array_map('stripslashes_deep', $_GET);
-    $_COOKIE = array_map('stripslashes_deep', $_COOKIE);
-    $_REQUEST = array_map('stripslashes_deep', $_REQUEST);
+    $_POST		= array_map('stripslashes_deep', $_POST);
+    $_GET		= array_map('stripslashes_deep', $_GET);
+    $_COOKIE	= array_map('stripslashes_deep', $_COOKIE);
+    $_REQUEST	= array_map('stripslashes_deep', $_REQUEST);
 }
 
 /// Load constants.
@@ -71,15 +71,15 @@ if (isset($_REQUEST['d'])) {
  * This is the first function to handle searches and verse lookups.
  * It figures out what type of search is being preformed and calls the corresponding functions.
  *
- * @example run_search(1001001, VERSE_LOOKUP, ADDITIONAL); /// Find verses starting with Genesis 1:1.
- * @example run_search(40000100, VERSE_LOOKUP, PREVIOUS); /// Find verses before the book of Matthew.
- * @example run_search("love", STANDARD_SEARCH, ADDITIONAL, 40000101); /// Search for the word "love" starting at Matthew 1:1.
- * @example run_search("God & love", STANDARD_SEARCH, ADDITIONAL); /// Find both words "God" and "love" in the same verse.
- * @example run_search('["love", [[4,1]], [0]]', MORPHOLOGICAL_SEARCH, ADDITIONAL); /// Find the word "love" only when it is used as a noun.
- * @param $query (string) The input to be searched for or a stringified JSON array for advanced searching.
- * @param $type (integer) The type of query: SEARCH || VERSE_LOOKUP.
- * @param $direction (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
- * @param $start_id (integer) (optional) The verse_id whence to start.
+ * @example	run_search(1001001, VERSE_LOOKUP, ADDITIONAL);							/// Find verses starting with Genesis 1:1.
+ * @example	run_search(40000100, VERSE_LOOKUP, PREVIOUS);							/// Find verses before the book of Matthew.
+ * @example	run_search("love", STANDARD_SEARCH, ADDITIONAL, 40000101);				/// Search for the word "love" starting at Matthew 1:1.
+ * @example	run_search("God & love", STANDARD_SEARCH, ADDITIONAL);					/// Find both words "God" and "love" in the same verse.
+ * @example	run_search('["love", [[4,1]], [0]]', MORPHOLOGICAL_SEARCH, ADDITIONAL);	/// Find the word "love" only when it is used as a noun.
+ * @param	$query		(string)				The input to be searched for or a stringified JSON array for advanced searching.
+ * @param	$type		(integer)				The type of query: SEARCH || VERSE_LOOKUP.
+ * @param	$direction	(integer)				The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
+ * @param	$start_id	(integer) (optional)	The verse_id whence to start.
  * @return NULL.  Data is sent to the buffer.  Intended for AJAX requests.
  * @note The script should stop execution before this function ends.
  */

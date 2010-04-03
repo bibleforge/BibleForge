@@ -3,23 +3,23 @@
 /**
  * BibleForge
  *
- * @date 1-30-10
- * @version 0.2 alpha
- * @link http://BibleForge.com
- * @license Reciprocal Public License 1.5 (RPL1.5)
- * @author BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
+ * @date	1-30-10
+ * @version	0.2 alpha
+ * @link	http://BibleForge.com
+ * @license	Reciprocal Public License 1.5 (RPL1.5)
+ * @author	BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
  */
 
 /**
  * Retrieve verses from the MySQL database.
  *
- * @example retrieve_verses(1001001, ADDITIONAL, 40);
- * @example retrieve_verses(40000100, PREVIOUS, LIMIT);
- * @param $verse_id (integer) The verse id from which to begin retrieving.
- * @param $direction (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
- * @param $limit (integer) The maximum number of verses to return.
- * @return NULL.  Data is sent to the buffer as a JSON array, and then execution ends.
- * @note Called by run_search().
+ * @example	retrieve_verses(1001001, ADDITIONAL, 40);
+ * @example	retrieve_verses(40000100, PREVIOUS, LIMIT);
+ * @param	$verse_id	(integer) The verse id from which to begin retrieving.
+ * @param	$direction	(integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
+ * @param	$limit		(integer) The maximum number of verses to return.
+ * @return	NULL.  Data is sent to the buffer as a JSON array, and then execution ends.
+ * @note	Called by run_search().
  */
 function retrieve_verses($verse_id, $direction, $limit)
 {
