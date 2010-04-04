@@ -9,9 +9,17 @@
  */
 
 /// Initialize the JavaScript frontend of BibleForge.
-create_viewport(document.getElementById("viewPort1"), document.getElementById("searchForm1"), document.getElementById("q1"),
-	document.getElementById("scroll1"), document.getElementById("infoBar1"), document.getElementById("topLoader1"),
-	document.getElementById("bottomLoader1"), document, document.documentElement, window);
+create_viewport(
+	document.getElementById("viewPort1"),
+	document.getElementById("searchForm1"),
+	document.getElementById("q1"),
+	document.getElementById("scroll1"),
+	document.getElementById("infoBar1"),
+	document.getElementById("topLoader1"),
+	document.getElementById("bottomLoader1"),
+	document,
+	document.documentElement,
+	window);
 
 /**
  * Create the BibleForge environment.
@@ -42,13 +50,13 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		ADDITIONAL	= 1,
 		PREVIOUS	= 2,
 		
+		highlight_limit				= 20,	/// Currently, we limit the unique number of search words to highlight.
 		highlight_re				= [],	/// Highlighter regex array
+		last_book					= 0,	/// The number of the last book of the Bible that was returned
 		last_search					= "",
 		last_search_encoded			= "",	/// A cache of the last search query
 		last_type,							/// The type of lookup performed last (VERSE_LOOKUP || MIXED_SEARCH || STANDARD_SEARCH || MORPHOLOGICAL_SEARCH)
 		waiting_for_first_search	= false,
-		last_book					= 0,	/// The number of the last book of the Bible that was returned
-		highlight_limit				= 20,	/// Currently, we limit the unique number of search words to highlight.
 		
 		/// Ajax objects
 		ajax_additional	= new win.XMLHttpRequest(),
@@ -56,35 +64,36 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		
 		/// Verse variables
 		/// top_verse and bottom_verse are the last verses displayed on the screen so that the same verse is not displayed twice when more search data is returned (currently just used for MORPHOLOGICAL_SEARCH).
-		top_verse		= 0,
 		bottom_verse	= 0,
+		top_verse		= 0,
+		
 		/// top_id and bottom_id are the last ids (either verse or word id) returned from a search or verse lookup.
 		/// These are the same as bottom_id and top_id for VERSE_LOOKUP and STANDARD_SEARCH since these deal with entire verses as a whole, not individual words.
 		/// For MORPHOLOGICAL_SEARCH, the last word id is stored.
-		top_id,
 		bottom_id,
+		top_id,
 		
 		/// Scrolling variables
-		scroll_pos						= 0,
-		scroll_check_count				= 0,
-		checking_excess_content_top		= false,
-		checking_excess_content_bottom	= false,
-		remove_content_top_interval,
-		remove_content_bottom_interval,
 		buffer_add						= 1000,
 		buffer_rem						= 10000,
-		cached_verses_top				= [],
+		cached_count_bottom				= 0,
 		cached_count_top				= 0,
 		cached_verses_bottom			= [],
-		cached_count_bottom				= 0,
-		scroll_maxed_top				= true,
-		scroll_maxed_bottom				= false,
+		cached_verses_top				= [],
+		checking_excess_content_bottom	= false,
+		checking_excess_content_top		= false,
+		looking_up_verse_range			= false,
+		lookup_delay					= 200,
+		lookup_range_speed				= 300,	/// In milliseconds
 		lookup_speed_scrolling			= 50,
 		lookup_speed_sitting			= 100,
-		lookup_delay					= 200,
+		remove_content_bottom_interval,
+		remove_content_top_interval,
 		remove_speed					= 3000,
-		look_up_range_speed				= 300,	/// In milliseconds
-		looking_up_verse_range			= false;
+		scroll_check_count				= 0,
+		scroll_maxed_bottom				= false,
+		scroll_maxed_top				= true,
+		scroll_pos						= 0;
 		
 	/// Simple Event Registration
 	/// Capture form submit event.
@@ -356,11 +365,11 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		
 		/// Prepare for the new results.
 		if (last_type == VERSE_LOOKUP) {
-			scroll_maxed_top = false;
-			scroll_maxed_bottom = false;
+			scroll_maxed_top	= false;
+			scroll_maxed_bottom	= false;
 		} else {
-			scroll_maxed_top = true;
-			scroll_maxed_bottom = false;
+			scroll_maxed_top	= true;
+			scroll_maxed_bottom	= false;
 			/// We immediately prepare the highlighter so that when the results are returned via Ajax.
 			/// the highlighter array will be ready to go.
 			/// Do we already have the regex array or do we not need because the highlighted words will be returned (e.g., morphological searching)?
@@ -735,7 +744,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		/// If it is not going to already, figure out which verses are presently displayed on the screen.
 		if (!looking_up_verse_range) {
 			looking_up_verse_range = true;
-			setTimeout(find_current_range, look_up_range_speed);
+			setTimeout(find_current_range, lookup_range_speed);
 		}
 	}
 	
@@ -749,9 +758,9 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 */
 	function clean_up_page() {
 		///TODO: This should have smooth scrolling effects, etc.
-		bottomLoader.style.visibility = "hidden";
-		topLoader.style.visibility = "hidden";
-		page.innerHTML = "";
+		bottomLoader.style.visibility	= "hidden";
+		topLoader.style.visibility		= "hidden";
+		page.innerHTML					= "";
 	}
 	
 	
@@ -939,7 +948,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		/*@cc_on
 			win.pageYOffset = doc_docEl.scrollTop;
 		@*/
-		var new_scroll_pos = win.pageYOffset, scrolling_down;
+		var new_scroll_pos = win.pageYOffset,
+			scrolling_down;
 		
 		if (new_scroll_pos == scroll_pos) {
 			/// IE/Opera sometimes don't update page.scrollTop until after this function is run.
@@ -955,7 +965,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		
 		if (!looking_up_verse_range) {
 			looking_up_verse_range = true;
-			setTimeout(find_current_range, look_up_range_speed);
+			setTimeout(find_current_range, lookup_range_speed);
 		}
 		
 		scrolling_down = (new_scroll_pos > scroll_pos);
@@ -996,7 +1006,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 */
 	function remove_excess_content_top()
 	{
-		var child = page.firstChild, child_height;
+		var child = page.firstChild,
+			child_height;
 		
 		if (child == null) return null;
 		
@@ -1045,7 +1056,9 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 */
 	function remove_excess_content_bottom()
 	{
-		var child = page.lastChild, child_position, page_height;
+		var child = page.lastChild,
+			child_position,
+			page_height;
 		
 		if (child == null) return null;
 		
@@ -1084,7 +1097,10 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 */
 	function add_content_bottom()
 	{
-		var child = page.lastChild, child_position, page_height, newEl;
+		var child = page.lastChild,
+			child_position,
+			newEl,
+			page_height;
 		
 		if (child == null) return null;
 		
@@ -1130,7 +1146,10 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 */
 	function add_content_top()
 	{
-		var child = page.firstChild, child_height, child_position, newEl;
+		var child = page.firstChild,
+			child_height,
+			child_position,
+			newEl;
 		
 		if (child == null) return null;
 		
@@ -1174,29 +1193,42 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 * Find the verse that is at the top of the page and at the bottom of the page window and
 	 * display that range on the page and change the page title to indicate the verse range as well.
 	 *
-	 * @example	setTimeout(find_current_range, look_up_range_speed);
+	 * @example	setTimeout(find_current_range, lookup_range_speed);
 	 * @return	NULL.  The page is modified to reflect the verse range.
 	 * @note	Called by scrolling(), resizing(), write_verses(), or itself via setTimeout().
 	 * @note	This function should be called every time the page is resized or scrolled or when visible content is added.
 	 */
 	function find_current_range()
-	{
+	{	
+		///TODO: Determine if there is a better way to calculate the topBar offset.
+		var b1,
+			b2,
+			bottom_pos			= scroll_pos + doc_docEl.clientHeight - 14,
+			bottom_verse_block,
+			c1,
+			c2,
+			new_title,
+			ref_range,
+			top_pos				= scroll_pos + topLoader.offsetHeight + 8,
+			top_verse_block,
+			v1,
+			v2,
+			verse1_el,
+			verse1,
+			verse2_el,
+			verse2;
+		
 		/// Allow for this function to be called again via setTimeout().  See scrolling().
 		looking_up_verse_range = false;
 		
-		///TODO: Determine if there is a better way to calculate the topBar offset.
-		var top_pos = scroll_pos + topLoader.offsetHeight + 8,
-			bottom_pos = scroll_pos + doc_docEl.clientHeight - 14,
-			top_verse_block = find_element_at_scroll_pos(top_pos, page),
-			verse1_el, verse2_el, verse1, v1, c1, b1, verse2, v2, c2, b2,
-			bottom_verse_block, ref_range, new_title;
+		top_verse_block = find_element_at_scroll_pos(top_pos, page);
 		
 		/// Is the top verse block not found?
 		if (top_verse_block === null) {
 			///NOTE: There appears to be no verses displayed on the screen.
 			///      Since they may still be being retrieved, so run this function again a little later.
 			looking_up_verse_range = true;
-			setTimeout(find_current_range, look_up_range_speed);
+			setTimeout(find_current_range, lookup_range_speed);
 			return null;
 		}
 		
@@ -1207,7 +1239,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			///NOTE: There are no verses at the bottom of the screen.
 			///      Since they may still be being retrieved, so run this function again a little later.
 			looking_up_verse_range = true;
-			setTimeout(find_current_range, look_up_range_speed);
+			setTimeout(find_current_range, lookup_range_speed);
 			return null;
 		}
 		
@@ -1220,7 +1252,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			///NOTE: It is possible for some padding to separate the verses.
 			///      This is probably a temporary issue, so run this function again a little later.
 			looking_up_verse_range = true;
-			setTimeout(find_current_range, look_up_range_speed);
+			setTimeout(find_current_range, lookup_range_speed);
 			return null;
 		}
 		
@@ -1300,7 +1332,12 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 */
 	function find_element_at_scroll_pos(the_pos, parent_el, el)
 	{
-		var el_start_at, el_offset_top, el_offset_height, looked_next, looked_previous;
+		var el_offset_height,
+			el_offset_top,
+			el_start_at,
+			looked_next,
+			looked_previous;
+		
 		/// Is the starting element unknown?
 		if (!el) {
 			/// Make an educated guess as to which element to start with to save time.
@@ -1368,7 +1405,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		/// If it is not doing so already, check to see if the range of visible verses has changed.
 		if (!looking_up_verse_range) {
 			looking_up_verse_range = true;
-			setTimeout(find_current_range, look_up_range_speed);
+			setTimeout(find_current_range, lookup_range_speed);
 		}
 	}
 	
