@@ -3,11 +3,11 @@
 /**
  * BibleForge
  *
- * @date 1-30-10
- * @version 0.2 alpha
- * @link http://BibleForge.com
- * @license Reciprocal Public License 1.5 (RPL1.5)
- * @author BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
+ * @date	1-30-10
+ * @version	0.2 alpha
+ * @link	http://BibleForge.com
+ * @license	Reciprocal Public License 1.5 (RPL1.5)
+ * @author	BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
  */
 
 ///TODO: Determine the performance cost of creating functions for the code overlap between the two function (standard_search() and morphology_search()).
@@ -16,14 +16,14 @@
  *
  * This function queries the Sphinx server and retrieves the verses from the MySQL server.
  *
- * @example standard_search("love", ADDITIONAL, 40, 0);
- * @example standard_search("lov*", ADDITIONAL, 10, 0, false);
- * @param $query (string) The query to be searched for.
- * @param $direction (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
- * @param $limit (integer) The maximum number of verses to return.
- * @param $start_id (integer) (optional) The verse_id whence to start.
- * @return NULL.  Data is sent to the buffer as a JSON array, and then execution ends.
- * @note Called in search.php.
+ * @example	standard_search("love", ADDITIONAL, 40, 0);
+ * @example	standard_search("lov*", ADDITIONAL, 10, 0, false);
+ * @param	$query		(string)				The query to be searched for.
+ * @param	$direction	(integer)				The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
+ * @param	$limit		(integer) (optional)	The maximum number of verses to return.
+ * @param	$start_id	(integer) (optional)	The verse_id whence to start.
+ * @return	NULL.  Data is sent to the buffer as a JSON array, and then execution ends.
+ * @note	Called in search.php.
  */
 function standard_search($query, $direction, $limit, $start_id = 0, $output_JSON = true)
 {

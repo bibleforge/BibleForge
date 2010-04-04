@@ -1,11 +1,11 @@
 /**
  * BibleForge
  *
- * @date 10-30-08
- * @version 0.2 alpha
- * @link http://BibleForge.com
- * @license Reciprocal Public License 1.5 (RPL1.5)
- * @author BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
+ * @date	10-30-08
+ * @version	0.2 alpha
+ * @link	http://BibleForge.com
+ * @license	Reciprocal Public License 1.5 (RPL1.5)
+ * @author	BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
  */
 
 /* TODO: Completely document the CSS. */
@@ -197,15 +197,15 @@ h1 {
 }
 
 /* Highlighted found words from searches */
-.f1 {background: #FF6;}
-.f2 {background: #AFF;}
-.f3 {background: #9F9;}
-.f4 {background: #F99;}
-.f5 {background: #F6F;}
-.f6 {background: #800;}
-.f7 {background: #0A0;}
-.f8 {background: #860;}
-.f9 {background: #049;}
+.f1  {background: #FF6;}
+.f2  {background: #AFF;}
+.f3  {background: #9F9;}
+.f4  {background: #F99;}
+.f5  {background: #F6F;}
+.f6  {background: #800;}
+.f7  {background: #0A0;}
+.f8  {background: #860;}
+.f9  {background: #049;}
 .f10 {background: #909;}
 .f11 {background: #EE0;}
 .f12 {background: #0FF;}
