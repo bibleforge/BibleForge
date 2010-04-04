@@ -9,9 +9,9 @@
  */
 
 /// Initialize the JavaScript frontend of BibleForge.
-create_viewport(doc.getElementById("viewPort1"), doc.getElementById("searchForm1"), doc.getElementById("q1"),
-	doc.getElementById("scroll1"), doc.getElementById("infoBar1"), doc.getElementById("topLoader1"),
-	doc.getElementById("bottomLoader1"), document, document.documentElement, window);
+create_viewport(document.getElementById("viewPort1"), document.getElementById("searchForm1"), document.getElementById("q1"),
+	document.getElementById("scroll1"), document.getElementById("infoBar1"), document.getElementById("topLoader1"),
+	document.getElementById("bottomLoader1"), document, document.documentElement, window);
 
 /**
  * Create the BibleForge environment.
@@ -105,11 +105,11 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	q_obj.onkeypress = (function ()
 	{
 		/// Auto Suggest variables
-		var last_suggestion_text = "",
-			suggestion_cache = {},
-			suggest_interval,
-			suggest_delay = 250,
-			ajax_suggestions = new win.XMLHttpRequest();
+		var ajax_suggestions		= new win.XMLHttpRequest(),
+			last_suggestion_text	= "",
+			suggest_cache			= {},
+			suggest_delay			= 250,
+			suggest_interval;
 		
 		/**
 		 * 
@@ -128,10 +128,10 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			
 			/// Check to see if we already have this in the cache.
 			/// Do we need to request the suggestions from the server?
-			if (typeof suggestion_cache[last_suggestion_text] == "undefined") {
+			if (typeof suggest_cache[last_suggestion_text] == "undefined") {
 				post_to_server("suggest.php", "q=" + encodeURIComponent(last_suggestion_text), ajax_suggestions, handle_suggest);
 			} else {
-				show_suggestions(suggestion_cache[last_suggestion_text]);
+				show_suggestions(suggest_cache[last_suggestion_text]);
 			}
 		}
 		
@@ -198,7 +198,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		 */
 		String.prototype.trim = function()
 		{
-			var start = -1, end = this.length;
+			var end		= this.length,
+				start	= -1;
 			while (this.charCodeAt(--end) < 33);
 			while (++start < end && this.charCodeAt(start) < 33);
 			return this.slice(start, end + 1);
@@ -219,7 +220,16 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		String.prototype._$$split = String.prototype._$$split || String.prototype.split;
 		String.prototype.split = function (s, limit)
 		{
-			var flags, s2, output, origLastIndex, lastLastIndex, i, match, lastLength, emptyMatch, j;
+			var flags,
+				emptyMatch,
+				i,
+				j,
+				lastLastIndex,
+				lastLength,
+				match,
+				origLastIndex,
+				output,
+				s2;
 			
 			if (!(s instanceof RegExp)) return String.prototype._$$split.apply(this, arguments);
 			
@@ -296,7 +306,10 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 */
 	function prepare_new_search()
 	{
-		var raw_search_terms = q_obj.value, verse_id, last_search_prepared, search_type_array;
+		var last_search_prepared,
+			raw_search_terms = q_obj.value,
+			search_type_array,
+			verse_id;
 		
 		waiting_for_first_search = true;
 		
@@ -389,7 +402,13 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 */
 	function determine_search_type(search_terms)
 	{
-		var split_pos, morph_json, morph_attribute_json, morph_attributes, split_start, morph_search_term;
+		var morph_attribute_json,
+			morph_attributes,
+			morph_json,
+			morph_search_term,
+			split_start,
+			split_pos;
+		
 		/// Did the user use the morphological keyword in his search?
 		if ((split_pos = search_terms.indexOf(lang.morph_marker)) != -1) {
 			///TODO: Determine what is better: a JSON array or POST/GET string (i.e., word1=word&grammar_type1=1&value1=3&include1=1&...).
@@ -458,7 +477,9 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	function run_search(direction)
 	{
 		/// last_type set in prepare_new_search().
-		var ajax, query = "t=" + last_type;
+		var ajax,
+			query = "t=" + last_type;
+		
 		if (direction == ADDITIONAL) {
 			ajax = ajax_additional;
 		} else {
@@ -506,7 +527,12 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	function handle_new_verses(res)
 	{
 		///TODO: On a verse lookup that does not start with Genesis 1:1, scroll_maxed_top must be set to FALSE. (Has this been taken care of?)
-		var total = res[3], action = res[0][0], direction = res[0][1], i, count, b_tag;
+		var action		= res[0][0],
+			b_tag,
+			count,
+			direction	= res[0][1],
+			i,
+			total		= res[3];
 		
 		if (total > 0) {
 			///FIXME: When looking up the last few verses of Revelation (i.e., Revelation 22:21), the page jumps when more content is loaded above.
@@ -605,11 +631,17 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	{
 		///NOTE: psalm_title_re determines if a psalm does not have a title.
 		///TODO: Determine if psalm_title_re should be global for performance reasons or otherwise.
-		var i, num, b, c, v, newEl,
-			HTML_str = "", chapter_text = "",
-			///TODO: Determine if this should be a global variable.
-			psalm_title_re = /^(?:1(?:0[4-7]?|1[1-9]|3[5-7]|4[6-9]|50)?|2|33|43|71|9[13-79])$/,
-			start_key = 0, stop_key = verse_ids.length;
+		var b,
+			c,
+			chapter_text	= "",
+			i,
+			HTML_str		= "",
+			newEl,
+			num,
+			psalm_title_re	= /^(?:1(?:0[4-7]?|1[1-9]|3[5-7]|4[6-9]|50)?|2|33|43|71|9[13-79])$/, ///TODO: Determine if this should be a global variable.
+			start_key		= 0,
+			stop_key		= verse_ids.length,
+			v;
 		
 		/// Currently only MORPHOLOGICAL_SEARCH searches data at the word level, so it is the only action that might stop in the middle of a verse and find more words in the same verse as the user scrolls.
 		if (action == MORPHOLOGICAL_SEARCH) {
@@ -623,15 +655,12 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		}
 		
 		for (i = start_key; i < stop_key; ++i) {
-			num = verse_ids[i];
-			/// Calculate the verse.
-			v = num % 1000;
-			/// Calculate the chapter.
-			c = ((num - v) % 1000000) / 1000;
-			/// Calculate the book by number (e.g., Genesis == 1).
-			b = (num - v - c * 1000) / 1000000;
-			///TODO: Determine if it would be better to have two for loops instead of the if statement inside of this one.
+			num	= verse_ids[i];
+			v	= num % 1000;						/// Calculate the verse.
+			c	= ((num - v) % 1000000) / 1000;		/// Calculate the chapter.
+			b	= (num - v - c * 1000) / 1000000;	/// Calculate the book by number (e.g., Genesis == 1).
 			
+			///TODO: Determine if it would be better to have two for loops instead of the if statement inside of this one.
 			if (action == VERSE_LOOKUP) {
 				/// Is this the first verse or the Psalm title?
 				if (v < 2) {

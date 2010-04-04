@@ -38,7 +38,7 @@ var lang = (function ()
 
 		/// Miscelaneous Text
 		chapter:		"Chapter",
-		found_plural	" verses found for ",
+		found_plural:	" verses found for ",
 		found_singular:	" verse found for ",
 		app_name:		"BibleForge",
 		psalm:			"Psalm",
