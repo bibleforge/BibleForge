@@ -106,6 +106,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	/*********************************
 	 * Start of Suggestion functions *
 	 *********************************/
+	
 	/// Create suggest and attach it to the keypress event.
 	///TODO: Determine if using closure here is helpful.
 	/**
@@ -190,6 +191,9 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		};
 	}());
 	
+	/*******************************
+	 * End of Suggestion functions *
+	 *******************************/
 	
 	/// Disable autocomplete for Javascript enabled browsers because they can use the auto suggestions.
 	q_obj.setAttribute("autocomplete", "off");
@@ -226,8 +230,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 */
 	///NOTE: The following conditional compilation code blocks only executes in IE.
 	/*@cc_on
-		String.prototype._$$split = String.prototype._$$split || String.prototype.split;
-		String.prototype.split = function (s, limit)
+		String.prototype._$$split	= String.prototype._$$split || String.prototype.split;
+		String.prototype.split		= function (s, limit)
 		{
 			var flags,
 				emptyMatch,
@@ -242,11 +246,11 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			
 			if (!(s instanceof RegExp)) return String.prototype._$$split.apply(this, arguments);
 			
-			flags = (s.global ? "g" : "") + (s.ignoreCase ? "i" : "") + (s.multiline ? "m" : "");
-			s2 = new RegExp("^" + s.source + "$", flags);
-			output = [];
-			origLastIndex = s.lastIndex;
-			lastLastIndex = 0;
+			flags			= (s.global ? "g" : "") + (s.ignoreCase ? "i" : "") + (s.multiline ? "m" : "");
+			s2				= new RegExp("^" + s.source + "$", flags);
+			output			= [];
+			origLastIndex	= s.lastIndex;
+			lastLastIndex	= 0;
 			i = 0;
 			
 			if (limit === undefined || +limit < 0) {
@@ -267,9 +271,9 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 				}
 				if (s.lastIndex > lastLastIndex) {
 					if (match.length > 1) {
-						match[0].replace(s2, function()
+						match[0].replace(s2, function ()
 						{
-							for (j = 1; j < arguments.length - 2; j++) {
+							for (j = 1; j < arguments.length - 2; ++j) {
 								if (arguments[j] === undefined) {
 									match[j] = undefined;
 								}
@@ -281,19 +285,19 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 					if (1 < match.length && match.index < this.length) {
 						output = output.concat(match.slice(1));
 					}
-					lastLength = match[0].length;
-					lastLastIndex = s.lastIndex;
+					lastLength		= match[0].length;
+					lastLastIndex	= s.lastIndex;
 				}
 				if (emptyMatch) ++s.lastIndex;
 			}
 			output = lastLastIndex === this.length ? (s.test("") && !lastLength ? output : output.concat("")) : (limit ? output : output.concat(this.slice(lastLastIndex)));
-			s.lastIndex = origLastIndex;
+			s.lastIndex = origLastIndex; /// TODO: Determine if this line of code is necessary.
 			return output;
 		};
 		
 		
 		/// Trick IE into understanding win.pageYOffset.
-		/// The initial value so that it is not undefined.
+		/// Set the initial value, so that it is not undefined.
 		/// See scrolling().
 		win.pageYOffset = doc_docEl.scrollTop;
 	@*/
@@ -712,7 +716,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		newEl = doc.createElement("div");
 		///NOTE: If innerHTML disappears in the future (because it is not (yet) in the "standards"),
 		///      a simple (but slow) alternative is to use the innerDOM script from http://innerdom.sourceforge.net/ or BetterInnerHTML from http://www.optimalworks.net/resources/betterinnerhtml/.
-		///      Also using "var range = doc.createRange();var newEl = range.createContextualFragment(HTML_str); is also a possibility.
+		///      Also using "range = doc.createRange(); newEl = range.createContextualFragment(HTML_str); is also a possibility.
 		newEl.innerHTML = HTML_str;
 		
 		if (direction == ADDITIONAL) {
@@ -832,32 +836,23 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			///FIXME: Move this to the language specific file because it is language dependent.
 			/// Fix special/unique words that the stemmer won't stem correctly.
 			switch (term) {
-			case "does":
-			case "doth":
-			case "do":
-			case "doeth":
-			case "doest":
+			case "does": case "doth": case "do": case "doeth": case "doest":
 				stemmed_word = "do[esth]*";
 				no_morph = true;
 				break;
-			case "haste":
-			case "hasted":
+			case "haste": case "hasted":
 				stemmed_word = "haste";
 				no_morph = false;
 				break;
-			case "shalt":
-			case "shall":
+			case "shalt": case "shall":
 				stemmed_word = "shal[lt]";
 				no_morph = true;
 				break;
-			case "wilt":
-			case "will":
+			case "wilt": case "will":
 				stemmed_word = "wil[lt]";
 				no_morph = true;
 				break;
-			case "have":
-			case "hast":
-			case "hath":
+			case "have": case "hast": case "hath":
 				stemmed_word = "ha[vesth]+";
 				no_morph = true;
 				break;
