@@ -41,8 +41,8 @@ create_viewport(
 function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, bottomLoader, doc, doc_docEl, win)
 {
 	///NOTE: This should be "const" instead of "var," but IE doesn't support constants yet.
-	var VERSE_LOOKUP 			= 1,
-		MIXED_SEARCH 			= 2,
+	var VERSE_LOOKUP			= 1,
+		MIXED_SEARCH			= 2,
 		STANDARD_SEARCH			= 3,
 		MORPHOLOGICAL_SEARCH	= 4,
 		
@@ -104,7 +104,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	win.onresize = resizing;
 	
 	/*********************************
- 	 * Start of Suggestion functions *
+	 * Start of Suggestion functions *
 	 *********************************/
 	/// Create suggest and attach it to the keypress event.
 	///TODO: Determine if using closure here is helpful.
@@ -205,12 +205,12 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		 * @return	A String with leading and trailing spaces removed.
 		 * @note	This does not remove all types of whitespace.  It actually removes anything under character code 33.
 		 */
-		String.prototype.trim = function()
+		String.prototype.trim = function ()
 		{
 			var end		= this.length,
 				start	= -1;
-			while (this.charCodeAt(--end) < 33);
-			while (++start < end && this.charCodeAt(start) < 33);
+			while (this.charCodeAt(--end) < 33) {}
+			while (++start < end && this.charCodeAt(start) < 33) {}
 			return this.slice(start, end + 1);
 		};
 	}
@@ -324,7 +324,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		
 		last_search_prepared = lang.prepare_search(raw_search_terms);
 		
-		if (last_search_prepared.length == 0) return false;
+		if (last_search_prepared.length === 0) return false;
 		
 		/// Stop any old requests since we have a new one.
 		/// Is readyState > 0 and < 4?  (Anything 1-3 needs to be aborted.)
@@ -386,9 +386,9 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		/// Clear cache.
 		///TODO: Determine a way to store the cache in a way that it can be used later.
 		cached_verses_top		= [];
-		cached_count_top 		= 0;
+		cached_count_top		= 0;
 		cached_verses_bottom	= [];
-		cached_count_bottom 	= 0;
+		cached_count_bottom		= 0;
 		
 		doc.title = raw_search_terms + " - " + lang.app_name;
 		return false;
@@ -411,9 +411,10 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 */
 	function determine_search_type(search_terms)
 	{
-		var morph_attribute_json,
+		var exclude_json			= "",	/// Used to concatenate data. TODO: Make description better.
+			morph_attribute_json	= "",	/// Used to concatenate data. TODO: Make description better.
 			morph_attributes,
-			morph_json,
+			morph_json				= "",	/// Used to concatenate data. TODO: Make description better.
 			morph_search_term,
 			split_start,
 			split_pos;
@@ -429,13 +430,10 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			/// Is the user trying to find all words that match the morphological attributes?
 			if (morph_search_term == "*") {
 				/// Sphinx will find all words if no query is present, so we need to send a blank search request.
-				morph_search_term = ""
+				morph_search_term = "";
 			}
 			
 			morph_json = '["' + morph_search_term.replace(/(["'])/g, "\\$1") + '",[';
-			
-			/// These strings will be used to concatenate data.
-			morph_attribute_json = "", exclude_json = "";
 			
 			morph_attributes = search_terms.slice(split_pos + lang.morph_marker_len);
 			
@@ -447,7 +445,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 				/// Find where the attributes separate (e.g., "NOUN, GENITIVE" would separate at character 4).
 				split_pos = morph_attributes.indexOf(lang.morph_separator, split_start);
 				/// Trim leading white space.
-				if (morph_attributes.slice(split_start, split_start + 1) == " ") ++split_start;
+				if (morph_attributes.slice(split_start, split_start + 1) === " ") ++split_start;
 				/// Is this morphological feature to be excluded?
 				if (morph_attributes.slice(split_start, split_start + 1) == "-") {
 					/// Skip the hyphen so that we just get the grammatical word (e.g., "love AS -NOUN" we just want "NOUN").
@@ -676,7 +674,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 					/// Is this chapter 1?  (We need to know if we should display the book name.)
 					if (c == 1) {
 						HTML_str += "<div class=book id=" + num + "_title>" + lang.books_long_pretitle[b] + "<h1>" + lang.books_long_main[b] + "</h1>" + lang.books_long_posttitle[b] + "</div>";
-					} else if (b != 19 || v == 0 || psalm_title_re.test(c)) { /// Display chapter/psalm number (but not on verse 1 of psalms that have titles).
+					} else if (b != 19 || v === 0 || psalm_title_re.test(c)) { /// Display chapter/psalm number (but not on verse 1 of psalms that have titles).
 						/// Is this the book of Psalms?  (Psalms have a special name.)
 						if (b == 19) {
 							chapter_text = lang.psalm;
@@ -686,7 +684,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 						HTML_str += "<h3 class=chapter id=" + num + "_chapter>" + chapter_text + " " + c + "</h3>";
 					}
 					/// Is this a Psalm title (i.e., verse 0)?  (Psalm titles are displayed specially.)
-					if (v == 0) {
+					if (v === 0) {
 						HTML_str += "<div class=pslam_title id=" + num + "_verse>" + verse_HTML[i] + "</div>";
 					} else {
 						HTML_str += "<div class=first_verse id=" + num + "_verse>" + verse_HTML[i] + "</div>";
@@ -698,7 +696,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			/// Searching
 			} else {
 				/// Change verse 0 to "title" (i.e., Psalm titles).  (Display Psalm 3:title instead of Psalm 3:0.)
-				if (v == 0) v = lang.title;
+				if (v === 0) v = lang.title;
 				
 				/// Is this verse from a different book than the last verse?
 				if (b != last_book) {
@@ -778,7 +776,11 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 */
 	function highlight_search_results(search_str)
 	{
-		var tmp_found_ids = [], count = 1, regex_id, regex_length = highlight_re.length, i, ids;
+		var i,
+			ids,
+			regex_id,
+			regex_length = highlight_re.length,
+			tmp_found_ids = [];
 		
 		for (regex_id = 0; regex_id < regex_length; ++regex_id) {
 			tmp_found_ids = search_str.split(highlight_re[regex_id]);
@@ -820,8 +822,9 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		
 		highlight_re = [];
 		
-		search_terms_arr = lang.filter_terms_for_highlighter(search_terms)
+		search_terms_arr = lang.filter_terms_for_highlighter(search_terms);
 		
+		///TODO: Determine if a normal for loop would be better.
 		first_loop:for (i in search_terms_arr) {
 			term = search_terms_arr[i];
 			len_before = term.length;
@@ -829,23 +832,32 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			///FIXME: Move this to the language specific file because it is language dependent.
 			/// Fix special/unique words that the stemmer won't stem correctly.
 			switch (term) {
-			case "does": case "doth": case "do": case "doeth": case "doest":
+			case "does":
+			case "doth":
+			case "do":
+			case "doeth":
+			case "doest":
 				stemmed_word = "do[esth]*";
 				no_morph = true;
 				break;
-			case "haste": case "hasted":
+			case "haste":
+			case "hasted":
 				stemmed_word = "haste";
 				no_morph = false;
 				break;
-			case "shalt": case "shall":
+			case "shalt":
+			case "shall":
 				stemmed_word = "shal[lt]";
 				no_morph = true;
 				break;
-			case "wilt": case "will":
+			case "wilt":
+			case "will":
 				stemmed_word = "wil[lt]";
 				no_morph = true;
 				break;
-			case "have": case "hast": case "hath":
+			case "have":
+			case "hast":
+			case "hath":
 				stemmed_word = "ha[vesth]+";
 				no_morph = true;
 				break;
@@ -1009,7 +1021,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		var child = page.firstChild,
 			child_height;
 		
-		if (child == null) return null;
+		if (child === null) return null;
 		
 		///NOTE: Mozilla ignores .clientHeight, .offsetHeight, .scrollHeight for some objects (not <div> however) with a doctype.
 		///      If Mozilla has problems in the future, you can use this as a replacement:
@@ -1060,7 +1072,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			child_position,
 			page_height;
 		
-		if (child == null) return null;
+		if (child === null) return null;
 		
 		child_position = child.offsetTop;
 		page_height = doc_docEl.clientHeight;
@@ -1102,7 +1114,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			newEl,
 			page_height;
 		
-		if (child == null) return null;
+		if (child === null) return null;
 		
 		child_position = child_position = child.offsetTop + child.clientHeight;
 		page_height = page_height = doc_docEl.clientHeight;
@@ -1151,7 +1163,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			child_position,
 			newEl;
 		
-		if (child == null) return null;
+		if (child === null) return null;
 		
 		child_height = child.clientHeight;
 		
@@ -1267,8 +1279,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		b2 = (verse2 - v2 - c2 * 1000) / 1000000;
 		
 		/// The titles in the book of Psalms are referenced as verse zero (cf. Psalm 3).
-		v1 = v1 == 0 ? lang.title : v1;
-		v2 = v2 == 0 ? lang.title : v2;
+		v1 = v1 === 0 ? lang.title : v1;
+		v2 = v2 === 0 ? lang.title : v2;
 		
 		///NOTE: \u2013 is Unicode for the en dash (–) (HTML: &ndash;).
 		///TODO: Determine if the colons should be language specified.
@@ -1366,11 +1378,11 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			} else {
 				/// Is the position in question lower?
 				if (the_pos > el_offset_top) {
-					 el = el.nextSibling;
-					 looked_next = true;
+					el = el.nextSibling;
+					looked_next = true;
 				} else {
-					 el = el.previousSibling;
-					 looked_previous = true
+					el = el.previousSibling;
+					looked_previous = true;
 				}
 				/// Is it stuck in an infinite loop?  (If so, then give up.)
 				if (looked_next && looked_previous) return null;
@@ -1440,7 +1452,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 					handler(eval(ajax.responseText));
 				} else {
 					/// Was the abort unintentional?
-					if (ajax.status != 0) {
+					if (ajax.status !== 0) {
 						///FIXME: Do meaningful error handling.
 						alert("Error " + ajax.status + ":\n" + ajax.responseText);
 					}
