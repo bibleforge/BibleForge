@@ -286,13 +286,13 @@ class SphinxClient
 	 */
 	function Query($query, $index = '*', $comment = "")
 	{
-		$extra_regex = "";
-		$error_message = "";
+		$extra_regex	= "";
+		$error_message	= "";
 		
 		///FIXME: The options should be applied when the corresponding functions are called, not when Query() is called.
-		$options = ' -q';
-		$options .= ' -l ' . $this->_limit;
-		$options .= ' -s "@id ASC"';
+		$options =	' -q';
+		$options .=	' -l ' . $this->_limit;
+		$options .=	' -s "@id ASC"';
 		
 		if (isset($this->_filters) && is_array($this->_filters)) {
 			foreach ($this->_filters as $values) {
@@ -320,8 +320,8 @@ class SphinxClient
 			///      where the id of the verse or word must be between the ids (if both are given).
 			///      Then we can filter out verses not in this range by looking for the value of the @expr attribute.
 			///      If it has a value of 1 (@expr=1), then it is within the range.  A value of 0 (@expr=0) is outside of the range. 
-			$sortexpr = ' -S "';
-			$sort_attribute = '@id';
+			$sortexpr		= ' -S "';
+			$sort_attribute	= '@id';
 			
 			if ($this->_min_id > 0) {
 				$sortexpr .= $sort_attribute . ' >= ' . $this->_min_id;
@@ -377,9 +377,9 @@ class SphinxClient
 			foreach($matches as $value) {
 				/// Since the results are comma delineated, we can use json_decode() to parse them as if they were a JSON object.
 				/// Curly brakets ({}) are added to make the results look like a JSON object.
-				$tmp_arr = json_decode('{' . $value . '}', true);
-				$doc = $tmp_arr['document'];
-				$mathces_attrs[$doc]['weight'] = $tmp_arr['weight'];
+				$tmp_arr						= json_decode('{' . $value . '}', true);
+				$doc							= $tmp_arr['document'];
+				$mathces_attrs[$doc]['weight']	= $tmp_arr['weight'];
 				
 				/// Removing the "document" and "weight" keys will leave just the attributes from the search results.
 				unset($tmp_arr['document']);
@@ -388,9 +388,9 @@ class SphinxClient
 			}
 		} else {
 			/// Make sure to indicate that no valid results were found (i.e., valid results must match the sort expression).
-			$stats[1] = 0;
-			$stats[2] = 0;
-			$mathces_attrs = "";
+			$stats[1]		= 0;
+			$stats[2]		= 0;
+			$mathces_attrs	= "";
 			
 			/// If there was an error, all of the stats need to be set manually to blank, so they can be returned.
 			if (!isset($stats[3])) $stats[3] = "";

@@ -44,7 +44,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	var VERSE_LOOKUP			= 1,
 		MIXED_SEARCH			= 2,
 		STANDARD_SEARCH			= 3,
-		MORPHOLOGICAL_SEARCH	= 4,
+		GRAMMATICAL_SEARCH		= 4,
 		
 		/// Direction constants
 		ADDITIONAL	= 1,
@@ -55,7 +55,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		last_book					= 0,	/// The number of the last book of the Bible that was returned
 		last_search					= "",
 		last_search_encoded			= "",	/// A cache of the last search query
-		last_type,							/// The type of lookup performed last (VERSE_LOOKUP || MIXED_SEARCH || STANDARD_SEARCH || MORPHOLOGICAL_SEARCH)
+		last_type,							/// The type of lookup performed last (VERSE_LOOKUP || MIXED_SEARCH || STANDARD_SEARCH || GRAMMATICAL_SEARCH)
 		waiting_for_first_search	= false,
 		
 		/// Ajax objects
@@ -63,13 +63,13 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		ajax_previous	= new win.XMLHttpRequest(),
 		
 		/// Verse variables
-		/// top_verse and bottom_verse are the last verses displayed on the screen so that the same verse is not displayed twice when more search data is returned (currently just used for MORPHOLOGICAL_SEARCH).
+		/// top_verse and bottom_verse are the last verses displayed on the screen so that the same verse is not displayed twice when more search data is returned (currently just used for GRAMMATICAL_SEARCH).
 		bottom_verse	= 0,
 		top_verse		= 0,
 		
 		/// top_id and bottom_id are the last ids (either verse or word id) returned from a search or verse lookup.
 		/// These are the same as bottom_id and top_id for VERSE_LOOKUP and STANDARD_SEARCH since these deal with entire verses as a whole, not individual words.
-		/// For MORPHOLOGICAL_SEARCH, the last word id is stored.
+		/// For GRAMMATICAL_SEARCH, the last word id is stored.
 		bottom_id,
 		top_id,
 		
@@ -320,7 +320,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	function prepare_new_search()
 	{
 		var last_search_prepared,
-			raw_search_terms = q_obj.value,
+			raw_search_terms		= q_obj.value,
 			search_type_array,
 			verse_id;
 		
@@ -351,14 +351,14 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			
 		/// The user is submitting a search request.
 		} else {
-			/// The type of search must be determined (i.e., MIXED_SEARCH or STANDARD_SEARCH or MORPHOLOGICAL_SEARCH).
+			/// The type of search must be determined (i.e., MIXED_SEARCH or STANDARD_SEARCH or GRAMMATICAL_SEARCH).
 			search_type_array = determine_search_type(last_search_prepared);
 			
 			/// The type of search is stored in the first index of the array.
 			last_type = search_type_array[0];
 			
-			if (last_type == MORPHOLOGICAL_SEARCH) {
-				/// MORPHOLOGICAL_SEARCH uses a JSON array which is stored as text in the second index of the array.
+			if (last_type == GRAMMATICAL_SEARCH) {
+				/// GRAMMATICAL_SEARCH uses a JSON array which is stored as text in the second index of the array.
 				last_search_prepared = search_type_array[1];
 			}
 			last_search_encoded = encodeURIComponent(last_search_prepared);
@@ -376,7 +376,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			scroll_maxed_bottom	= false;
 			/// We immediately prepare the highlighter so that when the results are returned via Ajax.
 			/// the highlighter array will be ready to go.
-			/// Do we already have the regex array or do we not need because the highlighted words will be returned (e.g., morphological searching)?
+			/// Do we already have the regex array or do we not need because the highlighted words will be returned (e.g., grammatical searching)?
 			if (raw_search_terms != last_search) {
 				prepare_highlighter(last_search_prepared);
 				/// This global variable is used to display the last search on the info bar.
@@ -403,11 +403,11 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 * Figure out what type of search is being attempted by the user.
 	 *
 	 * @example	determine_search_type("God & love");							/// Returns [STANDARD_SEARCH]
-	 * @example	determine_search_type("love AS NOUN");							/// Returns [MORPHOLOGICAL_SEARCH,'["love",[[1,1]],[1]]']
-	 * @example	determine_search_type("go AS IMPERATIVE, -SINGULAR");			/// Returns [MORPHOLOGICAL_SEARCH,'["go",[[9,3],[5,1]],[0,1]]']
-	 * @example	determine_search_type("go* AS PASSIVE, -PERFECT,INDICATIVE");	/// Returns [MORPHOLOGICAL_SEARCH,'["go*",[[8,3],[7,5],[9,1]],[0,1,0]]']
-	 * @example	determine_search_type("* AS RED, IMPERATIVE");					/// Returns [MORPHOLOGICAL_SEARCH,'["",[[3,1],[9,3]],[0,0]]']
-	 * //@example determine_search_type("love AS NOUN & more | less -good AS ADJECTIVE"); /// Returns [MORPHOLOGICAL_SEARCH, [0, "love", "NOUN"], STANDARD_SEARCH, "& more | less -good", MORPHOLOGICAL_SEARCH, [0, "good", "ADJECTIVE"]]
+	 * @example	determine_search_type("love AS NOUN");							/// Returns [GRAMMATICAL_SEARCH,'["love",[[1,1]],[1]]']
+	 * @example	determine_search_type("go AS IMPERATIVE, -SINGULAR");			/// Returns [GRAMMATICAL_SEARCH,'["go",[[9,3],[5,1]],[0,1]]']
+	 * @example	determine_search_type("go* AS PASSIVE, -PERFECT,INDICATIVE");	/// Returns [GRAMMATICAL_SEARCH,'["go*",[[8,3],[7,5],[9,1]],[0,1,0]]']
+	 * @example	determine_search_type("* AS RED, IMPERATIVE");					/// Returns [GRAMMATICAL_SEARCH,'["",[[3,1],[9,3]],[0,0]]']
+	 * //@example determine_search_type("love AS NOUN & more | less -good AS ADJECTIVE"); /// Returns [GRAMMATICAL_SEARCH, [0, "love", "NOUN"], STANDARD_SEARCH, "& more | less -good", GRAMMATICAL_SEARCH, [0, "good", "ADJECTIVE"]]
 	 * @param	search_terms (string) The prepared terms to be examined.
 	 * @return	An array describing the type of search.  Format: [(int)Type of search, (optional)(string)JSON array describing the search].
 	 * @note	Called by run_search().
@@ -416,42 +416,40 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	function determine_search_type(search_terms)
 	{
 		var exclude_json			= "",	/// Used to concatenate data. TODO: Make description better.
-			morph_attribute_json	= "",	/// Used to concatenate data. TODO: Make description better.
-			morph_attributes,
-			morph_json				= "",	/// Used to concatenate data. TODO: Make description better.
-			morph_search_term,
+			grammar_attribute_json	= "",	/// Used to concatenate data. TODO: Make description better.
+			grammar_attributes,
+			grammar_json			= "",	/// Used to concatenate data. TODO: Make description better.
+			grammar_search_term,
 			split_start,
 			split_pos;
 		
-		/// Did the user use the morphological keyword in his search?
-		if ((split_pos = search_terms.indexOf(lang.morph_marker)) != -1) {
+		/// Did the user use the grammatical keyword in his search?
+		if ((split_pos = search_terms.indexOf(lang.grammar_marker)) != -1) {
 			///TODO: Determine what is better: a JSON array or POST/GET string (i.e., word1=word&grammar_type1=1&value1=3&include1=1&...).
 			/// A JSON array is used to contain the information about the search.
 			/// JSON format: '["WORD",[[GRAMMAR_TYPE1,VALUE1],[...]],[INCLUDE1,...]]'
 			/// replace(/(["'])/g, "\\$1") adds slashes to sanitize the data.
-			morph_search_term = search_terms.slice(0, split_pos);
+			grammar_search_term = search_terms.slice(0, split_pos);
 			
-			/// Is the user trying to find all words that match the morphological attributes?
-			if (morph_search_term == "*") {
+			/// Is the user trying to find all words that match the grammatical attributes?
+			if (grammar_search_term == "*") {
 				/// Sphinx will find all words if no query is present, so we need to send a blank search request.
-				morph_search_term = "";
+				grammar_search_term = "";
 			}
 			
-			morph_json = '["' + morph_search_term.replace(/(["'])/g, "\\$1") + '",[';
-			
-			morph_attributes = search_terms.slice(split_pos + lang.morph_marker_len);
-			
-			split_start = 0;
+			grammar_json		= '["' + grammar_search_term.replace(/(["'])/g, "\\$1") + '",[';
+			grammar_attributes	= search_terms.slice(split_pos + lang.grammar_marker_len);
+			split_start			= 0;
 			
 			///TODO: Determine if there is a benefit to using do() over while().
 			///NOTE: An infinite loop is used because the data is returned when it reaches the end of the string.
 			do {
 				/// Find where the attributes separate (e.g., "NOUN, GENITIVE" would separate at character 4).
-				split_pos = morph_attributes.indexOf(lang.morph_separator, split_start);
+				split_pos = grammar_attributes.indexOf(lang.grammar_separator, split_start);
 				/// Trim leading white space.
-				if (morph_attributes.slice(split_start, split_start + 1) === " ") ++split_start;
-				/// Is this morphological feature to be excluded?
-				if (morph_attributes.slice(split_start, split_start + 1) == "-") {
+				if (grammar_attributes.slice(split_start, split_start + 1) === " ") ++split_start;
+				/// Is this grammatical feature to be excluded?
+				if (grammar_attributes.slice(split_start, split_start + 1) == "-") {
 					/// Skip the hyphen so that we just get the grammatical word (e.g., "love AS -NOUN" we just want "NOUN").
 					++split_start;
 					exclude_json += "1,";
@@ -460,12 +458,12 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 				}
 				
 				if (split_pos > -1) {
-					morph_attribute_json += lang.morph_grammar[morph_attributes.slice(split_start, split_pos).trim()] + ",";
+					grammar_attribute_json += lang.grammar_keywords[grammar_attributes.slice(split_start, split_pos).trim()] + ",";
 					split_start = split_pos + 1;
 				} else {
 					///TODO: Determine if trim() is necessary or if there is a better implementation.
 					///NOTE: exclude_json.slice(0, -1) is used to remove the trailing comma.  This could be unnecessary.
-					return [MORPHOLOGICAL_SEARCH, morph_json + morph_attribute_json + lang.morph_grammar[morph_attributes.slice(split_start).trim()] + "],[" + exclude_json.slice(0, -1) + "]]"];
+					return [GRAMMATICAL_SEARCH, grammar_json + grammar_attribute_json + lang.grammar_keywords[grammar_attributes.slice(split_start).trim()] + "],[" + exclude_json.slice(0, -1) + "]]"];
 				}
 			} while (true);
 		}
@@ -530,7 +528,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 *
 	 * @example	prepare_verses([[VERSE_LOOKUP, PREVIOUS], [1001001, 1001002], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>", "<b id="12">And</b> <b id="13">the</b> <b id="14">earth....</b>"], 2]);
 	 * @example	prepare_verses([[STANDARD_SEARCH, ADDITIONAL], [1001001], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>"], 1]);
-	 * @example	prepare_verses([[MORPHOLOGICAL_SEARCH, ADDITIONAL], [50004008], ["<b id=772635>Finally,</b> <b id=772636>brethren,</b> <b id=772637>whatsoever</b> <b id=772638>things....</b>"], 1, [772638]]);
+	 * @example	prepare_verses([[GRAMMATICAL_SEARCH, ADDITIONAL], [50004008], ["<b id=772635>Finally,</b> <b id=772636>brethren,</b> <b id=772637>whatsoever</b> <b id=772638>things....</b>"], 1, [772638]]);
 	 * @param	res (array) JSON array from the server.  Array format: [action, direction], [verse_ids, ...], [verse_HTML, ...], number_of_matches, [word_id, ...]].  ///NOTE: word_id is optional.
 	 * @return	NULL.  The function writes HTML to the page.
 	 * @note	Called by prepare_verses() after an Ajax request.
@@ -559,7 +557,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 				{
 					highlight_search_results('"' + res[2] + '"');
 				}, 100);
-			} else if (action == MORPHOLOGICAL_SEARCH) {
+			} else if (action == GRAMMATICAL_SEARCH) {
 				count = res[4].length;
 				for (i = 0; i < count; ++i) {
 					///TODO: Determine if there is a downside to having a space at the start of the className.
@@ -630,7 +628,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 *
 	 * @example	write_verses(action, direction, [verse_ids, ...], [verse_HTML, ...]);
 	 * @example	write_verses(VERSE_LOOKUP, ADDITIONAL, [1001001], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>"]);
-	 * @param	action		(integer)	The type of query: VERSE_LOOKUP || MIXED_SEARCH || STANDARD_SEARCH || MORPHOLOGICAL_SEARCH.
+	 * @param	action		(integer)	The type of query: VERSE_LOOKUP || MIXED_SEARCH || STANDARD_SEARCH || GRAMMATICAL_SEARCH.
 	 * @param	direction	(integer)	The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
 	 * @param	verse_ids	(array)		An array of integers representing Bible verse references.
 	 * @param	verse_HTML	(array)		An array of strings containing verses in HTML.
@@ -654,8 +652,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			stop_key		= verse_ids.length,
 			v;
 		
-		/// Currently only MORPHOLOGICAL_SEARCH searches data at the word level, so it is the only action that might stop in the middle of a verse and find more words in the same verse as the user scrolls.
-		if (action == MORPHOLOGICAL_SEARCH) {
+		/// Currently only GRAMMATICAL_SEARCH searches data at the word level, so it is the only action that might stop in the middle of a verse and find more words in the same verse as the user scrolls.
+		if (action == GRAMMATICAL_SEARCH) {
 			if (direction == ADDITIONAL) {
 				/// Is the first verse returned the same as the bottom verse on the page?
 				if (bottom_verse == verse_ids[0]) start_key = 1;
@@ -724,9 +722,9 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			
 			/// Record the bottom most verse reference and id so that we know where to start from for the next search or verse lookup as the user scrolls.
 			///NOTE: For VERSE_LOOKUP and STANDARD_SEARCH, the bottom_id and bottom_verse are the same because the search is preformed at the verse level.
-			///      MORPHOLOGICAL_SEARCH is performed at the word level, so the id is different from the verse.
-			///      The id for MORPHOLOGICAL_SEARCH is recorded in handle_new_verses(), currently.
-			///TODO: Determine the pros/cons of using an if statement to prevent morphological searches from recording the id here, since it is overwritten later.
+			///      GRAMMATICAL_SEARCH is performed at the word level, so the id is different from the verse.
+			///      The id for GRAMMATICAL_SEARCH is recorded in handle_new_verses(), currently.
+			///TODO: Determine the pros/cons of using an if statement to prevent grammatical searches from recording the id here, since it is overwritten later.
 			bottom_id = bottom_verse = num;
 		} else {
 			page.insertBefore(newEl, page.childNodes[0]);
@@ -737,9 +735,9 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			
 			/// Record the top most verse reference and id so that we know where to start from for the next search or verse lookup as the user scrolls.
 			///NOTE: For VERSE_LOOKUP and STANDARD_SEARCH, the top_id and top_verse are the same because the search is preformed at the verse level.
-			///      MORPHOLOGICAL_SEARCH is performed at the word level, so the id is different from the verse.
-			///      The id for MORPHOLOGICAL_SEARCH is recorded in handle_new_verses(), currently.
-			///TODO: Determine the pros/cons of using an if statement to prevent morphological searches from recording the id here, since it is overwritten later.
+			///      GRAMMATICAL_SEARCH is performed at the word level, so the id is different from the verse.
+			///      The id for GRAMMATICAL_SEARCH is recorded in handle_new_verses(), currently.
+			///TODO: Determine the pros/cons of using an if statement to prevent grammatical searches from recording the id here, since it is overwritten later.
 			top_id = top_verse = verse_ids[0];
 		}
 		
@@ -783,8 +781,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		var i,
 			ids,
 			regex_id,
-			regex_length = highlight_re.length,
-			tmp_found_ids = [];
+			regex_length	= highlight_re.length,
+			tmp_found_ids	= [];
 		
 		for (regex_id = 0; regex_id < regex_length; ++regex_id) {
 			tmp_found_ids = search_str.split(highlight_re[regex_id]);
@@ -814,13 +812,14 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 */
 	function prepare_highlighter(search_terms)
 	{
-		var count			= 0,
+		var count				= 0,
 			i,
 			j,
 			len_before,
 			len_after,
-			no_morph, term,
-			stemmed_arr		= [],
+			no_morph,
+			term,
+			stemmed_arr			= [],
 			search_terms_arr,
 			stemmed_word;
 		
@@ -836,23 +835,32 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			///FIXME: Move this to the language specific file because it is language dependent.
 			/// Fix special/unique words that the stemmer won't stem correctly.
 			switch (term) {
-			case "does": case "doth": case "do": case "doeth": case "doest":
+			case "does":
+			case "doth":
+			case "do":
+			case "doeth":
+			case "doest":
 				stemmed_word = "do[esth]*";
 				no_morph = true;
 				break;
-			case "haste": case "hasted":
+			case "haste":
+			case "hasted":
 				stemmed_word = "haste";
 				no_morph = false;
 				break;
-			case "shalt": case "shall":
+			case "shalt":
+			case "shall":
 				stemmed_word = "shal[lt]";
 				no_morph = true;
 				break;
-			case "wilt": case "will":
+			case "wilt":
+			case "will":
 				stemmed_word = "wil[lt]";
 				no_morph = true;
 				break;
-			case "have": case "hast": case "hath":
+			case "have":
+			case "hast":
+			case "hath":
 				stemmed_word = "ha[vesth]+";
 				no_morph = true;
 				break;
@@ -955,7 +963,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		/*@cc_on
 			win.pageYOffset = doc_docEl.scrollTop;
 		@*/
-		var new_scroll_pos = win.pageYOffset,
+		var new_scroll_pos	= win.pageYOffset,
 			scrolling_down;
 		
 		if (new_scroll_pos == scroll_pos) {
@@ -1013,7 +1021,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 */
 	function remove_excess_content_top()
 	{
-		var child = page.firstChild,
+		var child			= page.firstChild,
 			child_height;
 		
 		if (child === null) return null;
@@ -1063,7 +1071,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 */
 	function remove_excess_content_bottom()
 	{
-		var child = page.lastChild,
+		var child			= page.lastChild,
 			child_position,
 			page_height;
 		
@@ -1104,7 +1112,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 */
 	function add_content_bottom()
 	{
-		var child = page.lastChild,
+		var child			= page.lastChild,
 			child_position,
 			newEl,
 			page_height;
@@ -1153,7 +1161,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 */
 	function add_content_top()
 	{
-		var child = page.firstChild,
+		var child			= page.firstChild,
 			child_height,
 			child_position,
 			newEl;

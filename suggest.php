@@ -61,16 +61,15 @@ $simple_matches = implode(',', array_keys($sphinx_res['matches']));
 require_once 'functions/database.php';
 connect_to_database();
 
-$SQL_query = 'SELECT text, hits FROM ' . 'suggestions_english' . ' WHERE id IN (' . $simple_matches . ')';
-
-$SQL_res = mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
+$SQL_query	= 'SELECT text, hits FROM ' . 'suggestions_english' . ' WHERE id IN (' . $simple_matches . ')';
+$SQL_res	= mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
 
 /// Convert SQL results into one comma delineated string.
-$verses_str = "";
-$hits_str = "";
+$verses_str	= "";
+$hits_str	= "";
 while ($row = mysql_fetch_assoc($SQL_res)) {
-	$verses_str .= '"' . $row['text'] . '",';
-	$hits_str .= $row['hits'] . ',';
+	$verses_str	.= '"' . $row['text'] . '",';
+	$hits_str	.= $row['hits'] . ',';
 }
 
 /// Send results to the buffer as a JSON serialized array, and stop execution.

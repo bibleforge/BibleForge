@@ -44,8 +44,8 @@ function retrieve_verses($verse_id, $direction, $limit)
 	require_once 'functions/database.php';
 	connect_to_database();
 	
-	$SQL_query = 'SELECT id, words FROM ' . BIBLE_VERSES . ' WHERE id ' . $operator . (int)$verse_id . $order_by . ' LIMIT ' . $limit;
-	$SQL_res = mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
+	$SQL_query	= 'SELECT id, words FROM ' . BIBLE_VERSES . ' WHERE id ' . $operator . (int)$verse_id . $order_by . ' LIMIT ' . $limit;
+	$SQL_res	= mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
 	
 	/// Convert SQL results into one comma delineated string for JSON.
 	$verses_str = "";
