@@ -532,8 +532,8 @@ var lang = (function ()
 			
 			if (book === 0) return false;
 			
-			chapter = "001";
-			verse = "001";
+			chapter	= "001";
+			verse	= "001";
 			
 			/// Finally, we need to determine the chapter and/or verse reference is they are supplied.
 			cv = ref.split(/\s*([0-9]{1,3})(?:[:.;,\s]([0-9]{0,3})[-0-9]*)?$/);
@@ -585,7 +585,7 @@ var lang = (function ()
 			///NOTE: /\s+-\s+/g ensures that filter_array() will filter out negative words like "this - that" (i.e., "that" does not need to be highlighted).
 			///NOTE: \u2011-\u2015 replaces various hyphens, dashes, and minuses with the standard hyphen (-).
 			///NOTE: replace(/([0-9]+)[:.;,\s]title/ig, "$1:0") replaces Psalm title references into an acceptable format (e.g., "Psalm 3:title" becomes "Psalm 3:0").
-			return search_terms.replace(/\s{2,}/g, " ").replace(/\sAND\s/g, " & ").replace(/\sOR\s/g, " | ").replace(/(?:\s-|\s*\bNOT)\s/g, " -").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[\u2011-\u2015]/g, "-").replace(/([0-9]+)[:.;,\s]title/ig, "$1:0").trim();
+			return search_terms.replace(" IN RED", " AS RED").replace(/\s{2,}/g, " ").replace(/\sAND\s/g, " & ").replace(/\sOR\s/g, " | ").replace(/(?:\s-|\s*\bNOT)\s/g, " -").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[\u2011-\u2015]/g, "-").replace(/([0-9]+)[:.;,\s]title/ig, "$1:0").trim();
 		},
 
 
