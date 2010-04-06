@@ -516,7 +516,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 				query += "&s=" + (top_id + -1);
 			}
 		}
-		post_to_server("search.php", query, ajax, handle_new_verses);
+		post_to_server("search.php", query, ajax, handle_new_verses, {action: last_type, "direction": direction});
 	}
 	
 	
@@ -526,26 +526,26 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 * Writes new verses to the page, determines if more content is needed or available,
 	 * and writes initial information to the info bar.
 	 *
-	 * @example	prepare_verses([[VERSE_LOOKUP, PREVIOUS], [1001001, 1001002], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>", "<b id="12">And</b> <b id="13">the</b> <b id="14">earth....</b>"], 2]);
-	 * @example	prepare_verses([[STANDARD_SEARCH, ADDITIONAL], [1001001], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>"], 1]);
-	 * @example	prepare_verses([[GRAMMATICAL_SEARCH, ADDITIONAL], [50004008], ["<b id=772635>Finally,</b> <b id=772636>brethren,</b> <b id=772637>whatsoever</b> <b id=772638>things....</b>"], 1, [772638]]);
+	 * @example	prepare_verses([[1001001, 1001002], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>", "<b id="12">And</b> <b id="13">the</b> <b id="14">earth....</b>"], 2]);
+	 * @example	prepare_verses([[1001001], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>"], 1]);
+	 * @example	prepare_verses([[50004008], ["<b id=772635>Finally,</b> <b id=772636>brethren,</b> <b id=772637>whatsoever</b> <b id=772638>things....</b>"], 1, [772638]]);
 	 * @param	res (array) JSON array from the server.  Array format: [action, direction], [verse_ids, ...], [verse_HTML, ...], number_of_matches, [word_id, ...]].  ///NOTE: word_id is optional.
 	 * @return	NULL.  The function writes HTML to the page.
 	 * @note	Called by prepare_verses() after an Ajax request.
 	 */
-	function handle_new_verses(res)
+	function handle_new_verses(res, extra_data)
 	{
 		///TODO: On a verse lookup that does not start with Genesis 1:1, scroll_maxed_top must be set to FALSE. (Has this been taken care of?)
-		var action		= res[0][0],
+		var action		= extra_data.action,
 			b_tag,
 			count,
-			direction	= res[0][1],
+			direction	= extra_data.direction,
 			i,
-			total		= res[3];
+			total		= res[2];
 		
 		if (total > 0) {
 			///FIXME: When looking up the last few verses of Revelation (i.e., Revelation 22:21), the page jumps when more content is loaded above.
-			write_verses(action, direction, res[1], res[2]);
+			write_verses(action, direction, res[0], res[1]);
 			
 			///FIXME: Highlighting needs to be in its own function where each type and mixed highlighting will be done correctly.
 			if (action == STANDARD_SEARCH) {
@@ -555,30 +555,30 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 				///TODO: Determine if it is bad to convert the array to a string like this
 				setTimeout(function ()
 				{
-					highlight_search_results('"' + res[2] + '"');
+					highlight_search_results(res[1].join(""));
 				}, 100);
 			} else if (action == GRAMMATICAL_SEARCH) {
-				count = res[4].length;
+				count = res[3].length;
 				for (i = 0; i < count; ++i) {
 					///TODO: Determine if there is a downside to having a space at the start of the className.
 					///TODO: Determine if we ever need to replace an existing f* className.
-					doc.getElementById(res[4][i]).className += " f" + 1;
+					doc.getElementById(res[3][i]).className += " f" + 1;
 				}
 				/// Record the last id found from the search so that we know where to start from for the next search as the user scrolls.
 				/// Do we need to record the bottom id?
 				if (direction == ADDITIONAL) {
-					bottom_id = res[4][count - 1];
+					bottom_id = res[3][count - 1];
 				} else {
-					top_id = res[4][0];
+					top_id = res[3][0];
 				}
 			}
 			
 			/// Indicate to the user that more content may be loading, and check for more content.
-			if (direction == ADDITIONAL && res[1][res[1].length - 1] < 66022021) {
+			if (direction == ADDITIONAL && res[0][res[0].length - 1] < 66022021) {
 				bottomLoader.style.visibility = "visible";
 				setTimeout(add_content_bottom, lookup_speed_sitting);
 			}
-			if ((direction == PREVIOUS || waiting_for_first_search) && res[1][0] > 1001001) {
+			if ((direction == PREVIOUS || waiting_for_first_search) && res[0][0] > 1001001) {
 				topLoader.style.visibility = "visible";
 				/// A delay is added on to space out the requests.
 				setTimeout(add_content_top, lookup_speed_sitting + lookup_delay);
@@ -618,7 +618,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			}
 			
 			/// Store the first verse reference for later.
-			top_id = res[1][0];
+			top_id = res[0][0];
 		}
 	}
 	
@@ -638,8 +638,6 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 */
 	function write_verses(action, direction, verse_ids, verse_HTML)
 	{
-		///NOTE: psalm_title_re determines if a psalm does not have a title.
-		///TODO: Determine if psalm_title_re should be global for performance reasons or otherwise.
 		var b,
 			c,
 			chapter_text	= "",
@@ -647,7 +645,6 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			HTML_str		= "",
 			newEl,
 			num,
-			psalm_title_re	= /^(?:1(?:0[4-7]?|1[1-9]|3[5-7]|4[6-9]|50)?|2|33|43|71|9[13-79])$/, ///TODO: Determine if this should be a global variable.
 			start_key		= 0,
 			stop_key		= verse_ids.length,
 			v;
@@ -676,7 +673,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 					/// Is this chapter 1?  (We need to know if we should display the book name.)
 					if (c == 1) {
 						HTML_str += "<div class=book id=" + num + "_title>" + lang.books_long_pretitle[b] + "<h1>" + lang.books_long_main[b] + "</h1>" + lang.books_long_posttitle[b] + "</div>";
-					} else if (b != 19 || v === 0 || psalm_title_re.test(c)) { /// Display chapter/psalm number (but not on verse 1 of psalms that have titles).
+					} else if (b != 19 || v === 0 || ((c <= 2) || (c == 10) || (c == 33) || (c == 43) || (c == 71) || (c == 91) || (c >= 93 && c <= 97) || (c == 99) || (c >= 104 && c <= 107) || (c >= 111 && c <= 119) || (c >= 135 && c <= 137) || (c >= 146))) { /// Display chapter/psalm number (but not on verse 1 of psalms that have titles).
 						/// Is this the book of Psalms?  (Psalms have a special name.)
 						if (b == 19) {
 							chapter_text = lang.psalm;
@@ -704,6 +701,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 				if (b != last_book) {
 					/// We only need to print out the book if it is different from the last verse.
 					last_book = b;
+					
 					HTML_str += "<h1 class=book id=" + num + "_title>" + lang.books_short[b] + "</h1>"; /// Convert the book number to text.
 				}
 				
@@ -770,7 +768,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 * Highlights the words in the verses that match the search terms.
 	 * Highlighting is done by adding/changing the className of a word.
 	 *
-	 * @example	setTimeout(function () {highlight_search_results('"' + res[2] + '"');}, 100);
+	 * @example	setTimeout(function () {highlight_search_results(res[1]join("");}, 100);
 	 * @example	highlight_search_results("<b id=1>In</b> <b id=2>the</b> <b id=3>beginning...</b>");
 	 * @param	search_str (string) The HTML to examine and highlight.
 	 * @return	NULL.  Modifies objects className.
@@ -829,8 +827,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		
 		///TODO: Determine if a normal for loop would be better.
 		first_loop:for (i in search_terms_arr) {
-			term = search_terms_arr[i];
-			len_before = term.length;
+			term		= search_terms_arr[i];
+			len_before	= term.length;
 			
 			///FIXME: Move this to the language specific file because it is language dependent.
 			/// Fix special/unique words that the stemmer won't stem correctly.
@@ -1077,8 +1075,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		
 		if (child === null) return null;
 		
-		child_position = child.offsetTop;
-		page_height = doc_docEl.clientHeight;
+		child_position	= child.offsetTop;
+		page_height		= doc_docEl.clientHeight;
 		
 		/// Is the element is in the remove zone?
 		if (child_position > scroll_pos + page_height + buffer_rem) {
@@ -1119,8 +1117,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		
 		if (child === null) return null;
 		
-		child_position = child_position = child.offsetTop + child.clientHeight;
-		page_height = page_height = doc_docEl.clientHeight;
+		child_position	= child_position = child.offsetTop + child.clientHeight;
+		page_height		= page_height = doc_docEl.clientHeight;
 		/// Is the user scrolling close to the bottom of the page?
 		if (child_position < scroll_pos + page_height + buffer_add) {
 			/// Can the content be grabbed from cache?
@@ -1306,6 +1304,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			/// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
 			b1 = b1 == 19 ? lang.psalm : lang.books_short[b1];
 			b2 = b2 == 19 ? lang.psalm : lang.books_short[b2];
+			
 			ref_range = b1 + " " + c1 + ":" + v1 + "\u2013" + b2 + " " + c2 + ":" + v2;
 		}
 		
@@ -1367,12 +1366,12 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		/// Were no elements found?  (If so, then there is nothing to do.)
 		if (!el) return null;
 		
-		looked_next = false;
-		looked_previous = false;
+		looked_next		= false;
+		looked_previous	= false;
 		
 		do {
-			el_offset_top = el.offsetTop;
-			el_offset_height = el.offsetHeight + el_offset_top;
+			el_offset_top		= el.offsetTop;
+			el_offset_height	= el.offsetHeight + el_offset_top;
 			
 			/// Is the element somewhere between the position in question?
 			if (the_pos >= el_offset_top && the_pos <= el_offset_height) {
@@ -1381,11 +1380,11 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			} else {
 				/// Is the position in question lower?
 				if (the_pos > el_offset_top) {
-					el = el.nextSibling;
-					looked_next = true;
+					el			= el.nextSibling;
+					looked_next	= true;
 				} else {
-					el = el.previousSibling;
-					looked_previous = true;
+					el				= el.previousSibling;
+					looked_previous	= true;
 				}
 				/// Is it stuck in an infinite loop?  (If so, then give up.)
 				if (looked_next && looked_previous) return null;
@@ -1440,7 +1439,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 * @return	NULL.  Queries server and then performs an action with the received JSON array.
 	 * @note	Called by run_search().
 	 */
-	function post_to_server(server_URL, message, ajax, handler)
+	function post_to_server(server_URL, message, ajax, handler, extra_data)
 	{
 		///TODO: Consider whether GET could be better than POST.
 		ajax.open("POST", server_URL, true);
@@ -1452,7 +1451,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 					/// This is run when the results are returned properly.
 					///NOTE: JSON.parse() is at least currently (November 2009) twice as slow as eval(), and it does not work because of problems parsing the character combination slash plus single quote (\').  Two slashes may work.
 					///TODO: Add error handling for parsing.
-					handler(eval(ajax.responseText));
+					handler(eval(ajax.responseText), extra_data);
 				} else {
 					/// Was the abort unintentional?
 					if (ajax.status !== 0) {

@@ -73,7 +73,7 @@ function standard_search($query, $direction, $limit, $start_id = 0, $output_JSON
 	///FIXME: Sending an empty JSON is actually unnecesary if post_to_server() in main.js keeps track of the query.
 	if ($sphinx_res['total'] == 0) {
 		if ($output_JSON) {
-			echo '[[', STANDARD_SEARCH, ',', $direction, '],[],[],[0]]';
+			echo '[[],[],[0]]';
 			die;
 		} else {
 			return array("", "", 0);
@@ -98,11 +98,11 @@ function standard_search($query, $direction, $limit, $start_id = 0, $output_JSON
 	
 	if ($output_JSON) {
 		/// Send results to the buffer as a JSON serialized array, and stop execution.
-		/// Array Format: [[action,direction],[verse_ids,...],[verse_words,...],number_of_matches]
+		/// Array Format: [[verse_ids,...],[verse_words,...],number_of_matches]
 		///NOTE: rtrim(..., ',') removes trailing commas.  It seems to be slightly faster than substr(..., 0, -1).
 		///TODO: It would be nice to indicate if there are no more verses to find when it gets to the end.
 		///TODO: Make the JSON work with both eval() and JSON.parse().  The \' throws it off.  But \\' works.
-		echo '[[', STANDARD_SEARCH, ',', $direction, '],[', $simple_matches, '],[', $verses_str, '],', $sphinx_res['total_found'], ']';
+		echo '[[', $simple_matches, '],[', $verses_str, '],', $sphinx_res['total_found'], ']';
 		die;
 	} else {
 		return array($simple_matches, $verses_str, $sphinx_res['total_found']);

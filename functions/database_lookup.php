@@ -26,7 +26,7 @@ function retrieve_verses($verse_id, $direction, $limit)
 	/// Quickly check to see if the verse_id is outside of the valid range.
 	///TODO: Determine if $verse_id < 1001001 should default to 1001001 and $verse_id > 66022021 to 66022021.
 	if ($verse_id < 1001001 || $verse_id > 66022021) {
-		echo '[[', VERSE_LOOKUP, ',', $direction, '],[],[],[0]]';
+		echo '[[],[],[0]]';
 		die;
 	}
 	
@@ -64,9 +64,9 @@ function retrieve_verses($verse_id, $direction, $limit)
 	}
 	
 	/// Send results to the buffer as a JSON serialized array, and stop execution.
-	/// Array Format: [[action],[verse_ids,...],[verse_words,...],[success]]
+	/// Array Format: [[verse_ids,...],[verse_words,...],[success]]
 	///NOTE: rtrim(..., ',') removes trailing commas.  It seems to be slightly faster than substr(..., 0, -1).
 	///TODO: It would be nice to indicate if there are no more verses to find when it gets to the end.
-	echo '[[', VERSE_LOOKUP, ',', $direction, '],[', rtrim($verses_num, ','), '],[', rtrim($verses_str, ','), '],[1]]';
+	echo '[[', rtrim($verses_num, ','), '],[', rtrim($verses_str, ','), '],[1]]';
 	die;
 }
