@@ -114,7 +114,7 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			last_suggestion_text	= "",
 			suggest_cache			= {},
 			suggest_delay			= 250,
-			suggest_interval;
+			suggest_timeout;
 		
 		/**
 		 * Gets the suggestion from cache or the server.
@@ -124,7 +124,6 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		 */
 		function request_suggestions()
 		{
-			clearInterval(suggest_interval);
 			if (q_obj.value == last_suggestion_text) return;
 			///TODO: Determine if there is a better way to write this code so that we don't need to use q_obj twice.
 			last_suggestion_text = q_obj.value.trim();
@@ -185,8 +184,8 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 				///TODO: Move the highlighting down.
 				break;
 			default:
-				clearInterval(suggest_interval);
-				suggest_interval = setInterval(request_suggestions, suggest_delay);
+				clearTimeout(suggest_timeout);
+				suggest_timeout = setTimeout(request_suggestions, suggest_delay);
 				break;
 			}
 			return true;
