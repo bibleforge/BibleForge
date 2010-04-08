@@ -81,8 +81,12 @@ var BF_LANG = (function ()
 				suffix;
 			
 			/// Some quick checking to see if we even need to continue.
-			if (w.length < 3) return w;
-			if (stop_words_re.test(w)) return w;
+			if (w.length < 3) {
+				return w;
+			}
+			if (stop_words_re.test(w)) {
+				return w;
+			}
 			
 			/// Step 1a
 			re = /^(.+?)(ss|i)es$/;
@@ -231,7 +235,9 @@ var BF_LANG = (function ()
 				zeros;
 			
 			/// First determine if it is likely a verse reference.
-			if (!books_re.test(ref)) return false;
+			if (!books_re.test(ref)) {
+				return false;
+			}
 			
 			switch (ref.slice(0, 1).toLowerCase()) {
 			case "j":
@@ -530,7 +536,9 @@ var BF_LANG = (function ()
 				break;
 			}
 			
-			if (book === 0) return false;
+			if (book === 0) {
+				return false;
+			}
 			
 			chapter	= "001";
 			verse	= "001";
@@ -539,7 +547,9 @@ var BF_LANG = (function ()
 			cv = ref.split(/\s*([0-9]{1,3})(?:[:.;,\s]([0-9]{0,3})[-0-9]*)?$/);
 			
 			if (cv.length > 1) {
-				if (cv[1] != "") chapter = cv[1] + "";
+				if (cv[1] != "") {
+					chapter = cv[1] + "";
+				}
 				if (cv[2] != "" && typeof cv[2] != "undefined") {
 					verse = cv[2] + "";
 				} else {
@@ -619,7 +629,9 @@ var BF_LANG = (function ()
 			
 			first_loop:for (i = 0; i < arr_len; ++i) {
 				for (j = 0; j < new_arr_len; ++j) {
-					if (final_search_arr[j] == initial_search_arr[i]) continue first_loop; /// This words already exists; jump to the first loop and get the next word.  (This would be the same as "continue 2" in PHP.)
+					if (final_search_arr[j] == initial_search_arr[i]) {
+						continue first_loop; /// This words already exists; jump to the first loop and get the next word.  (This would be the same as "continue 2" in PHP.)
+					}
 				}
 				final_search_arr[new_arr_len++] = initial_search_arr[i];
 			}

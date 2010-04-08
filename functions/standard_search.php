@@ -35,7 +35,9 @@ function standard_search($query, $direction, $limit, $start_id = 0, $output_JSON
 	
 	///NOTE: The stop_id is now required for sphinxapi and should be calculated by the Forge, and could be set as a constant so that sphinxapi_cli is not slowed down by it.
 	///TODO: Calculate the stop_id in the Forge.
-	if ($start_id > 0) $sphinx->SetIDRange($start_id, 99999999); /// SetIDRange(start_id, stop_id (0 means no limit))
+	if ($start_id > 0) {
+		$sphinx->SetIDRange($start_id, 99999999); /// SetIDRange(start_id, stop_id (0 means no limit))
+	}
 	
 	/// Determine the search mode.
 	/// Default is SPH_MATCH_ALL (i.e., all words are required: word1 & word2).

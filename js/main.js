@@ -124,14 +124,20 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		 */
 		function request_suggestions()
 		{
-			if (q_obj.value == last_suggestion_text) return;
+			if (q_obj.value == last_suggestion_text) {
+				return;
+			}
 			///TODO: Determine if there is a better way to write this code so that we don't need to use q_obj twice.
 			last_suggestion_text = q_obj.value.trim();
 			
-			if (last_suggestion_text == "") return;
+			if (last_suggestion_text == "") {
+				return;
+			}
 			
 			/// Stop a previous, unfinished request.
-			if (ajax_suggestions.readyState % 4) ajax_suggestions.abort();
+			if (ajax_suggestions.readyState % 4) {
+				ajax_suggestions.abort();
+			}
 			
 			/// Check to see if we already have this in the cache.
 			/// Do we need to request the suggestions from the server?
@@ -168,7 +174,9 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		 */
 		return function (event)
 		{
-			if (!event) event = window.event; /// IE does not send the event object.
+			if (!event) {
+				event = window.event; /// IE does not send the event object.
+			}
 			
 			/// keyCode meanings:
 			/// 0	(any letter)
@@ -329,12 +337,18 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		
 		last_search_prepared = BF_LANG.prepare_search(raw_search_terms);
 		
-		if (last_search_prepared.length === 0) return false;
+		if (last_search_prepared.length === 0) {
+			return false;
+		}
 		
 		/// Stop any old requests since we have a new one.
 		/// Is readyState > 0 and < 4?  (Anything 1-3 needs to be aborted.)
-		if (ajax_additional.readyState % 4)	ajax_additional.abort();
-		if (ajax_previous.readyState % 4)	ajax_previous.abort();
+		if (ajax_additional.readyState % 4) {
+			ajax_additional.abort();
+		}
+		if (ajax_previous.readyState % 4) {
+			ajax_previous.abort();
+		}
 		
 		/// Determine if the user is preforming a search or looking up a verse.
 		/// If the query is a verse reference, a number is returned, if it is a search, then FALSE is returned.
@@ -343,7 +357,9 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		/// Is the user looking up a verse? (verse_id is false when the user is preforming a search.)
 		if (verse_id !== false) {
 			/// To get the titles of Psalms, select verse 0 instead of verse 1.
-			if (verse_id < 19145002 && verse_id > 19003000 && verse_id % 1000 == 1) --verse_id;
+			if (verse_id < 19145002 && verse_id > 19003000 && verse_id % 1000 == 1) {
+				--verse_id;
+			}
 			
 			last_type = verse_lookup;
 			///TODO: Determine if there is a better way of doing this.
@@ -448,7 +464,9 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 				/// Find where the attributes separate (e.g., "NOUN, GENITIVE" would separate at character 4).
 				split_pos = grammar_attributes.indexOf(BF_LANG.grammar_separator, split_start);
 				/// Trim leading white space.
-				if (grammar_attributes.slice(split_start, split_start + 1) === " ") ++split_start;
+				if (grammar_attributes.slice(split_start, split_start + 1) === " ") {
+					++split_start;
+				}
 				/// Is this grammatical feature to be excluded?
 				if (grammar_attributes.slice(split_start, split_start + 1) == "-") {
 					/// Skip the hyphen so that we just get the grammatical word (e.g., "love AS -NOUN" we just want "NOUN").
@@ -499,7 +517,9 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		
 		/// Is the server already working on this request?
 		///NOTE: readyState is between 0-4, and anything 1-3 means that the server is already working on this request.
-		if (ajax.readyState % 4) return null;
+		if (ajax.readyState % 4) {
+			return null;
+		}
 		
 		if (last_type == verse_lookup) {
 			if (direction == additional) {
@@ -511,7 +531,9 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			query += "&q=" + last_search_encoded;
 			if (direction == additional) {
 				/// Continue starting on the next verse.
-				if (bottom_id > 0) query += "&s=" + (bottom_id + 1);
+				if (bottom_id > 0) {
+					query += "&s=" + (bottom_id + 1);
+				}
 			} else {
 				/// Continue starting backwards on the previous verse.
 				query += "&s=" + (top_id + -1);
@@ -657,10 +679,14 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		if (action == grammatical_search) {
 			if (direction == additional) {
 				/// Is the first verse returned the same as the bottom verse on the page?
-				if (bottom_verse == verse_ids[0]) start_key = 1;
+				if (bottom_verse == verse_ids[0]) {
+					start_key = 1;
+				}
 			} else {
 				/// Is the last verse returned the same as the top verse on the page?
-				if (top_verse == verse_ids[stop_key - 1]) --start_key;
+				if (top_verse == verse_ids[stop_key - 1]) {
+					--start_key;
+				}
 			}
 		}
 		
@@ -699,7 +725,9 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			/// Searching
 			} else {
 				/// Change verse 0 to "title" (i.e., Psalm titles).  (Display Psalm 3:title instead of Psalm 3:0.)
-				if (v === 0) v = BF_LANG.title;
+				if (v === 0) {
+					v = BF_LANG.title;
+				}
 				
 				/// Is this verse from a different book than the last verse?
 				if (b != last_book) {
@@ -895,7 +923,9 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			
 			/// Skip words that are the same after stemming or regexing.
 			for (j = 0; j < count; ++j) {
-				if (stemmed_word == stemmed_arr[j]) continue first_loop; ///NOTE: This is the same as "continue 2" in PHP.
+				if (stemmed_word == stemmed_arr[j]) {
+					continue first_loop; ///NOTE: This is the same as "continue 2" in PHP.
+				}
 			}
 			
 			stemmed_arr[count] = stemmed_word;
@@ -929,7 +959,9 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	function format_number(num)
 	{
 		var rgx;
-		if (num < 1000) return num;
+		if (num < 1000) {
+			return num;
+		}
 		/// Quickly converts a number to a string quickly.
 		num += "";
 		rgx = /^([0-9]+)([0-9][0-9][0-9])/;
@@ -991,7 +1023,9 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		scroll_pos = new_scroll_pos;
 		
 		/// Don't look up more data until the first results come.
-		if (waiting_for_first_search) return null;
+		if (waiting_for_first_search) {
+			return null;
+		}
 		
 		/// Since the page is scrolling, we need to determine if more content needs to be added or if some content should be hidden.
 		
@@ -1027,7 +1061,9 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		var child			= page.firstChild,
 			child_height;
 		
-		if (child === null) return null;
+		if (child === null) {
+			return null;
+		}
 		
 		///NOTE: Mozilla ignores .clientHeight, .offsetHeight, .scrollHeight for some objects (not <div> however) with a doctype.
 		///      If Mozilla has problems in the future, you can use this as a replacement:
@@ -1077,7 +1113,9 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			child_position,
 			page_height;
 		
-		if (child === null) return null;
+		if (child === null) {
+			return null;
+		}
 		
 		child_position	= child.offsetTop;
 		page_height		= doc_docEl.clientHeight;
@@ -1119,7 +1157,9 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			newEl,
 			page_height;
 		
-		if (child === null) return null;
+		if (child === null) {
+			return null;
+		}
 		
 		child_position	= child_position = child.offsetTop + child.clientHeight;
 		page_height		= page_height = doc_docEl.clientHeight;
@@ -1168,7 +1208,9 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			child_position,
 			newEl;
 		
-		if (child === null) return null;
+		if (child === null) {
+			return null;
+		}
 		
 		child_height = child.clientHeight;
 		
@@ -1360,7 +1402,9 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		if (!el) {
 			/// Make an educated guess as to which element to start with to save time.
 			el_start_at = Math.round(parent_el.childNodes.length * (the_pos / doc_docEl.scrollHeight));
-			if (el_start_at < 1) el_start_at = 1;
+			if (el_start_at < 1) {
+				el_start_at = 1;
+			}
 			el = parent_el.childNodes[el_start_at - 1];
 		} else {
 			/// We may need the parent_el if the_pos is below all of the elements.
@@ -1368,7 +1412,9 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		}
 		
 		/// Were no elements found?  (If so, then there is nothing to do.)
-		if (!el) return null;
+		if (!el) {
+			return null;
+		}
 		
 		looked_next		= false;
 		looked_previous	= false;
@@ -1391,7 +1437,9 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 					looked_previous	= true;
 				}
 				/// Is it stuck in an infinite loop?  (If so, then give up.)
-				if (looked_next && looked_previous) return null;
+				if (looked_next && looked_previous) {
+					return null;
+				}
 			}
 		} while (el !== null);
 		

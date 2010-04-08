@@ -34,7 +34,9 @@ function morphology_search($json, $direction, $limit, $start_id = 0)
 	
 	///NOTE: The stop_id is now required for sphinxapi and should be calculated by the Forge, and could be set as a constant so that sphinxapi_cli is not slowed down by it.
 	///TODO: Calculate the stop_id in the Forge.
-	if ($start_id > 0) $sphinx->SetIDRange($start_id, 99999999); /// SetIDRange(start_id, stop_id)
+	if ($start_id > 0) {
+		$sphinx->SetIDRange($start_id, 99999999); /// SetIDRange(start_id, stop_id)
+	}
 	
 	$sphinx->SetRankingMode(SPH_RANK_NONE); /// No ranking, fastest
 	/// Set the attributes and prepare to search.

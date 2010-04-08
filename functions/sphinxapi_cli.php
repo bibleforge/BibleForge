@@ -393,7 +393,9 @@ class SphinxClient
 			$mathces_attrs	= "";
 			
 			/// If there was an error, all of the stats need to be set manually to blank, so they can be returned.
-			if (!isset($stats[3])) $stats[3] = "";
+			if (!isset($stats[3])) {
+				$stats[3] = "";
+			}
 			
 			/// Look for errors since no results were found.
 			preg_match('/: search error: (.*)$/i', $res, $error_match);
