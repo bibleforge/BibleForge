@@ -82,8 +82,8 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		lookup_range_speed				= 300,	/// In milliseconds
 		lookup_speed_scrolling			= 50,
 		lookup_speed_sitting			= 100,
-		remove_content_bottom_interval,
-		remove_content_top_interval,
+		remove_content_bottom_timeout,
+		remove_content_top_timeout,
 		remove_speed					= 3000,
 		scroll_check_count				= 0,
 		scroll_maxed_bottom				= false,
@@ -955,7 +955,7 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 * When the page scrolls this figures out the direction of the scroll and
 	 * calls specific functions to determine whether content should be added or removed.
 	 *
-	 * @return	NULL.  May call other functions via setTimeout() or setInterval().
+	 * @return	NULL.  May call other functions via setTimeout().
 	 * @note	Called when the window scrolls.
 	 * @note	Set via "window.onscroll = scrolling;".
 	 */
@@ -1004,22 +1004,23 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		}
 		
 		if (checking_excess_content_top) {
-			clearInterval(remove_content_top_interval);
-			remove_content_top_interval = setInterval(remove_excess_content_top, remove_speed);
+			clearTimeout(remove_content_top_timeout);
+			remove_content_top_timeout = setTimeout(remove_excess_content_top, remove_speed);
 		}
 		if (checking_excess_content_bottom) {
-			clearInterval(remove_content_bottom_interval);
-			remove_content_bottom_interval = setInterval(remove_excess_content_bottom, remove_speed);
+			clearTimeout(remove_content_bottom_timeout);
+			remove_content_bottom_timeout = setTimeout(remove_excess_content_bottom, remove_speed);
 		}
 	}
 	
 	
+	///TODO: Determine if remove_excess_content_top and remove_excess_content_bottom can be combind.
 	/**
 	 * Remove content that is past the top of screen and store in cache.
 	 *
 	 * @example	remove_excess_content_top();
 	 * @return	NULL.  Removes content from the page if required.
-	 * @note	Called by scrolling() via setInterval().
+	 * @note	Called by scrolling() via setTimeout().
 	 */
 	function remove_excess_content_top()
 	{
@@ -1045,7 +1046,7 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			///TODO: Determine if setting the display to "none" actually helps at all.
 			/// Remove quickly from page.
 			child.style.display = "none";
-			/// Calculate and set the new scroll position
+			/// Calculate and set the new scroll position.
 			/// Because content is being removed from the top of the page, the rest of the content will be shifted upward.
 			/// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was removed.
 			window.scrollTo(0, scroll_pos = (window.pageYOffset - child_height));
@@ -1054,13 +1055,12 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			
 			/// Indicates to the user that content will load if they scroll to the top of the screen.
 			topLoader.style.visibility = "visible";
-			/// End execution to keep the checking_content_top_interval running because there could be even more content that should be removed.
-			return null;
+			
+			/// Check again soon for more content to be removed.
+			remove_content_top_timeout = setTimeout(remove_excess_content_top, remove_speed);
+		} else {
+			checking_excess_content_top = false;
 		}
-		
-		/// Since no content needs to be removed, there is no need to check again.
-		clearInterval(remove_content_top_interval);
-		checking_excess_content_top = false;
 	}
 	
 	
@@ -1069,7 +1069,7 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 *
 	 * @example	remove_excess_content_bottom();
 	 * @return	NULL.  Removes content from the page if required.
-	 * @note	Called by scrolling() via setInterval().
+	 * @note	Called by scrolling() via setTimeout().
 	 */
 	function remove_excess_content_bottom()
 	{
@@ -1095,12 +1095,12 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			@*/
 			/// End execution to keep the checking_content_top_interval running because there might be even more content that should be removed.
 			bottomLoader.style.visibility = "visible";
-			return null;
+			
+			/// Check again soon for more content to be removed.
+			remove_content_bottom_timeout = setTimeout(remove_excess_content_bottom, remove_speed);
+		} else {
+			checking_excess_content_bottom = false;
 		}
-		
-		/// Since no content needs to be removed, there is no need to check again.
-		clearInterval(remove_content_bottom_interval);
-		checking_excess_content_bottom = false;
 	}
 	
 	
