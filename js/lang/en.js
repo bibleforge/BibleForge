@@ -12,7 +12,7 @@
 /**
  *
  */
-var lang = (function ()
+var BF_LANG = (function ()
 {
 	/// Book Regex
 	///NOTE: Created in the Forge via create_reference_regex.php on 12-23-2009 from ref_array.php.

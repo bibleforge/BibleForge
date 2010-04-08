@@ -9,7 +9,7 @@
  */
 
 /// Initialize the JavaScript frontend of BibleForge.
-create_viewport(
+CREATE_VIEWPORT(
 	document.getElementById("viewPort1"),
 	document.getElementById("searchForm1"),
 	document.getElementById("q1"),
@@ -17,9 +17,7 @@ create_viewport(
 	document.getElementById("infoBar1"),
 	document.getElementById("topLoader1"),
 	document.getElementById("bottomLoader1"),
-	document,
-	document.documentElement,
-	window);
+	document.documentElement);
 
 /**
  * Create the BibleForge environment.
@@ -33,43 +31,40 @@ create_viewport(
  * @param	infoBar			(object) The HTML object that displays information about the lookups and searches.
  * @param	topLoader		(object) The HTML object which displays the loading image above the text.
  * @param	bottomLoader	(object) The HTML object which displays the loading image below the text.
- * @param	doc				(object) The document element.
  * @param	doc_docEl		(object) The document.documentElement element (the HTML element).
- * @param	win				(object) The window element.
  * @return	NULL.  Some functions are attached to events and the rest accompany them via closure.
  */
-function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, bottomLoader, doc, doc_docEl, win)
+function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, bottomLoader, doc_docEl)
 {
-	///NOTE: This should be "const" instead of "var," but IE doesn't support constants yet.
-	var VERSE_LOOKUP			= 1,
-		MIXED_SEARCH			= 2,
-		STANDARD_SEARCH			= 3,
-		GRAMMATICAL_SEARCH		= 4,
+	var verse_lookup			= 1,
+		mixed_search			= 2,
+		standard_search			= 3,
+		grammatical_search		= 4,
 		
 		/// Direction constants
-		ADDITIONAL	= 1,
-		PREVIOUS	= 2,
+		additional	= 1,
+		previous	= 2,
 		
 		highlight_limit				= 20,	/// Currently, we limit the unique number of search words to highlight.
 		highlight_re				= [],	/// Highlighter regex array
 		last_book					= 0,	/// The number of the last book of the Bible that was returned
 		last_search					= "",
 		last_search_encoded			= "",	/// A cache of the last search query
-		last_type,							/// The type of lookup performed last (VERSE_LOOKUP || MIXED_SEARCH || STANDARD_SEARCH || GRAMMATICAL_SEARCH)
+		last_type,							/// The type of lookup performed last (verse_lookup || mixed_search || standard_search || grammatical_search)
 		waiting_for_first_search	= false,
 		
 		/// Ajax objects
-		ajax_additional	= new win.XMLHttpRequest(),
-		ajax_previous	= new win.XMLHttpRequest(),
+		ajax_additional	= new window.XMLHttpRequest(),
+		ajax_previous	= new window.XMLHttpRequest(),
 		
 		/// Verse variables
-		/// top_verse and bottom_verse are the last verses displayed on the screen so that the same verse is not displayed twice when more search data is returned (currently just used for GRAMMATICAL_SEARCH).
+		/// top_verse and bottom_verse are the last verses displayed on the screen so that the same verse is not displayed twice when more search data is returned (currently just used for grammatical_search).
 		bottom_verse	= 0,
 		top_verse		= 0,
 		
 		/// top_id and bottom_id are the last ids (either verse or word id) returned from a search or verse lookup.
-		/// These are the same as bottom_id and top_id for VERSE_LOOKUP and STANDARD_SEARCH since these deal with entire verses as a whole, not individual words.
-		/// For GRAMMATICAL_SEARCH, the last word id is stored.
+		/// These are the same as bottom_id and top_id for verse_lookup and standard_search since these deal with entire verses as a whole, not individual words.
+		/// For grammatical_search, the last word id is stored.
 		bottom_id,
 		top_id,
 		
@@ -100,8 +95,8 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	searchForm.onsubmit = prepare_new_search;
 	
 	///NOTE: Could use wheel if the scroll bars are invisible.
-	win.onscroll = scrolling;
-	win.onresize = resizing;
+	window.onscroll = scrolling;
+	window.onresize = resizing;
 	
 	/*********************************
 	 * Start of Suggestion functions *
@@ -115,14 +110,17 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	q_obj.onkeypress = (function ()
 	{
 		/// Auto Suggest variables
-		var ajax_suggestions		= new win.XMLHttpRequest(),
+		var ajax_suggestions		= new window.XMLHttpRequest(),
 			last_suggestion_text	= "",
 			suggest_cache			= {},
 			suggest_delay			= 250,
 			suggest_interval;
 		
 		/**
-		 * 
+		 * Gets the suggestion from cache or the server.
+		 *
+		 * @return	NULL.
+		 * @note	Called by the anonymous function returned into the onkeypress event via setTimeout().
 		 */
 		function request_suggestions()
 		{
@@ -146,7 +144,11 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		}
 		
 		/**
-		 * 
+		 * Display suggestions to the users.
+		 *
+		 * @param	res	(array)	JSON array from the server.
+		 *						Array format: ???
+		 * @note	Called by post_to_server() after an Ajax request.
 		 */
 		function handle_suggest(res)
 		{
@@ -162,17 +164,17 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		 * BibleForge needs to look up suggestions for the user.
 		 *
 		 * @param	event (event object) (optional) The event object (Mozilla/Safari/Opera).
-		 * @return	???
+		 * @return	TRUE. ///TODO: Determine if this is the correct value to return.
 		 * @note	This function is returned into the window.onkeypress event.
 		 */
 		return function (event)
 		{
-			if (!event) event = win.event; /// IE does not send the event object.
+			if (!event) event = window.event; /// IE does not send the event object.
 			
 			/// keyCode meanings:
 			/// 0	(any letter)
-			///	13	enter
 			///	8	backspace
+			///	13	enter
 			/// 38	up
 			/// 40	down
 			switch (event.keyCode) {
@@ -224,7 +226,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 * Make split() work correctly in IE.
 	 *
 	 * @param	s		(regexp || string)	The regular expression or string with which to break the string.
-	 * @param	limit	(int)				The number of times to split the string.
+	 * @param	limit	(int) (optional)	The number of times to split the string.
 	 * @return	Returns an array of the string now broken into pieces.
 	 * @see		http://blog.stevenlevithan.com/archives/cross-browser-split.
 	 */
@@ -296,10 +298,10 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		};
 		
 		
-		/// Trick IE into understanding win.pageYOffset.
+		/// Trick IE into understanding window.pageYOffset.
 		/// Set the initial value, so that it is not undefined.
 		/// See scrolling().
-		win.pageYOffset = doc_docEl.scrollTop;
+		window.pageYOffset = doc_docEl.scrollTop;
 	@*/
 	
 	
@@ -326,7 +328,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		
 		waiting_for_first_search = true;
 		
-		last_search_prepared = lang.prepare_search(raw_search_terms);
+		last_search_prepared = BF_LANG.prepare_search(raw_search_terms);
 		
 		if (last_search_prepared.length === 0) return false;
 		
@@ -337,38 +339,38 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		
 		/// Determine if the user is preforming a search or looking up a verse.
 		/// If the query is a verse reference, a number is returned, if it is a search, then FALSE is returned.
-		verse_id = lang.determine_reference(last_search_prepared);
+		verse_id = BF_LANG.determine_reference(last_search_prepared);
 		
 		/// Is the user looking up a verse? (verse_id is false when the user is preforming a search.)
 		if (verse_id !== false) {
 			/// To get the titles of Psalms, select verse 0 instead of verse 1.
 			if (verse_id < 19145002 && verse_id > 19003000 && verse_id % 1000 == 1) --verse_id;
 			
-			last_type = VERSE_LOOKUP;
+			last_type = verse_lookup;
 			///TODO: Determine if there is a better way of doing this.
 			///NOTE: Subtract 1 because run_search() adds one.
 			bottom_id = verse_id - 1;
 			
 		/// The user is submitting a search request.
 		} else {
-			/// The type of search must be determined (i.e., MIXED_SEARCH or STANDARD_SEARCH or GRAMMATICAL_SEARCH).
+			/// The type of search must be determined (i.e., mixed_search or standard_search or grammatical_search).
 			search_type_array = determine_search_type(last_search_prepared);
 			
 			/// The type of search is stored in the first index of the array.
 			last_type = search_type_array[0];
 			
-			if (last_type == GRAMMATICAL_SEARCH) {
-				/// GRAMMATICAL_SEARCH uses a JSON array which is stored as text in the second index of the array.
+			if (last_type == grammatical_search) {
+				/// grammatical_search uses a JSON array which is stored as text in the second index of the array.
 				last_search_prepared = search_type_array[1];
 			}
 			last_search_encoded = encodeURIComponent(last_search_prepared);
 			bottom_id = 0;
 		}
 		
-		run_search(ADDITIONAL);
+		run_search(additional);
 		
 		/// Prepare for the new results.
-		if (last_type == VERSE_LOOKUP) {
+		if (last_type == verse_lookup) {
 			scroll_maxed_top	= false;
 			scroll_maxed_bottom	= false;
 		} else {
@@ -394,7 +396,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		cached_verses_bottom	= [];
 		cached_count_bottom		= 0;
 		
-		doc.title = raw_search_terms + " - " + lang.app_name;
+		document.title = raw_search_terms + " - " + BF_LANG.app_name;
 		return false;
 	}
 	
@@ -402,12 +404,12 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	/**
 	 * Figure out what type of search is being attempted by the user.
 	 *
-	 * @example	determine_search_type("God & love");							/// Returns [STANDARD_SEARCH]
-	 * @example	determine_search_type("love AS NOUN");							/// Returns [GRAMMATICAL_SEARCH,'["love",[[1,1]],[1]]']
-	 * @example	determine_search_type("go AS IMPERATIVE, -SINGULAR");			/// Returns [GRAMMATICAL_SEARCH,'["go",[[9,3],[5,1]],[0,1]]']
-	 * @example	determine_search_type("go* AS PASSIVE, -PERFECT,INDICATIVE");	/// Returns [GRAMMATICAL_SEARCH,'["go*",[[8,3],[7,5],[9,1]],[0,1,0]]']
-	 * @example	determine_search_type("* AS RED, IMPERATIVE");					/// Returns [GRAMMATICAL_SEARCH,'["",[[3,1],[9,3]],[0,0]]']
-	 * //@example determine_search_type("love AS NOUN & more | less -good AS ADJECTIVE"); /// Returns [GRAMMATICAL_SEARCH, [0, "love", "NOUN"], STANDARD_SEARCH, "& more | less -good", GRAMMATICAL_SEARCH, [0, "good", "ADJECTIVE"]]
+	 * @example	determine_search_type("God & love");							/// Returns [standard_search]
+	 * @example	determine_search_type("love AS NOUN");							/// Returns [grammatical_search,'["love",[[1,1]],[1]]']
+	 * @example	determine_search_type("go AS IMPERATIVE, -SINGULAR");			/// Returns [grammatical_search,'["go",[[9,3],[5,1]],[0,1]]']
+	 * @example	determine_search_type("go* AS PASSIVE, -PERFECT,INDICATIVE");	/// Returns [grammatical_search,'["go*",[[8,3],[7,5],[9,1]],[0,1,0]]']
+	 * @example	determine_search_type("* AS RED, IMPERATIVE");					/// Returns [grammatical_search,'["",[[3,1],[9,3]],[0,0]]']
+	 * //@example determine_search_type("love AS NOUN & more | less -good AS ADJECTIVE"); /// Returns [grammatical_search, [0, "love", "NOUN"], standard_search, "& more | less -good", grammatical_search, [0, "good", "ADJECTIVE"]]
 	 * @param	search_terms (string) The prepared terms to be examined.
 	 * @return	An array describing the type of search.  Format: [(int)Type of search, (optional)(string)JSON array describing the search].
 	 * @note	Called by run_search().
@@ -424,7 +426,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			split_pos;
 		
 		/// Did the user use the grammatical keyword in his search?
-		if ((split_pos = search_terms.indexOf(lang.grammar_marker)) != -1) {
+		if ((split_pos = search_terms.indexOf(BF_LANG.grammar_marker)) != -1) {
 			///TODO: Determine what is better: a JSON array or POST/GET string (i.e., word1=word&grammar_type1=1&value1=3&include1=1&...).
 			/// A JSON array is used to contain the information about the search.
 			/// JSON format: '["WORD",[[GRAMMAR_TYPE1,VALUE1],[...]],[INCLUDE1,...]]'
@@ -438,14 +440,14 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			}
 			
 			grammar_json		= '["' + grammar_search_term.replace(/(["'])/g, "\\$1") + '",[';
-			grammar_attributes	= search_terms.slice(split_pos + lang.grammar_marker_len);
+			grammar_attributes	= search_terms.slice(split_pos + BF_LANG.grammar_marker_len);
 			split_start			= 0;
 			
 			///TODO: Determine if there is a benefit to using do() over while().
 			///NOTE: An infinite loop is used because the data is returned when it reaches the end of the string.
 			do {
 				/// Find where the attributes separate (e.g., "NOUN, GENITIVE" would separate at character 4).
-				split_pos = grammar_attributes.indexOf(lang.grammar_separator, split_start);
+				split_pos = grammar_attributes.indexOf(BF_LANG.grammar_separator, split_start);
 				/// Trim leading white space.
 				if (grammar_attributes.slice(split_start, split_start + 1) === " ") ++split_start;
 				/// Is this grammatical feature to be excluded?
@@ -458,26 +460,26 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 				}
 				
 				if (split_pos > -1) {
-					grammar_attribute_json += lang.grammar_keywords[grammar_attributes.slice(split_start, split_pos).trim()] + ",";
+					grammar_attribute_json += BF_LANG.grammar_keywords[grammar_attributes.slice(split_start, split_pos).trim()] + ",";
 					split_start = split_pos + 1;
 				} else {
 					///TODO: Determine if trim() is necessary or if there is a better implementation.
 					///NOTE: exclude_json.slice(0, -1) is used to remove the trailing comma.  This could be unnecessary.
-					return [GRAMMATICAL_SEARCH, grammar_json + grammar_attribute_json + lang.grammar_keywords[grammar_attributes.slice(split_start).trim()] + "],[" + exclude_json.slice(0, -1) + "]]"];
+					return [grammatical_search, grammar_json + grammar_attribute_json + BF_LANG.grammar_keywords[grammar_attributes.slice(split_start).trim()] + "],[" + exclude_json.slice(0, -1) + "]]"];
 				}
 			} while (true);
 		}
 		/// The search is just a standard search.
-		return [STANDARD_SEARCH];
+		return [standard_search];
 	}
 	
 	
 	/**
 	 * Submits a query via Ajax.
 	 *
-	 * @example	run_search(ADDITIONAL);	/// Will add verses to the bottom.
-	 * @example	run_search(PREVIOUS);	/// Will add verses to the top.
-	 * @param	direction (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
+	 * @example	run_search(additional);	/// Will add verses to the bottom.
+	 * @example	run_search(previous);	/// Will add verses to the top.
+	 * @param	direction (integer) The direction of the verses to be retrieved: additional || previous.
 	 * @return	NULL.  Query is sent via Ajax.
 	 * @note	Called by prepare_new_search() when the user submits a search.
 	 * @note	Called by add_content_bottom() and add_content_top() when scrolling.
@@ -489,7 +491,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		var ajax,
 			query = "t=" + last_type;
 		
-		if (direction == ADDITIONAL) {
+		if (direction == additional) {
 			ajax = ajax_additional;
 		} else {
 			ajax = ajax_previous;
@@ -500,15 +502,15 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		///NOTE: readyState is between 0-4, and anything 1-3 means that the server is already working on this request.
 		if (ajax.readyState % 4) return null;
 		
-		if (last_type == VERSE_LOOKUP) {
-			if (direction == ADDITIONAL) {
+		if (last_type == verse_lookup) {
+			if (direction == additional) {
 				query += "&q=" + (bottom_id + 1);
 			} else {
 				query += "&q=" + (top_id - 1);
 			}
 		} else {
 			query += "&q=" + last_search_encoded;
-			if (direction == ADDITIONAL) {
+			if (direction == additional) {
 				/// Continue starting on the next verse.
 				if (bottom_id > 0) query += "&s=" + (bottom_id + 1);
 			} else {
@@ -526,10 +528,13 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 * Writes new verses to the page, determines if more content is needed or available,
 	 * and writes initial information to the info bar.
 	 *
-	 * @example	prepare_verses([[1001001, 1001002], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>", "<b id="12">And</b> <b id="13">the</b> <b id="14">earth....</b>"], 2]);
-	 * @example	prepare_verses([[1001001], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>"], 1]);
-	 * @example	prepare_verses([[50004008], ["<b id=772635>Finally,</b> <b id=772636>brethren,</b> <b id=772637>whatsoever</b> <b id=772638>things....</b>"], 1, [772638]]);
-	 * @param	res (array) JSON array from the server.  Array format: [action, direction], [verse_ids, ...], [verse_HTML, ...], number_of_matches, [word_id, ...]].  ///NOTE: word_id is optional.
+	 * @example	handle_new_verses([[1001001, 1001002], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>", "<b id="12">And</b> <b id="13">the</b> <b id="14">earth....</b>"], 2]);
+	 * @example	handle_new_verses([[1001001], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>"], 1]);
+	 * @example	handle_new_verses([[50004008], ["<b id=772635>Finally,</b> <b id=772636>brethren,</b> <b id=772637>whatsoever</b> <b id=772638>things....</b>"], 1, [772638]]);
+	 * @param	res			(array)		JSON array from the server.
+	 *									Array format: [verse_ids, ...], [verse_HTML, ...], number_of_matches, [word_id, ...]] ///NOTE: word_id is optional.
+	 * @param	extra_data	(object)	An object containing the type of action that was preformed and the direction the verses are displayed in.
+	 *									Format: {action: (int), direction: (int)}
 	 * @return	NULL.  The function writes HTML to the page.
 	 * @note	Called by prepare_verses() after an Ajax request.
 	 */
@@ -548,7 +553,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			write_verses(action, direction, res[0], res[1]);
 			
 			///FIXME: Highlighting needs to be in its own function where each type and mixed highlighting will be done correctly.
-			if (action == STANDARD_SEARCH) {
+			if (action == standard_search) {
 				/// Highlight the verse after 100 milliseconds.
 				/// The delay is so that the verse is displayed as quickly as possible.
 				///TODO: Determine if it would be better to put this in an array and send it all at once, preferably without the implied eval().
@@ -557,16 +562,16 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 				{
 					highlight_search_results(res[1].join(""));
 				}, 100);
-			} else if (action == GRAMMATICAL_SEARCH) {
+			} else if (action == grammatical_search) {
 				count = res[3].length;
 				for (i = 0; i < count; ++i) {
 					///TODO: Determine if there is a downside to having a space at the start of the className.
 					///TODO: Determine if we ever need to replace an existing f* className.
-					doc.getElementById(res[3][i]).className += " f" + 1;
+					document.getElementById(res[3][i]).className += " f" + 1;
 				}
 				/// Record the last id found from the search so that we know where to start from for the next search as the user scrolls.
 				/// Do we need to record the bottom id?
-				if (direction == ADDITIONAL) {
+				if (direction == additional) {
 					bottom_id = res[3][count - 1];
 				} else {
 					top_id = res[3][0];
@@ -574,24 +579,24 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			}
 			
 			/// Indicate to the user that more content may be loading, and check for more content.
-			if (direction == ADDITIONAL && res[0][res[0].length - 1] < 66022021) {
+			if (direction == additional && res[0][res[0].length - 1] < 66022021) {
 				bottomLoader.style.visibility = "visible";
 				setTimeout(add_content_bottom, lookup_speed_sitting);
 			}
-			if ((direction == PREVIOUS || waiting_for_first_search) && res[0][0] > 1001001) {
+			if ((direction == previous || waiting_for_first_search) && res[0][0] > 1001001) {
 				topLoader.style.visibility = "visible";
 				/// A delay is added on to space out the requests.
 				setTimeout(add_content_top, lookup_speed_sitting + lookup_delay);
 			}
 		} else {
-			if (direction == ADDITIONAL) {
-				/// The user has reached the bottom by scrolling down (either RETURNED_SEARCH or RETURNED_VERSES_PREVIOUS), so we need to hide the loading graphic.
+			if (direction == additional) {
+				/// The user has reached the bottom by scrolling down (either RETURNED_SEARCH or RETURNED_VERSES_previous), so we need to hide the loading graphic.
 				/// This is cause by scrolling to Revelation 22:21 or end of search or there were no results.
 				scroll_maxed_bottom = true;
 				bottomLoader.style.visibility = "hidden";
 			}
-			if (direction == PREVIOUS || waiting_for_first_search) {
-				/// The user has readed the top of the page by scrolling up (either Genesis 1:1 or there were no search results), so we need to hide the loading graphic
+			if (direction == previous || waiting_for_first_search) {
+				/// The user has reached the top of the page by scrolling up (either Genesis 1:1 or there were no search results), so we need to hide the loading graphic
 				scroll_maxed_top = true;
 				topLoader.style.visibility = "hidden";
 			}
@@ -601,19 +606,19 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		if (waiting_for_first_search) {
 			/// If the user had scrolled down the page and then pressed the refresh button,
 			/// the page will keep scrolling down as content is loaded, so to prevent this, force the window to scroll to the top of the page.
-			win.scrollTo(0, 0);
+			window.scrollTo(0, 0);
 			
 			waiting_for_first_search = false;
 			
 			infoBar.innerHTML = "";
 			
-			if (action != VERSE_LOOKUP) {
+			if (action != verse_lookup) {
 				/// Create the inital text.
-				infoBar.appendChild(doc.createTextNode(format_number(total) + lang["found_" + (total == 1 ? "singular" : "plural")]));
+				infoBar.appendChild(document.createTextNode(format_number(total) + lang["found_" + (total == 1 ? "singular" : "plural")]));
 				/// Create a <b> for the search terms.
-				b_tag = doc.createElement("b");
+				b_tag = document.createElement("b");
 				///NOTE: We use this method instead of straight innerHTML to prevent HTML elements from appearing inside the <b></b>.
-				b_tag.appendChild(doc.createTextNode(last_search));
+				b_tag.appendChild(document.createTextNode(last_search));
 				infoBar.appendChild(b_tag);
 			}
 			
@@ -627,9 +632,9 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 * Writes new verses to page.
 	 *
 	 * @example	write_verses(action, direction, [verse_ids, ...], [verse_HTML, ...]);
-	 * @example	write_verses(VERSE_LOOKUP, ADDITIONAL, [1001001], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>"]);
-	 * @param	action		(integer)	The type of query: VERSE_LOOKUP || MIXED_SEARCH || STANDARD_SEARCH || GRAMMATICAL_SEARCH.
-	 * @param	direction	(integer)	The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
+	 * @example	write_verses(verse_lookup, additional, [1001001], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>"]);
+	 * @param	action		(integer)	The type of query: verse_lookup || mixed_search || standard_search || grammatical_search.
+	 * @param	direction	(integer)	The direction of the verses to be retrieved: additional || previous.
 	 * @param	verse_ids	(array)		An array of integers representing Bible verse references.
 	 * @param	verse_HTML	(array)		An array of strings containing verses in HTML.
 	 * @return	NULL.  Writes HTML to the page.
@@ -649,9 +654,9 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			stop_key		= verse_ids.length,
 			v;
 		
-		/// Currently only GRAMMATICAL_SEARCH searches data at the word level, so it is the only action that might stop in the middle of a verse and find more words in the same verse as the user scrolls.
-		if (action == GRAMMATICAL_SEARCH) {
-			if (direction == ADDITIONAL) {
+		/// Currently only grammatical_search searches data at the word level, so it is the only action that might stop in the middle of a verse and find more words in the same verse as the user scrolls.
+		if (action == grammatical_search) {
+			if (direction == additional) {
 				/// Is the first verse returned the same as the bottom verse on the page?
 				if (bottom_verse == verse_ids[0]) start_key = 1;
 			} else {
@@ -667,18 +672,18 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			b	= (num - v - c * 1000) / 1000000;	/// Calculate the book by number (e.g., Genesis == 1).
 			
 			///TODO: Determine if it would be better to have two for loops instead of the if statement inside of this one.
-			if (action == VERSE_LOOKUP) {
+			if (action == verse_lookup) {
 				/// Is this the first verse or the Psalm title?
 				if (v < 2) {
 					/// Is this chapter 1?  (We need to know if we should display the book name.)
 					if (c == 1) {
-						HTML_str += "<div class=book id=" + num + "_title>" + lang.books_long_pretitle[b] + "<h1>" + lang.books_long_main[b] + "</h1>" + lang.books_long_posttitle[b] + "</div>";
+						HTML_str += "<div class=book id=" + num + "_title>" + BF_LANG.books_long_pretitle[b] + "<h1>" + BF_LANG.books_long_main[b] + "</h1>" + BF_LANG.books_long_posttitle[b] + "</div>";
 					} else if (b != 19 || v === 0 || ((c <= 2) || (c == 10) || (c == 33) || (c == 43) || (c == 71) || (c == 91) || (c >= 93 && c <= 97) || (c == 99) || (c >= 104 && c <= 107) || (c >= 111 && c <= 119) || (c >= 135 && c <= 137) || (c >= 146))) { /// Display chapter/psalm number (but not on verse 1 of psalms that have titles).
 						/// Is this the book of Psalms?  (Psalms have a special name.)
 						if (b == 19) {
-							chapter_text = lang.psalm;
+							chapter_text = BF_LANG.psalm;
 						} else {
-							chapter_text = lang.chapter;
+							chapter_text = BF_LANG.chapter;
 						}
 						HTML_str += "<h3 class=chapter id=" + num + "_chapter>" + chapter_text + " " + c + "</h3>";
 					}
@@ -695,33 +700,33 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			/// Searching
 			} else {
 				/// Change verse 0 to "title" (i.e., Psalm titles).  (Display Psalm 3:title instead of Psalm 3:0.)
-				if (v === 0) v = lang.title;
+				if (v === 0) v = BF_LANG.title;
 				
 				/// Is this verse from a different book than the last verse?
 				if (b != last_book) {
 					/// We only need to print out the book if it is different from the last verse.
 					last_book = b;
 					
-					HTML_str += "<h1 class=book id=" + num + "_title>" + lang.books_short[b] + "</h1>"; /// Convert the book number to text.
+					HTML_str += "<h1 class=book id=" + num + "_title>" + BF_LANG.books_short[b] + "</h1>"; /// Convert the book number to text.
 				}
 				
 				HTML_str += "<div class=search_verse id=" + num + "_search>" + c + ":" + v + " " + verse_HTML[i] + "</div>";
 			}
 		}
 		
-		newEl = doc.createElement("div");
+		newEl = document.createElement("div");
 		///NOTE: If innerHTML disappears in the future (because it is not (yet) in the "standards"),
 		///      a simple (but slow) alternative is to use the innerDOM script from http://innerdom.sourceforge.net/ or BetterInnerHTML from http://www.optimalworks.net/resources/betterinnerhtml/.
-		///      Also using "range = doc.createRange(); newEl = range.createContextualFragment(HTML_str); is also a possibility.
+		///      Also using "range = document.createRange(); newEl = range.createContextualFragment(HTML_str); is also a possibility.
 		newEl.innerHTML = HTML_str;
 		
-		if (direction == ADDITIONAL) {
+		if (direction == additional) {
 			page.appendChild(newEl);
 			
 			/// Record the bottom most verse reference and id so that we know where to start from for the next search or verse lookup as the user scrolls.
-			///NOTE: For VERSE_LOOKUP and STANDARD_SEARCH, the bottom_id and bottom_verse are the same because the search is preformed at the verse level.
-			///      GRAMMATICAL_SEARCH is performed at the word level, so the id is different from the verse.
-			///      The id for GRAMMATICAL_SEARCH is recorded in handle_new_verses(), currently.
+			///NOTE: For verse_lookup and standard_search, the bottom_id and bottom_verse are the same because the search is preformed at the verse level.
+			///      grammatical_search is performed at the word level, so the id is different from the verse.
+			///      The id for grammatical_search is recorded in handle_new_verses(), currently.
 			///TODO: Determine the pros/cons of using an if statement to prevent grammatical searches from recording the id here, since it is overwritten later.
 			bottom_id = bottom_verse = num;
 		} else {
@@ -729,12 +734,12 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			
 			/// The new content that was just added to the top of the page will push the other contents downward.
 			/// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was added.
-			win.scrollTo(0, scroll_pos = win.pageYOffset + newEl.clientHeight);
+			window.scrollTo(0, scroll_pos = window.pageYOffset + newEl.clientHeight);
 			
 			/// Record the top most verse reference and id so that we know where to start from for the next search or verse lookup as the user scrolls.
-			///NOTE: For VERSE_LOOKUP and STANDARD_SEARCH, the top_id and top_verse are the same because the search is preformed at the verse level.
-			///      GRAMMATICAL_SEARCH is performed at the word level, so the id is different from the verse.
-			///      The id for GRAMMATICAL_SEARCH is recorded in handle_new_verses(), currently.
+			///NOTE: For verse_lookup and standard_search, the top_id and top_verse are the same because the search is preformed at the verse level.
+			///      grammatical_search is performed at the word level, so the id is different from the verse.
+			///      The id for grammatical_search is recorded in handle_new_verses(), currently.
 			///TODO: Determine the pros/cons of using an if statement to prevent grammatical searches from recording the id here, since it is overwritten later.
 			top_id = top_verse = verse_ids[0];
 		}
@@ -790,7 +795,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			for (i = 1; i < ids; i += 2) {
 				///TODO: Determine if there is a downside to having a space at the start of the className.
 				///TODO: Determine if we ever need to replace an existing f* className.
-				doc.getElementById(tmp_found_ids[i]).className += " f" + (regex_id + 1);
+				document.getElementById(tmp_found_ids[i]).className += " f" + (regex_id + 1);
 			}
 		}
 	}
@@ -823,7 +828,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		
 		highlight_re = [];
 		
-		search_terms_arr = lang.filter_terms_for_highlighter(search_terms);
+		search_terms_arr = BF_LANG.filter_terms_for_highlighter(search_terms);
 		
 		///TODO: Determine if a normal for loop would be better.
 		first_loop:for (i in search_terms_arr) {
@@ -883,7 +888,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 					no_morph = true;
 				} else {
 					/// A normal word without a wildcard gets stemmed.
-					stemmed_word = lang.stem_word(term);
+					stemmed_word = BF_LANG.stem_word(term);
 					no_morph = false;
 				}
 			}
@@ -957,11 +962,11 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 */
 	function scrolling()
 	{
-		/// Trick IE into understanding win.pageYOffset.
+		/// Trick IE into understanding window.pageYOffset.
 		/*@cc_on
-			win.pageYOffset = doc_docEl.scrollTop;
+			window.pageYOffset = doc_docEl.scrollTop;
 		@*/
-		var new_scroll_pos	= win.pageYOffset,
+		var new_scroll_pos	= window.pageYOffset,
 			scrolling_down;
 		
 		if (new_scroll_pos == scroll_pos) {
@@ -1044,7 +1049,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			/// Calculate and set the new scroll position
 			/// Because content is being removed from the top of the page, the rest of the content will be shifted upward.
 			/// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was removed.
-			win.scrollTo(0, scroll_pos = (win.pageYOffset - child_height));
+			window.scrollTo(0, scroll_pos = (window.pageYOffset - child_height));
 			
 			page.removeChild(child);
 			
@@ -1087,7 +1092,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			
 			/// This fixes an IE7+ bug that causes the page to scroll needlessly when an element is added.
 			/*@cc_on
-				win.scrollTo(0, scroll_pos);
+				window.scrollTo(0, scroll_pos);
 			@*/
 			/// End execution to keep the checking_content_top_interval running because there might be even more content that should be removed.
 			bottomLoader.style.visibility = "visible";
@@ -1123,7 +1128,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		if (child_position < scroll_pos + page_height + buffer_add) {
 			/// Can the content be grabbed from cache?
 			if (cached_count_bottom > 0) {
-				newEl = doc.createElement("div");
+				newEl = document.createElement("div");
 				/// First subtract 1 from the global counter variable to point to the last cached passage, and then retrieve the cached content.
 				newEl.innerHTML = cached_verses_bottom[--cached_count_bottom];
 				///NOTE: This is actually works like insertAfter() (if such a function existed).
@@ -1132,7 +1137,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 				
 				/// This fixes an IE7+ bug that causes the page to scroll needlessly when an element is added.
 				/*@cc_on
-					win.scrollTo(0, scroll_pos);
+					window.scrollTo(0, scroll_pos);
 				@*/
 				/// Better check to see if we need to add more content.
 				setTimeout(add_content_bottom, lookup_speed_scrolling);
@@ -1143,7 +1148,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 					return null;
 				}
 				/// Get more content.
-				run_search(ADDITIONAL);
+				run_search(additional);
 			}
 		}
 	}
@@ -1174,7 +1179,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		if (child_position + buffer_add > scroll_pos) {
 			/// Can the content be grabbed from cache?
 			if (cached_count_top > 0) {
-				newEl = doc.createElement("div");
+				newEl = document.createElement("div");
 				
 				/// First subtract 1 from the global counter variable to point to the last cached passage, and then retrieve the cached content.
 				newEl.innerHTML = cached_verses_top[--cached_count_top];
@@ -1183,7 +1188,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 				
 				/// The new content that was just added to the top of the page will push the other contents downward.
 				/// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was added.
-				win.scrollTo(0, scroll_pos = (win.pageYOffset + newEl.clientHeight));
+				window.scrollTo(0, scroll_pos = (window.pageYOffset + newEl.clientHeight));
 				
 				/// Check to see if we need to add more content.
 				setTimeout(add_content_top, lookup_speed_scrolling);
@@ -1194,7 +1199,7 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 					return null;
 				}
 				/// Get more content.
-				run_search(PREVIOUS);
+				run_search(previous);
 			}
 		}
 	}
@@ -1280,15 +1285,15 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		b2 = (verse2 - v2 - c2 * 1000) / 1000000;
 		
 		/// The titles in the book of Psalms are referenced as verse zero (cf. Psalm 3).
-		v1 = v1 === 0 ? lang.title : v1;
-		v2 = v2 === 0 ? lang.title : v2;
+		v1 = v1 === 0 ? BF_LANG.title : v1;
+		v2 = v2 === 0 ? BF_LANG.title : v2;
 		
 		///NOTE: \u2013 is Unicode for the en dash (–) (HTML: &ndash;).
 		///TODO: Determine if the colons should be language specified.
 		/// Are the books the same?
 		if (b1 == b2) {
 			/// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
-			b1 = b1 == 19 ? lang.psalm : lang.books_short[b1];
+			b1 = b1 == 19 ? BF_LANG.psalm : BF_LANG.books_short[b1];
 			/// Are the chapters the same?
 			if (c1 == c2) {
 				/// Are the verses the same?
@@ -1302,31 +1307,31 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			}
 		} else {
 			/// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
-			b1 = b1 == 19 ? lang.psalm : lang.books_short[b1];
-			b2 = b2 == 19 ? lang.psalm : lang.books_short[b2];
+			b1 = b1 == 19 ? BF_LANG.psalm : BF_LANG.books_short[b1];
+			b2 = b2 == 19 ? BF_LANG.psalm : BF_LANG.books_short[b2];
 			
 			ref_range = b1 + " " + c1 + ":" + v1 + "\u2013" + b2 + " " + c2 + ":" + v2;
 		}
 		
 		/// last_type is set in prepare_new_search().
 		/// The verse range is displayed differently based on the type of search (i.e., a verse look up or a regular search).
-		if (last_type == VERSE_LOOKUP) {
-			new_title = ref_range + " - " + lang.app_name;
+		if (last_type == verse_lookup) {
+			new_title = ref_range + " - " + BF_LANG.app_name;
 		} else {
-			new_title = last_search + " (" + ref_range + ") - " + lang.app_name;
+			new_title = last_search + " (" + ref_range + ") - " + BF_LANG.app_name;
 		}
 		
 		/// Is the new verse range the same as the old one?
 		/// If they are the same, updating it would just waste resources.
-		if (doc.title != new_title) {
-			doc.title = new_title;
+		if (document.title != new_title) {
+			document.title = new_title;
 			
 			/// Display the verse range on the page if looking up verses.
 			///FIXME: There should be a variable that shows the current view mode and not rely on last_type.
-			if (last_type == VERSE_LOOKUP) {
+			if (last_type == verse_lookup) {
 				///TODO: Find a better way to clear infoBar than innerHTML.
 				infoBar.innerHTML = "";
-				infoBar.appendChild(doc.createTextNode(ref_range));
+				infoBar.appendChild(document.createTextNode(ref_range));
 			}
 		}
 		
@@ -1431,11 +1436,13 @@ function create_viewport(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	/**
 	 * Send an Ajax request to the server.
 	 *
-	 * @example	post_to_server("search.php", "q=search", ajax);
-	 * @example	post_to_server("search.php", "q=search&s=48003027", ajax);
-	 * @param	server_URL	(string) The file on the server to run.
-	 * @param	message		(string) The variables to send.  URI format: "name1=value1&name2=value%202"
-	 * @param	ajax		(object) The Ajax object that preforms the query.
+	 * @example	post_to_server("search.php", "q=search", ajax, {action: last_type, "direction": direction});
+	 * @example	post_to_server("search.php", "q=search&s=48003027", ajax, {action: 1, "direction": 1});
+	 * @param	server_URL	(string)			The file on the server to run.
+	 * @param	message		(string)			The variables to send.
+	 *											URI format: "name1=value1&name2=value%202"
+	 * @param	ajax		(object)			The Ajax object that preforms the query.
+	 * @param	extra_data	(mixed) (optional)	Any data to send to the handler function.
 	 * @return	NULL.  Queries server and then performs an action with the received JSON array.
 	 * @note	Called by run_search().
 	 */
