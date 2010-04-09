@@ -8,19 +8,8 @@
  * @author	BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
  */
 
-/// Initialize the JavaScript frontend of BibleForge.
-CREATE_VIEWPORT(
-	document.getElementById("viewPort1"),
-	document.getElementById("searchForm1"),
-	document.getElementById("q1"),
-	document.getElementById("scroll1"),
-	document.getElementById("infoBar1"),
-	document.getElementById("topLoader1"),
-	document.getElementById("bottomLoader1"),
-	document.documentElement);
-
 /**
- * Create the BibleForge environment.
+ * Initialize the BibleForge environment.
  *
  * This function is used to house all of the code used by BibleForge,
  * expect for language specific code, which is stored in js/lang/LOCALE.js.
@@ -34,14 +23,17 @@ CREATE_VIEWPORT(
  * @param	doc_docEl		(object) The document.documentElement element (the HTML element).
  * @return	NULL.  Some functions are attached to events and the rest accompany them via closure.
  */
-function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, bottomLoader, doc_docEl)
-{
-	var verse_lookup			= 1,
+(function (viewPort, searchForm, q_obj, page, infoBar, topLoader, bottomLoader, doc_docEl)
+{	
+	var create_viewport = arguments.callee,
+		
+		/// Query type "constants"
+		verse_lookup			= 1,
 		mixed_search			= 2,
 		standard_search			= 3,
 		grammatical_search		= 4,
 		
-		/// Direction constants
+		/// Direction "constants"
 		additional	= 1,
 		previous	= 2,
 		
@@ -54,8 +46,8 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		waiting_for_first_search	= false,
 		
 		/// Ajax objects
-		ajax_additional	= new window.XMLHttpRequest(),
-		ajax_previous	= new window.XMLHttpRequest(),
+		ajax_additional	= new XMLHttpRequest(),
+		ajax_previous	= new XMLHttpRequest(),
 		
 		/// Verse variables
 		/// top_verse and bottom_verse are the last verses displayed on the screen so that the same verse is not displayed twice when more search data is returned (currently just used for grammatical_search).
@@ -89,14 +81,15 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		scroll_maxed_bottom				= false,
 		scroll_maxed_top				= true,
 		scroll_pos						= 0;
-		
+	
 	/// Simple Event Registration
 	/// Capture form submit event.
 	searchForm.onsubmit = prepare_new_search;
 	
 	///NOTE: Could use wheel if the scroll bars are invisible.
-	window.onscroll = scrolling;
-	window.onresize = resizing;
+	///FIXME: These global events need to be localized to the objects passed to the function.
+	onscroll = scrolling;
+	onresize = resizing;
 	
 	/*********************************
 	 * Start of Suggestion functions *
@@ -110,7 +103,7 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	q_obj.onkeypress = (function ()
 	{
 		/// Auto Suggest variables
-		var ajax_suggestions		= new window.XMLHttpRequest(),
+		var ajax_suggestions		= new XMLHttpRequest(),
 			last_suggestion_text	= "",
 			suggest_cache			= {},
 			suggest_delay			= 250,
@@ -170,12 +163,12 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		 *
 		 * @param	event (event object) (optional) The event object (Mozilla/Safari/Opera).
 		 * @return	TRUE. ///TODO: Determine if this is the correct value to return.
-		 * @note	This function is returned into the window.onkeypress event.
+		 * @note	This function is returned into the global onkeypress event.
 		 */
-		return function (event)
+		return function (e)
 		{
-			if (!event) {
-				event = window.event; /// IE does not send the event object.
+			if (!e) {
+				e = event; /// IE does not send the event object.
 			}
 			
 			/// keyCode meanings:
@@ -184,7 +177,7 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			///	13	enter
 			/// 38	up
 			/// 40	down
-			switch (event.keyCode) {
+			switch (e.keyCode) {
 			case 38:
 				///TODO: Move the highlighting up.
 				break;
@@ -305,10 +298,11 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		};
 		
 		
-		/// Trick IE into understanding window.pageYOffset.
+		/// Trick IE into understanding pageYOffset.
 		/// Set the initial value, so that it is not undefined.
 		/// See scrolling().
-		window.pageYOffset = doc_docEl.scrollTop;
+		///NOTE: pageYOffset is a browser-created, global variable.
+		pageYOffset = doc_docEl.scrollTop;
 	@*/
 	
 	
@@ -324,7 +318,7 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 * @example	prepare_new_search();
 	 * @return	FALSE to prevent the form from submitting.
 	 * @note	Called when clicking the submit button on the search bar in index.php.
-	 * @note	Global variables used: waiting_for_first_search, ajax_additional, ajax_previous, last_type, bottom_id, last_search_encoded, last_search.
+	 * @note	Outer variables used: waiting_for_first_search, ajax_additional, ajax_previous, last_type, bottom_id, last_search_encoded, last_search.
 	 */
 	function prepare_new_search()
 	{
@@ -396,7 +390,7 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			/// Do we already have the regex array or do we not need because the highlighted words will be returned (e.g., grammatical searching)?
 			if (raw_search_terms != last_search) {
 				prepare_highlighter(last_search_prepared);
-				/// This global variable is used to display the last search on the info bar.
+				/// This outer variable is used to display the last search on the info bar.
 				last_search = raw_search_terms;
 			}
 		}
@@ -500,7 +494,7 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 * @return	NULL.  Query is sent via Ajax.
 	 * @note	Called by prepare_new_search() when the user submits a search.
 	 * @note	Called by add_content_bottom() and add_content_top() when scrolling.
-	 * @note	Global variables used: last_type and bottom_id, top_id, last_search_encoded.
+	 * @note	Outer variables used: last_type and bottom_id, top_id, last_search_encoded.
 	 */
 	function run_search(direction)
 	{
@@ -627,7 +621,8 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		if (waiting_for_first_search) {
 			/// If the user had scrolled down the page and then pressed the refresh button,
 			/// the page will keep scrolling down as content is loaded, so to prevent this, force the window to scroll to the top of the page.
-			window.scrollTo(0, 0);
+			///NOTE: scrollTo() is a browser-created, global function.
+			scrollTo(0, 0);
 			
 			waiting_for_first_search = false;
 			
@@ -635,7 +630,7 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			
 			if (action != verse_lookup) {
 				/// Create the inital text.
-				infoBar.appendChild(document.createTextNode(format_number(total) + lang["found_" + (total == 1 ? "singular" : "plural")]));
+				infoBar.appendChild(document.createTextNode(format_number(total) + BF_LANG["found_" + (total == 1 ? "singular" : "plural")]));
 				/// Create a <b> for the search terms.
 				b_tag = document.createElement("b");
 				///NOTE: We use this method instead of straight innerHTML to prevent HTML elements from appearing inside the <b></b>.
@@ -761,7 +756,9 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			
 			/// The new content that was just added to the top of the page will push the other contents downward.
 			/// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was added.
-			window.scrollTo(0, scroll_pos = window.pageYOffset + newEl.clientHeight);
+			///NOTE: scrollTo() is a browser-created, global function.
+			///NOTE: pageYOffset is a browser-created, global variable.
+			scrollTo(0, scroll_pos = pageYOffset + newEl.clientHeight);
 			
 			/// Record the top most verse reference and id so that we know where to start from for the next search or verse lookup as the user scrolls.
 			///NOTE: For verse_lookup and standard_search, the top_id and top_verse are the same because the search is preformed at the verse level.
@@ -837,7 +834,7 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 * @example	prepare_highlighter(q_obj.value);
 	 * @example	prepare_highlighter("search terms");
 	 * @param	search_terms (string) The terms to look for.
-	 * @return	NULL.  A regex array is created and stored in the global variable highlight_re[].
+	 * @return	NULL.  A regex array is created and stored in the outer variable highlight_re[].
 	 * @note	Called by run_search().
 	 */
 	function prepare_highlighter(search_terms)
@@ -921,7 +918,7 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			}
 			len_after = stemmed_word.length;
 			
-			/// Skip words that are the same after stemming or regexing.
+			/// Skip words that are the same after stemming or regexing (e.g., "joy joyful" becomes "joy joy").
 			for (j = 0; j < count; ++j) {
 				if (stemmed_word == stemmed_arr[j]) {
 					continue first_loop; ///NOTE: This is the same as "continue 2" in PHP.
@@ -989,15 +986,16 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 *
 	 * @return	NULL.  May call other functions via setTimeout().
 	 * @note	Called when the window scrolls.
-	 * @note	Set via "window.onscroll = scrolling;".
+	 * @note	Set by  the onscroll event.
 	 */
 	function scrolling()
 	{
-		/// Trick IE into understanding window.pageYOffset.
+		/// Trick IE into understanding pageYOffset.
+		///NOTE: pageYOffset is a browser-created, global variable.
 		/*@cc_on
-			window.pageYOffset = doc_docEl.scrollTop;
+			pageYOffset = doc_docEl.scrollTop;
 		@*/
-		var new_scroll_pos	= window.pageYOffset,
+		var new_scroll_pos	= pageYOffset,
 			scrolling_down;
 		
 		if (new_scroll_pos == scroll_pos) {
@@ -1065,27 +1063,29 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			return null;
 		}
 		
-		///NOTE: Mozilla ignores .clientHeight, .offsetHeight, .scrollHeight for some objects (not <div> however) with a doctype.
+		///NOTE: Mozilla ignores .clientHeight, .offsetHeight, .scrollHeight for some objects (not <div> however) when in standards mode (i.e., a doctype is present).
 		///      If Mozilla has problems in the future, you can use this as a replacement:
-		///      child_height = parseInt(window.getComputedStyle(child, null).getPropertyValue("height"));
+		///      child_height = parseInt(getComputedStyle(child, null).getPropertyValue("height"));
 		
 		///NOTE: Opera wrongly subtracts the scroll position from .offsetTop.
 		
 		child_height = child.clientHeight;
 		
-		///NOTE: Mozilla also has window.scrollMaxY, which is slightly different than document.documentElement.scrollHeight (document.body.scrollHeight should work too).
+		///NOTE: Mozilla also has scrollMaxY, which is slightly different from document.documentElement.scrollHeight (document.body.scrollHeight should work too).
 		
 		/// Is the object in the remove zone, and is its height less than the remaining space to scroll to prevent jumping?
 		if (child_height + buffer_rem < scroll_pos && child_height < doc_docEl.scrollHeight - scroll_pos - doc_docEl.clientHeight) {
-			/// Store the content in cache, and then add 1 to the global counter variable so that we know how much cache we have.
+			/// Store the content in the cache, and then add 1 to the outer counter variable so that we know how much cache we have.
 			cached_verses_top[cached_count_top++] = child.innerHTML;
 			///TODO: Determine if setting the display to "none" actually helps at all.
-			/// Remove quickly from page.
+			/// Remove quickly from the page.
 			child.style.display = "none";
 			/// Calculate and set the new scroll position.
 			/// Because content is being removed from the top of the page, the rest of the content will be shifted upward.
 			/// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was removed.
-			window.scrollTo(0, scroll_pos = (window.pageYOffset - child_height));
+			///NOTE: scrollTo() is a browser-created, global function.
+			///NOTE: pageYOffset is a browser-created, global variable.
+			scrollTo(0, scroll_pos = (pageYOffset - child_height));
 			
 			page.removeChild(child);
 			
@@ -1122,14 +1122,15 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		
 		/// Is the element is in the remove zone?
 		if (child_position > scroll_pos + page_height + buffer_rem) {
-			/// Store the content in cache, and then add 1 to the global counter variable so that we know how much cache we have.
+			/// Store the content in the cache, and then add 1 to the outer counter variable so that we know how much cache we have.
 			cached_verses_bottom[cached_count_bottom++] = child.innerHTML;
 			
 			page.removeChild(child);
 			
 			/// This fixes an IE7+ bug that causes the page to scroll needlessly when an element is added.
+			///NOTE: scrollTo() is a browser-created, global function.
 			/*@cc_on
-				window.scrollTo(0, scroll_pos);
+				scrollTo(0, scroll_pos);
 			@*/
 			/// End execution to keep the checking_content_top_interval running because there might be even more content that should be removed.
 			bottomLoader.style.visibility = "visible";
@@ -1168,15 +1169,16 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			/// Can the content be grabbed from cache?
 			if (cached_count_bottom > 0) {
 				newEl = document.createElement("div");
-				/// First subtract 1 from the global counter variable to point to the last cached passage, and then retrieve the cached content.
+				/// First subtract 1 from the outer counter variable to point to the last cached passage, and then retrieve the cached content.
 				newEl.innerHTML = cached_verses_bottom[--cached_count_bottom];
 				///NOTE: This is actually works like insertAfter() (if such a function existed).
 				///      By using "null" as the second parameter, it tells it to add the element to the end.
 				page.insertBefore(newEl, null);
 				
 				/// This fixes an IE7+ bug that causes the page to scroll needlessly when an element is added.
+				///NOTE: scrollTo() is a browser-created, global function.
 				/*@cc_on
-					window.scrollTo(0, scroll_pos);
+					scrollTo(0, scroll_pos);
 				@*/
 				/// Better check to see if we need to add more content.
 				setTimeout(add_content_bottom, lookup_speed_scrolling);
@@ -1222,14 +1224,16 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 			if (cached_count_top > 0) {
 				newEl = document.createElement("div");
 				
-				/// First subtract 1 from the global counter variable to point to the last cached passage, and then retrieve the cached content.
+				/// First subtract 1 from the outer counter variable to point to the last cached passage, and then retrieve the cached content.
 				newEl.innerHTML = cached_verses_top[--cached_count_top];
 				
 				page.insertBefore(newEl, child);
 				
 				/// The new content that was just added to the top of the page will push the other contents downward.
 				/// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was added.
-				window.scrollTo(0, scroll_pos = (window.pageYOffset + newEl.clientHeight));
+				///NOTE: scrollTo() is a browser-created, global function.
+				///NOTE: pageYOffset is a browser-created, global variable.
+				scrollTo(0, scroll_pos = (pageYOffset + newEl.clientHeight));
 				
 				/// Check to see if we need to add more content.
 				setTimeout(add_content_top, lookup_speed_scrolling);
@@ -1461,7 +1465,7 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 	 *
 	 * @return	NULL.  Calls other functions
 	 * @note	Called when the window is resized.
-	 * @note	Set via window.onresize = resizing.
+	 * @note	Set by the onresize event.
 	 */
 	function resizing()
 	{
@@ -1517,4 +1521,11 @@ function CREATE_VIEWPORT(viewPort, searchForm, q_obj, page, infoBar, topLoader, 
 		};
 		ajax.send(message);
 	}
-}
+})(	document.getElementById("viewPort1"),
+	document.getElementById("searchForm1"),
+	document.getElementById("q1"),
+	document.getElementById("scroll1"),
+	document.getElementById("infoBar1"),
+	document.getElementById("topLoader1"),
+	document.getElementById("bottomLoader1"),
+	document.documentElement);
