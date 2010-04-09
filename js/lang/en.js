@@ -627,7 +627,8 @@ var BF_LANG = (function ()
 			initial_search_arr = search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?|[^\s]*)|[~\/]\d*|["',.:?!;&|\)\(\]\[\/\\`{}<$^+]|-\B)/g, "").toLowerCase().split(" ");
 			arr_len = initial_search_arr.length;
 			
-			first_loop:for (i = 0; i < arr_len; ++i) {
+			first_loop:
+			for (i = 0; i < arr_len; ++i) {
 				for (j = 0; j < new_arr_len; ++j) {
 					if (final_search_arr[j] == initial_search_arr[i]) {
 						continue first_loop; /// This words already exists; jump to the first loop and get the next word.  (This would be the same as "continue 2" in PHP.)

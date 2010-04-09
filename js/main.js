@@ -855,7 +855,8 @@
 		search_terms_arr = BF_LANG.filter_terms_for_highlighter(search_terms);
 		
 		///TODO: Determine if a normal for loop would be better.
-		first_loop:for (i in search_terms_arr) {
+		first_loop:
+		for (i in search_terms_arr) {
 			term		= search_terms_arr[i];
 			len_before	= term.length;
 			
