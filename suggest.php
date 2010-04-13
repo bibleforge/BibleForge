@@ -14,10 +14,10 @@
 
 /// Prepare the query for the Sphinx search.
 if (($break_point = strpos($_REQUEST['q'], ' ')) === false) {
-	$query = $_REQUEST['q'] . '*';
+    $query = $_REQUEST['q'] . '*';
 } else {
-	//$query = substr($_REQUEST['q'], 0, $break_point) . ' "' . substr($_REQUEST['q'], $break_point + 1) . '*"';
-	$query = substr($_REQUEST['q'], 0, $break_point) . ' "' . $_REQUEST['q'] . '*"';
+    //$query = substr($_REQUEST['q'], 0, $break_point) . ' "' . substr($_REQUEST['q'], $break_point + 1) . '*"';
+    $query = substr($_REQUEST['q'], 0, $break_point) . ' "' . $_REQUEST['q'] . '*"';
 }
 //echo $query;
 
@@ -27,8 +27,8 @@ require_once 'functions/standard_search.php';
 $search_res = standard_search($query, ADDITIONAL, LIMIT_SUGGEST, 0, false);
 
 if ($search_res[2] <= LIMIT_SUGGEST) {
-	echo '[[', 3, '],[', $search_res[0], '],[', $search_res[1], ']]';
-	die;
+    echo '[[', 3, '],[', $search_res[0], '],[', $search_res[1], ']]';
+    die;
 }
 
 require_once 'functions/' . SPHINX_API . '.php';
@@ -51,8 +51,8 @@ $sphinx_res = $sphinx->Query('^' . $query, 'suggestions_english');
 //echo "<pre>";print_r($sphinx_res);
 /// If no results found were found, send an empty JSON result.
 if ($sphinx_res['total'] == 0) {
-	echo '[[', 3, '],[],[],[0]]';
-	die;
+    echo '[[', 3, '],[],[],[0]]';
+    die;
 }
 
 $simple_matches = implode(',', array_keys($sphinx_res['matches']));
@@ -68,8 +68,8 @@ $SQL_res	= mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>'
 $verses_str	= "";
 $hits_str	= "";
 while ($row = mysql_fetch_assoc($SQL_res)) {
-	$verses_str	.= '"' . $row['text'] . '",';
-	$hits_str	.= $row['hits'] . ',';
+    $verses_str	.= '"' . $row['text'] . '",';
+    $hits_str	.= $row['hits'] . ',';
 }
 
 /// Send results to the buffer as a JSON serialized array, and stop execution.

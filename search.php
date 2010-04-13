@@ -12,14 +12,14 @@
 
 ///NOTE: This is just for compatibilities sake.  Magic Quotes should be turned off and this code should be removed.
 if (get_magic_quotes_gpc()) {
-	/**
-	 * Remove slashes inserted by Magic Quotes.
-	 * 
-	 * @example	$_POST = stripslashes_deep($_POST);
-	 * @param	$value (array) The array to remove slashes from.
-	 * @return	The array with slashes removed.
-	 * @note	This is ultimately should be removed and Magic Quotes should be turned off.
-	 */
+    /**
+     * Remove slashes inserted by Magic Quotes.
+     * 
+     * @example	$_POST = stripslashes_deep($_POST);
+     * @param	$value (array) The array to remove slashes from.
+     * @return	The array with slashes removed.
+     * @note	This is ultimately should be removed and Magic Quotes should be turned off.
+     */
     function stripslashes_deep($value)
     {
         $value = is_array($value) ? array_map('stripslashes_deep', $value) : stripslashes($value);
@@ -38,31 +38,31 @@ require_once 'config.php';
 /// Prepare for search.
 ///TODO: POST vs GET vs REQEUST
 if (!isset($_REQUEST['q'])) {
-	/// $_REQUEST['q'] is required.
-	die;
+    /// $_REQUEST['q'] is required.
+    die;
 } else {
-	$query = $_REQUEST['q'];
+    $query = $_REQUEST['q'];
 }
 
 if (isset($_REQUEST['t'])) {
-	$type = $_REQUEST['t'];
+    $type = $_REQUEST['t'];
 } else {
-	die;
+    die;
 }
 
 /// Which verse should the search start on?
 ///NOTE: Not used with VERSE_LOOKUP.
 if (isset($_REQUEST['s'])) {
-	$start_id = (int)$_REQUEST['s'];
+    $start_id = (int)$_REQUEST['s'];
 } else {
-	$start_id = 0;
+    $start_id = 0;
 }
 
 /// In what direction should the verses be retrieved?
 if (isset($_REQUEST['d'])) {
-	$direction = (int)$_REQUEST['d'];
+    $direction = (int)$_REQUEST['d'];
 } else {
-	$direction = ADDITIONAL;
+    $direction = ADDITIONAL;
 }
 
 /**
@@ -85,15 +85,15 @@ if (isset($_REQUEST['d'])) {
  */
 
 if ($type == VERSE_LOOKUP) {
-	/// $query example: 1001001 OR 43003016
-	require_once 'functions/database_lookup.php';
-	retrieve_verses($query, $direction, LIMIT);
+    /// $query example: 1001001 OR 43003016
+    require_once 'functions/database_lookup.php';
+    retrieve_verses($query, $direction, LIMIT);
 } elseif ($type == STANDARD_SEARCH) {
-	/// $query example: love OR God & love OR this -that OR "in the beginning"
-	require_once 'functions/standard_search.php';
-	standard_search($query, $direction, LIMIT, $start_id);
+    /// $query example: love OR God & love OR this -that OR "in the beginning"
+    require_once 'functions/standard_search.php';
+    standard_search($query, $direction, LIMIT, $start_id);
 } else { /// MORPHOLOGICAL_SEARCH
-	/// $query ex: '["love", [[4,1]], [1]]' (love AS NOUN) OR '["love", [[3,1], [7,1]], [1,0]]' (love AS RED, NOT PRESENT)
-	require_once 'functions/morphology.php';
-	morphology_search($query, $direction, LIMIT, $start_id);
+    /// $query ex: '["love", [[4,1]], [1]]' (love AS NOUN) OR '["love", [[3,1], [7,1]], [1,0]]' (love AS RED, NOT PRESENT)
+    require_once 'functions/morphology.php';
+    morphology_search($query, $direction, LIMIT, $start_id);
 }
