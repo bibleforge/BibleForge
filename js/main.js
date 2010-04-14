@@ -1522,11 +1522,4 @@
         };
         ajax.send(message);
     }
-})(	document.getElementById("viewPort1"),
-    document.getElementById("searchForm1"),
-    document.getElementById("q1"),
-    document.getElementById("scroll1"),
-    document.getElementById("infoBar1"),
-    document.getElementById("topLoader1"),
-    document.getElementById("bottomLoader1"),
-    document.documentElement);
+}(document.getElementById("viewPort1"), document.getElementById("searchForm1"), document.getElementById("q1"), document.getElementById("scroll1"), document.getElementById("infoBar1"), document.getElementById("topLoader1"), document.getElementById("bottomLoader1"), document.documentElement));
