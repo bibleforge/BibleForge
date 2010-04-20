@@ -60,40 +60,29 @@
         bottom_id,
         top_id,
         
-        /// Scrolling variables
-        buffer_add						= 1000,
-        buffer_rem						= 10000,
+        /// Cache
         cached_count_bottom				= 0,
         cached_count_top				= 0,
         cached_verses_bottom			= [],
         cached_verses_top				= [],
-        checking_excess_content_bottom	= false,
-        checking_excess_content_top		= false,
-        looking_up_verse_range			= false,
-        lookup_delay					= 200,
-        lookup_range_speed				= 300,	/// In milliseconds
-        lookup_speed_scrolling			= 50,
-        lookup_speed_sitting			= 100,
-        remove_content_bottom_timeout,
-        remove_content_top_timeout,
-        remove_speed					= 3000,
-        scroll_check_count				= 0,
+        
+        /// Scrolling
+        ///TODO: Determine if these can be placed in the scrolling closure.
         scroll_maxed_bottom				= false,
         scroll_maxed_top				= true,
-        scroll_pos						= 0;
+        scroll_pos						= 0,
+        
+        /// Objects
+        content_manager;
     
     /// Simple Event Registration
     /// Capture form submit event.
     searchForm.onsubmit = prepare_new_search;
     
-    ///NOTE: Could use wheel if the scroll bars are invisible.
-    ///FIXME: These global events need to be localized to the objects passed to the function.
-    onscroll = scrolling;
-    onresize = resizing;
     
-    /*********************************
-     * Start of Suggestion functions *
-     *********************************/
+    /*******************************
+     * Start of Suggestion Closure *
+     *******************************/
     
     /// Create suggest and attach it to the keypress event.
     ///TODO: Determine if using closure here is helpful.
@@ -192,6 +181,556 @@
             return true;
         };
     }());
+    
+    
+    /******************************
+     * Start of Scrolling Closure *
+     ******************************/
+    
+    content_manager = (function ()
+    {
+        var buffer_add						= 1000,
+            buffer_rem						= 10000,
+            checking_excess_content_bottom	= false,
+            checking_excess_content_top		= false,
+            looking_up_verse_range			= false,
+            lookup_delay					= 200,
+            lookup_range_speed				= 300,	/// In milliseconds
+            lookup_speed_scrolling			= 50,
+            lookup_speed_sitting			= 100,
+            remove_content_bottom_timeout,
+            remove_content_top_timeout,
+            remove_speed					= 3000,
+            scroll_check_count				= 0;
+        
+        /**
+         * The onscroll event.
+         *
+         * When the page scrolls this figures out the direction of the scroll and
+         * calls specific functions to determine whether content should be added or removed.
+         *
+         * @return	NULL.  May call other functions via setTimeout().
+         * @note	Called when the window scrolls.
+         * @note	Set by  the onscroll event.
+         */
+        function scrolling()
+        {
+            /// Trick IE into understanding pageYOffset.
+            ///NOTE: pageYOffset is a browser-created, global variable.
+            /*@cc_on
+                pageYOffset = doc_docEl.scrollTop;
+            @*/
+            var new_scroll_pos	= pageYOffset,
+                scrolling_down;
+            
+            if (new_scroll_pos == scroll_pos) {
+                /// IE/Opera sometimes don't update page.scrollTop until after this function is run.
+                /// Mozilla/WebKit can get stuck here too.
+                if (++scroll_check_count < 10) {
+                    setTimeout(scrolling, 30);
+                } else { /// Stop it if it is stuck looping.
+                    scroll_check_count = 0;
+                }
+                return null;
+            }
+            scroll_check_count = 0;
+            
+            update_verse_range();
+            
+            scrolling_down = (new_scroll_pos > scroll_pos);
+            
+            /// This keeps track of the current scroll position so we can tell the direction of the scroll.
+            scroll_pos = new_scroll_pos;
+            
+            /// Don't look up more data until the first results come.
+            if (waiting_for_first_search) {
+                return null;
+            }
+            
+            /// Since the page is scrolling, we need to determine if more content needs to be added or if some content should be hidden.
+            
+            if (scrolling_down) {
+                add_content_if_needed(additional);
+                checking_excess_content_top = true;
+            } else {
+                add_content_if_needed(previous);
+                checking_excess_content_bottom = true;
+            }
+            
+            if (checking_excess_content_top) {
+                clearTimeout(remove_content_top_timeout);
+                remove_content_top_timeout = setTimeout(remove_excess_content_top, remove_speed);
+            }
+            if (checking_excess_content_bottom) {
+                clearTimeout(remove_content_bottom_timeout);
+                remove_content_bottom_timeout = setTimeout(remove_excess_content_bottom, remove_speed);
+            }
+        }
+        
+        
+        ///TODO: Determine if remove_excess_content_top and remove_excess_content_bottom can be combind.
+        /**
+         * Remove content that is past the top of screen and store in cache.
+         *
+         * @example	remove_excess_content_top();
+         * @return	NULL.  Removes content from the page if required.
+         * @note	Called by scrolling() via setTimeout().
+         */
+        function remove_excess_content_top()
+        {
+            var child			= page.firstChild,
+                child_height;
+            
+            if (child === null) {
+                return null;
+            }
+            
+            ///NOTE: Mozilla ignores .clientHeight, .offsetHeight, .scrollHeight for some objects (not <div> however) when in standards mode (i.e., a doctype is present).
+            ///      If Mozilla has problems in the future, you can use this as a replacement:
+            ///      child_height = parseInt(getComputedStyle(child, null).getPropertyValue("height"));
+            
+            ///NOTE: Opera wrongly subtracts the scroll position from .offsetTop.
+            
+            child_height = child.clientHeight;
+            
+            ///NOTE: Mozilla also has scrollMaxY, which is slightly different from document.documentElement.scrollHeight (document.body.scrollHeight should work too).
+            
+            /// Is the object in the remove zone, and is its height less than the remaining space to scroll to prevent jumping?
+            if (child_height + buffer_rem < scroll_pos && child_height < doc_docEl.scrollHeight - scroll_pos - doc_docEl.clientHeight) {
+                /// Store the content in the cache, and then add 1 to the outer counter variable so that we know how much cache we have.
+                cached_verses_top[cached_count_top++] = child.innerHTML;
+                ///TODO: Determine if setting the display to "none" actually helps at all.
+                /// Remove quickly from the page.
+                child.style.display = "none";
+                /// Calculate and set the new scroll position.
+                /// Because content is being removed from the top of the page, the rest of the content will be shifted upward.
+                /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was removed.
+                ///NOTE: scrollTo() is a browser-created, global function.
+                ///NOTE: pageYOffset is a browser-created, global variable.
+                scrollTo(0, scroll_pos = (pageYOffset - child_height));
+                
+                page.removeChild(child);
+                
+                /// Indicates to the user that content will load if they scroll to the top of the screen.
+                topLoader.style.visibility = "visible";
+                
+                /// Check again soon for more content to be removed.
+                remove_content_top_timeout = setTimeout(remove_excess_content_top, remove_speed);
+            } else {
+                checking_excess_content_top = false;
+            }
+        }
+        
+        
+        /**
+         * Remove content from below the screen and store in cache.
+         *
+         * @example	remove_excess_content_bottom();
+         * @return	NULL.  Removes content from the page if required.
+         * @note	Called by scrolling() via setTimeout().
+         */
+        function remove_excess_content_bottom()
+        {
+            var child			= page.lastChild,
+                child_position,
+                page_height;
+            
+            if (child === null) {
+                return null;
+            }
+            
+            child_position	= child.offsetTop;
+            page_height		= doc_docEl.clientHeight;
+            
+            /// Is the element is in the remove zone?
+            if (child_position > scroll_pos + page_height + buffer_rem) {
+                /// Store the content in the cache, and then add 1 to the outer counter variable so that we know how much cache we have.
+                cached_verses_bottom[cached_count_bottom++] = child.innerHTML;
+                
+                page.removeChild(child);
+                
+                /// This fixes an IE7+ bug that causes the page to scroll needlessly when an element is added.
+                ///NOTE: scrollTo() is a browser-created, global function.
+                /*@cc_on
+                    scrollTo(0, scroll_pos);
+                @*/
+                /// End execution to keep the checking_content_top_interval running because there might be even more content that should be removed.
+                bottomLoader.style.visibility = "visible";
+                
+                /// Check again soon for more content to be removed.
+                remove_content_bottom_timeout = setTimeout(remove_excess_content_bottom, remove_speed);
+            } else {
+                checking_excess_content_bottom = false;
+            }
+        }
+        
+        
+        /**
+         * Add content to bottom of the page (off the screen)
+         *
+         * @example	add_content_bottom_if_needed();
+         * @return	NULL.  Adds content to the page if needed.
+         * @note	Called by scrolling() via setTimeout().
+         */
+        function add_content_bottom_if_needed()
+        {
+            var child			= page.lastChild,
+                child_position,
+                newEl,
+                page_height;
+            
+            if (child === null) {
+                return null;
+            }
+            
+            child_position	= child_position = child.offsetTop + child.clientHeight;
+            page_height		= page_height = doc_docEl.clientHeight;
+            /// Is the user scrolling close to the bottom of the page?
+            if (child_position < scroll_pos + page_height + buffer_add) {
+                /// Can the content be grabbed from cache?
+                if (cached_count_bottom > 0) {
+                    newEl = document.createElement("div");
+                    /// First subtract 1 from the outer counter variable to point to the last cached passage, and then retrieve the cached content.
+                    newEl.innerHTML = cached_verses_bottom[--cached_count_bottom];
+                    ///NOTE: This is actually works like insertAfter() (if such a function existed).
+                    ///      By using "null" as the second parameter, it tells it to add the element to the end.
+                    page.insertBefore(newEl, null);
+                    
+                    /// This fixes an IE7+ bug that causes the page to scroll needlessly when an element is added.
+                    ///NOTE: scrollTo() is a browser-created, global function.
+                    /*@cc_on
+                        scrollTo(0, scroll_pos);
+                    @*/
+                    /// Better check to see if we need to add more content.
+                    setTimeout(add_content_bottom_if_needed, lookup_speed_scrolling);
+                } else {
+                    /// Did the user scroll all the way to the very bottom?  (If so, then there is no more content to be gotten.)
+                    if (scroll_maxed_bottom) {
+                        bottomLoader.style.visibility = "hidden";
+                        return null;
+                    }
+                    /// Get more content.
+                    run_search(additional);
+                }
+            }
+        }
+        
+        
+        /**
+         * Add content to top of the page (off the screen)
+         *
+         * @example	setTimeout(add_content_top_if_needed, lookup_speed_scrolling);
+         * @return	NULL.  Adds content to the page if needed.
+         * @note	Called by add_content_if_needed() via setTimeout().
+         */
+        function add_content_top_if_needed()
+        {
+            var child			= page.firstChild,
+                child_height,
+                child_position,
+                newEl;
+            
+            if (child === null) {
+                return null;
+            }
+            
+            child_height = child.clientHeight;
+            
+            child_position = child_height;
+            
+            /// Is the user scrolling close to the top of the page?
+            if (child_position + buffer_add > scroll_pos) {
+                /// Can the content be grabbed from cache?
+                if (cached_count_top > 0) {
+                    newEl = document.createElement("div");
+                    
+                    /// First subtract 1 from the outer counter variable to point to the last cached passage, and then retrieve the cached content.
+                    newEl.innerHTML = cached_verses_top[--cached_count_top];
+                    
+                    page.insertBefore(newEl, child);
+                    
+                    /// The new content that was just added to the top of the page will push the other contents downward.
+                    /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was added.
+                    ///NOTE: scrollTo() is a browser-created, global function.
+                    ///NOTE: pageYOffset is a browser-created, global variable.
+                    scrollTo(0, scroll_pos = (pageYOffset + newEl.clientHeight));
+                    
+                    /// Check to see if we need to add more content.
+                    add_content_if_needed(previous);
+                } else {
+                    /// Did the user scroll all the way to the very top?  (If so, then there is no more content to be gotten.)
+                    if (scroll_maxed_top) {
+                        topLoader.style.visibility = "hidden";
+                        return null;
+                    }
+                    /// Get more content.
+                    run_search(previous);
+                }
+            }
+        }
+        
+        
+        /**
+         * Finds and displays the range of verses visible on the screen.
+         *
+         * Find the verse that is at the top of the page and at the bottom of the page window and
+         * display that range on the page and change the page title to indicate the verse range as well.
+         *
+         * @example	setTimeout(find_current_range, lookup_range_speed);
+         * @return	NULL.  The page is modified to reflect the verse range.
+         * @note	Called by scrolling(), resizing(), write_verses(), or itself via setTimeout().
+         * @note	This function should be called every time the page is resized or scrolled or when visible content is added.
+         */
+        function find_current_range()
+        {	
+            ///TODO: Determine if there is a better way to calculate the topBar offset.
+            var b1,
+                b2,
+                bottom_pos			= scroll_pos + doc_docEl.clientHeight - 14,
+                bottom_verse_block,
+                c1,
+                c2,
+                new_title,
+                ref_range,
+                top_pos				= scroll_pos + topLoader.offsetHeight + 8,
+                top_verse_block,
+                v1,
+                v2,
+                verse1_el,
+                verse1,
+                verse2_el,
+                verse2;
+            
+            /// Allow for this function to be called again via setTimeout().  See scrolling().
+            looking_up_verse_range = false;
+            
+            top_verse_block = find_element_at_scroll_pos(top_pos, page);
+            
+            /// Is the top verse block not found?
+            if (top_verse_block === null) {
+                ///NOTE: There appears to be no verses displayed on the screen.
+                ///      Since they may still be being retrieved, so run this function again a little later.
+                looking_up_verse_range = true;
+                setTimeout(find_current_range, lookup_range_speed);
+                return null;
+            }
+            
+            bottom_verse_block = find_element_at_scroll_pos(bottom_pos, null, top_verse_block);
+            
+            /// Is the bottom verse block not found?
+            if (bottom_verse_block === null) {
+                ///NOTE: There are no verses at the bottom of the screen.
+                ///      Since they may still be being retrieved, so run this function again a little later.
+                looking_up_verse_range = true;
+                setTimeout(find_current_range, lookup_range_speed);
+                return null;
+            }
+            
+            /// Find the verse elements.
+            verse1_el = find_element_at_scroll_pos(top_pos, top_verse_block);
+            verse2_el = find_element_at_scroll_pos(bottom_pos, bottom_verse_block);
+            
+            /// Are either of the verses not found?
+            if (verse1_el === null || verse2_el === null) {
+                ///NOTE: It is possible for some padding to separate the verses.
+                ///      This is probably a temporary issue, so run this function again a little later.
+                looking_up_verse_range = true;
+                setTimeout(find_current_range, lookup_range_speed);
+                return null;
+            }
+            
+            /// parseInt() is used to keep the number and remove the trailing string from the id.  See write_verses().
+            verse1 = parseInt(verse1_el.id);
+            v1 = verse1 % 1000;
+            c1 = ((verse1 - v1) % 1000000) / 1000;
+            b1 = (verse1 - v1 - c1 * 1000) / 1000000;
+            verse2 = parseInt(verse2_el.id);
+            v2 = verse2 % 1000;
+            c2 = ((verse2 - v2) % 1000000) / 1000;
+            b2 = (verse2 - v2 - c2 * 1000) / 1000000;
+            
+            /// The titles in the book of Psalms are referenced as verse zero (cf. Psalm 3).
+            v1 = v1 === 0 ? BF_LANG.title : v1;
+            v2 = v2 === 0 ? BF_LANG.title : v2;
+            
+            ///NOTE: \u2013 is Unicode for the en dash (–) (HTML: &ndash;).
+            ///TODO: Determine if the colons should be language specified.
+            /// Are the books the same?
+            if (b1 == b2) {
+                /// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
+                b1 = b1 == 19 ? BF_LANG.psalm : BF_LANG.books_short[b1];
+                /// Are the chapters the same?
+                if (c1 == c2) {
+                    /// Are the verses the same?
+                    if (v1 == v2) {
+                        ref_range = b1 + " " + c1 + ":" + v1;
+                    } else {
+                        ref_range = b1 + " " + c1 + ":" + v1 + "\u2013" + v2;
+                    }
+                } else {
+                    ref_range = b1 + " " + c1 + ":" + v1 + "\u2013" + c2 + ":" + v2;
+                }
+            } else {
+                /// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
+                b1 = b1 == 19 ? BF_LANG.psalm : BF_LANG.books_short[b1];
+                b2 = b2 == 19 ? BF_LANG.psalm : BF_LANG.books_short[b2];
+                
+                ref_range = b1 + " " + c1 + ":" + v1 + "\u2013" + b2 + " " + c2 + ":" + v2;
+            }
+            
+            /// last_type is set in prepare_new_search().
+            /// The verse range is displayed differently based on the type of search (i.e., a verse look up or a regular search).
+            if (last_type == verse_lookup) {
+                new_title = ref_range + " - " + BF_LANG.app_name;
+            } else {
+                new_title = last_search + " (" + ref_range + ") - " + BF_LANG.app_name;
+            }
+            
+            /// Is the new verse range the same as the old one?
+            /// If they are the same, updating it would just waste resources.
+            if (document.title != new_title) {
+                document.title = new_title;
+                
+                /// Display the verse range on the page if looking up verses.
+                ///FIXME: There should be a variable that shows the current view mode and not rely on last_type.
+                if (last_type == verse_lookup) {
+                    ///TODO: Find a better way to clear infoBar than innerHTML.
+                    infoBar.innerHTML = "";
+                    infoBar.appendChild(document.createTextNode(ref_range));
+                }
+            }
+            
+            return null;
+        }
+        
+        
+        /**
+         * Find an element that is within a certain Y position on the page.
+         *
+         * @example	element = find_element_at_scroll_pos(scroll_pos, page);
+         * @param	the_pos		(number) The vertical position on the page.
+         * @param	parent_el	(object) The DOM element to search inside of.
+         * @return	DOM element that is within the specified position of the page.
+         * @note	Called by find_current_range().
+         * @note	This is a helper function to find_current_range().
+         */
+        function find_element_at_scroll_pos(the_pos, parent_el, el)
+        {
+            var el_offset_height,
+                el_offset_top,
+                el_start_at,
+                looked_next,
+                looked_previous;
+            
+            /// Is the starting element unknown?
+            if (!el) {
+                /// Make an educated guess as to which element to start with to save time.
+                el_start_at = Math.round(parent_el.childNodes.length * (the_pos / doc_docEl.scrollHeight));
+                if (el_start_at < 1) {
+                    el_start_at = 1;
+                }
+                el = parent_el.childNodes[el_start_at - 1];
+            } else {
+                /// We may need the parent_el if the_pos is below all of the elements.
+                parent_el = el.parentNode;
+            }
+            
+            /// Were no elements found?  (If so, then there is nothing to do.)
+            if (!el) {
+                return null;
+            }
+            
+            looked_next		= false;
+            looked_previous	= false;
+            
+            do {
+                el_offset_top		= el.offsetTop;
+                el_offset_height	= el.offsetHeight + el_offset_top;
+                
+                /// Is the element somewhere between the position in question?
+                if (the_pos >= el_offset_top && the_pos <= el_offset_height) {
+                    /// The element was found.
+                    return el;
+                } else {
+                    /// Is the position in question lower?
+                    if (the_pos > el_offset_top) {
+                        el			= el.nextSibling;
+                        looked_next	= true;
+                    } else {
+                        el				= el.previousSibling;
+                        looked_previous	= true;
+                    }
+                    /// Is it stuck in an infinite loop?  (If so, then give up.)
+                    if (looked_next && looked_previous) {
+                        return null;
+                    }
+                }
+            } while (el !== null);
+            
+            /// Was the position in question to high for all of the elements?
+            if (looked_next) {
+                /// If there are no elements left (e.g., by scrolling all the way to the bottom) return the last element.
+                return parent_el.lastChild;
+            }
+            
+            ///TODO: Determine if we should return parent_el.firstChild if looked_previous or if that might cause bugs.
+            return null;
+        }
+        
+        
+        /**
+         * The onresize event.
+         *
+         * When the page is resized, check to see if more content should be loaded.
+         *
+         * @return	NULL.  Calls other functions
+         * @note	Called when the window is resized.
+         * @note	Set by the onresize event.
+         */
+        function resizing()
+        {
+            add_content_if_needed(additional);
+            add_content_if_needed(previous);
+            
+            update_verse_range();
+        }
+        
+        
+        ///TODO: Document.
+        function add_content_if_needed(direction)
+        {
+            if (direction === additional) {
+                setTimeout(add_content_bottom_if_needed, lookup_speed_sitting);
+            } else {
+                setTimeout(add_content_top_if_needed, lookup_speed_scrolling);
+            }
+        }
+        
+        
+        ///TODO: Document.
+        ///NOTE: Old text: If it is not going to already, figure out which verses are presently displayed on the screen.
+        function update_verse_range()
+        {
+            if (!looking_up_verse_range) {
+                looking_up_verse_range = true;
+                setTimeout(find_current_range, lookup_range_speed);
+            }
+        }
+        
+        
+        ///NOTE: These events could be attached as anonymous functions (lambdas),
+        ///      but scrolling() calls itself, so it would need to store arguments.callee.
+        ///NOTE: Could use wheel if the scroll bars are invisible.
+        ///FIXME: These events need to be localized to the objects passed to the function.
+        onscroll = scrolling;
+        onresize = resizing;
+        
+        return {add_content_if_needed: add_content_if_needed, update_verse_range: update_verse_range};
+    }());
+    /****************************
+     * End of Scrolling Closure *
+     ****************************/
+    
     
     /*******************************
      * End of Suggestion functions *
@@ -493,7 +1032,7 @@
      * @param	direction (integer) The direction of the verses to be retrieved: additional || previous.
      * @return	NULL.  Query is sent via Ajax.
      * @note	Called by prepare_new_search() when the user submits a search.
-     * @note	Called by add_content_bottom() and add_content_top() when scrolling.
+     * @note	Called by add_content_bottom_if_needed() and add_content_top_if_needed() when scrolling.
      * @note	Outer variables used: last_type and bottom_id, top_id, last_search_encoded.
      */
     function run_search(direction)
@@ -594,14 +1133,16 @@
             }
             
             /// Indicate to the user that more content may be loading, and check for more content.
-            if (direction == additional && res[0][res[0].length - 1] < 66022021) {
+            if (direction === additional && res[0][res[0].length - 1] < 66022021) {
                 bottomLoader.style.visibility = "visible";
-                setTimeout(add_content_bottom, lookup_speed_sitting);
+                content_manager.add_content_if_needed(direction)
             }
-            if ((direction == previous || waiting_for_first_search) && res[0][0] > 1001001) {
+            if ((direction === previous || waiting_for_first_search) && res[0][0] > 1001001) {
                 topLoader.style.visibility = "visible";
                 /// A delay is added on to space out the requests.
-                setTimeout(add_content_top, lookup_speed_sitting + lookup_delay);
+                ///FIXME: This used to use lookup_delay.  Nothing else does.  Is it necessary?  If so, how should it be implamented?
+                //setTimeout(add_content_top_if_needed, lookup_speed_sitting + lookup_delay);
+                content_manager.add_content_if_needed(previous);
             }
         } else {
             if (direction == additional) {
@@ -630,7 +1171,7 @@
             
             if (action != verse_lookup) {
                 /// Create the inital text.
-                infoBar.appendChild(document.createTextNode(format_number(total) + BF_LANG["found_" + (total == 1 ? "singular" : "plural")]));
+                infoBar.appendChild(document.createTextNode(format_number(total) + BF_LANG["found_" + (total === 1 ? "singular" : "plural")]));
                 /// Create a <b> for the search terms.
                 b_tag = document.createElement("b");
                 ///NOTE: We use this method instead of straight innerHTML to prevent HTML elements from appearing inside the <b></b>.
@@ -696,11 +1237,12 @@
                 /// Is this the first verse or the Psalm title?
                 if (v < 2) {
                     /// Is this chapter 1?  (We need to know if we should display the book name.)
-                    if (c == 1) {
+                    if (c === 1) {
                         HTML_str += "<div class=book id=" + num + "_title>" + BF_LANG.books_long_pretitle[b] + "<h1>" + BF_LANG.books_long_main[b] + "</h1>" + BF_LANG.books_long_posttitle[b] + "</div>";
-                    } else if (b != 19 || v === 0 || ((c <= 2) || (c == 10) || (c == 33) || (c == 43) || (c == 71) || (c == 91) || (c >= 93 && c <= 97) || (c == 99) || (c >= 104 && c <= 107) || (c >= 111 && c <= 119) || (c >= 135 && c <= 137) || (c >= 146))) { /// Display chapter/psalm number (but not on verse 1 of psalms that have titles).
+                    /// Display chapter/psalm number (but not on verse 1 of psalms that have titles).
+                    } else if (b !== 19 || v === 0 || ((c <= 2) || (c === 10) || (c === 33) || (c === 43) || (c === 71) || (c === 91) || (c >= 93 && c <= 97) || (c === 99) || (c >= 104 && c <= 107) || (c >= 111 && c <= 119) || (c >= 135 && c <= 137) || (c >= 146))) {
                         /// Is this the book of Psalms?  (Psalms have a special name.)
-                        if (b == 19) {
+                        if (b === 19) {
                             chapter_text = BF_LANG.psalm;
                         } else {
                             chapter_text = BF_LANG.chapter;
@@ -725,7 +1267,7 @@
                 }
                 
                 /// Is this verse from a different book than the last verse?
-                if (b != last_book) {
+                if (b !== last_book) {
                     /// We only need to print out the book if it is different from the last verse.
                     last_book = b;
                     
@@ -742,7 +1284,7 @@
         ///      Also using "range = document.createRange(); newEl = range.createContextualFragment(HTML_str); is also a possibility.
         newEl.innerHTML = HTML_str;
         
-        if (direction == additional) {
+        if (direction === additional) {
             page.appendChild(newEl);
             
             /// Record the bottom most verse reference and id so that we know where to start from for the next search or verse lookup as the user scrolls.
@@ -768,11 +1310,7 @@
             top_id = top_verse = verse_ids[0];
         }
         
-        /// If it is not going to already, figure out which verses are presently displayed on the screen.
-        if (!looking_up_verse_range) {
-            looking_up_verse_range = true;
-            setTimeout(find_current_range, lookup_range_speed);
-        }
+        content_manager.update_verse_range();
     }
     
     
@@ -973,516 +1511,6 @@
     /***************************
      * End of search functions *
      ***************************/
-    
-    
-    /********************************
-     * Start of Scrolling functions *
-     ********************************/
-    
-    /**
-     * The onscroll event.
-     *
-     * When the page scrolls this figures out the direction of the scroll and
-     * calls specific functions to determine whether content should be added or removed.
-     *
-     * @return	NULL.  May call other functions via setTimeout().
-     * @note	Called when the window scrolls.
-     * @note	Set by  the onscroll event.
-     */
-    function scrolling()
-    {
-        /// Trick IE into understanding pageYOffset.
-        ///NOTE: pageYOffset is a browser-created, global variable.
-        /*@cc_on
-            pageYOffset = doc_docEl.scrollTop;
-        @*/
-        var new_scroll_pos	= pageYOffset,
-            scrolling_down;
-        
-        if (new_scroll_pos == scroll_pos) {
-            /// IE/Opera sometimes don't update page.scrollTop until after this function is run.
-            /// Mozilla/WebKit can get stuck here too.
-            if (++scroll_check_count < 10) {
-                setTimeout(scrolling, 30);
-            } else { /// Stop it if it is stuck looping.
-                scroll_check_count = 0;
-            }
-            return null;
-        }
-        scroll_check_count = 0;
-        
-        if (!looking_up_verse_range) {
-            looking_up_verse_range = true;
-            setTimeout(find_current_range, lookup_range_speed);
-        }
-        
-        scrolling_down = (new_scroll_pos > scroll_pos);
-        
-        /// This keeps track of the current scroll position so we can tell the direction of the scroll.
-        scroll_pos = new_scroll_pos;
-        
-        /// Don't look up more data until the first results come.
-        if (waiting_for_first_search) {
-            return null;
-        }
-        
-        /// Since the page is scrolling, we need to determine if more content needs to be added or if some content should be hidden.
-        
-        if (scrolling_down) {
-            setTimeout(add_content_bottom, lookup_speed_scrolling);
-            checking_excess_content_top = true;
-        } else {
-            setTimeout(add_content_top, lookup_speed_scrolling);
-            checking_excess_content_bottom = true;
-        }
-        
-        if (checking_excess_content_top) {
-            clearTimeout(remove_content_top_timeout);
-            remove_content_top_timeout = setTimeout(remove_excess_content_top, remove_speed);
-        }
-        if (checking_excess_content_bottom) {
-            clearTimeout(remove_content_bottom_timeout);
-            remove_content_bottom_timeout = setTimeout(remove_excess_content_bottom, remove_speed);
-        }
-    }
-    
-    
-    ///TODO: Determine if remove_excess_content_top and remove_excess_content_bottom can be combind.
-    /**
-     * Remove content that is past the top of screen and store in cache.
-     *
-     * @example	remove_excess_content_top();
-     * @return	NULL.  Removes content from the page if required.
-     * @note	Called by scrolling() via setTimeout().
-     */
-    function remove_excess_content_top()
-    {
-        var child			= page.firstChild,
-            child_height;
-        
-        if (child === null) {
-            return null;
-        }
-        
-        ///NOTE: Mozilla ignores .clientHeight, .offsetHeight, .scrollHeight for some objects (not <div> however) when in standards mode (i.e., a doctype is present).
-        ///      If Mozilla has problems in the future, you can use this as a replacement:
-        ///      child_height = parseInt(getComputedStyle(child, null).getPropertyValue("height"));
-        
-        ///NOTE: Opera wrongly subtracts the scroll position from .offsetTop.
-        
-        child_height = child.clientHeight;
-        
-        ///NOTE: Mozilla also has scrollMaxY, which is slightly different from document.documentElement.scrollHeight (document.body.scrollHeight should work too).
-        
-        /// Is the object in the remove zone, and is its height less than the remaining space to scroll to prevent jumping?
-        if (child_height + buffer_rem < scroll_pos && child_height < doc_docEl.scrollHeight - scroll_pos - doc_docEl.clientHeight) {
-            /// Store the content in the cache, and then add 1 to the outer counter variable so that we know how much cache we have.
-            cached_verses_top[cached_count_top++] = child.innerHTML;
-            ///TODO: Determine if setting the display to "none" actually helps at all.
-            /// Remove quickly from the page.
-            child.style.display = "none";
-            /// Calculate and set the new scroll position.
-            /// Because content is being removed from the top of the page, the rest of the content will be shifted upward.
-            /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was removed.
-            ///NOTE: scrollTo() is a browser-created, global function.
-            ///NOTE: pageYOffset is a browser-created, global variable.
-            scrollTo(0, scroll_pos = (pageYOffset - child_height));
-            
-            page.removeChild(child);
-            
-            /// Indicates to the user that content will load if they scroll to the top of the screen.
-            topLoader.style.visibility = "visible";
-            
-            /// Check again soon for more content to be removed.
-            remove_content_top_timeout = setTimeout(remove_excess_content_top, remove_speed);
-        } else {
-            checking_excess_content_top = false;
-        }
-    }
-    
-    
-    /**
-     * Remove content from below the screen and store in cache.
-     *
-     * @example	remove_excess_content_bottom();
-     * @return	NULL.  Removes content from the page if required.
-     * @note	Called by scrolling() via setTimeout().
-     */
-    function remove_excess_content_bottom()
-    {
-        var child			= page.lastChild,
-            child_position,
-            page_height;
-        
-        if (child === null) {
-            return null;
-        }
-        
-        child_position	= child.offsetTop;
-        page_height		= doc_docEl.clientHeight;
-        
-        /// Is the element is in the remove zone?
-        if (child_position > scroll_pos + page_height + buffer_rem) {
-            /// Store the content in the cache, and then add 1 to the outer counter variable so that we know how much cache we have.
-            cached_verses_bottom[cached_count_bottom++] = child.innerHTML;
-            
-            page.removeChild(child);
-            
-            /// This fixes an IE7+ bug that causes the page to scroll needlessly when an element is added.
-            ///NOTE: scrollTo() is a browser-created, global function.
-            /*@cc_on
-                scrollTo(0, scroll_pos);
-            @*/
-            /// End execution to keep the checking_content_top_interval running because there might be even more content that should be removed.
-            bottomLoader.style.visibility = "visible";
-            
-            /// Check again soon for more content to be removed.
-            remove_content_bottom_timeout = setTimeout(remove_excess_content_bottom, remove_speed);
-        } else {
-            checking_excess_content_bottom = false;
-        }
-    }
-    
-    
-    /**
-     * Add content to bottom of the page (off the screen)
-     *
-     * @example	add_content_bottom();
-     * @return	NULL.  Adds content to the page if needed.
-     * @note	Called by scrolling() via setTimeout().
-     * @note	May call itself via setTimeout() if content is added.
-     */
-    function add_content_bottom()
-    {
-        var child			= page.lastChild,
-            child_position,
-            newEl,
-            page_height;
-        
-        if (child === null) {
-            return null;
-        }
-        
-        child_position	= child_position = child.offsetTop + child.clientHeight;
-        page_height		= page_height = doc_docEl.clientHeight;
-        /// Is the user scrolling close to the bottom of the page?
-        if (child_position < scroll_pos + page_height + buffer_add) {
-            /// Can the content be grabbed from cache?
-            if (cached_count_bottom > 0) {
-                newEl = document.createElement("div");
-                /// First subtract 1 from the outer counter variable to point to the last cached passage, and then retrieve the cached content.
-                newEl.innerHTML = cached_verses_bottom[--cached_count_bottom];
-                ///NOTE: This is actually works like insertAfter() (if such a function existed).
-                ///      By using "null" as the second parameter, it tells it to add the element to the end.
-                page.insertBefore(newEl, null);
-                
-                /// This fixes an IE7+ bug that causes the page to scroll needlessly when an element is added.
-                ///NOTE: scrollTo() is a browser-created, global function.
-                /*@cc_on
-                    scrollTo(0, scroll_pos);
-                @*/
-                /// Better check to see if we need to add more content.
-                setTimeout(add_content_bottom, lookup_speed_scrolling);
-            } else {
-                /// Did the user scroll all the way to the very bottom?  (If so, then there is no more content to be gotten.)
-                if (scroll_maxed_bottom) {
-                    bottomLoader.style.visibility = "hidden";
-                    return null;
-                }
-                /// Get more content.
-                run_search(additional);
-            }
-        }
-    }
-    
-    
-    /**
-     * Add content to top of the page (off the screen)
-     *
-     * @example	add_content_top();
-     * @return	NULL.  Adds content to the page if needed.
-     * @note	Called by scrolling(), resizing(), and write_verses() via setTimeout().
-     * @note	May call itself via setTimeout() if content is added.
-     */
-    function add_content_top()
-    {
-        var child			= page.firstChild,
-            child_height,
-            child_position,
-            newEl;
-        
-        if (child === null) {
-            return null;
-        }
-        
-        child_height = child.clientHeight;
-        
-        child_position = child_height;
-        
-        /// Is the user scrolling close to the top of the page?
-        if (child_position + buffer_add > scroll_pos) {
-            /// Can the content be grabbed from cache?
-            if (cached_count_top > 0) {
-                newEl = document.createElement("div");
-                
-                /// First subtract 1 from the outer counter variable to point to the last cached passage, and then retrieve the cached content.
-                newEl.innerHTML = cached_verses_top[--cached_count_top];
-                
-                page.insertBefore(newEl, child);
-                
-                /// The new content that was just added to the top of the page will push the other contents downward.
-                /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was added.
-                ///NOTE: scrollTo() is a browser-created, global function.
-                ///NOTE: pageYOffset is a browser-created, global variable.
-                scrollTo(0, scroll_pos = (pageYOffset + newEl.clientHeight));
-                
-                /// Check to see if we need to add more content.
-                setTimeout(add_content_top, lookup_speed_scrolling);
-            } else {
-                /// Did the user scroll all the way to the very top?  (If so, then there is no more content to be gotten.)
-                if (scroll_maxed_top) {
-                    topLoader.style.visibility = "hidden";
-                    return null;
-                }
-                /// Get more content.
-                run_search(previous);
-            }
-        }
-    }
-    
-    
-    /**
-     * Finds and displays the range of verses visible on the screen.
-     *
-     * Find the verse that is at the top of the page and at the bottom of the page window and
-     * display that range on the page and change the page title to indicate the verse range as well.
-     *
-     * @example	setTimeout(find_current_range, lookup_range_speed);
-     * @return	NULL.  The page is modified to reflect the verse range.
-     * @note	Called by scrolling(), resizing(), write_verses(), or itself via setTimeout().
-     * @note	This function should be called every time the page is resized or scrolled or when visible content is added.
-     */
-    function find_current_range()
-    {	
-        ///TODO: Determine if there is a better way to calculate the topBar offset.
-        var b1,
-            b2,
-            bottom_pos			= scroll_pos + doc_docEl.clientHeight - 14,
-            bottom_verse_block,
-            c1,
-            c2,
-            new_title,
-            ref_range,
-            top_pos				= scroll_pos + topLoader.offsetHeight + 8,
-            top_verse_block,
-            v1,
-            v2,
-            verse1_el,
-            verse1,
-            verse2_el,
-            verse2;
-        
-        /// Allow for this function to be called again via setTimeout().  See scrolling().
-        looking_up_verse_range = false;
-        
-        top_verse_block = find_element_at_scroll_pos(top_pos, page);
-        
-        /// Is the top verse block not found?
-        if (top_verse_block === null) {
-            ///NOTE: There appears to be no verses displayed on the screen.
-            ///      Since they may still be being retrieved, so run this function again a little later.
-            looking_up_verse_range = true;
-            setTimeout(find_current_range, lookup_range_speed);
-            return null;
-        }
-        
-        bottom_verse_block = find_element_at_scroll_pos(bottom_pos, null, top_verse_block);
-        
-        /// Is the bottom verse block not found?
-        if (bottom_verse_block === null) {
-            ///NOTE: There are no verses at the bottom of the screen.
-            ///      Since they may still be being retrieved, so run this function again a little later.
-            looking_up_verse_range = true;
-            setTimeout(find_current_range, lookup_range_speed);
-            return null;
-        }
-        
-        /// Find the verse elements.
-        verse1_el = find_element_at_scroll_pos(top_pos, top_verse_block);
-        verse2_el = find_element_at_scroll_pos(bottom_pos, bottom_verse_block);
-        
-        /// Are either of the verses not found?
-        if (verse1_el === null || verse2_el === null) {
-            ///NOTE: It is possible for some padding to separate the verses.
-            ///      This is probably a temporary issue, so run this function again a little later.
-            looking_up_verse_range = true;
-            setTimeout(find_current_range, lookup_range_speed);
-            return null;
-        }
-        
-        /// parseInt() is used to keep the number and remove the trailing string from the id.  See write_verses().
-        verse1 = parseInt(verse1_el.id);
-        v1 = verse1 % 1000;
-        c1 = ((verse1 - v1) % 1000000) / 1000;
-        b1 = (verse1 - v1 - c1 * 1000) / 1000000;
-        verse2 = parseInt(verse2_el.id);
-        v2 = verse2 % 1000;
-        c2 = ((verse2 - v2) % 1000000) / 1000;
-        b2 = (verse2 - v2 - c2 * 1000) / 1000000;
-        
-        /// The titles in the book of Psalms are referenced as verse zero (cf. Psalm 3).
-        v1 = v1 === 0 ? BF_LANG.title : v1;
-        v2 = v2 === 0 ? BF_LANG.title : v2;
-        
-        ///NOTE: \u2013 is Unicode for the en dash (–) (HTML: &ndash;).
-        ///TODO: Determine if the colons should be language specified.
-        /// Are the books the same?
-        if (b1 == b2) {
-            /// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
-            b1 = b1 == 19 ? BF_LANG.psalm : BF_LANG.books_short[b1];
-            /// Are the chapters the same?
-            if (c1 == c2) {
-                /// Are the verses the same?
-                if (v1 == v2) {
-                    ref_range = b1 + " " + c1 + ":" + v1;
-                } else {
-                    ref_range = b1 + " " + c1 + ":" + v1 + "\u2013" + v2;
-                }
-            } else {
-                ref_range = b1 + " " + c1 + ":" + v1 + "\u2013" + c2 + ":" + v2;
-            }
-        } else {
-            /// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
-            b1 = b1 == 19 ? BF_LANG.psalm : BF_LANG.books_short[b1];
-            b2 = b2 == 19 ? BF_LANG.psalm : BF_LANG.books_short[b2];
-            
-            ref_range = b1 + " " + c1 + ":" + v1 + "\u2013" + b2 + " " + c2 + ":" + v2;
-        }
-        
-        /// last_type is set in prepare_new_search().
-        /// The verse range is displayed differently based on the type of search (i.e., a verse look up or a regular search).
-        if (last_type == verse_lookup) {
-            new_title = ref_range + " - " + BF_LANG.app_name;
-        } else {
-            new_title = last_search + " (" + ref_range + ") - " + BF_LANG.app_name;
-        }
-        
-        /// Is the new verse range the same as the old one?
-        /// If they are the same, updating it would just waste resources.
-        if (document.title != new_title) {
-            document.title = new_title;
-            
-            /// Display the verse range on the page if looking up verses.
-            ///FIXME: There should be a variable that shows the current view mode and not rely on last_type.
-            if (last_type == verse_lookup) {
-                ///TODO: Find a better way to clear infoBar than innerHTML.
-                infoBar.innerHTML = "";
-                infoBar.appendChild(document.createTextNode(ref_range));
-            }
-        }
-        
-        return null;
-    }
-    
-    
-    /**
-     * Find an element that is within a certain Y position on the page.
-     *
-     * @example	element = find_element_at_scroll_pos(scroll_pos, page);
-     * @param	the_pos		(number) The vertical position on the page.
-     * @param	parent_el	(object) The DOM element to search inside of.
-     * @return	DOM element that is within the specified position of the page.
-     * @note	Called by find_current_range().
-     * @note	This is a helper function to find_current_range().
-     */
-    function find_element_at_scroll_pos(the_pos, parent_el, el)
-    {
-        var el_offset_height,
-            el_offset_top,
-            el_start_at,
-            looked_next,
-            looked_previous;
-        
-        /// Is the starting element unknown?
-        if (!el) {
-            /// Make an educated guess as to which element to start with to save time.
-            el_start_at = Math.round(parent_el.childNodes.length * (the_pos / doc_docEl.scrollHeight));
-            if (el_start_at < 1) {
-                el_start_at = 1;
-            }
-            el = parent_el.childNodes[el_start_at - 1];
-        } else {
-            /// We may need the parent_el if the_pos is below all of the elements.
-            parent_el = el.parentNode;
-        }
-        
-        /// Were no elements found?  (If so, then there is nothing to do.)
-        if (!el) {
-            return null;
-        }
-        
-        looked_next		= false;
-        looked_previous	= false;
-        
-        do {
-            el_offset_top		= el.offsetTop;
-            el_offset_height	= el.offsetHeight + el_offset_top;
-            
-            /// Is the element somewhere between the position in question?
-            if (the_pos >= el_offset_top && the_pos <= el_offset_height) {
-                /// The element was found.
-                return el;
-            } else {
-                /// Is the position in question lower?
-                if (the_pos > el_offset_top) {
-                    el			= el.nextSibling;
-                    looked_next	= true;
-                } else {
-                    el				= el.previousSibling;
-                    looked_previous	= true;
-                }
-                /// Is it stuck in an infinite loop?  (If so, then give up.)
-                if (looked_next && looked_previous) {
-                    return null;
-                }
-            }
-        } while (el !== null);
-        
-        /// Was the position in question to high for all of the elements?
-        if (looked_next) {
-            /// If there are no elements left (e.g., by scrolling all the way to the bottom) return the last element.
-            return parent_el.lastChild;
-        }
-        
-        ///TODO: Determine if we should return parent_el.firstChild if looked_previous or if that might cause bugs.
-        return null;
-    }
-    
-    
-    /**
-     * The onresize event.
-     *
-     * When the page is resized, check to see if more content should be loaded.
-     *
-     * @return	NULL.  Calls other functions
-     * @note	Called when the window is resized.
-     * @note	Set by the onresize event.
-     */
-    function resizing()
-    {
-        setTimeout(add_content_bottom, lookup_speed_scrolling);
-        setTimeout(add_content_top, lookup_speed_scrolling);
-        
-        /// If it is not doing so already, check to see if the range of visible verses has changed.
-        if (!looking_up_verse_range) {
-            looking_up_verse_range = true;
-            setTimeout(find_current_range, lookup_range_speed);
-        }
-    }
-    
-    /******************************
-     * End of Scrolling functions *
-     ******************************/
     
     
     /**
