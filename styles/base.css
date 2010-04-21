@@ -68,8 +68,11 @@ body {
 }
 
 #q {
-	/* Remove the background of the text box to see the transparent info bar below. */
-	background: transparent;
+    /* A solid background for IE/Mozilla 2-/Opera 9.6- */
+    background: rgb(255, 255, 255);
+    /* Slight transparent white background */
+    /* This allows the text to be readable while still allowing for some transparency. */
+    background: rgba(255, 255, 255, .5);
 }
 
 /* Individual words in verses */
