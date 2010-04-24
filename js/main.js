@@ -1478,6 +1478,15 @@
 }(document.getElementById("viewPort1"), document.getElementById("searchForm1"), document.getElementById("q1"), document.getElementById("scroll1"), document.getElementById("infoBar1"), document.getElementById("topLoader1"), document.getElementById("bottomLoader1"), document.documentElement));
 
 
+/// Opera specific code.
+if (window.opera) {
+    /// Inject CSS to make the drop caps take up two lines, so that wrapping text is not placed over it.  (See John 4:1.)
+    ///NOTE: Needed for Opera 10.51-.
+    ///TODO: Determine if this would be better as a function.
+    document.body.appendChild(document.createElement("style").appendChild(document.createTextNode(".first_verse:first-letter { margin-bottom: 0; padding: 1px; }")).parentNode);
+}
+
+
 /**
  * Make split() work correctly in IE.
  *

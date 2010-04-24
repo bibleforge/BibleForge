@@ -138,10 +138,6 @@ body {
     /* Bold makes some letters better, especially P's. */
     /* This fixes the spacing problem with some letters, like W, but not quite capital J's. */
     margin-bottom:	-9px;
-    /* FIXME: Opera needs this:
-    margin-bottom:	0;
-    padding:		1px;
-    */
 }
 
 /* Fixes a bug where the last word of the first verse sometimes wraps. */
