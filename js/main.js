@@ -1064,7 +1064,7 @@
             /// Indicate to the user that more content may be loading, and check for more content.
             if (direction === additional && res[0][res[0].length - 1] < 66022021) {
                 bottomLoader.style.visibility = "visible";
-                content_manager.add_content_if_needed(direction)
+                content_manager.add_content_if_needed(direction);
             }
             if ((direction === previous || waiting_for_first_search) && res[0][0] > 1001001) {
                 topLoader.style.visibility = "visible";
