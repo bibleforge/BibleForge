@@ -761,82 +761,7 @@
     }
     
     
-    /**
-     * Make split() work correctly in IE.
-     *
-     * @param	s		(regexp || string)	The regular expression or string with which to break the string.
-     * @param	limit	(int) (optional)	The number of times to split the string.
-     * @return	Returns an array of the string now broken into pieces.
-     * @see		http://blog.stevenlevithan.com/archives/cross-browser-split.
-     */
-    ///NOTE: The following conditional compilation code blocks only executes in IE.
     /*@cc_on
-        String.prototype._$$split	= String.prototype._$$split || String.prototype.split;
-        String.prototype.split		= function (s, limit)
-        {
-            var flags,
-                emptyMatch,
-                i,
-                j,
-                lastLastIndex,
-                lastLength,
-                match,
-                origLastIndex,
-                output,
-                s2;
-            
-            if (!(s instanceof RegExp)) return String.prototype._$$split.apply(this, arguments);
-            
-            flags			= (s.global ? "g" : "") + (s.ignoreCase ? "i" : "") + (s.multiline ? "m" : "");
-            s2				= new RegExp("^" + s.source + "$", flags);
-            output			= [];
-            origLastIndex	= s.lastIndex;
-            lastLastIndex	= 0;
-            i = 0;
-            
-            if (limit === undefined || +limit < 0) {
-                limit = false;
-            } else {
-                limit = Math.floor(+limit);
-                if (!limit) return [];
-            }
-            if (s.global) {
-                s.lastIndex = 0;
-            } else {
-                s = new RegExp(s.source, "g" + flags);
-            }
-            while ((!limit || i++ <= limit) && (match = s.exec(this))) {
-                emptyMatch = !match[0].length;
-                if (emptyMatch && s.lastIndex > match.index) {
-                    --s.lastIndex;
-                }
-                if (s.lastIndex > lastLastIndex) {
-                    if (match.length > 1) {
-                        match[0].replace(s2, function ()
-                        {
-                            for (j = 1; j < arguments.length - 2; ++j) {
-                                if (arguments[j] === undefined) {
-                                    match[j] = undefined;
-                                }
-                            }
-                        });
-                    }
-                    
-                    output = output.concat(this.slice(lastLastIndex, match.index));
-                    if (1 < match.length && match.index < this.length) {
-                        output = output.concat(match.slice(1));
-                    }
-                    lastLength		= match[0].length;
-                    lastLastIndex	= s.lastIndex;
-                }
-                if (emptyMatch) ++s.lastIndex;
-            }
-            output = lastLastIndex === this.length ? (s.test("") && !lastLength ? output : output.concat("")) : (limit ? output : output.concat(this.slice(lastLastIndex)));
-            s.lastIndex = origLastIndex; /// TODO: Determine if this line of code is necessary.
-            return output;
-        };
-        
-        
         /// Trick IE into understanding pageYOffset.
         /// Set the initial value, so that it is not undefined.
         /// See scrolling().
@@ -1551,3 +1476,82 @@
         ajax.send(message);
     }
 }(document.getElementById("viewPort1"), document.getElementById("searchForm1"), document.getElementById("q1"), document.getElementById("scroll1"), document.getElementById("infoBar1"), document.getElementById("topLoader1"), document.getElementById("bottomLoader1"), document.documentElement));
+
+
+/**
+ * Make split() work correctly in IE.
+ *
+ * @param	s		(regexp || string)	The regular expression or string with which to break the string.
+ * @param	limit	(int) (optional)	The number of times to split the string.
+ * @return	Returns an array of the string now broken into pieces.
+ * @see		http://blog.stevenlevithan.com/archives/cross-browser-split.
+ */
+///NOTE: The following conditional compilation code blocks only executes in IE.
+/*@cc_on
+
+String.prototype._$$split = String.prototype._$$split || String.prototype.split;
+String.prototype.split    = function (s, limit)
+{
+    var flags,
+        emptyMatch,
+        i,
+        j,
+        lastLastIndex,
+        lastLength,
+        match,
+        origLastIndex,
+        output,
+        s2;
+    
+    if (!(s instanceof RegExp)) return String.prototype._$$split.apply(this, arguments);
+    
+    flags			= (s.global ? "g" : "") + (s.ignoreCase ? "i" : "") + (s.multiline ? "m" : "");
+    s2				= new RegExp("^" + s.source + "$", flags);
+    output			= [];
+    origLastIndex	= s.lastIndex;
+    lastLastIndex	= 0;
+    i = 0;
+    
+    if (limit === undefined || +limit < 0) {
+        limit = false;
+    } else {
+        limit = Math.floor(+limit);
+        if (!limit) return [];
+    }
+    if (s.global) {
+        s.lastIndex = 0;
+    } else {
+        s = new RegExp(s.source, "g" + flags);
+    }
+    while ((!limit || i++ <= limit) && (match = s.exec(this))) {
+        emptyMatch = !match[0].length;
+        if (emptyMatch && s.lastIndex > match.index) {
+            --s.lastIndex;
+        }
+        if (s.lastIndex > lastLastIndex) {
+            if (match.length > 1) {
+                match[0].replace(s2, function ()
+                {
+                    for (j = 1; j < arguments.length - 2; ++j) {
+                        if (arguments[j] === undefined) {
+                            match[j] = undefined;
+                        }
+                    }
+                });
+            }
+            
+            output = output.concat(this.slice(lastLastIndex, match.index));
+            if (1 < match.length && match.index < this.length) {
+                output = output.concat(match.slice(1));
+            }
+            lastLength		= match[0].length;
+            lastLastIndex	= s.lastIndex;
+        }
+        if (emptyMatch) ++s.lastIndex;
+    }
+    output = lastLastIndex === this.length ? (s.test("") && !lastLength ? output : output.concat("")) : (limit ? output : output.concat(this.slice(lastLastIndex)));
+    s.lastIndex = origLastIndex; /// TODO: Determine if this line of code is necessary.
+    return output;
+};
+
+@*/
