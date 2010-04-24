@@ -8,6 +8,10 @@
  * @author	BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
  */
 
+/// Set JSLint options.
+/*global window, BF_LANG */
+/*jslint white: true, browser: true, devel: true, evil: true, forin: true, onevar: true, undef: true, nomen: true, bitwise: true, newcap: true, immed: true */
+
 /**
  * Initialize the BibleForge environment.
  *
