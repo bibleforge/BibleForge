@@ -5,10 +5,10 @@
  *
  * @date    08-25-09
  * @version 0.2 alpha
- * @link http://BibleForge.com
+ * @link    http://BibleForge.com
  * @license GNU Lesser General Public License v2.1 (LGPLv2.1)
- * @author Andrew "shodan" Aksyonoff (original)
- * @author BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
+ * @author  Andrew "shodan" Aksyonoff (original)
+ * @author  BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
  */
  
 //
@@ -389,7 +389,12 @@ function sphFixUint ( $value )
 }
 
 
-/// sphinx searchd client class
+/**
+ * The Sphinx searchd client class
+ * 
+ * @example $sphinx = new SphinxClient();
+ * @note Called by standard_search() in functions/standard_search.php and morphology_search() in functions/morphology.php.
+ */
 class SphinxClient
 {
 	var $_host;			///< searchd host (default is "localhost")

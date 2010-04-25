@@ -1,73 +1,77 @@
 /**
  * BibleForge
  *
- * @version 0.2 alpha
  * @date    10-30-08
- * @link http://BibleForge.com
+ * @version 0.2 alpha
+ * @link    http://BibleForge.com
  * @license Reciprocal Public License 1.5 (RPL1.5)
- * @author BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
+ * @author  BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
  */
 
 /* TODO: Completely document the CSS. */
 
 html, body {
-	margin: 0;
-	padding: 0;
-	border: 0;
-	width: 100%;
+    margin:		0;
+    padding:	0;
+    border:		0;
+    width:		100%;
+    background:	#FFF;
 }
 
 html {
-	overflow-y: scroll;
-	overflow-x: hidden;
-	font-family: Verdana, 'BibleForge Sans', Verdana, 'Bitstream Vera Sans', 'DejaVu Sans', Arial, sans-serif;
-	font-size: 15px;
+    overflow-y:		scroll;
+    overflow-x:		hidden;
+    font-family:	Verdana, 'BibleForge Sans', Verdana, 'Bitstream Vera Sans', 'DejaVu Sans', Arial, sans-serif;
+    font-size:		15px;
 }
+
 body {
-	overflow: hidden;
+    overflow: hidden;
 }
 
-#topBar {
-	position: fixed;
-	top: 0px;
-	left: 0px;
-	width: 100%;
-	height: 30px;
+
+.topBars {
+    position:	fixed;
+    top:		0;
+    left:		0;
+    width:		100%;
+    height:		30px;
 }
 
-#searchBar {
-	/* A solid background for IE/Mozilla 2-/Opera 9.6- */
-	background: rgb(255,255,255);
-	/* Transparent white background for Firefox 3.5-/Opera 10 */
-	background: rgba(255,255,255,.9);
-	/* TODO: Determine if gradients increase CPU usage significantly? */
-	/* Transparent white gradient for Firefox 3.6+ */
-	background: -moz-linear-gradient(top, rgba(255,255,255,.96), rgba(255,255,255,.92) 25%, rgba(255,255,255,.9));
-	/* Transparent white gradient for WebKit */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(255,255,255,.96)), color-stop(.25, rgba(255,255,255,.92)), color-stop(1, rgba(255,255,255,.9)));
-	width: 100%;
-	height: 100%;
+.searchBars {
+    /* A solid background for IE/Mozilla 2-/Opera 9.6- */
+    background:	rgb(255,255,255);
+    /* Transparent white background for Firefox 3.5-/Opera 10 */
+    background:	rgba(255,255,255,.9);
+    /* TODO: Determine if gradients increase CPU usage significantly? */
+    /* Transparent white gradient for Firefox 3.6+ */
+    background:	-moz-linear-gradient(top, rgba(255, 255, 255, .96), rgba(255, 255, 255, .92) 25%, rgba(255, 255, 255, .9));
+    /* Transparent white gradient for WebKit */
+    background:	-webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(255, 255, 255, .96)), color-stop(.25, rgba(255, 255, 255, .92)), color-stop(1, rgba(255, 255, 255, .9)));
+    width:		100%;
+    height:		100%;
 }
 
-#infoBar {
-	/* A solid background for IE/Mozilla 2-/Opera 9.6- */
-	background: rgb(255,255,221);
-	/* Transparent yellow background */
-	background: rgba(255,255,221,.9);
-	border-top: #EEE999 solid 1px;
-	border-bottom: #EEE999 solid 1px;
-	width: 100%;
-	height: 18px;
-	/* Prevent a long search string from overflowing the info bar by cutting it short and adding an ellipsis. (Mozilla has no support for this yet.) */
-	/* FIXME: This does not work yet. */
-	text-overflow: ellipsis;
-	-o-text-overflow: ellipsis; /* Opera */
-	/* This is what actually hides the text, currently. */
-	overflow: hidden;
-	font-size: 13px;
+.infoBars {
+    /* A solid background for IE/Mozilla 2-/Opera 9.6- */
+    background:		rgb(255, 255, 221);
+    /* Transparent yellow background */
+    background:		rgba(255, 255, 221, .9);
+    border-top: 	#EEE999 solid 1px;
+    border-bottom:	#EEE999 solid 1px;
+    width:			100%;
+    height:			18px;
+    
+    /* Prevent a long search string from overflowing the info bar by cutting it short and adding an ellipsis. (Mozilla has no support for this yet.) */
+    /* FIXME: This does not work yet. */
+    text-overflow:		ellipsis;
+    -o-text-overflow:	ellipsis; /* Opera */
+    /* This is what actually hides the text, currently. */
+    overflow:			hidden;
+    font-size:			13px;
 }
 
-#q {
+.textInputs {
     /* A solid background for IE/Mozilla 2-/Opera 9.6- */
     background: rgb(255, 255, 255);
     /* Slight transparent white background */
@@ -76,220 +80,256 @@ body {
 }
 
 /* Individual words in verses */
-#page a {
-	line-height: 19px;
-	height: 19px;
+.scrolls a {
+    line-height:	19px;
+    height:			19px;
 }
 
-#page {
-	overflow: hidden;
-	max-width: 800px;
-	min-width: 200px;
-	margin-left: auto;
-	margin-right: auto;
-	padding: 0 4px 0 4px; /* Fixes the clipping of italics p's at the beginning of a line (e.g., Acts 5:3 with a large window) or f's at the end of a line (Ex. 36:8). */
+.scrolls {
+    overflow:		hidden;
+    max-width:		800px;
+    min-width:		200px;
+    margin-left:	auto;
+    margin-right:	auto;
+    padding:		0 4px 0 4px; /* Fixes the clipping of italics p's at the beginning of a line (e.g., Acts 5:3 with a large window) or f's at the end of a line (Ex. 36:8). */
 }
 
 /* Verse blocks */
-#page div {
-	/* display: inline-block; is required for IE to use .clientHeight for an object. */
-	display: inline-block;
+.scrolls div {
+    /* display: inline-block; is required for IE to use .clientHeight for an object. */
+    display: inline-block;
 }
 
-.loader {
-	height: 50px;
-	width: 100%;
-	background: url("../images/loader.gif") no-repeat center;
-	visibility: hidden;
+.loaders {
+    height:		50px;
+    width:		100%;
+    background:	url("../images/loader.gif") no-repeat center;
+    visibility:	hidden;
 }
 
 
 /* Verses created from a search. */
 .search_verse {	
-	/* This gives reverse indent, but causes problems with margins (tested w/Mozilla).
-	text-indent: -2em;
-	margin-left: 2em;
-	*/
-	text-indent: 2em;
-	width: 100%;
+    /* This gives reverse indent, but causes problems with margins (tested w/Mozilla).
+    text-indent:	-2em;
+    margin-left:	2em;
+    */
+    text-indent:	2em;
+    width:			100%;
 }
 
 /* Verses created from a verse lookup. */
 .verse {
-	text-indent: 1em;
-	width: 100%;
+    text-indent:	1em;
+    width:			100%;
 }
 
 /* Verses created from a verse lookup. */
 .pslam_title {
-	margin: 0px 2em 0px 2em;
-	padding-bottom: 19px;
+    margin:			0 2em 0 2em;
+    padding-bottom:	19px;
 }
 
 /* Drop caps for the first letter of a chapter */
 .first_verse:first-letter {
-	/* FIXME: Capital J's can cover up part of characters in the third line of the first verse.  See 2 Kings 22:1 in a narrow window. */
-	font-size: 51px;
-	float: left;
-	/* Bold makes some letters better, especially P's. */
-	/* This fixes the spacing problem with some letters, like W, but not quite capital J's. */
-	margin-bottom:-9px;
-	/* FIXME: Opera needs this:
-	margin-bottom:0px;
-	padding: 1px;
-	*/
+    /* FIXME: Capital J's can cover up part of characters in the third line of the first verse.  See 2 Kings 22:1 in a narrow window. */
+    font-size:		51px;
+    float:			left;
+    /* Bold makes some letters better, especially P's. */
+    /* This fixes the spacing problem with some letters, like W, but not quite capital J's. */
+    margin-bottom:	-9px;
 }
+
 /* Fixes a bug where the last word of the first verse sometimes wraps. */
 .first_verse {
-	width: 100%;
-	/* This makes sure that the first line is at least two lines long to give the drop caps just enough space. */
-	min-height: 38px;
+    width:		100%;
+    /* This makes sure that the first line is at least two lines long to give the drop caps just enough space. */
+    min-height:	38px;
 }
 
 /* Serif fonts */
 .book, .chapter, .first_verse:first-letter, .d {
-	font-family: 'Palatino Linotype', Palatino, TexGyrePagella, 'TeX Gyre Pagella', 'URWPalladioL', 'Book Antiqua', 'Times new Roman', Times, serif;
+    font-family: 'Palatino Linotype', Palatino, TexGyrePagella, 'TeX Gyre Pagella', 'URWPalladioL', 'Book Antiqua', 'Times new Roman', Times, serif;
 }
 
 .book, .chapter {
-	text-align: center;
-	width: 100%;
-	font-size: 23px;
+    text-align:	center;
+    width:		100%;
+    font-size:	23px;
 }
+
 .chapter {
-	padding: 13px 0 13px 0;
-	margin: 0;
+    padding:	13px 0 13px 0;
+    margin:		0;
 }
 
 /* Short book titles */
 h1.book {
-	padding: 10px;
+    padding: 10px;
 }
 
 
 /* Long book titles */
 div.book {
-	padding: 60px 0px 20px 0px;
+    padding: 60px 0 20px 0;
 }
 
 /* Main name for long book titles */
 h1 {
-	padding-top: 5px;
-	margin: 0;
-	font-size: 69px;
-	display: block;
+    padding-top:	5px;
+    margin:			0;
+    font-size:		69px;
+    display:		block;
 }
 
 /* The divine name of God */
 .d {
-	font-variant: small-caps;
-	font-size: 16px;
-	/* Different fonts have different line-heights.  This eliminates the inconsistency. */
-	line-height: 1px!important;
+    font-variant:	small-caps;
+    font-size:		16px;
+    /* Different fonts have different line-heights.  This eliminates the inconsistency. */
+    line-height: 	1px!important;
 }
 
 /* Added (implied) words */
 .a {
-	font-style: italic;
+    font-style: italic;
 }
 
 /* Quotations of Jesus */
 .q {
-	color: #D00;
+    color: #D00;
 }
 
 /* Highlighted found words from searches */
-.f1 {background: #FF6;}
-.f2 {background: #AFF;}
-.f3 {background: #9F9;}
-.f4 {background: #F99;}
-.f5 {background: #F6F;}
-.f6 {background: #800;}
-.f7 {background: #0A0;}
-.f8 {background: #860;}
-.f9 {background: #049;}
-.f10 {background: #909;}
-.f11 {background: #EE0;}
-.f12 {background: #0FF;}
-.f13 {background: #A0A;}
-.f14 {background: #7F0;}
-.f15 {background: #19f;}
-.f16 {background: #F00;}
-.f17 {background: #F70;}
-.f18 {background: #CF0;}
-.f19 {background: #AA9;}
-.f20 {background: #469;}
+.f1  {
+    background: #FF6;
+}
+.f2  {
+    background: #AFF;
+}
+.f3  {
+    background: #9F9;
+}
+.f4  {
+    background: #F99;
+}
+.f5  {
+    background: #F6F;
+}
+.f6  {
+    background: #800;
+}
+.f7  {
+    background: #0A0;
+}
+.f8  {
+    background: #860;
+}
+.f9  {
+    background: #049;
+}
+.f10 {
+    background: #909;
+}
+.f11 {
+    background: #EE0;
+}
+.f12 {
+    background: #0FF;
+}
+.f13 {
+    background: #A0A;
+}
+.f14 {
+    background: #7F0;
+}
+.f15 {
+    background: #19f;
+}
+.f16 {
+    background: #F00;
+}
+.f17 {
+    background: #F70;
+}
+.f18 {
+    background: #CF0;
+}
+.f19 {
+    background: #AA9;
+}
+.f20 {
+    background: #469;
+}
 
 /* Fonts for IE */
-
 @font-face {
-	font-family: 'TeX Gyre Pagella';
-	src: url('fonts/fonts/texgyrepagella-regular.eot');
+    font-family:	'TeX Gyre Pagella';
+    src:			url('fonts/fonts/texgyrepagella-regular.eot');
 }
 
 /* Fonts for Mozilla/Opera/Webkit */
-
 @font-face {
-	font-family: 'TeX Gyre Pagella';
-	src: local('TeX Gyre Pagella Regular'),
-	     local('TeXGyrePagella-Regular'),
-	     url('texgyrepagella-regular.otf') format('opentype');
+    font-family:	'TeX Gyre Pagella';
+    src:			local('TeX Gyre Pagella Regular'),
+                    local('TeXGyrePagella-Regular'),
+                    url('texgyrepagella-regular.otf')		format('opentype');
 }
 
 @font-face {
-	font-family: 'TeX Gyre Pagella';
-	src: local('TeX Gyre Pagella Italic'),
-	     local('TeXGyrePagella-Italic'),
-	     url('texgyrepagella-italic.otf') format('opentype');
-	font-style: italic;
+    font-family:	'TeX Gyre Pagella';
+    src:			local('TeX Gyre Pagella Italic'),
+                    local('TeXGyrePagella-Italic'),
+                    url('texgyrepagella-italic.otf')		format('opentype');
+    font-style:		italic;
 }
 
 @font-face {
-	font-family: 'TeX Gyre Pagella';
-	src: local('TeX Gyre Pagella Bold'),
-	     local('TeXGyrePagella-Bold'),
-	     url('texgyrepagella-bold.otf') format('opentype');
-	font-weight: bold;
+    font-family:	'TeX Gyre Pagella';
+    src:			local('TeX Gyre Pagella Bold'),
+                    local('TeXGyrePagella-Bold'),
+                    url('texgyrepagella-bold.otf')			format('opentype');
+                    font-weight: bold;
 }
 
 @font-face {
-	font-family: 'TeX Gyre Pagella';
-	src: local('TeX Gyre Pagella Bold Italic'),
-	     local('TeXGyrePagella-BoldItalic'),
-	     url('texgyrepagella-bolditalic.otf') format('opentype');
-	font-weight: bold;
-	font-style: italic;
+    font-family:	'TeX Gyre Pagella';
+    src:			local('TeX Gyre Pagella Bold Italic'),
+                    local('TeXGyrePagella-BoldItalic'),
+                    url('texgyrepagella-bolditalic.otf')	format('opentype');
+    font-weight:	bold;
+    font-style: 	italic;
 }
 
 
 @font-face {
-	font-family: 'Bitstream Vera Sans';
-	src: local('Bitstream Vera Sans'),
-	     local('BitstreamVeraSans'),
-	     url('fonts/Vera.ttf') format('truetype');
+    font-family:	'Bitstream Vera Sans';
+    src:			local('Bitstream Vera Sans'),
+                    local('BitstreamVeraSans'),
+                    url('fonts/Vera.ttf')					format('truetype');
 }
 
 @font-face {
-	font-family: 'Bitstream Vera Sans';
-	src: local('Bitstream Vera Sans Oblique'),
-	     local('BitstreamVeraSans-Oblique'),
-	     url('fonts/VeraIt.ttf') format('truetype');
-	font-style: italic;
+    font-family:	'Bitstream Vera Sans';
+    src:			local('Bitstream Vera Sans Oblique'),
+                    local('BitstreamVeraSans-Oblique'),
+                    url('fonts/VeraIt.ttf')					format('truetype');
+    font-style:		italic;
 }
 
 @font-face {
-	font-family: 'Bitstream Vera Sans';
-	src: local('Bitstream Vera Sans Bold'),
-	     local('BitstreamVeraSans-Bold'),
-	     url('fonts/VeraBd.ttf') format('truetype');
-	font-weight: bold;
+    font-family:	'Bitstream Vera Sans';
+    src:			local('Bitstream Vera Sans Bold'),
+                    local('BitstreamVeraSans-Bold'),
+                    url('fonts/VeraBd.ttf')					format('truetype');
+    font-weight:	bold;
 }
 
 @font-face {
-	font-family: 'Bitstream Vera Sans';
-	src: local('Bitstream Vera Sans Bold Oblique'),
-	     local('BitstreamVeraSans-BoldOblique'),
-	     url('fonts/VeraBI.ttf') format('truetype');
-	font-weight: bold;
-	font-style: italic;
+    font-family:	'Bitstream Vera Sans';
+    src:			local('Bitstream Vera Sans Bold Oblique'),
+                    local('BitstreamVeraSans-BoldOblique'),
+                    url('fonts/VeraBI.ttf')					format('truetype');
+    font-weight:	bold;
+    font-style:		italic;
 }
