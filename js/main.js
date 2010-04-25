@@ -186,6 +186,9 @@
         };
     }());
     
+    /*******************************
+     * End of Suggestion functions *
+     *******************************/
     
     /******************************
      * Start of Scrolling Closure *
@@ -731,14 +734,11 @@
         
         return {add_content_if_needed: add_content_if_needed, update_verse_range: update_verse_range};
     }());
+    
     /****************************
      * End of Scrolling Closure *
      ****************************/
     
-    
-    /*******************************
-     * End of Suggestion functions *
-     *******************************/
     
     /// Disable autocomplete for Javascript enabled browsers because they can use the auto suggestions.
     q_obj.setAttribute("autocomplete", "off");
