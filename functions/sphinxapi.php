@@ -8,7 +8,7 @@
  * @link    http://BibleForge.com
  * @license GNU Lesser General Public License v2.1 (LGPLv2.1)
  * @author  Andrew "shodan" Aksyonoff (original)
- * @author  BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
+ * @author  BibleForge <info@bibleforge.com>
  */
  
 //
