@@ -20,7 +20,7 @@
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License v2.1.
-// You should have received a copy of the LGPLv2.1 license along with 
+// You should have received a copy of the LGPLv2.1 license along with
 // this program; if you did not, you can find it at http://www.gnu.org/.
 //
 // Modified and streamlined for BibleForge (http://BibleForge.com).

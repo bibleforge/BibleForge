@@ -109,7 +109,7 @@ body {
 
 
 /* Verses created from a search. */
-.search_verse {	
+.search_verse {
     /* This gives reverse indent, but causes problems with margins (tested w/Mozilla).
     text-indent:	-2em;
     margin-left:	2em;

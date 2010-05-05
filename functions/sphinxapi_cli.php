@@ -57,7 +57,7 @@ define('SPH_GROUPBY_ATTRPAIR',	5);
 
 /**
  * The Sphinx search client class
- * 
+ *
  * @example $sphinx = new SphinxClient();
  * @note Called by standard_search() in functions/standard_search.php and morphology_search() in functions/morphology.php.
  */
@@ -100,7 +100,7 @@ class SphinxClient
     
     /**
      * Create a new client object and fill defaults.
-     * 
+     *
      * @return NULL.  Default values are set.
      * @note Called automatically when the class is created.
      * @note The class is created by standard_search() and morphology_search() in search.php.
@@ -147,7 +147,7 @@ class SphinxClient
     
     /**
      * Set the search path and sphinx config file.
-     * 
+     *
      * @example	$sphinx->SetServer(SPHINX_SERVER, SPHINX_PORT);
      * @example	$sphinx->SetServer('search', 'sphinx.conf');
      * @param	$path	(string) The path to the search executable file.  Default is "search."
@@ -166,9 +166,9 @@ class SphinxClient
     
     /**
      * Set the id range to match.
-     * 
+     *
      * Only match records if document ID is between $min and $max (inclusive).
-     * 
+     *
      * @example	$sphinx->SetIDRange($start_id, 0);
      * @param	$min (integer) The lowest id to be returned.
      * @param	$max (integer) The highest id to be returned.  If 0 then there is no upper limit.
@@ -184,7 +184,7 @@ class SphinxClient
      
     /**
      * Set offset and count into result set, and optionally set max-matches and cutoff limits.
-     * 
+     *
      * @example	$sphinx->SetLimits(0, LIMIT);
      * @param	$offset	(integer) 				The result to start at.
      * @param	$limit	(integer)				The number of results to return.
@@ -208,7 +208,7 @@ class SphinxClient
     
     /**
      * Set the matching mode.
-     * 
+     *
      * @example	$sphinx->SetMatchMode(SPH_MATCH_EXTENDED);
      * @param	$mode (integer) The mode to search with.  The default is SPH_MATCH_ALL.
      * @return	NULL.
@@ -222,7 +222,7 @@ class SphinxClient
     
     /**
      * Set the sorting mode.
-     * 
+     *
      * @example	$sphinx->SetSortMode(SPH_SORT_EXTENDED, '@id ASC');
      * @param	$mode	(integer)			The search mode to use.  The default is SPH_SORT_RELEVANCE.
      * @param	$sortby	(string) (optional)	The search expression to use.
@@ -238,7 +238,7 @@ class SphinxClient
     
     /**
      * Set the ranking mode.
-     *  
+     *
      * @example	$sphinx->SetRankingMode(SPH_RANK_NONE);
      * @param	$ranker (integer) The ranking mode to use.  The default is SPH_RANK_PROXIMITY_BM25.
      * @return	NULL.
@@ -252,9 +252,9 @@ class SphinxClient
     
     /**
      * Set values to filter the attributes with.
-     * 
+     *
      * Only match records where $attribute value is in given set.
-     * 
+     *
      * @example	$sphinx->SetFilter($attr, array((int)$morphology_arr[1]), (bool)$include_arr[$key]);
      * @example	$sphinx->SetFilter('tense', array(1), false); /// This finds words that are in the present tense.
      * @param	$attribute	(string)				The attribute to filter.
@@ -273,9 +273,9 @@ class SphinxClient
     
     /**
      * Execute the "search" executable, run the given query through the given indices, and return the result.
-     * 
+     *
      * Only match records where $attribute value is in given set.
-     * 
+     *
      * @example	$sphinx_res = $sphinx->Query($query, 'index');
      * @example	$sphinx_res = $sphinx->Query('love', 'verse_text'); /// Do a simple search for the word "love."
      * @param	$query		(string)			The string to search for.
@@ -319,7 +319,7 @@ class SphinxClient
             ///      The max and min ids can be emulated by sorting the results with a sort expression
             ///      where the id of the verse or word must be between the ids (if both are given).
             ///      Then we can filter out verses not in this range by looking for the value of the @expr attribute.
-            ///      If it has a value of 1 (@expr=1), then it is within the range.  A value of 0 (@expr=0) is outside of the range. 
+            ///      If it has a value of 1 (@expr=1), then it is within the range.  A value of 0 (@expr=0) is outside of the range.
             $sortexpr		= ' -S "';
             $sort_attribute	= '@id';
             
@@ -333,7 +333,7 @@ class SphinxClient
                 $sortexpr .= $sort_attribute . ' <= ' . $this->_max_id;
             }
             $options .= $sortexpr . '"';
-            /// The regular expressions that parse the result should only retrieve results that match the sort expression and, therefore, have a value of one. 
+            /// The regular expressions that parse the result should only retrieve results that match the sort expression and, therefore, have a value of one.
             $extra_regex = ', @expr=1';
             
         }

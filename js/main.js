@@ -28,7 +28,7 @@
  * @return	NULL.  Some functions are attached to events and the rest accompany them via closure.
  */
 (function (viewPort, searchForm, q_obj, page, infoBar, topLoader, bottomLoader, doc_docEl)
-{	
+{
     var create_viewport = arguments.callee,
         
         /// Query type "constants"
@@ -489,7 +489,7 @@
          * @note	This function should be called every time the page is resized or scrolled or when visible content is added.
          */
         function find_current_range()
-        {	
+        {
             ///TODO: Determine if there is a better way to calculate the topBar offset.
             var b1,
                 b2,

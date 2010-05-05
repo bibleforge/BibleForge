@@ -14,7 +14,7 @@
 if (get_magic_quotes_gpc()) {
     /**
      * Remove slashes inserted by Magic Quotes.
-     * 
+     *
      * @example	$_POST = stripslashes_deep($_POST);
      * @param	$value (array) The array to remove slashes from.
      * @return	The array with slashes removed.
