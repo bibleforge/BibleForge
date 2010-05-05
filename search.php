@@ -36,12 +36,13 @@ if (get_magic_quotes_gpc()) {
 require_once 'config.php';
 
 /// Prepare for search.
-///TODO: POST vs GET vs REQEUST
-if (!isset($_REQUEST['q'])) {
+
+///TODO: Compare POST vs GET vs REQEUST.
+if (isset($_REQUEST['q'])) {
+    $query = $_REQUEST['q'];
+} else {
     /// $_REQUEST['q'] is required.
     die;
-} else {
-    $query = $_REQUEST['q'];
 }
 
 if (isset($_REQUEST['t'])) {
