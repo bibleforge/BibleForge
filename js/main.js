@@ -133,7 +133,7 @@
         /**
          * Handle cursor hiding when a mouse button is clicked.
          *
-         * @param e (object) The event object (normally supplied by the browser).
+         * @param  e (object) The event object (normally supplied by the browser).
          * @return NULL.
          * @note   Called by page.onmousedown.
          **/
@@ -159,7 +159,7 @@
         /**
          * Prevent hiding the cursor when cursor moves off the scroll.
          *
-         * @param e (object) The event object (normally supplied by the browser).
+         * @param  e (object) The event object (normally supplied by the browser).
          * @return NULL.
          * @note   Called by page.onmouseout.
          **/
