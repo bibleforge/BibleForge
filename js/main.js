@@ -118,6 +118,7 @@
          **/
         function hide_cursor_delayed()
         {
+            ///TODO: Determine if it would be better to check if the cursor needs to be unhidden.
             show_cursor();
             hide_cursor_timeout = setTimeout(function ()
             {
@@ -148,6 +149,7 @@
             ///NOTE: In the future, it may be necessary to map the mouse buttons to variables because most are different on IE; however, the right mouse button is always 2.
             if (e.button == 2) {
                 /// Since the right mouse button usually brings up a menu, the user will likely want to see the cursor indefinately.
+                ///TODO: Determine if it would be better to check if the cursor needs to be unhidden.
                 show_cursor();
             } else {
                 /// Other types of clicks should show the mouse cursor briefly but still hide it again.
