@@ -87,7 +87,7 @@
     /*********************************
      * Start of Mouse Hiding Closure *
      *********************************/
-     
+    
     /**
      * Register events to manage the cursor for better readability.
      *
@@ -108,13 +108,12 @@
             page.style.cursor = "auto";
         }
         
-                
         /**
          * Hide the cursor after a short delay.
          *
          * @return NULL.
          **/
-        page.onmousemove = function ()
+        function hide_cursor_delayed()
         {
             reset_cursor();
             hide_cursor_timeout = setTimeout(function ()
@@ -127,9 +126,23 @@
             }, 2000);
         };
         
-        page.onmouseout  = reset_cursor;
-        ///TODO: Determine if onmousedown should hide the cursor again after a short delay (like onmousemove).
-        page.onmousedown = reset_cursor;
+        
+        page.onmousedown = function (e)
+        {
+            ///NOTE: Since this does not work on IE, there is no IE specific code for getting the global event object from window.event.
+            /// Was the right mouse button clicked?
+            ///TODO: Determine how to detect when the menu comes up on a Mac?
+            ///NOTE: In the future, it may be necessary to map the mouse buttons to variables because most are different on IE; however, the right mouse button is always 2.
+            if (e.button == 2) {
+                /// Since the right mouse button usually brings up a menu, the user will likely want to see the cursor indefinately.
+                reset_cursor();
+            } else {
+                /// Other types of clicks should show the mouse cursor breifly but still hide it again.
+                hide_cursor_delayed();
+            }
+        };
+        
+        page.onmousemove = hide_cursor_delayed;
     }());
     
     /*******************************
