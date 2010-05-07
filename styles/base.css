@@ -5,7 +5,7 @@
  * @version 0.2 alpha
  * @link    http://BibleForge.com
  * @license Reciprocal Public License 1.5 (RPL1.5)
- * @author  BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
+ * @author  BibleForge <info@bibleforge.com>
  */
 
 /* TODO: Completely document the CSS. */
@@ -109,7 +109,7 @@ body {
 
 
 /* Verses created from a search. */
-.search_verse {	
+.search_verse {
     /* This gives reverse indent, but causes problems with margins (tested w/Mozilla).
     text-indent:	-2em;
     margin-left:	2em;

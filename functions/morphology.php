@@ -7,7 +7,7 @@
  * @version 0.2 alpha
  * @link    http://BibleForge.com
  * @license Reciprocal Public License 1.5 (RPL1.5)
- * @author  BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
+ * @author  BibleForge <info@bibleforge.com>
  */
 
 /**
@@ -87,7 +87,7 @@ function morphology_search($json, $direction, $limit, $start_id = 0)
 
 /**
  * Set the attributes to filter in Sphinx.
- * 
+ *
  * @example set_morphology_attributes(array(array(3, 1), array(7, 1)), array(0, 1), $sphinx); /// Set Sphinx to only find words that are spoken by Jesus and not in the present tense.
  * @param   $attribute_arr  (array) An array of arrays containing two integers indicating the attribute to filter and the value with which to filter accordingly.
  * @param   $exclude_arr    (array) An array containing ones and zeros indicating whether to only find words that match the attributes (0) or exclude those words (1).

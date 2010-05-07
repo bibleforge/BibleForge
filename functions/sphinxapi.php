@@ -8,7 +8,7 @@
  * @link    http://BibleForge.com
  * @license GNU Lesser General Public License v2.1 (LGPLv2.1)
  * @author  Andrew "shodan" Aksyonoff (original)
- * @author  BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
+ * @author  BibleForge <info@bibleforge.com>
  */
  
 //
@@ -20,7 +20,7 @@
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License v2.1.
-// You should have received a copy of the LGPLv2.1 license along with 
+// You should have received a copy of the LGPLv2.1 license along with
 // this program; if you did not, you can find it at http://www.gnu.org/.
 //
 // Modified and streamlined for BibleForge (http://BibleForge.com).

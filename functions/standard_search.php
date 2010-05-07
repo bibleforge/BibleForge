@@ -7,7 +7,7 @@
  * @version 0.2 alpha
  * @link    http://BibleForge.com
  * @license Reciprocal Public License 1.5 (RPL1.5)
- * @author  BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
+ * @author  BibleForge <info@bibleforge.com>
  */
 
 ///TODO: Determine the performance cost of creating functions for the code overlap between the two function (standard_search() and morphology_search()).

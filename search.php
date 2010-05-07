@@ -3,18 +3,18 @@
 /**
  * BibleForge
  *
- * @date	10-30-08
- * @version	0.2 alpha
- * @link	http://BibleForge.com
- * @license	Reciprocal Public License 1.5 (RPL1.5)
- * @author	BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
+ * @date    10-30-08
+ * @version 0.2 alpha
+ * @link    http://BibleForge.com
+ * @license Reciprocal Public License 1.5 (RPL1.5)
+ * @author  BibleForge <info@bibleforge.com>
  */
 
 ///NOTE: This is just for compatibilities sake.  Magic Quotes should be turned off and this code should be removed.
 if (get_magic_quotes_gpc()) {
     /**
      * Remove slashes inserted by Magic Quotes.
-     * 
+     *
      * @example	$_POST = stripslashes_deep($_POST);
      * @param	$value (array) The array to remove slashes from.
      * @return	The array with slashes removed.
@@ -36,12 +36,13 @@ if (get_magic_quotes_gpc()) {
 require_once 'config.php';
 
 /// Prepare for search.
-///TODO: POST vs GET vs REQEUST
-if (!isset($_REQUEST['q'])) {
+
+///TODO: Compare POST vs GET vs REQEUST.
+if (isset($_REQUEST['q'])) {
+    $query = $_REQUEST['q'];
+} else {
     /// $_REQUEST['q'] is required.
     die;
-} else {
-    $query = $_REQUEST['q'];
 }
 
 if (isset($_REQUEST['t'])) {

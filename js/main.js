@@ -1,11 +1,11 @@
 /**
  * BibleForge
  *
- * @date	10-30-08
- * @version	0.2 alpha
- * @link	http://BibleForge.com
- * @license	Reciprocal Public License 1.5 (RPL1.5)
- * @author	BibleForge <http://mailhide.recaptcha.net/d?k=01jGsLrhXoE5xEPHj_81qdGA==&c=EzCH6aLjU3N9jI2dLDl54-N4kPCiE8JmTWHPxwN8esM=>
+ * @date    10-30-08
+ * @version 0.2 alpha
+ * @link    http://BibleForge.com
+ * @license Reciprocal Public License 1.5 (RPL1.5)
+ * @author  BibleForge <info@bibleforge.com>
  */
 
 /// Set JSLint options.
@@ -28,7 +28,7 @@
  * @return	NULL.  Some functions are attached to events and the rest accompany them via closure.
  */
 (function (viewPort, searchForm, q_obj, page, infoBar, topLoader, bottomLoader, doc_docEl)
-{	
+{
     var create_viewport = arguments.callee,
         
         /// Query type "constants"
@@ -83,6 +83,58 @@
     /// Capture form submit event.
     searchForm.onsubmit = prepare_new_search;
     
+    
+    /*********************************
+     * Start of Mouse Hiding Closure *
+     *********************************/
+     
+    /**
+     * Register events to manage the cursor for better readability.
+     *
+     * @return NULL.
+     */
+    (function ()
+    {
+        var hide_cursor_timeout;
+        
+        /**
+         * Set the mouse cursor back to its default state.
+         *
+         * @return NULL.
+         **/
+        function reset_cursor()
+        {
+            clearTimeout(hide_cursor_timeout);
+            page.style.cursor = "auto";
+        }
+        
+                
+        /**
+         * Hide the cursor after a short delay.
+         *
+         * @return NULL.
+         **/
+        page.onmousemove = function ()
+        {
+            reset_cursor();
+            hide_cursor_timeout = setTimeout(function ()
+            {
+                ///NOTE: Only works in Mozilla.
+                ///      IE 9- is the only other major browser family that supports transparent cursors (.CUR files only), but it cannot be set via a timeout.
+                ///      WebKit 532.9- (Safari/Chrome 4.0-) does not properly support completely transparent cursors.  It also cannot be set via a timeout.
+                ///      Opera 10.53- has no alternate cursor support whatsoever.
+                page.style.cursor = "none";
+            }, 2000);
+        };
+        
+        page.onmouseout  = reset_cursor;
+        ///TODO: Determine if onmousedown should hide the cursor again after a short delay (like onmousemove).
+        page.onmousedown = reset_cursor;
+    }());
+    
+    /*******************************
+     * End of Mouse Hiding Closure *
+     *******************************/
     
     /******************************
      * Start of Scrolling Closure *
@@ -383,7 +435,7 @@
          * @note	This function should be called every time the page is resized or scrolled or when visible content is added.
          */
         function find_current_range()
-        {	
+        {
             ///TODO: Determine if there is a better way to calculate the topBar offset.
             var b1,
                 b2,
@@ -628,6 +680,7 @@
         
         return {add_content_if_needed: add_content_if_needed, update_verse_range: update_verse_range};
     }());
+    
     /****************************
      * End of Scrolling Closure *
      ****************************/
