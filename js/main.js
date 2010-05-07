@@ -129,7 +129,10 @@
         
         page.onmousedown = function (e)
         {
-            ///NOTE: Since this does not work on IE, there is no IE specific code for getting the global event object from window.event.
+            /// Get the global event object for IE compatibility.
+            /*@cc_on
+                e = window.event;
+            @*/
             /// Was the right mouse button clicked?
             ///TODO: Determine how to detect when the menu comes up on a Mac?
             ///NOTE: In the future, it may be necessary to map the mouse buttons to variables because most are different on IE; however, the right mouse button is always 2.
@@ -137,10 +140,42 @@
                 /// Since the right mouse button usually brings up a menu, the user will likely want to see the cursor indefinately.
                 reset_cursor();
             } else {
-                /// Other types of clicks should show the mouse cursor breifly but still hide it again.
+                /// Other types of clicks should show the mouse cursor briefly but still hide it again.
                 hide_cursor_delayed();
             }
         };
+        
+        
+        /**
+         * Prevent hiding the cursor when cursor moves off the scroll.
+         *
+         * @param e (object) The event object (normally supplied by the browser).
+         * @return NULL.
+         * @note   Called by page.onmouseout.
+         **/
+        page.onmouseout = function (e)
+        {
+            /// Get the global event object for IE compatibility.
+            /*@cc_on
+                e = window.event;
+            @*/
+            ///NOTE: For future IE compatibility, currentTarget is this and relatedTarget is event.toElement.  (Currently, IE cannot handle custom cursors yet.)
+            var curTarget = e.currentTarget,
+                relTarget = e.relatedTarget;
+            
+            ///NOTE: onmouseout does not work as expected.  It fires when the cursor moves over any element, even if it is still over the parent element.
+            ///      Therefore, we must check all of the parent elements to see if it is still over the element in question.
+            ///      IE actually supports the correct behavior with onmouseleave.
+            while (curTarget != relTarget && relTarget !== null && relTarget.nodeName != 'BODY') {
+                relTarget = relTarget.parentNode;
+            }
+            
+            /// Did the mouse cursor leave the parent element?
+            if (curTarget != relTarget) {
+                reset_cursor();
+            }
+        };
+        
         
         page.onmousemove = hide_cursor_delayed;
     }());
