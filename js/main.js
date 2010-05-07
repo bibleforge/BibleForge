@@ -92,7 +92,7 @@
      * Register events to manage the cursor for better readability.
      *
      * @return NULL.
-     */
+     **/
     (function ()
     {
         var hide_cursor_timeout;
@@ -101,6 +101,7 @@
          * Set the mouse cursor back to its default state.
          *
          * @return NULL.
+         * @note   Called by hide_cursor_delayed(), page.onmousedown, and page.onmouseout.
          **/
         function reset_cursor()
         {
@@ -108,10 +109,12 @@
             page.style.cursor = "auto";
         }
         
+        
         /**
          * Hide the cursor after a short delay.
          *
          * @return NULL.
+         * @note   Called by page.onmousedown and page.onmousemove.
          **/
         function hide_cursor_delayed()
         {
@@ -124,9 +127,16 @@
                 ///      Opera 10.53- has no alternate cursor support whatsoever.
                 page.style.cursor = "none";
             }, 2000);
-        };
+        }
         
         
+        /**
+         * Handle cursor hiding when a mouse button is clicked.
+         *
+         * @param e (object) The event object (normally supplied by the browser).
+         * @return NULL.
+         * @note   Called by page.onmousedown.
+         **/
         page.onmousedown = function (e)
         {
             /// Get the global event object for IE compatibility.
@@ -719,9 +729,9 @@
         }
         
         
-        ///NOTE: These events could be attached as anonymous functions (lambdas),
-        ///      but scrolling() calls itself, so it would need to store arguments.callee.
-        ///NOTE: Could use wheel if the scroll bars are invisible.
+        ///NOTE:  These events could be attached as anonymous functions (lambdas),
+        ///       but scrolling() calls itself, so it would need to store arguments.callee.
+        ///NOTE:  Could use wheel if the scroll bars are invisible.
         ///FIXME: These events need to be localized to the objects passed to the function.
         onscroll = scrolling;
         onresize = resizing;
@@ -1386,12 +1396,12 @@
             
             stemmed_arr[count] = stemmed_word;
             
-            ///NOTE: [<-] finds either the beginning of the close tag (</b>) or a hyphen (-).
-            ///      The hyphen is to highlight hyphenated words that would otherwise be missed (matching first word only) (i.e., "Beth").
-            ///      ([^>]+-)? finds words where the match is not the first of a hyphenated word (i.e., "Maachah").
-            ///      The current English version (KJV) does not use square brackets ([]).
+            ///NOTE:  [<-] finds either the beginning of the close tag (</b>) or a hyphen (-).
+            ///       The hyphen is to highlight hyphenated words that would otherwise be missed (matching first word only) (i.e., "Beth").
+            ///       ([^>]+-)? finds words where the match is not the first of a hyphenated word (i.e., "Maachah").
+            ///       The current English version (KJV) does not use square brackets ([]).
             ///FIXME: The punctuation ,.?!;:)( could be considered language specific.
-            ///TODO: Bench mark different regex (creation and testing).
+            ///TODO:  Bench mark different regex (creation and testing).
             if (no_morph || (len_after == len_before && len_after < 3)) {
                 highlight_re[count++] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")[),.?!;:]*[<-]", "i");
             } else {
