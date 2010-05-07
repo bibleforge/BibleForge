@@ -103,7 +103,7 @@
          * @return NULL.
          * @note   Called by hide_cursor_delayed(), page.onmousedown, and page.onmouseout.
          **/
-        function reset_cursor()
+        function show_cursor()
         {
             clearTimeout(hide_cursor_timeout);
             page.style.cursor = "auto";
@@ -118,7 +118,7 @@
          **/
         function hide_cursor_delayed()
         {
-            reset_cursor();
+            show_cursor();
             hide_cursor_timeout = setTimeout(function ()
             {
                 ///NOTE: Only works in Mozilla.
@@ -148,7 +148,7 @@
             ///NOTE: In the future, it may be necessary to map the mouse buttons to variables because most are different on IE; however, the right mouse button is always 2.
             if (e.button == 2) {
                 /// Since the right mouse button usually brings up a menu, the user will likely want to see the cursor indefinately.
-                reset_cursor();
+                show_cursor();
             } else {
                 /// Other types of clicks should show the mouse cursor briefly but still hide it again.
                 hide_cursor_delayed();
@@ -182,7 +182,7 @@
             
             /// Did the mouse cursor leave the parent element?
             if (curTarget != relTarget) {
-                reset_cursor();
+                show_cursor();
             }
         };
         
