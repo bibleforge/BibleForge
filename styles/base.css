@@ -98,7 +98,17 @@ body {
     /*       80% is used because it is a good balance when the page is wide or narrow. */
     width:     80%;
     
-    color: #555;
+    /* Dim the text when not in focus (or hovering) so that it does not distract from the text. */
+    /* Transition for Mozilla (Firefox 3.7+) */
+    -moz-transition-property:    color;
+    -moz-transition-duration:    0.3s;
+    /* Transition for WebKit */
+    -webkit-transition-property: color;
+    -webkit-transition-duration: 0.3s;
+    /* Transition for Opera 10.5+ */
+    -o-transition-property:      color;
+    -o-transition-duration:      0.3s;
+    color: #a7a7a7;
     
     border-style: solid;
     border-width: 1px;
@@ -121,8 +131,25 @@ body {
  */
 .queryInput:focus {
     border-color: #96968e;
+    color:        #555;
 }
 
+/**
+ * Highlight the input box.
+ */
+.queryInput:hover {
+    /* Darken the text so that it is more prominent. */
+    /* Transition for Mozilla (Firefox 3.7+) */
+    -moz-transition-property:    color;
+    -moz-transition-duration:    0.3s;
+    /* Transition for WebKit */
+    -webkit-transition-property: color;
+    -webkit-transition-duration: 0.3s;
+    /* Transition for Opera 10.5+ */
+    -o-transition-property:      color;
+    -o-transition-duration:      0.3s;
+    color: #555;
+}
 
 .inputIcon {
     /* Move the icon over the right end of the input box. */
