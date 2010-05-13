@@ -49,6 +49,7 @@ var BF_LANG = (function ()
         found_plural:   " verses found for ",
         found_singular: " verse found for ",
         psalm:          "Psalm",
+        query_title:    'Keyword or Reference: "God so loved" or Romans 3:23',
         title:          "title",
         
         /// Grammatical Variables

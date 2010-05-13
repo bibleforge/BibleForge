@@ -79,9 +79,14 @@
         /// Objects
         content_manager;
     
-    /// Simple Event Registration
+    /// Bring focus to the query input box.
+    q_obj.focus();
+    
     /// Capture form submit event.
     searchForm.onsubmit = prepare_new_search;
+    
+    /// Set tooltip text for the query input box.
+    q_obj.title = BF_LANG.query_title;
     
     
     /*********************************
