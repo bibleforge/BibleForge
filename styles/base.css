@@ -50,6 +50,7 @@ body {
     background:	-webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(255, 255, 255, .96)), color-stop(.25, rgba(255, 255, 255, .92)), color-stop(1, rgba(255, 255, 255, .9)));
     width:		100%;
     height:		100%;
+    text-align: center;
 }
 
 .infoBars {
@@ -59,25 +60,122 @@ body {
     background:		rgba(255, 255, 221, .9);
     border-top: 	#EEE999 solid 1px;
     border-bottom:	#EEE999 solid 1px;
+    
     width:			100%;
     height:			18px;
     
     /* Prevent a long search string from overflowing the info bar by cutting it short and adding an ellipsis. (Mozilla has no support for this yet.) */
     /* FIXME: This does not work yet. */
     text-overflow:		ellipsis;
-    -o-text-overflow:	ellipsis; /* Opera */
+    /* Opera specific */
+    -o-text-overflow:	ellipsis;
     /* This is what actually hides the text, currently. */
     overflow:			hidden;
     font-size:			13px;
 }
 
-.textInputs {
-    /* A solid background for IE/Mozilla 2-/Opera 9.6- */
-    background: rgb(255, 255, 255);
-    /* Slight transparent white background */
-    /* This allows the text to be readable while still allowing for some transparency. */
-    background: rgba(255, 255, 255, .5);
+
+.queryInput {
+    /* Rounded corners for Mozilla */
+    -moz-border-radius:    15px;
+    /* Rounded corners for WebKit */
+    -webkit-border-radius: 15px;
+    /* Rounded corners for Opera, IE 9+ */
+    border-radius:         15px;
+    
+    /* Add slight gradient shadow to the top of the input box. */
+    /* NOTE: Opera has a glitch where the background extends past the rounded corners. */
+    background: url('data:image/gif;base64,R0lGODlhAQADAKEDAN3d3eTk5PLy8v///yH5BAEKAAMALAAAAAABAAMAAAICRFQAOw==') top repeat-x rgba(255, 255, 255, .5);
+    
+    /* Padding is used to push the text away from the rounded corners */
+    padding: 4px 25px 1px 7px;
+    
+    font-size: 14px;
+    
+    max-width: 480px;
+    min-width: 30px;
+    /* NOTE: 100% width cannot be used because it extends off the page */
+    /*       80% is used because it is a good balance when the page is wide or narrow. */
+    width:     80%;
+    
+    color: #555;
+    
+    border-style: solid;
+    border-width: 1px;
+    
+    /* This gives the input box a slight 3D effect. */
+    border-top-color:    #a7a7a7;
+    border-left-color:   #a1a19b;
+    border-bottom-color: #c3c3c3;
+    border-right-color:  #cacaca;
+    
+    /* The margin must be cleared for WebKit and Opera to move the icon close to the input box. */
+    margin-right: 0;
+    
+    /* This removes the awful (non-rounded) selection rectangle that WebKit imposes. */
+    outline: 0;
 }
+
+/**
+ * Highlight the input box.
+ */
+.queryInput:focus {
+    border-color: #96968e;
+}
+
+
+.inputIcon {
+    /* Move the icon over the right end of the input box. */
+    margin-left: -25px;
+    /* Aligns the image in a somewhat cross-browser way. */
+    vertical-align: bottom;
+    /* Add padding so that the user does not have to click exactly on the icon to hit it. */
+    padding: 6px 9px 4px 0;
+    
+    /* Remove the hideous selection rectangle when clicked. */
+    outline: 0;
+    
+    /* Fade out slightly when the mouse cursor moves off. */
+    /* Transition for Mozilla (Firefox 3.7+) */
+    -moz-transition-property:    opacity;
+    -moz-transition-duration:    0.3s;
+    /* Transition for WebKit */
+    -webkit-transition-property: opacity;
+    -webkit-transition-duration: 0.3s;
+    /* Transition for Opera 10.5+ */
+    -o-transition-property:      opacity;
+    -o-transition-duration:      0.3s;
+    
+    opacity: .45;
+}
+
+/**
+ * Fade in icon on hover.
+ */
+.inputIcon:hover {
+    /* Fade in slightly when the mouse cursor moves over. */
+    /* Transition for Mozilla (Firefox 3.7+) */
+    -moz-transition-property:    opacity;
+    -moz-transition-duration:    0.3s;
+    /* Transition for WebKit */
+    -webkit-transition-property: opacity;
+    -webkit-transition-duration: 0.3s;
+    /* Transition for Opera 10.5+ */
+    -o-transition-property:      opacity;
+    -o-transition-duration:      0.3s;
+    opacity: .75;
+}
+
+/**
+ * Emulate button pressing.
+ */
+.inputIcon:active {
+    /* This is a simple way of moving the icon over slightly when clicked. */
+    border-left: 1px solid transparent;
+    /* Highlight the icon even more. */
+    opacity: .9;
+}
+
 
 /* Individual words in verses */
 .scrolls a {
