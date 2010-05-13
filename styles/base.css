@@ -54,7 +54,7 @@ body {
 }
 
 .infoBars {
-    /* A solid background for IE/Mozilla 2-/Opera 9.6- */
+    /* A solid background for IE/Mozilla (Firefox 2-)/Opera 9.6- */
     background:		#FFD;
     /* Transparent yellow background */
     background:		rgba(255, 255, 221, .9);
@@ -168,6 +168,8 @@ body {
 
 /**
  * Emulate button pressing.
+ *
+ * @note This does not work in IE.
  */
 .inputIcon:active {
     /* This is a simple way of moving the icon over slightly when clicked. */
@@ -208,7 +210,7 @@ body {
 
 /* Verses created from a search. */
 .search_verse {
-    /* This gives reverse indent, but causes problems with margins (tested w/Mozilla).
+    /* This gives reverse indent, but causes problems with margins (tested in Mozilla).
     text-indent:	-2em;
     margin-left:	2em;
     */
