@@ -88,9 +88,9 @@ body {
     background: url('data:image/gif;base64,R0lGODlhAQADAKEDAN3d3eTk5PLy8v///yH5BAEKAAMALAAAAAABAAMAAAICRFQAOw==') top repeat-x rgba(255, 255, 255, .5);
     
     /* Padding is used to push the text away from the rounded corners */
-    padding: 4px 25px 1px 7px;
+    padding: 3px 25px 1px 7px;
     
-    font-size: 14px;
+    font-size: 15px;
     
     max-width: 480px;
     min-width: 30px;
