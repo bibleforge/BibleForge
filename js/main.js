@@ -82,9 +82,6 @@
     /// Bring focus to the query input box.
     q_obj.focus();
     
-    /// Capture form submit event.
-    searchForm.onsubmit = prepare_new_search;
-    
     /// Set tooltip text for the query input box.
     q_obj.title = BF_LANG.query_title;
     
@@ -139,9 +136,9 @@
             hide_cursor_timeout = setTimeout(function ()
             {
                 ///NOTE: Only works in Mozilla.
-                ///      IE 9- is the only other major browser family that supports transparent cursors (.CUR files only), but it cannot be set via a timeout.
-                ///      WebKit 532.9- (Safari/Chrome 4.0-) does not properly support completely transparent cursors.  It also cannot be set via a timeout.
-                ///      Opera 10.53- has no alternate cursor support whatsoever.
+                ///      IE is the only other major browser family that supports transparent cursors (.CUR files only), but it cannot be set via a timeout.
+                ///      WebKit (at least 532.9 (Safari 4/Chrome 4.0)) does not properly support completely transparent cursors.  It also cannot be set via a timeout (see http://code.google.com/p/chromium/issues/detail?id=26723).
+                ///      Opera (at least 10.53) has no alternate cursor support whatsoever.
                 page.style.cursor = "none";
             }, 2000);
         }
@@ -158,7 +155,7 @@
         {
             /// Get the global event object for IE compatibility.
             /*@cc_on
-                e = window.event;
+                e = event;
             @*/
             /// Was the right mouse button clicked?
             ///TODO: Determine how to detect when the menu comes up on a Mac?
@@ -185,7 +182,7 @@
         {
             /// Get the global event object for IE compatibility.
             /*@cc_on
-                e = window.event;
+                e = event;
             @*/
             ///NOTE: For future IE compatibility, currentTarget is this and relatedTarget is event.toElement.  (Currently, IE cannot handle custom cursors yet.)
             var curTarget = e.currentTarget,
@@ -762,28 +759,6 @@
      ****************************/
     
     
-    /// Prototypes
-    ///NOTE: Adds trim() to Strings for IE/Opera/WebKit/Mozilla 3.0-.
-    if (!"".trim) {
-        /**
-         * Removes leading and trailing spaces.
-         *
-         * @example	trimmed = trim("  God is   good  "); /// Returns "God is   good"
-         * @param	str (string) The string to trim.
-         * @return	A String with leading and trailing spaces removed.
-         * @note	This does not remove all types of whitespace.  It actually removes anything under character code 33.
-         */
-        String.prototype.trim = function ()
-        {
-            var end		= this.length,
-                start	= -1;
-            while (this.charCodeAt(--end) < 33) {}
-            while (++start < end && this.charCodeAt(start) < 33) {}
-            return this.slice(start, end + 1);
-        };
-    }
-    
-    
     /*@cc_on
         /// Trick IE into understanding pageYOffset.
         /// Set the initial value, so that it is not undefined.
@@ -802,7 +777,6 @@
      *
      * Evaluates the query from the user and deterim the search query from the input box.
      *
-     * @example	prepare_new_search();
      * @return	FALSE to prevent the form from submitting.
      * @note	Called when clicking the submit button on the search bar in index.php.
      * @note	Outer variables used: waiting_for_first_search, ajax_additional, ajax_previous, last_type, bottom_id, last_search_encoded, last_search.
@@ -818,7 +792,7 @@
         
         last_search_prepared = BF_LANG.prepare_search(raw_search_terms);
         
-        if (last_search_prepared.length === 0) {
+        if (last_search_prepared === "") {
             return false;
         }
         
@@ -1501,10 +1475,32 @@
 }(document.getElementById("viewPort1"), document.getElementById("searchForm1"), document.getElementById("q1"), document.getElementById("scroll1"), document.getElementById("infoBar1"), document.getElementById("topLoader1"), document.getElementById("bottomLoader1"), document.documentElement));
 
 
-/// Opera specific code.
+/// Prototypes
+///NOTE: Adds trim() to Strings for IE/Opera/WebKit/Mozilla 3.0-.
+if (!"".trim) {
+    /**
+     * Removes leading and trailing spaces.
+     *
+     * @example	trimmed = trim("  God is   good  "); /// Returns "God is   good"
+     * @param	str (string) The string to trim.
+     * @return	A String with leading and trailing spaces removed.
+     * @note	This does not remove all types of whitespace.  It actually removes anything under character code 33.
+     */
+    String.prototype.trim = function ()
+    {
+        var end		= this.length,
+            start	= -1;
+        while (this.charCodeAt(--end) < 33) {}
+        while (++start < end && this.charCodeAt(start) < 33) {}
+        return this.slice(start, end + 1);
+    };
+}
+
+
+/// Opera specific code
 if (window.opera) {
     /// Inject CSS to make the drop caps take up two lines, so that wrapping text is not placed over it.  (See John 4:1.)
-    ///NOTE: Needed for Opera 10.51-.
+    ///NOTE: Needed for at least Opera 10.51.
     ///TODO: Determine if this would be better as a function.
     document.body.appendChild(document.createElement("style").appendChild(document.createTextNode(".first_verse:first-letter { margin-bottom: 0; padding: 1px; }")).parentNode);
 }
@@ -1512,77 +1508,86 @@ if (window.opera) {
 
 /**
  *
+ */
+{
+    
+    
+    
+    }
+
+
+/**
+ * Fix IE's string.split.
+ *
  * @param	s		(regexp || string)	The regular expression or string with which to break the string.
  * @param	limit	(int) (optional)	The number of times to split the string.
  * @return	Returns an array of the string now broken into pieces.
- * @see		http://blog.stevenlevithan.com/archives/cross-browser-split.
+ * @see		http://blog.stevenlevithan.com/archives/cross-browser-split
  */
 ///NOTE: The following conditional compilation code blocks only executes in IE.
 /*@cc_on
-
-String.prototype._$$split = String.prototype._$$split || String.prototype.split;
-String.prototype.split    = function (s, limit)
-{
-    var flags,
-        emptyMatch,
-        i,
-        j,
-        lastLastIndex,
-        lastLength,
-        match,
-        origLastIndex,
-        output,
-        s2;
-    
-    if (!(s instanceof RegExp)) return String.prototype._$$split.apply(this, arguments);
-    
-    flags			= (s.global ? "g" : "") + (s.ignoreCase ? "i" : "") + (s.multiline ? "m" : "");
-    s2				= new RegExp("^" + s.source + "$", flags);
-    output			= [];
-    origLastIndex	= s.lastIndex;
-    lastLastIndex	= 0;
-    i = 0;
-    
-    if (limit === undefined || +limit < 0) {
-        limit = false;
-    } else {
-        limit = Math.floor(+limit);
-        if (!limit) return [];
-    }
-    if (s.global) {
-        s.lastIndex = 0;
-    } else {
-        s = new RegExp(s.source, "g" + flags);
-    }
-    while ((!limit || i++ <= limit) && (match = s.exec(this))) {
-        emptyMatch = !match[0].length;
-        if (emptyMatch && s.lastIndex > match.index) {
-            --s.lastIndex;
+    String.prototype._$$split = String.prototype._$$split || String.prototype.split;
+    String.prototype.split    = function (s, limit)
+    {
+        var flags,
+            emptyMatch,
+            i,
+            j,
+            lastLastIndex,
+            lastLength,
+            match,
+            origLastIndex,
+            output,
+            s2;
+        
+        if (!(s instanceof RegExp)) return String.prototype._$$split.apply(this, arguments);
+        
+        flags			= (s.global ? "g" : "") + (s.ignoreCase ? "i" : "") + (s.multiline ? "m" : "");
+        s2				= new RegExp("^" + s.source + "$", flags);
+        output			= [];
+        origLastIndex	= s.lastIndex;
+        lastLastIndex	= 0;
+        i = 0;
+        
+        if (limit === undefined || +limit < 0) {
+            limit = false;
+        } else {
+            limit = Math.floor(+limit);
+            if (!limit) return [];
         }
-        if (s.lastIndex > lastLastIndex) {
-            if (match.length > 1) {
-                match[0].replace(s2, function ()
-                {
-                    for (j = 1; j < arguments.length - 2; ++j) {
-                        if (arguments[j] === undefined) {
-                            match[j] = undefined;
+        if (s.global) {
+            s.lastIndex = 0;
+        } else {
+            s = new RegExp(s.source, "g" + flags);
+        }
+        while ((!limit || i++ <= limit) && (match = s.exec(this))) {
+            emptyMatch = !match[0].length;
+            if (emptyMatch && s.lastIndex > match.index) {
+                --s.lastIndex;
+            }
+            if (s.lastIndex > lastLastIndex) {
+                if (match.length > 1) {
+                    match[0].replace(s2, function ()
+                    {
+                        for (j = 1; j < arguments.length - 2; ++j) {
+                            if (arguments[j] === undefined) {
+                                match[j] = undefined;
+                            }
                         }
-                    }
-                });
+                    });
+                }
+                
+                output = output.concat(this.slice(lastLastIndex, match.index));
+                if (1 < match.length && match.index < this.length) {
+                    output = output.concat(match.slice(1));
+                }
+                lastLength		= match[0].length;
+                lastLastIndex	= s.lastIndex;
             }
-            
-            output = output.concat(this.slice(lastLastIndex, match.index));
-            if (1 < match.length && match.index < this.length) {
-                output = output.concat(match.slice(1));
-            }
-            lastLength		= match[0].length;
-            lastLastIndex	= s.lastIndex;
+            if (emptyMatch) ++s.lastIndex;
         }
-        if (emptyMatch) ++s.lastIndex;
-    }
-    output = lastLastIndex === this.length ? (s.test("") && !lastLength ? output : output.concat("")) : (limit ? output : output.concat(this.slice(lastLastIndex)));
-    s.lastIndex = origLastIndex; /// TODO: Determine if this line of code is necessary.
-    return output;
-};
-
+        output = lastLastIndex === this.length ? (s.test("") && !lastLength ? output : output.concat("")) : (limit ? output : output.concat(this.slice(lastLastIndex)));
+        s.lastIndex = origLastIndex; /// TODO: Determine if this line of code is necessary.
+        return output;
+    };
 @*/
