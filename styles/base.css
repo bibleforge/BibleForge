@@ -61,8 +61,8 @@ body {
     border-top: 	#EEE999 solid 1px;
     border-bottom:	#EEE999 solid 1px;
     
-    width:			100%;
-    height:			18px;
+    width:  100%;
+    height: 18px;
     
     /* Prevent a long search string from overflowing the info bar by cutting it short and adding an ellipsis. (Mozilla has no support for this yet.) */
     /* FIXME: This does not work yet. */
@@ -151,6 +151,7 @@ body {
     color: #555;
 }
 
+
 .inputIcon {
     /* Move the icon over the right end of the input box. */
     margin-left: -25px;
@@ -172,7 +173,6 @@ body {
     /* Transition for Opera 10.5+ */
     -o-transition-property:      opacity;
     -o-transition-duration:      0.3s;
-    
     opacity: .45;
 }
 
