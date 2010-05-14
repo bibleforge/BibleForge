@@ -102,6 +102,17 @@
     {
         var hide_cursor_timeout;
         
+        ///NOTE: Chrome (at least 4.0) has a strange but when setting the cursor to "auto" and
+        ///      the mouse moves over the HTML element drop caps letters moves downward!
+        ///      Therefore, prevent Chrome from running the code below.
+        ///      To a less extent, Safari (at least 4) has the same bug, but it only seems
+        ///      to happen when an alert box pops up, but there does not seem to be a simple way
+        ///      to detect Safari or WebKit as a whole using object detection.
+        ///TODO: File a bug report with WebKit and/or Chrome.
+        if (window.chrome) {
+            return;
+        }
+        
         /**
          * Set the mouse cursor back to its default state.
          *
