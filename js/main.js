@@ -79,12 +79,6 @@
         /// Objects
         content_manager;
     
-    /// Bring focus to the query input box.
-    q_obj.focus();
-    
-    /// Set tooltip text for the query input box.
-    q_obj.title = BF_LANG.query_title;
-    
     
     /*********************************
      * Start of Mouse Hiding Closure *
@@ -200,7 +194,6 @@
                 show_cursor();
             }
         };
-        
         
         page.onmousemove = hide_cursor_delayed;
     }());
@@ -788,6 +781,11 @@
             search_type_array,
             verse_id;
         
+        if (raw_search_terms == BF_LANG.query_explanation) {
+            q_obj.focus();
+            return false;
+        }
+        
         waiting_for_first_search = true;
         
         last_search_prepared = BF_LANG.prepare_search(raw_search_terms);
@@ -867,6 +865,10 @@
         cached_count_bottom		= 0;
         
         document.title = raw_search_terms + " - " + BF_LANG.app_name;
+        
+        /// Stop filling in the explaination text so that the user can make the input box blank.
+        q_obj.onblur = function () {};
+        
         return false;
     }
     
@@ -1472,6 +1474,31 @@
         };
         ajax.send(message);
     }
+    
+    /**************
+     * Set Events *
+     **************/
+     
+    /// Capture form submit event.
+    searchForm.onsubmit = prepare_new_search;
+    
+    /// Set tooltip text for the query input box.
+    q_obj.onblur = function ()
+    {
+        if (this.value == "") {
+            this.value = BF_LANG.query_explanation;
+        }
+    };
+    
+    q_obj.onfocus = function ()
+    {
+        if (this.value == BF_LANG.query_explanation) {
+            this.value = "";
+        }
+    };
+    
+    q_obj.onblur();
+
 }(document.getElementById("viewPort1"), document.getElementById("searchForm1"), document.getElementById("q1"), document.getElementById("scroll1"), document.getElementById("infoBar1"), document.getElementById("topLoader1"), document.getElementById("bottomLoader1"), document.documentElement));
 
 
@@ -1507,13 +1534,45 @@ if (window.opera) {
 
 
 /**
+ * Capture certain key events, bringing focus to the query box.
  *
+ * @param  e (object) The event object (normally supplied by the browser).
+ * @return NULL.
+ * @note   Called on all keydown events.
  */
+document.onkeydown = function (e)
 {
+    var activeEl = document.activeElement,
+        keyCode;
     
-    
-    
+    /// Are there input boxes selected (not including images)?  If so, this function should not be executed.
+    ///NOTE: In the future, other elements, such as, TEXTAREA or buttons, may also need to be detected.
+    if (activeEl.tagName == "INPUT" && activeEl.type != "image") {
+        return;
     }
+    
+    /// Get the global event object for IE compatibility.
+    /*@cc_on
+        e = event;
+    @*/
+    
+    keyCode = e.keyCode;
+    
+    /// Is the user pressing a key that should probably be entered into the input box?  If so, highlight the query box so that the keystrokes will be captured.
+    ///NOTE:      8 = Backspace
+    ///          13 = Enter
+    ///          32 = Space
+    ///       48-90 = Alphanumeric
+    ///      96-111 = Numpad keys
+    ///        186+ = Punctuation
+    ///TODO: Determine if capturing Backspace and/Space is confusing because they have alternate functions (the back button and page down, respectively).
+    ///      One possible solution is to allow Shift, Ctrl, or Alt + Backspace or Space to be the normal action.
+    if (keyCode == 8 || keyCode == 13 || keyCode == 32 || (keyCode > 47 && keyCode < 91) || (keyCode > 95 && keyCode < 112) || keyCode > 185) {
+        ///TODO: Determine which input box to select when split screen mode is implamented.
+        ///      One option would be to have a global select object.
+        document.getElementById("q1").focus();
+    }
+}
 
 
 /**

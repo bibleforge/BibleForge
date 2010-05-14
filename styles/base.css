@@ -131,13 +131,7 @@ body {
  */
 .queryInput:focus {
     border-color: #96968e;
-    color:        #555;
-}
-
-/**
- * Highlight the input box.
- */
-.queryInput:hover {
+    
     /* Darken the text so that it is more prominent. */
     /* Transition for Mozilla (Firefox 3.7+) */
     -moz-transition-property:    color;
