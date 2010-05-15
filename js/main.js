@@ -104,6 +104,7 @@
             return;
         }
         
+        
         /**
          * Set the mouse cursor back to its default state.
          *
@@ -235,11 +236,10 @@
         function scrolling()
         {
             /// Trick IE into understanding pageYOffset.
-            ///NOTE: pageYOffset is a browser-created, global variable.
             /*@cc_on
-                pageYOffset = doc_docEl.scrollTop;
+                window.pageYOffset = doc_docEl.scrollTop;
             @*/
-            var new_scroll_pos	= pageYOffset,
+            var new_scroll_pos = window.pageYOffset,
                 scrolling_down;
             
             if (new_scroll_pos == scroll_pos) {
@@ -324,9 +324,7 @@
                 /// Calculate and set the new scroll position.
                 /// Because content is being removed from the top of the page, the rest of the content will be shifted upward.
                 /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was removed.
-                ///NOTE: scrollTo() is a browser-created, global function.
-                ///NOTE: pageYOffset is a browser-created, global variable.
-                scrollTo(0, scroll_pos = (pageYOffset - child_height));
+                window.scrollTo(0, scroll_pos = (window.pageYOffset - child_height));
                 
                 page.removeChild(child);
                 
@@ -369,9 +367,8 @@
                 page.removeChild(child);
                 
                 /// This fixes an IE7+ bug that causes the page to scroll needlessly when an element is added.
-                ///NOTE: scrollTo() is a browser-created, global function.
                 /*@cc_on
-                    scrollTo(0, scroll_pos);
+                    window.scrollTo(0, scroll_pos);
                 @*/
                 /// End execution to keep the checking_content_top_interval running because there might be even more content that should be removed.
                 bottomLoader.style.visibility = "visible";
@@ -416,9 +413,8 @@
                     page.insertBefore(newEl, null);
                     
                     /// This fixes an IE7+ bug that causes the page to scroll needlessly when an element is added.
-                    ///NOTE: scrollTo() is a browser-created, global function.
                     /*@cc_on
-                        scrollTo(0, scroll_pos);
+                        window.scrollTo(0, scroll_pos);
                     @*/
                     /// Better check to see if we need to add more content.
                     setTimeout(add_content_bottom_if_needed, lookup_speed_scrolling);
@@ -470,9 +466,7 @@
                     
                     /// The new content that was just added to the top of the page will push the other contents downward.
                     /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was added.
-                    ///NOTE: scrollTo() is a browser-created, global function.
-                    ///NOTE: pageYOffset is a browser-created, global variable.
-                    scrollTo(0, scroll_pos = (pageYOffset + newEl.clientHeight));
+                    window.scrollTo(0, scroll_pos = (window.pageYOffset + newEl.clientHeight));
                     
                     /// Check to see if we need to add more content.
                     add_content_if_needed(previous);
@@ -741,8 +735,8 @@
         ///       but scrolling() calls itself, so it would need to store arguments.callee.
         ///NOTE:  Could use wheel if the scroll bars are invisible.
         ///FIXME: These events need to be localized to the objects passed to the function.
-        onscroll = scrolling;
-        onresize = resizing;
+        window.onscroll = scrolling;
+        window.onresize = resizing;
         
         return {add_content_if_needed: add_content_if_needed, update_verse_range: update_verse_range};
     }());
@@ -756,8 +750,7 @@
         /// Trick IE into understanding pageYOffset.
         /// Set the initial value, so that it is not undefined.
         /// See scrolling().
-        ///NOTE: pageYOffset is a browser-created, global variable.
-        pageYOffset = doc_docEl.scrollTop;
+        window.pageYOffset = doc_docEl.scrollTop;
     @*/
     
     
@@ -1086,8 +1079,7 @@
         if (waiting_for_first_search) {
             /// If the user had scrolled down the page and then pressed the refresh button,
             /// the page will keep scrolling down as content is loaded, so to prevent this, force the window to scroll to the top of the page.
-            ///NOTE: scrollTo() is a browser-created, global function.
-            scrollTo(0, 0);
+            window.scrollTo(0, 0);
             
             waiting_for_first_search = false;
             
@@ -1222,9 +1214,7 @@
             
             /// The new content that was just added to the top of the page will push the other contents downward.
             /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was added.
-            ///NOTE: scrollTo() is a browser-created, global function.
-            ///NOTE: pageYOffset is a browser-created, global variable.
-            scrollTo(0, scroll_pos = pageYOffset + newEl.clientHeight);
+            window.scrollTo(0, scroll_pos = window.pageYOffset + newEl.clientHeight);
             
             /// Record the top most verse reference and id so that we know where to start from for the next search or verse lookup as the user scrolls.
             ///NOTE: For verse_lookup and standard_search, the top_id and top_verse are the same because the search is preformed at the verse level.
@@ -1572,7 +1562,7 @@ document.onkeydown = function (e)
         ///      One option would be to have a global select object.
         document.getElementById("q1").focus();
     }
-}
+};
 
 
 /**
