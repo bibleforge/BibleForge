@@ -127,6 +127,23 @@ body {
 }
 
 /**
+ * Highlight the input box partially on hover.
+ */
+.queryInput:hover {
+    /* Darken the text so that it is more prominent. */
+    /* Transition for Mozilla (Firefox 3.7+) */
+    -moz-transition-property:    border-color;
+    -moz-transition-duration:    0.3s;
+    /* Transition for WebKit */
+    -webkit-transition-property: border-color;
+    -webkit-transition-duration: 0.3s;
+    /* Transition for Opera 10.5+ */
+    -o-transition-property:      border-color;
+    -o-transition-duration:      0.3s;
+    border-color: #96968e;
+}
+
+/**
  * Highlight the input box.
  */
 .queryInput:focus {
@@ -167,7 +184,7 @@ body {
     /* Transition for Opera 10.5+ */
     -o-transition-property:      opacity;
     -o-transition-duration:      0.3s;
-    opacity: .45;
+    opacity: .3;
 }
 
 /**
@@ -184,7 +201,7 @@ body {
     /* Transition for Opera 10.5+ */
     -o-transition-property:      opacity;
     -o-transition-duration:      0.3s;
-    opacity: .75;
+    opacity: .6;
 }
 
 /**
