@@ -21,7 +21,7 @@ html, body {
 html {
     overflow-y:		scroll;
     overflow-x:		hidden;
-    font-family:	Verdana, 'BibleForge Sans', Verdana, 'Bitstream Vera Sans', 'DejaVu Sans', Arial, sans-serif;
+    font-family:	Verdana, 'BibleForge Sans', 'Bitstream Vera Sans', 'DejaVu Sans', Arial, sans-serif;
     font-size:		15px;
 }
 
@@ -403,7 +403,7 @@ h1 {
 /* Fonts for IE */
 @font-face {
     font-family:	'TeX Gyre Pagella';
-    src:			url('fonts/fonts/texgyrepagella-regular.eot');
+    src:			url('../fonts/texgyrepagella-regular.eot');
 }
 
 /* Fonts for Mozilla/Opera/Webkit */
@@ -411,14 +411,14 @@ h1 {
     font-family:	'TeX Gyre Pagella';
     src:			local('TeX Gyre Pagella Regular'),
                     local('TeXGyrePagella-Regular'),
-                    url('texgyrepagella-regular.otf')		format('opentype');
+                    url('../fonts/texgyrepagella-regular.otf')    format('opentype');
 }
 
 @font-face {
     font-family:	'TeX Gyre Pagella';
     src:			local('TeX Gyre Pagella Italic'),
                     local('TeXGyrePagella-Italic'),
-                    url('texgyrepagella-italic.otf')		format('opentype');
+                    url('../fonts/texgyrepagella-italic.otf')     format('opentype');
     font-style:		italic;
 }
 
@@ -426,7 +426,7 @@ h1 {
     font-family:	'TeX Gyre Pagella';
     src:			local('TeX Gyre Pagella Bold'),
                     local('TeXGyrePagella-Bold'),
-                    url('texgyrepagella-bold.otf')			format('opentype');
+                    url('../fonts/texgyrepagella-bold.otf')       format('opentype');
                     font-weight: bold;
 }
 
@@ -434,7 +434,7 @@ h1 {
     font-family:	'TeX Gyre Pagella';
     src:			local('TeX Gyre Pagella Bold Italic'),
                     local('TeXGyrePagella-BoldItalic'),
-                    url('texgyrepagella-bolditalic.otf')	format('opentype');
+                    url('../fonts/texgyrepagella-bolditalic.otf') format('opentype');
     font-weight:	bold;
     font-style: 	italic;
 }
@@ -444,14 +444,14 @@ h1 {
     font-family:	'Bitstream Vera Sans';
     src:			local('Bitstream Vera Sans'),
                     local('BitstreamVeraSans'),
-                    url('fonts/Vera.ttf')					format('truetype');
+                    url('../fonts/Vera.ttf')                      format('truetype');
 }
 
 @font-face {
     font-family:	'Bitstream Vera Sans';
     src:			local('Bitstream Vera Sans Oblique'),
                     local('BitstreamVeraSans-Oblique'),
-                    url('fonts/VeraIt.ttf')					format('truetype');
+                    url('../fonts/VeraIt.ttf')                    format('truetype');
     font-style:		italic;
 }
 
@@ -459,7 +459,7 @@ h1 {
     font-family:	'Bitstream Vera Sans';
     src:			local('Bitstream Vera Sans Bold'),
                     local('BitstreamVeraSans-Bold'),
-                    url('fonts/VeraBd.ttf')					format('truetype');
+                    url('../fonts/VeraBd.ttf')                    format('truetype');
     font-weight:	bold;
 }
 
@@ -467,7 +467,7 @@ h1 {
     font-family:	'Bitstream Vera Sans';
     src:			local('Bitstream Vera Sans Bold Oblique'),
                     local('BitstreamVeraSans-BoldOblique'),
-                    url('fonts/VeraBI.ttf')					format('truetype');
+                    url('../fonts/VeraBI.ttf')                    format('truetype');
     font-weight:	bold;
     font-style:		italic;
 }
