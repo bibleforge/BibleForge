@@ -88,7 +88,7 @@
      * Register events to manage the cursor for better readability.
      *
      * @return NULL.
-     **/
+     */
     (function ()
     {
         var hide_cursor_timeout;
@@ -110,7 +110,7 @@
          *
          * @return NULL.
          * @note   Called by hide_cursor_delayed(), page.onmousedown, and page.onmouseout.
-         **/
+         */
         function show_cursor()
         {
             clearTimeout(hide_cursor_timeout);
@@ -123,10 +123,9 @@
          *
          * @return NULL.
          * @note   Called by page.onmousedown and page.onmousemove.
-         **/
+         */
         function hide_cursor_delayed()
         {
-            ///TODO: Determine if it would be better to check if the cursor needs to be unhidden.
             show_cursor();
             hide_cursor_timeout = setTimeout(function ()
             {
@@ -145,7 +144,7 @@
          * @param  e (object) The event object (normally supplied by the browser).
          * @return NULL.
          * @note   Called by page.onmousedown.
-         **/
+         */
         page.onmousedown = function (e)
         {
             /// Get the global event object for IE compatibility.
@@ -157,7 +156,6 @@
             ///NOTE: In the future, it may be necessary to map the mouse buttons to variables because most are different on IE; however, the right mouse button is always 2.
             if (e.button == 2) {
                 /// Since the right mouse button usually brings up a menu, the user will likely want to see the cursor indefinately.
-                ///TODO: Determine if it would be better to check if the cursor needs to be unhidden.
                 show_cursor();
             } else {
                 /// Other types of clicks should show the mouse cursor briefly but still hide it again.
@@ -172,7 +170,7 @@
          * @param  e (object) The event object (normally supplied by the browser).
          * @return NULL.
          * @note   Called by page.onmouseout.
-         **/
+         */
         page.onmouseout = function (e)
         {
             /// Get the global event object for IE compatibility.
