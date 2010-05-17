@@ -1554,10 +1554,10 @@ document.onkeydown = function (e)
     ///          32 = Space
     ///       48-90 = Alphanumeric
     ///      96-111 = Numpad keys
-    ///        186+ = Punctuation
+    ///     186-254 = Punctuation
     ///TODO: Determine if capturing Backspace and/Space is confusing because they have alternate functions (the back button and page down, respectively).
     ///      One possible solution is to allow Shift, Ctrl, or Alt + Backspace or Space to be the normal action.
-    if (keyCode == 8 || keyCode == 13 || keyCode == 32 || (keyCode > 47 && keyCode < 91) || (keyCode > 95 && keyCode < 112) || keyCode > 185) {
+    if (keyCode == 8 || keyCode == 13 || keyCode == 32 || (keyCode > 47 && keyCode < 91) || (keyCode > 95 && keyCode < 112) || (keyCode > 185 && keyCode < 255)) {
         ///TODO: Determine which input box to select when split screen mode is implamented.
         ///      One option would be to have a global select object.
         document.getElementById("q1").focus();
