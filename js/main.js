@@ -1470,7 +1470,13 @@
     /// Capture form submit event.
     searchForm.onsubmit = prepare_new_search;
     
-    /// Set tooltip text for the query input box.
+    /**
+     * Set the query input box text with an explanation of what the user can enter in.
+     *
+     * @return null
+     * @note   Called on q_obj onblur.
+     * @note   This function is removed after the user submits a search by prepare_new_search() because the user no longer needs the instructions.
+     */
     q_obj.onblur = function ()
     {
         if (this.value == "") {
@@ -1478,6 +1484,13 @@
         }
     };
     
+    
+    /**
+     * Remove the explanation text so that the user can type.
+     *
+     * @return null
+     * @note   Called on q_obj onfocus.
+     */
     q_obj.onfocus = function ()
     {
         if (this.value == BF_LANG.query_explanation) {
