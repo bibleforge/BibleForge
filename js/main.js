@@ -1504,7 +1504,7 @@
 
 
 /// Prototypes
-///NOTE: Adds trim() to Strings for IE/Opera/WebKit/Mozilla 3.0-.
+///NOTE: Adds trim() to Strings for IE/Opera/WebKit/Mozilla (Firefox 3.0-).
 if (!"".trim) {
     /**
      * Removes leading and trailing spaces.
@@ -1560,12 +1560,12 @@ document.onkeydown = function (e)
     keyCode = e.keyCode;
     
     /// Is the user pressing a key that should probably be entered into the input box?  If so, highlight the query box so that the keystrokes will be captured.
-    ///NOTE:      8 = Backspace
-    ///          13 = Enter
-    ///          32 = Space
-    ///       48-90 = Alphanumeric
-    ///      96-111 = Numpad keys
-    ///     186-254 = Punctuation
+    ///NOTE:       8 = Backspace
+    ///           13 = Enter
+    ///           32 = Space
+    ///        48-90 = Alphanumeric
+    ///       96-111 = Numpad keys
+    ///      186-254 = Punctuation
     ///TODO: Determine if capturing Backspace and/Space is confusing because they have alternate functions (the back button and page down, respectively).
     ///      One possible solution is to allow Shift, Ctrl, or Alt + Backspace or Space to be the normal action.
     if (keyCode == 8 || keyCode == 13 || keyCode == 32 || (keyCode > 47 && keyCode < 91) || (keyCode > 95 && keyCode < 112) || (keyCode > 185 && keyCode < 255)) {
