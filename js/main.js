@@ -93,13 +93,14 @@
     {
         var hide_cursor_timeout;
         
-        ///NOTE: Chrome (at least 4.0) has a strange but when setting the cursor to "auto" and
-        ///      the mouse moves over the HTML element drop caps letters moves downward!
-        ///      Therefore, prevent Chrome from running the code below.
-        ///      To a less extent, Safari (at least 4) has the same bug, but it only seems
-        ///      to happen when an alert box pops up, but there does not seem to be a simple way
-        ///      to detect Safari or WebKit as a whole using object detection.
-        ///TODO: File a bug report with WebKit and/or Chrome.
+        ///NOTE: Chromium (at least 4.0) has a strange bug when setting the cursor to "auto" and
+        ///      the mouse moves over the HTML element, drop caps letters move downward!
+        ///      Therefore, prevent Chromium from running the code below.
+        ///      To a lesser extent, Safari (at least 4) has the same bug, but it only happens
+        ///      when an alert box pops up, but there does not seem to be a simple way to detect
+        ///      Safari (or WebKit as a whole) using object detection.
+        ///TODO: File a bug report with WebKit and/or Chromium.
+        ///NOTE: Chromium 5.0.342.9 (43360) seems to have fixed this issue for Chromium.
         if (window.chrome) {
             return;
         }
@@ -131,7 +132,7 @@
             {
                 ///NOTE: Only works in Mozilla.
                 ///      IE is the only other major browser family that supports transparent cursors (.CUR files only), but it cannot be set via a timeout.
-                ///      WebKit (at least 532.9 (Safari 4/Chrome 4.0)) does not properly support completely transparent cursors.  It also cannot be set via a timeout (see http://code.google.com/p/chromium/issues/detail?id=26723).
+                ///      WebKit (at least 532.9 (Safari 4/Chromium 4.0)) does not properly support completely transparent cursors.  It also cannot be set via a timeout (see http://code.google.com/p/chromium/issues/detail?id=26723).
                 ///      Opera (at least 10.53) has no alternate cursor support whatsoever.
                 page.style.cursor = "none";
             }, 2000);
