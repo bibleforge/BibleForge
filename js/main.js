@@ -1558,6 +1558,14 @@ document.onkeydown = function (e)
         e = event;
     @*/
     
+    /// If a special key is also pressed, do not capture the storke.
+    ///TODO: Determine if this works on Mac with the Command key.
+    ///NOTE: It may be that the Command key is keyCode 91, and may need to be caught by another keydown event.
+    ///NOTE: The meta key does not seem to be detected, and may need to do this checking manually, like for the Mac.
+    if (e.ctrlKey || e.altKey || e.metaKey) {
+        return;
+    }
+    
     keyCode = e.keyCode;
     
     /// Is the user pressing a key that should probably be entered into the input box?  If so, highlight the query box so that the keystrokes will be captured.
