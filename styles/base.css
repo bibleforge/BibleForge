@@ -25,6 +25,14 @@ html {
     font-size:		15px;
 }
 
+input {
+    /* NOTE: Input fields do not inherit from the HTML element. */
+    /*       If a font-family is not specified, it will use a system default. */
+    /*       On Windows, that font is "MS Shell Dlg," which is actually "Microsoft Sans Serif." */
+    /* TODO: Make/find a good replacement font for Arial. */
+    font-family:	Arial, 'Bitstream Vera Sans', 'DejaVu Sans', sans-serif;
+}
+
 body {
     overflow: hidden;
 }
@@ -91,6 +99,8 @@ body {
     
     /* Padding is used to push the text away from the rounded corners */
     padding: 3px 25px 1px 7px;
+    
+    height: 18px;
     
     font-size: 15px;
     
