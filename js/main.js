@@ -133,6 +133,8 @@
                 ///NOTE: Only works in Mozilla.
                 ///      IE is the only other major browser family that supports transparent cursors (.CUR files only), but it cannot be set via a timeout.
                 ///      WebKit (at least 532.9 (Safari 4/Chromium 4.0)) does not properly support completely transparent cursors.  It also cannot be set via a timeout (see http://code.google.com/p/chromium/issues/detail?id=26723).
+                ///      WebKit can use an almost completely transparent PNG, and it will change the mouse cursor, but it calls the onmousemove event when the cursor changes.
+                ///      It would be possible to manually determine if the onmousemove event was legitimate by checking the X and Y coordinates.
                 ///      Opera (at least 10.53) has no alternate cursor support whatsoever.
                 page.style.cursor = "none";
             }, 2000);
@@ -1483,6 +1485,14 @@
         if (this.value == "") {
             this.value = BF_LANG.query_explanation;
         }
+        document.getElementById("topMenu").className = "fadeout";
+        
+        document.title=document.getElementById("topMenu").style.opacity;
+        fade_obj(document.getElementById("topMenu"), parseFloat(+document.getElementById("topMenu").style.opacity) * 100, -10, 50, 0, function ()
+        {
+            document.getElementById("topMenu").style.display = "none";
+        });
+        
     };
     
     
@@ -1497,9 +1507,34 @@
         if (this.value == BF_LANG.query_explanation) {
             this.value = "";
         }
+        
+        var start_opacity = parseInt(document.getElementById("topMenu").style.opacity);
+        
+        //document.getElementById("topMenu").style.opacity = parseInt(document.getElementById("topMenu").style.opacity);
+        document.getElementById("topMenu").style.display = 'inline';
+        
+        fade_obj(document.getElementById("topMenu"), parseFloat(+document.getElementById("topMenu").style.opacity) * 100, 10, 50, 50, function () {})
     };
     
     q_obj.onblur();
+    
+    function fade_obj(obj, opacity, step, speed, stop_op, run_at_end)
+    {
+        if (opacity / 100 != obj.style.opacity) return false;
+
+        if ((step < 0 && opacity <= stop_op) || (step > 0 && opacity >= stop_op)) {
+            run_at_end();
+        } else {
+            opacity += step;
+            obj.style.opacity = opacity / 100;
+            //document.title = obj.style.opacity;
+            
+            setTimeout(function ()
+            {
+                fade_obj(obj, opacity, step, speed, stop_op, run_at_end);
+            }, speed);
+        }
+    }
 
 }(document.getElementById("viewPort1"), document.getElementById("searchForm1"), document.getElementById("q1"), document.getElementById("scroll1"), document.getElementById("infoBar1"), document.getElementById("topLoader1"), document.getElementById("bottomLoader1"), document.documentElement));
 
@@ -1660,3 +1695,7 @@ document.onkeydown = function (e)
         return output;
     };
 @*/
+
+
+
+document.getElementById("topMenu").innerHTML = "<a href='http://bibleforge.wordpress.com'>About</a>";
