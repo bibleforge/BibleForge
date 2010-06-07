@@ -231,7 +231,6 @@ body {
 
 /* Individual words in verses */
 .scrolls a {
-    line-height:	19px;
     height:			19px;
 }
 
@@ -244,11 +243,6 @@ body {
     padding:		0 4px 0 4px; /* Fixes the clipping of italics p's at the beginning of a line (e.g., Acts 5:3 with a large window) or f's at the end of a line (Ex. 36:8). */
 }
 
-/* Verse blocks */
-.scrolls div {
-    /* display: inline-block; is required for IE to use .clientHeight for an object. */
-    display: inline-block;
-}
 
 .loaders {
     height:		50px;
@@ -274,8 +268,14 @@ body {
     width:			100%;
 }
 
+/* Make all lines of text the same height. */
+.scrolls .verse, .scrolls .first_verse, .psalm_title, .search_verse {
+    line-height: 19px;
+}
+
+
 /* Verses created from a verse lookup. */
-.pslam_title {
+.psalm_title {
     margin:			0 2em 0 2em;
     padding-bottom:	19px;
 }
@@ -298,39 +298,46 @@ body {
 }
 
 /* Serif fonts */
-.book, .chapter, .first_verse:first-letter, .d {
+.book, .chapter, .short_book, .first_verse:first-letter, .d {
     font-family: 'Palatino Linotype', Palatino, TexGyrePagella, 'TeX Gyre Pagella', 'URWPalladioL', 'Book Antiqua', 'Times new Roman', Times, serif;
 }
 
-.book, .chapter {
+.book, .chapter, .short_book {
     text-align:	center;
     width:		100%;
     font-size:	23px;
 }
 
-.chapter {
-    padding:	13px 0 13px 0;
-    margin:		0;
+.chapter, .short_book {
+    padding:     13px 0 13px 0;
+    margin:      0;
+    line-height: 31px;
 }
-
-/* Short book titles */
-h1.book {
-    padding: 10px;
-}
-
 
 /* Long book titles */
 div.book {
-    padding: 60px 0 20px 0;
+    padding: 57px 0 19px 0;
 }
+
 
 /* Main name for long book titles */
 h1 {
-    padding-top:	5px;
-    margin:			0;
-    font-size:		69px;
-    display:		block;
+    margin:      0;
+    font-size:   69px;
+    display:     block;
+    font-weight: bold;
+    line-height: 95px;
 }
+
+/* Pre- and post-titles for long book titles */
+h2 {
+    font-size:   23px;
+    display:     block;
+    font-weight: normal;
+    margin:      0;
+    line-height: 19px;
+}
+
 
 /* The divine name of God */
 .d {

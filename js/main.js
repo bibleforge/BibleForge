@@ -305,7 +305,7 @@
                 return null;
             }
             
-            ///NOTE: Mozilla ignores .clientHeight, .offsetHeight, .scrollHeight for some objects (not <div> however) when in standards mode (i.e., a doctype is present).
+            ///NOTE: Mozilla ignores .clientHeight, .offsetHeight, .scrollHeight for some objects (not <div> tags, however) when in standards mode (i.e., a doctype is present).
             ///      If Mozilla has problems in the future, you can use this as a replacement:
             ///      child_height = parseInt(getComputedStyle(child, null).getPropertyValue("height"));
             
@@ -1155,7 +1155,7 @@
                 if (v < 2) {
                     /// Is this chapter 1?  (We need to know if we should display the book name.)
                     if (c === 1) {
-                        HTML_str += "<div class=book id=" + num + "_title>" + BF_LANG.books_long_pretitle[b] + "<h1>" + BF_LANG.books_long_main[b] + "</h1>" + BF_LANG.books_long_posttitle[b] + "</div>";
+                        HTML_str += "<div class=book id=" + num + "_title><h2>" + BF_LANG.books_long_pretitle[b] + "</h2><h1>" + BF_LANG.books_long_main[b] + "</h1><h2>" + BF_LANG.books_long_posttitle[b] + "</h2></div>";
                     /// Display chapter/psalm number (but not on verse 1 of psalms that have titles).
                     } else if (b !== 19 || v === 0 || ((c <= 2) || (c === 10) || (c === 33) || (c === 43) || (c === 71) || (c === 91) || (c >= 93 && c <= 97) || (c === 99) || (c >= 104 && c <= 107) || (c >= 111 && c <= 119) || (c >= 135 && c <= 137) || (c >= 146))) {
                         /// Is this the book of Psalms?  (Psalms have a special name.)
@@ -1168,7 +1168,7 @@
                     }
                     /// Is this a Psalm title (i.e., verse 0)?  (Psalm titles are displayed specially.)
                     if (v === 0) {
-                        HTML_str += "<div class=pslam_title id=" + num + "_verse>" + verse_HTML[i] + "</div>";
+                        HTML_str += "<div class=psalm_title id=" + num + "_verse>" + verse_HTML[i] + "</div>";
                     } else {
                         HTML_str += "<div class=first_verse id=" + num + "_verse>" + verse_HTML[i] + "</div>";
                     }
@@ -1188,7 +1188,7 @@
                     /// We only need to print out the book if it is different from the last verse.
                     last_book = b;
                     
-                    HTML_str += "<h1 class=book id=" + num + "_title>" + BF_LANG.books_short[b] + "</h1>"; /// Convert the book number to text.
+                    HTML_str += "<h1 class=short_book id=" + num + "_title>" + BF_LANG.books_short[b] + "</h1>"; /// Convert the book number to text.
                 }
                 
                 HTML_str += "<div class=search_verse id=" + num + "_search>" + c + ":" + v + " " + verse_HTML[i] + "</div>";
