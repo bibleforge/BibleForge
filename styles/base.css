@@ -19,10 +19,15 @@ html, body {
 }
 
 html {
-    overflow-y:		scroll;
-    overflow-x:		hidden;
-    font-family:	Verdana, 'BibleForge Sans', 'Bitstream Vera Sans', 'DejaVu Sans', Arial, sans-serif;
-    font-size:		15px;
+    overflow-y:     scroll;
+    overflow-x:     hidden;
+    font-family:    Verdana, 'BibleForge Sans', 'Bitstream Vera Sans', 'DejaVu Sans', Arial, sans-serif;
+    font-size:      15px;
+    
+    /* Improve the text rendering and enable support for ligatures and kerning in Mozilla. */
+    /* NOTE: This may have a slight speed cost. */
+    /* NOTE: This does not effect Mozilla on Macs. */
+    text-rendering: optimizeLegibility;
 }
 
 input {
