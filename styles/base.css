@@ -234,11 +234,6 @@ body {
 }
 
 
-/* Individual words in verses */
-.scrolls a {
-    height:			19px;
-}
-
 .scrolls {
     overflow:		hidden;
     max-width:		800px;
