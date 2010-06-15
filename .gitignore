@@ -9,3 +9,7 @@
 #
 
 config.php
+.htaccess
+robots.txt
+sitemap.xml
+favicon.ico #NOTE: This is temporarily ignored until a real favicon is created.
