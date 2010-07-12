@@ -518,22 +518,8 @@
             /// Allow for this function to be called again via setTimeout().  See scrolling().
             looking_up_verse_range = false;
             
-            top_verse_block = find_element_at_scroll_pos(top_pos, page);
-            
-            /// Is the top verse block not found?
-            if (top_verse_block === null) {
+            if ((top_verse_block = find_element_at_scroll_pos(top_pos, page)) === null || (bottom_verse_block = find_element_at_scroll_pos(bottom_pos, null, top_verse_block)) === null) {
                 ///NOTE: There appears to be no verses displayed on the screen.
-                ///      Since they may still be being retrieved, so run this function again a little later.
-                looking_up_verse_range = true;
-                setTimeout(find_current_range, lookup_range_speed);
-                return null;
-            }
-            
-            bottom_verse_block = find_element_at_scroll_pos(bottom_pos, null, top_verse_block);
-            
-            /// Is the bottom verse block not found?
-            if (bottom_verse_block === null) {
-                ///NOTE: There are no verses at the bottom of the screen.
                 ///      Since they may still be being retrieved, so run this function again a little later.
                 looking_up_verse_range = true;
                 setTimeout(find_current_range, lookup_range_speed);
