@@ -1006,6 +1006,7 @@
             i,
             total		= res[2];
         
+        ///FIXME: Lookups always return 1 for success instead of the number of verses.  See functions/database_lookup.php.
         if (total > 0) {
             ///FIXME: When looking up the last few verses of Revelation (i.e., Revelation 22:21), the page jumps when more content is loaded above.
             write_verses(action, direction, res[0], res[1]);

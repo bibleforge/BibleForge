@@ -53,6 +53,7 @@ if (isset($_REQUEST['t'])) {
 
 /// Which verse should the search start on?
 ///NOTE: Not used with VERSE_LOOKUP.
+///TODO: Determine if this can be moved so that it does not always run.
 if (isset($_REQUEST['s'])) {
     $start_id = (int)$_REQUEST['s'];
 } else {
@@ -65,6 +66,7 @@ if (isset($_REQUEST['d'])) {
 } else {
     $direction = ADDITIONAL;
 }
+
 
 /**
  * Run a search.
@@ -86,15 +88,28 @@ if (isset($_REQUEST['d'])) {
  */
 
 if ($type == VERSE_LOOKUP) {
-    /// $query example: 1001001 OR 43003016
+    
+    /// Should verses be returned in paragraph form?
+    if (isset($_REQUEST['p'])) {
+        $in_paragraphs = (bool)$_REQUEST['p'];
+    } else {
+        $in_paragraphs = true;
+    }
+    
     require_once 'functions/database_lookup.php';
-    retrieve_verses($query, $direction, LIMIT);
+    
+    /// $query example: 1001001 or 43003016
+    retrieve_verses($query, $direction, LIMIT, $in_paragraphs);
+    
 } elseif ($type == STANDARD_SEARCH) {
-    /// $query example: love OR God & love OR this -that OR "in the beginning"
     require_once 'functions/standard_search.php';
+    
+    /// $query example: love or God & love or this -that or "in the beginning"
     standard_search($query, $direction, LIMIT, $start_id);
+    
 } else { /// MORPHOLOGICAL_SEARCH
-    /// $query ex: '["love", [[4,1]], [1]]' (love AS NOUN) OR '["love", [[3,1], [7,1]], [1,0]]' (love AS RED, NOT PRESENT)
     require_once 'functions/morphology.php';
+    
+    /// $query example: '["love", [[4,1]], [1]]' (love AS NOUN) or '["love", [[3,1], [7,1]], [1,0]]' (love AS RED, NOT PRESENT)
     morphology_search($query, $direction, LIMIT, $start_id);
 }

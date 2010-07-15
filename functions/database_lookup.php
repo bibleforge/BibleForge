@@ -21,7 +21,7 @@
  * @return  NULL.       Data is sent to the buffer as a JSON array, and then execution ends.
  * @note    Called by run_search().
  */
-function retrieve_verses($verse_id, $direction, $limit)
+function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true)
 {
     /// Quickly check to see if the verse_id is outside of the valid range.
     ///TODO: Determine if $verse_id < 1001001 should default to 1001001 and $verse_id > 66022021 to 66022021.
@@ -44,29 +44,56 @@ function retrieve_verses($verse_id, $direction, $limit)
     require_once 'functions/database.php';
     connect_to_database();
     
-    $SQL_query  = 'SELECT id, words FROM ' . BIBLE_VERSES . ' WHERE id ' . $operator . (int)$verse_id . $order_by . ' LIMIT ' . $limit;
-    $SQL_res    = mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
-    
-    /// Convert SQL results into one comma delineated string for JSON.
-    $verses_str = "";
-    $verses_num = "";
-    
-    if ($direction == ADDITIONAL) {
-        while ($row = mysql_fetch_assoc($SQL_res)) {
-            $verses_str .= '"' . $row['words'] . '",';
-            $verses_num .= $row['id'] . ',';
-        }
+    if ($in_paragraphs) {
+        /// The longest paragraph in the English version is 57 verses.
+        /// Therefore, the limit must be at least that long because paragraphs cannot be split.
+        $limit = 57;
+        $extra_fields = ', paragraph';
     } else {
-        while ($row = mysql_fetch_assoc($SQL_res)) {
-            $verses_str = '"' . $row['words'] . '",' . $verses_str;
-            $verses_num = $row['id'] . ',' . $verses_num;
-        }
+        $extra_fields = "";
     }
     
-    /// Send results to the buffer as a JSON serialized array, and stop execution.
-    /// Array Format: [[verse_ids,...],[verse_words,...],[success]]
-    ///NOTE: rtrim(..., ',') removes trailing commas.  It seems to be slightly faster than substr(..., 0, -1).
-    ///TODO: It would be nice to indicate if there are no more verses to find when it gets to the end.
-    echo '[[', rtrim($verses_num, ','), '],[', rtrim($verses_str, ','), '],[1]]';
-    die;
+    $SQL_query  = 'SELECT id, words' . $extra_fields . ' FROM ' . BIBLE_VERSES . ' WHERE id ' . $operator . (int)$verse_id . $order_by . ' LIMIT ' . $limit;
+    $SQL_res = mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
+    
+    
+    if ($in_paragraphs && false) {
+        $verse_HTML    = array();
+        $verse_numbers = array();
+        $paragraphs    = array();
+        
+        while ($row = mysql_fetch_assoc($SQL_res)) {
+            $verse_HTML[]    = $row['words'];
+            $verse_numbers[] = $row['id'];
+            $paragraphs[]    = $row['paragraph'];
+        }
+        
+        ///FIXME: handle_new_verses() in js/main.js is expecting the total number of verses, not success/fail for the last value.
+        echo '[[', implode(',', $verse_numbers), '],["', implode('","', $verse_HTML), '"],[' . implode(',', $paragraphs) . '],1]';
+        die;
+    } else {
+        /// Convert SQL results into one comma delineated string for JSON.
+        $verses_str = "";
+        $verses_num = "";
+        
+        if ($direction == ADDITIONAL) {
+            while ($row = mysql_fetch_assoc($SQL_res)) {
+                $verses_str .= '"' . $row['words'] . '",';
+                $verses_num .= $row['id'] . ',';
+            }
+        } else {
+            while ($row = mysql_fetch_assoc($SQL_res)) {
+                $verses_str = '"' . $row['words'] . '",' . $verses_str;
+                $verses_num = $row['id'] . ',' . $verses_num;
+            }
+        }
+        
+        /// Send results to the buffer as a JSON serialized array, and stop execution.
+        /// Array Format: [[verse_ids,...],[verse_words,...],[success]]
+        ///NOTE:  rtrim(..., ',') removes trailing commas.  It seems to be slightly faster than substr(..., 0, -1).
+        ///TODO:  It would be nice to indicate if there are no more verses to find when it gets to the end.
+        ///FIXME: handle_new_verses() in js/main.js is expecting the total number of verses, not sucess/fail for the last value.
+        echo '[[', rtrim($verses_num, ','), '],[', rtrim($verses_str, ','), '],1]';
+        die;
+    }
 }
