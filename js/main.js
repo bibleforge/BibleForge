@@ -1110,17 +1110,20 @@
      * @note	Called by handle_new_verses().
      * @note	verse_ids contains an array of verses in the following format: [B]BCCCVVV (e.g., Genesis 1:1 == 1001001).
      */
-    function write_verses(action, direction, verse_ids, verse_HTML)
+    function write_verses(action, direction, verse_ids, verse_HTML, paragraphs)
     {
         var b,
             c,
-            chapter_text	= "",
+            chapter_text         = "",
+            end_paragraph_HTML   = "",
+            first_paragraph_HTML = "",
             i,
-            HTML_str		= "",
+            HTML_str             = "",
             newEl,
             num,
-            start_key		= 0,
-            stop_key		= verse_ids.length,
+            start_key            = 0,
+            start_paragraph_HTML = "",
+            stop_key             = verse_ids.length,
             v;
         
         /// Currently only grammatical_search searches data at the word level, so it is the only action that might stop in the middle of a verse and find more words in the same verse as the user scrolls.
@@ -1130,12 +1133,17 @@
                 if (bottom_verse == verse_ids[0]) {
                     start_key = 1;
                 }
-            } else {
-                /// Is the last verse returned the same as the top verse on the page?
-                if (top_verse == verse_ids[stop_key - 1]) {
-                    --start_key;
-                }
+            /// Is the last verse returned the same as the top verse on the page?
+            } else if (top_verse == verse_ids[stop_key - 1]) {
+                --start_key;
             }
+        }
+        
+        var in_paragraphs = true; /// <-- TEMP
+        if (in_paragraphs) {
+            start_paragraph_HTML = "<div class=paragraph>";
+            first_paragraph_HTML = '<div class="paragraph first_paragraph">';
+            end_paragraph_HTML   = "</div>";
         }
         
         for (i = start_key; i < stop_key; ++i) {
@@ -1148,6 +1156,9 @@
             if (action == verse_lookup) {
                 /// Is this the first verse or the Psalm title?
                 if (v < 2) {
+                    if (i != start_key) {
+                        HTML_str += end_paragraph_HTML;
+                    }
                     /// Is this chapter 1?  (We need to know if we should display the book name.)
                     if (c === 1) {
                         HTML_str += "<div class=book id=" + num + "_title><h2>" + BF_LANG.books_long_pretitle[b] + "</h2><h1>" + BF_LANG.books_long_main[b] + "</h1><h2>" + BF_LANG.books_long_posttitle[b] + "</h2></div>";
@@ -1165,9 +1176,17 @@
                     if (v === 0) {
                         HTML_str += "<div class=psalm_title id=" + num + "_verse>" + verse_HTML[i] + "</div>";
                     } else {
-                        HTML_str += "<div class=first_verse id=" + num + "_verse>" + verse_HTML[i] + "</div>";
+                        HTML_str += first_paragraph_HTML + "<div class=first_verse id=" + num + "_verse>" + verse_HTML[i] + "</div>";
                     }
                 } else {
+                    if (paragraphs[i]) {
+                        if (i != start_key) {
+                            HTML_str += end_paragraph_HTML;
+                        }
+                        
+                        HTML_str += start_paragraph_HTML;
+                        is_in_paragraph = true;
+                    }
                     HTML_str += "<div class=verse id=" + num + "_verse>" + v + " " + verse_HTML[i] + "</div>";
                 }
                 
@@ -1188,6 +1207,10 @@
                 
                 HTML_str += "<div class=search_verse id=" + num + "_search>" + c + ":" + v + " " + verse_HTML[i] + "</div>";
             }
+        }
+        
+        if (in_paragraphs) {
+            HTML_str += end_paragraph_HTML;
         }
         
         newEl = document.createElement("div");
