@@ -999,17 +999,25 @@
     function handle_new_verses(res, extra_data)
     {
         ///TODO: On a verse lookup that does not start with Genesis 1:1, scroll_maxed_top must be set to FALSE. (Has this been taken care of?)
-        var action		= extra_data.action,
+        var action        = extra_data.action,
             b_tag,
             count,
-            direction	= extra_data.direction,
+            direction     = extra_data.direction,
             i,
-            total		= res[2];
+            total         = res.t,
+            paragraphs,
+            verse_numbers = res.n,
+            verse_html    = res.v;
+        
+        var in_paragraphs = true; /// <-- TEMP
+        if (in_paragraphs) {
+            paragraphs = res.p;
+        }
         
         ///FIXME: Lookups always return 1 for success instead of the number of verses.  See functions/database_lookup.php.
         if (total > 0) {
             ///FIXME: When looking up the last few verses of Revelation (i.e., Revelation 22:21), the page jumps when more content is loaded above.
-            write_verses(action, direction, res[0], res[1]);
+            write_verses(action, direction, verse_numbers, verse_html, paragraphs);
             
             ///FIXME: Highlighting needs to be in its own function where each type and mixed highlighting will be done correctly.
             if (action == standard_search) {
@@ -1019,7 +1027,7 @@
                 ///TODO: Determine if it is bad to convert the array to a string like this
                 setTimeout(function ()
                 {
-                    highlight_search_results(res[1].join(""));
+                    highlight_search_results(verse_html.join(""));
                 }, 100);
             } else if (action == grammatical_search) {
                 count = res[3].length;
@@ -1038,11 +1046,11 @@
             }
             
             /// Indicate to the user that more content may be loading, and check for more content.
-            if (direction === additional && res[0][res[0].length - 1] < 66022021) {
+            if (direction === additional && verse_numbers[verse_numbers.length - 1] < 66022021) {
                 bottomLoader.style.visibility = "visible";
                 content_manager.add_content_if_needed(direction);
             }
-            if ((direction === previous || waiting_for_first_search) && res[0][0] > 1001001) {
+            if ((direction === previous || waiting_for_first_search) && verse_numbers[0] > 1001001) {
                 topLoader.style.visibility = "visible";
                 /// A delay is added on to space out the requests.
                 ///FIXME: This used to use lookup_delay.  Nothing else does.  Is it necessary?  If so, how should it be implamented?
@@ -1084,7 +1092,7 @@
             }
             
             /// Store the first verse reference for later.
-            top_id = res[0][0];
+            top_id = verse_numbers[0];
         }
     }
     
@@ -1440,7 +1448,7 @@
                     /// This is run when the results are returned properly.
                     ///NOTE: JSON.parse() is at least currently (November 2009) twice as slow as eval(), and it does not work because of problems parsing the character combination slash plus single quote (\').  Two slashes may work.
                     ///TODO: Add error handling for parsing.
-                    handler(eval(ajax.responseText), extra_data);
+                    handler(eval("(" + ajax.responseText + ")"), extra_data);
                 } else {
                     /// Was the abort unintentional?
                     if (ajax.status !== 0) {

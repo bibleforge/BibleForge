@@ -57,7 +57,7 @@ function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true)
     $SQL_res = mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
     
     
-    if ($in_paragraphs && false) {
+    if ($in_paragraphs) {
         $verse_HTML    = array();
         $verse_numbers = array();
         $paragraphs    = array();
@@ -69,7 +69,7 @@ function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true)
         }
         
         ///FIXME: handle_new_verses() in js/main.js is expecting the total number of verses, not success/fail for the last value.
-        echo '[[', implode(',', $verse_numbers), '],["', implode('","', $verse_HTML), '"],[' . implode(',', $paragraphs) . '],1]';
+        echo '{n:[', implode(',', $verse_numbers), '],v:["', implode('","', $verse_HTML), '"],p:[', implode(',', $paragraphs), '],t:1}';
         die;
     } else {
         /// Convert SQL results into one comma delineated string for JSON.
