@@ -986,15 +986,15 @@
      * Writes new verses to the page, determines if more content is needed or available,
      * and writes initial information to the info bar.
      *
-     * @example	handle_new_verses([[1001001, 1001002], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>", "<b id="12">And</b> <b id="13">the</b> <b id="14">earth....</b>"], 2]);
-     * @example	handle_new_verses([[1001001], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>"], 1]);
-     * @example	handle_new_verses([[50004008], ["<b id=772635>Finally,</b> <b id=772636>brethren,</b> <b id=772637>whatsoever</b> <b id=772638>things....</b>"], 1, [772638]]);
-     * @param	res			(array)		JSON array from the server.
-     *									Array format: [verse_ids, ...], [verse_HTML, ...], number_of_matches, [word_id, ...]] ///NOTE: word_id is optional.
-     * @param	extra_data	(object)	An object containing the type of action that was preformed and the direction the verses are displayed in.
-     *									Format: {action: (int), direction: (int)}
-     * @return	NULL.  The function writes HTML to the page.
-     * @note	Called by prepare_verses() after an Ajax request.
+     * @example handle_new_verses([[1001001, 1001002], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>", "<b id="12">And</b> <b id="13">the</b> <b id="14">earth....</b>"], 2]);
+     * @example handle_new_verses([[1001001], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>"], 1]);
+     * @example handle_new_verses([[50004008], ["<b id=772635>Finally,</b> <b id=772636>brethren,</b> <b id=772637>whatsoever</b> <b id=772638>things....</b>"], 1, [772638]]);
+     * @param   res        (array)  JSON array from the server.
+     *                              Array format: [verse_ids, ...], [verse_HTML, ...], number_of_matches, [word_id, ...]] ///NOTE: word_id is optional.
+     * @param   extra_data (object) An object containing the type of action that was preformed and the direction the verses are displayed in.
+     *                              Format: {action: (int), direction: (int)}
+     * @return  NULL.  The function writes HTML to the page.
+     * @note    Called by prepare_verses() after an Ajax request.
      */
     function handle_new_verses(res, extra_data)
     {
