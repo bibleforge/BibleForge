@@ -281,7 +281,7 @@ body {
 }
 
 /* Drop caps for the first letter of a chapter */
-.first_verse:first-letter {
+.first_verse:first-letter, .first_paragraph:first-letter {
     /* FIXME: Capital J's can cover up part of characters in the third line of the first verse.  See 2 Kings 22:1 in a narrow window. */
     font-size:		51px;
     float:			left;
@@ -297,8 +297,26 @@ body {
     min-height:	38px;
 }
 
+
+.paragraph {
+    text-indent: 2em;
+}
+
+.paragraph .first_verse {
+    display: inline;
+}
+
+.first_paragraph {
+text-indent: 0;
+}
+
+.paragraph .verse {
+    display: inline;
+    padding-left: 5px;
+}
+
 /* Serif fonts */
-.book, .chapter, .short_book, .first_verse:first-letter, .d {
+.book, .chapter, .short_book, .first_verse:first-letter, .first_paragraph:first-letter, .d {
     font-family: 'Palatino Linotype', Palatino, TexGyrePagella, 'TeX Gyre Pagella', 'URWPalladioL', 'Book Antiqua', 'Times new Roman', Times, serif;
 }
 
