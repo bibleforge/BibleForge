@@ -45,17 +45,19 @@ function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true)
     connect_to_database();
     
     if ($in_paragraphs) {
-        /// The longest paragraph in the English version is 57 verses.
+        /// The longest paragraph in the English version is 57 verses.  By adding 32 we can be
+        /// confident that it will always grab plenty of verses.
         /// Therefore, the limit must be at least that long because paragraphs cannot be split.
-        ///TODO: Determine if 57 should be stored in a config file or variable somewhere (maybe in a builder).
-        $limit = 57;
-        $extra_fields = ', paragraph';
+        ///TODO: Determine if 58 should be stored in a config file or variable somewhere (maybe in a builder).
+        $limit          = 90;
+        $minimum_verses = 32;
+        $extra_fields   = ', paragraph';
     } else {
         $extra_fields = "";
     }
     
     $SQL_query  = 'SELECT id, words' . $extra_fields . ' FROM ' . BIBLE_VERSES . ' WHERE id ' . $operator . (int)$verse_id . $order_by . ' LIMIT ' . $limit;
-    $SQL_res = mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
+    $SQL_res    = mysql_unbuffered_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
     
     
     if ($in_paragraphs) {
@@ -64,11 +66,9 @@ function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true)
         $paragraphs    = array();
         
         $verse_count    = 0;
-        $last_paragraph = 0;
         
         while ($row = mysql_fetch_assoc($SQL_res)) {
             if ($row['paragraph']) {
-                $last_paragraph = $verse_count;
                 /// Did it find enough verses to send to the browser.
                 if ($verse_count > 35) {
                     break;
@@ -78,15 +78,6 @@ function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true)
             $verse_HTML[]    = $row['words'];
             $verse_numbers[] = $row['id'];
             $paragraphs[]    = $row['paragraph'];
-            
-            ++$verse_count;
-        }
-        
-        /// Did it not break at a paragraph?
-        if ($last_paragraph != $verse_count) {
-            $verse_HTML    = array_slice($verse_HTML,    0, $last_paragraph);
-            $verse_numbers = array_slice($verse_numbers, 0, $last_paragraph);
-            $paragraphs    = array_slice($paragraphs,    0, $last_paragraph);
         }
         
         ///FIXME: handle_new_verses() in js/main.js is expecting the total number of verses, not success/fail for the last value.
