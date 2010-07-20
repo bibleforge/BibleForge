@@ -80,6 +80,12 @@ function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true)
             $paragraphs[]    = $row['paragraph'];
         }
         
+        if ($direction == PREVIOUS) {
+            krsort($verse_HTML);
+            krsort($verse_numbers);
+            krsort($paragraphs);
+        }
+        
         ///FIXME: handle_new_verses() in js/main.js is expecting the total number of verses, not success/fail for the last value.
         echo '{n:[', implode(',', $verse_numbers), '],v:["', implode('","', $verse_HTML), '"],p:[', implode(',', $paragraphs), '],t:1}';
         die;
