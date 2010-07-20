@@ -47,6 +47,7 @@ function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true)
     if ($in_paragraphs) {
         /// The longest paragraph in the English version is 57 verses.
         /// Therefore, the limit must be at least that long because paragraphs cannot be split.
+        ///TODO: Determine if 57 should be stored in a config file or variable somewhere (maybe in a builder).
         $limit = 57;
         $extra_fields = ', paragraph';
     } else {
@@ -62,10 +63,30 @@ function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true)
         $verse_numbers = array();
         $paragraphs    = array();
         
+        $verse_count    = 0;
+        $last_paragraph = 0;
+        
         while ($row = mysql_fetch_assoc($SQL_res)) {
+            if ($row['paragraph']) {
+                $last_paragraph = $verse_count;
+                /// Did it find enough verses to send to the browser.
+                if ($verse_count > 35) {
+                    break;
+                }
+            }
+            
             $verse_HTML[]    = $row['words'];
             $verse_numbers[] = $row['id'];
             $paragraphs[]    = $row['paragraph'];
+            
+            ++$verse_count;
+        }
+        
+        /// Did it not break at a paragraph?
+        if ($last_paragraph != $verse_count) {
+            $verse_HTML    = array_slice($verse_HTML,    0, $last_paragraph);
+            $verse_numbers = array_slice($verse_numbers, 0, $last_paragraph);
+            $paragraphs    = array_slice($paragraphs,    0, $last_paragraph);
         }
         
         ///FIXME: handle_new_verses() in js/main.js is expecting the total number of verses, not success/fail for the last value.
