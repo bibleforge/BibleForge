@@ -88,6 +88,7 @@ if (isset($_REQUEST['d'])) {
  */
 
 if ($type == VERSE_LOOKUP) {
+    require_once 'functions/database_lookup.php';
     
     /// Should verses be returned in paragraph form?
     if (isset($_REQUEST['p'])) {
@@ -96,7 +97,6 @@ if ($type == VERSE_LOOKUP) {
         $in_paragraphs = true;
     }
     
-    require_once 'functions/database_lookup.php';
     
     /// $query example: 1001001 or 43003016
     retrieve_verses($query, $direction, LIMIT, $in_paragraphs);

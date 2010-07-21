@@ -25,6 +25,7 @@ function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true)
 {
     /// Quickly check to see if the verse_id is outside of the valid range.
     ///TODO: Determine if $verse_id < 1001001 should default to 1001001 and $verse_id > 66022021 to 66022021.
+    ///TODO: 66022021 may need to be language dependant because different langauges have different verse breaks.
     if ($verse_id < 1001001 || $verse_id > 66022021) {
         echo '[[],[],[0]]';
         die;
@@ -38,6 +39,7 @@ function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true)
         $order_by = '';
     } else {
         $operator = '<=';
+        ///NOTE: Leading space is needed in case the preceeding variable does end with whitespace.
         $order_by = ' ORDER BY id DESC';
     }
     
@@ -65,7 +67,7 @@ function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true)
     ///      back to the client sooner.
     ///TODO: Determine the best way to query the database: consider mysql_query() vs mysql_unbuffered_query(),
     ///      as well as mysqli_store_result() plus mysql_use_result().
-    $SQL_res    = mysql_unbuffered_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
+    $SQL_res = mysql_unbuffered_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
     
     
     if ($in_paragraphs) {
@@ -79,7 +81,7 @@ function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true)
         while ($row = mysql_fetch_assoc($SQL_res)) {
             if ($row['paragraph']) {
                 /// Did it find enough verses to send to the browser.
-                if ($verse_count > 35) {
+                if ($verse_count > $minimum_verses) {
                     /// The first verse should be at a paragraph beginning, and the last verse
                     /// should be just before one. Therefore, when looking up previous verses,
                     /// we must get this verse (because previous lookups are in reverse).

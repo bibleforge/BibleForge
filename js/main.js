@@ -941,6 +941,7 @@
      */
     function run_search(direction)
     {
+        ///TODO: Rewrite code so that it does not rely on so many inner variables (such as last_type and last_search_encoded).
         /// last_type set in prepare_new_search().
         var ajax,
             query = "t=" + last_type;
@@ -960,8 +961,10 @@
         
         if (last_type == verse_lookup) {
             if (direction == additional) {
+                /// In order to find the next verse from which to start, it adds 1.
                 query += "&q=" + (bottom_id + 1);
             } else {
+                /// In order to find the previous verse from which to start, it subtracts 1.
                 query += "&q=" + (top_id - 1);
             }
         } else {
@@ -976,6 +979,7 @@
                 query += "&s=" + (top_id + -1);
             }
         }
+        
         post_to_server("search.php", query, ajax, handle_new_verses, {action: last_type, "direction": direction});
     }
     
