@@ -21,11 +21,11 @@
  * @return  NULL.       Data is sent to the buffer as a JSON array, and then execution ends.
  * @note    Called by run_search().
  */
-function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true)
+function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true, $find_paragraph_start = false)
 {
     /// Quickly check to see if the verse_id is outside of the valid range.
     ///TODO: Determine if $verse_id < 1001001 should default to 1001001 and $verse_id > 66022021 to 66022021.
-    ///TODO: 66022021 may need to be language dependant because different langauges have different verse breaks.
+    ///TODO: 66022021 may need to be language dependent because different languages have different verse breaks.
     if ($verse_id < 1001001 || $verse_id > 66022021) {
         echo '[[],[],[0]]';
         die;
@@ -58,7 +58,17 @@ function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true)
         $extra_fields = "";
     }
     
-    $SQL_query  = 'SELECT id, words' . $extra_fields . ' FROM ' . BIBLE_VERSES . ' WHERE id ' . $operator . (int)$verse_id . $order_by . ' LIMIT ' . $limit;
+    if ($find_paragraph_start) {
+        /// Create a subquery that will return the nearest verse that is at a paragraph break.
+        ///NOTE: Currently, $find_paragraph_start is never true when $direction == PREVIOUS.  In order to find the correct
+        ///      starting verse when looking up in reverse, the comparison operator would need to be greater than or equals (>=),
+        ///      and 1 would need to be subtracted from the found starting id.
+        $starting_verse = '(SELECT id FROM `' . BIBLE_VERSES . '` WHERE id <= ' . (int)$verse_id . ' AND paragraph = 1 ORDER BY id DESC LIMIT 1)';
+    } else {
+        $starting_verse = (int)$verse_id;
+    }
+    
+    $SQL_query = 'SELECT id, words' . $extra_fields . ' FROM `' . BIBLE_VERSES . '` WHERE id ' . $operator . $starting_verse . $order_by . ' LIMIT ' . $limit;
     
     ///NOTE: Unbuffered queries start returning data as soon as the first row is available;
     ///      however, when the PHP script ends, if all of the data has not been fetched,

@@ -97,9 +97,17 @@ if ($type == VERSE_LOOKUP) {
         $in_paragraphs = true;
     }
     
+    /// Should the server assume that the starting verse is not at a paragraph break
+    /// so it should figure out where the paragraph begins.
+    ///NOTE: Currently, this is only needed when the client preforms the initial verse lookup.
+    if (isset($_REQUEST['f'])) {
+        $find_paragraph_start = (bool)$_REQUEST['f'];
+    } else {
+        $find_paragraph_start = false;
+    }
     
     /// $query example: 1001001 or 43003016
-    retrieve_verses($query, $direction, LIMIT, $in_paragraphs);
+    retrieve_verses($query, $direction, LIMIT, $in_paragraphs, $find_paragraph_start);
     
 } elseif ($type == STANDARD_SEARCH) {
     require_once 'functions/standard_search.php';

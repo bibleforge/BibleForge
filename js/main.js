@@ -967,6 +967,16 @@
                 /// In order to find the previous verse from which to start, it subtracts 1.
                 query += "&q=" + (top_id - 1);
             }
+            
+            var in_paragraphs = true; /// <-- TEMP
+            /// Is it impossible to tell if this verse starts at a paragraph breaking point?
+            ///NOTE: If this is the first lookup and the verse number is greater than 1,
+            ///      then it must ask the server to find the nearest paragraph break.
+            if (waiting_for_first_search && in_paragraphs && ((bottom_id + 1) % 1000 > 1)) {
+                /// Tell the server to find the nearest paragraph break.
+                query += "&f=1";
+            }
+            
         } else {
             query += "&q=" + last_search_encoded;
             if (direction == additional) {
