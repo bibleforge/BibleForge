@@ -114,7 +114,12 @@ function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true)
         
         ///FIXME: handle_new_verses() in js/main.js is expecting the total number of verses, not success/fail for the last value.
         echo '{n:[', implode(',', $verse_numbers), '],v:["', implode('","', $verse_HTML), '"],p:[', implode(',', $paragraphs), '],t:1}';
-        die;
+        
+        /// Flush the results to the server as quickly as possible because it may take a while for the 
+        /// script to end because it has to fetch and clear the MySQL buffer.
+        ///TODO: Determine the best way to flush the output buffer (and maybe write a function for it).
+        @ob_flush();
+        flush();
     } else {
         /// Convert SQL results into one comma delineated string for JSON.
         $verses_str = "";
@@ -138,6 +143,6 @@ function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true)
         ///TODO:  It would be nice to indicate if there are no more verses to find when it gets to the end.
         ///FIXME: handle_new_verses() in js/main.js is expecting the total number of verses, not sucess/fail for the last value.
         echo '[[', rtrim($verses_num, ','), '],[', rtrim($verses_str, ','), '],1]';
-        die;
     }
+    die;
 }
