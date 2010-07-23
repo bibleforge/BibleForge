@@ -880,9 +880,10 @@
         /// Did the user use the grammatical keyword in his search?
         if ((split_pos = search_terms.indexOf(BF_LANG.grammar_marker)) != -1) {
             ///TODO: Determine what is better: a JSON array or POST/GET string (i.e., word1=word&grammar_type1=1&value1=3&include1=1&...).
-            /// A JSON array is used to contain the information about the search.
-            /// JSON format: '["WORD",[[GRAMMAR_TYPE1,VALUE1],[...]],[INCLUDE1,...]]'
-            /// replace(/(["'])/g, "\\$1") adds slashes to sanitize the data.
+            ///NOTE: A JSON array is used to contain the information about the search.
+            ///      JSON format: '["WORD",[[GRAMMAR_TYPE1,VALUE1],[...]],[INCLUDE1,...]]'
+            
+            /// Get the search term (e.g., in "go AS IMPERATIVE, -SINGULAR", grammar_search_term = "go").
             grammar_search_term = search_terms.slice(0, split_pos);
             
             /// Is the user trying to find all words that match the grammatical attributes?
@@ -891,9 +892,12 @@
                 grammar_search_term = "";
             }
             
-            grammar_json		= '["' + grammar_search_term.replace(/(["'])/g, "\\$1") + '",[';
-            grammar_attributes	= search_terms.slice(split_pos + BF_LANG.grammar_marker_len);
-            split_start			= 0;
+            ///NOTE: replace(/(["'])/g, "\\$1") adds slashes to sanitize the data.  (It is essentially the same as addslashes() in PHP.)
+            grammar_json = '["' + grammar_search_term.replace(/(["'])/g, "\\$1") + '",[';
+            
+            /// Get the grammatical attributes (e.g., in "go AS IMPERATIVE, -SINGULAR", grammar_attributes = IMPERATIVE, -SINGULAR").
+            grammar_attributes = search_terms.slice(split_pos + BF_LANG.grammar_marker_len);
+            split_start        = 0;
             
             ///TODO: Determine if there is a benefit to using do() over while().
             ///NOTE: An infinite loop is used because the data is returned when it reaches the end of the string.
@@ -914,6 +918,9 @@
                 }
                 
                 if (split_pos > -1) {
+                    ///TODO: Determine if there should be error handling when a grammar keyword does not exist.
+                    ///NOTE: The slice() function separates the various grammatical attributes and then that word is
+                    ///      looked up in the grammar_keywords object in order to find the JSON code to send to the server.
                     grammar_attribute_json += BF_LANG.grammar_keywords[grammar_attributes.slice(split_start, split_pos).trim()] + ",";
                     split_start = split_pos + 1;
                 } else {
