@@ -1021,8 +1021,9 @@
             return false;
         }
         
-        /// - topLoader.offsetHeight subtracts off the height of the top bar.
-        scroll_pos = get_top_position(verse_obj) - topLoader.offsetHeight;
+        ///NOTE: - topLoader.offsetHeight subtracts off the height of the top bar.
+        ///      Also, it subtracts 1 pixel because it actually should scroll just before the element.
+        scroll_pos = get_top_position(verse_obj) - topLoader.offsetHeight - 1;
         
         window.scrollTo(0, scroll_pos);
         
