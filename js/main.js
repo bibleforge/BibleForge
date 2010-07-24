@@ -55,8 +55,8 @@
         
         /// Verse variables
         /// top_verse and bottom_verse are the last verses displayed on the screen so that the same verse is not displayed twice when more search data is returned (currently just used for grammatical_search).
-        bottom_verse	= 0,
-        top_verse		= 0,
+        bottom_verse = 0,
+        top_verse    = 0,
         
         /// top_id and bottom_id are the last ids (either verse or word id) returned from a search or verse lookup.
         /// These are the same as bottom_id and top_id for verse_lookup and standard_search since these deal with entire verses as a whole, not individual words.
@@ -65,16 +65,16 @@
         top_id,
         
         /// Cache
-        cached_count_bottom				= 0,
-        cached_count_top				= 0,
-        cached_verses_bottom			= [],
-        cached_verses_top				= [],
+        cached_count_bottom  = 0,
+        cached_count_top     = 0,
+        cached_verses_bottom = [],
+        cached_verses_top    = [],
         
         /// Scrolling
         ///TODO: Determine if these can be placed in the scrolling closure.
-        scroll_maxed_bottom				= false,
-        scroll_maxed_top				= true,
-        scroll_pos						= 0,
+        scroll_maxed_bottom = false,
+        scroll_maxed_top    = true,
+        scroll_pos          = 0,
         
         /// Objects
         content_manager;
@@ -951,13 +951,16 @@
         ///TODO: Rewrite code so that it does not rely on so many inner variables (such as last_type and last_search_encoded).
         /// last_type set in prepare_new_search().
         var ajax,
+            extra_data = {action: last_type, "direction": direction, search_type: last_type},
             query = "t=" + last_type;
         
         if (direction == additional) {
             ajax = ajax_additional;
+            extra_data.verse = bottom_id + 1;
         } else {
             ajax = ajax_previous;
             query += "&d=" + direction;
+            extra_data.verse = top_id - 1;
         }
         
         /// Is the server already working on this request?
@@ -985,6 +988,7 @@
             }
             
         } else {
+            extra_data.search_encoded = last_search_encoded;
             query += "&q=" + last_search_encoded;
             if (direction == additional) {
                 /// Continue starting on the next verse.
@@ -993,11 +997,36 @@
                 }
             } else {
                 /// Continue starting backwards on the previous verse.
-                query += "&s=" + (top_id + -1);
+                query += "&s=" + (top_id - 1);
             }
         }
         
-        post_to_server("search.php", query, ajax, handle_new_verses, {action: last_type, "direction": direction});
+        post_to_server("search.php", query, ajax, handle_new_verses, extra_data);
+    }
+    
+    
+    /**
+     * Scrolls that page to make the specified verse at the top of the viewable area.
+     *
+     * @example scroll_to_verse(45001014); /// Scrolls to Romans 1:14.
+     * @param   verse_id (number) The id number of the verse in the format [B]BCCCVVV.
+     * @return  Returns TRUE on success and FALSE if the verse cannot be found on the scroll.
+     * @note    Called by handle_new_verses() after the first Ajax request of a particular verse lookup.
+     */
+    function scroll_to_verse(verse_id)
+    {
+        var verse_obj = document.getElementById(verse_id + "_verse");
+        
+        if (!verse_obj) {
+            return false;
+        }
+        
+        /// - topLoader.offsetHeight subtracts off the height of the top bar.
+        scroll_pos = get_top_position(verse_obj) - topLoader.offsetHeight;
+        
+        window.scrollTo(0, scroll_pos);
+        
+        return true;
     }
     
     
@@ -1094,10 +1123,13 @@
         
         /// If this is the first results, update the info bar.
         if (waiting_for_first_search) {
-            /// If the user had scrolled down the page and then pressed the refresh button,
-            /// the page will keep scrolling down as content is loaded, so to prevent this, force the window to scroll to the top of the page.
-            window.scrollTo(0, 0);
-            
+            if (in_paragraphs) {
+                scroll_to_verse(extra_data.verse);
+            } else {
+                /// If the user had scrolled down the page and then pressed the refresh button,
+                /// the page will keep scrolling down as content is loaded, so to prevent this, force the window to scroll to the top of the page.
+                window.scrollTo(0, 0);
+            }
             waiting_for_first_search = false;
             
             infoBar.innerHTML = "";
@@ -1115,6 +1147,28 @@
             /// Store the first verse reference for later.
             top_id = verse_numbers[0];
         }
+    }
+    
+    
+    /**
+     * Gets the distance of an object from the top of the scroll.
+     *
+     * @example get_top_position(element);
+     * @param   obj (element) An element on the page.
+     * @return  Returns the distance of obj from the top of the scroll.
+     * @note    Called by scroll_to_verse().
+     */
+    function get_top_position(obj)
+    {
+        var top_pos = 0;
+        
+        /// Does the object have an element above it (i.e., offsetParent)?
+        if (obj.offsetParent) {
+            do {
+                top_pos += obj.offsetTop;
+            } while (obj = obj.offsetParent);
+        }
+        return top_pos;
     }
     
     
@@ -1515,7 +1569,7 @@
     /**
      * Set the query input box text with an explanation of what the user can enter in.
      *
-     * @return null
+     * @return NULL.
      * @note   Called on q_obj onblur.
      * @note   This function is removed after the user submits a search by prepare_new_search() because the user no longer needs the instructions.
      */
@@ -1530,7 +1584,7 @@
     /**
      * Remove the explanation text so that the user can type.
      *
-     * @return null
+     * @return NULL.
      * @note   Called on q_obj onfocus.
      */
     q_obj.onfocus = function ()

@@ -245,10 +245,10 @@ body {
 
 
 .loaders {
-    height:		50px;
-    width:		100%;
-    background:	url("../images/loader.gif") no-repeat center;
-    visibility:	hidden;
+    height:     50px;
+    width:      100%;
+    background: url("../images/loader.gif") no-repeat center;
+    visibility: hidden;
 }
 
 
