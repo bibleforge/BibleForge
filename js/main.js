@@ -1122,9 +1122,13 @@
             }
         }
         
-        /// If this is the first results, update the info bar.
+        /// Is this is the first results of a search or lookup?
         if (waiting_for_first_search) {
-            if (in_paragraphs) {
+            /// Are the results displayed in paragraphs and the verse looked up not at the beginning of a paragraph?
+            ///TODO: Determine if this should require the search type to be a verse lookup.
+            if (extra_data.search_type == verse_lookup && in_paragraphs && verse_numbers[0] != extra_data.verse) {
+                /// Because the verse the user is looking for is not at the beginning of a paragraph
+                /// the text needs to be scrolled so that the verse is at the top.
                 scroll_to_verse(extra_data.verse);
             } else {
                 /// If the user had scrolled down the page and then pressed the refresh button,
