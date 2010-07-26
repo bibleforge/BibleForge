@@ -243,18 +243,22 @@
             var new_scroll_pos = window.pageYOffset,
                 scrolling_down;
             
+            /// Has the scroll position actually not changed?
+            ///NOTE: IE/Opera sometimes don't update scroll position until after this function is run.
+            ///      Mozilla/WebKit can have the same problem.
             if (new_scroll_pos == scroll_pos) {
-                /// IE/Opera sometimes don't update page.scrollTop until after this function is run.
-                /// Mozilla/WebKit can get stuck here too.
+                /// Should we wait a moment and see if the scroll position changes.
                 if (++scroll_check_count < 10) {
                     setTimeout(scrolling, 30);
-                } else { /// Stop it if it is stuck looping.
+                } else {
+                    /// Reset the counter and do not check anymore.
                     scroll_check_count = 0;
                 }
                 return null;
             }
             scroll_check_count = 0;
             
+            /// Find and indicate the range of verses displayed on the screen.
             update_verse_range();
             
             scrolling_down = (new_scroll_pos > scroll_pos);
@@ -579,7 +583,8 @@
             }
             
             /// last_type is set in prepare_new_search().
-            /// The verse range is displayed differently based on the type of search (i.e., a verse look up or a regular search).
+            /// The verse range is displayed differently based on the type of search (i.e., a verse lookup or a search).
+            ///TODO: Set the date of the verse (or when it was written).
             if (last_type == verse_lookup) {
                 new_title = ref_range + " - " + BF_LANG.app_name;
             } else {
@@ -587,7 +592,7 @@
             }
             
             /// Is the new verse range the same as the old one?
-            /// If they are the same, updating it would just waste resources.
+            /// If they are the same, updating it would just waste time.
             if (document.title != new_title) {
                 document.title = new_title;
                 
