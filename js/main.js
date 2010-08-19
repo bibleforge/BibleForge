@@ -18,14 +18,15 @@
  * This function is used to house all of the code used by BibleForge,
  * expect for language specific code, which is stored in js/lang/LOCALE.js.
  *
- * @param	viewPort		(object) The HTML object which encapsulates all of the other objects.
- * @param	searchForm		(object) The <form> object which contains the text box and button.
- * @param	q_obj			(object) The <input> object the user types into.
- * @param	infoBar			(object) The HTML object that displays information about the lookups and searches.
- * @param	topLoader		(object) The HTML object which displays the loading image above the text.
- * @param	bottomLoader	(object) The HTML object which displays the loading image below the text.
- * @param	doc_docEl		(object) The document.documentElement element (the HTML element).
- * @return	NULL.  Some functions are attached to events and the rest accompany them via closure.
+ * @param	viewPort     (object) The HTML element which encapsulates all of the other objects.
+ * @param	searchForm   (object) The <form> element which contains the text box and button.
+ * @param	q_obj        (object) The <input> element the user types into.
+ * @param	page         (object) The HTML element which contains all of the Bible contents.
+ * @param	infoBar      (object) The HTML element that displays information about the lookups and searches.
+ * @param	topLoader    (object) The HTML element which displays the loading image above the text.
+ * @param	bottomLoader (object) The HTML element which displays the loading image below the text.
+ * @param	doc_docEl    (object) The document.documentElement element (the HTML element).
+ * @return	NULL. Some functions are attached to events and the rest accompany them via closure.
  */
 (function (viewPort, searchForm, q_obj, page, infoBar, topLoader, bottomLoader, doc_docEl)
 {
@@ -353,19 +354,14 @@
          */
         function remove_excess_content_bottom()
         {
-            var child			= page.lastChild,
-                child_position,
-                page_height;
+            var child = page.lastChild;
             
             if (child === null) {
                 return null;
             }
             
-            child_position	= child.offsetTop;
-            page_height		= doc_docEl.clientHeight;
-            
             /// Is the element is in the remove zone?
-            if (child_position > scroll_pos + page_height + buffer_rem) {
+            if (child.offsetTop > scroll_pos + doc_docEl.clientHeight + buffer_rem) {
                 /// Store the content in the cache, and then add 1 to the outer counter variable so that we know how much cache we have.
                 cached_verses_bottom[cached_count_bottom++] = child.innerHTML;
                 
@@ -395,19 +391,15 @@
          */
         function add_content_bottom_if_needed()
         {
-            var child			= page.lastChild,
-                child_position,
-                newEl,
-                page_height;
+            var child = page.lastChild,
+                newEl;
             
             if (child === null) {
                 return null;
             }
             
-            child_position	= child_position = child.offsetTop + child.clientHeight;
-            page_height		= page_height = doc_docEl.clientHeight;
             /// Is the user scrolling close to the bottom of the page?
-            if (child_position < scroll_pos + page_height + buffer_add) {
+            if (child.offsetTop + child.clientHeight < scroll_pos + doc_docEl.clientHeight + buffer_add) {
                 /// Can the content be grabbed from cache?
                 if (cached_count_bottom > 0) {
                     newEl = document.createElement("div");
@@ -445,21 +437,15 @@
          */
         function add_content_top_if_needed()
         {
-            var child			= page.firstChild,
-                child_height,
-                child_position,
+            var child = page.firstChild,
                 newEl;
             
             if (child === null) {
                 return null;
             }
             
-            child_height = child.clientHeight;
-            
-            child_position = child_height;
-            
             /// Is the user scrolling close to the top of the page?
-            if (child_position + buffer_add > scroll_pos) {
+            if (child.clientHeight + buffer_add > scroll_pos) {
                 /// Can the content be grabbed from cache?
                 if (cached_count_top > 0) {
                     newEl = document.createElement("div");
@@ -649,8 +635,8 @@
             looked_previous	= false;
             
             do {
-                el_offset_top		= el.offsetTop;
-                el_offset_height	= el.offsetHeight + el_offset_top;
+                el_offset_top    = el.offsetTop;
+                el_offset_height = el.offsetHeight + el_offset_top;
                 
                 /// Is the element somewhere between the position in question?
                 if (the_pos >= el_offset_top && the_pos <= el_offset_height) {
