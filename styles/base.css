@@ -269,7 +269,7 @@ body {
 }
 
 /* Make all lines of text the same height. */
-.scrolls .verse, .scrolls .first_verse, .psalm_title, .search_verse {
+.scrolls .verse, .scrolls .first_verse, .psalm_title, .search_verse, .paragraph {
     line-height: 19px;
 }
 
