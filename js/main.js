@@ -679,9 +679,11 @@
             /// Does the element contain a verse, or do we need to look inside the element?
             switch (el.className) {
             case "verse":
+            case "search_verse":
             case "first_verse":
             case "chapter":
             case "book":
+            case "short_book":
                 /// Check to see if other verses in the paragraph are also visible.
                 while ((looking_upward ? possible_el = el.previousSibling : possible_el = el.nextSibling) !== null && the_pos >= possible_el.offsetTop && the_pos <= possible_el.offsetTop + possible_el.offsetHeight) {
                     el = possible_el;
@@ -1225,18 +1227,18 @@
                     highlight_search_results(verse_html.join(""));
                 }, 100);
             } else if (action == grammatical_search) {
-                count = res[3].length;
+                count = verse_numbers.length;
                 for (i = 0; i < count; ++i) {
                     ///TODO: Determine if there is a downside to having a space at the start of the className.
                     ///TODO: Determine if we ever need to replace an existing f* className.
-                    document.getElementById(res[3][i]).className += " f" + 1;
+                    document.getElementById(verse_numbers[i]).className += " f" + 1;
                 }
                 /// Record the last id found from the search so that we know where to start from for the next search as the user scrolls.
                 /// Do we need to record the bottom id?
                 if (direction == additional) {
-                    bottom_id = res[3][count - 1];
+                    bottom_id = verse_numbers[count - 1];
                 } else {
-                    top_id = res[3][0];
+                    top_id = verse_numbers[0];
                 }
             }
             

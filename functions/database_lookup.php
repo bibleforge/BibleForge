@@ -27,7 +27,7 @@ function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true, $
     ///TODO: Determine if $verse_id < 1001001 should default to 1001001 and $verse_id > 66022021 to 66022021.
     ///TODO: 66022021 may need to be language dependent because different languages have different verse breaks.
     if ($verse_id < 1001001 || $verse_id > 66022021) {
-        echo '[[],[],[0]]';
+        echo '{n:[],v:[],t:0}';
         die;
     }
     
@@ -153,8 +153,8 @@ function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true, $
         /// Array Format: [[verse_ids,...],[verse_words,...],[success]]
         ///NOTE:  rtrim(..., ',') removes trailing commas.  It seems to be slightly faster than substr(..., 0, -1).
         ///TODO:  It would be nice to indicate if there are no more verses to find when it gets to the end.
-        ///FIXME: handle_new_verses() in js/main.js is expecting the total number of verses, not sucess/fail for the last value.
-        echo '[[', rtrim($verses_num, ','), '],[', rtrim($verses_str, ','), '],1]';
+        ///FIXME: handle_new_verses() in js/main.js is expecting the total number of verses, not success/fail for the last value.
+        echo '{n:[', rtrim($verses_num, ','), '],v:[', rtrim($verses_str, ','), '],t:1}';
     }
     die;
 }
