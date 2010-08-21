@@ -1405,7 +1405,8 @@
                         HTML_str += first_paragraph_HTML + "<div class=first_verse id=" + num + "_verse>" + verse_HTML[i] + "</div>";
                     }
                 } else {
-                    if (paragraphs[i]) {
+                    /// Is there a paragraph break here?
+                    if (in_paragraphs && paragraphs[i]) {
                         if (i != start_key) {
                             HTML_str += end_paragraph_HTML;
                         }
@@ -1413,7 +1414,9 @@
                         HTML_str += start_paragraph_HTML;
                         is_in_paragraph = true;
                     }
-                    HTML_str += "<div class=verse id=" + num + "_verse>" + v + " " + verse_HTML[i] + "</div>";
+                    
+                    ///NOTE: The leading space adds a space between verses in a paragraph and does not effect other verses.
+                    HTML_str += " <div class=verse id=" + num + "_verse>" + v + "&nbsp;" + verse_HTML[i] + "</div>";
                 }
                 
             /// Searching

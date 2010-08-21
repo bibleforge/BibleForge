@@ -312,7 +312,10 @@ text-indent: 0;
 
 .paragraph .verse {
     display: inline;
-    padding-left: 5px;
+}
+
+.paragraph .verse {
+    display: inline;
 }
 
 /* Serif fonts */
