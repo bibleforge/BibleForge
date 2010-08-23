@@ -318,6 +318,16 @@ text-indent: 0;
     display: inline;
 }
 
+
+.paragraph span {
+    /* Shrink the verse number. */
+	font-size: 75%;
+	/* Raise it slightly. */
+	vertical-align: 4px;
+	/* Remove extra line height created by raising the numbers. */
+	line-height: 1px!important;
+}
+
 /* Serif fonts */
 .book, .chapter, .short_book, .first_verse:first-letter, .first_paragraph:first-letter, .d {
     font-family: 'Palatino Linotype', Palatino, TexGyrePagella, 'TeX Gyre Pagella', 'URWPalladioL', 'Book Antiqua', 'Times new Roman', Times, serif;

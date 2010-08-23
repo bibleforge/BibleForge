@@ -1407,6 +1407,7 @@
                 } else {
                     /// Is there a paragraph break here?
                     if (in_paragraphs && paragraphs[i]) {
+                        /// Is this not the first paragraph?  (The first paragraph does not need to be closed.)
                         if (i != start_key) {
                             HTML_str += end_paragraph_HTML;
                         }
@@ -1416,7 +1417,7 @@
                     }
                     
                     ///NOTE: The leading space adds a space between verses in a paragraph and does not effect other verses.
-                    HTML_str += " <div class=verse id=" + num + "_verse>" + v + "&nbsp;" + verse_HTML[i] + "</div>";
+                    HTML_str += "<div class=verse id=" + num + "_verse> <span class=verse_number>" + v + "&nbsp;</span>" + verse_HTML[i] + "</div>";
                 }
                 
             /// Searching
