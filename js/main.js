@@ -1389,7 +1389,7 @@
                     if (c === 1) {
                         HTML_str += "<div class=book id=" + num + "_title><h2>" + BF_LANG.books_long_pretitle[b] + "</h2><h1>" + BF_LANG.books_long_main[b] + "</h1><h2>" + BF_LANG.books_long_posttitle[b] + "</h2></div>";
                     /// Display chapter/psalm number (but not on verse 1 of psalms that have titles).
-                    } else if (b !== 19 || v === 0 || ((c <= 2) || (c === 10) || (c === 33) || (c === 43) || (c === 71) || (c === 91) || (c >= 93 && c <= 97) || (c === 99) || (c >= 104 && c <= 107) || (c >= 111 && c <= 119) || (c >= 135 && c <= 137) || (c >= 146))) {
+                    } else if (b !== 19 || v === 0 || (c <= 2 || c === 10 || c === 33 || c === 43 || c === 71 || c === 91 || (c >= 93 && c <= 97) || c === 99 || (c >= 104 && c <= 107) || (c >= 111 && c <= 119) || (c >= 135 && c <= 137) || c >= 146)) {
                         /// Is this the book of Psalms?  (Psalms have a special name.)
                         if (b === 19) {
                             chapter_text = BF_LANG.psalm;
