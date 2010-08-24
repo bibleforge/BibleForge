@@ -669,7 +669,7 @@
             } while (el !== null);
             
             /// Was the position in question to high for all of the elements?
-            if (!looked_next && el === null) {
+            if (!looked_next || el === null) {
                 //fail_func();
                 return false;
             }
@@ -1167,7 +1167,7 @@
             return false;
         }
         
-        ///NOTE: - topLoader.offsetHeight subtracts off the height of the top bar.
+        ///NOTE: "- topLoader.offsetHeight" subtracts off the height of the top bar.
         ///      Also, it subtracts 1 pixel because it actually should scroll just before the element.
         scroll_pos = get_top_position(verse_obj) - topLoader.offsetHeight - 1;
         
@@ -1263,8 +1263,8 @@
             }
             if (direction == previous || waiting_for_first_search) {
                 /// The user has reached the top of the page by scrolling up (either Genesis 1:1 or there were no search results), so we need to hide the loading graphic
-                scroll_maxed_top = true;
-                topLoader.style.visibility = "hidden";
+                scroll_maxed_top    = true;
+                topLoader.style.visibility    = "hidden";
             }
         }
         
