@@ -326,6 +326,8 @@ text-indent: 0;
 	vertical-align: 4px;
 	/* Remove extra line height created by raising the numbers. */
 	line-height: 1px!important;
+	/* Move the verse numbers over a little closer to the text. */
+	margin-right: -2px;
 }
 
 /* Serif fonts */
