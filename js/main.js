@@ -475,139 +475,19 @@
                 }
             }
         }
-        
+                
         
         /**
-         * Finds and displays the range of verses visible on the screen.
+         * Find a verse element that is within a certain Y coordinate on the screen.
          *
-         * Find the verse that is at the top of the page and at the bottom of the page window and
-         * display that range on the page and change the page title to indicate the verse range as well.
-         *
-         * @example	setTimeout(find_current_range, lookup_range_speed);
-         * @return	NULL.  The page is modified to reflect the verse range.
-         * @note	Called by scrolling(), resizing(), write_verses(), or itself via setTimeout().
-         * @note	This function should be called every time the page is resized or scrolled or when visible content is added.
+         * @example verse = get_verse_at_position(scroll_pos + topLoader.offsetHeight + 8,  true,  page); /// Could return {b: 1, c: 1, v: 1} for Genesis 1:1.
+         * @param   the_pos        (number)  The vertical position on the page.
+         * @param   looking_upward (boolean) Whether the verses at the top or bottom of the page.
+         * @param   parent_el      (element) The HTML element that ultimately contains the verse.
+         * @return  Returns an object containing the book, chapter, and verse of the verse element.  Format {b: BB, c: CCC, v: VVV}.
+         * @note    Called by update_verse_range() and itself.
          */
-        function find_current_range()
-        {
-            ///TODO: Determine if there is a better way to calculate the topBar offset.
-            var b1,
-                b2,
-                bottom_pos			= scroll_pos + doc_docEl.clientHeight - 14,
-                bottom_verse_block,
-                c1,
-                c2,
-                new_title,
-                ref_range,
-                top_pos				= scroll_pos + topLoader.offsetHeight + 8,
-                top_verse_block,
-                v1,
-                v2,
-                verse1_el,
-                verse1,
-                verse2_el,
-                verse2;
-            
-            /// Allow for this function to be called again via setTimeout().  See scrolling().
-            looking_up_verse_range = false;
-            
-            if ((top_verse_block = find_element_at_scroll_pos(top_pos, page)) === null || (bottom_verse_block = find_element_at_scroll_pos(bottom_pos, null, top_verse_block)) === null) {
-                ///NOTE: There appears to be no verses displayed on the screen.
-                ///      Since they may still be being retrieved, so run this function again a little later.
-                looking_up_verse_range = true;
-                setTimeout(find_current_range, lookup_range_speed);
-                return null;
-            }
-            
-            /// Find the verse elements.
-            verse1_el = find_element_at_scroll_pos(top_pos, top_verse_block);
-            verse2_el = find_element_at_scroll_pos(bottom_pos, bottom_verse_block);
-            
-            /// Are either of the verses not found?
-            if (verse1_el === null || verse2_el === null) {
-                ///NOTE: It is possible for some padding to separate the verses.
-                ///      This is probably a temporary issue, so run this function again a little later.
-                looking_up_verse_range = true;
-                setTimeout(find_current_range, lookup_range_speed);
-                return null;
-            }
-            
-            /// parseInt() is used to keep the number and remove the trailing string from the id.  See write_verses().
-            verse1 = parseInt(verse1_el.id);
-            v1 = verse1 % 1000;
-            c1 = ((verse1 - v1) % 1000000) / 1000;
-            b1 = (verse1 - v1 - c1 * 1000) / 1000000;
-            verse2 = parseInt(verse2_el.id);
-            v2 = verse2 % 1000;
-            c2 = ((verse2 - v2) % 1000000) / 1000;
-            b2 = (verse2 - v2 - c2 * 1000) / 1000000;
-            
-            /// The titles in the book of Psalms are referenced as verse zero (cf. Psalm 3).
-            v1 = v1 === 0 ? BF_LANG.title : v1;
-            v2 = v2 === 0 ? BF_LANG.title : v2;
-            
-            ///NOTE: \u2013 is Unicode for the en dash (–) (HTML: &ndash;).
-            ///TODO: Determine if the colons should be language specified.
-            /// Are the books the same?
-            if (b1 == b2) {
-                /// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
-                b1 = b1 == 19 ? BF_LANG.psalm : BF_LANG.books_short[b1];
-                /// Are the chapters the same?
-                if (c1 == c2) {
-                    /// Are the verses the same?
-                    if (v1 == v2) {
-                        ref_range = b1 + " " + c1 + ":" + v1;
-                    } else {
-                        ref_range = b1 + " " + c1 + ":" + v1 + "\u2013" + v2;
-                    }
-                } else {
-                    ref_range = b1 + " " + c1 + ":" + v1 + "\u2013" + c2 + ":" + v2;
-                }
-            } else {
-                /// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
-                b1 = b1 == 19 ? BF_LANG.psalm : BF_LANG.books_short[b1];
-                b2 = b2 == 19 ? BF_LANG.psalm : BF_LANG.books_short[b2];
-                
-                ref_range = b1 + " " + c1 + ":" + v1 + "\u2013" + b2 + " " + c2 + ":" + v2;
-            }
-            
-            /// last_type is set in prepare_new_search().
-            /// The verse range is displayed differently based on the type of search (i.e., a verse lookup or a search).
-            ///TODO: Set the date of the verse (or when it was written).
-            if (last_type == verse_lookup) {
-                new_title = ref_range + " - " + BF_LANG.app_name;
-            } else {
-                new_title = last_search + " (" + ref_range + ") - " + BF_LANG.app_name;
-            }
-            
-            /// Is the new verse range the same as the old one?
-            /// If they are the same, updating it would just waste time.
-            if (document.title != new_title) {
-                document.title = new_title;
-                
-                /// Display the verse range on the page if looking up verses.
-                ///FIXME: There should be a variable that shows the current view mode and not rely on last_type.
-                if (last_type == verse_lookup) {
-                    ///TODO: Find a better way to clear infoBar than innerHTML.
-                    infoBar.innerHTML = "";
-                    infoBar.appendChild(document.createTextNode(ref_range));
-                }
-            }
-            
-            return null;
-        }
-        
-        
-        /**
-         * Find an element that is within a certain Y position on the page.
-         *
-         * @example element = get_verse_at_position(scroll_pos + topLoader.offsetHeight + 8); /// Finds the first readable verse.
-         * @param   the_pos (number)             The vertical position on the page.
-         * @param   
-         * @return  The verse id of the verse at a specfic position on the screen, in the format [B]BCCCVVV.
-         * @note    Called by update_verse_range().
-         */
-        function get_verse_at_position(the_pos, looking_upward, parent_el, success_func, fail_func)
+        function get_verse_at_position(the_pos, looking_upward, parent_el)
         {
             var b,
                 c,
@@ -664,20 +544,22 @@
                     }
                     /// Is it stuck in an infinite loop?  (If so, then give up.)
                     if (looked_next && looked_previous) {
-                        //fail_func();
                         return false;
                     }
                 }
             } while (el !== null);
             
-            /// Was the position in question to high for all of the elements?
-            //if (!looked_next || el === null) {
+            /// Were no appropriate elements found?
             if (el === null) {
-                //fail_func();
-                return false;
+                /// If we found some elements, but not enough, just use the last element (e.g., when scrolling to the very end of the Bible, all of the verses are past the bottom).
+                if (looked_next) {
+                    el = parent_el.lastChild;
+                } else {
+                   return false;
+                }
             }
             
-            /// The element was found or there are no elements left (e.g., by scrolling all the way to the bottom so returning the last element).
+            /// An element was found.
             
             /// Does the element contain a verse, or do we need to look inside the element?
             switch (el.className) {
@@ -688,6 +570,7 @@
             case "book":
             case "short_book":
                 /// Check to see if other verses in the paragraph are also visible.
+                ///NOTE: When in paragraph form, multiple verses could share the same y coordinates; therefore, we need to keep checking for more verses that may also be at the same y coordinate.
                 while ((looking_upward ? possible_el = el.previousSibling : possible_el = el.nextSibling) !== null && the_pos >= possible_el.offsetTop && the_pos <= possible_el.offsetTop + possible_el.offsetHeight) {
                     el = possible_el;
                 }
@@ -697,14 +580,10 @@
                 v = verse_id % 1000;
                 c = ((verse_id - v) % 1000000) / 1000;
                 b = (verse_id - v - c * 1000) / 1000000;
-                //success_func({b: b, c: c, v: v});
                 return {b: b, c: c, v: v};
             default:
-                /// The verse has not yet been found.  Wait for a very short amount of time and then look inside element.
-                //setTimeout(function ()
-                //{
-                    return get_verse_at_position(the_pos, looking_upward, el, success_func, fail_func);
-                //}, 10);
+                /// The verse has not yet been found.
+                return get_verse_at_position(the_pos, looking_upward, el);
             }
             
             ///TODO: Determine if we should return parent_el.firstChild if looked_previous or if that might cause bugs.
@@ -1443,7 +1322,7 @@
                 
             /// Searching
             } else {
-                /// Change verse 0 to "title" (i.e., Psalm titles).  (Display Psalm 3:title instead of Psalm 3:0.)
+                /// Change verse 0 to "title" (e.g., Psalm 3:title instead of Psalm 3:0).
                 if (v === 0) {
                     v = BF_LANG.title;
                 }
