@@ -331,7 +331,8 @@
                 /// Calculate and set the new scroll position.
                 /// Because content is being removed from the top of the page, the rest of the content will be shifted upward.
                 /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was removed.
-                window.scrollTo(0, scroll_pos = (window.pageYOffset - child_height));
+                scroll_pos = window.pageYOffset - child_height
+                window.scrollTo(0, scroll_pos);
                 
                 page.removeChild(child);
                 
@@ -458,7 +459,8 @@
                     
                     /// The new content that was just added to the top of the page will push the other contents downward.
                     /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was added.
-                    window.scrollTo(0, scroll_pos = (window.pageYOffset + newEl.clientHeight));
+                    scroll_pos = window.pageYOffset + newEl.clientHeight;
+                    window.scrollTo(0, scroll_pos);
                     
                     /// Check to see if we need to add more content.
                     add_content_if_needed(previous);
@@ -669,7 +671,8 @@
             } while (el !== null);
             
             /// Was the position in question to high for all of the elements?
-            if (!looked_next || el === null) {
+            //if (!looked_next || el === null) {
+            if (el === null) {
                 //fail_func();
                 return false;
             }
@@ -1161,21 +1164,39 @@
      */
     function scroll_to_verse(verse_id)
     {
-        var verse_obj = document.getElementById(verse_id + "_verse");
+        var div_tag,
+            pixels_needed,
+            verse_obj = document.getElementById(verse_id + "_verse");
         
         if (!verse_obj) {
             return false;
         }
         
         ///NOTE: "- topLoader.offsetHeight" subtracts off the height of the top bar.
-        ///      Also, it subtracts 1 pixel because it actually should scroll just before the element.
-        scroll_pos = get_top_position(verse_obj) - topLoader.offsetHeight - 1;
-        
+        scroll_pos = get_top_position(verse_obj) - topLoader.offsetHeight;
+        //alert(scroll_pos + " " + (document.documentElement.scrollHeight - document.documentElement.clientHeight));
+        pixels_needed = doc_docEl.clientHeight - (document.body.clientHeight - scroll_pos);
+        if (pixels_needed > 0) {
+                div_tag = document.createElement("div");
+                div_tag.style.height = (pixels_needed + 10) + 'px';
+                viewPort.insertBefore(div_tag, null);
+//            viewPort.style.paddingBottom = pixels_needed + "px";
+            var padding_interval = setInterval(function ()
+            {
+                if (doc_docEl.scrollHeight - (window.pageYOffset + doc_docEl.clientHeight) > pixels_needed + 10) {
+//                    viewPort.style.paddingBottom = 0;
+                    viewPort.removeChild(div_tag);
+                    clearInterval(padding_interval);
+                }
+            }, 1000);
+        }
+        //alert(pixels_needed);
+        ///viewPort.style.paddingBottom = 
         window.scrollTo(0, scroll_pos);
         
         return true;
     }
-    
+    //viewPort.style.paddingBottom = "1000px";
     
     /**
      * Handles new verses from the server.
@@ -1416,8 +1437,8 @@
                         is_in_paragraph = true;
                     }
                     
-                    ///NOTE: The leading space adds a space between verses in a paragraph and does not effect other verses.
-                    HTML_str += "<div class=verse id=" + num + "_verse> <span class=verse_number>" + v + "&nbsp;</span>" + verse_HTML[i] + "</div>";
+                    ///NOTE: The trailing space adds a space between verses in a paragraph and does not effect paragraph final verses.
+                    HTML_str += "<div class=verse id=" + num + "_verse><span class=verse_number>" + v + "&nbsp;</span>" + verse_HTML[i] + " </div>";
                 }
                 
             /// Searching
@@ -1463,7 +1484,8 @@
             
             /// The new content that was just added to the top of the page will push the other contents downward.
             /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was added.
-            window.scrollTo(0, scroll_pos = window.pageYOffset + newEl.clientHeight);
+            scroll_pos = scroll_pos + newEl.clientHeight
+            window.scrollTo(0, scroll_pos);
             
             /// Record the top most verse reference and id so that we know where to start from for the next search or verse lookup as the user scrolls.
             ///NOTE: For verse_lookup and standard_search, the top_id and top_verse are the same because the search is preformed at the verse level.
@@ -1472,7 +1494,6 @@
             ///TODO: Determine the pros/cons of using an if statement to prevent grammatical searches from recording the id here, since it is overwritten later.
             top_id = top_verse = verse_ids[0];
         }
-        
         content_manager.update_verse_range();
     }
     
