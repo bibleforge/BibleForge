@@ -1302,7 +1302,8 @@
                     if (v === 0) {
                         HTML_str += "<div class=psalm_title id=" + num + "_verse>" + verse_HTML[i] + "</div>";
                     } else {
-                        HTML_str += first_paragraph_HTML + "<div class=first_verse id=" + num + "_verse>" + verse_HTML[i] + "</div>";
+                        ///NOTE: The trailing space adds a space between verses in a paragraph and does not effect paragraph final verses.
+                        HTML_str += first_paragraph_HTML + "<div class=first_verse id=" + num + "_verse>" + verse_HTML[i] + " </div>";
                     }
                 } else {
                     /// Is there a paragraph break here?

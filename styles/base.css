@@ -307,18 +307,14 @@ body {
 }
 
 .first_paragraph {
-text-indent: 0;
+    text-indent: 0;
 }
 
 .paragraph .verse {
     display: inline;
 }
 
-.paragraph .verse {
-    display: inline;
-}
-
-
+/* Verse numbers in paragraph form */
 .paragraph span {
     /* Shrink the verse number. */
 	font-size: 75%;
