@@ -209,6 +209,11 @@
      * Start of Scrolling Closure *
      ******************************/
     
+    /**
+     * The functions that handle the scrolling of the page and other related functions.
+     *
+     * @return Returns an object with functions for adding content and updating the verse range.
+     */
     content_manager = (function ()
     {
         var buffer_add						= 1000,
@@ -415,8 +420,9 @@
                     /*@cc_on
                         window.scrollTo(0, scroll_pos);
                     @*/
-                    /// Better check to see if we need to add more content.
-                    setTimeout(add_content_bottom_if_needed, lookup_speed_scrolling);
+                    
+                    /// Check to see if we need to add more content.
+                    add_content_if_needed(additional);
                 } else {
                     /// Did the user scroll all the way to the very bottom?  (If so, then there is no more content to be gotten.)
                     if (scroll_maxed_bottom) {
@@ -570,11 +576,11 @@
             case "book":
             case "short_book":
                 /// Check to see if other verses in the paragraph are also visible.
-                ///NOTE: When in paragraph form, multiple verses could share the same y coordinates; therefore, we need to keep checking for more verses that may also be at the same y coordinate.
+                ///NOTE: When in paragraph form, multiple verses could share the same Y coordinates; therefore, we need to keep checking for more verses that may also be at the same Y coordinate.
                 while ((looking_upward ? possible_el = el.previousSibling : possible_el = el.nextSibling) !== null && the_pos >= possible_el.offsetTop && the_pos <= possible_el.offsetTop + possible_el.offsetHeight) {
                     el = possible_el;
                 }
-
+                
                 /// Found the verse, so calculate the verseID and call the success function.
                 verse_id = parseInt(el.id);
                 v = verse_id % 1000;
@@ -595,9 +601,9 @@
          *
          * When the page is resized, check to see if more content should be loaded.
          *
-         * @return	NULL.  Calls other functions
-         * @note	Called when the window is resized.
-         * @note	Set by the onresize event.
+         * @return NULL.  Calls other functions
+         * @note   Called when the window is resized.
+         * @note   Set by the onresize event.
          */
         function resizing()
         {
@@ -608,7 +614,14 @@
         }
         
         
-        ///TODO: Document.
+        /**
+         * Find a verse element that is within a certain Y coordinate on the screen.
+         *
+         * @example add_content_if_needed(additional);
+         * @param   direction (integer) The direction that verses should be added: additional || previous.
+         * @return  Null.  A function is run after a delay that may add verses to the page.
+         * @note    Called by add_content_bottom_if_needed(), add_content_top_if_needed(), handle_new_verses(), resizing(), and scrolling().
+         */
         function add_content_if_needed(direction)
         {
             if (direction === additional) {
@@ -619,26 +632,34 @@
         }
         
         
-        ///TODO: Document.
-        ///NOTE: Old text: If it is not going to already, figure out which verses are presently displayed on the screen.
+        /**
+         * Determine and set the range of verses currently visible on the screen.
+         *
+         * @return  Null.  The verse range is updated if need be.
+         * @note    Called by resizing(), scrolling(), and write_verses().
+         */
         function update_verse_range()
         {
             var verse1,
                 verse2;
+            
+            /// Is it not already looking for the verse range?
             if (!looking_up_verse_range) {
                 looking_up_verse_range = true;
                 
+                /// Run this function after a brief delay.
                 setTimeout(function ()
                 {
                     ///TODO: Make a variable that clearly represents the height of the topBar, not topLoader.offsetHeight).
-                    ///NOTE: Check a few pixels below what is actually in view so that it finds the verse that is actually readable.
-                    
+                    ///NOTE: Check a few pixels (8) below what is actually in view so that it finds the verse that is actually readable.
                     verse1 = get_verse_at_position(scroll_pos + topLoader.offsetHeight + 8,  true,  page);
                     if (verse1 === false) {
                         looking_up_verse_range = false;
                         ///TODO: Try again?
                         return;
                     }
+                    
+                    ///NOTE: Check a few pixels (14) above what is actually in view so that it finds the verse that is actually readable.
                     verse2 = get_verse_at_position(scroll_pos + doc_docEl.clientHeight - 14, false, page);
                     if (verse2 === false) {
                         looking_up_verse_range = false;
@@ -646,48 +667,6 @@
                         return;
                     }
                     
-                    /*
-                    document.title= verse1.b + " " + verse1.c + ":" + verse1.v + " - " + verse2.b + " " + verse2.c + ":" + verse2.v;
-                    looking_up_verse_range = false;
-                    return;
-                    get_verse_at_position(scroll_pos + topLoader.offsetHeight + 8, true, page, function (verse1)
-                    {
-                        alert("Success (1) " + verse1.b + " " + verse1.c + ":" + verse1.v);
-                        //alert("Success " + verse1.b + " " + verse1.c + ":" + verse1.v);
-                        get_verse_at_position(scroll_pos + doc_docEl.clientHeight - 14, false, page, function (verse2)
-                        {
-                            alert("Success (2) " + verse2.b + " " + verse2.c + ":" + verse2.v);
-                            looking_up_verse_range = false;
-                        }, function ()
-                        {
-                            alert("fail");
-                            looking_up_verse_range = false;
-                        }); 
-                    }, function ()
-                    {
-                        alert("fail");
-                        looking_up_verse_range = false;
-                    });
-                    
-                    return;
-                    
-                    if (verse1_id === false) {
-                        ///TODO: error handle.
-                        return;
-                    }
-                    
-                    ///NOTE: Check a few pixels above what is actually in view so that it finds the verse that is actually readable.
-                    verse2_id = get_verse_at_position(scroll_pos + doc_docEl.clientHeight - 14);
-                    
-                    /// parseInt() is used to keep the number and remove the trailing string from the id.  See write_verses().
-                    v1 = verse1_id % 1000;
-                    c1 = ((verse1_id - v1) % 1000000) / 1000;
-                    b1 = (verse1_id - v1 - c1 * 1000) / 1000000;
-                    verse2 = parseInt(verse2_el.id);
-                    v2 = verse2_id % 1000;
-                    c2 = ((verse2_id - v2) % 1000000) / 1000;
-                    b2 = (verse2_id - v2 - c2 * 1000) / 1000000;
-                    */
                     /// The titles in the book of Psalms are referenced as verse zero (cf. Psalm 3).
                     verse1.v = verse1.v === 0 ? BF_LANG.title : verse1.v;
                     verse2.v = verse2.v === 0 ? BF_LANG.title : verse2.v;
@@ -1036,7 +1015,7 @@
     /**
      * Scrolls that page to make the specified verse at the top of the viewable area.
      *
-     * @example scroll_to_verse(45001014); /// Scrolls to Romans 1:14.
+     * @example scroll_to_verse(45001014); /// Scrolls to Romans 1:14 if that verse element is in the DOM.
      * @param   verse_id (number) The id number of the verse in the format [B]BCCCVVV.
      * @return  Returns TRUE on success and FALSE if the verse cannot be found on the scroll.
      * @note    Called by handle_new_verses() after the first Ajax request of a particular verse lookup.
@@ -1044,6 +1023,7 @@
     function scroll_to_verse(verse_id)
     {
         var div_tag,
+            padding_interval,
             pixels_needed,
             verse_obj = document.getElementById(verse_id + "_verse");
         
@@ -1051,31 +1031,33 @@
             return false;
         }
         
+        /// Calculate the verse's Y coordinate.
         ///NOTE: "- topLoader.offsetHeight" subtracts off the height of the top bar.
         scroll_pos = get_top_position(verse_obj) - topLoader.offsetHeight;
-        //alert(scroll_pos + " " + (document.documentElement.scrollHeight - document.documentElement.clientHeight));
+        
+        /// Calculate how many pixels (if any) need to be added in order to be able to scroll to that verse
+        /// (i.e., if the verse is near the bottom (e.g., Revelation 22:21 or Proverbs 28:28) there needs to be extra space on the bottom of the screen in order to scroll down to the verse).
         pixels_needed = doc_docEl.clientHeight - (document.body.clientHeight - scroll_pos);
         if (pixels_needed > 0) {
-                div_tag = document.createElement("div");
-                div_tag.style.height = (pixels_needed + 10) + 'px';
-                viewPort.insertBefore(div_tag, null);
-//            viewPort.style.paddingBottom = pixels_needed + "px";
-            var padding_interval = setInterval(function ()
+            div_tag = document.createElement("div");
+            div_tag.style.height = (pixels_needed + 10) + 'px';
+            viewPort.insertBefore(div_tag, null);
+            
+            padding_interval = setInterval(function ()
             {
                 if (doc_docEl.scrollHeight - (window.pageYOffset + doc_docEl.clientHeight) > pixels_needed + 10) {
-//                    viewPort.style.paddingBottom = 0;
                     viewPort.removeChild(div_tag);
                     clearInterval(padding_interval);
                 }
             }, 1000);
         }
-        //alert(pixels_needed);
-        ///viewPort.style.paddingBottom = 
+        
         window.scrollTo(0, scroll_pos);
         
+        ///TODO: Determine if there is any value to returning TRUE and FALSE.
         return true;
     }
-    //viewPort.style.paddingBottom = "1000px";
+    
     
     /**
      * Handles new verses from the server.
@@ -1083,9 +1065,9 @@
      * Writes new verses to the page, determines if more content is needed or available,
      * and writes initial information to the info bar.
      *
-     * @example handle_new_verses([[1001001, 1001002], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>", "<b id="12">And</b> <b id="13">the</b> <b id="14">earth....</b>"], 2]);
-     * @example handle_new_verses([[1001001], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>"], 1]);
-     * @example handle_new_verses([[50004008], ["<b id=772635>Finally,</b> <b id=772636>brethren,</b> <b id=772637>whatsoever</b> <b id=772638>things....</b>"], 1, [772638]]);
+     * @example handle_new_verses([[1001001, 1001002], ["<a id=1>In</a> <a id=2>the</a> <a id=3>beginning....</a>", "<a id=12>And</a> <a id=13>the</a> <a id=14>earth....</a>"], 2]);
+     * @example handle_new_verses([[1001001], ["<a id=1>In</a> <a id=2>the</a> <a id=3>beginning....</a>"], 1]);
+     * @example handle_new_verses([[50004008], ["<a id=772635>Finally,</a> <a id=772636>brethren,</a> <a id=772637>whatsoever</a> <a id=772638>things....</a>"], 1, [772638]]);
      * @param   res        (array)  JSON array from the server.
      *                              Array format: [verse_ids, ...], [verse_HTML, ...], number_of_matches, [word_id, ...]] ///NOTE: word_id is optional.
      * @param   extra_data (object) An object containing the type of action that was preformed and the direction the verses are displayed in.
@@ -1149,9 +1131,6 @@
             }
             if ((direction === previous || waiting_for_first_search) && verse_numbers[0] > 1001001) {
                 topLoader.style.visibility = "visible";
-                /// A delay is added on to space out the requests.
-                ///FIXME: This used to use lookup_delay.  Nothing else does.  Is it necessary?  If so, how should it be implamented?
-                //setTimeout(add_content_top_if_needed, lookup_speed_sitting + lookup_delay);
                 content_manager.add_content_if_needed(previous);
             }
         } else {
@@ -1227,7 +1206,7 @@
      * Writes new verses to page.
      *
      * @example	write_verses(action, direction, [verse_ids, ...], [verse_HTML, ...]);
-     * @example	write_verses(verse_lookup, additional, [1001001], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>"]);
+     * @example	write_verses(verse_lookup, additional, [1001001], ["<a id=1>In</a> <a id=2>the</a> <a id=3>beginning....</a>"]);
      * @param	action		(integer)	The type of query: verse_lookup || mixed_search || standard_search || grammatical_search.
      * @param	direction	(integer)	The direction of the verses to be retrieved: additional || previous.
      * @param	verse_ids	(array)		An array of integers representing Bible verse references.
@@ -1400,7 +1379,7 @@
      * Highlighting is done by adding/changing the className of a word.
      *
      * @example	setTimeout(function () {highlight_search_results(res[1]join("");}, 100);
-     * @example	highlight_search_results("<b id=1>In</b> <b id=2>the</b> <b id=3>beginning...</b>");
+     * @example	highlight_search_results("<a id=1>In</a> <a id=2>the</a> <a id=3>beginning...</a>");
      * @param	search_str (string) The HTML to examine and highlight.
      * @return	NULL.  Modifies objects className.
      * @note	Called by write_verses() via setTimeout() with a short delay.
@@ -1530,7 +1509,7 @@
             
             stemmed_arr[count] = stemmed_word;
             
-            ///NOTE:  [<-] finds either the beginning of the close tag (</b>) or a hyphen (-).
+            ///NOTE:  [<-] finds either the beginning of the close tag (</a>) or a hyphen (-).
             ///       The hyphen is to highlight hyphenated words that would otherwise be missed (matching first word only) (i.e., "Beth").
             ///       ([^>]+-)? finds words where the match is not the first of a hyphenated word (i.e., "Maachah").
             ///       The current English version (KJV) does not use square brackets ([]).
@@ -1720,12 +1699,12 @@ document.onkeydown = function (e)
     keyCode = e.keyCode;
     
     /// Is the user pressing a key that should probably be entered into the input box?  If so, highlight the query box so that the keystrokes will be captured.
-    ///NOTE:       8 = Backspace
-    ///           13 = Enter
-    ///           32 = Space
-    ///        48-90 = Alphanumeric
-    ///       96-111 = Numpad keys
-    ///      186-254 = Punctuation
+    ///NOTE:  8 = Backspace
+    ///      13 = Enter
+    ///      32 = Space
+    ///   48-90 = Alphanumeric
+    ///  96-111 = Numpad keys
+    /// 186-254 = Punctuation
     ///TODO: Determine if capturing Backspace and/Space is confusing because they have alternate functions (the back button and page down, respectively).
     ///      One possible solution is to allow Shift, Ctrl, or Alt + Backspace or Space to be the normal action.
     if (keyCode == 8 || keyCode == 13 || keyCode == 32 || (keyCode > 47 && keyCode < 91) || (keyCode > 95 && keyCode < 112) || (keyCode > 185 && keyCode < 255)) {
