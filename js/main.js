@@ -336,7 +336,7 @@
                 /// Calculate and set the new scroll position.
                 /// Because content is being removed from the top of the page, the rest of the content will be shifted upward.
                 /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was removed.
-                scroll_pos = window.pageYOffset - child_height
+                scroll_pos = window.pageYOffset - child_height;
                 window.scrollTo(0, scroll_pos);
                 
                 page.removeChild(child);
@@ -561,7 +561,7 @@
                 if (looked_next) {
                     el = parent_el.lastChild;
                 } else {
-                   return false;
+                    return false;
                 }
             }
             
@@ -1343,7 +1343,7 @@
             
             /// The new content that was just added to the top of the page will push the other contents downward.
             /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was added.
-            scroll_pos = scroll_pos + newEl.clientHeight
+            scroll_pos = scroll_pos + newEl.clientHeight;
             window.scrollTo(0, scroll_pos);
             
             /// Record the top most verse reference and id so that we know where to start from for the next search or verse lookup as the user scrolls.
@@ -1610,7 +1610,7 @@
      */
     q_obj.onblur = function ()
     {
-        if (this.value == "") {
+        if (this.value === "") {
             this.value = BF_LANG.query_explanation;
         }
     };
