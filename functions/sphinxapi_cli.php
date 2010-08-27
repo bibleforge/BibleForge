@@ -346,7 +346,6 @@ class SphinxClient
             $query = ' " ' . str_replace('"', '\"', $query) . '"';
         }
         
-        ///TODO: Determine if this work on Linux?
         ///FIXME: If there is a space in the $this->path on Windows, then we have to use the cmd executable to run the query.
         ///       E.g., exec('cmd /c "' . ... . '"');
         ///TODO: Determine if the problem with spaces on Windows is a PHP bug, and report it if it is.

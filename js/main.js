@@ -18,14 +18,15 @@
  * This function is used to house all of the code used by BibleForge,
  * expect for language specific code, which is stored in js/lang/LOCALE.js.
  *
- * @param	viewPort		(object) The HTML object which encapsulates all of the other objects.
- * @param	searchForm		(object) The <form> object which contains the text box and button.
- * @param	q_obj			(object) The <input> object the user types into.
- * @param	infoBar			(object) The HTML object that displays information about the lookups and searches.
- * @param	topLoader		(object) The HTML object which displays the loading image above the text.
- * @param	bottomLoader	(object) The HTML object which displays the loading image below the text.
- * @param	doc_docEl		(object) The document.documentElement element (the HTML element).
- * @return	NULL.  Some functions are attached to events and the rest accompany them via closure.
+ * @param	viewPort     (object) The HTML element which encapsulates all of the other objects.
+ * @param	searchForm   (object) The <form> element which contains the text box and button.
+ * @param	q_obj        (object) The <input> element the user types into.
+ * @param	page         (object) The HTML element which contains all of the Bible contents.
+ * @param	infoBar      (object) The HTML element that displays information about the lookups and searches.
+ * @param	topLoader    (object) The HTML element which displays the loading image above the text.
+ * @param	bottomLoader (object) The HTML element which displays the loading image below the text.
+ * @param	doc_docEl    (object) The document.documentElement element (the HTML element).
+ * @return	NULL. Some functions are attached to events and the rest accompany them via closure.
  */
 (function (viewPort, searchForm, q_obj, page, infoBar, topLoader, bottomLoader, doc_docEl)
 {
@@ -55,8 +56,8 @@
         
         /// Verse variables
         /// top_verse and bottom_verse are the last verses displayed on the screen so that the same verse is not displayed twice when more search data is returned (currently just used for grammatical_search).
-        bottom_verse	= 0,
-        top_verse		= 0,
+        bottom_verse = 0,
+        top_verse    = 0,
         
         /// top_id and bottom_id are the last ids (either verse or word id) returned from a search or verse lookup.
         /// These are the same as bottom_id and top_id for verse_lookup and standard_search since these deal with entire verses as a whole, not individual words.
@@ -65,18 +66,19 @@
         top_id,
         
         /// Cache
-        cached_count_bottom				= 0,
-        cached_count_top				= 0,
-        cached_verses_bottom			= [],
-        cached_verses_top				= [],
+        cached_count_bottom  = 0,
+        cached_count_top     = 0,
+        cached_verses_bottom = [],
+        cached_verses_top    = [],
         
         /// Scrolling
         ///TODO: Determine if these can be placed in the scrolling closure.
-        scroll_maxed_bottom				= false,
-        scroll_maxed_top				= true,
-        scroll_pos						= 0,
+        scroll_maxed_bottom = false,
+        scroll_maxed_top    = true,
+        scroll_pos          = 0,
         
         /// Objects
+        settings = {in_paragraphs: true}, ///TODO: Determine how this should be created.
         content_manager;
     
     
@@ -208,6 +210,11 @@
      * Start of Scrolling Closure *
      ******************************/
     
+    /**
+     * The functions that handle the scrolling of the page and other related functions.
+     *
+     * @return Returns an object with functions for adding content and updating the verse range.
+     */
     content_manager = (function ()
     {
         var buffer_add						= 1000,
@@ -243,24 +250,29 @@
             var new_scroll_pos = window.pageYOffset,
                 scrolling_down;
             
+            /// Has the scroll position actually not changed?
+            ///NOTE: IE/Opera sometimes don't update scroll position until after this function is run.
+            ///      Mozilla/WebKit can have the same problem.
             if (new_scroll_pos == scroll_pos) {
-                /// IE/Opera sometimes don't update page.scrollTop until after this function is run.
-                /// Mozilla/WebKit can get stuck here too.
+                /// Should we wait a moment and see if the scroll position changes.
                 if (++scroll_check_count < 10) {
                     setTimeout(scrolling, 30);
-                } else { /// Stop it if it is stuck looping.
+                } else {
+                    /// Reset the counter and do not check anymore.
                     scroll_check_count = 0;
                 }
                 return null;
             }
             scroll_check_count = 0;
             
-            update_verse_range();
             
             scrolling_down = (new_scroll_pos > scroll_pos);
             
             /// This keeps track of the current scroll position so we can tell the direction of the scroll.
             scroll_pos = new_scroll_pos;
+            
+            /// Find and indicate the range of verses displayed on the screen.
+            update_verse_range();
             
             /// Don't look up more data until the first results come.
             if (waiting_for_first_search) {
@@ -325,7 +337,8 @@
                 /// Calculate and set the new scroll position.
                 /// Because content is being removed from the top of the page, the rest of the content will be shifted upward.
                 /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was removed.
-                window.scrollTo(0, scroll_pos = (window.pageYOffset - child_height));
+                scroll_pos = window.pageYOffset - child_height;
+                window.scrollTo(0, scroll_pos);
                 
                 page.removeChild(child);
                 
@@ -349,19 +362,14 @@
          */
         function remove_excess_content_bottom()
         {
-            var child			= page.lastChild,
-                child_position,
-                page_height;
+            var child = page.lastChild;
             
             if (child === null) {
                 return null;
             }
             
-            child_position	= child.offsetTop;
-            page_height		= doc_docEl.clientHeight;
-            
             /// Is the element is in the remove zone?
-            if (child_position > scroll_pos + page_height + buffer_rem) {
+            if (child.offsetTop > scroll_pos + doc_docEl.clientHeight + buffer_rem) {
                 /// Store the content in the cache, and then add 1 to the outer counter variable so that we know how much cache we have.
                 cached_verses_bottom[cached_count_bottom++] = child.innerHTML;
                 
@@ -391,19 +399,15 @@
          */
         function add_content_bottom_if_needed()
         {
-            var child			= page.lastChild,
-                child_position,
-                newEl,
-                page_height;
+            var child = page.lastChild,
+                newEl;
             
             if (child === null) {
                 return null;
             }
             
-            child_position	= child_position = child.offsetTop + child.clientHeight;
-            page_height		= page_height = doc_docEl.clientHeight;
             /// Is the user scrolling close to the bottom of the page?
-            if (child_position < scroll_pos + page_height + buffer_add) {
+            if (child.offsetTop + child.clientHeight < scroll_pos + doc_docEl.clientHeight + buffer_add) {
                 /// Can the content be grabbed from cache?
                 if (cached_count_bottom > 0) {
                     newEl = document.createElement("div");
@@ -417,8 +421,9 @@
                     /*@cc_on
                         window.scrollTo(0, scroll_pos);
                     @*/
-                    /// Better check to see if we need to add more content.
-                    setTimeout(add_content_bottom_if_needed, lookup_speed_scrolling);
+                    
+                    /// Check to see if we need to add more content.
+                    add_content_if_needed(additional);
                 } else {
                     /// Did the user scroll all the way to the very bottom?  (If so, then there is no more content to be gotten.)
                     if (scroll_maxed_bottom) {
@@ -441,21 +446,15 @@
          */
         function add_content_top_if_needed()
         {
-            var child			= page.firstChild,
-                child_height,
-                child_position,
+            var child = page.firstChild,
                 newEl;
             
             if (child === null) {
                 return null;
             }
             
-            child_height = child.clientHeight;
-            
-            child_position = child_height;
-            
             /// Is the user scrolling close to the top of the page?
-            if (child_position + buffer_add > scroll_pos) {
+            if (child.clientHeight + buffer_add > scroll_pos) {
                 /// Can the content be grabbed from cache?
                 if (cached_count_top > 0) {
                     newEl = document.createElement("div");
@@ -467,7 +466,8 @@
                     
                     /// The new content that was just added to the top of the page will push the other contents downward.
                     /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was added.
-                    window.scrollTo(0, scroll_pos = (window.pageYOffset + newEl.clientHeight));
+                    scroll_pos = window.pageYOffset + newEl.clientHeight;
+                    window.scrollTo(0, scroll_pos);
                     
                     /// Check to see if we need to add more content.
                     add_content_if_needed(previous);
@@ -482,199 +482,118 @@
                 }
             }
         }
-        
+                
         
         /**
-         * Finds and displays the range of verses visible on the screen.
+         * Find a verse element that is within a certain Y coordinate on the screen.
          *
-         * Find the verse that is at the top of the page and at the bottom of the page window and
-         * display that range on the page and change the page title to indicate the verse range as well.
-         *
-         * @example	setTimeout(find_current_range, lookup_range_speed);
-         * @return	NULL.  The page is modified to reflect the verse range.
-         * @note	Called by scrolling(), resizing(), write_verses(), or itself via setTimeout().
-         * @note	This function should be called every time the page is resized or scrolled or when visible content is added.
+         * @example verse = get_verse_at_position(scroll_pos + topLoader.offsetHeight + 8,  true,  page); /// Could return {b: 1, c: 1, v: 1} for Genesis 1:1.
+         * @param   the_pos        (number)  The vertical position on the page.
+         * @param   looking_upward (boolean) Whether the verses at the top or bottom of the page.
+         * @param   parent_el      (element) The HTML element that ultimately contains the verse.
+         * @return  Returns an object containing the book, chapter, and verse of the verse element.  Format {b: BB, c: CCC, v: VVV}.
+         * @note    Called by update_verse_range() and itself.
          */
-        function find_current_range()
+        function get_verse_at_position(the_pos, looking_upward, parent_el)
         {
-            ///TODO: Determine if there is a better way to calculate the topBar offset.
-            var b1,
-                b2,
-                bottom_pos			= scroll_pos + doc_docEl.clientHeight - 14,
-                bottom_verse_block,
-                c1,
-                c2,
-                new_title,
-                ref_range,
-                top_pos				= scroll_pos + topLoader.offsetHeight + 8,
-                top_verse_block,
-                v1,
-                v2,
-                verse1_el,
-                verse1,
-                verse2_el,
-                verse2;
-            
-            /// Allow for this function to be called again via setTimeout().  See scrolling().
-            looking_up_verse_range = false;
-            
-            if ((top_verse_block = find_element_at_scroll_pos(top_pos, page)) === null || (bottom_verse_block = find_element_at_scroll_pos(bottom_pos, null, top_verse_block)) === null) {
-                ///NOTE: There appears to be no verses displayed on the screen.
-                ///      Since they may still be being retrieved, so run this function again a little later.
-                looking_up_verse_range = true;
-                setTimeout(find_current_range, lookup_range_speed);
-                return null;
-            }
-            
-            /// Find the verse elements.
-            verse1_el = find_element_at_scroll_pos(top_pos, top_verse_block);
-            verse2_el = find_element_at_scroll_pos(bottom_pos, bottom_verse_block);
-            
-            /// Are either of the verses not found?
-            if (verse1_el === null || verse2_el === null) {
-                ///NOTE: It is possible for some padding to separate the verses.
-                ///      This is probably a temporary issue, so run this function again a little later.
-                looking_up_verse_range = true;
-                setTimeout(find_current_range, lookup_range_speed);
-                return null;
-            }
-            
-            /// parseInt() is used to keep the number and remove the trailing string from the id.  See write_verses().
-            verse1 = parseInt(verse1_el.id);
-            v1 = verse1 % 1000;
-            c1 = ((verse1 - v1) % 1000000) / 1000;
-            b1 = (verse1 - v1 - c1 * 1000) / 1000000;
-            verse2 = parseInt(verse2_el.id);
-            v2 = verse2 % 1000;
-            c2 = ((verse2 - v2) % 1000000) / 1000;
-            b2 = (verse2 - v2 - c2 * 1000) / 1000000;
-            
-            /// The titles in the book of Psalms are referenced as verse zero (cf. Psalm 3).
-            v1 = v1 === 0 ? BF_LANG.title : v1;
-            v2 = v2 === 0 ? BF_LANG.title : v2;
-            
-            ///NOTE: \u2013 is Unicode for the en dash (–) (HTML: &ndash;).
-            ///TODO: Determine if the colons should be language specified.
-            /// Are the books the same?
-            if (b1 == b2) {
-                /// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
-                b1 = b1 == 19 ? BF_LANG.psalm : BF_LANG.books_short[b1];
-                /// Are the chapters the same?
-                if (c1 == c2) {
-                    /// Are the verses the same?
-                    if (v1 == v2) {
-                        ref_range = b1 + " " + c1 + ":" + v1;
-                    } else {
-                        ref_range = b1 + " " + c1 + ":" + v1 + "\u2013" + v2;
-                    }
-                } else {
-                    ref_range = b1 + " " + c1 + ":" + v1 + "\u2013" + c2 + ":" + v2;
-                }
-            } else {
-                /// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
-                b1 = b1 == 19 ? BF_LANG.psalm : BF_LANG.books_short[b1];
-                b2 = b2 == 19 ? BF_LANG.psalm : BF_LANG.books_short[b2];
-                
-                ref_range = b1 + " " + c1 + ":" + v1 + "\u2013" + b2 + " " + c2 + ":" + v2;
-            }
-            
-            /// last_type is set in prepare_new_search().
-            /// The verse range is displayed differently based on the type of search (i.e., a verse look up or a regular search).
-            if (last_type == verse_lookup) {
-                new_title = ref_range + " - " + BF_LANG.app_name;
-            } else {
-                new_title = last_search + " (" + ref_range + ") - " + BF_LANG.app_name;
-            }
-            
-            /// Is the new verse range the same as the old one?
-            /// If they are the same, updating it would just waste resources.
-            if (document.title != new_title) {
-                document.title = new_title;
-                
-                /// Display the verse range on the page if looking up verses.
-                ///FIXME: There should be a variable that shows the current view mode and not rely on last_type.
-                if (last_type == verse_lookup) {
-                    ///TODO: Find a better way to clear infoBar than innerHTML.
-                    infoBar.innerHTML = "";
-                    infoBar.appendChild(document.createTextNode(ref_range));
-                }
-            }
-            
-            return null;
-        }
-        
-        
-        /**
-         * Find an element that is within a certain Y position on the page.
-         *
-         * @example	element = find_element_at_scroll_pos(scroll_pos, page);
-         * @param	the_pos		(number) The vertical position on the page.
-         * @param	parent_el	(object) The DOM element to search inside of.
-         * @return	DOM element that is within the specified position of the page.
-         * @note	Called by find_current_range().
-         * @note	This is a helper function to find_current_range().
-         */
-        function find_element_at_scroll_pos(the_pos, parent_el, el)
-        {
-            var el_offset_height,
+            var b,
+                c,
+                el,
+                el_offset_height,
                 el_offset_top,
                 el_start_at,
                 looked_next,
-                looked_previous;
+                looked_previous,
+                possible_el,
+                parent_el_children_count = parent_el.childNodes.length,
+                parent_el_top            = parent_el.offsetTop,
+                v,
+                verse_id;
             
-            /// Is the starting element unknown?
-            if (!el) {
-                /// Make an educated guess as to which element to start with to save time.
-                el_start_at = Math.round(parent_el.childNodes.length * (the_pos / doc_docEl.scrollHeight));
-                if (el_start_at < 1) {
-                    el_start_at = 1;
-                }
-                el = parent_el.childNodes[el_start_at - 1];
+            /// Make an educated guess as to which element to start with to save time.
+            ///TODO: Determine if page.height could be used instead of doc_docEl.scrollHeight.
+            el_start_at = Math.round(parent_el_children_count * ((the_pos - parent_el_top) / parent_el.offsetHeight));
+            
+            if (el_start_at < 1) {
+                el_start_at = 1;
+            }
+            
+            if (el_start_at > parent_el_children_count) {
+                el = parent_el.lastChild;
             } else {
-                /// We may need the parent_el if the_pos is below all of the elements.
-                parent_el = el.parentNode;
+                el = parent_el.childNodes[el_start_at - 1];
             }
             
             /// Were no elements found?  (If so, then there is nothing to do.)
             if (!el) {
-                return null;
+                return false;
             }
             
             looked_next		= false;
             looked_previous	= false;
             
             do {
-                el_offset_top		= el.offsetTop;
-                el_offset_height	= el.offsetHeight + el_offset_top;
+                el_offset_top    = el.offsetTop;
+                el_offset_height = el.offsetHeight + el_offset_top;
                 
                 /// Is the element somewhere between the position in question?
                 if (the_pos >= el_offset_top && the_pos <= el_offset_height) {
                     /// The element was found.
-                    return el;
+                    break;
                 } else {
                     /// Is the position in question lower?
                     if (the_pos > el_offset_top) {
-                        el			= el.nextSibling;
+                        el = el.nextSibling;
                         looked_next	= true;
                     } else {
-                        el				= el.previousSibling;
+                        el = el.previousSibling;
                         looked_previous	= true;
                     }
                     /// Is it stuck in an infinite loop?  (If so, then give up.)
                     if (looked_next && looked_previous) {
-                        return null;
+                        return false;
                     }
                 }
             } while (el !== null);
             
-            /// Was the position in question to high for all of the elements?
-            if (looked_next) {
-                /// If there are no elements left (e.g., by scrolling all the way to the bottom) return the last element.
-                return parent_el.lastChild;
+            /// Were no appropriate elements found?
+            if (el === null) {
+                /// If we found some elements, but not enough, just use the last element (e.g., when scrolling to the very end of the Bible, all of the verses are past the bottom).
+                if (looked_next) {
+                    el = parent_el.lastChild;
+                } else {
+                    return false;
+                }
+            }
+            
+            /// An element was found.
+            
+            /// Does the element contain a verse, or do we need to look inside the element?
+            switch (el.className) {
+            case "verse":
+            case "search_verse":
+            case "first_verse":
+            case "chapter":
+            case "book":
+            case "short_book":
+                /// Check to see if other verses in the paragraph are also visible.
+                ///NOTE: When in paragraph form, multiple verses could share the same Y coordinates; therefore, we need to keep checking for more verses that may also be at the same Y coordinate.
+                while ((looking_upward ? possible_el = el.previousSibling : possible_el = el.nextSibling) !== null && the_pos >= possible_el.offsetTop && the_pos <= possible_el.offsetTop + possible_el.offsetHeight) {
+                    el = possible_el;
+                }
+                
+                /// Found the verse, so calculate the verseID and call the success function.
+                verse_id = parseInt(el.id);
+                v = verse_id % 1000;
+                c = ((verse_id - v) % 1000000) / 1000;
+                b = (verse_id - v - c * 1000) / 1000000;
+                return {b: b, c: c, v: v};
+            default:
+                /// The verse has not yet been found.
+                return get_verse_at_position(the_pos, looking_upward, el);
             }
             
             ///TODO: Determine if we should return parent_el.firstChild if looked_previous or if that might cause bugs.
-            return null;
         }
         
         
@@ -683,9 +602,9 @@
          *
          * When the page is resized, check to see if more content should be loaded.
          *
-         * @return	NULL.  Calls other functions
-         * @note	Called when the window is resized.
-         * @note	Set by the onresize event.
+         * @return NULL.  Calls other functions
+         * @note   Called when the window is resized.
+         * @note   Set by the onresize event.
          */
         function resizing()
         {
@@ -696,7 +615,14 @@
         }
         
         
-        ///TODO: Document.
+        /**
+         * Find a verse element that is within a certain Y coordinate on the screen.
+         *
+         * @example add_content_if_needed(additional);
+         * @param   direction (integer) The direction that verses should be added: additional || previous.
+         * @return  Null.  A function is run after a delay that may add verses to the page.
+         * @note    Called by add_content_bottom_if_needed(), add_content_top_if_needed(), handle_new_verses(), resizing(), and scrolling().
+         */
         function add_content_if_needed(direction)
         {
             if (direction === additional) {
@@ -707,13 +633,95 @@
         }
         
         
-        ///TODO: Document.
-        ///NOTE: Old text: If it is not going to already, figure out which verses are presently displayed on the screen.
+        /**
+         * Determine and set the range of verses currently visible on the screen.
+         *
+         * @return  Null.  The verse range is updated if need be.
+         * @note    Called by resizing(), scrolling(), and write_verses().
+         */
         function update_verse_range()
         {
+            var verse1,
+                verse2;
+            
+            /// Is it not already looking for the verse range?
             if (!looking_up_verse_range) {
                 looking_up_verse_range = true;
-                setTimeout(find_current_range, lookup_range_speed);
+                
+                /// Run this function after a brief delay.
+                setTimeout(function ()
+                {
+                    ///TODO: Make a variable that clearly represents the height of the topBar, not topLoader.offsetHeight).
+                    ///NOTE: Check a few pixels (8) below what is actually in view so that it finds the verse that is actually readable.
+                    verse1 = get_verse_at_position(scroll_pos + topLoader.offsetHeight + 8,  true,  page);
+                    if (verse1 === false) {
+                        looking_up_verse_range = false;
+                        ///TODO: Try again?
+                        return;
+                    }
+                    
+                    ///NOTE: Check a few pixels (14) above what is actually in view so that it finds the verse that is actually readable.
+                    verse2 = get_verse_at_position(scroll_pos + doc_docEl.clientHeight - 14, false, page);
+                    if (verse2 === false) {
+                        looking_up_verse_range = false;
+                        ///TODO: Try again?
+                        return;
+                    }
+                    
+                    /// The titles in the book of Psalms are referenced as verse zero (cf. Psalm 3).
+                    verse1.v = verse1.v === 0 ? BF_LANG.title : verse1.v;
+                    verse2.v = verse2.v === 0 ? BF_LANG.title : verse2.v;
+                    
+                    ///NOTE: \u2013 is Unicode for the en dash (–) (HTML: &ndash;).
+                    ///TODO: Determine if the colons should be language specified.
+                    /// Are the books the same?
+                    if (verse1.b == verse2.b) {
+                        /// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
+                        verse1.b = verse1.b == 19 ? BF_LANG.psalm : BF_LANG.books_short[verse1.b];
+                        /// Are the chapters the same?
+                        if (verse1.c == verse2.c) {
+                            /// Are the verses the same?
+                            if (verse1.v == verse2.v) {
+                                ref_range = verse1.b + " " + verse1.c + ":" + verse1.v;
+                            } else {
+                                ref_range = verse1.b + " " + verse1.c + ":" + verse1.v + "\u2013" + verse2.v;
+                            }
+                        } else {
+                            ref_range = verse1.b + " " + verse1.c + ":" + verse1.v + "\u2013" + verse2.c + ":" + verse2.v;
+                        }
+                    } else {
+                        /// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
+                        verse1.b = verse1.b == 19 ? BF_LANG.psalm : BF_LANG.books_short[verse1.b];
+                        verse2.b = verse2.b == 19 ? BF_LANG.psalm : BF_LANG.books_short[verse2.b];
+                        
+                        ref_range = verse1.b + " " + verse1.c + ":" + verse1.v + "\u2013" + verse2.b + " " + verse2.c + ":" + verse2.v;
+                    }
+                    
+                    /// last_type is set in prepare_new_search().
+                    /// The verse range is displayed differently based on the type of search (i.e., a verse lookup or a search).
+                    ///TODO: Set the date of the verse (or when it was written).
+                    if (last_type == verse_lookup) {
+                        new_title = ref_range + " - " + BF_LANG.app_name;
+                    } else {
+                        new_title = last_search + " (" + ref_range + ") - " + BF_LANG.app_name;
+                    }
+                    
+                    /// Is the new verse range the same as the old one?
+                    /// If they are the same, updating it would just waste time.
+                    if (document.title != new_title) {
+                        document.title = new_title;
+                        
+                        /// Display the verse range on the page if looking up verses.
+                        ///FIXME: There should be a variable that shows the current view mode and not rely on last_type.
+                        if (last_type == verse_lookup) {
+                            ///TODO: Find a better way to clear infoBar than innerHTML.
+                            infoBar.innerHTML = "";
+                            infoBar.appendChild(document.createTextNode(ref_range));
+                        }
+                    }
+                    
+                    looking_up_verse_range = false;
+                }, lookup_range_speed);
             }
         }
         
@@ -880,9 +888,10 @@
         /// Did the user use the grammatical keyword in his search?
         if ((split_pos = search_terms.indexOf(BF_LANG.grammar_marker)) != -1) {
             ///TODO: Determine what is better: a JSON array or POST/GET string (i.e., word1=word&grammar_type1=1&value1=3&include1=1&...).
-            /// A JSON array is used to contain the information about the search.
-            /// JSON format: '["WORD",[[GRAMMAR_TYPE1,VALUE1],[...]],[INCLUDE1,...]]'
-            /// replace(/(["'])/g, "\\$1") adds slashes to sanitize the data.
+            ///NOTE: A JSON array is used to contain the information about the search.
+            ///      JSON format: '["WORD",[[GRAMMAR_TYPE1,VALUE1],[...]],[INCLUDE1,...]]'
+            
+            /// Get the search term (e.g., in "go AS IMPERATIVE, -SINGULAR", grammar_search_term = "go").
             grammar_search_term = search_terms.slice(0, split_pos);
             
             /// Is the user trying to find all words that match the grammatical attributes?
@@ -891,9 +900,12 @@
                 grammar_search_term = "";
             }
             
-            grammar_json		= '["' + grammar_search_term.replace(/(["'])/g, "\\$1") + '",[';
-            grammar_attributes	= search_terms.slice(split_pos + BF_LANG.grammar_marker_len);
-            split_start			= 0;
+            ///NOTE: replace(/(["'])/g, "\\$1") adds slashes to sanitize the data.  (It is essentially the same as addslashes() in PHP.)
+            grammar_json = '["' + grammar_search_term.replace(/(["'])/g, "\\$1") + '",[';
+            
+            /// Get the grammatical attributes (e.g., in "go AS IMPERATIVE, -SINGULAR", grammar_attributes = IMPERATIVE, -SINGULAR").
+            grammar_attributes = search_terms.slice(split_pos + BF_LANG.grammar_marker_len);
+            split_start        = 0;
             
             ///TODO: Determine if there is a benefit to using do() over while().
             ///NOTE: An infinite loop is used because the data is returned when it reaches the end of the string.
@@ -914,6 +926,9 @@
                 }
                 
                 if (split_pos > -1) {
+                    ///TODO: Determine if there should be error handling when a grammar keyword does not exist.
+                    ///NOTE: The slice() function separates the various grammatical attributes and then that word is
+                    ///      looked up in the grammar_keywords object in order to find the JSON code to send to the server.
                     grammar_attribute_json += BF_LANG.grammar_keywords[grammar_attributes.slice(split_start, split_pos).trim()] + ",";
                     split_start = split_pos + 1;
                 } else {
@@ -941,15 +956,19 @@
      */
     function run_search(direction)
     {
+        ///TODO: Rewrite code so that it does not rely on so many inner variables (such as last_type and last_search_encoded).
         /// last_type set in prepare_new_search().
         var ajax,
+            extra_data = {action: last_type, "direction": direction, search_type: last_type, in_paragraphs: settings.in_paragraphs},
             query = "t=" + last_type;
         
         if (direction == additional) {
             ajax = ajax_additional;
+            extra_data.verse = bottom_id + 1;
         } else {
             ajax = ajax_previous;
             query += "&d=" + direction;
+            extra_data.verse = top_id - 1;
         }
         
         /// Is the server already working on this request?
@@ -960,11 +979,29 @@
         
         if (last_type == verse_lookup) {
             if (direction == additional) {
+                /// In order to find the next verse from which to start, it adds 1.
                 query += "&q=" + (bottom_id + 1);
             } else {
+                /// In order to find the previous verse from which to start, it subtracts 1.
                 query += "&q=" + (top_id - 1);
             }
+            
+            /// Is it impossible to tell if this verse starts at a paragraph breaking point?
+            ///NOTE: If this is the first lookup and the verse number is greater than 1,
+            ///      then it must ask the server to find the nearest paragraph break.
+            if (waiting_for_first_search && extra_data.in_paragraphs && ((bottom_id + 1) % 1000 > 1)) {
+                /// Tell the server to find the nearest paragraph break.
+                query += "&f=1";
+            }
+            
+            /// Should the results not be in paragraph form?
+            ///NOTE: Currently, only verse lookups are in paragraph form.
+            if (!extra_data.in_paragraphs) {
+                query += "&p=0";
+            }
+            
         } else {
+            extra_data.search_encoded = last_search_encoded;
             query += "&q=" + last_search_encoded;
             if (direction == additional) {
                 /// Continue starting on the next verse.
@@ -973,10 +1010,60 @@
                 }
             } else {
                 /// Continue starting backwards on the previous verse.
-                query += "&s=" + (top_id + -1);
+                query += "&s=" + (top_id - 1);
             }
         }
-        post_to_server("search.php", query, ajax, handle_new_verses, {action: last_type, "direction": direction});
+        
+        post_to_server("search.php", query, ajax, handle_new_verses, extra_data);
+    }
+    
+    
+    /**
+     * Scrolls that page to make the specified verse at the top of the viewable area.
+     *
+     * @example scroll_to_verse(45001014); /// Scrolls to Romans 1:14 if that verse element is in the DOM.
+     * @param   verse_id (number) The id number of the verse in the format [B]BCCCVVV.
+     * @return  Returns TRUE on success and FALSE if the verse cannot be found on the scroll.
+     * @note    Called by handle_new_verses() after the first Ajax request of a particular verse lookup.
+     * @todo    Determine how to handle verses at chapter and book beginnings (e.g., Genesis 1:1).
+     */
+    function scroll_to_verse(verse_id)
+    {
+        var div_tag,
+            padding_interval,
+            pixels_needed,
+            ///FIXME: This will not get the correct element if the verse is verse 1 (i.e., is at the beginning of a chapter or book).
+            verse_obj = document.getElementById(verse_id + "_verse");
+        
+        if (!verse_obj) {
+            return false;
+        }
+        
+        /// Calculate the verse's Y coordinate.
+        ///NOTE: "- topLoader.offsetHeight" subtracts off the height of the top bar.
+        scroll_pos = get_top_position(verse_obj) - topLoader.offsetHeight;
+        
+        /// Calculate how many pixels (if any) need to be added in order to be able to scroll to that verse
+        /// (i.e., if the verse is near the bottom (e.g., Revelation 22:21 or Proverbs 28:28) there needs to be extra space on the bottom of the screen in order to scroll down to the verse).
+        pixels_needed = doc_docEl.clientHeight - (document.body.clientHeight - scroll_pos);
+        if (pixels_needed > 0) {
+            div_tag = document.createElement("div");
+            div_tag.style.height = (pixels_needed + 10) + 'px';
+            viewPort.insertBefore(div_tag, null);
+            
+            padding_interval = setInterval(function ()
+            {
+                if (doc_docEl.scrollHeight - (window.pageYOffset + doc_docEl.clientHeight) > pixels_needed + 10) {
+                    viewPort.removeChild(div_tag);
+                    clearInterval(padding_interval);
+                }
+            }, 1000);
+        }
+        
+        window.scrollTo(0, scroll_pos);
+        
+        ///TODO: Determine if there is any value to returning TRUE and FALSE.
+        return true;
     }
     
     
@@ -986,29 +1073,37 @@
      * Writes new verses to the page, determines if more content is needed or available,
      * and writes initial information to the info bar.
      *
-     * @example	handle_new_verses([[1001001, 1001002], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>", "<b id="12">And</b> <b id="13">the</b> <b id="14">earth....</b>"], 2]);
-     * @example	handle_new_verses([[1001001], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>"], 1]);
-     * @example	handle_new_verses([[50004008], ["<b id=772635>Finally,</b> <b id=772636>brethren,</b> <b id=772637>whatsoever</b> <b id=772638>things....</b>"], 1, [772638]]);
-     * @param	res			(array)		JSON array from the server.
-     *									Array format: [verse_ids, ...], [verse_HTML, ...], number_of_matches, [word_id, ...]] ///NOTE: word_id is optional.
-     * @param	extra_data	(object)	An object containing the type of action that was preformed and the direction the verses are displayed in.
-     *									Format: {action: (int), direction: (int)}
-     * @return	NULL.  The function writes HTML to the page.
-     * @note	Called by prepare_verses() after an Ajax request.
+     * @example handle_new_verses([[1001001, 1001002], ["<a id=1>In</a> <a id=2>the</a> <a id=3>beginning....</a>", "<a id=12>And</a> <a id=13>the</a> <a id=14>earth....</a>"], 2]);
+     * @example handle_new_verses([[1001001], ["<a id=1>In</a> <a id=2>the</a> <a id=3>beginning....</a>"], 1]);
+     * @example handle_new_verses([[50004008], ["<a id=772635>Finally,</a> <a id=772636>brethren,</a> <a id=772637>whatsoever</a> <a id=772638>things....</a>"], 1, [772638]]);
+     * @param   res        (array)  JSON array from the server.
+     *                              Array format: [verse_ids, ...], [verse_HTML, ...], number_of_matches, [word_id, ...]] ///NOTE: word_id is optional.
+     * @param   extra_data (object) An object containing the type of action that was preformed and the direction the verses are displayed in.
+     *                              Format: {action: (int), direction: (int)}
+     * @return  NULL.  The function writes HTML to the page.
+     * @note    Called by prepare_verses() after an Ajax request.
      */
     function handle_new_verses(res, extra_data)
     {
         ///TODO: On a verse lookup that does not start with Genesis 1:1, scroll_maxed_top must be set to FALSE. (Has this been taken care of?)
-        var action		= extra_data.action,
+        var action        = extra_data.action,
             b_tag,
             count,
-            direction	= extra_data.direction,
+            direction     = extra_data.direction,
             i,
-            total		= res[2];
+            total         = res.t,
+            paragraphs,
+            verse_numbers = res.n,
+            verse_html    = res.v;
         
+        if (extra_data.in_paragraphs) {
+            paragraphs = res.p;
+        }
+        
+        ///FIXME: Lookups always return 1 for success instead of the number of verses.  See functions/database_lookup.php.
         if (total > 0) {
             ///FIXME: When looking up the last few verses of Revelation (i.e., Revelation 22:21), the page jumps when more content is loaded above.
-            write_verses(action, direction, res[0], res[1]);
+            write_verses(action, direction, verse_numbers, verse_html, paragraphs, extra_data.in_paragraphs);
             
             ///FIXME: Highlighting needs to be in its own function where each type and mixed highlighting will be done correctly.
             if (action == standard_search) {
@@ -1018,34 +1113,31 @@
                 ///TODO: Determine if it is bad to convert the array to a string like this
                 setTimeout(function ()
                 {
-                    highlight_search_results(res[1].join(""));
+                    highlight_search_results(verse_html.join(""));
                 }, 100);
             } else if (action == grammatical_search) {
-                count = res[3].length;
+                count = verse_numbers.length;
                 for (i = 0; i < count; ++i) {
                     ///TODO: Determine if there is a downside to having a space at the start of the className.
                     ///TODO: Determine if we ever need to replace an existing f* className.
-                    document.getElementById(res[3][i]).className += " f" + 1;
+                    document.getElementById(verse_numbers[i]).className += " f" + 1;
                 }
                 /// Record the last id found from the search so that we know where to start from for the next search as the user scrolls.
                 /// Do we need to record the bottom id?
                 if (direction == additional) {
-                    bottom_id = res[3][count - 1];
+                    bottom_id = verse_numbers[count - 1];
                 } else {
-                    top_id = res[3][0];
+                    top_id = verse_numbers[0];
                 }
             }
             
             /// Indicate to the user that more content may be loading, and check for more content.
-            if (direction === additional && res[0][res[0].length - 1] < 66022021) {
+            if (direction === additional && verse_numbers[verse_numbers.length - 1] < 66022021) {
                 bottomLoader.style.visibility = "visible";
                 content_manager.add_content_if_needed(direction);
             }
-            if ((direction === previous || waiting_for_first_search) && res[0][0] > 1001001) {
+            if ((direction === previous || waiting_for_first_search) && verse_numbers[0] > 1001001) {
                 topLoader.style.visibility = "visible";
-                /// A delay is added on to space out the requests.
-                ///FIXME: This used to use lookup_delay.  Nothing else does.  Is it necessary?  If so, how should it be implamented?
-                //setTimeout(add_content_top_if_needed, lookup_speed_sitting + lookup_delay);
                 content_manager.add_content_if_needed(previous);
             }
         } else {
@@ -1057,17 +1149,25 @@
             }
             if (direction == previous || waiting_for_first_search) {
                 /// The user has reached the top of the page by scrolling up (either Genesis 1:1 or there were no search results), so we need to hide the loading graphic
-                scroll_maxed_top = true;
-                topLoader.style.visibility = "hidden";
+                scroll_maxed_top    = true;
+                topLoader.style.visibility    = "hidden";
             }
         }
         
-        /// If this is the first results, update the info bar.
+        /// Is this is the first results of a search or lookup?
         if (waiting_for_first_search) {
-            /// If the user had scrolled down the page and then pressed the refresh button,
-            /// the page will keep scrolling down as content is loaded, so to prevent this, force the window to scroll to the top of the page.
-            window.scrollTo(0, 0);
-            
+            /// Are the results displayed in paragraphs and the verse looked up not at the beginning of a paragraph?
+            ///TODO: Determine if this should require the search type to be a verse lookup.
+            ///FIXME: There is a problem when a verse near the end of the Bible is selected (cf. Revelation 22:21 or Revelation 22:18 (even in paragraph mode)).
+            if (extra_data.search_type == verse_lookup && extra_data.in_paragraphs && verse_numbers[0] != extra_data.verse) {
+                /// Because the verse the user is looking for is not at the beginning of a paragraph
+                /// the text needs to be scrolled so that the verse is at the top.
+                scroll_to_verse(extra_data.verse);
+            } else {
+                /// If the user had scrolled down the page and then pressed the refresh button,
+                /// the page will keep scrolling down as content is loaded, so to prevent this, force the window to scroll to the top of the page.
+                window.scrollTo(0, 0);
+            }
             waiting_for_first_search = false;
             
             infoBar.innerHTML = "";
@@ -1083,8 +1183,30 @@
             }
             
             /// Store the first verse reference for later.
-            top_id = res[0][0];
+            top_id = verse_numbers[0];
         }
+    }
+    
+    
+    /**
+     * Gets the distance of an object from the top of the scroll.
+     *
+     * @example get_top_position(element);
+     * @param   obj (element) An element on the page.
+     * @return  Returns the distance of obj from the top of the scroll.
+     * @note    Called by scroll_to_verse().
+     */
+    function get_top_position(obj)
+    {
+        var top_pos = 0;
+        
+        /// Does the object have an element above it (i.e., offsetParent)?
+        if (obj.offsetParent) {
+            do {
+                top_pos += obj.offsetTop;
+            } while (obj = obj.offsetParent);
+        }
+        return top_pos;
     }
     
     
@@ -1092,7 +1214,7 @@
      * Writes new verses to page.
      *
      * @example	write_verses(action, direction, [verse_ids, ...], [verse_HTML, ...]);
-     * @example	write_verses(verse_lookup, additional, [1001001], ["<b id=1>In</b> <b id=2>the</b> <b id=3>beginning....</b>"]);
+     * @example	write_verses(verse_lookup, additional, [1001001], ["<a id=1>In</a> <a id=2>the</a> <a id=3>beginning....</a>"]);
      * @param	action		(integer)	The type of query: verse_lookup || mixed_search || standard_search || grammatical_search.
      * @param	direction	(integer)	The direction of the verses to be retrieved: additional || previous.
      * @param	verse_ids	(array)		An array of integers representing Bible verse references.
@@ -1101,17 +1223,20 @@
      * @note	Called by handle_new_verses().
      * @note	verse_ids contains an array of verses in the following format: [B]BCCCVVV (e.g., Genesis 1:1 == 1001001).
      */
-    function write_verses(action, direction, verse_ids, verse_HTML)
+    function write_verses(action, direction, verse_ids, verse_HTML, paragraphs, in_paragraphs)
     {
         var b,
             c,
-            chapter_text	= "",
+            chapter_text         = "",
+            end_paragraph_HTML   = "",
+            first_paragraph_HTML = "",
             i,
-            HTML_str		= "",
+            HTML_str             = "",
             newEl,
             num,
-            start_key		= 0,
-            stop_key		= verse_ids.length,
+            start_key            = 0,
+            start_paragraph_HTML = "",
+            stop_key             = verse_ids.length,
             v;
         
         /// Currently only grammatical_search searches data at the word level, so it is the only action that might stop in the middle of a verse and find more words in the same verse as the user scrolls.
@@ -1121,12 +1246,16 @@
                 if (bottom_verse == verse_ids[0]) {
                     start_key = 1;
                 }
-            } else {
-                /// Is the last verse returned the same as the top verse on the page?
-                if (top_verse == verse_ids[stop_key - 1]) {
-                    --start_key;
-                }
+            /// Is the last verse returned the same as the top verse on the page?
+            } else if (top_verse == verse_ids[stop_key - 1]) {
+                --start_key;
             }
+        }
+        
+        if (in_paragraphs) {
+            start_paragraph_HTML = "<div class=paragraph>";
+            first_paragraph_HTML = '<div class="paragraph first_paragraph">';
+            end_paragraph_HTML   = "</div>";
         }
         
         for (i = start_key; i < stop_key; ++i) {
@@ -1139,11 +1268,14 @@
             if (action == verse_lookup) {
                 /// Is this the first verse or the Psalm title?
                 if (v < 2) {
+                    if (i != start_key) {
+                        HTML_str += end_paragraph_HTML;
+                    }
                     /// Is this chapter 1?  (We need to know if we should display the book name.)
                     if (c === 1) {
                         HTML_str += "<div class=book id=" + num + "_title><h2>" + BF_LANG.books_long_pretitle[b] + "</h2><h1>" + BF_LANG.books_long_main[b] + "</h1><h2>" + BF_LANG.books_long_posttitle[b] + "</h2></div>";
                     /// Display chapter/psalm number (but not on verse 1 of psalms that have titles).
-                    } else if (b !== 19 || v === 0 || ((c <= 2) || (c === 10) || (c === 33) || (c === 43) || (c === 71) || (c === 91) || (c >= 93 && c <= 97) || (c === 99) || (c >= 104 && c <= 107) || (c >= 111 && c <= 119) || (c >= 135 && c <= 137) || (c >= 146))) {
+                    } else if (b !== 19 || v === 0 || (c <= 2 || c === 10 || c === 33 || c === 43 || c === 71 || c === 91 || (c >= 93 && c <= 97) || c === 99 || (c >= 104 && c <= 107) || (c >= 111 && c <= 119) || (c >= 135 && c <= 137) || c >= 146)) {
                         /// Is this the book of Psalms?  (Psalms have a special name.)
                         if (b === 19) {
                             chapter_text = BF_LANG.psalm;
@@ -1156,15 +1288,28 @@
                     if (v === 0) {
                         HTML_str += "<div class=psalm_title id=" + num + "_verse>" + verse_HTML[i] + "</div>";
                     } else {
-                        HTML_str += "<div class=first_verse id=" + num + "_verse>" + verse_HTML[i] + "</div>";
+                        ///NOTE: The trailing space adds a space between verses in a paragraph and does not effect paragraph final verses.
+                        HTML_str += first_paragraph_HTML + "<div class=first_verse id=" + num + "_verse>" + verse_HTML[i] + " </div>";
                     }
                 } else {
-                    HTML_str += "<div class=verse id=" + num + "_verse>" + v + " " + verse_HTML[i] + "</div>";
+                    /// Is there a paragraph break here?
+                    if (in_paragraphs && paragraphs[i]) {
+                        /// Is this not the first paragraph?  (The first paragraph does not need to be closed.)
+                        if (i != start_key) {
+                            HTML_str += end_paragraph_HTML;
+                        }
+                        
+                        HTML_str += start_paragraph_HTML;
+                        is_in_paragraph = true;
+                    }
+                    
+                    ///NOTE: The trailing space adds a space between verses in a paragraph and does not effect paragraph final verses.
+                    HTML_str += "<div class=verse id=" + num + "_verse><span class=verse_number>" + v + "&nbsp;</span>" + verse_HTML[i] + " </div>";
                 }
                 
             /// Searching
             } else {
-                /// Change verse 0 to "title" (i.e., Psalm titles).  (Display Psalm 3:title instead of Psalm 3:0.)
+                /// Change verse 0 to "title" (e.g., Psalm 3:title instead of Psalm 3:0).
                 if (v === 0) {
                     v = BF_LANG.title;
                 }
@@ -1179,6 +1324,10 @@
                 
                 HTML_str += "<div class=search_verse id=" + num + "_search>" + c + ":" + v + " " + verse_HTML[i] + "</div>";
             }
+        }
+        
+        if (in_paragraphs) {
+            HTML_str += end_paragraph_HTML;
         }
         
         newEl = document.createElement("div");
@@ -1201,7 +1350,9 @@
             
             /// The new content that was just added to the top of the page will push the other contents downward.
             /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was added.
-            window.scrollTo(0, scroll_pos = window.pageYOffset + newEl.clientHeight);
+            scroll_pos = scroll_pos + newEl.clientHeight;
+            ///FIXME: We need to figure out if there is enough room to scroll.  If not, a temporary element will need to be created.
+            window.scrollTo(0, scroll_pos);
             
             /// Record the top most verse reference and id so that we know where to start from for the next search or verse lookup as the user scrolls.
             ///NOTE: For verse_lookup and standard_search, the top_id and top_verse are the same because the search is preformed at the verse level.
@@ -1210,7 +1361,6 @@
             ///TODO: Determine the pros/cons of using an if statement to prevent grammatical searches from recording the id here, since it is overwritten later.
             top_id = top_verse = verse_ids[0];
         }
-        
         content_manager.update_verse_range();
     }
     
@@ -1237,7 +1387,7 @@
      * Highlighting is done by adding/changing the className of a word.
      *
      * @example	setTimeout(function () {highlight_search_results(res[1]join("");}, 100);
-     * @example	highlight_search_results("<b id=1>In</b> <b id=2>the</b> <b id=3>beginning...</b>");
+     * @example	highlight_search_results("<a id=1>In</a> <a id=2>the</a> <a id=3>beginning...</a>");
      * @param	search_str (string) The HTML to examine and highlight.
      * @return	NULL.  Modifies objects className.
      * @note	Called by write_verses() via setTimeout() with a short delay.
@@ -1367,7 +1517,7 @@
             
             stemmed_arr[count] = stemmed_word;
             
-            ///NOTE:  [<-] finds either the beginning of the close tag (</b>) or a hyphen (-).
+            ///NOTE:  [<-] finds either the beginning of the close tag (</a>) or a hyphen (-).
             ///       The hyphen is to highlight hyphenated words that would otherwise be missed (matching first word only) (i.e., "Beth").
             ///       ([^>]+-)? finds words where the match is not the first of a hyphenated word (i.e., "Maachah").
             ///       The current English version (KJV) does not use square brackets ([]).
@@ -1439,7 +1589,7 @@
                     /// This is run when the results are returned properly.
                     ///NOTE: JSON.parse() is at least currently (November 2009) twice as slow as eval(), and it does not work because of problems parsing the character combination slash plus single quote (\').  Two slashes may work.
                     ///TODO: Add error handling for parsing.
-                    handler(eval(ajax.responseText), extra_data);
+                    handler(eval("(" + ajax.responseText + ")"), extra_data);
                 } else {
                     /// Was the abort unintentional?
                     if (ajax.status !== 0) {
@@ -1462,13 +1612,13 @@
     /**
      * Set the query input box text with an explanation of what the user can enter in.
      *
-     * @return null
+     * @return NULL.
      * @note   Called on q_obj onblur.
      * @note   This function is removed after the user submits a search by prepare_new_search() because the user no longer needs the instructions.
      */
     q_obj.onblur = function ()
     {
-        if (this.value == "") {
+        if (this.value === "") {
             this.value = BF_LANG.query_explanation;
         }
     };
@@ -1477,7 +1627,7 @@
     /**
      * Remove the explanation text so that the user can type.
      *
-     * @return null
+     * @return NULL.
      * @note   Called on q_obj onfocus.
      */
     q_obj.onfocus = function ()
@@ -1519,7 +1669,7 @@ if (window.opera) {
     /// Inject CSS to make the drop caps take up two lines, so that wrapping text is not placed over it.  (See John 4:1.)
     ///NOTE: Needed for at least Opera 10.51.
     ///TODO: Determine if this would be better as a function.
-    document.body.appendChild(document.createElement("style").appendChild(document.createTextNode(".first_verse:first-letter { margin-bottom: 0; padding: 1px; } .queryInput { background: rgba(255, 255, 255, .5); }")).parentNode);
+    document.body.appendChild(document.createElement("style").appendChild(document.createTextNode(".first_verse:first-letter, .first_paragraph:first-letter { margin-bottom: 0; padding: 1px; } .queryInput { background: rgba(255, 255, 255, .5); }")).parentNode);
 }
 
 
@@ -1558,12 +1708,12 @@ document.onkeydown = function (e)
     }
     
     /// Is the user pressing a key that should probably be entered into the input box?  If so, highlight the query box so that the keystrokes will be captured.
-    ///NOTE:       8 = Backspace
-    ///           13 = Enter
-    ///           32 = Space
-    ///        48-90 = Alphanumeric
-    ///       96-111 = Numpad keys
-    ///      186-254 = Punctuation
+    ///NOTE:  8 = Backspace
+    ///      13 = Enter
+    ///      32 = Space
+    ///   48-90 = Alphanumeric
+    ///  96-111 = Numpad keys
+    /// 186-254 = Punctuation
     ///TODO: Determine if capturing Backspace and/Space is confusing because they have alternate functions (the back button and page down, respectively).
     ///      One possible solution is to allow Shift, Ctrl, or Alt + Backspace or Space to be the normal action.
     if (keyCode == 8 || keyCode == 13 || keyCode == 32 || (keyCode > 47 && keyCode < 91) || (keyCode > 95 && keyCode < 112) || (keyCode > 185 && keyCode < 255)) {
