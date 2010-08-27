@@ -78,6 +78,7 @@
         scroll_pos          = 0,
         
         /// Objects
+        settings = {in_paragraphs: true}, ///TODO: Determine how this should be created.
         content_manager;
     
     
@@ -958,7 +959,7 @@
         ///TODO: Rewrite code so that it does not rely on so many inner variables (such as last_type and last_search_encoded).
         /// last_type set in prepare_new_search().
         var ajax,
-            extra_data = {action: last_type, "direction": direction, search_type: last_type},
+            extra_data = {action: last_type, "direction": direction, search_type: last_type, in_paragraphs: settings.in_paragraphs},
             query = "t=" + last_type;
         
         if (direction == additional) {
@@ -985,13 +986,18 @@
                 query += "&q=" + (top_id - 1);
             }
             
-            var in_paragraphs = true; /// <-- TEMP
             /// Is it impossible to tell if this verse starts at a paragraph breaking point?
             ///NOTE: If this is the first lookup and the verse number is greater than 1,
             ///      then it must ask the server to find the nearest paragraph break.
-            if (waiting_for_first_search && in_paragraphs && ((bottom_id + 1) % 1000 > 1)) {
+            if (waiting_for_first_search && extra_data.in_paragraphs && ((bottom_id + 1) % 1000 > 1)) {
                 /// Tell the server to find the nearest paragraph break.
                 query += "&f=1";
+            }
+            
+            /// Should the results not be in paragraph form?
+            ///NOTE: Currently, only verse lookups are in paragraph form.
+            if (!extra_data.in_paragraphs) {
+                query += "&p=0";
             }
             
         } else {
@@ -1019,12 +1025,14 @@
      * @param   verse_id (number) The id number of the verse in the format [B]BCCCVVV.
      * @return  Returns TRUE on success and FALSE if the verse cannot be found on the scroll.
      * @note    Called by handle_new_verses() after the first Ajax request of a particular verse lookup.
+     * @todo    Determine how to handle verses at chapter and book beginnings (e.g., Genesis 1:1).
      */
     function scroll_to_verse(verse_id)
     {
         var div_tag,
             padding_interval,
             pixels_needed,
+            ///FIXME: This will not get the correct element if the verse is verse 1 (i.e., is at the beginning of a chapter or book).
             verse_obj = document.getElementById(verse_id + "_verse");
         
         if (!verse_obj) {
@@ -1088,15 +1096,14 @@
             verse_numbers = res.n,
             verse_html    = res.v;
         
-        var in_paragraphs = true; /// <-- TEMP
-        if (in_paragraphs) {
+        if (extra_data.in_paragraphs) {
             paragraphs = res.p;
         }
         
         ///FIXME: Lookups always return 1 for success instead of the number of verses.  See functions/database_lookup.php.
         if (total > 0) {
             ///FIXME: When looking up the last few verses of Revelation (i.e., Revelation 22:21), the page jumps when more content is loaded above.
-            write_verses(action, direction, verse_numbers, verse_html, paragraphs);
+            write_verses(action, direction, verse_numbers, verse_html, paragraphs, extra_data.in_paragraphs);
             
             ///FIXME: Highlighting needs to be in its own function where each type and mixed highlighting will be done correctly.
             if (action == standard_search) {
@@ -1151,7 +1158,8 @@
         if (waiting_for_first_search) {
             /// Are the results displayed in paragraphs and the verse looked up not at the beginning of a paragraph?
             ///TODO: Determine if this should require the search type to be a verse lookup.
-            if (extra_data.search_type == verse_lookup && in_paragraphs && verse_numbers[0] != extra_data.verse) {
+            ///FIXME: There is a problem when a verse near the end of the Bible is selected (cf. Revelation 22:21 or Revelation 22:18 (even in paragraph mode)).
+            if (extra_data.search_type == verse_lookup && extra_data.in_paragraphs && verse_numbers[0] != extra_data.verse) {
                 /// Because the verse the user is looking for is not at the beginning of a paragraph
                 /// the text needs to be scrolled so that the verse is at the top.
                 scroll_to_verse(extra_data.verse);
@@ -1215,7 +1223,7 @@
      * @note	Called by handle_new_verses().
      * @note	verse_ids contains an array of verses in the following format: [B]BCCCVVV (e.g., Genesis 1:1 == 1001001).
      */
-    function write_verses(action, direction, verse_ids, verse_HTML, paragraphs)
+    function write_verses(action, direction, verse_ids, verse_HTML, paragraphs, in_paragraphs)
     {
         var b,
             c,
@@ -1244,7 +1252,6 @@
             }
         }
         
-        var in_paragraphs = true; /// <-- TEMP
         if (in_paragraphs) {
             start_paragraph_HTML = "<div class=paragraph>";
             first_paragraph_HTML = '<div class="paragraph first_paragraph">';
@@ -1344,6 +1351,7 @@
             /// The new content that was just added to the top of the page will push the other contents downward.
             /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was added.
             scroll_pos = scroll_pos + newEl.clientHeight;
+            ///FIXME: We need to figure out if there is enough room to scroll.  If not, a temporary element will need to be created.
             window.scrollTo(0, scroll_pos);
             
             /// Record the top most verse reference and id so that we know where to start from for the next search or verse lookup as the user scrolls.
