@@ -18,15 +18,15 @@
  * This function is used to house all of the code used by BibleForge,
  * expect for language specific code, which is stored in js/lang/LOCALE.js.
  *
- * @param	viewPort     (object) The HTML element which encapsulates all of the other objects.
- * @param	searchForm   (object) The <form> element which contains the text box and button.
- * @param	q_obj        (object) The <input> element the user types into.
- * @param	page         (object) The HTML element which contains all of the Bible contents.
- * @param	infoBar      (object) The HTML element that displays information about the lookups and searches.
- * @param	topLoader    (object) The HTML element which displays the loading image above the text.
- * @param	bottomLoader (object) The HTML element which displays the loading image below the text.
- * @param	doc_docEl    (object) The document.documentElement element (the HTML element).
- * @return	NULL. Some functions are attached to events and the rest accompany them via closure.
+ * @param   viewPort     (object) The HTML element which encapsulates all of the other objects.
+ * @param   searchForm   (object) The <form> element which contains the text box and button.
+ * @param   q_obj        (object) The <input> element the user types into.
+ * @param   page         (object) The HTML element which contains all of the Bible contents.
+ * @param   infoBar      (object) The HTML element that displays information about the lookups and searches.
+ * @param   topLoader    (object) The HTML element which displays the loading image above the text.
+ * @param   bottomLoader (object) The HTML element which displays the loading image below the text.
+ * @param   doc_docEl    (object) The document.documentElement element (the HTML element).
+ * @return	NULL.  Some functions are attached to events and the rest accompany them via closure.
  */
 (function (viewPort, searchForm, q_obj, page, infoBar, topLoader, bottomLoader, doc_docEl)
 {
@@ -75,7 +75,6 @@
         ///TODO: Determine if these can be placed in the scrolling closure.
         scroll_maxed_bottom = false,
         scroll_maxed_top    = true,
-        scroll_pos          = 0,
         
         /// Objects
         settings = {in_paragraphs: true}, ///TODO: Determine how this should be created.
@@ -213,23 +212,24 @@
     /**
      * The functions that handle the scrolling of the page and other related functions.
      *
-     * @return Returns an object with functions for adding content and updating the verse range.
+     * @return Returns an object with functions for adding content, updating the verse range, and scrollng the view.
      */
     content_manager = (function ()
     {
-        var buffer_add						= 1000,
-            buffer_rem						= 10000,
-            checking_excess_content_bottom	= false,
-            checking_excess_content_top		= false,
-            looking_up_verse_range			= false,
-            lookup_delay					= 200,
-            lookup_range_speed				= 300,	/// In milliseconds
-            lookup_speed_scrolling			= 50,
-            lookup_speed_sitting			= 100,
+        var buffer_add                     = 1000,  /// In milliseconds
+            buffer_rem                     = 10000, /// In milliseconds
+            checking_excess_content_bottom = false,
+            checking_excess_content_top    = false,
+            looking_up_verse_range         = false,
+            lookup_delay                   = 200,
+            lookup_range_speed             = 300,   /// In milliseconds
+            lookup_speed_scrolling         = 50,    /// In milliseconds
+            lookup_speed_sitting           = 100,   /// In milliseconds
             remove_content_bottom_timeout,
             remove_content_top_timeout,
-            remove_speed					= 3000,
-            scroll_check_count				= 0;
+            remove_speed                   = 3000,  /// In milliseconds
+            scroll_check_count             = 0,
+            scroll_pos                     = 0;
         
         /**
          * The onscroll event.
@@ -237,9 +237,9 @@
          * When the page scrolls this figures out the direction of the scroll and
          * calls specific functions to determine whether content should be added or removed.
          *
-         * @return	NULL.  May call other functions via setTimeout().
-         * @note	Called when the window scrolls.
-         * @note	Set by  the onscroll event.
+         * @return NULL.  May call other functions via setTimeout().
+         * @note   Called when the window scrolls.
+         * @note   Set by the onscroll event.
          */
         function scrolling()
         {
@@ -328,7 +328,7 @@
             ///NOTE: Mozilla also has scrollMaxY, which is slightly different from document.documentElement.scrollHeight (document.body.scrollHeight should work too).
             
             /// Is the object in the remove zone, and is its height less than the remaining space to scroll to prevent jumping?
-            if (child_height + buffer_rem < scroll_pos && child_height < doc_docEl.scrollHeight - scroll_pos - doc_docEl.clientHeight) {
+            if (child_height + buffer_rem < window.pageYOffset && child_height < doc_docEl.scrollHeight - window.pageYOffset - doc_docEl.clientHeight) {
                 /// Store the content in the cache, and then add 1 to the outer counter variable so that we know how much cache we have.
                 cached_verses_top[cached_count_top++] = child.innerHTML;
                 ///TODO: Determine if setting the display to "none" actually helps at all.
@@ -337,8 +337,7 @@
                 /// Calculate and set the new scroll position.
                 /// Because content is being removed from the top of the page, the rest of the content will be shifted upward.
                 /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was removed.
-                scroll_pos = window.pageYOffset - child_height;
-                window.scrollTo(0, scroll_pos);
+                scrollViewTo(0, window.pageYOffset - child_height);
                 
                 page.removeChild(child);
                 
@@ -369,7 +368,7 @@
             }
             
             /// Is the element is in the remove zone?
-            if (child.offsetTop > scroll_pos + doc_docEl.clientHeight + buffer_rem) {
+            if (child.offsetTop > window.pageYOffset + doc_docEl.clientHeight + buffer_rem) {
                 /// Store the content in the cache, and then add 1 to the outer counter variable so that we know how much cache we have.
                 cached_verses_bottom[cached_count_bottom++] = child.innerHTML;
                 
@@ -377,7 +376,7 @@
                 
                 /// This fixes an IE7+ bug that causes the page to scroll needlessly when an element is added.
                 /*@cc_on
-                    window.scrollTo(0, scroll_pos);
+                    scrollViewTo(0, window.pageYOffset);
                 @*/
                 /// End execution to keep the checking_content_top_interval running because there might be even more content that should be removed.
                 bottomLoader.style.visibility = "visible";
@@ -407,7 +406,7 @@
             }
             
             /// Is the user scrolling close to the bottom of the page?
-            if (child.offsetTop + child.clientHeight < scroll_pos + doc_docEl.clientHeight + buffer_add) {
+            if (child.offsetTop + child.clientHeight < window.pageYOffset + doc_docEl.clientHeight + buffer_add) {
                 /// Can the content be grabbed from cache?
                 if (cached_count_bottom > 0) {
                     newEl = document.createElement("div");
@@ -419,7 +418,7 @@
                     
                     /// This fixes an IE7+ bug that causes the page to scroll needlessly when an element is added.
                     /*@cc_on
-                        window.scrollTo(0, scroll_pos);
+                        scrollViewTo(0, window.pageYOffset);
                     @*/
                     
                     /// Check to see if we need to add more content.
@@ -454,7 +453,7 @@
             }
             
             /// Is the user scrolling close to the top of the page?
-            if (child.clientHeight + buffer_add > scroll_pos) {
+            if (child.clientHeight + buffer_add > window.pageYOffset) {
                 /// Can the content be grabbed from cache?
                 if (cached_count_top > 0) {
                     newEl = document.createElement("div");
@@ -466,8 +465,7 @@
                     
                     /// The new content that was just added to the top of the page will push the other contents downward.
                     /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was added.
-                    scroll_pos = window.pageYOffset + newEl.clientHeight;
-                    window.scrollTo(0, scroll_pos);
+                    scrollViewTo(0, window.pageYOffset + newEl.clientHeight);
                     
                     /// Check to see if we need to add more content.
                     add_content_if_needed(previous);
@@ -487,7 +485,7 @@
         /**
          * Find a verse element that is within a certain Y coordinate on the screen.
          *
-         * @example verse = get_verse_at_position(scroll_pos + topLoader.offsetHeight + 8,  true,  page); /// Could return {b: 1, c: 1, v: 1} for Genesis 1:1.
+         * @example verse = get_verse_at_position(window.pageYOffset + topLoader.offsetHeight + 8,  true,  page); /// Could return {b: 1, c: 1, v: 1} for Genesis 1:1.
          * @param   the_pos        (number)  The vertical position on the page.
          * @param   looking_upward (boolean) Whether the verses at the top or bottom of the page.
          * @param   parent_el      (element) The HTML element that ultimately contains the verse.
@@ -636,8 +634,8 @@
         /**
          * Determine and set the range of verses currently visible on the screen.
          *
-         * @return  Null.  The verse range is updated if need be.
-         * @note    Called by resizing(), scrolling(), and write_verses().
+         * @return Null.  The verse range is updated if need be.
+         * @note   Called by resizing(), scrolling(), and write_verses().
          */
         function update_verse_range()
         {
@@ -653,7 +651,7 @@
                 {
                     ///TODO: Make a variable that clearly represents the height of the topBar, not topLoader.offsetHeight).
                     ///NOTE: Check a few pixels (8) below what is actually in view so that it finds the verse that is actually readable.
-                    verse1 = get_verse_at_position(scroll_pos + topLoader.offsetHeight + 8,  true,  page);
+                    verse1 = get_verse_at_position(window.pageYOffset + topLoader.offsetHeight + 8,  true,  page);
                     if (verse1 === false) {
                         looking_up_verse_range = false;
                         ///TODO: Try again?
@@ -661,7 +659,7 @@
                     }
                     
                     ///NOTE: Check a few pixels (14) above what is actually in view so that it finds the verse that is actually readable.
-                    verse2 = get_verse_at_position(scroll_pos + doc_docEl.clientHeight - 14, false, page);
+                    verse2 = get_verse_at_position(window.pageYOffset + doc_docEl.clientHeight - 14, false, page);
                     if (verse2 === false) {
                         looking_up_verse_range = false;
                         ///TODO: Try again?
@@ -726,6 +724,42 @@
         }
         
         
+        function scrollViewTo(x, y, smooth)
+        {
+            var padding_el,
+                padding_interval,
+                pixels_needed;
+            
+            if (!smooth) {
+                scroll_pos = y;
+                
+                /// Is the scroll position not the top of the page.
+                if (scroll_pos > 0) {
+                    /// Calculate how many pixels (if any) need to be added in order to be able to scroll to the specified position.
+                    /// If the scroll position is near the bottom (e.g., Revelation 22:21 or Proverbs 28:28) there needs to be extra space on the bottom.
+                    pixels_needed = doc_docEl.clientHeight - (document.body.clientHeight - scroll_pos);
+                    if (pixels_needed > 0) {
+                        padding_el = document.createElement("div");
+                        padding_el.style.height = (pixels_needed + 10) + 'px';
+                        viewPort.insertBefore(padding_el, null);
+                        
+                        padding_interval = setInterval(function ()
+                        {
+                            if (doc_docEl.scrollHeight - (window.pageYOffset + doc_docEl.clientHeight) > pixels_needed + 10) {
+                                viewPort.removeChild(padding_el);
+                                clearInterval(padding_interval);
+                            }
+                        }, 1000);
+                    }
+                }
+                
+                window.scrollTo(x, y);
+            } else {
+                ///TODO: Do smooth scrolling.
+            }
+        }
+        
+        
         ///NOTE:  These events could be attached as anonymous functions (lambdas),
         ///       but scrolling() calls itself, so it would need to store arguments.callee.
         ///NOTE:  Could use wheel if the scroll bars are invisible.
@@ -733,20 +767,12 @@
         window.onscroll = scrolling;
         window.onresize = resizing;
         
-        return {add_content_if_needed: add_content_if_needed, update_verse_range: update_verse_range};
+        return {add_content_if_needed: add_content_if_needed, update_verse_range: update_verse_range, scrollViewTo: scrollViewTo};
     }());
     
     /****************************
      * End of Scrolling Closure *
      ****************************/
-    
-    
-    /*@cc_on
-        /// Trick IE into understanding pageYOffset.
-        /// Set the initial value, so that it is not undefined.
-        /// See scrolling().
-        window.pageYOffset = doc_docEl.scrollTop;
-    @*/
     
     
     /*****************************
@@ -1041,26 +1067,7 @@
         
         /// Calculate the verse's Y coordinate.
         ///NOTE: "- topLoader.offsetHeight" subtracts off the height of the top bar.
-        scroll_pos = get_top_position(verse_obj) - topLoader.offsetHeight;
-        
-        /// Calculate how many pixels (if any) need to be added in order to be able to scroll to that verse
-        /// (i.e., if the verse is near the bottom (e.g., Revelation 22:21 or Proverbs 28:28) there needs to be extra space on the bottom of the screen in order to scroll down to the verse).
-        pixels_needed = doc_docEl.clientHeight - (document.body.clientHeight - scroll_pos);
-        if (pixels_needed > 0) {
-            div_tag = document.createElement("div");
-            div_tag.style.height = (pixels_needed + 10) + 'px';
-            viewPort.insertBefore(div_tag, null);
-            
-            padding_interval = setInterval(function ()
-            {
-                if (doc_docEl.scrollHeight - (window.pageYOffset + doc_docEl.clientHeight) > pixels_needed + 10) {
-                    viewPort.removeChild(div_tag);
-                    clearInterval(padding_interval);
-                }
-            }, 1000);
-        }
-        
-        window.scrollTo(0, scroll_pos);
+        content_manager.scrollViewTo(0, get_top_position(verse_obj) - topLoader.offsetHeight);
         
         ///TODO: Determine if there is any value to returning TRUE and FALSE.
         return true;
@@ -1158,7 +1165,6 @@
         if (waiting_for_first_search) {
             /// Are the results displayed in paragraphs and the verse looked up not at the beginning of a paragraph?
             ///TODO: Determine if this should require the search type to be a verse lookup.
-            ///FIXME: There is a problem when a verse near the end of the Bible is selected (cf. Revelation 22:21 or Revelation 22:18 (even in paragraph mode)).
             if (extra_data.search_type == verse_lookup && extra_data.in_paragraphs && verse_numbers[0] != extra_data.verse) {
                 /// Because the verse the user is looking for is not at the beginning of a paragraph
                 /// the text needs to be scrolled so that the verse is at the top.
@@ -1166,7 +1172,7 @@
             } else {
                 /// If the user had scrolled down the page and then pressed the refresh button,
                 /// the page will keep scrolling down as content is loaded, so to prevent this, force the window to scroll to the top of the page.
-                window.scrollTo(0, 0);
+                content_manager.scrollViewTo(0, 0);
             }
             waiting_for_first_search = false;
             
@@ -1350,9 +1356,7 @@
             
             /// The new content that was just added to the top of the page will push the other contents downward.
             /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was added.
-            scroll_pos = scroll_pos + newEl.clientHeight;
-            ///FIXME: We need to figure out if there is enough room to scroll.  If not, a temporary element will need to be created.
-            window.scrollTo(0, scroll_pos);
+            content_manager.scrollViewTo(0, window.pageYOffset + newEl.clientHeight);
             
             /// Record the top most verse reference and id so that we know where to start from for the next search or verse lookup as the user scrolls.
             ///NOTE: For verse_lookup and standard_search, the top_id and top_verse are the same because the search is preformed at the verse level.
@@ -1696,15 +1700,16 @@ document.onkeydown = function (e)
         e = event;
     @*/
     
-    /// If a special key is also pressed, do not capture the storke.
+    keyCode = e.keyCode;
+    
+    /// If a special key is also pressed, do not capture the stroke.
     ///TODO: Determine if this works on Mac with the Command key.
     ///NOTE: It may be that the Command key is keyCode 91, and may need to be caught by another keydown event.
     ///NOTE: The meta key does not seem to be detected, and may need to do this checking manually, like for the Mac.
-    if (e.ctrlKey || e.altKey || e.metaKey) {
+    ///NOTE: We do want to grab the stroke if the user is pasting.  keyCode 86 = "V," which is the standard shortcut for Paste.
+    if ((e.ctrlKey && keyCode != 86)|| e.altKey || e.metaKey) {
         return;
     }
-    
-    keyCode = e.keyCode;
     
     /// Is the user pressing a key that should probably be entered into the input box?  If so, highlight the query box so that the keystrokes will be captured.
     ///NOTE:  8 = Backspace
@@ -1723,6 +1728,10 @@ document.onkeydown = function (e)
 };
 
 
+/*****************************
+ * Start of IE Specific Code *
+ *****************************/
+ 
 /**
  * Fix IE's string.split.
  *
@@ -1797,4 +1806,13 @@ document.onkeydown = function (e)
         s.lastIndex = origLastIndex; /// TODO: Determine if this line of code is necessary.
         return output;
     };
+    
+    /// Trick IE into understanding pageYOffset.
+    /// Set the initial value, so that it is not undefined.
+    /// See scrolling().
+    var pageYOffset = doc_docEl.scrollTop;
 @*/
+
+/***************************
+ * End of IE Specific Code *
+ ***************************/
