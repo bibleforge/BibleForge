@@ -1810,7 +1810,7 @@ document.onkeydown = function (e)
     /// Trick IE into understanding pageYOffset.
     /// Set the initial value, so that it is not undefined.
     /// See scrolling().
-    var pageYOffset = doc_docEl.scrollTop;
+    var pageYOffset = document.documentElement.scrollTop;
 @*/
 
 /***************************
