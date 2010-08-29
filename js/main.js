@@ -1668,15 +1668,6 @@ if (!"".trim) {
 }
 
 
-/// Opera specific code
-if (window.opera) {
-    /// Inject CSS to make the drop caps take up two lines, so that wrapping text is not placed over it.  (See John 4:1.)
-    ///NOTE: Needed for at least Opera 10.51.
-    ///TODO: Determine if this would be better as a function.
-    document.body.appendChild(document.createElement("style").appendChild(document.createTextNode(".first_verse:first-letter, .first_paragraph:first-letter { margin-bottom: 0; padding: 1px; } .queryInput { background: rgba(255, 255, 255, .5); }")).parentNode);
-}
-
-
 /**
  * Capture certain key events, bringing focus to the query box.
  *
@@ -1727,6 +1718,37 @@ document.onkeydown = function (e)
     }
 };
 
+
+/******************************
+ * Start WebKit specific code *
+ ******************************/
+
+/// Is the browser Chromium or WebKit based?
+if (window.chrome || /AppleWebKit\//.test(navigator.userAgent)) {
+    /// Inject CSS to make the drop caps aligned with the second line of text.
+    ///NOTE: Needed for at least Chromium 5.
+    ///TODO: Determine if this would be better as a function.
+    document.body.appendChild(document.createElement("style").appendChild(document.createTextNode(".first_verse:first-letter, .first_paragraph:first-letter { padding-top: 5px; }")).parentNode);
+}
+
+/****************************
+ * End WebKit specific code *
+ ****************************/
+
+/*****************************
+ * Start Opera specific code *
+ *****************************/
+
+if (window.opera) {
+    /// Inject CSS to make the drop caps take up two lines, so that wrapping text is not placed over it.  (See John 4:1.)
+    ///NOTE: Needed for at least Opera 10.51.
+    ///TODO: Determine if this would be better as a function.
+    document.body.appendChild(document.createElement("style").appendChild(document.createTextNode(".first_verse:first-letter, .first_paragraph:first-letter { margin-bottom: 0; margin-top: 13px; padding: 1px; } .queryInput { background: rgba(255, 255, 255, .5); }")).parentNode);
+}
+
+/***************************
+ * End Opera specific code *
+ ***************************/
 
 /*****************************
  * Start of IE Specific Code *
