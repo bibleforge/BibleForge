@@ -243,9 +243,11 @@
          */
         function scrolling()
         {
-            /// Trick IE into understanding pageYOffset.
+            /// Trick IE 8- into understanding pageYOffset.
             /*@cc_on
-                window.pageYOffset = doc_docEl.scrollTop;
+                @if (@_jscript_version < 9)
+                    window.pageYOffset = doc_docEl.scrollTop;
+                @end
             @*/
             var new_scroll_pos = window.pageYOffset,
                 scrolling_down;
@@ -1832,10 +1834,12 @@ if (window.opera) {
         return output;
     };
     
-    /// Trick IE into understanding pageYOffset.
+    /// Trick IE 8- into understanding pageYOffset.
     /// Set the initial value, so that it is not undefined.
     /// See scrolling().
-    var pageYOffset = document.documentElement.scrollTop;
+    @if (@_jscript_version < 9)
+        var pageYOffset = document.documentElement.scrollTop;
+    @end
 @*/
 
 ///TODO: IE needs ".first_verse:first-letter, .first_paragraph:first-letter { margin-top: 5px; }" for drop caps to be aligned correctly.
