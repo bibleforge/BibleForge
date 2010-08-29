@@ -571,20 +571,22 @@
             case "verse":
             case "search_verse":
             case "first_verse":
-            case "chapter":
-            case "book":
-            case "short_book":
                 /// Check to see if other verses in the paragraph are also visible.
                 ///NOTE: When in paragraph form, multiple verses could share the same Y coordinates; therefore, we need to keep checking for more verses that may also be at the same Y coordinate.
+                ///NOTE: Only verses can be on the same line.  Chapter and book elements may have sibling elements that are not verses (like paragraph elements).
                 while ((looking_upward ? possible_el = el.previousSibling : possible_el = el.nextSibling) !== null && the_pos >= possible_el.offsetTop && the_pos <= possible_el.offsetTop + possible_el.offsetHeight) {
                     el = possible_el;
                 }
-                
+                ///NOTE: Intential fall through.
+            case "chapter":
+            case "book":
+            case "short_book":
                 /// Found the verse, so calculate the verseID and call the success function.
                 verse_id = parseInt(el.id);
                 v = verse_id % 1000;
                 c = ((verse_id - v) % 1000000) / 1000;
                 b = (verse_id - v - c * 1000) / 1000000;
+                
                 return {b: b, c: c, v: v};
             default:
                 /// The verse has not yet been found.
