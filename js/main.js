@@ -1720,6 +1720,7 @@ document.onkeydown = function (e)
     }
 };
 
+///TODO: Move browser specific code to external files.
 
 /******************************
  * Start WebKit specific code *
@@ -1836,6 +1837,8 @@ if (window.opera) {
     /// See scrolling().
     var pageYOffset = document.documentElement.scrollTop;
 @*/
+
+///TODO: IE needs ".first_verse:first-letter, .first_paragraph:first-letter { margin-top: 5px; }" for drop caps to be aligned correctly.
 
 /***************************
  * End of IE Specific Code *
