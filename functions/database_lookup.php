@@ -47,12 +47,11 @@ function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true, $
     connect_to_database();
     
     if ($in_paragraphs) {
-        /// The longest paragraph in the English version is 57 verses.  By adding 32 we can be
-        /// confident that it will always grab plenty of verses.
-        /// Therefore, the limit must be at least that long because paragraphs cannot be split.
-        ///TODO: Determine if 58 should be stored in a config file or variable somewhere (maybe in a builder).
+        /// The longest paragraph in the English version is 57 verses.  By selecting 90, it ensures that plenty of verses should be found.
+        /// The limit must be at least that long because paragraphs cannot be split.
+        ///TODO: Determine if $limit should be stored in a config file or variable somewhere (maybe in a builder).
         $limit          = 90;
-        $minimum_verses = 32;
+        $minimum_desired_verses = 40;
         $extra_fields   = ', paragraph';
     } else {
         $extra_fields = "";
@@ -91,7 +90,7 @@ function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true, $
         while ($row = mysql_fetch_assoc($SQL_res)) {
             if ($row['paragraph']) {
                 /// Did it find enough verses to send to the browser.
-                if ($verse_count > $minimum_verses) {
+                if ($verse_count > $minimum_desired_verses) {
                     /// The first verse should be at a paragraph beginning, and the last verse
                     /// should be just before one. Therefore, when looking up previous verses,
                     /// we must get this verse (because previous lookups are in reverse).
@@ -134,6 +133,7 @@ function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true, $
         flush();
     } else {
         /// Convert SQL results into one comma delineated string for JSON.
+        
         $verses_str = "";
         $verses_num = "";
         
