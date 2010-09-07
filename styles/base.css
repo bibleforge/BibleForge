@@ -207,7 +207,10 @@ body {
 .wrenchPadding {
     position: absolute;
     /* Add padding around wrench with extra padding below and on the right. */
-    padding: 1px 4px 4px 1px;
+    padding: 1px 6px 4px 1px;
+    
+    /* Use the hand cursor for the padded area, just like the button. */
+    cursor: pointer;
 }
 
 .wrenchIcon {
