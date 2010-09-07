@@ -205,13 +205,15 @@ body {
 }
 
 .wrenchPadding {
-    padding: 1px 4px 4px 1px;
     position: absolute;
+    /* Add padding around wrench with extra padding below and on the right. */
+    padding: 1px 4px 4px 1px;
 }
 
 .wrenchIcon {
-    
     padding: 4px;
+    
+    /* A transparent border is needed because otherwise it would jump when the hover border appears. */
     border: 1px solid transparent;
     /* Remove the hideous selection rectangle when clicked. */
     outline: 0;
@@ -226,7 +228,7 @@ body {
     /* Transition for Opera 10.5+ */
     -o-transition-property:      opacity;
     -o-transition-duration:      0.3s;
-    opacity: .3;
+    opacity: .2;
 }
 
 /**
@@ -248,9 +250,10 @@ body {
 
 .wrenchIcon:hover, .wrenchPadding:hover .wrenchIcon {
     border: 1px solid #999;
-    -moz-border-radius: 6px;
+    
+    -moz-border-radius:    6px;
     -webkit-border-radius: 6px;
-    -o-border-radius: 6px;
+    -o-border-radius:      6px;
 }
 
 /**
