@@ -19,7 +19,9 @@
     <link rel=stylesheet href="styles/base.css">
     <meta name=description content="BibleForge: The free, open source Bible Study web app.">
     <!-- Safari on the iPhone or iPad requires that the viewport width be set. -->
-    <meta name=viewport content="width=device-width">
+    <!-- The Froyo browser on Android 2.2 needs scaling disabled in order for fixed positioning to work. -->
+    <!-- TODO: The correct header should probably be sent dynamically from the server (via PHP). -->
+    <meta name=viewport content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
 </head>
 <body>
 <div id=viewPort1 class=viewPorts>
