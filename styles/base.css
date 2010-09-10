@@ -214,49 +214,55 @@ body {
 }
 
 .wrenchIcon {
-    padding: 4px;
+    /* Darken the text so that it is more prominent. */
+    /* Transition for Mozilla (Firefox 3.7+) */
+    -moz-transition-property:    opacity, border-color;
+    -moz-transition-duration:    0.6s,    0.8s;
+    /* Transition for WebKit */
+    -webkit-transition-property: opacity, border-color;
+    -webkit-transition-duration: 0.6s,    0.8s;
+    /* Transition for Opera 10.5+ */
+    -o-transition-property:      opacity, border-color;
+    -o-transition-duration:      0.6s,    0.8s;
     
     /* A transparent border is needed because otherwise it would jump when the hover border appears. */
-    border: 1px solid transparent;
-    /* Remove the hideous selection rectangle when clicked. */
-    outline: 0;
+    border-color: transparent;
+    border-color: rgba(0, 0, 0, 0);
+    border-width: 1px;
+    border-style: solid;
     
     /* Fade out slightly when the mouse cursor moves off. */
-    /* Transition for Mozilla (Firefox 3.7+) */
-    -moz-transition-property:    opacity;
-    -moz-transition-duration:    0.3s;
-    /* Transition for WebKit */
-    -webkit-transition-property: opacity;
-    -webkit-transition-duration: 0.3s;
-    /* Transition for Opera 10.5+ */
-    -o-transition-property:      opacity;
-    -o-transition-duration:      0.3s;
     opacity: .2;
+    
+    -moz-border-radius:    6px;
+    -webkit-border-radius: 6px;
+    -o-border-radius:      6px;
+    
+    padding: 4px;
+    
+    /* Remove the hideous selection rectangle when clicked. */
+    outline: 0;
 }
 
 /**
  * Fade in icon on hover.
  */
 .inputIcon:hover, .wrenchIcon:hover, .wrenchPadding:hover .wrenchIcon {
-    /* Fade in slightly when the mouse cursor moves over. */
-    /* Transition for Mozilla (Firefox 3.7+) */
-    -moz-transition-property:    opacity;
-    -moz-transition-duration:    0.3s;
-    /* Transition for WebKit */
-    -webkit-transition-property: opacity;
-    -webkit-transition-duration: 0.3s;
-    /* Transition for Opera 10.5+ */
-    -o-transition-property:      opacity;
-    -o-transition-duration:      0.3s;
     opacity: .6;
 }
 
 .wrenchIcon:hover, .wrenchPadding:hover .wrenchIcon {
-    border: 1px solid #999;
-    
-    -moz-border-radius:    6px;
-    -webkit-border-radius: 6px;
-    -o-border-radius:      6px;
+    /* The speed of the border-color change is increased to make it fade in before the opacity is finished so that is looks smooth. */
+    /* Transition for Mozilla (Firefox 3.7+) */
+    -moz-transition-property:    opacity, border-color;
+    -moz-transition-duration:    0.6s,    0.3s;
+    /* Transition for WebKit */
+    -webkit-transition-property: opacity, border-color;
+    -webkit-transition-duration: 0.6s,    0.3s;
+    /* Transition for Opera 10.5+ */
+    -o-transition-property:      opacity, border-color;
+    -o-transition-duration:      0.6s,    0.3s;
+    border-color: #999;
 }
 
 /**
