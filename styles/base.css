@@ -243,7 +243,8 @@ body {
     
     -moz-border-radius:    6px;
     -webkit-border-radius: 6px;
-    -o-border-radius:      6px;
+    /* Rounded corners for Opera, IE 9+ */
+    border-radius:         6px;
     
     padding: 4px;
     
