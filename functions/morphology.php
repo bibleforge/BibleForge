@@ -80,7 +80,7 @@ function morphology_search($json, $direction, $limit, $start_id = 0)
     /// Array Format: [[verse_ids,...],[verse_words,...],number_of_matches,[word_id,...]]
     ///NOTE: rtrim(..., ',') removes trailing commas.  It seems to be slightly faster than substr(..., 0, -1).
     ///TODO: Indicate if there are no more verses to find when it gets to the end.
-    echo '{n:[', $simple_matches, '],v:[', rtrim($verses_str, ','), '],t:', $sphinx_res['total_found'], ',[', $word_ids ,']}';
+    echo '{n:[', $simple_matches, '],v:[', rtrim($verses_str, ','), '],t:', $sphinx_res['total_found'], ',i:[', $word_ids ,']}';
     die;
 }
 
