@@ -9,7 +9,7 @@
  */
 
 /// Set JSLint options.
-/*global window, BF_LANG */
+/*global window, BF */
 /*jslint white: true, browser: true, devel: true, evil: true, forin: true, onevar: true, undef: true, nomen: true, bitwise: true, newcap: true, immed: true */
 
 /**
@@ -80,6 +80,10 @@
         settings = {in_paragraphs: true}, ///TODO: Determine how this should be created.
         content_manager;
     
+    if (!BF.viewPort_count) {
+        BF.viewPort_count = 0;
+    }
+    ++BF.viewPort_count;
     
     /*********************************
      * Start of Mouse Hiding Closure *
@@ -671,15 +675,15 @@
                     }
                     
                     /// The titles in the book of Psalms are referenced as verse zero (cf. Psalm 3).
-                    verse1.v = verse1.v === 0 ? BF_LANG.title : verse1.v;
-                    verse2.v = verse2.v === 0 ? BF_LANG.title : verse2.v;
+                    verse1.v = verse1.v === 0 ? BF.lang.title : verse1.v;
+                    verse2.v = verse2.v === 0 ? BF.lang.title : verse2.v;
                     
                     ///NOTE: \u2013 is Unicode for the en dash (–) (HTML: &ndash;).
                     ///TODO: Determine if the colons should be language specified.
                     /// Are the books the same?
                     if (verse1.b == verse2.b) {
                         /// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
-                        verse1.b = verse1.b == 19 ? BF_LANG.psalm : BF_LANG.books_short[verse1.b];
+                        verse1.b = verse1.b == 19 ? BF.lang.psalm : BF.lang.books_short[verse1.b];
                         /// Are the chapters the same?
                         if (verse1.c == verse2.c) {
                             /// Are the verses the same?
@@ -693,8 +697,8 @@
                         }
                     } else {
                         /// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
-                        verse1.b = verse1.b == 19 ? BF_LANG.psalm : BF_LANG.books_short[verse1.b];
-                        verse2.b = verse2.b == 19 ? BF_LANG.psalm : BF_LANG.books_short[verse2.b];
+                        verse1.b = verse1.b == 19 ? BF.lang.psalm : BF.lang.books_short[verse1.b];
+                        verse2.b = verse2.b == 19 ? BF.lang.psalm : BF.lang.books_short[verse2.b];
                         
                         ref_range = verse1.b + " " + verse1.c + ":" + verse1.v + "\u2013" + verse2.b + " " + verse2.c + ":" + verse2.v;
                     }
@@ -703,9 +707,9 @@
                     /// The verse range is displayed differently based on the type of search (i.e., a verse lookup or a search).
                     ///TODO: Set the date of the verse (or when it was written).
                     if (last_type == verse_lookup) {
-                        new_title = ref_range + " - " + BF_LANG.app_name;
+                        new_title = ref_range + " - " + BF.lang.app_name;
                     } else {
-                        new_title = last_search + " (" + ref_range + ") - " + BF_LANG.app_name;
+                        new_title = last_search + " (" + ref_range + ") - " + BF.lang.app_name;
                     }
                     
                     /// Is the new verse range the same as the old one?
@@ -799,14 +803,14 @@
             search_type_array,
             verse_id;
         
-        if (raw_search_terms == BF_LANG.query_explanation) {
+        if (raw_search_terms == BF.lang.query_explanation) {
             q_obj.focus();
             return false;
         }
         
         waiting_for_first_search = true;
         
-        last_search_prepared = BF_LANG.prepare_search(raw_search_terms);
+        last_search_prepared = BF.lang.prepare_search(raw_search_terms);
         
         if (last_search_prepared === "") {
             return false;
@@ -823,7 +827,7 @@
         
         /// Determine if the user is preforming a search or looking up a verse.
         /// If the query is a verse reference, a number is returned, if it is a search, then FALSE is returned.
-        verse_id = BF_LANG.determine_reference(last_search_prepared);
+        verse_id = BF.lang.determine_reference(last_search_prepared);
         
         /// Is the user looking up a verse? (verse_id is false when the user is preforming a search.)
         if (verse_id !== false) {
@@ -882,7 +886,7 @@
         cached_verses_bottom	= [];
         cached_count_bottom		= 0;
         
-        document.title = raw_search_terms + " - " + BF_LANG.app_name;
+        document.title = raw_search_terms + " - " + BF.lang.app_name;
         
         /// Stop filling in the explaination text so that the user can make the input box blank.
         q_obj.onblur = function () {};
@@ -916,7 +920,7 @@
             split_pos;
         
         /// Did the user use the grammatical keyword in his search?
-        if ((split_pos = search_terms.indexOf(BF_LANG.grammar_marker)) != -1) {
+        if ((split_pos = search_terms.indexOf(BF.lang.grammar_marker)) != -1) {
             ///TODO: Determine what is better: a JSON array or POST/GET string (i.e., word1=word&grammar_type1=1&value1=3&include1=1&...).
             ///NOTE: A JSON array is used to contain the information about the search.
             ///      JSON format: '["WORD",[[GRAMMAR_TYPE1,VALUE1],[...]],[INCLUDE1,...]]'
@@ -934,14 +938,14 @@
             grammar_json = '["' + grammar_search_term.replace(/(["'])/g, "\\$1") + '",[';
             
             /// Get the grammatical attributes (e.g., in "go AS IMPERATIVE, -SINGULAR", grammar_attributes = IMPERATIVE, -SINGULAR").
-            grammar_attributes = search_terms.slice(split_pos + BF_LANG.grammar_marker_len);
+            grammar_attributes = search_terms.slice(split_pos + BF.lang.grammar_marker_len);
             split_start        = 0;
             
             ///TODO: Determine if there is a benefit to using do() over while().
             ///NOTE: An infinite loop is used because the data is returned when it reaches the end of the string.
             do {
                 /// Find where the attributes separate (e.g., "NOUN, GENITIVE" would separate at character 4).
-                split_pos = grammar_attributes.indexOf(BF_LANG.grammar_separator, split_start);
+                split_pos = grammar_attributes.indexOf(BF.lang.grammar_separator, split_start);
                 /// Trim leading white space.
                 if (grammar_attributes.slice(split_start, split_start + 1) === " ") {
                     ++split_start;
@@ -959,12 +963,12 @@
                     ///TODO: Determine if there should be error handling when a grammar keyword does not exist.
                     ///NOTE: The slice() function separates the various grammatical attributes and then that word is
                     ///      looked up in the grammar_keywords object in order to find the JSON code to send to the server.
-                    grammar_attribute_json += BF_LANG.grammar_keywords[grammar_attributes.slice(split_start, split_pos).trim()] + ",";
+                    grammar_attribute_json += BF.lang.grammar_keywords[grammar_attributes.slice(split_start, split_pos).trim()] + ",";
                     split_start = split_pos + 1;
                 } else {
                     ///TODO: Determine if trim() is necessary or if there is a better implementation.
                     ///NOTE: exclude_json.slice(0, -1) is used to remove the trailing comma.  This could be unnecessary.
-                    return [grammatical_search, grammar_json + grammar_attribute_json + BF_LANG.grammar_keywords[grammar_attributes.slice(split_start).trim()] + "],[" + exclude_json.slice(0, -1) + "]]"];
+                    return [grammatical_search, grammar_json + grammar_attribute_json + BF.lang.grammar_keywords[grammar_attributes.slice(split_start).trim()] + "],[" + exclude_json.slice(0, -1) + "]]"];
                 }
             } while (true);
         }
@@ -1184,7 +1188,7 @@
             
             if (action != verse_lookup) {
                 /// Create the inital text.
-                infoBar.appendChild(document.createTextNode(format_number(total) + BF_LANG["found_" + (total === 1 ? "singular" : "plural")]));
+                infoBar.appendChild(document.createTextNode(format_number(total) + BF.lang["found_" + (total === 1 ? "singular" : "plural")]));
                 /// Create a <b> for the search terms.
                 b_tag = document.createElement("b");
                 ///NOTE: We use this method instead of straight innerHTML to prevent HTML elements from appearing inside the <b></b>.
@@ -1283,14 +1287,14 @@
                     }
                     /// Is this chapter 1?  (We need to know if we should display the book name.)
                     if (c === 1) {
-                        HTML_str += "<div class=book id=" + num + "_title><h2>" + BF_LANG.books_long_pretitle[b] + "</h2><h1>" + BF_LANG.books_long_main[b] + "</h1><h2>" + BF_LANG.books_long_posttitle[b] + "</h2></div>";
+                        HTML_str += "<div class=book id=" + num + "_title><h2>" + BF.lang.books_long_pretitle[b] + "</h2><h1>" + BF.lang.books_long_main[b] + "</h1><h2>" + BF.lang.books_long_posttitle[b] + "</h2></div>";
                     /// Display chapter/psalm number (but not on verse 1 of psalms that have titles).
                     } else if (b !== 19 || v === 0 || (c <= 2 || c === 10 || c === 33 || c === 43 || c === 71 || c === 91 || (c >= 93 && c <= 97) || c === 99 || (c >= 104 && c <= 107) || (c >= 111 && c <= 119) || (c >= 135 && c <= 137) || c >= 146)) {
                         /// Is this the book of Psalms?  (Psalms have a special name.)
                         if (b === 19) {
-                            chapter_text = BF_LANG.psalm;
+                            chapter_text = BF.lang.psalm;
                         } else {
-                            chapter_text = BF_LANG.chapter;
+                            chapter_text = BF.lang.chapter;
                         }
                         HTML_str += "<h3 class=chapter id=" + num + "_chapter>" + chapter_text + " " + c + "</h3>";
                     }
@@ -1321,7 +1325,7 @@
             } else {
                 /// Change verse 0 to "title" (e.g., Psalm 3:title instead of Psalm 3:0).
                 if (v === 0) {
-                    v = BF_LANG.title;
+                    v = BF.lang.title;
                 }
                 
                 /// Is this verse from a different book than the last verse?
@@ -1329,7 +1333,7 @@
                     /// We only need to print out the book if it is different from the last verse.
                     last_book = b;
                     
-                    HTML_str += "<h1 class=short_book id=" + num + "_title>" + BF_LANG.books_short[b] + "</h1>"; /// Convert the book number to text.
+                    HTML_str += "<h1 class=short_book id=" + num + "_title>" + BF.lang.books_short[b] + "</h1>"; /// Convert the book number to text.
                 }
                 
                 HTML_str += "<div class=search_verse id=" + num + "_search>" + c + ":" + v + " " + verse_HTML[i] + "</div>";
@@ -1449,7 +1453,7 @@
         
         highlight_re = [];
         
-        search_terms_arr = BF_LANG.filter_terms_for_highlighter(search_terms);
+        search_terms_arr = BF.lang.filter_terms_for_highlighter(search_terms);
         
         ///TODO: Determine if a normal for loop would be better.
         first_loop:
@@ -1510,7 +1514,7 @@
                     no_morph = true;
                 } else {
                     /// A normal word without a wildcard gets stemmed.
-                    stemmed_word = BF_LANG.stem_word(term);
+                    stemmed_word = BF.lang.stem_word(term);
                     no_morph = false;
                 }
             }
@@ -1610,6 +1614,14 @@
         ajax.send(message);
     }
     
+    /*************************
+     * Start Panel Functions *
+     *************************/
+    function display_config()
+    {
+        display_panel("<b>test</b>");
+    }
+    
     /**************
      * Set Events *
      **************/
@@ -1627,7 +1639,7 @@
     q_obj.onblur = function ()
     {
         if (this.value === "") {
-            this.value = BF_LANG.query_explanation;
+            this.value = BF.lang.query_explanation;
         }
     };
     
@@ -1640,7 +1652,7 @@
      */
     q_obj.onfocus = function ()
     {
-        if (this.value == BF_LANG.query_explanation) {
+        if (this.value == BF.lang.query_explanation) {
             this.value = "";
         }
     };

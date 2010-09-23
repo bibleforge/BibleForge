@@ -12,13 +12,18 @@
 /*global window */
 /*jslint white: true, browser: true, devel: true, evil: true, forin: true, onevar: true, undef: true, nomen: true, bitwise: true, newcap: true, immed: true */
 
+/// Create the global BibleForge variable if it does not exist.
+if (!window.BF) {
+    var BF = {};
+}
+
 /**
  * Create the BibleForge language specific object for the English language.
  *
  * @note    The object that is created is used by main.js to preform language specific operations.
  * @return  Returns an object containing language specific functions and variables.
  */
-var BF_LANG = (function ()
+BF.lang = (function ()
 {
     /// Create variables used by these functions but hidden from the rest of the code via closure.
     /// Book Regex
