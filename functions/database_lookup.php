@@ -59,14 +59,15 @@ function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true, $
     
     if ($find_paragraph_start) {
         /// Create a subquery that will return the nearest verse that is at a paragraph break.
-        ///NOTE: Currently, $find_paragraph_start is never true when $direction == PREVIOUS.  In order to find the correct
-        ///      starting verse when looking up in reverse, the comparison operator would need to be greater than or equals (>=),
+        ///NOTE: Currently, $find_paragraph_start is never true when $direction == PREVIOUS because previous lookups always start at a paragraph break.
+        ///      In order to find the correct starting verse when looking up in reverse, the comparison operator (<=) would need to be greater than or equal to (>=),
         ///      and 1 would need to be subtracted from the found starting id.
         $starting_verse = '(SELECT id FROM `' . BIBLE_VERSES . '` WHERE id <= ' . (int)$verse_id . ' AND paragraph = 1 ORDER BY id DESC LIMIT 1)';
     } else {
         $starting_verse = (int)$verse_id;
     }
     
+    /// Create the query.
     $SQL_query = 'SELECT id, words' . $extra_fields . ' FROM `' . BIBLE_VERSES . '` WHERE id ' . $operator . $starting_verse . $order_by . ' LIMIT ' . $limit;
     
     ///NOTE: Unbuffered queries start returning data as soon as the first row is available;
