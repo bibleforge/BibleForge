@@ -233,7 +233,8 @@
             remove_content_top_timeout,
             remove_speed                   = 3000,  /// In milliseconds
             scroll_check_count             = 0,
-            scroll_pos                     = 0;
+            scroll_pos                     = 0,
+            update_verse_range;
         
         /**
          * The onscroll event.
@@ -316,7 +317,7 @@
          */
         function remove_excess_content_top()
         {
-            var child			= page.firstChild,
+            var child = page.firstChild,
                 child_height;
             
             if (child === null) {
@@ -640,96 +641,111 @@
         
         
         /**
-         * Determine and set the range of verses currently visible on the screen.
+         * Creates update_verse_range().
          *
-         * @return Null.  The verse range is updated if need be.
+         * @return A function that runs update_verse_range_delayed() after a short delay if needed.
          * @note   Called by resizing(), scrolling(), and write_verses().
+         * @note   The anonymous function runs once and returns a small function with the bigger update_verse_range_delayed() in the closure.
          */
-        function update_verse_range()
+        update_verse_range = (function ()
         {
-            var verse1,
-                verse2;
-            
-            /// Is it not already looking for the verse range?
-            if (!looking_up_verse_range) {
-                looking_up_verse_range = true;
+            /**
+             * Determine and set the range of verses currently visible on the screen.
+             *
+             * @return Null.  The verse range is updated if need be.
+             * @note   Called by update_verse_range().
+             */
+            function update_verse_range_delayed()
+            {
+                var new_title,
+                    ref_range,
+                    verse1,
+                    verse2;
                 
-                /// Run this function after a brief delay.
-                setTimeout(function ()
-                {
-                    ///TODO: Make a variable that clearly represents the height of the topBar, not topLoader.offsetHeight).
-                    ///NOTE: Check a few pixels (8) below what is actually in view so that it finds the verse that is actually readable.
-                    verse1 = get_verse_at_position(window.pageYOffset + topLoader.offsetHeight + 8,  true,  page);
-                    if (verse1 === false) {
-                        looking_up_verse_range = false;
-                        ///TODO: Try again?
-                        return;
-                    }
-                    
-                    ///NOTE: Check a few pixels (14) above what is actually in view so that it finds the verse that is actually readable.
-                    verse2 = get_verse_at_position(window.pageYOffset + doc_docEl.clientHeight - 14, false, page);
-                    if (verse2 === false) {
-                        looking_up_verse_range = false;
-                        ///TODO: Try again?
-                        return;
-                    }
-                    
-                    /// The titles in the book of Psalms are referenced as verse zero (cf. Psalm 3).
-                    verse1.v = verse1.v === 0 ? BF.lang.title : verse1.v;
-                    verse2.v = verse2.v === 0 ? BF.lang.title : verse2.v;
-                    
-                    ///NOTE: \u2013 is Unicode for the en dash (–) (HTML: &ndash;).
-                    ///TODO: Determine if the colons should be language specified.
-                    /// Are the books the same?
-                    if (verse1.b == verse2.b) {
-                        /// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
-                        verse1.b = verse1.b == 19 ? BF.lang.psalm : BF.lang.books_short[verse1.b];
-                        /// Are the chapters the same?
-                        if (verse1.c == verse2.c) {
-                            /// Are the verses the same?
-                            if (verse1.v == verse2.v) {
-                                ref_range = verse1.b + " " + verse1.c + ":" + verse1.v;
-                            } else {
-                                ref_range = verse1.b + " " + verse1.c + ":" + verse1.v + "\u2013" + verse2.v;
-                            }
-                        } else {
-                            ref_range = verse1.b + " " + verse1.c + ":" + verse1.v + "\u2013" + verse2.c + ":" + verse2.v;
-                        }
-                    } else {
-                        /// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
-                        verse1.b = verse1.b == 19 ? BF.lang.psalm : BF.lang.books_short[verse1.b];
-                        verse2.b = verse2.b == 19 ? BF.lang.psalm : BF.lang.books_short[verse2.b];
-                        
-                        ref_range = verse1.b + " " + verse1.c + ":" + verse1.v + "\u2013" + verse2.b + " " + verse2.c + ":" + verse2.v;
-                    }
-                    
-                    /// last_type is set in prepare_new_search().
-                    /// The verse range is displayed differently based on the type of search (i.e., a verse lookup or a search).
-                    ///TODO: Set the date of the verse (or when it was written).
-                    if (last_type == verse_lookup) {
-                        new_title = ref_range + " - " + BF.lang.app_name;
-                    } else {
-                        new_title = last_search + " (" + ref_range + ") - " + BF.lang.app_name;
-                    }
-                    
-                    /// Is the new verse range the same as the old one?
-                    /// If they are the same, updating it would just waste time.
-                    if (document.title != new_title) {
-                        document.title = new_title;
-                        
-                        /// Display the verse range on the page if looking up verses.
-                        ///FIXME: There should be a variable that shows the current view mode and not rely on last_type.
-                        if (last_type == verse_lookup) {
-                            ///TODO: Find a better way to clear infoBar than innerHTML.
-                            infoBar.innerHTML = "";
-                            infoBar.appendChild(document.createTextNode(ref_range));
-                        }
-                    }
-                    
+                ///TODO: Make a variable that clearly represents the height of the topBar, not topLoader.offsetHeight).
+                ///NOTE: Check a few pixels (8) below what is actually in view so that it finds the verse that is actually readable.
+                verse1 = get_verse_at_position(window.pageYOffset + topLoader.offsetHeight + 8,  true,  page);
+                if (verse1 === false) {
                     looking_up_verse_range = false;
-                }, lookup_range_speed);
+                    ///TODO: Try again?
+                    return;
+                }
+                
+                ///NOTE: Check a few pixels (14) above what is actually in view so that it finds the verse that is actually readable.
+                verse2 = get_verse_at_position(window.pageYOffset + doc_docEl.clientHeight - 14, false, page);
+                if (verse2 === false) {
+                    looking_up_verse_range = false;
+                    ///TODO: Try again?
+                    return;
+                }
+                
+                /// The titles in the book of Psalms are referenced as verse zero (cf. Psalm 3).
+                verse1.v = verse1.v === 0 ? BF.lang.title : verse1.v;
+                verse2.v = verse2.v === 0 ? BF.lang.title : verse2.v;
+                
+                ///NOTE: \u2013 is Unicode for the en dash (–) (HTML: &ndash;).
+                ///TODO: Determine if the colons should be language specified.
+                /// Are the books the same?
+                if (verse1.b == verse2.b) {
+                    /// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
+                    verse1.b = verse1.b == 19 ? BF.lang.psalm : BF.lang.books_short[verse1.b];
+                    /// Are the chapters the same?
+                    if (verse1.c == verse2.c) {
+                        /// Are the verses the same?
+                        if (verse1.v == verse2.v) {
+                            ref_range = verse1.b + " " + verse1.c + ":" + verse1.v;
+                        } else {
+                            ref_range = verse1.b + " " + verse1.c + ":" + verse1.v + "\u2013" + verse2.v;
+                        }
+                    } else {
+                        ref_range = verse1.b + " " + verse1.c + ":" + verse1.v + "\u2013" + verse2.c + ":" + verse2.v;
+                    }
+                } else {
+                    /// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
+                    verse1.b = verse1.b == 19 ? BF.lang.psalm : BF.lang.books_short[verse1.b];
+                    verse2.b = verse2.b == 19 ? BF.lang.psalm : BF.lang.books_short[verse2.b];
+                    
+                    ref_range = verse1.b + " " + verse1.c + ":" + verse1.v + "\u2013" + verse2.b + " " + verse2.c + ":" + verse2.v;
+                }
+                
+                /// last_type is set in prepare_new_search().
+                /// The verse range is displayed differently based on the type of search (i.e., a verse lookup or a search).
+                ///TODO: Set the date of the verse (or when it was written).
+                if (last_type == verse_lookup) {
+                    new_title = ref_range + " - " + BF.lang.app_name;
+                } else {
+                    new_title = last_search + " (" + ref_range + ") - " + BF.lang.app_name;
+                }
+                
+                /// Is the new verse range the same as the old one?
+                /// If they are the same, updating it would just waste time.
+                if (document.title != new_title) {
+                    document.title = new_title;
+                    
+                    /// Display the verse range on the page if looking up verses.
+                    ///FIXME: There should be a variable that shows the current view mode and not rely on last_type.
+                    if (last_type == verse_lookup) {
+                        ///TODO: Find a better way to clear infoBar than innerHTML.
+                        infoBar.innerHTML = "";
+                        infoBar.appendChild(document.createTextNode(ref_range));
+                    }
+                }
+                
+                looking_up_verse_range = false;
             }
-        }
+            
+            /// Return the small function to call update_verse_range_delayed().
+            return function ()
+            {
+                /// Is it not already looking for the verse range?
+                if (!looking_up_verse_range) {
+                    looking_up_verse_range = true;
+                    
+                    /// Run this function after a brief delay.
+                    setTimeout(update_verse_range_delayed, lookup_range_speed);
+                }
+            };
+        }());
         
         
         function scrollViewTo(x, y, smooth)
