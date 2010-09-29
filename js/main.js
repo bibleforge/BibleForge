@@ -1697,9 +1697,8 @@ if (!window.BF) {
         
         iframe.style.cssText = 'position:absolute;width:0;height:0;border:none';
         iframe.tabIndex      = -1;
-        iframe.src           = path;
         
-        iframe.onload        = function ()
+        iframe.onload = function ()
         {
             clearTimeout(include_timeout);
             window.setTimeout(callback, 10);
@@ -1713,6 +1712,8 @@ if (!window.BF) {
                 });
             @end
         @*/
+        
+        iframe.src = path;
 
         document.body.appendChild(iframe);
         
