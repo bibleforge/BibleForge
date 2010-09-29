@@ -1698,11 +1698,21 @@ if (!window.BF) {
         iframe.style.cssText = 'position:absolute;width:0;height:0;border:none';
         iframe.tabIndex      = -1;
         iframe.src           = path;
+        
         iframe.onload        = function ()
         {
             clearTimeout(include_timeout);
             window.setTimeout(callback, 10);
         };
+        /*@cc_on
+            @if (@_jscript_version < 9)
+                iframe.attachEvent("onload", function ()
+                {
+                    clearTimeout(include_timeout);
+                    window.setTimeout(callback, 10);
+                });
+            @end
+        @*/
 
         document.body.appendChild(iframe);
         
