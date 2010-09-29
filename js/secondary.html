@@ -1,7 +1,8 @@
+<script>
 /**
  * BibleForge
  *
- * @date    09-21-10
+ * @date    09-28-10
  * @version 0.2 alpha
  * @link    http://BibleForge.com
  * @license Reciprocal Public License 1.5 (RPL1.5)
@@ -18,8 +19,9 @@
  * @note    The object that is created is used by main.js to preform language specific operations.
  * @return  Returns an object containing language specific functions and variables.
  */
-var BF.MISC = (function ()
+function init()
 {
-    /// Create extra UI.
-
+    alert(this + " " + this.page);
 }
+alert("Hello, from the secondary.html. " + (new Date).getTime());
+</script>

@@ -1683,7 +1683,7 @@ if (!window.BF) {
     
     function include(path, callback, timeout, auto_retry)
     {
-        var script = document.createElement("script"),
+        var iframe = document.createElement("iframe"),
             include_timeout;
         
         if (typeof timeout == "undefined") {
@@ -1695,33 +1695,21 @@ if (!window.BF) {
             auto_retry = true;
         }
         
-        script.setAttribute("type", "text/javascript");
-        script.setAttribute("src", path);
-        
-        if (window.addEventListener) {
-            /// Mozilla, WebKit, Opera, IE 9
-            script.addEventListener("load", function ()
-            {
-                clearTimeout(include_timeout);
-                window.setTimeout(callback, 10);
-            }, false);
-        } else {
-            /// IE 8-
-            script.onreadystatechange = function ()
-            {
-                if (script.readyState == "loaded" || script.readyState == "complete") {
-                    clearTimeout(include_timeout);
-                    window.setTimeout(callback, 0);
-                }
-            }
-        }
-        
-        document.getElementsByTagName('head')[0].appendChild(script);
+        iframe.style.cssText = 'position:absolute;width:0;height:0;border:none';
+        iframe.tabIndex      = -1;
+        iframe.src           = path;
+        iframe.onload        = function ()
+        {
+            clearTimeout(include_timeout);
+            window.setTimeout(callback, 10);
+        };
+
+        document.body.appendChild(iframe);
         
         if (timeout) {
             include_timeout = window.setTimeout(function ()
             {
-                document.getElementsByTagName('head')[0].removeChild(script);
+                document.body.removeChild(iframe);
                 if (auto_retry) {
                     include(path, callback, timeout, auto_retry);
                 }
@@ -1729,8 +1717,8 @@ if (!window.BF) {
         }
     }
     
-    include("js/secondary.js", function () {alert("Hello, from the closure." + (new Date).getTime());});
-    include("js/secondary.js", function () {alert("Hello, from the closure 2. " + (new Date).getTime());});
+    include("js/secondary.html", function () {alert("Hello, from the closure." + (new Date).getTime());});
+    include("js/secondary.html", function () {alert("Hello, from the closure 2. " + (new Date).getTime());});
 
 }(document.getElementById("viewPort1"), document.getElementById("searchForm1"), document.getElementById("q1"), document.getElementById("scroll1"), document.getElementById("infoBar1"), document.getElementById("topLoader1"), document.getElementById("bottomLoader1"), document.documentElement));
 
