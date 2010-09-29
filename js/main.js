@@ -12,6 +12,11 @@
 /*global window, BF */
 /*jslint white: true, browser: true, devel: true, evil: true, forin: true, onevar: true, undef: true, nomen: true, bitwise: true, newcap: true, immed: true */
 
+/// Create the global BibleForge variable if it does not exist.
+if (!window.BF) {
+    var BF = {};
+}
+
 /**
  * Initialize the BibleForge environment.
  *
@@ -84,6 +89,7 @@
         BF.viewPort_count = 0;
     }
     ++BF.viewPort_count;
+    
     
     /*********************************
      * Start of Mouse Hiding Closure *
