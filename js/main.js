@@ -1755,7 +1755,7 @@ if (!window.BF) {
         include("js/secondary.html", {topBar: viewPort.firstChild, viewPort_num: viewPort_num});
     }, 1000);
 
-}(document.getElementById("viewPort1"), document.getElementById("searchForm1"), document.getElementById("q1"), document.getElementById("scroll1"), document.getElementById("infoBar1"), document.getElementById("topLoader1"), document.getElementById("bottomLoader1"), document.documentElement));
+}(document.getElementById("viewPort0"), document.getElementById("searchForm0"), document.getElementById("q0"), document.getElementById("scroll0"), document.getElementById("infoBar0"), document.getElementById("topLoader0"), document.getElementById("bottomLoader0"), document.documentElement));
 
 
 /// Prototypes
@@ -1824,9 +1824,9 @@ document.onkeydown = function (e)
     ///TODO: Determine if capturing Backspace and/Space is confusing because they have alternate functions (the back button and page down, respectively).
     ///      One possible solution is to allow Shift, Ctrl, or Alt + Backspace or Space to be the normal action.
     if (keyCode == 8 || keyCode == 13 || keyCode == 32 || (keyCode > 47 && keyCode < 91) || (keyCode > 95 && keyCode < 112) || (keyCode > 185 && keyCode < 255)) {
-        ///TODO: Determine which input box to select when split screen mode is implamented.
+        ///TODO: Determine which input box to select when split screen mode is implemented.
         ///      One option would be to have a global select object.
-        document.getElementById("q1").focus();
+        document.getElementById("q0").focus();
     }
 };
 
