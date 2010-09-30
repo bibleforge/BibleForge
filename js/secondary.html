@@ -10,18 +10,38 @@
  */
 
 /// Set JSLint options.
-/*global window, BF */
+/*global window */
 /*jslint white: true, browser: true, devel: true, evil: true, forin: true, onevar: true, undef: true, nomen: true, bitwise: true, newcap: true, immed: true */
 
 /**
  * Create the BibleForge language specific object for the English language.
  *
- * @note    The object that is created is used by main.js to preform language specific operations.
- * @return  Returns an object containing language specific functions and variables.
+ * @example init.call(this, {needed_var: var_from_the_closure});
+ * @param   context (object) An object containing necessary variables from the parent closure.
+ * @note    This function is loaded in a hidden iframe and then called from inside of the main closure in main.js.
+ * @note    This function is called via function.call(); therefor, the "this" variable contains the scope of the parent page.
+ * @todo    Ensure that the "this" variable was correctly assigned.
+ * @return  Null.
  */
-function init()
+function init(context)
 {
-    alert(this + " " + this.page);
+    var wrench_button = document.createElement("input"),
+        wrench_label  = document.createElement("label");
+    
+    /// A label is used to allow the cursor to be all the way in the corner and still be able to click on the button.
+    ///NOTE: Because of a bug in WebKit, the elements have to be attached to the DOM before setting the className value.
+    ///TODO: Report the WebKit (or Chrome?) bug.
+    wrench_label.appendChild(wrench_button);
+    context.topBar.insertBefore(wrench_label, context.topBar.childNodes[0]);
+    
+    wrench_label.className  = "wrenchPadding";
+    wrench_label.htmlFor    = wrench_button.id;
+    
+    wrench_button.className = "wrenchIcon";
+    wrench_button.id        = "wrenchIcon" + context.viewPort_num;
+    ///TODO: Determine where the best place for this gif data should be.
+    wrench_button.src       = "data:image/gif;base64,R0lGODdhEAAQAMIIAAEDADAyL05OSWlpYYyLg7GwqNjVyP/97iwAAAAAEAAQAAADQ3i6OwBhsGnCe2Qy+4LRS3EBn5JNxCgchgBo6ThwFDc+61LdY6m4vEeBAbwMBBHfoYgBLW8njUPmPNwk1SkAW31yqwkAOw==";
+    wrench_button.title     = this.BF.lang.wrench_title;
+    wrench_button.type      = "image";
 }
-alert("Hello, from the secondary.html. " + (new Date).getTime());
 </script>
