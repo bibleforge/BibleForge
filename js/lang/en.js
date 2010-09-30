@@ -56,7 +56,8 @@ BF.lang = (function ()
         psalm:             "Psalm",
         query_explanation: 'Keyword or Reference: "God so loved" or Romans 3:23',
         title:             "title",
-        wrench_title:      "Customize and Configure " + this.app_name,
+        ///TODO: Determine if the app_name should be dynamically appended to the string below or if it should be done in the build system.
+        wrench_title:      "Customize and Configure BibleForge",
         
         /// Grammatical Variables
         /// Grammatical search format: WORD grammar_marker ATTRIBUTE_1 grammar_separator ATTRIBUTE_2 grammar_separator ... ATTRIBUTE_N
