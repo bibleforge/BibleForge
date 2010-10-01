@@ -1693,8 +1693,9 @@ if (!window.BF) {
      * @example include("js/secondary.html", {topBar: viewPort.firstChild, viewPort_num: viewPort_num});
      * @param   path    (string)             The location of the HTML file (containing JavaScript) to load.
      * @param   context (object)             The variable to send to the included JavaScript.
-     * @param   timeout (number)  (optional) How long to wait before giving up on the page to load (in milliseconds).  (Default is 10000 milliseconds.)
-     * @param   retry   (boolean) (optional) Whether or not to retry loading the page if a timeout occurs.           (Default is TRUE.)
+     * @param   timeout (number)  (optional) How long to wait before giving up on the page to load (in milliseconds).
+     *                                       A falsey value (such as 0 or FALSE) disables timing out.       (Default is 10000 milliseconds.)
+     * @param   retry   (boolean) (optional) Whether or not to retry loading the page if a timeout occurs.  (Default is TRUE.)
      * @return  NULL.   Runs code.
      * @todo    If the code has already been loaded, determine how to simply run the script without re-downloading anything.
      */
@@ -1705,6 +1706,7 @@ if (!window.BF) {
         
         if (typeof timeout == "undefined") {
             /// Default to 10 seconds.
+            ///TODO: This should be dynamic based on the quality of the connection to the server.
             timeout = 10000;
         }
         
@@ -1713,7 +1715,7 @@ if (!window.BF) {
         }
         
         /// Hide the iframe.
-        iframe.style.cssText = 'position:absolute;width:0;height:0;border:none';
+        iframe.style.cssText = "position:absolute;width:0;height:0;border:none";
         iframe.tabIndex      = -1;
         
         /// Call the init() function after the code loads.
