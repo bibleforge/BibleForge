@@ -1726,9 +1726,17 @@ if (!window.BF) {
             }, 10);
         };
         /// IE 8- needs to use the attachEvent() in order to work.
+        ///TODO: Get rid of redundant code.
         /*@cc_on
             @if (@_jscript_version < 9)
-                iframe.attachEvent("onload", iframe.onload);
+                iframe.attachEvent("onload", function ()
+                {
+                    clearTimeout(include_timeout);
+                    window.setTimeout(function ()
+                    {
+                        iframe.contentWindow.init.call(this, context);
+                    }, 10);
+                });
             @end
         @*/
         

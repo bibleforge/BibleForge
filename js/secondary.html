@@ -28,6 +28,15 @@ function init(context)
     var wrench_button = document.createElement("input"),
         wrench_label  = document.createElement("label");
     
+    ///NOTE: IE 8 has a bug that does not let you modify the type attribute after the element is attached to the DOM.
+    wrench_button.type      = "image";
+    wrench_button.id        = "wrenchIcon" + context.viewPort_num;
+    ///TODO: Determine where the best place for this gif data should be.
+    wrench_button.src       = "data:image/gif;base64,R0lGODdhEAAQAMIIAAEDADAyL05OSWlpYYyLg7GwqNjVyP/97iwAAAAAEAAQAAADQ3i6OwBhsGnCe2Qy+4LRS3EBn5JNxCgchgBo6ThwFDc+61LdY6m4vEeBAbwMBBHfoYgBLW8njUPmPNwk1SkAW31yqwkAOw==";
+    wrench_button.title     = this.BF.lang.wrench_title;
+    
+    wrench_label.htmlFor    = wrench_button.id;
+    
     /// A label is used to allow the cursor to be all the way in the corner and still be able to click on the button.
     ///NOTE: Because of a bug in WebKit, the elements have to be attached to the DOM before setting the className value.
     ///TODO: Report the WebKit (or Chrome?) bug.
@@ -35,13 +44,8 @@ function init(context)
     context.topBar.insertBefore(wrench_label, context.topBar.childNodes[0]);
     
     wrench_label.className  = "wrenchPadding";
-    wrench_label.htmlFor    = wrench_button.id;
-    
     wrench_button.className = "wrenchIcon";
-    wrench_button.id        = "wrenchIcon" + context.viewPort_num;
-    ///TODO: Determine where the best place for this gif data should be.
-    wrench_button.src       = "data:image/gif;base64,R0lGODdhEAAQAMIIAAEDADAyL05OSWlpYYyLg7GwqNjVyP/97iwAAAAAEAAQAAADQ3i6OwBhsGnCe2Qy+4LRS3EBn5JNxCgchgBo6ThwFDc+61LdY6m4vEeBAbwMBBHfoYgBLW8njUPmPNwk1SkAW31yqwkAOw==";
-    wrench_button.title     = this.BF.lang.wrench_title;
-    wrench_button.type      = "image";
+
+    
 }
 </script>
