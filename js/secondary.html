@@ -28,10 +28,10 @@ function init(context)
     var wrench_button = document.createElement("input"),
         wrench_label  = document.createElement("label");
     
-    ///NOTE: IE 8 has a bug that does not let you modify the type attribute after the element is attached to the DOM.
+    ///NOTE: A IE 8 bug prevents modification of the type attribute after an element is attached to the DOM.
     wrench_button.type      = "image";
     wrench_button.id        = "wrenchIcon" + context.viewPort_num;
-    ///TODO: Determine where the best place for this gif data should be.
+    ///TODO: Determine where this gif data should be.
     wrench_button.src       = "data:image/gif;base64,R0lGODdhEAAQAMIIAAEDADAyL05OSWlpYYyLg7GwqNjVyP/97iwAAAAAEAAQAAADQ3i6OwBhsGnCe2Qy+4LRS3EBn5JNxCgchgBo6ThwFDc+61LdY6m4vEeBAbwMBBHfoYgBLW8njUPmPNwk1SkAW31yqwkAOw==";
     wrench_button.title     = this.BF.lang.wrench_title;
     
@@ -43,9 +43,14 @@ function init(context)
     wrench_label.appendChild(wrench_button);
     context.topBar.insertBefore(wrench_label, context.topBar.childNodes[0]);
     
-    wrench_label.className  = "wrenchPadding";
-    wrench_button.className = "wrenchIcon";
-
+    /// Make the elements transparent at first and fade in (using a CSS transition).
+    wrench_label.className  = "wrenchPadding transparent";
+    ///NOTE: In order for the transition to occur, there needs to be a slight delay.
+    window.setTimeout(function ()
+    {
+        wrench_label.className = "wrenchPadding";
+    }, 0);
     
+    wrench_button.className = "wrenchIcon";
 }
 </script>
