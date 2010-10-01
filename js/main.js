@@ -1758,10 +1758,11 @@ if (!window.BF) {
     }
     
     /// After a short delay, load extra, nonessential (or at least not immediately essential) code, like the wrench menu.
+    ///TODO: Determine if there is any problem hitting the server so quickly.
     window.setTimeout(function ()
     {
         include("js/secondary.html", {topBar: viewPort.firstChild, viewPort_num: viewPort_num});
-    }, 1000);
+    }, 0);
 
 }(document.getElementById("viewPort0"), document.getElementById("searchForm0"), document.getElementById("q0"), document.getElementById("scroll0"), document.getElementById("infoBar0"), document.getElementById("topLoader0"), document.getElementById("bottomLoader0"), document.documentElement));
 
