@@ -1615,7 +1615,7 @@ if (!window.BF) {
     function post_to_server(server_URL, message, ajax, handler, extra_data)
     {
         ///TODO: Consider whether GET could be better than POST.
-        ajax.open("POST", server_URL, true);
+        ajax.open("POST", server_URL);
         ajax.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         ajax.onreadystatechange = function ()
         {
