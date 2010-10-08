@@ -23,15 +23,15 @@ if (!window.BF) {
  * This function is used to house all of the code used by BibleForge,
  * expect for language specific code, which is stored in js/lang/LOCALE.js.
  *
- * @param   viewPort     (object) The HTML element which encapsulates all of the other objects.
- * @param   searchForm   (object) The <form> element which contains the text box and button.
- * @param   q_obj        (object) The <input> element the user types into.
- * @param   page         (object) The HTML element which contains all of the Bible contents.
- * @param   infoBar      (object) The HTML element that displays information about the lookups and searches.
- * @param   topLoader    (object) The HTML element which displays the loading image above the text.
- * @param   bottomLoader (object) The HTML element which displays the loading image below the text.
- * @param   doc_docEl    (object) The document.documentElement element (the HTML element).
- * @return	NULL.  Some functions are attached to events and the rest accompany them via closure.
+ * @param  viewPort     (object) The HTML element which encapsulates all of the other objects.
+ * @param  searchForm   (object) The <form> element which contains the text box and button.
+ * @param  q_obj        (object) The <input> element the user types into.
+ * @param  page         (object) The HTML element which contains all of the Bible contents.
+ * @param  infoBar      (object) The HTML element that displays information about the lookups and searches.
+ * @param  topLoader    (object) The HTML element which displays the loading image above the text.
+ * @param  bottomLoader (object) The HTML element which displays the loading image below the text.
+ * @param  doc_docEl    (object) The document.documentElement element (the HTML element).
+ * @return NULL.  Some functions are attached to events and the rest accompany them via closure.
  */
 (function (viewPort, searchForm, q_obj, page, infoBar, topLoader, bottomLoader, doc_docEl)
 {
@@ -100,6 +100,7 @@ if (!window.BF) {
      * Register events to manage the cursor for better readability.
      *
      * @return NULL.
+     * @note   Called immediately.
      */
     (function ()
     {
