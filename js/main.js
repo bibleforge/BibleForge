@@ -17,6 +17,89 @@ if (!window.BF) {
     var BF = {};
 }
 
+
+/// Declare helper function(s) attached to the global BibleForge object (BF).
+
+/**
+ * Load some Javascript and send (optionally) it some variables from the closure.
+ *
+ * @example BF.include("path/to/HTML_with_JS.html", {needed_var: var_from_the_closure}, 20000, false);
+ * @example BF.include("js/secondary.html", {topBar: viewPort.firstChild, viewPort_num: viewPort_num});
+ * @param   path    (string)             The location of the HTML file (containing JavaScript) to load.
+ * @param   context (object)             The variable to send to the included JavaScript.
+ * @param   timeout (number)  (optional) How long to wait before giving up on the page to load (in milliseconds).
+ *                                       A falsey value (such as 0 or FALSE) disables timing out.       (Default is 10,000 milliseconds.)
+ * @param   retry   (boolean) (optional) Whether or not to retry loading the page if a timeout occurs.  (Default is TRUE.)
+ * @return  NULL.   Runs code.
+ * @todo    If the code has already been loaded, simply run the script without re-downloading anything.
+ */
+BF.include = (function ()
+{
+    /// Stores files that have already been loaded so that they do not have to be downloaded more than once.
+    ///TODO: Use this.
+    var files = [];
+    
+    return function (path, context, timeout, retry)
+    {
+        var ajax = new XMLHttpRequest(),
+            include_timeout;
+        
+        /**
+         * Send the Ajax requst and start timeout timer.
+         *
+         * @return NULL.
+         * @note   This code is a separate function to reduce code duplication.
+         * @note   Called by the parent function.
+         */
+        function begin_include()
+        {
+            ajax.send();
+            
+            if (timeout) {
+                /// Begin the timeout timer to ensure that the download does not freeze.
+                include_timeout = window.setTimeout(function ()
+                {
+                    ajax.abort();
+                    if (retry) {
+                        begin_include();
+                    }
+                }, timeout);
+            }
+        }
+        
+        /// Determine if arguments were passed to the last two parameters.  If not, set the defaults.
+        if (typeof timeout == "undefined") {
+            /// Default to 10 seconds.
+            ///TODO: This should be dynamic based on the quality of the connection to the server.
+            timeout = 10000;
+        }
+        
+        if (typeof retry == "undefined") {
+            retry = true;
+        }
+        
+        ///TODO: determine if the first parameter should be different.
+        ajax.open("GET", path);
+        ajax.onreadystatechange = function ()
+        {
+            if (ajax.readyState == 4) {
+                /// Stop the timeout timer that may be running so it does not try again.
+                clearTimeout(include_timeout);
+                
+                /// Was the request successful?
+                if (ajax.status == 200) {
+                    /// Load and run the new code.
+                    eval(ajax.responseText)(context);
+                } else if (retry) {
+                    begin_include();
+                }
+            }
+        };
+        begin_include();
+    }
+}());
+
+
 /**
  * Initialize the BibleForge environment.
  *
@@ -1683,89 +1766,13 @@ if (!window.BF) {
     
     q_obj.onblur();
     
-    /*****************************************
-     * Lazily load more code from the server *
-     *****************************************/
     
-    /**
-     * Load some Javascript and send (optionally) it some variables from the closure.
-     *
-     * @example include("path/to/HTML_with_JS.html", {needed_var: var_from_the_closure}, 20000, true);
-     * @example include("js/secondary.html", {topBar: viewPort.firstChild, viewPort_num: viewPort_num});
-     * @param   path    (string)             The location of the HTML file (containing JavaScript) to load.
-     * @param   context (object)             The variable to send to the included JavaScript.
-     * @param   timeout (number)  (optional) How long to wait before giving up on the page to load (in milliseconds).
-     *                                       A falsey value (such as 0 or FALSE) disables timing out.       (Default is 10000 milliseconds.)
-     * @param   retry   (boolean) (optional) Whether or not to retry loading the page if a timeout occurs.  (Default is TRUE.)
-     * @return  NULL.   Runs code.
-     * @todo    If the code has already been loaded, determine how to simply run the script without re-downloading anything.
-     */
-    function include(path, context, timeout, retry)
-    {
-        var iframe = document.createElement("iframe"),
-            include_timeout;
-        
-        if (typeof timeout == "undefined") {
-            /// Default to 10 seconds.
-            ///TODO: This should be dynamic based on the quality of the connection to the server.
-            timeout = 10000;
-        }
-        
-        if (typeof retry == "undefined") {
-            retry = true;
-        }
-        
-        /// Hide the iframe.
-        iframe.style.cssText = "position:absolute;width:0;height:0;border:none";
-        iframe.tabIndex      = -1;
-        
-        /// Call the init() function after the code loads.
-        iframe.onload = function ()
-        {
-            clearTimeout(include_timeout);
-            window.setTimeout(function ()
-            {
-                iframe.contentWindow.init.call(this, context);
-            }, 10);
-        };
-        /// IE 8- needs to use the attachEvent() in order to work.
-        ///TODO: Get rid of redundant code.
-        /*@cc_on
-            @if (@_jscript_version < 9)
-                iframe.attachEvent("onload", function ()
-                {
-                    clearTimeout(include_timeout);
-                    window.setTimeout(function ()
-                    {
-                        iframe.contentWindow.init.call(this, context);
-                    }, 10);
-                });
-            @end
-        @*/
-        
-        ///NOTE: One downside to using an iframe is that it may cause a "click" sound when the page loads (on Windows).
-        iframe.src = path;
-
-        document.body.appendChild(iframe);
-        
-        if (timeout) {
-            include_timeout = window.setTimeout(function ()
-            {
-                ///TODO: Determine if there is any value in removing the event handlers before removing the object.
-                document.body.removeChild(iframe);
-                if (retry) {
-                    include(path, callback, timeout, retry);
-                }
-            }, timeout);
-        }
-    }
-    
-    /// After a short delay, load extra, nonessential (or at least not immediately essential) code, like the wrench menu.
+    /// After a short delay, lazily load extra, nonessential (or at least not immediately essential) code, like the wrench menu.
     ///TODO: Determine if there is any problem hitting the server so quickly.
     window.setTimeout(function ()
     {
-        include("js/secondary.html", {topBar: viewPort.firstChild, viewPort_num: viewPort_num});
-    }, 0);
+        BF.include("js/secondary.js", {topBar: viewPort.firstChild, viewPort_num: viewPort_num});
+    }, 1000);
 
 }(document.getElementById("viewPort0"), document.getElementById("searchForm0"), document.getElementById("q0"), document.getElementById("scroll0"), document.getElementById("infoBar0"), document.getElementById("topLoader0"), document.getElementById("bottomLoader0"), document.documentElement));
 

@@ -1,4 +1,3 @@
-<script>
 /**
  * BibleForge
  *
@@ -14,16 +13,13 @@
 /*jslint white: true, browser: true, devel: true, evil: true, forin: true, onevar: true, undef: true, nomen: true, bitwise: true, newcap: true, immed: true */
 
 /**
- * Create the BibleForge language specific object for the English language.
+ * Load secondary, nonessential code, such as the wrench button.
  *
- * @example init.call(this, {needed_var: var_from_the_closure});
- * @param   context (object) An object containing necessary variables from the parent closure.
- * @note    This function is loaded in a hidden iframe and then called from inside of the main closure in main.js.
- * @note    This function is called via function.call(); therefor, the "this" variable contains the scope of the parent page.
- * @todo    Ensure that the "this" variable was correctly assigned.
- * @return  Null.
+ * @param  context (object) An object containing necessary variables from the parent closure.
+ * @note   This code is eval'ed inside of main.js.  The anonymous function is then run and data from the BibleForge closure is passed though the context object.
+ * @return Null.
  */
-function init(context)
+(function (context)
 {
     var wrench_button = document.createElement("input"),
         wrench_label  = document.createElement("label");
@@ -33,7 +29,7 @@ function init(context)
     wrench_button.id        = "wrenchIcon" + context.viewPort_num;
     ///TODO: Determine where this gif data should be.
     wrench_button.src       = "data:image/gif;base64,R0lGODdhEAAQAMIIAAEDADAyL05OSWlpYYyLg7GwqNjVyP/97iwAAAAAEAAQAAADQ3i6OwBhsGnCe2Qy+4LRS3EBn5JNxCgchgBo6ThwFDc+61LdY6m4vEeBAbwMBBHfoYgBLW8njUPmPNwk1SkAW31yqwkAOw==";
-    wrench_button.title     = this.BF.lang.wrench_title;
+    wrench_button.title     = BF.lang.wrench_title;
     
     wrench_label.htmlFor    = wrench_button.id;
     
@@ -52,5 +48,4 @@ function init(context)
     }, 0);
     
     wrench_button.className = "wrenchIcon";
-}
-</script>
+});
