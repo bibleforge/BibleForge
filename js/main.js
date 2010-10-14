@@ -12,12 +12,6 @@
 /*global window, BF */
 /*jslint white: true, browser: true, devel: true, evil: true, forin: true, onevar: true, undef: true, nomen: true, bitwise: true, newcap: true, immed: true */
 
-/// Create the global BibleForge variable if it does not exist.
-if (!window.BF) {
-    var BF = {};
-}
-
-
 /// Declare helper function(s) attached to the global BibleForge object (BF).
 
 /**
@@ -96,7 +90,7 @@ BF.include = (function ()
             }
         };
         begin_include();
-    }
+    };
 }());
 
 
@@ -1721,13 +1715,6 @@ BF.include = (function ()
         ajax.send(message);
     }
     
-    /*************************
-     * Start Panel Functions *
-     *************************/
-    function display_config()
-    {
-        display_panel("<b>test</b>");
-    }
     
     /**************
      * Set Events *
@@ -1829,7 +1816,7 @@ document.onkeydown = function (e)
     ///NOTE: It may be that the Command key is keyCode 91, and may need to be caught by another keydown event.
     ///NOTE: The meta key does not seem to be detected, and may need to do this checking manually, like for the Mac.
     ///NOTE: We do want to grab the stroke if the user is pasting.  keyCode 86 = "V," which is the standard shortcut for Paste.
-    if ((e.ctrlKey && keyCode != 86)|| e.altKey || e.metaKey) {
+    if ((e.ctrlKey && keyCode != 86) || e.altKey || e.metaKey) {
         return;
     }
     
