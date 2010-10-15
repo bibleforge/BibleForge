@@ -25,49 +25,33 @@
     var show_context_menu = (function ()
     {
         var context_menu = document.createElement("div"),
-            is_open      = false,
-            opening      = false;
+            is_open      = false;
         
-        /// Hide the context menu so that it will not be displayed on the page yet.
+        /// By default, the menu is not displayed on the screen.
         context_menu.className = "contextMenu";
         
         document.body.insertBefore(context_menu, null);
         
         function close_menu(callback)
         {
-            /// A delay is needed in order for the CSS tranisition to occur.
+            /// First, stop the element from being displayed.
+            context_menu.style.display = "none";
+            /// Then reset the opacity so that it will fade in when the menu is re-displayed later.
+            context_menu.style.opacity = 0;
+            
+            /// A delay is needed so that if there is a callback, it will run after the menu has been visually removed from the page.
             window.setTimeout(function ()
             {
-                context_menu.style.opacity = 0;                
-            }, 0);
-            
-            /// This function is used by the transitionEnd variants to run the callback function after the CSS transition finishes.
-            function on_close(e)
-            {
-                document.title = e.propertyName;
-                is_open = false;
-                
+                /// Set the menu's is_open status to false after the delay to prevent the menu from being re-opened in the meantime.
+                is_open = false;   
                 callback();
-            }
-            
-            ///NOTE: This will not work on Firefox 3.6- or IE.
-            /// Mozilla 4.0+
-            context_menu.addEventListener('transitionend',       on_close, false);
-            context_menu.addEventListener('oTransitionEnd',      on_close, false);
-            context_menu.addEventListener('webkitTransitionEnd', on_close, false);
+            }, 0);
         }
         
         return function (x_pos, y_pos, menu_items)
         {
             var i,
                 menu_count = menu_items.length;
-            
-            /// Is it already in the process of opening?  If so, prevent the action.
-            if (opening) {
-                return;
-            }
-            
-            opening = true;
             
             function open_menu()
             {
@@ -83,13 +67,13 @@
                 context_menu.style.left     = x_pos + "px";
                 context_menu.style.top      = y_pos + "px";
                 context_menu.style.display  = "inline";
+                
+                /// A delay is needed in order for the CSS transition to occur.
                 window.setTimeout(function ()
                 {
                     context_menu.style.opacity  = .99;
-                    opening = false;
                 }, 0);
             }
-            
             
             if (is_open) {
                 close_menu(open_menu);
