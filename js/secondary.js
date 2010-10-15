@@ -34,6 +34,10 @@
         
         function close_menu(callback)
         {
+            if (!is_open) {
+                return;
+            }
+            
             /// First, stop the element from being displayed.
             context_menu.style.display = "none";
             /// Then reset the opacity so that it will fade in when the menu is re-displayed later.
@@ -43,8 +47,10 @@
             window.setTimeout(function ()
             {
                 /// Set the menu's is_open status to false after the delay to prevent the menu from being re-opened in the meantime.
-                is_open = false;   
-                callback();
+                is_open = false;
+                if (callback) {
+                    callback();
+                }
             }, 0);
         }
         
@@ -55,6 +61,8 @@
             
             function open_menu()
             {
+                var tmp_document_onclick = document.onclick ? document.onclick : function () {};
+                
                 is_open = true;
                 
                 context_menu.innerHTML = ""; /// TEMP
@@ -63,15 +71,22 @@
                     context_menu.innerHTML += "<div>" + menu_items[i][0] + "</div>";
                 }
                 
-                //context_menu.style.cssText = "left:" + x_pos + "px;top:" + y_pos + "px;display:inline"; /// Faster?
-                context_menu.style.left     = x_pos + "px";
-                context_menu.style.top      = y_pos + "px";
-                context_menu.style.display  = "inline";
+                context_menu.style.cssText = "left:" + x_pos + "px;top:" + y_pos + "px;display:inline";
+                
+                /// Close the context menu if the user clicks the page.
+                document.onclick = function ()
+                {
+                    close_menu();
+                    
+                    tmp_document_onclick();
+                    document.onclick = tmp_document_onclick;
+                }
                 
                 /// A delay is needed in order for the CSS transition to occur.
                 window.setTimeout(function ()
                 {
-                    context_menu.style.opacity  = .99;
+                    ///TODO: Determine if setting the opacity all the way up to 1 still causes a visual glitch.
+                    context_menu.style.opacity = .99;
                 }, 0);
             }
             
@@ -122,12 +137,26 @@
         wrench_button.className = "wrenchIcon";
         
         ///TODO: Make the wrench icon look pressed.
-        wrench_button.onclick = function ()
+        wrench_button.onclick = function (e)
         {
             var wrench_pos = BF.get_position(wrench_button);
             
             ///TODO: These need to be language specific.
             show_context_menu(wrench_pos.left, wrench_pos.top + wrench_button.offsetHeight, [["Configure", show_panel], ["Blog", "http://blog.bibleforge.com"], ["Help", show_panel]]);
+            
+            /// Stop the even from bubbling so that document.onclick() does not fire and attempt to close the menu immediately.
+            ///TODO: Determine if stopping propagation causes or could cause problems with other events.
+            ///NOTE: IE does not pass the event variable to the function, so the global event variable must be retrieved.
+            if (!e) {
+                e = window.event;
+            }
+            /// IE 8-
+            e.cancelBubble = true;
+            /// Mozilla/WebKit/Opera/IE 9
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+
         };
     }
     
