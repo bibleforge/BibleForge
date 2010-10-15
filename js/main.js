@@ -95,6 +95,56 @@ BF.include = (function ()
 
 
 /**
+ * Gets the distance of an object from the top of the scroll.
+ *
+ * @example get_top_position(element);
+ * @param   obj (element) An element on the page.
+ * @return  Returns the distance of obj from the top of the scroll.
+ * @note    Called by scroll_to_verse().
+ */
+BF.get_position = function (obj)
+{
+    var left_pos = 0,
+        top_pos  = 0;
+    
+    /// Does the object have an element above it (i.e., offsetParent)?
+    if (obj.offsetParent) {
+        do {
+            left_pos += obj.offsetLeft;
+            top_pos  += obj.offsetTop;
+        } while (obj = obj.offsetParent);
+    }
+    
+    return {left: left_pos, top: top_pos};
+}
+
+
+/**
+ * Format a positive number with appropriate commas.
+ *
+ * @example	format_number(1000); /// Returns "1,000"
+ * @param	num (positive number) The number to format.
+ * @return	A formatted number as a string.
+ * @note	To be faster, this will not format a negative number.
+ */
+BF.format_number = function (num)
+{
+    var rgx;
+    if (num < 1000) {
+        return num;
+    }
+    /// Quickly converts a number to a string quickly.
+    num += "";
+    rgx = /^([0-9]+)([0-9][0-9][0-9])/;
+    
+    while (rgx.test(num)) {
+        num = num.replace(rgx, "$1,$2");
+    }
+    return num;
+}
+
+
+/**
  * Initialize the BibleForge environment.
  *
  * This function is used to house all of the code used by BibleForge,
@@ -1176,7 +1226,7 @@ BF.include = (function ()
         
         /// Calculate the verse's Y coordinate.
         ///NOTE: "- topLoader.offsetHeight" subtracts off the height of the top bar.
-        content_manager.scrollViewTo(0, get_top_position(verse_obj) - topLoader.offsetHeight);
+        content_manager.scrollViewTo(0, BF.get_position(verse_obj).top - topLoader.offsetHeight);
         
         ///TODO: Determine if there is any value to returning TRUE and FALSE.
         return true;
@@ -1289,7 +1339,7 @@ BF.include = (function ()
             
             if (action != verse_lookup) {
                 /// Create the inital text.
-                infoBar.appendChild(document.createTextNode(format_number(total) + BF.lang["found_" + (total === 1 ? "singular" : "plural")]));
+                infoBar.appendChild(document.createTextNode(BF.format_number(total) + BF.lang["found_" + (total === 1 ? "singular" : "plural")]));
                 /// Create a <b> for the search terms.
                 b_tag = document.createElement("b");
                 ///NOTE: We use this method instead of straight innerHTML to prevent HTML elements from appearing inside the <b></b>.
@@ -1300,28 +1350,6 @@ BF.include = (function ()
             /// Store the first verse reference for later.
             top_id = verse_numbers[0];
         }
-    }
-    
-    
-    /**
-     * Gets the distance of an object from the top of the scroll.
-     *
-     * @example get_top_position(element);
-     * @param   obj (element) An element on the page.
-     * @return  Returns the distance of obj from the top of the scroll.
-     * @note    Called by scroll_to_verse().
-     */
-    function get_top_position(obj)
-    {
-        var top_pos = 0;
-        
-        /// Does the object have an element above it (i.e., offsetParent)?
-        if (obj.offsetParent) {
-            do {
-                top_pos += obj.offsetTop;
-            } while (obj = obj.offsetParent);
-        }
-        return top_pos;
     }
     
     
@@ -1647,30 +1675,6 @@ BF.include = (function ()
         }
     }
     
-    
-    /**
-     * Format a positive number with appropriate commas.
-     *
-     * @example	format_number(1000); /// Returns "1,000"
-     * @param	num (positive number) The number to format.
-     * @return	A formatted number as a string.
-     * @note	To be faster, this will not format a negative number.
-     */
-    function format_number(num)
-    {
-        var rgx;
-        if (num < 1000) {
-            return num;
-        }
-        /// Quickly converts a number to a string quickly.
-        num += "";
-        rgx = /^([0-9]+)([0-9][0-9][0-9])/;
-        
-        while (rgx.test(num)) {
-            num = num.replace(rgx, "$1,$2");
-        }
-        return num;
-    }
     
     /***************************
      * End of search functions *
