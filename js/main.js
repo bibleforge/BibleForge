@@ -120,7 +120,7 @@ BF.get_position = function (obj)
 
 
 /**
- * Format a positive number with appropriate commas.
+ * Formats a positive number with appropriate commas.
  *
  * @example	format_number(1000); /// Returns "1,000"
  * @param	num (positive number) The number to format.
@@ -744,7 +744,7 @@ BF.format_number = function (num)
          *
          * When the page is resized, check to see if more content should be loaded.
          *
-         * @return NULL.  Calls other functions
+         * @return NULL.  Calls other functions.
          * @note   Called when the window is resized.
          * @note   Set by the onresize event.
          */
