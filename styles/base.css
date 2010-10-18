@@ -9,6 +9,7 @@
  */
 
 /* TODO: Completely document the CSS. */
+/* TODO: Re-order (as well as maybe group) the styles alphabetically. */
 
 html, body {
     margin:		0;
@@ -35,7 +36,7 @@ input {
     /*       If a font-family is not specified, it will use a system default. */
     /*       On Windows, that font is "MS Shell Dlg," which is actually "Microsoft Sans Serif." */
     /* TODO: Make/find a good replacement font for Arial. */
-    font-family:	Arial, 'Bitstream Vera Sans', 'DejaVu Sans', sans-serif;
+    font-family: Arial, 'Bitstream Vera Sans', 'DejaVu Sans', sans-serif;
 }
 
 body {
@@ -100,7 +101,7 @@ body {
     /* NOTE: Opera and some WebKit based browsers (like some versions of the iPhone) have a glitch where the background extends past the rounded corners. */
     background: url('data:image/gif;base64,R0lGODlhAQADAKEDAN3d3eTk5PLy8v///yH5BAEKAAMALAAAAAABAAMAAAICRFQAOw==') top repeat-x rgba(255, 255, 255, .5);
     
-    /* Padding is used to push the text away from the rounded corners */
+    /* Padding is used to push the text away from the rounded corners. */
     padding: 3px 25px 1px 7px;
     
     height: 18px;
@@ -114,7 +115,7 @@ body {
     width:     70%;
     
     /* Dim the text when not in focus (or hovering) so that it does not distract from the text. */
-    /* Transition for Mozilla (Firefox 3.7+) */
+    /* Transition for Mozilla (Firefox 4.0+) */
     -moz-transition:    color .3s ease, border-color .3s ease;
     /* Transition for WebKit */
     -webkit-transition: color .3s ease, border-color .3s ease;
@@ -150,7 +151,7 @@ body {
     border-color: #96968e;
     
     /* Darken the text so that it is more prominent. */
-    /* Transition for Mozilla (Firefox 3.7+) */
+    /* Transition for Mozilla (Firefox 4.0+) */
     -moz-transition:    color .3s ease;
     /* Transition for WebKit */
     -webkit-transition: color .3s ease;
@@ -177,7 +178,7 @@ body {
     outline: 0;
     
     /* Fade out slightly when the mouse cursor moves off. */
-    /* Transition for Mozilla (Firefox 3.7+) */
+    /* Transition for Mozilla (Firefox 4.0+) */
     -moz-transition:    opacity .3s ease;
     /* Transition for WebKit */
     -webkit-transition: opacity .3s ease;
@@ -198,7 +199,7 @@ body {
     
     /* Fade this element in. */
     /* TODO: Determine if there should be a separate class for CSS transition fade ins.. */
-    /* Transition for Mozilla (Firefox 3.7+) */
+    /* Transition for Mozilla (Firefox 4.0+) */
     -moz-transition:    opacity 1s ease-in;
     /* Transition for WebKit */
     -webkit-transition: opacity 1s ease-in;
@@ -217,7 +218,7 @@ body {
 
 .wrenchIcon {
     /* Darken the text so that it is more prominent. */
-    /* Transition for Mozilla (Firefox 3.7+) */
+    /* Transition for Mozilla (Firefox 4.0+) */
     -moz-transition:    opacity .6s ease, border-color .6s ease;
     /* Transition for WebKit */
     -webkit-transition: opacity .6s ease, border-color .6s ease;
@@ -252,7 +253,7 @@ body {
 
 .wrenchIcon:hover, .wrenchPadding:hover .wrenchIcon {
     /* The speed of the border-color change is increased to make it fade in before the opacity is finished so that is looks smooth. */
-    /* Transition for Mozilla (Firefox 3.7+) */
+    /* Transition for Mozilla (Firefox 4.0+) */
     -moz-transition:    opacity .6s ease, border-color .3s ease;
     /* Transition for WebKit */
     -webkit-transition: opacity .6s ease, border-color .3s ease;
@@ -270,7 +271,7 @@ body {
     border:     #A3A3A3 1px solid;
     padding:    3px;
     
-    /* Transition for Mozilla (Firefox 3.7+) */
+    /* Transition for Mozilla (Firefox 4.0+) */
     -moz-transition:    opacity .2s ease-in;
     /* Transition for WebKit */
     -webkit-transition: opacity .2s ease-in;
@@ -281,6 +282,21 @@ body {
     -moz-border-radius: 3px;
     /* Rounded corners for Opera 10.5+, IE 9+, WebKit 532.5+ (Chrome 4, Safari 5), Gecko 2 (Mozilla 4) */
     border-radius:      3px;
+}
+
+.contextMenu div {
+    white-space: nowrap;
+}
+
+.contextMenu div div {
+    width: 100%;
+}
+
+.contextMenu div div:hover {
+    /* TODO: Determine if it is better to use the color that is similar to the yellow before the transparency is applied (#DDF) or use transparency. */
+    background: #E1E1FF;
+    /* Ensure that the cursor will look like a hand even if not hovering over the text. */
+    cursor: pointer;
 }
 
 /**
@@ -302,7 +318,8 @@ body {
     min-width:		200px;
     margin-left:	auto;
     margin-right:	auto;
-    padding:		0 4px 0 4px; /* Fixes the clipping of italics p's at the beginning of a line (e.g., Acts 5:3 with a large window) or f's at the end of a line (Ex. 36:8). */
+    /* Fixes the clipping of italics p's at the beginning of a line (e.g., Acts 5:3 with a large window) or f's at the end of a line (Ex. 36:8). */
+    padding:		0 4px 0 4px;
 }
 
 

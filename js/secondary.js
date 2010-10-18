@@ -59,19 +59,26 @@
             var i,
                 menu_count = menu_items.length;
             
-            /// This code is in a seperate function because it may need to be called as a callback after the menu is closed.
+            /// This code is in a separate function because it may need to be called as a callback after the menu is closed.
             function open_menu()
             {
-                var tmp_document_onclick = document.onclick ? document.onclick : function () {};
+                var menu_container        = "",
+                    tmp_menu_html,
+                    prev_document_onclick = document.onclick ? document.onclick : function () {};
                 
                 is_open = true;
-                
-                context_menu.innerHTML = ""; /// TEMP
+                ///NOTE: Use white-space: nowrap and a div to hold it all.
                 for (i = 0; i < menu_count; ++i) {
                     ///TODO: Really create menu list.
-                    context_menu.innerHTML += "<div>" + menu_items[i][0] + "</div>";
+                    if (typeof menu_items[i][1] == "string") {
+                        tmp_menu_html = '<a href="' + menu_items[i][1] + '">' + menu_items[i][0] + "</a>";
+                    } else {
+                        tmp_menu_html = '<a href="#something" onclick="">' + menu_items[i][0] + "</a>";
+                    }
+                    menu_container += "<div>" + tmp_menu_html + "</div>";
                 }
                 
+                context_menu.innerHTML     = "<div>" + menu_container + "</div>";
                 context_menu.style.cssText = "left:" + x_pos + "px;top:" + y_pos + "px;display:inline";
                 
                 /// Close the context menu if the user clicks the page.
@@ -83,9 +90,9 @@
                     /// Re-assign the onclick() code back to document.onclick now that this code has finished its purpose.
                     ///TODO: If multiple functions attempt to reassign a global event function, there could be problems; figure out a better way to do this,
                     ///      such as creating a function that handles all event re-assignments and attaching it to the BF object.
-                    document.onclick = tmp_document_onclick;
+                    document.onclick = prev_document_onclick;
                     /// Run any code that normally would have run when the page is clicked.
-                    tmp_document_onclick();
+                    prev_document_onclick();
                 }
                 
                 /// A delay is needed in order for the CSS transition to occur.
