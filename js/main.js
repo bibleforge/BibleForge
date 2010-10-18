@@ -13,24 +13,25 @@
 /*jslint white: true, browser: true, devel: true, evil: true, forin: true, onevar: true, undef: true, nomen: true, bitwise: true, newcap: true, immed: true */
 
 /// Declare helper function(s) attached to the global BibleForge object (BF).
+///TODO: Determine if the BF object can be created here, in main.js, instead of in the language specific code.
 
 /**
- * Load some Javascript and send (optionally) it some variables from the closure.
+ * Load some Javascript and optionally send it some variables from the closure.
  *
- * @example BF.include("path/to/HTML_with_JS.html", {needed_var: var_from_the_closure}, 20000, false);
- * @example BF.include("js/secondary.html", {topBar: viewPort.firstChild, viewPort_num: viewPort_num});
- * @param   path    (string)             The location of the HTML file (containing JavaScript) to load.
+ * @example BF.include("path/to/script.js", {needed_var: var_from_the_closure}, 20000, false);
+ * @example BF.include("js/secondary.js", {topBar: viewPort.firstChild, viewPort_num: viewPort_num});
+ * @param   path    (string)             The location of the JavaScript to load.
  * @param   context (object)             The variable to send to the included JavaScript.
- * @param   timeout (number)  (optional) How long to wait before giving up on the page to load (in milliseconds).
- *                                       A falsey value (such as 0 or FALSE) disables timing out.       (Default is 10,000 milliseconds.)
- * @param   retry   (boolean) (optional) Whether or not to retry loading the page if a timeout occurs.  (Default is TRUE.)
+ * @param   timeout (number)  (optional) How long to wait before giving up on the script to load (in milliseconds).
+ *                                       A falsey value (such as 0 or FALSE) disables timing out.         (Default is 10,000 milliseconds.)
+ * @param   retry   (boolean) (optional) Whether or not to retry loading the script if a timeout occurs.  (Default is TRUE.)
  * @return  NULL.   Runs code.
  * @todo    If the code has already been loaded, simply run the script without re-downloading anything.
  */
 BF.include = (function ()
 {
     /// Stores files that have already been loaded so that they do not have to be downloaded more than once.
-    ///TODO: Use this.
+    ///TODO: Use this, and maybe make a way to ignore the cache is needed.
     var files = [];
     
     return function (path, context, timeout, retry)
@@ -1731,7 +1732,7 @@ BF.format_number = function (num)
      * Set the query input box text with an explanation of what the user can enter in.
      *
      * @return NULL.
-     * @note   Called on q_obj onblur.
+     * @note   Called on q_obj blur.
      * @note   This function is removed after the user submits a search by prepare_new_search() because the user no longer needs the instructions.
      */
     q_obj.onblur = function ()
@@ -1746,7 +1747,7 @@ BF.format_number = function (num)
      * Remove the explanation text so that the user can type.
      *
      * @return NULL.
-     * @note   Called on q_obj onfocus.
+     * @note   Called on q_obj focus.
      */
     q_obj.onfocus = function ()
     {
@@ -1817,14 +1818,14 @@ document.onkeydown = function (e)
     
     /// If a special key is also pressed, do not capture the stroke.
     ///TODO: Determine if this works on Mac with the Command key.
-    ///NOTE: It may be that the Command key is keyCode 91, and may need to be caught by another keydown event.
-    ///NOTE: The meta key does not seem to be detected, and may need to do this checking manually, like for the Mac.
-    ///NOTE: We do want to grab the stroke if the user is pasting.  keyCode 86 = "V," which is the standard shortcut for Paste.
+    ///NOTE: It may be that the Command key is keyCode 91 and may need to be caught by another keydown event.
+    ///NOTE: The meta key does not seem to be detected; this may need me manually checked for, like for the Mac.
+    ///NOTE: However, it does want to grab the stroke if the user is pasting.  keyCode 86 == "V," which is the standard shortcut for Paste.
     if ((e.ctrlKey && keyCode != 86) || e.altKey || e.metaKey) {
         return;
     }
     
-    /// Is the user pressing a key that should probably be entered into the input box?  If so, highlight the query box so that the keystrokes will be captured.
+    /// Is the user pressing a key that should probably be entered into the input box?  If so, bring focus to the query box so that the keystrokes will be captured.
     ///NOTE:  8 = Backspace
     ///      13 = Enter
     ///      32 = Space
@@ -1835,7 +1836,7 @@ document.onkeydown = function (e)
     ///      One possible solution is to allow Shift, Ctrl, or Alt + Backspace or Space to be the normal action.
     if (keyCode == 8 || keyCode == 13 || keyCode == 32 || (keyCode > 47 && keyCode < 91) || (keyCode > 95 && keyCode < 112) || (keyCode > 185 && keyCode < 255)) {
         ///TODO: Determine which input box to select when split screen mode is implemented.
-        ///      One option would be to have a global select object.
+        ///      One option would be to have a value in the global BF object.
         document.getElementById("q0").focus();
     }
 };

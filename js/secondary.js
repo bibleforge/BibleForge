@@ -27,7 +27,7 @@
         var context_menu = document.createElement("div"),
             is_open      = false;
         
-        /// By default, the menu is not displayed on the screen.
+        ///NOTE: The default style does has "display" set to "none" and "position" set to "fixed."
         context_menu.className = "contextMenu";
         
         document.body.insertBefore(context_menu, null);
@@ -59,6 +59,7 @@
             var i,
                 menu_count = menu_items.length;
             
+            /// This code is in a seperate function because it may need to be called as a callback after the menu is closed.
             function open_menu()
             {
                 var tmp_document_onclick = document.onclick ? document.onclick : function () {};
@@ -74,12 +75,17 @@
                 context_menu.style.cssText = "left:" + x_pos + "px;top:" + y_pos + "px;display:inline";
                 
                 /// Close the context menu if the user clicks the page.
+                ///NOTE: Firefox 3.6 Does not close the menu when clicking the query box the first time.
                 document.onclick = function ()
                 {
                     close_menu();
                     
-                    tmp_document_onclick();
+                    /// Re-assign the onclick() code back to document.onclick now that this code has finished its purpose.
+                    ///TODO: If multiple functions attempt to reassign a global event function, there could be problems; figure out a better way to do this,
+                    ///      such as creating a function that handles all event re-assignments and attaching it to the BF object.
                     document.onclick = tmp_document_onclick;
+                    /// Run any code that normally would have run when the page is clicked.
+                    tmp_document_onclick();
                 }
                 
                 /// A delay is needed in order for the CSS transition to occur.
@@ -90,6 +96,7 @@
                 }, 0);
             }
             
+            /// If it is already open, close it and then re-open it with the new menu.
             if (is_open) {
                 close_menu(open_menu);
             } else {
@@ -112,11 +119,11 @@
             wrench_label  = document.createElement("label");
         
         ///NOTE: A IE 8 bug prevents modification of the type attribute after an element is attached to the DOM.
-        wrench_button.type   = "image";
-        wrench_button.id     = "wrenchIcon" + context.viewPort_num;
+        wrench_button.type  = "image";
+        wrench_button.id    = "wrenchIcon" + context.viewPort_num;
         ///TODO: Determine where this gif data should be.
-        wrench_button.src    = "data:image/gif;base64,R0lGODdhEAAQAMIIAAEDADAyL05OSWlpYYyLg7GwqNjVyP/97iwAAAAAEAAQAAADQ3i6OwBhsGnCe2Qy+4LRS3EBn5JNxCgchgBo6ThwFDc+61LdY6m4vEeBAbwMBBHfoYgBLW8njUPmPNwk1SkAW31yqwkAOw==";
-        wrench_button.title  = BF.lang.wrench_title;
+        wrench_button.src   = "data:image/gif;base64,R0lGODdhEAAQAMIIAAEDADAyL05OSWlpYYyLg7GwqNjVyP/97iwAAAAAEAAQAAADQ3i6OwBhsGnCe2Qy+4LRS3EBn5JNxCgchgBo6ThwFDc+61LdY6m4vEeBAbwMBBHfoYgBLW8njUPmPNwk1SkAW31yqwkAOw==";
+        wrench_button.title = BF.lang.wrench_title;
         
         wrench_label.htmlFor = wrench_button.id;
         
@@ -127,7 +134,7 @@
         context.topBar.insertBefore(wrench_label, context.topBar.childNodes[0]);
         
         /// Make the elements transparent at first and fade in (using a CSS transition).
-        wrench_label.className  = "wrenchPadding transparent";
+        wrench_label.className = "wrenchPadding transparent";
         ///NOTE: In order for the transition to occur, there needs to be a slight delay.
         window.setTimeout(function ()
         {
@@ -137,6 +144,7 @@
         wrench_button.className = "wrenchIcon";
         
         ///TODO: Make the wrench icon look pressed.
+        ///NOTE: Opera does not send the onclick event from the label to the button.
         wrench_button.onclick = function (e)
         {
             var wrench_pos = BF.get_position(wrench_button);

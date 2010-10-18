@@ -19,10 +19,10 @@ html, body {
 }
 
 html {
-    overflow-y:     scroll;
-    overflow-x:     hidden;
-    font-family:    Verdana, 'BibleForge Sans', 'Bitstream Vera Sans', 'DejaVu Sans', Arial, sans-serif;
-    font-size:      15px;
+    overflow-y:  scroll;
+    overflow-x:  hidden;
+    font-family: Verdana, 'BibleForge Sans', 'Bitstream Vera Sans', 'DejaVu Sans', Arial, sans-serif;
+    font-size:   15px;
     
     /* Improve the text rendering and enable support for ligatures and kerning in Mozilla. */
     /* NOTE: This may have a slight speed cost. */
@@ -131,7 +131,7 @@ body {
     /* The margin balances moves the input box over a little so as not to cover the wrench icon. */
     margin: 2px 30px;
     
-    /* This removes the awful (non-rounded) selection rectangle that WebKit imposes. */
+    /* This removes the awful, non-rounded selection rectangle that WebKit imposes. */
     outline: 0;
 }
 
