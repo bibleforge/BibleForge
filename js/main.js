@@ -1261,13 +1261,13 @@ BF.format_number = function (num)
             direction     = extra_data.direction,
             i,
             total         = res.t,
-            paragraphs,
+            paragraphs    = res.p,
             verse_numbers = res.n,
-            verse_html    = res.v;
+            verse_html    = res.v,
+            word_ids      = res.i;
         
-        if (extra_data.in_paragraphs) {
-            paragraphs = res.p;
-        }
+        /// Clean up memory.
+        res = [];
         
         ///FIXME: Lookups always return 1 for success instead of the number of verses.  See functions/database_lookup.php.
         if (total > 0) {
@@ -1285,18 +1285,18 @@ BF.format_number = function (num)
                     highlight_search_results(verse_html.join(""));
                 }, 100);
             } else if (action == grammatical_search) {
-                count = verse_numbers.length;
+                count = word_ids.length;
                 for (i = 0; i < count; ++i) {
                     ///TODO: Determine if there is a downside to having a space at the start of the className.
                     ///TODO: Determine if we ever need to replace an existing f* className.
-                    document.getElementById(verse_numbers[i]).className += " f" + 1;
+                    document.getElementById(word_ids[i]).className += " f" + 1;
                 }
                 /// Record the last id found from the search so that we know where to start from for the next search as the user scrolls.
                 /// Do we need to record the bottom id?
                 if (direction == additional) {
-                    bottom_id = verse_numbers[count - 1];
+                    bottom_id = word_ids[count - 1];
                 } else {
-                    top_id = verse_numbers[0];
+                    top_id = word_ids[0];
                 }
             }
             
