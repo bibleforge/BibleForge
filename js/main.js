@@ -117,7 +117,7 @@ BF.get_position = function (obj)
     }
     
     return {left: left_pos, top: top_pos};
-}
+};
 
 
 /**
@@ -142,7 +142,7 @@ BF.format_number = function (num)
         num = num.replace(rgx, "$1,$2");
     }
     return num;
-}
+};
 
 
 /**
