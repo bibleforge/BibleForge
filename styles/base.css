@@ -94,7 +94,7 @@ body {
 .queryInput {
     /* Rounded corners for Mozilla */
     -moz-border-radius: 15px;
-    /* Rounded corners for Opera 10.5+, IE 9+, WebKit 532.5+ (Chrome 4, Safari 5), Gecko 2 (Mozilla 4) */
+    /* Rounded corners for Opera 10.5+, IE 9+, WebKit 532.5+ (Chrome 4, Safari 5), Gecko 2 (Mozilla 4.0) */
     border-radius:      15px;
     
     /* Add slight gradient shadow to the top of the input box. */
@@ -235,7 +235,7 @@ body {
     opacity: .2;
     
     -moz-border-radius: 6px;
-    /* Rounded corners for Opera 10.5+, IE 9+, WebKit 532.5+ (Chrome 4, Safari 5), Gecko 2 (Mozilla 4) */
+    /* Rounded corners for Opera 10.5+, IE 9+, WebKit 532.5+ (Chrome 4, Safari 5), Gecko 2 (Mozilla 4.0) */
     border-radius:      6px;
     
     padding: 4px;
@@ -280,24 +280,27 @@ body {
     
     /* Rounded corners for Mozilla */
     -moz-border-radius: 3px;
-    /* Rounded corners for Opera 10.5+, IE 9+, WebKit 532.5+ (Chrome 4, Safari 5), Gecko 2 (Mozilla 4) */
+    /* Rounded corners for Opera 10.5+, IE 9+, WebKit 532.5+ (Chrome 4, Safari 5), Gecko 2 (Mozilla 4.0) */
     border-radius:      3px;
 }
 
-.contextMenu div {
-    white-space: nowrap;
-}
 
 .contextMenu div a {
-    width: 100%;
-    display: block
+    color:           #555;
+    /* Block display is needed to make the width 100%. */
+    display:         block;
+    padding:         1px 0;
+    text-decoration: none;
+    /* Prevent the text from wrapping. */
+    white-space:     nowrap;
+    width:           100%;
 }
 
 .contextMenu div a:hover {
     /* TODO: Determine if it is better to use the color that is similar to the yellow before the transparency is applied (#DDF) or use transparency. */
     background: #E1E1FF;
     /* Ensure that the cursor will look like a hand even if not hovering over the text. */
-    cursor: pointer;
+    cursor:     pointer;
 }
 
 /**

@@ -48,73 +48,99 @@
             {
                 /// Set the menu's is_open status to false after the delay to prevent the menu from being re-opened in the meantime.
                 is_open = false;
+                
                 if (callback) {
                     callback();
                 }
             }, 0);
         }
         
-        return function (x_pos, y_pos, menu_items)
+        
+        function open_menu(x_pos, y_pos, menu_items)
         {
             var i,
-                menu_count = menu_items.length;
+                line_break_above      = false,
+                menu_container        = document.createElement("div"),
+                menu_count            = menu_items.length,
+                menu_item,
+                prev_document_onclick = document.onclick ? document.onclick : function () {};
             
-            /// This code is in a separate function because it may need to be called as a callback after the menu is closed.
-            function open_menu()
-            {
-                var menu_container        = document.createElement("div"),
-                    menu_item,
-                    prev_document_onclick = document.onclick ? document.onclick : function () {};
-                
-                is_open = true;
-                ///NOTE: Use white-space: nowrap and a div to hold it all.
-                for (i = 0; i < menu_count; ++i) {
-                    menu_item = document.createElement("a")
-                    if (typeof menu_items[i][1] == "string") {
-                        menu_item.href = menu_items[i][1];
-                    } else {
-                        ///TODO: Create a usable hash value.
-                        menu_item.href = "#";
-                        menu_item.onclick = menu_items[i][1];
-                    }
-                    menu_item.appendChild(document.createTextNode(menu_items[i][0]));
-                    menu_container.appendChild(menu_item);
+            is_open = true;
+            
+            for (i = 0; i < menu_count; ++i) {
+                /// If the link is simply a hyphen, then add a line break above the next item.
+                if (menu_items[i][1] == "-") {
+                    line_break_above = true;
+                    /// Skip to the next menu item because lines are added to the next item.
+                    /// That way, if there are no more items, the line will not be displayed.
+                    /// Also, if there are multiple line breaks in a row, at most one line will be displayed.
+                    continue;
                 }
                 
-                context_menu.innerHTML = "";
-                context_menu.appendChild(menu_container);
-                context_menu.style.cssText = "left:" + x_pos + "px;top:" + y_pos + "px;display:inline";
+                menu_item = document.createElement("a");
                 
-                /// Close the context menu if the user clicks the page.
-                ///BUG: Firefox 3.6 Does not close the menu when clicking the query box the first time.
-                document.onclick = function ()
-                {
-                    close_menu();
-                    
-                    /// Re-assign the onclick() code back to document.onclick now that this code has finished its purpose.
-                    ///TODO: If multiple functions attempt to reassign a global event function, there could be problems; figure out a better way to do this,
-                    ///      such as creating a function that handles all event re-assignments and attaching it to the BF object.
-                    document.onclick = prev_document_onclick;
-                    /// Run any code that normally would have run when the page is clicked.
-                    prev_document_onclick();
+                /// If the link is a string then it is simply a URL; otherwise, it is a function.
+                if (typeof menu_items[i][1] == "string") {
+                    menu_item.href = menu_items[i][1];
+                } else {
+                    ///TODO: Create a usable hash value.
+                    menu_item.href    = "#";
+                    menu_item.onclick = menu_items[i][1];
+                }
+                /// The the previous item was a line break, add a line above this item.
+                if (line_break_above) {
+                    menu_item.style.borderTop = "1px solid #A3A3A3";
+                    line_break_above = false;
                 }
                 
-                /// A delay is needed in order for the CSS transition to occur.
-                window.setTimeout(function ()
-                {
-                    ///TODO: Determine if setting the opacity all the way up to 1 still causes a visual glitch.
-                    context_menu.style.opacity = .99;
-                }, 0);
+                /// document.createTextNode() is akin to innerText.  It does not inject HTML.
+                menu_item.appendChild(document.createTextNode(menu_items[i][0]));
+                menu_container.appendChild(menu_item);
             }
             
+            /// The menu needs to be cleared first.
+            ///TODO: Determine if there is a better way to do this.  Since the items are contained in a single <div> tag, it should not be slow.
+            context_menu.innerHTML = "";
+            
+            context_menu.appendChild(menu_container);
+            
+            ///TODO: Determine if the menu will go off of the page.
+            context_menu.style.cssText = "left:" + x_pos + "px;top:" + y_pos + "px;display:inline";
+            
+            /// Close the context menu if the user clicks the page.
+            ///BUG: Firefox 3.6 Does not close the menu when clicking the query box the first time.
+            document.onclick = function ()
+            {
+                close_menu();
+                
+                /// Re-assign the onclick() code back to document.onclick now that this code has finished its purpose.
+                ///TODO: If multiple functions attempt to reassign a global event function, there could be problems; figure out a better way to do this,
+                ///      such as creating a function that handles all event re-assignments and attaching it to the BF object.
+                document.onclick = prev_document_onclick;
+                /// Run any code that normally would have run when the page is clicked.
+                prev_document_onclick();
+            }
+            
+            /// A delay is needed in order for the CSS transition to occur.
+            window.setTimeout(function ()
+            {
+                ///TODO: Determine if setting the opacity all the way up to 1 still causes a visual glitch.
+                context_menu.style.opacity = .99;
+            }, 0);
+        }
+        
+        
+        return function (x_pos, y_pos, menu_items)
+        {
             /// If it is already open, close it and then re-open it with the new menu.
             if (is_open) {
-                close_menu(open_menu);
+                close_menu(function ()
+                {
+                    open_menu(x_pos, y_pos, menu_items)
+                });
             } else {
-                open_menu();
+                open_menu(x_pos, y_pos, menu_items);
             }
-            
-
         };
     }());
     
@@ -161,7 +187,7 @@
             var wrench_pos = BF.get_position(wrench_button);
             
             ///TODO: These need to be language specific.
-            show_context_menu(wrench_pos.left, wrench_pos.top + wrench_button.offsetHeight, [["Configure", show_panel], ["Blog", "http://blog.bibleforge.com"], ["Help", show_panel]]);
+            show_context_menu(wrench_pos.left, wrench_pos.top + wrench_button.offsetHeight, [["Configure", show_panel], [0, "-"], ["Blog", "http://blog.bibleforge.com"], ["Help", show_panel]]);
             
             /// Stop the even from bubbling so that document.onclick() does not fire and attempt to close the menu immediately.
             ///TODO: Determine if stopping propagation causes or could cause problems with other events.
