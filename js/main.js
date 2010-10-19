@@ -886,7 +886,9 @@ BF.format_number = function (num)
         
         function scrollViewTo(x, y, smooth)
         {
-            var padding_el,
+            /// A small amount of extra padding is added just to ensure that the padding element will be large enough.
+            var extra_padding = 10,
+                padding_el,
                 padding_interval,
                 pixels_needed;
             
@@ -900,12 +902,12 @@ BF.format_number = function (num)
                     pixels_needed = doc_docEl.clientHeight - (document.body.clientHeight - scroll_pos);
                     if (pixels_needed > 0) {
                         padding_el = document.createElement("div");
-                        padding_el.style.height = (pixels_needed + 10) + 'px';
+                        padding_el.style.height = (pixels_needed + extra_padding) + 'px';
                         viewPort.insertBefore(padding_el, null);
                         
                         padding_interval = setInterval(function ()
                         {
-                            if (doc_docEl.scrollHeight - (window.pageYOffset + doc_docEl.clientHeight) > pixels_needed + 10) {
+                            if (doc_docEl.scrollHeight - (window.pageYOffset + doc_docEl.clientHeight) > pixels_needed + extra_padding) {
                                 viewPort.removeChild(padding_el);
                                 clearInterval(padding_interval);
                             }
