@@ -288,11 +288,12 @@ body {
     white-space: nowrap;
 }
 
-.contextMenu div div {
+.contextMenu div a {
     width: 100%;
+    display: block
 }
 
-.contextMenu div div:hover {
+.contextMenu div a:hover {
     /* TODO: Determine if it is better to use the color that is similar to the yellow before the transparency is applied (#DDF) or use transparency. */
     background: #E1E1FF;
     /* Ensure that the cursor will look like a hand even if not hovering over the text. */

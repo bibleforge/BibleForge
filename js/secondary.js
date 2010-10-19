@@ -62,27 +62,31 @@
             /// This code is in a separate function because it may need to be called as a callback after the menu is closed.
             function open_menu()
             {
-                var menu_container        = "",
-                    tmp_menu_html,
+                var menu_container        = document.createElement("div"),
+                    menu_item,
                     prev_document_onclick = document.onclick ? document.onclick : function () {};
                 
                 is_open = true;
                 ///NOTE: Use white-space: nowrap and a div to hold it all.
                 for (i = 0; i < menu_count; ++i) {
-                    ///TODO: Really create menu list.
+                    menu_item = document.createElement("a")
                     if (typeof menu_items[i][1] == "string") {
-                        tmp_menu_html = '<a href="' + menu_items[i][1] + '">' + menu_items[i][0] + "</a>";
+                        menu_item.href = menu_items[i][1];
                     } else {
-                        tmp_menu_html = '<a href="#something" onclick="">' + menu_items[i][0] + "</a>";
+                        ///TODO: Create a usable hash value.
+                        menu_item.href = "#";
+                        menu_item.onclick = menu_items[i][1];
                     }
-                    menu_container += "<div>" + tmp_menu_html + "</div>";
+                    menu_item.appendChild(document.createTextNode(menu_items[i][0]));
+                    menu_container.appendChild(menu_item);
                 }
                 
-                context_menu.innerHTML     = "<div>" + menu_container + "</div>";
+                context_menu.innerHTML = "";
+                context_menu.appendChild(menu_container);
                 context_menu.style.cssText = "left:" + x_pos + "px;top:" + y_pos + "px;display:inline";
                 
                 /// Close the context menu if the user clicks the page.
-                ///NOTE: Firefox 3.6 Does not close the menu when clicking the query box the first time.
+                ///BUG: Firefox 3.6 Does not close the menu when clicking the query box the first time.
                 document.onclick = function ()
                 {
                     close_menu();
@@ -125,7 +129,7 @@
         var wrench_button = document.createElement("input"),
             wrench_label  = document.createElement("label");
         
-        ///NOTE: A IE 8 bug prevents modification of the type attribute after an element is attached to the DOM.
+        ///NOTE: An IE 8 bug(?) prevents modification of the type attribute after an element is attached to the DOM, so it must be done earlier.
         wrench_button.type  = "image";
         wrench_button.id    = "wrenchIcon" + context.viewPort_num;
         ///TODO: Determine where this gif data should be.
@@ -142,7 +146,7 @@
         
         /// Make the elements transparent at first and fade in (using a CSS transition).
         wrench_label.className = "wrenchPadding transparent";
-        ///NOTE: In order for the transition to occur, there needs to be a slight delay.
+        ///NOTE: In order for the CSS transition to occur, there needs to be a slight delay.
         window.setTimeout(function ()
         {
             wrench_label.className = "wrenchPadding";
@@ -151,7 +155,7 @@
         wrench_button.className = "wrenchIcon";
         
         ///TODO: Make the wrench icon look pressed.
-        ///NOTE: Opera does not send the onclick event from the label to the button.
+        ///BUG:  Opera does not send the onclick event from the label to the button.
         wrench_button.onclick = function (e)
         {
             var wrench_pos = BF.get_position(wrench_button);
@@ -161,12 +165,13 @@
             
             /// Stop the even from bubbling so that document.onclick() does not fire and attempt to close the menu immediately.
             ///TODO: Determine if stopping propagation causes or could cause problems with other events.
-            ///NOTE: IE does not pass the event variable to the function, so the global event variable must be retrieved.
-            if (!e) {
-                e = window.event;
-            }
-            /// IE 8-
-            e.cancelBubble = true;
+            ///NOTE: IE 8- does not pass the event variable to the function, so the global event variable must be retrieved.
+            /*@cc_on
+                @if (@_jscript_version < 9)
+                    e = window.event;
+                    e.cancelBubble = true;
+                @end
+            @*/
             /// Mozilla/WebKit/Opera/IE 9
             if (e.stopPropagation) {
                 e.stopPropagation();
