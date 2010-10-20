@@ -16,12 +16,18 @@
  * Load secondary, nonessential code, such as the wrench button.
  *
  * @param  context (object) An object containing necessary variables from the parent closure.
- * @note   This code is eval'ed inside of main.js.  The anonymous function is then run and data from the BibleForge closure is passed though the context object.
+ * @note   This code is eval'ed inside of main.js.  The anonymous function is then called and data from the BibleForge closure is passed though the context object.
  * @note   Even though this function is not called immediately, it needs to be wrapped in parentheses to make it a function expression.
  * @return Null.
  */
 (function (context)
 {
+    /**
+     * Create the show_context_menu() function with closure.
+     *
+     * @note   This function is called immediately.
+     * @return The function for that is used to create the menu.
+     */
     var show_context_menu = (function ()
     {
         var context_menu = document.createElement("div"),
@@ -32,6 +38,15 @@
         
         document.body.insertBefore(context_menu, null);
         
+        /**
+         * Close the context menu.
+         *
+         * @example close_menu(open_menu); /// Closes the menu and then runs the open_menu() function.
+         * @example close_menu();          /// Closes the menu and does nothing else.
+         * @param   callback (function) (optional) The function to run after the menu is closed.
+         * @note    Called by show_context_menu() and document.onclick().
+         * @return  NULL.
+         */
         function close_menu(callback)
         {
             if (!is_open) {
@@ -56,10 +71,20 @@
         }
         
         
+        /**
+         * Display the context menu.
+         *
+         * @example open_menu(leftOffset, topOffset, [{text: "Menu Item 1", link: "http://link.com"}, [text: "Menu Item 2", link: some_function, true}]); /// Creates a menu with one external link and one link that runs a function with a line break separating the two.
+         * @param   x_pos      (number) The X position of the menu.
+         * @param   y_pos      (number) The Y position of the menu.
+         * @param   menu_items (array)  An array containing object(s) specifying the text of the menu items, the corresponding links, and whether or not to add a line break.
+         *                              Array format: [{text: (string), link: (string or function), line: (truthy or falsey (optional))}, {...}]
+         * @note    Called by show_context_menu() and close_menu() (as the callback function).
+         * @return  NULL.
+         */
         function open_menu(x_pos, y_pos, menu_items)
         {
             var i,
-                line_break_above      = false,
                 menu_container        = document.createElement("div"),
                 menu_count            = menu_items.length,
                 menu_item,
@@ -68,33 +93,23 @@
             is_open = true;
             
             for (i = 0; i < menu_count; ++i) {
-                /// If the link is simply a hyphen, then add a line break above the next item.
-                if (menu_items[i][1] == "-") {
-                    line_break_above = true;
-                    /// Skip to the next menu item because lines are added to the next item.
-                    /// That way, if there are no more items, the line will not be displayed.
-                    /// Also, if there are multiple line breaks in a row, at most one line will be displayed.
-                    continue;
-                }
-                
                 menu_item = document.createElement("a");
                 
-                /// If the link is a string then it is simply a URL; otherwise, it is a function.
-                if (typeof menu_items[i][1] == "string") {
-                    menu_item.href = menu_items[i][1];
+                /// If the link is a string, then it is simply a URL; otherwise, it is a function.
+                if (typeof menu_items[i].link == "string") {
+                    menu_item.href = menu_items[i].link;
                 } else {
-                    ///TODO: Create a usable hash value.
+                    ///TODO: Create a useful hash value.
                     menu_item.href    = "#";
-                    menu_item.onclick = menu_items[i][1];
+                    menu_item.onclick = menu_items[i].link;
                 }
-                /// The the previous item was a line break, add a line above this item.
-                if (line_break_above) {
+                /// Should there be a line break before this item?
+                if (menu_items[i].line) {
                     menu_item.style.borderTop = "1px solid #A3A3A3";
-                    line_break_above = false;
                 }
                 
                 /// document.createTextNode() is akin to innerText.  It does not inject HTML.
-                menu_item.appendChild(document.createTextNode(menu_items[i][0]));
+                menu_item.appendChild(document.createTextNode(menu_items[i].text));
                 menu_container.appendChild(menu_item);
             }
             
@@ -107,10 +122,17 @@
             ///TODO: Determine if the menu will go off of the page.
             context_menu.style.cssText = "left:" + x_pos + "px;top:" + y_pos + "px;display:inline";
             
-            /// Close the context menu if the user clicks the page.
-            ///BUG: Firefox 3.6 Does not close the menu when clicking the query box the first time.
+            ///TODO: Determine if it would be good to also close the menu on document blur.
+            /**
+             * Catch mouse clicks in order to close the menu.
+             *
+             * @note   Called on the mouse click event anywhere on the page (unless the event is canceled).
+             * @return NULL.
+             * @bug    Firefox 3.6 Does not close the menu when clicking the query box the first time.  However, it does close after submitting the query.
+             */
             document.onclick = function ()
             {
+                /// Close the context menu if the user clicks the page.
                 close_menu();
                 
                 /// Re-assign the onclick() code back to document.onclick now that this code has finished its purpose.
@@ -130,6 +152,18 @@
         }
         
         
+        /**
+         * Handle opening the context menu, even if one is already open.
+         *
+         * @example show_context_menu(leftOffset, topOffset, [{text: "Menu Item 1", link: "http://link.com"}, [text: "Menu Item 2", link: some_function, true}]); /// Creates a menu with one external link and one link that runs a function with a line break separating the two.
+         * @param   x_pos      (number) The X position of the menu.
+         * @param   y_pos      (number) The Y position of the menu.
+         * @param   menu_items (array)  An array containing object(s) specifying the text of the menu items, the corresponding links, and whether or not to add a line break.
+         *                              Array format: [{text: (string), link: (string or function), line: (truthy or falsey (optional))}, {...}]
+         * @note    This is the function stored in the show_context_menu variable.
+         * @note    Called by the wrench menu onclick event.
+         * @return  NULL.
+         */
         return function (x_pos, y_pos, menu_items)
         {
             /// If it is already open, close it and then re-open it with the new menu.
@@ -145,12 +179,24 @@
     }());
     
     
+    /**
+     * Display the panel window.
+     *
+     * @return NULL.
+     */
     function show_panel()
     {
         
     }
     
-    function create_wrench()
+    
+    /**
+     * Add the rest of the BibleForge user interface (currently, just the wrench menu).
+     *
+     * @note   This function is called immediately.
+     * @return NULL.
+     */
+    (function ()
     {
         var wrench_button = document.createElement("input"),
             wrench_label  = document.createElement("label");
@@ -180,14 +226,21 @@
         
         wrench_button.className = "wrenchIcon";
         
-        ///TODO: Make the wrench icon look pressed.
-        ///BUG:  Opera does not send the onclick event from the label to the button.
+        /**
+         * Prepare to display the context menu near the wrench button.
+         *
+         * @param  e (object) The event object optionally sent by the browser.
+         * @note   Called when the user clicks on the wrench button.
+         * @return NULL.
+         * @todo   Make the wrench icon look pressed.
+         * @bug    Opera does not send the onclick event from the label to the button.
+         */
         wrench_button.onclick = function (e)
         {
             var wrench_pos = BF.get_position(wrench_button);
             
             ///TODO: These need to be language specific.
-            show_context_menu(wrench_pos.left, wrench_pos.top + wrench_button.offsetHeight, [["Configure", show_panel], [0, "-"], ["Blog", "http://blog.bibleforge.com"], ["Help", show_panel]]);
+            show_context_menu(wrench_pos.left, wrench_pos.top + wrench_button.offsetHeight, [{text: "Configure", link: show_panel}, {line: 1, text: "Blog", link: "http://blog.bibleforge.com"}, {text: "Help", link: show_panel}]);
             
             /// Stop the even from bubbling so that document.onclick() does not fire and attempt to close the menu immediately.
             ///TODO: Determine if stopping propagation causes or could cause problems with other events.
@@ -204,7 +257,5 @@
             }
 
         };
-    }
-    
-    create_wrench();
+    }());
 });
