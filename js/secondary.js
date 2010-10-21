@@ -48,11 +48,7 @@
          * @return  NULL.
          */
         function close_menu(callback)
-        {
-            if (!is_open) {
-                return;
-            }
-            
+        {   
             /// First, stop the element from being displayed.
             context_menu.style.display = "none";
             /// Then reset the opacity so that it will fade in when the menu is re-displayed later.
