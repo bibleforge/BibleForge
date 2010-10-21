@@ -141,13 +141,12 @@
                 document.onclick = prev_document_onclick;
                 /// Run any code that normally would have run when the page is clicked.
                 prev_document_onclick();
-            }
+            };
             
             /// A delay is needed in order for the CSS transition to occur.
             window.setTimeout(function ()
             {
-                ///TODO: Determine if setting the opacity all the way up to 1 still causes a visual glitch.
-                context_menu.style.opacity = .99;
+                context_menu.style.opacity = 1;
             }, 0);
         }
         
@@ -170,7 +169,7 @@
             if (is_open) {
                 close_menu(function ()
                 {
-                    open_menu(x_pos, y_pos, menu_items)
+                    open_menu(x_pos, y_pos, menu_items);
                 });
             } else {
                 open_menu(x_pos, y_pos, menu_items);
