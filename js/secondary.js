@@ -22,13 +22,17 @@
  */
 (function (context)
 {
+    var show_context_menu,
+        show_panel;
+    
+    /// TODO: Combine show_context_menu() and show_panel() into a single function that takes the open and close functions as parameters and creates the respective functions.
     /**
      * Create the show_context_menu() function with closure.
      *
      * @note   This function is called immediately.
      * @return The function for that is used to create the menu.
      */
-    var show_context_menu = (function ()
+    show_context_menu = (function ()
     {
         var context_menu = document.createElement("div"),
             is_open      = false;
@@ -36,6 +40,7 @@
         ///NOTE: The default style does has "display" set to "none" and "position" set to "fixed."
         context_menu.className = "contextMenu";
         
+        /// Attach the element to the DOM now so that it does not have to be done each time it is displayed.
         document.body.insertBefore(context_menu, null);
         
         /**
@@ -96,7 +101,7 @@
                     menu_item.href = menu_items[i].link;
                 } else {
                     ///TODO: Create a useful hash value.
-                    menu_item.href    = "#";
+                    menu_item.href    = "#contextmenu";
                     menu_item.onclick = menu_items[i].link;
                 }
                 /// Should there be a line break before this item?
@@ -115,8 +120,8 @@
             
             context_menu.appendChild(menu_container);
             
-            ///TODO: Determine if the menu will go off of the page.
-            context_menu.style.cssText = "left:" + x_pos + "px;top:" + y_pos + "px;display:inline";
+            ///TODO: Determine if the menu will go off of the page and adjust the position accordingly.
+            context_menu.style.cssText = "left:" + x_pos + "px;top:" + y_pos + "px;display:block";
             
             ///TODO: Determine if it would be good to also close the menu on document blur.
             /**
@@ -179,10 +184,31 @@
      *
      * @return NULL.
      */
-    function show_panel()
+    show_panel = (function ()
     {
+        var panel   = document.createElement("div"),
+            is_open = false;
         
-    }
+        ///NOTE: The default style does has "display" set to "none" and "position" set to "fixed."
+        panel.className = "panel";
+        
+        /// Attach the element to the DOM now so that it does not have to be done each time it is displayed.
+        document.body.insertBefore(panel, null);
+        
+        return function ()
+        {
+            panel.className = "panel";
+            panel.innerHTML = "test<br>test<br>testing 123 123 123<br>test<br>test<br>test<br>test<br>test<br>test";
+            panel.style.display = "block";
+            panel.style.top  = -panel.offsetHeight + "px";
+            panel.style.left = ((window.innerWidth / 2) - (panel.offsetWidth / 2)) + "px";
+            panel.className = "panel slide";
+            window.setTimeout(function ()
+            {
+                panel.style.top = 0;
+            }, 0);
+        };
+    }());
     
     
     /**
