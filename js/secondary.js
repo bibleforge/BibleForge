@@ -25,34 +25,7 @@
     var show_context_menu,
         show_panel;
     
-    /// TODO: Combine show_context_menu() and show_panel() into a single function that takes the open and close functions as parameters and creates the respective functions.
-    function menu_maker(open_menu, close_menu, className)
-    {
-        var menu    = document.createElement("div"),
-            is_open = false;
-        
-        menu.className = className;
-        
-        /// Attach the element to the DOM now so that it does not have to be done each time it is displayed.
-        document.body.insertBefore(menu, null);
-        
-        /**
-         * @return  NULL.
-         */
-        return function (data)
-        {
-            /// If it is already open, close it and then re-open it with the new menu.
-            if (is_open) {
-                close_menu(menu, function ()
-                {
-                    open_menu(menu, data);
-                });
-            } else {
-                open_menu(menu, data);
-            }
-        };
-    }
-    
+    /// TODO: Reevaluate combining show_context_menu() and show_panel() into a single function that takes the open and close functions as parameters and creates the respective functions.
     /**
      * Create the show_context_menu() function with closure.
      *
