@@ -195,10 +195,45 @@
         /// Attach the element to the DOM now so that it does not have to be done each time it is displayed.
         document.body.insertBefore(panel, null);
         
-        return function ()
+        function close_panel(callback, quick)
         {
+            ///TODO: Attempt to detect CSS transition support.  Something like var cssTransitionsSupported = document.body.style.webkitTransition !== undefined || document.body.style.MozTransition !== undefined || document.body.style.OTransition !== undefined;
+            if (quick) {
+                /// First, stop the element from being displayed.
+                panel.style.display = "none";
+            } else {
+                panel.style.top = -panel.offsetHeight + "px";
+            }
+            
+            /// A delay is needed so that if there is a callback, it will run after the menu has been visually removed from the page.
+            window.setTimeout(function ()
+            {
+                /// Set the menu's is_open status to false after the delay to prevent the menu from being re-opened in the meantime.
+                is_open = false;
+                
+                if (callback) {
+                    callback();
+                }
+            }, 0);
+        }
+        
+        function open_panel()
+        {
+            var menu_item,
+                panel_container = document.createElement("div");
+            
+            menu_item = document.createElement("input");
+            menu_item.type = "button";
+            menu_item.value="close";
+            menu_item.onclick = function ()
+            {
+                close_panel();
+            }
+            
+            panel_container.appendChild(menu_item);
+            panel.appendChild(panel_container);
+            
             panel.className = "panel";
-            panel.innerHTML = "test<br>test<br>testing 123 123 123<br>test<br>test<br>test<br>test<br>test<br>test";
             panel.style.display = "block";
             panel.style.top  = -panel.offsetHeight + "px";
             panel.style.left = ((window.innerWidth / 2) - (panel.offsetWidth / 2)) + "px";
@@ -207,6 +242,14 @@
             {
                 panel.style.top = 0;
             }, 0);
+        }
+        
+        return function ()
+        {
+            close_panel(function ()
+            {
+                open_panel();
+            }, true);
         };
     }());
     
