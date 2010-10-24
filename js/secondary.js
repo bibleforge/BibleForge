@@ -228,7 +228,7 @@
             menu_item.onclick = function ()
             {
                 close_panel();
-            }
+            };
             
             panel_container.appendChild(menu_item);
             panel.appendChild(panel_container);
