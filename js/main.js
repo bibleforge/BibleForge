@@ -36,7 +36,7 @@ BF.include = (function ()
     
     return function (path, context, timeout, retry)
     {
-        var ajax = new XMLHttpRequest(),
+        var ajax = new window.XMLHttpRequest(),
             include_timeout;
         
         /**
@@ -136,7 +136,7 @@ BF.format_number = function (num)
     }
     /// Quickly converts a number to a string quickly.
     num += "";
-    rgx = /^([0-9]+)([0-9][0-9][0-9])/;
+    rgx  = /^([0-9]+)([0-9][0-9][0-9])/;
     
     while (rgx.test(num)) {
         num = num.replace(rgx, "$1,$2");
@@ -185,8 +185,8 @@ BF.format_number = function (num)
         waiting_for_first_search	= false,
         
         /// Ajax objects
-        ajax_additional	= new XMLHttpRequest(),
-        ajax_previous	= new XMLHttpRequest(),
+        ajax_additional	= new window.XMLHttpRequest(),
+        ajax_previous	= new window.XMLHttpRequest(),
         
         /// Verse variables
         /// top_verse and bottom_verse are the last verses displayed on the screen so that the same verse is not displayed twice when more search data is returned (currently just used for grammatical_search).
@@ -269,7 +269,7 @@ BF.format_number = function (num)
         function hide_cursor_delayed()
         {
             show_cursor();
-            hide_cursor_timeout = setTimeout(function ()
+            hide_cursor_timeout = window.setTimeout(function ()
             {
                 ///NOTE: Only works in Mozilla.
                 ///      IE is the only other major browser family that supports transparent cursors (.CUR files only), but it cannot be set via a timeout.
@@ -399,7 +399,7 @@ BF.format_number = function (num)
             if (new_scroll_pos == scroll_pos) {
                 /// Should we wait a moment and see if the scroll position changes.
                 if (++scroll_check_count < 10) {
-                    setTimeout(scrolling, 30);
+                    window.setTimeout(scrolling, 30);
                 } else {
                     /// Reset the counter and do not check anymore.
                     scroll_check_count = 0;
@@ -434,16 +434,16 @@ BF.format_number = function (num)
             
             if (checking_excess_content_top) {
                 clearTimeout(remove_content_top_timeout);
-                remove_content_top_timeout = setTimeout(remove_excess_content_top, remove_speed);
+                remove_content_top_timeout    = window.setTimeout(remove_excess_content_top,    remove_speed);
             }
             if (checking_excess_content_bottom) {
                 clearTimeout(remove_content_bottom_timeout);
-                remove_content_bottom_timeout = setTimeout(remove_excess_content_bottom, remove_speed);
+                remove_content_bottom_timeout = window.setTimeout(remove_excess_content_bottom, remove_speed);
             }
         }
         
         
-        ///TODO: Determine if remove_excess_content_top and remove_excess_content_bottom can be combind.
+        ///TODO: Determine if remove_excess_content_top and remove_excess_content_bottom can be combined.
         /**
          * Remove content that is past the top of screen and store in cache.
          *
@@ -488,7 +488,7 @@ BF.format_number = function (num)
                 topLoader.style.visibility = "visible";
                 
                 /// Check again soon for more content to be removed.
-                remove_content_top_timeout = setTimeout(remove_excess_content_top, remove_speed);
+                remove_content_top_timeout = window.setTimeout(remove_excess_content_top, remove_speed);
             } else {
                 checking_excess_content_top = false;
             }
@@ -525,7 +525,7 @@ BF.format_number = function (num)
                 bottomLoader.style.visibility = "visible";
                 
                 /// Check again soon for more content to be removed.
-                remove_content_bottom_timeout = setTimeout(remove_excess_content_bottom, remove_speed);
+                remove_content_bottom_timeout = window.setTimeout(remove_excess_content_bottom, remove_speed);
             } else {
                 checking_excess_content_bottom = false;
             }
@@ -651,6 +651,9 @@ BF.format_number = function (num)
                 v,
                 verse_id;
             
+            ///TODO: Rewrite this function to use document.elementFromPoint(clientX, clientY).
+            ///NOTE: Old versions of WebKit use pageX and pageY.
+            
             /// Make an educated guess as to which element to start with to save time.
             ///TODO: Determine if page.height could be used instead of doc_docEl.scrollHeight.
             el_start_at = Math.round(parent_el_children_count * ((the_pos - parent_el_top) / parent_el.offsetHeight));
@@ -685,7 +688,7 @@ BF.format_number = function (num)
                     /// Is the position in question lower?
                     if (the_pos > el_offset_top) {
                         el = el.nextSibling;
-                        looked_next	= true;
+                        looked_next	    = true;
                     } else {
                         el = el.previousSibling;
                         looked_previous	= true;
@@ -720,12 +723,14 @@ BF.format_number = function (num)
                 while ((looking_upward ? possible_el = el.previousSibling : possible_el = el.nextSibling) !== null && the_pos >= possible_el.offsetTop && the_pos <= possible_el.offsetTop + possible_el.offsetHeight) {
                     el = possible_el;
                 }
-                ///NOTE: Intential fall through.
+                ///NOTE: Intentional fall through.
             case "chapter":
             case "book":
             case "short_book":
                 /// Found the verse, so calculate the verseID and call the success function.
-                verse_id = parseInt(el.id);
+                ///NOTE: No radix is used because the number should never begin with a leading 0 and suppling the radix slows Mozilla (Firefox 3.6-) down tremendously.
+                verse_id = window.parseInt(el.id);
+                
                 v = verse_id % 1000;
                 c = ((verse_id - v) % 1000000) / 1000;
                 b = (verse_id - v - c * 1000) / 1000000;
@@ -769,9 +774,9 @@ BF.format_number = function (num)
         function add_content_if_needed(direction)
         {
             if (direction === additional) {
-                setTimeout(add_content_bottom_if_needed, lookup_speed_sitting);
+                window.setTimeout(add_content_bottom_if_needed, lookup_speed_sitting);
             } else {
-                setTimeout(add_content_top_if_needed, lookup_speed_scrolling);
+                window.setTimeout(add_content_top_if_needed,    lookup_speed_scrolling);
             }
         }
         
@@ -877,8 +882,8 @@ BF.format_number = function (num)
                 if (!looking_up_verse_range) {
                     looking_up_verse_range = true;
                     
-                    /// Run this function after a brief delay.
-                    setTimeout(update_verse_range_delayed, lookup_range_speed);
+                    /// Run update_verse_range_delayed() after a brief delay.
+                    window.setTimeout(update_verse_range_delayed, lookup_range_speed);
                 }
             };
         }());
@@ -901,15 +906,15 @@ BF.format_number = function (num)
                     /// If the scroll position is near the bottom (e.g., Revelation 22:21 or Proverbs 28:28) there needs to be extra space on the bottom.
                     pixels_needed = doc_docEl.clientHeight - (document.body.clientHeight - scroll_pos);
                     if (pixels_needed > 0) {
-                        padding_el = document.createElement("div");
+                        padding_el              = document.createElement("div");
                         padding_el.style.height = (pixels_needed + extra_padding) + 'px';
                         viewPort.insertBefore(padding_el, null);
                         
-                        padding_interval = setInterval(function ()
+                        padding_interval = window.setInterval(function ()
                         {
                             if (doc_docEl.scrollHeight - (window.pageYOffset + doc_docEl.clientHeight) > pixels_needed + extra_padding) {
                                 viewPort.removeChild(padding_el);
-                                clearInterval(padding_interval);
+                                window.clearInterval(padding_interval);
                             }
                         }, 1000);
                     }
@@ -1007,7 +1012,7 @@ BF.format_number = function (num)
                 /// grammatical_search uses a JSON array which is stored as text in the second index of the array.
                 last_search_prepared = search_type_array[1];
             }
-            last_search_encoded = encodeURIComponent(last_search_prepared);
+            last_search_encoded = window.encodeURIComponent(last_search_prepared);
             bottom_id = 0;
         }
         
@@ -1036,8 +1041,8 @@ BF.format_number = function (num)
         /// Clear cache.
         ///TODO: Determine a way to store the cache in a way that it can be used later.
         cached_verses_top		= [];
-        cached_count_top		= 0;
         cached_verses_bottom	= [];
+        cached_count_top		= 0;
         cached_count_bottom		= 0;
         
         document.title = raw_search_terms + " - " + BF.lang.app_name;
@@ -1148,7 +1153,7 @@ BF.format_number = function (num)
         /// last_type set in prepare_new_search().
         var ajax,
             extra_data = {action: last_type, "direction": direction, search_type: last_type, in_paragraphs: settings.in_paragraphs},
-            query = "t=" + last_type;
+            query      = "t=" + last_type;
         
         if (direction == additional) {
             ajax = ajax_additional;
@@ -1156,7 +1161,7 @@ BF.format_number = function (num)
         } else {
             ajax = ajax_previous;
             query += "&d=" + direction;
-            extra_data.verse = top_id - 1;
+            extra_data.verse = top_id    - 1;
         }
         
         /// Is the server already working on this request?
@@ -1171,7 +1176,7 @@ BF.format_number = function (num)
                 query += "&q=" + (bottom_id + 1);
             } else {
                 /// In order to find the previous verse from which to start, it subtracts 1.
-                query += "&q=" + (top_id - 1);
+                query += "&q=" + (top_id    - 1);
             }
             
             /// Is it impossible to tell if this verse starts at a paragraph breaking point?
@@ -1280,7 +1285,7 @@ BF.format_number = function (num)
                 /// The delay is so that the verse is displayed as quickly as possible.
                 ///TODO: Determine if it would be better to put this in an array and send it all at once, preferably without the implied eval().
                 ///TODO: Determine if it is bad to convert the array to a string like this
-                setTimeout(function ()
+                window.setTimeout(function ()
                 {
                     highlight_search_results(verse_html.join(""));
                 }, 100);
@@ -1296,7 +1301,7 @@ BF.format_number = function (num)
                 if (direction == additional) {
                     bottom_id = word_ids[count - 1];
                 } else {
-                    top_id = word_ids[0];
+                    top_id    = word_ids[0];
                 }
             }
             
@@ -1306,7 +1311,7 @@ BF.format_number = function (num)
                 content_manager.add_content_if_needed(direction);
             }
             if ((direction === previous || waiting_for_first_search) && verse_numbers[0] > 1001001) {
-                topLoader.style.visibility = "visible";
+                topLoader.style.visibility    = "visible";
                 content_manager.add_content_if_needed(previous);
             }
         } else {
@@ -1714,7 +1719,7 @@ BF.format_number = function (num)
                     /// Was the abort unintentional?
                     if (ajax.status !== 0) {
                         ///FIXME: Do meaningful error handling.
-                        alert("Error " + ajax.status + ":\n" + ajax.responseText);
+                        window.alert("Error " + ajax.status + ":\n" + ajax.responseText);
                     }
                 }
             }
@@ -1850,7 +1855,7 @@ document.onkeydown = function (e)
  ******************************/
 
 /// Is the browser Chromium or WebKit based?
-if (window.chrome || /AppleWebKit\//.test(navigator.userAgent)) {
+if (window.chrome || /AppleWebKit\//.test(window.navigator.userAgent)) {
     /// Inject CSS to make the drop caps aligned with the second line of text.
     ///NOTE: Needed for at least Chromium 5.
     ///TODO: Determine if this would be better as a function.
