@@ -105,8 +105,6 @@ body {
     /* Padding is used to push the text away from the rounded corners. */
     padding: 3px 25px 1px 7px;
     
-    height: 18px;
-    
     font-size: 15px;
     
     max-width: 480px;
@@ -115,13 +113,9 @@ body {
     /*       70% is used because it is a good balance when the page is wide or narrow. */
     width:     70%;
     
+    height:    18px;
+    
     /* Dim the text when not in focus (or hovering) so that it does not distract from the text. */
-    /* Transition for Mozilla (Firefox 4.0+) */
-    -moz-transition:    color .3s ease, border-color .3s ease;
-    /* Transition for WebKit */
-    -webkit-transition: color .3s ease, border-color .3s ease;
-    /* Transition for Opera 10.5+ */
-    -o-transition:      color .3s ease, border-color .3s ease;
     color: #a7a7a7;
     
     border-style: solid;
@@ -135,6 +129,14 @@ body {
     
     /* This removes the awful, non-rounded selection rectangle that WebKit imposes. */
     outline: 0;
+    
+    /* Apply transitions to all changes (in particular, background-color, border-color, and color) */
+    /* Transition for Mozilla (Firefox 4.0+) */
+    -moz-transition:    all .3s;
+    /* Transition for WebKit */
+    -webkit-transition: all .3s;
+    /* Transition for Opera 10.5+ */
+    -o-transition:      all .3s;
 }
 
 /**
@@ -152,13 +154,8 @@ body {
     border-color: #96968e;
     
     /* Darken the text so that it is more prominent. */
-    /* Transition for Mozilla (Firefox 4.0+) */
-    -moz-transition:    color .3s ease;
-    /* Transition for WebKit */
-    -webkit-transition: color .3s ease;
-    /* Transition for Opera 10.5+ */
-    -o-transition:      color .3s ease;
     color: #555;
+    background-color: #FFF;
 }
 
 
