@@ -161,10 +161,9 @@ BF.format_number = function (num)
  * @param  doc_docEl    (object) The document.documentElement element (the HTML element).
  * @return NULL.  Some functions are attached to events and the rest accompany them via closure.
  */
-(function (viewPort, searchForm, q_obj, page, infoBar, topLoader, bottomLoader, doc_docEl)
+BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLoader, bottomLoader, doc_docEl)
 {
-    var create_viewport = arguments.callee,
-        viewPort_num,
+    var viewPort_num,
         
         /// Query type "constants"
         verse_lookup			= 1,
@@ -1773,7 +1772,7 @@ BF.format_number = function (num)
         BF.include("js/secondary.js", {topBar: viewPort.firstChild, viewPort_num: viewPort_num});
     }, 1000);
 
-}(document.getElementById("viewPort0"), document.getElementById("searchForm0"), document.getElementById("q0"), document.getElementById("scroll0"), document.getElementById("infoBar0"), document.getElementById("topLoader0"), document.getElementById("bottomLoader0"), document.documentElement));
+};
 
 
 /// Prototypes
@@ -1956,7 +1955,8 @@ if (window.opera) {
             if (emptyMatch) ++s.lastIndex;
         }
         output = lastLastIndex === this.length ? (s.test("") && !lastLength ? output : output.concat("")) : (limit ? output : output.concat(this.slice(lastLastIndex)));
-        s.lastIndex = origLastIndex; /// TODO: Determine if this line of code is necessary.
+        /// TODO: Determine if this next line of code is necessary.
+        s.lastIndex = origLastIndex;
         return output;
     };
     
@@ -1973,3 +1973,6 @@ if (window.opera) {
 /***************************
  * End of IE Specific Code *
  ***************************/
+
+/// Initialize BibleForge.
+BF.create_viewport(document.getElementById("viewPort0"), document.getElementById("searchForm0"), document.getElementById("q0"), document.getElementById("scroll0"), document.getElementById("infoBar0"), document.getElementById("topLoader0"), document.getElementById("bottomLoader0"), document.documentElement);
