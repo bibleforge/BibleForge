@@ -70,11 +70,11 @@ body {
 
 .infoBars {
     /* A solid background for IE/Mozilla (Firefox 2-)/Opera 9.6- */
-    background:		#FFD;
+    background:    #FFD;
     /* Transparent yellow background */
-    background:		rgba(255, 255, 221, .9);
-    border-top: 	#EEE999 solid 1px;
-    border-bottom:	#EEE999 solid 1px;
+    background:    rgba(255, 255, 221, .9);
+    border-top:    #EEE999 solid 1px;
+    border-bottom: #EEE999 solid 1px;
     
     padding-left: 3px;
     
@@ -83,12 +83,21 @@ body {
     
     /* Prevent a long search string from overflowing the info bar by cutting it short and adding an ellipsis. (Mozilla has no support for this yet.) */
     /* FIXME: This does not work yet. */
-    text-overflow:		ellipsis;
+    text-overflow:    ellipsis;
     /* Opera specific */
-    -o-text-overflow:	ellipsis;
+    -o-text-overflow: ellipsis;
     /* This is what actually hides the text, currently. */
-    overflow:			hidden;
-    font-size:			13px;
+    overflow:         hidden;
+    
+    font-size: 13px;
+    
+    /* NOTE: IE has its own DropShadow filter that could be used. */
+    /* Opera 10.5/Mozilla 4.0 */
+    box-shadow:         0px 3px 6px rgba(0, 0, 0, .08);
+    /* Mozilla 3.5- */
+    -moz-box-shadow:    0px 3px 6px rgba(0, 0, 0, .08);
+    /* WebKit 522 (Chrome, Safari 3) */
+    -webkit-box-shadow: 0px 3px 6px rgba(0, 0, 0, .08);
 }
 
 
