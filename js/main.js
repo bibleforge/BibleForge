@@ -145,6 +145,11 @@ BF.format_number = function (num)
 };
 
 
+/// Determine if CSS transitions are supported by the browser.
+///NOTE: All of these variables currently require vendor specific prefixes.
+BF.cssTransitions = typeof document.body.style.webkitTransition !== "undefined" || typeof document.body.style.MozTransition !== "undefined" || typeof document.body.style.OTransition !== "undefined";
+
+
 /**
  * Initialize the BibleForge environment.
  *

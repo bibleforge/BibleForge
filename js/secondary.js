@@ -195,53 +195,73 @@
         /// Attach the element to the DOM now so that it does not have to be done each time it is displayed.
         document.body.insertBefore(panel, null);
         
-        function close_panel(callback, quick)
+        function close_panel(callback)
         {
-            ///TODO: Attempt to detect CSS transition support.  Something like var cssTransitionsSupported = document.body.style.webkitTransition !== undefined || document.body.style.MozTransition !== undefined || document.body.style.OTransition !== undefined;
-            if (quick) {
-                /// First, stop the element from being displayed.
-                panel.style.display = "none";
-            } else {
-                panel.style.top = -panel.offsetHeight + "px";
-            }
-            
-            /// A delay is needed so that if there is a callback, it will run after the menu has been visually removed from the page.
-            window.setTimeout(function ()
+            function on_panel_close()
             {
-                /// Set the menu's is_open status to false after the delay to prevent the menu from being re-opened in the meantime.
+                /// Set the panel's is_open status to false after the delay to prevent the menu from being re-opened in the meantime.
                 is_open = false;
+                
+                /// Make sure that this function will not fire again when the panel opens.
+                panel.removeEventListener("transitionend",       on_panel_close, false);
+                panel.removeEventListener("oTransitionEnd",      on_panel_close, false);
+                panel.removeEventListener("webkitTransitionEnd", on_panel_close, false);
+                
+                /// Ensure that the display is set to none (even though it might already be if this is the first time or if no CSS transitions were used).
+                panel.style.display = "none";
                 
                 if (callback) {
                     callback();
                 }
-            }, 0);
+            }
+            
+            /// Is the panel already open and are CSS transitions supported by the browser?
+            if (is_open && BF.cssTransitions) {
+                panel.addEventListener("transitionend",       on_panel_close, false);
+                panel.addEventListener("oTransitionEnd",      on_panel_close, false);
+                panel.addEventListener("webkitTransitionEnd", on_panel_close, false);
+                
+                panel.style.top = -panel.offsetHeight + "px";
+            } else {
+                panel.style.display = "none";
+                /// A delay is needed so that if there is a callback, it will run after the menu has been visually removed from the page.
+                window.setTimeout(on_panel_close, 0);
+            }
         }
         
         function open_panel()
         {
-            var menu_item,
+            var close_button, /// <--- TEMP
                 panel_container = document.createElement("div");
             
-            menu_item = document.createElement("input");
-            menu_item.type = "button";
-            menu_item.value="close";
-            menu_item.onclick = function ()
+            is_open = true;
+            
+            /// TEMP
+            close_button         = document.createElement("input");
+            close_button.type    = "button";
+            close_button.value   = "close";
+            close_button.onclick = function ()
             {
                 close_panel();
             };
-            
-            panel_container.appendChild(menu_item);
+            panel_container.appendChild(close_button);
             panel.appendChild(panel_container);
+            /// END TEMP
             
-            panel.className = "panel";
+            /// Remove CSS Transitions so that the element will immediately be moved just outside of the visible area so that it can slide in nicely (if CSS transitions are supported).
+            panel.className     = "panel";
+            /// Ensure that the element is visible (display is set to "none" when it is closed).
             panel.style.display = "block";
-            panel.style.top  = -panel.offsetHeight + "px";
-            panel.style.left = ((window.innerWidth / 2) - (panel.offsetWidth / 2)) + "px";
-            panel.className = "panel slide";
-            window.setTimeout(function ()
-            {
-                panel.style.top = 0;
-            }, 0);
+            /// Quickly move the element to just above of the visible area.
+            panel.style.top     = -panel.offsetHeight + "px";
+            /// Center the element on the page.
+            ///BUG: It is not quite centered.
+            panel.style.left    = ((window.innerWidth / 2) - (panel.offsetWidth / 2)) + "px";
+            /// Restore CSS transitions (if supported by the browser).
+            panel.className     = "panel slide";
+            /// Move the panel to the very top of the page.
+            /// The element has enough padding on the top to ensure that everything inside of it is visible to the user.
+            panel.style.top     = 0;
         }
         
         return function ()
@@ -249,7 +269,7 @@
             close_panel(function ()
             {
                 open_panel();
-            }, true);
+            });
         };
     }());
     
