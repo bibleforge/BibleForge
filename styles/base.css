@@ -281,6 +281,16 @@ body {
     -moz-border-radius: 3px;
     /* Rounded corners for Opera 10.5+, IE 9+, WebKit 532.5+ (Chrome 4, Safari 5), Gecko 2 (Mozilla 4.0) */
     border-radius:      3px;
+    
+    /* This shadow is slightly dimmer than the panel because it is supposed to look higher up. */
+    /* TODO: The direction of the shadow could be set dynamically based on where it is on the page. */
+    /* NOTE: IE has its own DropShadow filter that could be used. */
+    /* Opera 10.5/Mozilla 4.0 */
+    box-shadow:         2px 2px 3px rgba(0, 0, 0, .2);
+    /* Mozilla 3.5- */
+    -moz-box-shadow:    2px 2px 3px rgba(0, 0, 0, .2);
+    /* WebKit 522 (Chrome, Safari 3) */
+    -webkit-box-shadow: 2px 2px 3px rgba(0, 0, 0, .2);
 }
 
 
@@ -310,7 +320,7 @@ body {
     /* A solid background for IE/Mozilla 2-/Opera 9.6- */
     background:  #FFF;
     /* Transparent white background for Mozilla/Opera 10/WebKit */
-    background:  rgba(255, 255, 255, .9);
+    background:  rgba(255, 255, 255, .95);
     border:      #A3A3A3 1px solid;
     /* Add enough padding to the top to push the contents past the top bar. */
     /* Add extra padding on the sides so that the optional scroll bars will not cover up any of the content. */
@@ -319,9 +329,17 @@ body {
     overflow:    auto;
     
     /* Rounded corners for Mozilla 3.6- */
-    -moz-border-radius: 3px;
+    -moz-border-radius: 9px;
     /* Rounded corners for Opera 10.5+, IE 9+, WebKit 532.5+ (Chrome 4, Safari 5), Gecko 2 (Mozilla 4.0) */
-    border-radius:      3px;
+    border-radius:      9px;
+    
+    /* NOTE: IE has its own DropShadow filter that could be used. */
+    /* Opera 10.5/Mozilla 4.0 */
+    box-shadow:         3px 3px 3px rgba(0, 0, 0, .3);
+    /* Mozilla 3.5- */
+    -moz-box-shadow:    3px 3px 3px rgba(0, 0, 0, .3);
+    /* WebKit 522 (Chrome, Safari 3) */
+    -webkit-box-shadow: 3px 3px 3px rgba(0, 0, 0, .3);
 }
 
 .slide {

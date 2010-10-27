@@ -246,7 +246,7 @@
             };
             panel_container.appendChild(close_button);
             panel.appendChild(panel_container);
-            panel.innerHTML = "sflkslkfjsafjsdlksdflksfjlksjsdlkfjldkfjlsdkjflkdjflkjfjfkjsdklfjsdlkfjsdfsdflksdjfskdlfjskldfsdfksdjfklsjfklsjfklsjfkljfksdjfklsfjkljsklfjklsdjkljjsfdlkjsfdklj sdflkjsdflkjsfjslkfjsflksdlkfjsdlkfjsdklfjlkj ssldfjsdlkfjsdlkfjskdlfjsdjfslkfsdjfklsjdl<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf";
+            panel.innerHTML = "ssldfjsdlkfjsdlkfjskdlfjsdjfslkfsdjfklsjdl<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sdsfsdfsdfdssfsdffsdfsdf";
             /// END TEMP
             
             /// Remove CSS Transitions so that the element will immediately be moved just outside of the visible area so that it can slide in nicely (if CSS transitions are supported).
