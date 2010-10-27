@@ -284,6 +284,7 @@ body {
 }
 
 
+/* Menu items */
 .contextMenu div a {
     color:           #555;
     /* Block display is needed to make the width 100%. */
@@ -304,16 +305,20 @@ body {
 
 
 .panel {
-    display:    none;
-    position:   fixed;
-    background: #FFF;
-    background: rgba(255, 255, 255, .9);
-    border:     #A3A3A3 1px solid;
-    padding:    3px;
+    display:     none;
+    position:    fixed;
+    /* A solid background for IE/Mozilla 2-/Opera 9.6- */
+    background:  #FFF;
+    /* Transparent white background for Mozilla/Opera 10/WebKit */
+    background:  rgba(255, 255, 255, .9);
+    border:      #A3A3A3 1px solid;
+    /* Add enough padding to the top to push the contents past the top bar. */
+    /* Add extra padding on the sides so that the optional scroll bars will not cover up any of the content. */
+    padding:     60px 16px 16px 16px;
+    /* Add scroll bars when the contents extend past the height or width. */
+    overflow:    auto;
     
-    padding-top: 60px;
-    
-    /* Rounded corners for Mozilla */
+    /* Rounded corners for Mozilla 3.6- */
     -moz-border-radius: 3px;
     /* Rounded corners for Opera 10.5+, IE 9+, WebKit 532.5+ (Chrome 4, Safari 5), Gecko 2 (Mozilla 4.0) */
     border-radius:      3px;
