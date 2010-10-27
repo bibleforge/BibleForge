@@ -255,15 +255,16 @@
             panel.style.display   = "block";
             /// Set the max with and height to a little smaller than the screen so that the contents will always be visible.
             ///TODO: Determine if this should be done each time the window is resized.
-            panel.style.maxHeight = (window.innerHeight - 80) + "px";
-            panel.style.maxWidth  = (window.innerWidth  - 60) + "px";
+            ///NOTE: document.body.clientHeight will not work right because it takes into account the entire page height, not just the viewable region.
+            panel.style.maxHeight = (window.innerHeight        - 80) + "px";
+            panel.style.maxWidth  = (document.body.clientWidth - 40) + "px";
             /// Quickly move the element to just above of the visible area.
             panel.style.top       = -panel.offsetHeight + "px";
             /// Center the element on the page.
-            ///BUG: It is not quite centered.
-            panel.style.left      = ((window.innerWidth / 2) - (panel.offsetWidth / 2)) + "px";
+            ///NOTE: document.body.clientWidth does not include the scroll bars.
+            panel.style.left      = ((document.body.clientWidth / 2) - (panel.offsetWidth / 2)) + "px";
             /// Restore CSS transitions (if supported by the browser).
-            panel.className     = "panel slide";
+            panel.className       = "panel slide";
             /// Move the panel to the very top of the page.
             /// The element has enough padding on the top to ensure that everything inside of it is visible to the user.
             ///NOTE: Opera needs a short delay in order for the transition to take effect.
