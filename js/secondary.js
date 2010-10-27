@@ -261,7 +261,11 @@
             panel.className     = "panel slide";
             /// Move the panel to the very top of the page.
             /// The element has enough padding on the top to ensure that everything inside of it is visible to the user.
-            panel.style.top     = 0;
+            ///NOTE: Opera needs a short delay in order for the transition to take effect.
+            window.setTimeout(function ()
+            {
+                panel.style.top = 0;
+            }, 0);
         }
         
         return function ()
