@@ -246,17 +246,22 @@
             };
             panel_container.appendChild(close_button);
             panel.appendChild(panel_container);
+            panel.innerHTML = "sflkslkfjsafjsdlksdflksfjlksjsdlkfjldkfjlsdkjflkdjflkjfjfkjsdklfjsdlkfjsdfsdflksdjfskdlfjskldfsdfksdjfklsjfklsjfklsjfkljfksdjfklsfjkljsklfjklsdjkljjsfdlkjsfdklj sdflkjsdflkjsfjslkfjsflksdlkfjsdlkfjsdklfjlkj ssldfjsdlkfjsdlkfjskdlfjsdjfslkfsdjfklsjdl<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf";
             /// END TEMP
             
             /// Remove CSS Transitions so that the element will immediately be moved just outside of the visible area so that it can slide in nicely (if CSS transitions are supported).
-            panel.className     = "panel";
+            panel.className       = "panel";
             /// Ensure that the element is visible (display is set to "none" when it is closed).
-            panel.style.display = "block";
+            panel.style.display   = "block";
+            /// Set the max with and height to a little smaller than the screen so that the contents will always be visible.
+            ///TODO: Determine if this should be done each time the window is resized.
+            panel.style.maxHeight = (window.innerHeight - 80) + "px";
+            panel.style.maxWidth  = (window.innerWidth  - 60) + "px";
             /// Quickly move the element to just above of the visible area.
-            panel.style.top     = -panel.offsetHeight + "px";
+            panel.style.top       = -panel.offsetHeight + "px";
             /// Center the element on the page.
             ///BUG: It is not quite centered.
-            panel.style.left    = ((window.innerWidth / 2) - (panel.offsetWidth / 2)) + "px";
+            panel.style.left      = ((window.innerWidth / 2) - (panel.offsetWidth / 2)) + "px";
             /// Restore CSS transitions (if supported by the browser).
             panel.className     = "panel slide";
             /// Move the panel to the very top of the page.
