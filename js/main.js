@@ -1860,10 +1860,10 @@ document.onkeydown = function (e)
 
 /// Is the browser Chromium or WebKit based?
 if (window.chrome || /AppleWebKit\//.test(window.navigator.userAgent)) {
-    /// Inject CSS to make the drop caps aligned with the second line of text.
-    ///NOTE: Needed for at least Chromium 5.
+    /// Inject CSS to make the drop caps aligned with the second line of text and add an inset shadow to the input box.
+    ///NOTE: Needed for at least Chromium 8.
     ///TODO: Determine if this would be better as a function.
-    document.body.appendChild(document.createElement("style").appendChild(document.createTextNode(".first_verse:first-letter, .first_paragraph:first-letter { padding-top: 5px; }")).parentNode);
+    document.body.appendChild(document.createElement("style").appendChild(document.createTextNode(".first_verse:first-letter, .first_paragraph:first-letter { padding-top: 5px; } .queryInput { background: url('data:image/gif;base64,R0lGODlhAQADAKEDAN3d3eTk5PLy8v///yH5BAEKAAMALAAAAAABAAMAAAICRFQAOw==') top repeat-x rgba(255, 255, 255, .5); }")).parentNode);
 }
 
 /****************************
