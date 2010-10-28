@@ -102,14 +102,7 @@ body {
 
 
 .queryInput {
-    /* Rounded corners for Mozilla */
-    -moz-border-radius: 15px;
-    /* Rounded corners for Opera 10.5+, IE 9+, WebKit 532.5+ (Chrome 4, Safari 5), Gecko 2 (Mozilla 4.0) */
-    border-radius:      15px;
-    
-    /* Add slight gradient shadow to the top of the input box. */
-    /* NOTE: Opera and some WebKit based browsers (like some versions of the iPhone) have a glitch where the background extends past the rounded corners. */
-    background: url('data:image/gif;base64,R0lGODlhAQADAKEDAN3d3eTk5PLy8v///yH5BAEKAAMALAAAAAABAAMAAAICRFQAOw==') top repeat-x rgba(255, 255, 255, .5);
+    background: rgba(255, 255, 255, .5);
     
     /* Padding is used to push the text away from the rounded corners. */
     padding: 3px 25px 1px 7px;
@@ -127,11 +120,24 @@ body {
     /* Dim the text when not in focus (or hovering) so that it does not distract from the text. */
     color: #a7a7a7;
     
-    border-style: solid;
-    border-width: 1px;
-    
+    border-style:       solid;
+    border-width:       1px;
     /* This gives the input box a slight 3D effect. */
-    border-color: #a7a7a7 #cacaca #c3c3c3 #a1a19b;
+    border-color:       #a7a7a7 #cacaca #c3c3c3 #a1a19b;
+    /* Rounded corners for Mozilla */
+    -moz-border-radius: 15px;
+    /* Rounded corners for Opera 10.5+, IE 9+, WebKit 532.5+ (Chrome 4, Safari 5), Gecko 2 (Mozilla 4.0) */
+    border-radius:      15px;
+    
+    /* Add slight gradient shadow to the top of the input box. */
+    /* NOTE: IE has its own DropShadow filter that could be used. */
+    /* Opera 10.5/Mozilla 4.0 */
+    box-shadow:         inset 0px 2px 3px rgba(0, 0, 0, .16);
+    /* Mozilla 3.5- */
+    -moz-box-shadow:    inset 0px 2px 3px rgba(0, 0, 0, .16);
+    /* WebKit 522 (Chrome, Safari 3) */
+    /* BUG: The inset shadow does not stay inside of the rounded corners.  (See Chromium issue 29427.) */
+    /* -webkit-box-shadow: inset 0px 2px 3px rgba(0, 0, 0, .16); */
     
     /* The margin balances moves the input box over a little so as not to cover the wrench icon. */
     margin: 2px 30px;
