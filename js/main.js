@@ -215,7 +215,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         scroll_maxed_top    = true,
         
         /// Objects
-        settings = {in_paragraphs: true}, ///TODO: Determine how this should be created.
+        settings = {view: {in_paragraphs: true, red_letters: true}}, ///TODO: Determine how this should be created.
         content_manager;
     
     if (!BF.viewPort_count) {
@@ -1156,7 +1156,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         ///TODO: Rewrite code so that it does not rely on so many inner variables (such as last_type and last_search_encoded).
         /// last_type set in prepare_new_search().
         var ajax,
-            extra_data = {action: last_type, "direction": direction, search_type: last_type, in_paragraphs: settings.in_paragraphs},
+            extra_data = {action: last_type, "direction": direction, search_type: last_type, in_paragraphs: settings.view.in_paragraphs},
             query      = "t=" + last_type;
         
         if (direction == additional) {
@@ -1774,7 +1774,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
     ///TODO: Determine if there is any problem hitting the server so quickly.
     window.setTimeout(function ()
     {
-        BF.include("js/secondary.js", {topBar: viewPort.firstChild, viewPort_num: viewPort_num});
+        BF.include("js/secondary.js", {settings: settings, topBar: viewPort.firstChild, viewPort_num: viewPort_num});
     }, 1000);
 
 };

@@ -229,13 +229,14 @@
             }
         }
         
-        function open_panel()
+        function open_panel(panel_el)
         {
             var close_button, /// <--- TEMP
                 panel_container = document.createElement("div");
             
             is_open = true;
             
+            /*
             /// TEMP
             close_button         = document.createElement("input");
             close_button.type    = "button";
@@ -245,15 +246,16 @@
                 close_panel();
             };
             panel_container.appendChild(close_button);
-            panel.appendChild(panel_container);
-            panel.innerHTML = "ssldfjsdlkfjsdlkfjskdlfjsdjfslkfsdjfklsjdl<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sdsfsdfsdfdssfsdffsdfsdf";
+            */
+            panel.appendChild(panel_el);
+            //panel.innerHTML = "ssldfjsdlkfjsdlkfjskdlfjsdjfslkfsdjfklsjdl<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sdsfsdfsdfdssfsdffsdfsdf";
             /// END TEMP
             
             /// Remove CSS Transitions so that the element will immediately be moved just outside of the visible area so that it can slide in nicely (if CSS transitions are supported).
             panel.className       = "panel";
             /// Ensure that the element is visible (display is set to "none" when it is closed).
             panel.style.display   = "block";
-            /// Set the max with and height to a little smaller than the screen so that the contents will always be visible.
+            /// Set the max with and height to get a little smaller than the screen so that the contents will always be visible.
             ///TODO: Determine if this should be done each time the window is resized.
             ///NOTE: document.body.clientHeight will not work right because it takes into account the entire page height, not just the viewable region.
             panel.style.maxHeight = (window.innerHeight        - 80) + "px";
@@ -274,11 +276,11 @@
             }, 0);
         }
         
-        return function ()
+        return function (panel_el)
         {
             close_panel(function ()
             {
-                open_panel();
+                open_panel(panel_el);
             });
         };
     }());
@@ -292,7 +294,8 @@
      */
     (function ()
     {
-        var wrench_button = document.createElement("input"),
+        var show_configure_panel,
+            wrench_button = document.createElement("input"),
             wrench_label  = document.createElement("label");
         
         ///NOTE: An IE 8 bug(?) prevents modification of the type attribute after an element is attached to the DOM, so it must be done earlier.
@@ -320,10 +323,23 @@
         
         wrench_button.className = "wrenchIcon";
         
+        
+        show_configure_panel = (function ()
+        {
+            var panel_element = document.createElement("div");
+            
+            panel_element.innerHTML = "<fieldset><legend>View</legend><table><tr><td>Red Letters</td><td><input type=checkbox name=paragraphs></td></tr><tr><td>Paragraphs</td><td><input type=checkbox name=paragraphs></td></tr></table></fieldset>";
+            
+            return function ()
+            {
+                show_panel(panel_element);
+            };
+        }());
+        
         /**
          * Prepare to display the context menu near the wrench button.
          *
-         * @param  e (object) The event object optionally sent by the browser.
+         * @param  e (object) (optional) The event object optionally sent by the browser.
          * @note   Called when the user clicks on the wrench button.
          * @return NULL.
          * @todo   Make the wrench icon look pressed.
@@ -334,7 +350,7 @@
             var wrench_pos = BF.get_position(wrench_button);
             
             ///TODO: These need to be language specific.
-            show_context_menu(wrench_pos.left, wrench_pos.top + wrench_button.offsetHeight, [{text: "Configure", link: show_panel}, {line: 1, text: "Blog", link: "http://blog.bibleforge.com"}, {text: "Help", link: show_panel}]);
+            show_context_menu(wrench_pos.left, wrench_pos.top + wrench_button.offsetHeight, [{text: "Configure", link: show_configure_panel}, {line: true, text: "Blog", link: "http://blog.bibleforge.com"}, {text: "Help", link: show_panel}]);
             
             /// Stop the even from bubbling so that document.onclick() does not fire and attempt to close the menu immediately.
             ///TODO: Determine if stopping propagation causes or could cause problems with other events.

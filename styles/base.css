@@ -264,6 +264,19 @@ body {
     opacity: .6;
 }
 
+/**
+ * Emulate button pressing.
+ *
+ * @note This does not work in IE.
+ */
+.inputIcon:active {
+    /* This is a simple way of moving the icon over slightly when clicked. */
+    border-left: 1px solid transparent;
+    /* Highlight the icon even more. */
+    opacity: .9;
+}
+
+
 .wrenchIcon:hover, .wrenchPadding:hover .wrenchIcon {
     /* The speed of the border-color change is increased to make it fade in before the opacity is finished so that is looks smooth. */
     /* Transition for Mozilla (Firefox 4.0+) */
@@ -367,18 +380,14 @@ body {
 }
 
 
-/**
- * Emulate button pressing.
- *
- * @note This does not work in IE.
- */
-.inputIcon:active {
-    /* This is a simple way of moving the icon over slightly when clicked. */
-    border-left: 1px solid transparent;
-    /* Highlight the icon even more. */
-    opacity: .9;
+fieldset {
+    border: 0;
 }
 
+legend {
+    font-size:    20px;
+    margin-left: -10px;
+}
 
 .scrolls {
     overflow:		hidden;
