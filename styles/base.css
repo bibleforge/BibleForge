@@ -179,48 +179,6 @@ body {
 }
 
 
-.panel .done_button {
-    float: right;
-}
-
-button {
-   border: 1px solid #8ec1da;
-   background-color: #ddeef6;
-   border-radius: 4px;
-   -moz-border-radius: 4px;
-   box-shadow:         inset 0 1px 3px #fff, inset 0 -15px #cbe6f2, 0 0 3px #8ec1da;
-   -webkit-box-shadow: inset 0 1px 3px #fff, inset 0 -15px #cbe6f2, 0 0 3px #8ec1da;
-   -moz-box-shadow:    inset 0 1px 3px #fff, inset 0 -15px #cbe6f2, 0 0 3px #8ec1da;
-   color: #3985a8;
-   text-shadow: 0 1px #fff;
-   padding: 5px 14px;
-   outline: 0;
-   
-    /* Fade the background color on mouse down. */
-    /* Transition for Mozilla (Firefox 4.0+) */
-    -moz-transition:    background-color .2s;
-    /* Transition for WebKit */
-    -webkit-transition: background-color .2s;
-    /* Transition for Opera 10.5+ */
-    -o-transition:      background-color .2s;
-}
-
-/**
- * Emulate button pressing.
- *
- * @note This does not work in IE.
- */
-button:active {
-    padding: 6px 13px 4px 15px;
-    background-color: #c6e7f6;
-}
-
-/* Remove the ugly dashed border on the text of buttons in Mozilla when clicked. */
-button::-moz-focus-inner {
-    border: 0;
-}
-
-
 .inputIcon {
     /* Move the icon over the right end of the input box. */
     margin-left: -55px;
@@ -431,6 +389,54 @@ legend {
     font-size:    20px;
     margin-left: -10px;
 }
+
+
+.panel .done_button {
+    float: right;
+}
+
+button {
+   border: 1px solid #8ec1da;
+   
+   border-radius:      4px;
+   -moz-border-radius: 4px;
+   
+   background-color: #ddeef6;
+   
+   box-shadow:         inset 0 1px 3px #fff, inset 0 -15px #cbe6f2, 0 0 3px #8ec1da;
+   -webkit-box-shadow: inset 0 1px 3px #fff, inset 0 -15px #cbe6f2, 0 0 3px #8ec1da;
+   -moz-box-shadow:    inset 0 1px 3px #fff, inset 0 -15px #cbe6f2, 0 0 3px #8ec1da;
+   
+   color:       #3985a8;
+   text-shadow: 0 1px #fff;
+   
+   padding: 5px 14px;
+   outline: 0;
+   
+    /* Fade the background color on mouse down. */
+    /* Transition for Mozilla (Firefox 4.0+) */
+    -moz-transition:    background-color .2s;
+    /* Transition for WebKit */
+    -webkit-transition: background-color .2s;
+    /* Transition for Opera 10.5+ */
+    -o-transition:      background-color .2s;
+}
+
+/**
+ * Emulate button pressing.
+ *
+ * @note This does not work in IE.
+ */
+button:active {
+    padding: 6px 13px 4px 15px;
+    background-color: #c6e7f6;
+}
+
+/* Remove the ugly dashed border on the text of buttons in Mozilla when clicked. */
+button::-moz-focus-inner {
+    border: 0;
+}
+
 
 .scrolls {
     overflow:		hidden;
