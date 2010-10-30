@@ -231,13 +231,12 @@
         
         function open_panel(panel_el)
         {
-            var done_button     = document.createElement("input"),
+            var done_button     = document.createElement("button"),
                 panel_container = document.createElement("div");
             
             is_open = true;
             
-            done_button.type      = "button";
-            done_button.value     = "Done";
+            done_button.innerHTML = "Done";
             done_button.className = "done_button";
             /// An anonymous function must be used because we do not want to send the event object to close_panel().
             done_button.onclick   = function ()
