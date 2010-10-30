@@ -179,6 +179,11 @@ body {
 }
 
 
+.panel .done_button {
+    float: right;
+}
+
+
 .inputIcon {
     /* Move the icon over the right end of the input box. */
     margin-left: -55px;

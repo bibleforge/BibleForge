@@ -231,25 +231,28 @@
         
         function open_panel(panel_el)
         {
-            var close_button, /// <--- TEMP
+            var done_button     = document.createElement("input"),
                 panel_container = document.createElement("div");
             
             is_open = true;
             
-            /*
-            /// TEMP
-            close_button         = document.createElement("input");
-            close_button.type    = "button";
-            close_button.value   = "close";
-            close_button.onclick = function ()
+            done_button.type      = "button";
+            done_button.value     = "Done";
+            done_button.className = "done_button";
+            /// An anonymous function must be used because we do not want to send the event object to close_panel().
+            done_button.onclick   = function ()
             {
                 close_panel();
             };
-            panel_container.appendChild(close_button);
-            */
-            panel.appendChild(panel_el);
-            //panel.innerHTML = "ssldfjsdlkfjsdlkfjskdlfjsdjfslkfsdjfklsjdl<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sfsdfsdf<br>sdsfsdfsdfdssfsdffsdfsdf";
-            /// END TEMP
+            
+            ///NOTE: The reason why panel_container is used is to provide a single element that can be attached to the DOM so that the page does not have to reflow multiple times.
+            ///      Also, clearing innerHTML works much better when there is just one element to clear.
+            panel_container.appendChild(panel_el);
+            panel_container.appendChild(done_button);
+            /// Remove the old panel.
+            ///TODO: Figure out if it is better not to clear the panel if the panel is the same as the previous one.
+            panel.innerHTML = "";
+            panel.appendChild(panel_container);
             
             /// Remove CSS Transitions so that the element will immediately be moved just outside of the visible area so that it can slide in nicely (if CSS transitions are supported).
             panel.className       = "panel";
