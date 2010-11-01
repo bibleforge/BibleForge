@@ -403,9 +403,10 @@ button {
    
    background-color: #ddeef6;
    
-   box-shadow:         inset 0 1px 3px #fff, inset 0 -15px #cbe6f2, 0 0 3px #8ec1da;
-   -webkit-box-shadow: inset 0 1px 3px #fff, inset 0 -15px #cbe6f2, 0 0 3px #8ec1da;
-   -moz-box-shadow:    inset 0 1px 3px #fff, inset 0 -15px #cbe6f2, 0 0 3px #8ec1da;
+   /* Opera 10.5/Mozilla 4.0 */
+   box-shadow:         inset 0 1px 3px #fff, inset 0 -15px 1px #cbe6f2, 0 0 3px #8ec1da;
+   -webkit-box-shadow: inset 0 1px 3px #fff, inset 0 -15px 1px #cbe6f2, 0 0 3px #8ec1da;
+   -moz-box-shadow:    inset 0 1px 3px #fff, inset 0 -15px 1px #cbe6f2, 0 0 3px #8ec1da;
    
    color:       #3985a8;
    text-shadow: 0 1px #fff;
