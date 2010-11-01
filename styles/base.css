@@ -423,11 +423,11 @@ button {
    
     /* Fade the background color on mouse down. */
     /* Transition for Mozilla (Firefox 4.0+) */
-    -moz-transition:    background-color .2s;
+    -moz-transition:    background-color .1s;
     /* Transition for WebKit */
-    -webkit-transition: background-color .2s;
+    -webkit-transition: background-color .1s;
     /* Transition for Opera 10.5+ */
-    -o-transition:      background-color .2s;
+    -o-transition:      background-color .1s;
 }
 
 /**
