@@ -118,12 +118,12 @@ body {
     height:    18px;
     
     /* Dim the text when not in focus (or hovering) so that it does not distract from the text. */
-    color: #a7a7a7;
+    color: #A7A7A7;
     
     border-style:       solid;
     border-width:       1px;
     /* This gives the input box a slight 3D effect. */
-    border-color:       #a7a7a7 #cacaca #c3c3c3 #a1a19b;
+    border-color:       #A7A7A7 #CACACA #C3C3C3 #A1A19B;
     /* Rounded corners for Mozilla */
     -moz-border-radius: 15px;
     /* Rounded corners for Opera 10.5+, IE 9+, WebKit 532.5+ (Chrome 4, Safari 5), Gecko 2 (Mozilla 4.0) */
@@ -159,14 +159,14 @@ body {
  */
 .queryInput:hover {
     /* Darken the text so that it is more prominent. */
-    border-color: #96968e;
+    border-color: #96968E;
 }
 
 /**
  * Highlight the input box.
  */
 .queryInput:focus {
-    border-color: #96968e;
+    border-color: #96968E;
     
     /* Darken the text so that it is more prominent. */
     color: #555;
@@ -396,20 +396,20 @@ legend {
 }
 
 button {
-   border: 1px solid #8ec1da;
+   border: 1px solid #8EC1DA;
    
    border-radius:      4px;
    -moz-border-radius: 4px;
    
-   background-color: #ddeef6;
+   background-color: #DDEEF6;
    
    /* Opera 10.5/Mozilla 4.0 */
-   box-shadow:         inset 0 1px 3px #fff, inset 0 -15px 1px #cbe6f2, 0 0 3px #8ec1da;
-   -webkit-box-shadow: inset 0 1px 3px #fff, inset 0 -15px 1px #cbe6f2, 0 0 3px #8ec1da;
-   -moz-box-shadow:    inset 0 1px 3px #fff, inset 0 -15px 1px #cbe6f2, 0 0 3px #8ec1da;
+   box-shadow:         inset 0 1px 3px #FFF, inset 0 -15px 1px #CBE6F2, 0 0 3px #8EC1DA;
+   -webkit-box-shadow: inset 0 1px 3px #FFF, inset 0 -15px 1px #CBE6F2, 0 0 3px #8EC1DA;
+   -moz-box-shadow:    inset 0 1px 3px #FFF, inset 0 -15px 1px #CBE6F2, 0 0 3px #8EC1DA;
    
-   color:       #3985a8;
-   text-shadow: 0 1px #fff;
+   color:       #3985A8;
+   text-shadow: 0 1px #FFF;
    
    padding: 5px 14px;
    outline: 0;
@@ -430,7 +430,7 @@ button {
  */
 button:active {
     padding: 6px 13px 4px 15px;
-    background-color: #c6e7f6;
+    background-color: #C6E7F6;
 }
 
 /* Remove the ugly dashed border on the text of buttons in Mozilla when clicked. */
