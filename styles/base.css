@@ -332,13 +332,20 @@ body {
     /* Prevent the text from wrapping. */
     white-space:     nowrap;
     width:           100%;
+    
+    /* Make the background and font color fade when the mouse hovers/leaves. */
+    -moz-transition:    background .2s, color .2s;
+    -webkit-transition: background .2s, color .2s;
+    -o-transition:      background .2s, color .2s;
 }
 
 .contextMenu div a:hover {
     /* TODO: Determine if it is better to use the color that is similar to the yellow before the transparency is applied (#DDF) or use transparency. */
     background: #E1E1FF;
+    color:      #3985A8;
+    
     /* Ensure that the cursor will look like a hand even if not hovering over the text. */
-    cursor:     pointer;
+    cursor: pointer;
 }
 
 
