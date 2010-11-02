@@ -421,13 +421,19 @@ button {
     -o-transition:      background-color .1s;
 }
 
+button:hover {
+    background-color: rgba(221, 238, 246, .6);
+}
+
 /**
  * Emulate button pressing.
  *
  * @note This does not work in IE.
  */
 button:active {
+    /* TODO: Determine if it would be better just to change the text shadow color.  (Opera already moves the text.) */
     padding: 6px 13px 4px 15px;
+    
     background-color: #E1E1FF;
 }
 
