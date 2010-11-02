@@ -224,6 +224,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
     viewPort_num = BF.viewPort_count++;
     
     
+    ///TODO: Move this to secondary.js.
     /*********************************
      * Start of Mouse Hiding Closure *
      *********************************/

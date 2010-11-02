@@ -317,11 +317,11 @@
         
         /// Make the elements transparent at first and fade in (using a CSS transition).
         wrench_label.className = "wrenchPadding transparent";
-        ///NOTE: In order for the CSS transition to occur, there needs to be a slight delay.
+        ///NOTE: In order for the CSS transition to occur, there needs to be a slight delay.  Mozilla 4.0 seems to need at least 20 milliseconds.
         window.setTimeout(function ()
         {
             wrench_label.className = "wrenchPadding";
-        }, 0);
+        }, 20);
         
         wrench_button.className = "wrenchIcon";
         
