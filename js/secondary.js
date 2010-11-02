@@ -316,11 +316,12 @@
         context.topBar.insertBefore(wrench_label, context.topBar.childNodes[0]);
         
         /// Make the elements transparent at first and fade in (using a CSS transition).
-        wrench_label.className = "wrenchPadding transparent";
+        wrench_label.style.opacity = 0;
+        wrench_label.className     = "wrenchPadding";
         ///NOTE: In order for the CSS transition to occur, there needs to be a slight delay.  Mozilla 4.0 seems to need at least 20 milliseconds.
         window.setTimeout(function ()
         {
-            wrench_label.className = "wrenchPadding";
+            wrench_label.style.opacity = 1;
         }, 20);
         
         wrench_button.className = "wrenchIcon";
