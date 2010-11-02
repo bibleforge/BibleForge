@@ -201,6 +201,26 @@ body {
     position: absolute;
 }
 
+/**
+ * Fade in icon on hover.
+ */
+.inputIcon:hover, .wrenchIcon:hover, .wrenchPadding:hover .wrenchIcon {
+    opacity: .6;
+}
+
+/**
+ * Emulate button pressing.
+ *
+ * @note This does not work in IE.
+ */
+.inputIcon:active {
+    /* This is a simple way of moving the icon over slightly when clicked. */
+    border-left: 1px solid transparent;
+    /* Highlight the icon even more. */
+    opacity: .9;
+}
+
+
 .wrenchPadding {
     position: absolute;
     /* Add padding around wrench with extra padding below and on the right. */
@@ -246,26 +266,6 @@ body {
     /* Remove the hideous selection rectangle when clicked. */
     outline: 0;
 }
-
-/**
- * Fade in icon on hover.
- */
-.inputIcon:hover, .wrenchIcon:hover, .wrenchPadding:hover .wrenchIcon {
-    opacity: .6;
-}
-
-/**
- * Emulate button pressing.
- *
- * @note This does not work in IE.
- */
-.inputIcon:active {
-    /* This is a simple way of moving the icon over slightly when clicked. */
-    border-left: 1px solid transparent;
-    /* Highlight the icon even more. */
-    opacity: .9;
-}
-
 
 .wrenchIcon:hover, .wrenchPadding:hover .wrenchIcon {
     /* The speed of the border-color change is increased to make it fade in before the opacity is finished so that is looks smooth. */
