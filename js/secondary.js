@@ -109,7 +109,7 @@
                     menu_item.style.borderTop = "1px solid #A3A3A3";
                 }
                 
-                /// document.createTextNode() is akin to innerText.  It does not inject HTML.
+                ///NOTE: document.createTextNode() is akin to innerText.  It does not inject HTML.
                 menu_item.appendChild(document.createTextNode(menu_items[i].text));
                 menu_container.appendChild(menu_item);
             }
@@ -329,9 +329,54 @@
         
         show_configure_panel = (function ()
         {
-            var panel_element = document.createElement("div");
+            var panel_element   = document.createElement("div"),
+                settings_config = [{name: "View", settings_value: "view", options: [{name: "Red Letters", type: "checkbox", settings_value: "red_letters"}, {name: "Paragraphs", type: "checkbox", settings_value: "in_paragraphs"}]}];
             
-            panel_element.innerHTML = "<fieldset><legend>View</legend><table><tr><td>Red Letters</td><td><input type=checkbox name=paragraphs></td></tr><tr><td>Paragraphs</td><td><input type=checkbox name=paragraphs></td></tr></table></fieldset>";
+            function create_element_from_config(config)
+            {
+                var container_el = document.createElement("fieldset"),
+                    cur_option   = 0,
+                    input_el,
+                    legend_el    = document.createElement("legend"),
+                    apply_change,
+                    option_count = config.options.length,
+                    table_el     = document.createElement("table"),
+                    table_row,
+                    table_cell;
+                
+                ///NOTE: document.createTextNode() is akin to innerText.  It does not inject HTML.
+                legend_el.appendChild(document.createTextNode(config.name));
+                container_el.appendChild(legend_el);
+                
+                while (cur_option < option_count) {
+                    table_row  = table_el.insertRow(-1);
+                    
+                    table_cell = table_row.insertCell(-1);
+                    table_cell.appendChild(document.createTextNode(config.options[cur_option].name));
+                    
+                    table_cell = table_row.insertCell(-1);
+                    
+                    switch (config.options[cur_option].type) {
+                    case "checkbox":
+                        input_el = document.createElement("input");
+                        input_el.type = "checkbox";
+                    }
+                    
+                    table_cell.appendChild(input_el);
+                    
+                    ++cur_option;
+                }
+                
+                container_el.appendChild(table_el);
+                
+                return container_el;
+            }
+            
+            
+            //panel_element.innerHTML = "<fieldset><legend>View</legend><table><tr><td>Red Letters</td><td><input type=checkbox name=paragraphs></td></tr><tr><td>Paragraphs</td><td><input type=checkbox name=paragraphs></td></tr></table></fieldset>";
+            
+            ///TODO: Determine which settings pane to create first (based on the last one the user used).
+            panel_element = create_element_from_config(settings_config[0]);
             
             return function ()
             {
