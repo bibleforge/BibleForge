@@ -180,7 +180,6 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         additional	= 1,
         previous	= 2,
         
-        highlight_limit				= 20,	/// Currently, we limit the unique number of search words to highlight.
         highlight_re				= [],	/// Highlighter regex array
         last_book					= 0,	/// The number of the last book of the Bible that was returned
         last_search					= "",
