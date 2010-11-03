@@ -384,6 +384,9 @@
                         input_el = document.createElement("input");
                         input_el.type = "checkbox";
                         
+                        /// Set the current value.
+                        input_el.checked = context.settings[config.settings_value][config.options[cur_option].settings_value];
+                        
                         /**
                         * Create the function that sends the new value to the settings.
                         *
