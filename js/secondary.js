@@ -373,11 +373,11 @@
                         */
                         return function (new_value)
                         {
-                            document.title = "(testing) " + option_name + " = " + new_value;
+                            document.title = "(testing) " + option_name + " = " + new_value + " | " + context.settings.view.red_letters;
                             ///NOTE: Need to use getters and setters.
                             settings_obj[option_name] = new_value;
                         }
-                    }(context.settings[config.name], config.options[cur_option].name));
+                    }(context.settings[config.settings_value], config.options[cur_option].settings_value));
                     
                     switch (config.options[cur_option].type) {
                     case "checkbox":
