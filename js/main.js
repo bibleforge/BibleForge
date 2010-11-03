@@ -1455,7 +1455,6 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         }
                         
                         HTML_str += start_paragraph_HTML;
-                        is_in_paragraph = true;
                     }
                     
                     ///NOTE: The trailing space adds a space between verses in a paragraph and does not effect paragraph final verses.
