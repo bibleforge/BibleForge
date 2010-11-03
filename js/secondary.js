@@ -344,10 +344,51 @@
                     table_row,
                     table_cell;
                 
+                /**
+                 * Create the function that changes the settings.
+                 *
+                 * @note Called immediately.
+                 */
+                function make_apply_change(settings_obj, option_name)
+                {
+                    /**
+                     * Implement the change in setting.
+                     *
+                     * @note Called when the user changes a setting.
+                     */
+                    return function (new_value)
+                    {
+                        document.title = "(testing) " + option_name + " = " + new_value + " | " + context.settings.view.red_letters;
+                        ///NOTE: Need to use getters and setters.
+                        settings_obj[option_name] = new_value;
+                    };
+                }
+                
+                
+                /**
+                 * Create the function that sends the new value to the settings.
+                 *
+                 * @note Called immediately.
+                 */
+                function make_checkbox_onclick(this_apply_change)
+                {
+                    /**
+                     * Run the specific function to make the change.
+                     *
+                     * @note Called when the user clicks a checkbox.
+                     * @note Keyboard actions (such as pressing Space Bar) counts as a click.
+                     */
+                    return function ()
+                    {
+                        this_apply_change(this.checked);
+                    };
+                }
+                
                 ///NOTE: document.createTextNode() is akin to innerText.  It does not inject HTML.
                 legend_el.appendChild(document.createTextNode(config.name));
                 container_el.appendChild(legend_el);
                 
+                /// Create the input items in the table.
                 while (cur_option < option_count) {
                     ///NOTE: Passing -1 to insertRow() and insertCell() adds a row/cell to the end of the table.
                     table_row  = table_el.insertRow(-1);
@@ -359,25 +400,7 @@
                     
                     table_cell = table_row.insertCell(-1);
                     
-                    /**
-                     * Create the function that changes the settings.
-                     *
-                     * @note Called immediately.
-                     */
-                    apply_change = (function (settings_obj, option_name)
-                    {
-                        /**
-                        * Implement the change in setting.
-                        *
-                        * @note Called when the user changes a setting.
-                        */
-                        return function (new_value)
-                        {
-                            document.title = "(testing) " + option_name + " = " + new_value + " | " + context.settings.view.red_letters;
-                            ///NOTE: Need to use getters and setters.
-                            settings_obj[option_name] = new_value;
-                        }
-                    }(context.settings[config.settings_value], config.options[cur_option].settings_value));
+                    apply_change = make_apply_change(context.settings[config.settings_value], config.options[cur_option].settings_value);
                     
                     switch (config.options[cur_option].type) {
                     case "checkbox":
@@ -387,24 +410,7 @@
                         /// Set the current value.
                         input_el.checked = context.settings[config.settings_value][config.options[cur_option].settings_value];
                         
-                        /**
-                        * Create the function that sends the new value to the settings.
-                        *
-                        * @note Called immediately.
-                        */
-                        input_el.onclick = (function (this_apply_change)
-                        {
-                            /**
-                            * Run the specific function to make the change.
-                            *
-                            * @note Called when the user clicks a checkbox.
-                            * @note Keyboard actions (such as pressing Space Bar) counts as a click.
-                            */
-                            return function ()
-                            {
-                                this_apply_change(this.checked);
-                            };
-                        }(apply_change));
+                        input_el.onclick = make_checkbox_onclick(apply_change);
                     }
                     
                     table_cell.appendChild(input_el);
