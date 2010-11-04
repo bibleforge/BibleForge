@@ -358,9 +358,9 @@
                      */
                     return function (new_value)
                     {
-                        document.title = "(testing) " + option_name + " = " + new_value + " | " + context.settings.view.red_letters;
+                        document.title = "(testing) " + option_name + " = " + new_value + " | " + context.settings.view.red_letters.get();
                         ///NOTE: Need to use getters and setters.
-                        settings_obj[option_name] = new_value;
+                        settings_obj[option_name].set(new_value);
                     };
                 }
                 
@@ -408,7 +408,7 @@
                         input_el.type = "checkbox";
                         
                         /// Set the current value.
-                        input_el.checked = context.settings[config.settings_value][config.options[cur_option].settings_value];
+                        input_el.checked = context.settings[config.settings_value][config.options[cur_option].settings_value].get();
                         
                         input_el.onclick = make_checkbox_onclick(apply_change);
                     }
