@@ -556,9 +556,11 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 page.removeChild(child);
                 
                 /// This fixes an IE7+ bug that causes the page to scroll needlessly when an element is added.
+                ///TODO: Determine if this is still an issue with IE9.
                 /*@cc_on
                     scrollViewTo(0, window.pageYOffset);
                 @*/
+                
                 /// End execution to keep the checking_content_top_interval running because there might be even more content that should be removed.
                 bottomLoader.style.visibility = "visible";
                 
