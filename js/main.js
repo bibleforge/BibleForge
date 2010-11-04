@@ -214,13 +214,47 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         scroll_maxed_top    = true,
         
         /// Objects
-        settings = {view: {in_paragraphs: true, red_letters: true}}, ///TODO: Determine how this should be created.
+        settings,
         content_manager;
     
     if (!BF.viewPort_count) {
         BF.viewPort_count = 0;
     }
     viewPort_num = BF.viewPort_count++;
+    
+    
+    /**
+     * Create an object with getter and setter abilities.
+     *
+     * @param  cur_val  (mixed)    (optional) The default value.
+     * @param  onchange (function) (optional) The function to be called after the set method is called.
+     * @return An object containing get and set methods.
+     * @note   This is used to handle data in the settings object.
+     * @todo   Determine if there should be a validate_change function as a parameter that can accept or reject a change.
+     */
+    function create_get_set(cur_val, onchange)
+    {
+        return {get: function ()
+        {
+            return cur_val;
+        }, set: function (new_val)
+        {
+            /// Temporarily store the original value to be sent to the onchange function.
+            var old_val = cur_val;
+            
+            cur_val = new_val;
+            
+            /// Optionally run a function when the value is changed.
+            if (onchange && typeof onchange != "function") {
+                window.setTimeout(function ()
+                {
+                    onchange({old_val: old_val, new_val: new_val});
+                }, 0);
+            }
+        }};
+    }
+    
+    settings = {view: {in_paragraphs: create_get_set(true), red_letters: create_get_set(true)}}, ///TODO: Determine how this should be created.
     
     
     ///TODO: Move this to secondary.js.
@@ -1156,7 +1190,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         ///TODO: Rewrite code so that it does not rely on so many inner variables (such as last_type and last_search_encoded).
         /// last_type set in prepare_new_search().
         var ajax,
-            extra_data = {action: last_type, "direction": direction, search_type: last_type, in_paragraphs: settings.view.in_paragraphs},
+            extra_data = {action: last_type, "direction": direction, search_type: last_type, in_paragraphs: settings.view.in_paragraphs.get()},
             query      = "t=" + last_type;
         
         if (direction == additional) {
