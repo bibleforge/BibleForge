@@ -347,14 +347,16 @@
                 /**
                  * Create the function that changes the settings.
                  *
-                 * @note Called immediately.
+                 * @return A function.
+                 * @note   Called immediately.
                  */
                 function make_apply_change(settings_obj, option_name)
                 {
                     /**
                      * Implement the change in setting.
                      *
-                     * @note Called when the user changes a setting.
+                     * @return NULL.
+                     * @note   Called when the user changes a setting.
                      */
                     return function (new_value)
                     {
@@ -368,6 +370,7 @@
                 /**
                  * Create the function that sends the new value to the settings.
                  *
+                 * @return A function.
                  * @note Called immediately.
                  */
                 function make_checkbox_onclick(this_apply_change)
@@ -375,6 +378,7 @@
                     /**
                      * Run the specific function to make the change.
                      *
+                     * @return NULL.
                      * @note Called when the user clicks a checkbox.
                      * @note Keyboard actions (such as pressing Space Bar) counts as a click.
                      */
@@ -393,13 +397,16 @@
                     ///NOTE: Passing -1 to insertRow() and insertCell() adds a row/cell to the end of the table.
                     table_row  = table_el.insertRow(-1);
                     
+                    /// Insert a <td> for the name of the setting.
                     table_cell = table_row.insertCell(-1);
                     ///TODO: Add a label connected with the input box.
                     ///NOTE: document.createTextNode() is akin to innerText.  It does not inject HTML.
                     table_cell.appendChild(document.createTextNode(config.options[cur_option].name));
                     
+                    /// Insert a <td> for the input element.
                     table_cell = table_row.insertCell(-1);
                     
+                    /// Create the function that changes the proper settings before the switch statement so that it can be used multiple times inside of it.
                     apply_change = make_apply_change(context.settings[config.settings_value], config.options[cur_option].settings_value);
                     
                     switch (config.options[cur_option].type) {
