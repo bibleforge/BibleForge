@@ -244,8 +244,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             
             cur_val = new_val;
             
-            /// Optionally run a function when the value is changed.
-            if (onchange && typeof onchange != "function") {
+            /// Optionally, run a function after the value is changed.
+            if (onchange && typeof onchange == "function") {
                 window.setTimeout(function ()
                 {
                     onchange({old_val: old_val, new_val: new_val});
