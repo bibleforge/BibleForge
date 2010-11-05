@@ -69,8 +69,6 @@ BF.lang = (function ()
         grammar_marker_len: 4,   /// The length of grammar_marker.
         grammar_separator:  ",", /// The punctuation that separates two attributes.
         
-        ///TODO: Review stem_word() for optimizations.
-        ///TODO: Document stem_word() better.
         /**
          * Convert an English word to its root form.
          *
@@ -83,6 +81,8 @@ BF.lang = (function ()
          * @note	Called by prepare_highlighter() in js/main.js.
          * @link	http://snowball.tartarus.org/algorithms/english/stemmer.html
          * @link	http://www.tartarus.org/~martin/PorterStemmer
+         * @todo    Document stem_word() better: give examples and reasonings for each regular expression, etc.
+         * @todo    Review stem_word() for optimizations: avoid regex when possible.
          */
         stem_word: function (w)
         {
@@ -107,17 +107,16 @@ BF.lang = (function ()
             /// Step 1a
             re  = /^(.+?)(ss|i)es$/;
             re2 = /^(.+?)([^s])s$/;
-
+            
             if (re.test(w)) {
-                w = w.replace(re, "$1$2");
+                w = w.replace(re,  "$1$2");
             } else if (re2.test(w)) {
                 w = w.replace(re2, "$1$2");
             }
             
             /// Step 1b
             /// "Present-day" English: re = /^(.+?)eed$/;
-            re = /^(.+?)ee$/; /// Early Modern English fix
-            
+            re  = /^(.+?)ee$/; /// Early Modern English fix
             /// "Present-day" English: re2 = /^(.+?)(ingly|edly|ed|ing|ly)$/;
             re2 = /^(.+?)(ing(?:ly)?|ed(?:ly)?|ly|e(?:st|th))$/; /// Early Modern English fix
             
@@ -127,8 +126,8 @@ BF.lang = (function ()
                     w.slice(0, -1);
                 }
             } else if (re2.test(w)) {
-                fp      = re2.exec(w);
-                stem    = fp[1];
+                fp   = re2.exec(w);
+                stem = fp[1];
                 if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy]/.test(stem)) {
                     w   = stem;
                     re2 = /(?:at|bl|iz)$/;
@@ -148,8 +147,8 @@ BF.lang = (function ()
             /// Step 1c
             re = /^(.+?)y$/;
             if (re.test(w)) {
-                fp      = re.exec(w);
-                stem    = fp[1];
+                fp   = re.exec(w);
+                stem = fp[1];
                 if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy]/.test(stem)) {
                     w = stem + "i";
                 }
@@ -158,9 +157,9 @@ BF.lang = (function ()
             /// Step 2
             re = /^(.+?)(a(?:t(?:ion(?:al)?|or)|nci|l(?:li|i(?:sm|ti)))|tional|e(?:n(?:ci|til)|li)|i(?:z(?:er|ation)|v(?:eness|iti))|b(?:li|iliti)|ous(?:li|ness)|fulness|logi)$/;
             if (re.test(w)) {
-                fp      = re.exec(w);
-                stem    = fp[1];
-                suffix  = fp[2];
+                fp     = re.exec(w);
+                stem   = fp[1];
+                suffix = fp[2];
                 if (/^([^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(stem)) {
                     w = stem + step2list[suffix];
                 }
@@ -169,9 +168,9 @@ BF.lang = (function ()
             /// Step 3
             re = /^(.+?)(ic(?:a(?:te|l)|iti)|a(?:tive|lize)|ful|ness|self)$/;
             if (re.test(w)) {
-                fp      = re.exec(w);
-                stem    = fp[1];
-                suffix  = fp[2];
+                fp     = re.exec(w);
+                stem   = fp[1];
+                suffix = fp[2];
                 if (/^([^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(stem)) {
                     w = stem + step3list[suffix];
                 }
@@ -182,14 +181,14 @@ BF.lang = (function ()
             re2 = /^(.+?)([st])ion$/;
             
             if (re.test(w)) {
-                fp      = re.exec(w);
-                stem    = fp[1];
+                fp   = re.exec(w);
+                stem = fp[1];
                 if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(stem)) {
                     w = stem;
                 }
             } else if (re2.test(w)) {
-                fp      = re2.exec(w);
-                stem    = fp[1] + fp[2];
+                fp   = re2.exec(w);
+                stem = fp[1] + fp[2];
                 if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(stem)) {
                     w = stem;
                 }
@@ -198,11 +197,11 @@ BF.lang = (function ()
             /// Step 5
             re = /^(.+?)e$/;
             if (re.test(w)) {
-                fp      = re.exec(w);
-                stem    = fp[1];
-                re	    = /^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/;
-                re2     = /^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*(?:[aeiouy][aeiou]*)?$/;
-                re3     = /^[^aeiou][^aeiouy]*[aeiouy][^aeiouwxy]$/;
+                fp   = re.exec(w);
+                stem = fp[1];
+                re   = /^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/;
+                re2  = /^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*(?:[aeiouy][aeiou]*)?$/;
+                re3  = /^[^aeiou][^aeiouy]*[aeiouy][^aeiouwxy]$/;
                 
                 if (re.test(stem) || (re2.test(stem) && !(re3.test(stem)))) {
                     w = stem;
@@ -244,7 +243,7 @@ BF.lang = (function ()
          */
         determine_reference: function (ref)
         {
-            var book    = 0,
+            var book = 0,
                 chapter,
                 cv,
                 verse,
@@ -576,13 +575,13 @@ BF.lang = (function ()
                     case "63":
                     case "64":
                     case "65":
-                        verse = chapter;
+                        verse   = chapter;
                         chapter = "001";
                     }
                 }
-                zeros = ["", "00", "0", ""];
+                zeros   = ["", "00", "0", ""];
                 chapter = zeros[chapter.length] + chapter;
-                verse = zeros[verse.length] + verse;
+                verse   = zeros[verse.length]   + verse;
             }
             
             return book + chapter + verse;
