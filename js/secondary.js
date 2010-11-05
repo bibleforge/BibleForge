@@ -327,6 +327,12 @@
         wrench_button.className = "wrenchIcon";
         
         
+        /**
+         * Prepare the configuration panel.
+         *
+         * @return A function that shows the panel.
+         * @note   Called immediately in order to create another function that shows the panel.
+         */
         show_configure_panel = (function ()
         {
             var panel_element   = document.createElement("div"),
@@ -372,7 +378,7 @@
                  * Create the function that sends the new value to the settings.
                  *
                  * @return A function.
-                 * @note Called immediately.
+                 * @note   Called immediately.
                  */
                 function make_checkbox_onclick(this_apply_change)
                 {
@@ -380,8 +386,8 @@
                      * Run the specific function to make the change.
                      *
                      * @return NULL.
-                     * @note Called when the user clicks a checkbox.
-                     * @note Keyboard actions (such as pressing Space Bar) counts as a click.
+                     * @note   Called when the user clicks a checkbox.
+                     * @note   Keyboard actions (such as pressing Space Bar) counts as a click.
                      */
                     return function ()
                     {
@@ -437,9 +443,6 @@
                 return container_el;
             }
             
-            
-            //panel_element.innerHTML = "<fieldset><legend>View</legend><table><tr><td>Red Letters</td><td><input type=checkbox name=paragraphs></td></tr><tr><td>Paragraphs</td><td><input type=checkbox name=paragraphs></td></tr></table></fieldset>";
-            
             ///TODO: Determine which settings pane to create first (based on the last one the user used).
             panel_element = create_element_from_config(settings_config[0]);
             
@@ -448,6 +451,7 @@
                 show_panel(panel_element);
             };
         }());
+        
         
         /**
          * Prepare to display the context menu near the wrench button.
