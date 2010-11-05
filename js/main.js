@@ -145,6 +145,39 @@ BF.format_number = function (num)
 };
 
 
+/**
+ * Change an existing CSS rule.
+ *
+ * @example BF.changeCSS(".q", "color: #000;")); /// Changes the ".q" rule (i.e., the "q" class) to have a text color of black.
+ * @param   selector (string) The name of the rule to replace.
+ * @param   new_CSS  (string) The CSS to use for the specified selector.
+ * @return  NULL.  Changes the CSS.
+ * @note    Called when the user changes the red_letters setting.
+ * @todo    Test in IE.
+ */
+BF.changeCSS = function (selector, new_CSS)
+{
+    var CSS_rules,
+        CSS_rules_len,
+        i           = 0,
+        ///TODO: Determine if it should loop through all styles sheets.
+        style_sheet = document.styleSheets[0];
+    
+    /// Get the styles (cssRules) for Mozilla/WebKit/Opera/IE9 and (rules) for IE8-.
+    CSS_rules     = style_sheet.cssRules ? style_sheet.cssRules : style_sheet.rules;
+    CSS_rules_len = CSS_rules.length;
+    
+    while (i < CSS_rules_len) {
+        if (CSS_rules[i].selectorText == selector) {
+            CSS_rules[i].style.cssText = new_CSS;
+        }
+        ++i;
+    }
+};
+
+
+
+
 /// Determine if CSS transitions are supported by the browser.
 ///NOTE: All of these variables currently require vendor specific prefixes.
 BF.cssTransitions = typeof document.body.style.webkitTransition !== "undefined" || typeof document.body.style.MozTransition !== "undefined" || typeof document.body.style.OTransition !== "undefined";
@@ -269,7 +302,12 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             ///FIXME: It does not necessarily need to reload the verses if switching from paragraph mode to non-paragraph mode.
             clean_up_page();
         }
-    }), red_letters: create_get_set(true)}},
+    }), red_letters: create_get_set(true, function (values)
+    {
+        /// Alternate between red and black letters.
+        ///TODO: Add other options, such as custom color, and (in the future) highlighting of other people's words (e.g., highlight the words of Paul in blue).
+        BF.changeCSS(".q", "color: " + (values.new_val ? "#D00;" : "#000;"));
+    })}},
     
     
     ///TODO: Move this to secondary.js.
