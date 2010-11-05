@@ -462,6 +462,12 @@ button::-moz-focus-inner {
 }
 
 
+/* Make labels have a hand cursor. */
+label {
+    cursor: pointer;
+}
+
+
 /* Verses created from a search. */
 .search_verse {
     /* This gives reverse indent, but causes problems with margins (tested in Mozilla).
