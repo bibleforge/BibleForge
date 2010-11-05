@@ -297,6 +297,7 @@
     (function ()
     {
         var show_configure_panel,
+            show_help_panel,
             wrench_button = document.createElement("input"),
             wrench_label  = document.createElement("label");
         
@@ -451,6 +452,19 @@
         }());
         
         
+        show_help_panel = (function ()
+        {            
+            var panel_element = document.createElement("div");
+            
+            panel_element.innerHTML = "Email: <a href=\"mailto:info@bibleforge.com\">info@bibleforge.com</a><br><br>More coming soon, Lord willing.<br><br>";
+            
+            return function ()
+            {
+                show_panel(panel_element);
+            };
+        }());
+        
+        
         /**
          * Prepare to display the context menu near the wrench button.
          *
@@ -465,7 +479,7 @@
             var wrench_pos = BF.get_position(wrench_button);
             
             ///TODO: These need to be language specific.
-            show_context_menu(wrench_pos.left, wrench_pos.top + wrench_button.offsetHeight, [{text: "Configure", link: show_configure_panel}, {line: true, text: "Blog", link: "http://blog.bibleforge.com"}, {text: "Help", link: show_panel}]);
+            show_context_menu(wrench_pos.left, wrench_pos.top + wrench_button.offsetHeight, [{text: "Configure", link: show_configure_panel}, {line: true, text: "Blog", link: "http://blog.bibleforge.com"}, {text: "Help", link: show_help_panel}]);
             
             /// Stop the even from bubbling so that document.onclick() does not fire and attempt to close the menu immediately.
             ///TODO: Determine if stopping propagation causes or could cause problems with other events.
