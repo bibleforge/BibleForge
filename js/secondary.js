@@ -367,8 +367,6 @@
                      */
                     return function (new_value)
                     {
-                        document.title = "(testing) " + option_name + " = " + new_value + " | " + context.settings.view.red_letters.get();
-                        ///NOTE: Need to use getters and setters.
                         settings_obj[option_name].set(new_value);
                     };
                 }
