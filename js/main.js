@@ -254,7 +254,22 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         }};
     }
     
-    settings = {view: {in_paragraphs: create_get_set(true), red_letters: create_get_set(true)}}, ///TODO: Determine how this should be created.
+    ///TODO: Determine how this should be created.
+    settings = {view: {in_paragraphs: create_get_set(true, function (values)
+    {
+        var cur_verse;
+        
+        if (last_type != verse_lookup) return;
+        
+        ///FIXME: There should be a dedicated function for getting the current verse (or better yet, a variable that stores that information).
+        cur_verse = content_manager.get_verse_at_position(window.pageYOffset + topLoader.offsetHeight + 8,  true,  page)
+        
+        if (cur_verse !== false) {
+            ///FIXME: This should reload the verses.
+            ///FIXME: It does not necessarily need to reload the verses if switching from paragraph mode to non-paragraph mode.
+            clean_up_page();
+        }
+    }), red_letters: create_get_set(true)}},
     
     
     ///TODO: Move this to secondary.js.
@@ -974,7 +989,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         window.onscroll = scrolling;
         window.onresize = resizing;
         
-        return {add_content_if_needed: add_content_if_needed, update_verse_range: update_verse_range, scrollViewTo: scrollViewTo};
+        ///NOTE: get_verse_at_position is temporary.
+        return {add_content_if_needed: add_content_if_needed, update_verse_range: update_verse_range, scrollViewTo: scrollViewTo, get_verse_at_position: get_verse_at_position};
     }());
     
     /****************************
