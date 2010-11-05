@@ -337,6 +337,7 @@
                 var container_el = document.createElement("fieldset"),
                     cur_option   = 0,
                     input_el,
+                    label_el,
                     legend_el    = document.createElement("legend"),
                     apply_change,
                     option_count = config.options.length,
@@ -399,9 +400,13 @@
                     
                     /// Insert a <td> for the name of the setting.
                     table_cell = table_row.insertCell(-1);
-                    ///TODO: Add a label connected with the input box.
+                    label_el   = document.createElement("label");
+                    
+                    /// The label identifies with the input element via a unique id.
+                    label_el.htmlFor = context.settings[config.settings_value] + "_" + config.options[cur_option].settings_value;
                     ///NOTE: document.createTextNode() is akin to innerText.  It does not inject HTML.
-                    table_cell.appendChild(document.createTextNode(config.options[cur_option].name));
+                    label_el.appendChild(document.createTextNode(config.options[cur_option].name));
+                    table_cell.appendChild(label_el);
                     
                     /// Insert a <td> for the input element.
                     table_cell = table_row.insertCell(-1);
@@ -411,7 +416,7 @@
                     
                     switch (config.options[cur_option].type) {
                     case "checkbox":
-                        input_el = document.createElement("input");
+                        input_el      = document.createElement("input");
                         input_el.type = "checkbox";
                         
                         /// Set the current value.
@@ -419,6 +424,8 @@
                         
                         input_el.onclick = make_checkbox_onclick(apply_change);
                     }
+                    /// Give the input element an id that matches the label so that clicking the label will interact with the input field.
+                    input_el.id   = label_el.htmlFor;
                     
                     table_cell.appendChild(input_el);
                     
