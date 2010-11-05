@@ -236,7 +236,7 @@
             
             is_open = true;
             
-            done_button.innerHTML = "Done";
+            done_button.innerHTML = BF.lang.done;
             done_button.className = "done_button";
             /// An anonymous function must be used because we do not want to send the event object to close_panel().
             done_button.onclick   = function ()
@@ -337,7 +337,7 @@
         show_configure_panel = (function ()
         {
             var panel_element   = document.createElement("div"),
-                settings_config = [{name: "View", settings_value: "view", options: [{name: "Red Letters", type: "checkbox", settings_value: "red_letters"}, {name: "Paragraphs", type: "checkbox", settings_value: "in_paragraphs"}]}];
+                settings_config = [{name: BF.lang.view, settings_value: "view", options: [{name: BF.lang.red_letters, type: "checkbox", settings_value: "red_letters"}, {name: BF.lang.paragraphs, type: "checkbox", settings_value: "in_paragraphs"}]}];
             
             function create_element_from_config(config)
             {
@@ -452,10 +452,17 @@
         }());
         
         
+        /**
+         * Prepare the help panel.
+         *
+         * @return A function that shows the panel.
+         * @note   Called immediately in order to create another function that shows the panel.
+         */
         show_help_panel = (function ()
         {            
             var panel_element = document.createElement("div");
             
+            ///FIXME: Make a real help panel.
             panel_element.innerHTML = "Email: <a href=\"mailto:info@bibleforge.com\">info@bibleforge.com</a><br><br>More coming soon, Lord willing.<br><br>";
             
             return function ()
@@ -479,7 +486,7 @@
             var wrench_pos = BF.get_position(wrench_button);
             
             ///TODO: These need to be language specific.
-            show_context_menu(wrench_pos.left, wrench_pos.top + wrench_button.offsetHeight, [{text: "Configure", link: show_configure_panel}, {line: true, text: "Blog", link: "http://blog.bibleforge.com"}, {text: "Help", link: show_help_panel}]);
+            show_context_menu(wrench_pos.left, wrench_pos.top + wrench_button.offsetHeight, [{text: BF.lang.configure, link: show_configure_panel}, {line: true, text: BF.lang.blog, link: "http://blog.bibleforge.com"}, {text: BF.lang.help, link: show_help_panel}]);
             
             /// Stop the even from bubbling so that document.onclick() does not fire and attempt to close the menu immediately.
             ///TODO: Determine if stopping propagation causes or could cause problems with other events.

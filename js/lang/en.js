@@ -47,20 +47,28 @@ BF.lang = (function ()
         books_long_posttitle: ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "of Jeremiah", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "of the Apostles", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "of Jesus Christ"],
         books_long_pretitle:  ["", "The First Book of Moses, called", "The Second Book of Moses, called", "The Third Book of Moses, called", "The Fourth Book of Moses, called", "The Fifth Book of Moses, called", "The Book of", "The Book of", "The Book of", "The First book of", "The Second book of", "The First book of", "The Second book of", "The First book of", "The Second book of", "The Book of", "The Book of", "The Book of", "The Book of", "The Book of", "The Book of", "The Book of", "The Song of", "The Book of", "The Book of", "The Book of the", "The Book of", "The Book of", "The Book of", "The Book of", "The Book of", "The Book of", "The Book of", "The Book of", "The Book of", "The Book of", "The Book of", "The Book of", "The Book of", "The Book of", "The Gospel According to", "The Gospel According to", "The Gospel According to", "The Gospel According to", "", "The Epistle of Paul to the", "The First Epistle of Paul to the", "The Second Epistle of Paul to the", "The Epistle of Paul to the", "The Epistle of Paul to the", "The Epistle of Paul to the", "The Epistle of Paul to the", "The First Epistle of Paul to the", "The Second Epistle of Paul to the", "The First Epistle of Paul to", "The Second Epistle of Paul to", "The Epistle of Paul to", "The Epistle of Paul to", "The Epistle of Paul to the", "The Epistle of", "The First Epistle of", "The Second Epistle of", "The First Epistle of", "The Second Epistle of", "The Third Epistle of", "The Epistle of", ""],
         books_short:          ["", "Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy", "Joshua", "Judges", "Ruth", "1 Samuel", "2 Samuel", "1 Kings", "2 Kings", "1 Chronicles", "2 Chronicles", "Ezra", "Nehemiah", "Esther", "Job", "Psalms", "Proverbs", "Ecclesiastes", "Song of Songs", "Isaiah", "Jeremiah", "Lamentations", "Ezekiel", "Daniel", "Hosea", "Joel", "Amos", "Obadiah", "Jonah", "Micah", "Nahum", "Habakkuk", "Zephaniah", "Haggai", "Zechariah", "Malachi", "Matthew", "Mark", "Luke", "John", "Acts", "Romans", "1 Corinthians", "2 Corinthians", "Galatians", "Ephesians", "Philippians", "Colossians", "1 Thessalonians", "2 Thessalonians", "1 Timothy", "2 Timothy", "Titus", "Philemon", "Hebrews", "James", "1 Peter", "2 Peter", "1 John", "2 John", "3 John", "Jude", "Revelation"],
-
-        /// Miscelaneous Text
-        app_name:          "BibleForge",
-        chapter:           "Chapter",
-        found_plural:      " verses found for ",
-        found_singular:    " verse found for ",
-        psalm:             "Psalm",
-        query_explanation: 'Keyword or Reference: "God so loved" or Romans 3:23',
-        title:             "title",
-        ///TODO: Determine if the app_name should be dynamically appended to the string below or if it should be done in the build system.
-        wrench_title:      "Customize and Configure BibleForge",
+        
+        ///TODO: Determine if texts should be categorized.
+        /// Miscellaneous Text
+        app_name:          "BibleForge",                                          /// The name of the application
+        blog:              "Blog",                                                /// Context menu item
+        chapter:           "Chapter",                                             /// Chapter headings
+        configure:         "Configure",                                           /// Context menu item
+        done:              "Done",                                                /// The button that closes panels
+        found_plural:      " verses found for ",                                  /// On the info bar when searching (multiple results)
+        found_singular:    " verse found for ",                                   /// On the info bar when searching (one result)
+        help:              "Help",                                                /// Context menu item
+        paragraphs:        "Paragraphs",                                          /// In the View configuration panel
+        psalm:             "Psalm",                                               /// The title of chapters in the book of Psalms
+        query_explanation: 'Keyword or Reference: "God so loved" or Romans 3:23', /// In a blank query input box before a search has been preformed
+        red_letters:       "Red Letters",                                         /// In the View configuration panel
+        title:             "title",                                               /// Used instead of "0" for Psalm title verse references
+        view:              "View",                                                /// The title of a configuration panel
+        ///TODO: Determine if the app_name should be dynamically appended to the string below or if it should be done in the build system
+        wrench_title:      "Customize and Configure BibleForge",                  /// The text displayed when hovering over the wrench menu
         
         /// Grammatical Variables
-        /// Grammatical search format: WORD grammar_marker ATTRIBUTE_1 grammar_separator ATTRIBUTE_2 grammar_separator ... ATTRIBUTE_N
+        /// Grammatical search format:  WORD grammar_marker ATTRIBUTE_1 grammar_separator ATTRIBUTE_2 grammar_separator ... ATTRIBUTE_N
         /// Grammatical search example: love AS VERB, THIRD_PERSON
         /// The keyword that indicates a grammatical search.
         ///NOTE: Created in the Forge via grammar_constants_parser.php on 04-05-2010 from Grammar Constants.txt.
