@@ -268,7 +268,14 @@ body {
     outline: 0;
 }
 
-/* TODO: Determine if it would be good to emulate button pressing for .wrenchIcon:active. */
+/* Emulate the wrench icon being pressed.  */
+.wrenchIcon:active, .activeWrenchIcon {
+    box-shadow:         inset 2px 2px 3px rgba(0, 0, 0, .2);
+    /* Mozilla 3.5- */
+    -moz-box-shadow:    inset 2px 2px 3px rgba(0, 0, 0, .2);
+    /* WebKit 522 (Chrome, Safari 3) */
+    -webkit-box-shadow: inset 2px 2px 3px rgba(0, 0, 0, .2);
+}
 
 .wrenchIcon:hover, .wrenchPadding:hover .wrenchIcon, .activeWrenchIcon {
     /* The speed of the border-color change is increased to make it fade in before the opacity is finished so that is looks smooth. */

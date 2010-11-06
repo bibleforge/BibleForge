@@ -81,11 +81,12 @@
          * @param   y_pos          (number)              The Y position of the menu.
          * @param   menu_items     (array)               An array containing object(s) specifying the text of the menu items, the corresponding links, and whether or not to add a line break.
          *                                               Array format: [{text: (string), link: (string or function), line: (truthy or falsey (optional))}, {...}]
-         * @param   close_callback (function) (optional) The function to send to close_menu() as a callback.
+         * @param   open_callback  (function) (optional) The function to run when the menu opens.
+         * @param   close_callback (function) (optional) The function to send to close_menu() as a callback when the menu closes.
          * @note    Called by show_context_menu() and close_menu() (as the callback function).
          * @return  NULL.
          */
-        function open_menu(x_pos, y_pos, menu_items, close_callback)
+        function open_menu(x_pos, y_pos, menu_items, open_callback, close_callback)
         {
             var i,
                 menu_container        = document.createElement("div"),
@@ -150,6 +151,10 @@
             window.setTimeout(function ()
             {
                 context_menu.style.opacity = 1;
+                
+                if (open_callback && typeof open_callback == "function") {
+                    open_callback();
+                }
             }, 0);
         }
         
@@ -162,25 +167,26 @@
          * @param   y_pos          (number)              The Y position of the menu.
          * @param   menu_items     (array)               An array containing object(s) specifying the text of the menu items, the corresponding links, and whether or not to add a line break.
          *                                               Array format: [{text: (string), link: (string or function), line: (truthy or falsey (optional))}, {...}]
-         * @param   close_callback (function) (optional) The function to send to close_menu() as a callback.
+         * @param   open_callback  (function) (optional) The function to send to open_menu() as a callback when the menu opens.
+         * @param   close_callback (function) (optional) The function to send to close_menu() as a callback when the menu closes.
          * @note    This is the function stored in the show_context_menu variable.
          * @note    Called by the wrench menu onclick event.
          * @return  NULL.
          */
-        return function (x_pos, y_pos, menu_items, close_callback)
+        return function (x_pos, y_pos, menu_items, open_callback, close_callback)
         {
             /// If it is already open, close it and then re-open it with the new menu.
             ///TODO: Determine if this can (or should) ever happen.
             if (is_open) {
                 close_menu(function ()
                 {
-                    open_menu(x_pos, y_pos, menu_items, close_callback);
                     if (close_callback && typeof close_callback == "function") {
                         close_callback();
                     }
+                    open_menu(x_pos, y_pos, menu_items, open_callback, close_callback);
                 });
             } else {
-                open_menu(x_pos, y_pos, menu_items, close_callback);
+                open_menu(x_pos, y_pos, menu_items, open_callback, close_callback);
             }
         };
     }());
@@ -495,11 +501,12 @@
             ///TODO: These need to be language specific.
             show_context_menu(wrench_pos.left, wrench_pos.top + wrench_button.offsetHeight, [{text: BF.lang.configure, link: show_configure_panel}, {line: true, text: BF.lang.blog, link: "http://blog.bibleforge.com"}, {text: BF.lang.help, link: show_help_panel}], function ()
             {
+                /// TODO: Create a function attached to the BF object that adds and removes class names.
+                wrench_button.className += " activeWrenchIcon";
+            }, function ()
+            {
                 wrench_button.className = "wrenchIcon";
             });
-            
-            /// TODO: Create a function attached to the BF object that adds and removes class names.
-            wrench_button.className += " activeWrenchIcon";
             
             /// Stop the even from bubbling so that document.onclick() does not fire and attempt to close the menu immediately.
             ///TODO: Determine if stopping propagation causes or could cause problems with other events.
