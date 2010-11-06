@@ -204,8 +204,9 @@ body {
 /**
  * Fade in icon on hover.
  */
-.inputIcon:hover, .wrenchIcon:hover, .wrenchPadding:hover .wrenchIcon {
-    opacity: .6;
+.inputIcon:hover, .wrenchIcon:hover, .wrenchPadding:hover .wrenchIcon, .activeWrenchIcon {
+    /* !important is used to enforce the opacity for .activeWrenchIcon when the context menu is open. */
+    opacity: .6!important;
 }
 
 /**
@@ -267,7 +268,9 @@ body {
     outline: 0;
 }
 
-.wrenchIcon:hover, .wrenchPadding:hover .wrenchIcon {
+/* TODO: Determine if it would be good to emulate button pressing for .wrenchIcon:active. */
+
+.wrenchIcon:hover, .wrenchPadding:hover .wrenchIcon, .activeWrenchIcon {
     /* The speed of the border-color change is increased to make it fade in before the opacity is finished so that is looks smooth. */
     /* Transition for Mozilla (Firefox 4.0+) */
     -moz-transition:    opacity .6s ease, border-color .3s ease;

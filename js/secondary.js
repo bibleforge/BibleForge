@@ -50,10 +50,11 @@
          * @example close_menu();          /// Closes the menu and does nothing else.
          * @param   callback (function) (optional) The function to run after the menu is closed.
          * @note    Called by show_context_menu() and document.onclick().
+         * @todo    It would be nice to make the menu item that was clicked fade out slowly.
          * @return  NULL.
          */
         function close_menu(callback)
-        {   
+        {
             /// First, stop the element from being displayed.
             context_menu.style.display = "none";
             /// Then reset the opacity so that it will fade in when the menu is re-displayed later.
@@ -76,14 +77,15 @@
          * Display the context menu.
          *
          * @example open_menu(leftOffset, topOffset, [{text: "Menu Item 1", link: "http://link.com"}, [text: "Menu Item 2", link: some_function, true}]); /// Creates a menu with one external link and one link that runs a function with a line break separating the two.
-         * @param   x_pos      (number) The X position of the menu.
-         * @param   y_pos      (number) The Y position of the menu.
-         * @param   menu_items (array)  An array containing object(s) specifying the text of the menu items, the corresponding links, and whether or not to add a line break.
-         *                              Array format: [{text: (string), link: (string or function), line: (truthy or falsey (optional))}, {...}]
+         * @param   x_pos          (number)              The X position of the menu.
+         * @param   y_pos          (number)              The Y position of the menu.
+         * @param   menu_items     (array)               An array containing object(s) specifying the text of the menu items, the corresponding links, and whether or not to add a line break.
+         *                                               Array format: [{text: (string), link: (string or function), line: (truthy or falsey (optional))}, {...}]
+         * @param   close_callback (function) (optional) The function to send to close_menu() as a callback.
          * @note    Called by show_context_menu() and close_menu() (as the callback function).
          * @return  NULL.
          */
-        function open_menu(x_pos, y_pos, menu_items)
+        function open_menu(x_pos, y_pos, menu_items, close_callback)
         {
             var i,
                 menu_container        = document.createElement("div"),
@@ -134,7 +136,7 @@
             document.onclick = function ()
             {
                 /// Close the context menu if the user clicks the page.
-                close_menu();
+                close_menu(close_callback);
                 
                 /// Re-assign the onclick() code back to document.onclick now that this code has finished its purpose.
                 ///TODO: If multiple functions attempt to reassign a global event function, there could be problems; figure out a better way to do this,
@@ -156,24 +158,29 @@
          * Handle opening the context menu, even if one is already open.
          *
          * @example show_context_menu(leftOffset, topOffset, [{text: "Menu Item 1", link: "http://link.com"}, [text: "Menu Item 2", link: some_function, true}]); /// Creates a menu with one external link and one link that runs a function with a line break separating the two.
-         * @param   x_pos      (number) The X position of the menu.
-         * @param   y_pos      (number) The Y position of the menu.
-         * @param   menu_items (array)  An array containing object(s) specifying the text of the menu items, the corresponding links, and whether or not to add a line break.
-         *                              Array format: [{text: (string), link: (string or function), line: (truthy or falsey (optional))}, {...}]
+         * @param   x_pos          (number)              The X position of the menu.
+         * @param   y_pos          (number)              The Y position of the menu.
+         * @param   menu_items     (array)               An array containing object(s) specifying the text of the menu items, the corresponding links, and whether or not to add a line break.
+         *                                               Array format: [{text: (string), link: (string or function), line: (truthy or falsey (optional))}, {...}]
+         * @param   close_callback (function) (optional) The function to send to close_menu() as a callback.
          * @note    This is the function stored in the show_context_menu variable.
          * @note    Called by the wrench menu onclick event.
          * @return  NULL.
          */
-        return function (x_pos, y_pos, menu_items)
+        return function (x_pos, y_pos, menu_items, close_callback)
         {
             /// If it is already open, close it and then re-open it with the new menu.
+            ///TODO: Determine if this can (or should) ever happen.
             if (is_open) {
                 close_menu(function ()
                 {
-                    open_menu(x_pos, y_pos, menu_items);
+                    open_menu(x_pos, y_pos, menu_items, close_callback);
+                    if (close_callback && typeof close_callback == "function") {
+                        close_callback();
+                    }
                 });
             } else {
-                open_menu(x_pos, y_pos, menu_items);
+                open_menu(x_pos, y_pos, menu_items, close_callback);
             }
         };
     }());
@@ -486,7 +493,13 @@
             var wrench_pos = BF.get_position(wrench_button);
             
             ///TODO: These need to be language specific.
-            show_context_menu(wrench_pos.left, wrench_pos.top + wrench_button.offsetHeight, [{text: BF.lang.configure, link: show_configure_panel}, {line: true, text: BF.lang.blog, link: "http://blog.bibleforge.com"}, {text: BF.lang.help, link: show_help_panel}]);
+            show_context_menu(wrench_pos.left, wrench_pos.top + wrench_button.offsetHeight, [{text: BF.lang.configure, link: show_configure_panel}, {line: true, text: BF.lang.blog, link: "http://blog.bibleforge.com"}, {text: BF.lang.help, link: show_help_panel}], function ()
+            {
+                wrench_button.className = "wrenchIcon";
+            });
+            
+            /// TODO: Create a function attached to the BF object that adds and removes class names.
+            wrench_button.className += " activeWrenchIcon";
             
             /// Stop the even from bubbling so that document.onclick() does not fire and attempt to close the menu immediately.
             ///TODO: Determine if stopping propagation causes or could cause problems with other events.
