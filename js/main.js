@@ -2061,6 +2061,12 @@ if (window.opera) {
     @if (@_jscript_version < 9)
         var pageYOffset = document.documentElement.scrollTop;
     @end
+    
+    /// IE9+ CSS: Make the inputIcon appear next to the queryInput.
+    ///NOTE: The query box is slightly off centered in IE9 with this CSS.
+    @if (@_jscript_version >= 9)
+        document.body.appendChild(document.createElement("style").appendChild(document.createTextNode(" .inputIcon { position: relative; } ")).parentNode);
+    @end
 @*/
 
 ///TODO: IE needs ".first_verse:first-letter, .first_paragraph:first-letter { margin-top: 5px; }" for drop caps to be aligned correctly.
