@@ -30,73 +30,89 @@
  */
 BF.include = (function ()
 {
-    /// Stores files that have already been loaded so that they do not have to be downloaded more than once.
-    ///TODO: Use this, and maybe make a way to ignore the cache is needed.
-    var files = [];
-    
-    return function (path, context, timeout, retry)
+    /**
+     * Eval code in a neutral scope.
+     *
+     * @param  code (string) The string to eval.
+     * @return The result of the eval'ed code.
+     * @note   Called by ajax.onreadystatechange().
+     * @note   This is used to prevent included code from having access to the variables inside of the function's scope.
+     */
+    function evaler(code)
     {
-        var ajax = new window.XMLHttpRequest(),
-            include_func,
-            include_timeout;
+        return eval(code);
+    }
+    
+    return (function ()
+    {
+        /// Stores files that have already been loaded so that they do not have to be downloaded more than once.
+        ///TODO: Use this, and maybe make a way to ignore the cache is needed.
+        var files = [];
         
-        /**
-         * Send the Ajax requst and start timeout timer.
-         *
-         * @return NULL.
-         * @note   This code is a separate function to reduce code duplication.
-         * @note   Called by the parent function.
-         */
-        function begin_include()
+        return function (path, context, timeout, retry)
         {
-            ajax.send();
+            var ajax = new window.XMLHttpRequest(),
+                include_func,
+                include_timeout;
             
-            if (timeout) {
-                /// Begin the timeout timer to ensure that the download does not freeze.
-                include_timeout = window.setTimeout(function ()
-                {
-                    ajax.abort();
-                    if (retry) {
-                        begin_include();
-                    }
-                }, timeout);
-            }
-        }
-        
-        /// Determine if arguments were passed to the last two parameters.  If not, set the defaults.
-        if (typeof timeout == "undefined") {
-            /// Default to 10 seconds.
-            ///TODO: This should be dynamic based on the quality of the connection to the server.
-            timeout = 10000;
-        }
-        
-        if (typeof retry == "undefined") {
-            retry = true;
-        }
-        
-        ///TODO: determine if the first parameter should be different.
-        ajax.open("GET", path);
-        ajax.onreadystatechange = function ()
-        {
-            if (ajax.readyState == 4) {
-                /// Stop the timeout timer that may be running so it does not try again.
-                clearTimeout(include_timeout);
+            /**
+             * Send the Ajax requst and start timeout timer.
+             *
+             * @return NULL.
+             * @note   This code is a separate function to reduce code duplication.
+             * @note   Called by the parent function.
+             */
+            function begin_include()
+            {
+                ajax.send();
                 
-                /// Was the request successful?
-                if (ajax.status == 200) {
-                    /// Load and run the new code.
-                    ///NOTE: IE8- does not eval the code correctly.
-                    include_func = eval(ajax.responseText);
-                    if (typeof include_func == "function") {
-                        include_func(context);
-                    }
-                } else if (retry) {
-                    begin_include();
+                if (timeout) {
+                    /// Begin the timeout timer to ensure that the download does not freeze.
+                    include_timeout = window.setTimeout(function ()
+                    {
+                        ajax.abort();
+                        if (retry) {
+                            begin_include();
+                        }
+                    }, timeout);
                 }
             }
+            
+            /// Determine if arguments were passed to the last two parameters.  If not, set the defaults.
+            if (typeof timeout == "undefined") {
+                /// Default to 10 seconds.
+                ///TODO: This should be dynamic based on the quality of the connection to the server.
+                timeout = 10000;
+            }
+            
+            if (typeof retry == "undefined") {
+                retry = true;
+            }
+            
+            ///TODO: determine if the first parameter should be different.
+            ajax.open("GET", path);
+            ajax.onreadystatechange = function ()
+            {
+                if (ajax.readyState == 4) {
+                    /// Stop the timeout timer that may be running so it does not try again.
+                    clearTimeout(include_timeout);
+                    
+                    /// Was the request successful?
+                    if (ajax.status == 200) {
+                        /// Load and run the new code.
+                        ///NOTE: IE8- does not eval the code correctly.
+                        include_func = evaler(ajax.responseText);
+                        if (typeof include_func == "function") {
+                            include_func(context);
+                        }
+                    } else if (retry) {
+                        begin_include();
+                    }
+                }
+            };
+            begin_include();
         };
-        begin_include();
-    };
+    }());
 }());
 
 
