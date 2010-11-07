@@ -215,10 +215,12 @@
                 /// Set the panel's is_open status to false after the delay to prevent the menu from being re-opened in the meantime.
                 is_open = false;
                 
-                /// Make sure that this function will not fire again when the panel opens.
-                panel.removeEventListener("transitionend",       on_panel_close, false);
-                panel.removeEventListener("oTransitionEnd",      on_panel_close, false);
-                panel.removeEventListener("webkitTransitionEnd", on_panel_close, false);
+                if (BF.cssTransitions) {
+                    /// Make sure that this function will not fire again when the panel opens.
+                    panel.removeEventListener("transitionend",       on_panel_close, false);
+                    panel.removeEventListener("oTransitionEnd",      on_panel_close, false);
+                    panel.removeEventListener("webkitTransitionEnd", on_panel_close, false);
+                }
                 
                 /// Ensure that the display is set to none (even though it might already be if this is the first time or if no CSS transitions were used).
                 panel.style.display = "none";
