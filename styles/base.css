@@ -351,18 +351,18 @@ body {
 
 
 .panel {
-    display:     none;
-    position:    fixed;
+    display:    none;
+    position:   fixed;
     /* A solid background for IE/Mozilla 2-/Opera 9.6- */
-    background:  #FFF;
+    background: #FFF;
     /* Transparent white background for Mozilla/Opera 10/WebKit */
-    background:  rgba(255, 255, 255, .95);
-    border:      #A3A3A3 1px solid;
+    background: rgba(255, 255, 255, .95);
+    border:     #A3A3A3 1px solid;
     /* Add enough padding to the top to push the contents past the top bar. */
     /* Add extra padding on the sides so that the optional scroll bars will not cover up any of the content. */
-    padding:     60px 16px 16px 16px;
+    padding:    60px 16px 16px 16px;
     /* Add scroll bars when the contents extend past the height or width. */
-    overflow:    auto;
+    overflow:   auto;
     
     /* Rounded corners for Mozilla 3.6- */
     -moz-border-radius: 9px;
