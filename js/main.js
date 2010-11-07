@@ -37,6 +37,7 @@ BF.include = (function ()
     return function (path, context, timeout, retry)
     {
         var ajax = new window.XMLHttpRequest(),
+            include_func,
             include_timeout;
         
         /**
@@ -84,7 +85,11 @@ BF.include = (function ()
                 /// Was the request successful?
                 if (ajax.status == 200) {
                     /// Load and run the new code.
-                    eval(ajax.responseText)(context);
+                    ///NOTE: IE8- does not eval the code correctly.
+                    include_func = eval(ajax.responseText);
+                    if (typeof include_func == "function") {
+                        include_func(context);
+                    }
                 } else if (retry) {
                     begin_include();
                 }
