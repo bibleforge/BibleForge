@@ -2065,7 +2065,7 @@ if (window.opera) {
     /// IE9+ CSS: Make the inputIcon appear next to the queryInput.
     ///NOTE: The query box is slightly off centered in IE9 with this CSS.
     @if (@_jscript_version >= 9)
-        document.body.appendChild(document.createElement("style").appendChild(document.createTextNode(" .inputIcon { position: relative; } ")).parentNode);
+        document.body.appendChild(document.createElement("style").appendChild(document.createTextNode(".inputIcon { position: relative; }")).parentNode);
     @end
 @*/
 
