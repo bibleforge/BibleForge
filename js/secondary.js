@@ -512,18 +512,7 @@
             
             /// Stop the even from bubbling so that document.onclick() does not fire and attempt to close the menu immediately.
             ///TODO: Determine if stopping propagation causes or could cause problems with other events.
-            ///NOTE: IE 8- does not pass the event variable to the function, so the global event variable must be retrieved.
-            /*@cc_on
-                @if (@_jscript_version < 9)
-                    e = window.event;
-                    e.cancelBubble = true;
-                @end
-            @*/
-            /// Mozilla/WebKit/Opera/IE 9
-            if (e.stopPropagation) {
-                e.stopPropagation();
-            }
-
+            e.stopPropagation();
         };
     }());
 });

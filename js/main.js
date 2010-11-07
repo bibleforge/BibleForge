@@ -100,16 +100,9 @@ BF.include = (function ()
                     /// Was the request successful?
                     if (ajax.status == 200) {
                         /// Load and run the new code.
-                        ///NOTE: IE8- does not eval the code correctly.
+                        ///NOTE: This will not work in IE8-.
                         include_func = evaler(ajax.responseText);
-                        ///NOTE: IE8 will not return a function by itself.
-                        /*@cc_on
-                            @if (@_jscript_version < 9)
-                                /// Wrap the code in an array and slice off the ending semicolon so that it is essentially a JSON array.
-                                include_func = evaler("[" + ajax.responseText.slice(0, ajax.responseText.trim().length - 1) + "]")[0];
-                            @end
-                        @*/
-
+                        ///TODO: Determine what kind of error handling should be done.
                         if (typeof include_func == "function") {
                             include_func(context);
                         }
