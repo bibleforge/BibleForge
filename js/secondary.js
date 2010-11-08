@@ -500,13 +500,18 @@
         {
             var wrench_pos = BF.get_position(wrench_button);
             
+            /// TODO: Create a function attached to the BF object that adds and removes class names.
+            /// Make the wrench icon look pressed immediately so that it does not blink between the time the mouse clicks and the context menu appears via setTimeout().
+            wrench_button.className += " activeWrenchIcon";
+            
             ///TODO: These need to be language specific.
             show_context_menu(wrench_pos.left, wrench_pos.top + wrench_button.offsetHeight, [{text: BF.lang.configure, link: show_configure_panel}, {line: true, text: BF.lang.blog, link: "http://blog.bibleforge.com"}, {text: BF.lang.help, link: show_help_panel}], function ()
             {
-                /// TODO: Create a function attached to the BF object that adds and removes class names.
+                /// Because the context menu is open, make the wrench button look pressed.
                 wrench_button.className += " activeWrenchIcon";
             }, function ()
             {
+                /// When the menu closes, the wrench button should no longer look pressed.
                 wrench_button.className = "wrenchIcon";
             });
             
