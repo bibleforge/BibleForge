@@ -202,7 +202,6 @@ BF.changeCSS = function (selector, new_CSS, change_all)
 
 
 
-
 /// Determine if CSS transitions are supported by the browser.
 ///NOTE: All of these variables currently require vendor specific prefixes.
 BF.cssTransitions = typeof document.body.style.webkitTransition !== "undefined" || typeof document.body.style.MozTransition !== "undefined" || typeof document.body.style.OTransition !== "undefined";
@@ -275,10 +274,12 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         settings,
         content_manager;
     
+    /// Keep track of which view port this is. (In the future, there may be a split view mode.  Currently, this is not used.)
     if (!BF.viewPort_count) {
         BF.viewPort_count = 0;
     }
-    viewPort_num = BF.viewPort_count++;
+    viewPort_num = BF.viewPort_count;
+    ++BF.viewPort_count;
     
     
     /**
