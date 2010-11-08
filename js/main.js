@@ -47,12 +47,11 @@ BF.include = (function ()
     {
         /// Stores files that have already been loaded so that they do not have to be downloaded more than once.
         ///TODO: Use this, and maybe make a way to ignore the cache is needed.
-        var files = [];
+        var files = {};
         
         return function (path, context, timeout, retry)
         {
             var ajax = new window.XMLHttpRequest(),
-                include_func,
                 include_timeout;
             
             /**
@@ -101,10 +100,10 @@ BF.include = (function ()
                     if (ajax.status == 200) {
                         /// Load and run the new code.
                         ///NOTE: This will not work in IE8-.
-                        include_func = evaler(ajax.responseText);
+                        files[path] = evaler(ajax.responseText);
                         ///TODO: Determine what kind of error handling should be done.
-                        if (typeof include_func == "function") {
-                            include_func(context);
+                        if (typeof files[path] == "function") {
+                            files[path](context);
                         }
                     } else if (retry) {
                         begin_include();
