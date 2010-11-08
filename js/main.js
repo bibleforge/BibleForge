@@ -171,13 +171,14 @@ BF.format_number = function (num)
  * Change an existing CSS rule.
  *
  * @example BF.changeCSS(".q", "color: #000;")); /// Changes the ".q" rule (i.e., the "q" class) to have a text color of black.
- * @param   selector (string) The name of the rule to replace.
- * @param   new_CSS  (string) The CSS to use for the specified selector.
- * @return  NULL.  Changes the CSS.
+ * @param   selector   (string)             The name of the rule to replace.
+ * @param   new_CSS    (string)             The CSS to use for the specified selector.
+ * @param   change_all (boolean) (optional) Whether or not to check every rule.  If falsey, it will stop after finding one rule that matches selector.
+ * @return  NULL.  Possibly changes the CSS.
  * @note    Called when the user changes the red_letters setting.
  * @todo    Test in IE.
  */
-BF.changeCSS = function (selector, new_CSS)
+BF.changeCSS = function (selector, new_CSS, change_all)
 {
     var CSS_rules,
         CSS_rules_len,
@@ -192,6 +193,9 @@ BF.changeCSS = function (selector, new_CSS)
     while (i < CSS_rules_len) {
         if (CSS_rules[i].selectorText == selector) {
             CSS_rules[i].style.cssText = new_CSS;
+            if (!change_all) {
+                return;
+            }
         }
         ++i;
     }
