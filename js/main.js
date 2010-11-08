@@ -314,10 +314,12 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
     {
         var cur_verse;
         
-        if (last_type != verse_lookup) return;
+        if (last_type != verse_lookup) {
+            return;
+        }
         
         ///FIXME: There should be a dedicated function for getting the current verse (or better yet, a variable that stores that information).
-        cur_verse = content_manager.get_verse_at_position(window.pageYOffset + topLoader.offsetHeight + 8,  true,  page)
+        cur_verse = content_manager.get_verse_at_position(window.pageYOffset + topLoader.offsetHeight + 8,  true,  page);
         
         if (cur_verse !== false) {
             ///FIXME: This should reload the verses.
@@ -329,7 +331,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         /// Alternate between red and black letters.
         ///TODO: Add other options, such as custom color, and (in the future) highlighting of other people's words (e.g., highlight the words of Paul in blue).
         BF.changeCSS(".q", "color: " + (values.new_val ? "#D00;" : "#000;"));
-    })}},
+    })}};
     
     
     ///TODO: Move this to secondary.js.
