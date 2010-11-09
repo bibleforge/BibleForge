@@ -22,7 +22,8 @@
  */
 (function (context)
 {
-    var show_context_menu,
+    var page = context.page,
+        show_context_menu,
         show_panel;
     
     /// TODO: Reevaluate combining show_context_menu() and show_panel() into a single function that takes the open and close functions as parameters and creates the respective functions.
@@ -301,6 +302,132 @@
             });
         };
     }());
+    
+    
+    /*********************************
+     * Start of Mouse Hiding Closure *
+     *********************************/
+    
+    /**
+     * Register events to manage the cursor for better readability.
+     *
+     * @return NULL.
+     * @note   Called immediately.
+     */
+    (function ()
+    {
+        var hide_cursor_timeout;
+        
+        ///NOTE: Chromium (at least 4.0) has a strange bug when setting the cursor to "auto" and
+        ///      the mouse moves over the HTML element, drop caps letters move downward!
+        ///      Therefore, prevent Chromium from running the code below.
+        ///      To a lesser extent, Safari (at least 4) has the same bug, but it only happens
+        ///      when an alert box pops up, but there does not seem to be a simple way to detect
+        ///      Safari (or WebKit as a whole) using object detection.
+        ///TODO: File a bug report with WebKit and/or Chromium.
+        ///NOTE: Chromium 5.0.342.9 (43360) seems to have fixed this issue for Chromium.
+        if (window.chrome) {
+            return;
+        }
+        
+        
+        /**
+         * Set the mouse cursor back to its default state.
+         *
+         * @return NULL.
+         * @note   Called by hide_cursor_delayed(), page.onmousedown, and page.onmouseout.
+         */
+        function show_cursor()
+        {
+            clearTimeout(hide_cursor_timeout);
+            page.style.cursor = "auto";
+        }
+        
+        
+        /**
+         * Hide the cursor after a short delay.
+         *
+         * @return NULL.
+         * @note   Called by page.onmousedown and page.onmousemove.
+         */
+        function hide_cursor_delayed()
+        {
+            show_cursor();
+            hide_cursor_timeout = window.setTimeout(function ()
+            {
+                ///NOTE: Only works in Mozilla.
+                ///      IE is the only other major browser family that supports transparent cursors (.CUR files only), but it cannot be set via a timeout.
+                ///      WebKit (at least 532.9 (Safari 4/Chromium 4.0)) does not properly support completely transparent cursors.  It also cannot be set via a timeout (see http://code.google.com/p/chromium/issues/detail?id=26723).
+                ///      WebKit can use an almost completely transparent PNG, and it will change the mouse cursor, but it calls the onmousemove event when the cursor changes.
+                ///      It would be possible to manually determine if the onmousemove event was legitimate by checking the X and Y coordinates.
+                ///      Opera (at least 10.53) has no alternate cursor support whatsoever.
+                page.style.cursor = "none";
+            }, 2000);
+        }
+        
+        
+        /**
+         * Handle cursor hiding when a mouse button is clicked.
+         *
+         * @param  e (object) The event object (normally supplied by the browser).
+         * @return NULL.
+         * @note   Called by page.onmousedown.
+         */
+        page.onmousedown = function (e)
+        {
+            /// Get the global event object for IE compatibility.
+            /*@cc_on
+                e = event;
+            @*/
+            /// Was the right mouse button clicked?
+            ///TODO: Determine how to detect when the menu comes up on a Mac?
+            ///NOTE: In the future, it may be necessary to map the mouse buttons to variables because most are different on IE; however, the right mouse button is always 2.
+            if (e.button == 2) {
+                /// Since the right mouse button usually brings up a menu, the user will likely want to see the cursor indefinitely.
+                show_cursor();
+            } else {
+                /// Other types of clicks should show the mouse cursor briefly but still hide it again.
+                hide_cursor_delayed();
+            }
+        };
+        
+        
+        /**
+         * Prevent hiding the cursor when cursor moves off the scroll.
+         *
+         * @param  e (object) The event object (normally supplied by the browser).
+         * @return NULL.
+         * @note   Called by page.onmouseout.
+         */
+        page.onmouseout = function (e)
+        {
+            /// Get the global event object for IE compatibility.
+            /*@cc_on
+                e = event;
+            @*/
+            ///NOTE: For future IE compatibility, currentTarget is this and relatedTarget is event.toElement.  (Currently, IE cannot handle custom cursors yet.)
+            var curTarget = e.currentTarget,
+                relTarget = e.relatedTarget;
+            
+            ///NOTE: onmouseout does not work as expected.  It fires when the cursor moves over any element, even if it is still over the parent element.
+            ///      Therefore, we must check all of the parent elements to see if it is still over the element in question.
+            ///      IE actually supports the correct behavior with onmouseleave.
+            while (curTarget != relTarget && relTarget !== null && relTarget.nodeName != 'BODY') {
+                relTarget = relTarget.parentNode;
+            }
+            
+            /// Did the mouse cursor leave the parent element?
+            if (curTarget != relTarget) {
+                show_cursor();
+            }
+        };
+        
+        page.onmousemove = hide_cursor_delayed;
+    }());
+    
+    /*******************************
+     * End of Mouse Hiding Closure *
+     *******************************/
     
     
     /**
