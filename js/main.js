@@ -283,59 +283,68 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
     
     
     /**
-     * Create an object with getter and setter abilities.
+     * Load settings.
      *
-     * @param  cur_val  (mixed)    (optional) The default value.
-     * @param  onchange (function) (optional) The function to be called after the set method is called.
-     * @return An object containing get and set methods.
-     * @note   This is used to handle data in the settings object.
-     * @todo   Determine if there should be a validate_change function as a parameter that can accept or reject a change.
+     * @todo Document
      */
-    function create_get_set(cur_val, onchange)
+    (function ()
     {
-        return {get: function ()
+        /**
+        * Create an object with getter and setter abilities.
+        *
+        * @param  cur_val  (mixed)    (optional) The default value.
+        * @param  onchange (function) (optional) The function to be called after the set method is called.
+        * @return An object containing get and set methods.
+        * @note   This is used to handle data in the settings object.
+        * @todo   Determine if there should be a validate_change function as a parameter that can accept or reject a change.
+        * @todo   Determine if it is a good idea to delete this and other functions after they are no longer needed.
+        */
+        function create_get_set(cur_val, onchange)
         {
-            return cur_val;
-        }, set: function (new_val)
+            return {get: function ()
+            {
+                return cur_val;
+            }, set: function (new_val)
+            {
+                /// Temporarily store the original value to be sent to the onchange function.
+                var old_val = cur_val;
+                
+                cur_val = new_val;
+                
+                /// Optionally, run a function after the value is changed.
+                if (onchange && typeof onchange == "function") {
+                    window.setTimeout(function ()
+                    {
+                        onchange({old_val: old_val, new_val: new_val});
+                    }, 0);
+                }
+            }};
+        }
+        
+        ///TODO: Determine how this should be created.
+        settings = {view: {in_paragraphs: create_get_set(true, function (values)
         {
-            /// Temporarily store the original value to be sent to the onchange function.
-            var old_val = cur_val;
+            var cur_verse;
             
-            cur_val = new_val;
-            
-            /// Optionally, run a function after the value is changed.
-            if (onchange && typeof onchange == "function") {
-                window.setTimeout(function ()
-                {
-                    onchange({old_val: old_val, new_val: new_val});
-                }, 0);
+            if (last_type != verse_lookup) {
+                return;
             }
-        }};
-    }
-    
-    ///TODO: Determine how this should be created.
-    settings = {view: {in_paragraphs: create_get_set(true, function (values)
-    {
-        var cur_verse;
-        
-        if (last_type != verse_lookup) {
-            return;
-        }
-        
-        ///FIXME: There should be a dedicated function for getting the current verse (or better yet, a variable that stores that information).
-        cur_verse = content_manager.get_verse_at_position(window.pageYOffset + topLoader.offsetHeight + 8,  true,  page);
-        
-        if (cur_verse !== false) {
-            ///FIXME: This should reload the verses.
-            ///FIXME: It does not necessarily need to reload the verses if switching from paragraph mode to non-paragraph mode.
-            clean_up_page();
-        }
-    }), red_letters: create_get_set(true, function (values)
-    {
-        /// Alternate between red and black letters.
-        ///TODO: Add other options, such as custom color, and (in the future) highlighting of other people's words (e.g., highlight the words of Paul in blue).
-        BF.changeCSS(".q", "color: " + (values.new_val ? "#D00;" : "#000;"));
-    })}};
+            
+            ///FIXME: There should be a dedicated function for getting the current verse (or better yet, a variable that stores that information).
+            cur_verse = content_manager.get_verse_at_position(window.pageYOffset + topLoader.offsetHeight + 8,  true,  page);
+            
+            if (cur_verse !== false) {
+                ///FIXME: This should reload the verses.
+                ///FIXME: It does not necessarily need to reload the verses if switching from paragraph mode to non-paragraph mode.
+                clean_up_page();
+            }
+        }), red_letters: create_get_set(true, function (values)
+        {
+            /// Alternate between red and black letters.
+            ///TODO: Add other options, such as custom color, and (in the future) highlighting of other people's words (e.g., highlight the words of Paul in blue).
+            BF.changeCSS(".q", "color: " + (values.new_val ? "#D00;" : "#000;"));
+        })}};
+    }());
     
     
     ///TODO: Move this to secondary.js.
