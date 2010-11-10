@@ -370,79 +370,93 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             remove_content_bottom_timeout,
             remove_content_top_timeout,
             remove_speed                   = 3000,  /// In milliseconds
-            scroll_check_count             = 0,
             scroll_pos                     = 0,
             update_verse_range;
         
         /**
-         * The onscroll event.
+         * The scrolling closure
          *
-         * When the page scrolls this figures out the direction of the scroll and
-         * calls specific functions to determine whether content should be added or removed.
-         *
-         * @return NULL.  May call other functions via setTimeout().
-         * @note   Called when the window scrolls.
-         * @note   Set by the onscroll event.
+         * @todo Determine if any variables can be placed in here.
          */
-        function scrolling()
+        (function ()
         {
-            /// Trick IE 8- into understanding pageYOffset.
-            /*@cc_on
-                @if (@_jscript_version < 9)
-                    window.pageYOffset = doc_docEl.scrollTop;
-                @end
-            @*/
-            var new_scroll_pos = window.pageYOffset,
-                scrolling_down;
+            var scroll_check_count = 0;
+            ///TODO: Perhaps move scroll_pos in here too.
             
-            /// Has the scroll position actually not changed?
-            ///NOTE: IE/Opera sometimes don't update scroll position until after this function is run.
-            ///      Mozilla/WebKit can have the same problem.
-            if (new_scroll_pos == scroll_pos) {
-                /// Should we wait a moment and see if the scroll position changes.
-                if (++scroll_check_count < 10) {
-                    window.setTimeout(scrolling, 30);
-                } else {
-                    /// Reset the counter and do not check anymore.
-                    scroll_check_count = 0;
+            /**
+            * The onscroll event.
+            *
+            * When the page scrolls this figures out the direction of the scroll and
+            * calls specific functions to determine whether content should be added or removed.
+            *
+            * @return NULL.  May call other functions via setTimeout().
+            * @note   Called when the window scrolls.  It may also call itself.
+            * @note   Set by the onscroll event.
+            */
+            function scrolling()
+            {
+                /// Trick IE 8- into understanding pageYOffset.
+                /*@cc_on
+                    @if (@_jscript_version < 9)
+                        window.pageYOffset = doc_docEl.scrollTop;
+                    @end
+                @*/
+                var new_scroll_pos = window.pageYOffset,
+                    scrolling_down;
+                
+                /// Has the scroll position actually not changed?
+                ///NOTE: IE/Opera sometimes don't update scroll position until after this function is run.
+                ///      Mozilla/WebKit can have the same problem.
+                if (new_scroll_pos == scroll_pos) {
+                    /// Should we wait a moment and see if the scroll position changes.
+                    if (++scroll_check_count < 10) {
+                        window.setTimeout(scrolling, 30);
+                    } else {
+                        /// Reset the counter and do not check anymore.
+                        scroll_check_count = 0;
+                    }
+                    return null;
                 }
-                return null;
+                scroll_check_count = 0;
+                
+                
+                scrolling_down = (new_scroll_pos > scroll_pos);
+                
+                /// This keeps track of the current scroll position so we can tell the direction of the scroll.
+                scroll_pos = new_scroll_pos;
+                
+                /// Find and indicate the range of verses displayed on the screen.
+                update_verse_range();
+                
+                /// Don't look up more data until the first results come.
+                if (waiting_for_first_search) {
+                    return null;
+                }
+                
+                /// Since the page is scrolling, we need to determine if more content needs to be added or if some content should be hidden.
+                
+                if (scrolling_down) {
+                    add_content_if_needed(additional);
+                    checking_excess_content_top = true;
+                } else {
+                    add_content_if_needed(previous);
+                    checking_excess_content_bottom = true;
+                }
+                
+                if (checking_excess_content_top) {
+                    window.clearTimeout(remove_content_top_timeout);
+                    remove_content_top_timeout    = window.setTimeout(remove_excess_content_top,    remove_speed);
+                }
+                if (checking_excess_content_bottom) {
+                    window.clearTimeout(remove_content_bottom_timeout);
+                    remove_content_bottom_timeout = window.setTimeout(remove_excess_content_bottom, remove_speed);
+                }
             }
-            scroll_check_count = 0;
             
-            
-            scrolling_down = (new_scroll_pos > scroll_pos);
-            
-            /// This keeps track of the current scroll position so we can tell the direction of the scroll.
-            scroll_pos = new_scroll_pos;
-            
-            /// Find and indicate the range of verses displayed on the screen.
-            update_verse_range();
-            
-            /// Don't look up more data until the first results come.
-            if (waiting_for_first_search) {
-                return null;
-            }
-            
-            /// Since the page is scrolling, we need to determine if more content needs to be added or if some content should be hidden.
-            
-            if (scrolling_down) {
-                add_content_if_needed(additional);
-                checking_excess_content_top = true;
-            } else {
-                add_content_if_needed(previous);
-                checking_excess_content_bottom = true;
-            }
-            
-            if (checking_excess_content_top) {
-                clearTimeout(remove_content_top_timeout);
-                remove_content_top_timeout    = window.setTimeout(remove_excess_content_top,    remove_speed);
-            }
-            if (checking_excess_content_bottom) {
-                clearTimeout(remove_content_bottom_timeout);
-                remove_content_bottom_timeout = window.setTimeout(remove_excess_content_bottom, remove_speed);
-            }
-        }
+            ///NOTE: Could use the wheel event if the scroll bars need to be invisible.
+            ///TODO: Determine how to handle scrolling if there were multiple viewports (i.e., split view).
+            window.onscroll = scrolling;
+        }());
         
         
         ///TODO: Determine if remove_excess_content_top and remove_excess_content_bottom can be combined.
@@ -931,11 +945,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         }
         
         
-        ///NOTE:  These events could be attached as anonymous functions (lambdas),
-        ///       but scrolling() calls itself, so it would need to store arguments.callee.
-        ///NOTE:  Could use wheel if the scroll bars are invisible.
         ///FIXME: These events need to be localized to the objects passed to the function.
-        window.onscroll = scrolling;
         window.onresize = resizing;
         
         ///NOTE: get_verse_at_position is temporary.
