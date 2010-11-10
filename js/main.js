@@ -675,24 +675,6 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         
         
         /**
-         * The onresize event.
-         *
-         * When the page is resized, check to see if more content should be loaded.
-         *
-         * @return NULL.  Calls other functions.
-         * @note   Called when the window is resized.
-         * @note   Set by the onresize event.
-         */
-        function resizing()
-        {
-            add_content_if_needed(additional);
-            add_content_if_needed(previous);
-            
-            update_verse_range();
-        }
-        
-        
-        /**
          * Create add_content_if_needed().
          *
          * @return A function that checks if more content is needed.
@@ -799,7 +781,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             * @example add_content_if_needed(additional);
             * @param   direction (integer) The direction that verses should be added: additional || previous.
             * @return  Null.  A function is run after a delay that may add verses to the page.
-            * @note    Called by add_content_bottom_if_needed(), add_content_top_if_needed(), handle_new_verses(), resizing(), and scrolling().
+            * @note    Called by add_content_bottom_if_needed(), add_content_top_if_needed(), handle_new_verses(), window.onresize(), and scrolling().
             */
             return function (direction)
             {
@@ -816,7 +798,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
          * Creates update_verse_range().
          *
          * @return A function that runs update_verse_range_delayed() after a short delay if needed.
-         * @note   Called by resizing(), scrolling(), and write_verses().
+         * @note   Called by window.onresize(), scrolling(), and write_verses().
          * @note   The anonymous function runs once and returns a small function with the bigger update_verse_range_delayed() in the closure.
          */
         update_verse_range = (function ()
@@ -958,8 +940,23 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         }
         
         
-        ///FIXME: These events need to be localized to the objects passed to the function.
-        window.onresize = resizing;
+        /**
+         * The onresize event.
+         *
+         * When the page is resized, check to see if more content should be loaded.
+         *
+         * @return NULL.  Calls other functions.
+         * @note   Called when the window is resized.
+         * @note   Set by the onresize event.
+         * @todo   Make a function that allows for adding and removing more global events.
+         */
+        window.onresize = function ()
+        {
+            add_content_if_needed(additional);
+            add_content_if_needed(previous);
+            
+            update_verse_range();
+        }
         
         ///NOTE: get_verse_at_position is temporary.
         return {add_content_if_needed: add_content_if_needed, update_verse_range: update_verse_range, scrollViewTo: scrollViewTo, get_verse_at_position: get_verse_at_position};
