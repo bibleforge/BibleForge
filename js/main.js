@@ -358,7 +358,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
      */
     content_manager = (function ()
     {
-        var buffer_add                     = 1000,  /// In milliseconds
+        var add_content_if_needed,
+            buffer_add                     = 1000,  /// In milliseconds
             buffer_rem                     = 10000, /// In milliseconds
             checking_excess_content_bottom = false,
             checking_excess_content_top    = false,
@@ -551,99 +552,6 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         
         
         /**
-         * Add content to bottom of the page (off the screen)
-         *
-         * @example	add_content_bottom_if_needed();
-         * @return	NULL.  Adds content to the page if needed.
-         * @note	Called by scrolling() via setTimeout().
-         */
-        function add_content_bottom_if_needed()
-        {
-            var child = page.lastChild,
-                newEl;
-            
-            if (child === null) {
-                return null;
-            }
-            
-            /// Is the user scrolling close to the bottom of the page?
-            if (child.offsetTop + child.clientHeight < window.pageYOffset + doc_docEl.clientHeight + buffer_add) {
-                /// Can the content be grabbed from cache?
-                if (cached_count_bottom > 0) {
-                    newEl = document.createElement("div");
-                    /// First subtract 1 from the outer counter variable to point to the last cached passage, and then retrieve the cached content.
-                    newEl.innerHTML = cached_verses_bottom[--cached_count_bottom];
-                    ///NOTE: This is actually works like insertAfter() (if such a function existed).
-                    ///      By using "null" as the second parameter, it tells it to add the element to the end.
-                    page.insertBefore(newEl, null);
-                    
-                    /// This fixes an IE7+ bug that causes the page to scroll needlessly when an element is added.
-                    /*@cc_on
-                        scrollViewTo(0, window.pageYOffset);
-                    @*/
-                    
-                    /// Check to see if we need to add more content.
-                    add_content_if_needed(additional);
-                } else {
-                    /// Did the user scroll all the way to the very bottom?  (If so, then there is no more content to be gotten.)
-                    if (scroll_maxed_bottom) {
-                        bottomLoader.style.visibility = "hidden";
-                        return null;
-                    }
-                    /// Get more content.
-                    run_search(additional);
-                }
-            }
-        }
-        
-        
-        /**
-         * Add content to top of the page (off the screen)
-         *
-         * @example	setTimeout(add_content_top_if_needed, lookup_speed_scrolling);
-         * @return	NULL.  Adds content to the page if needed.
-         * @note	Called by add_content_if_needed() via setTimeout().
-         */
-        function add_content_top_if_needed()
-        {
-            var child = page.firstChild,
-                newEl;
-            
-            if (child === null) {
-                return null;
-            }
-            
-            /// Is the user scrolling close to the top of the page?
-            if (child.clientHeight + buffer_add > window.pageYOffset) {
-                /// Can the content be grabbed from cache?
-                if (cached_count_top > 0) {
-                    newEl = document.createElement("div");
-                    
-                    /// First subtract 1 from the outer counter variable to point to the last cached passage, and then retrieve the cached content.
-                    newEl.innerHTML = cached_verses_top[--cached_count_top];
-                    
-                    page.insertBefore(newEl, child);
-                    
-                    /// The new content that was just added to the top of the page will push the other contents downward.
-                    /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was added.
-                    scrollViewTo(0, window.pageYOffset + newEl.clientHeight);
-                    
-                    /// Check to see if we need to add more content.
-                    add_content_if_needed(previous);
-                } else {
-                    /// Did the user scroll all the way to the very top?  (If so, then there is no more content to be gotten.)
-                    if (scroll_maxed_top) {
-                        topLoader.style.visibility = "hidden";
-                        return null;
-                    }
-                    /// Get more content.
-                    run_search(previous);
-                }
-            }
-        }
-                
-        
-        /**
          * Find a verse element that is within a certain Y coordinate on the screen.
          *
          * @example verse = get_verse_at_position(window.pageYOffset + topLoader.offsetHeight + 8,  true,  page); /// Could return {b: 1, c: 1, v: 1} for Genesis 1:1.
@@ -782,21 +690,123 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         
         
         /**
-         * Find a verse element that is within a certain Y coordinate on the screen.
+         * Create add_content_if_needed().
          *
-         * @example add_content_if_needed(additional);
-         * @param   direction (integer) The direction that verses should be added: additional || previous.
-         * @return  Null.  A function is run after a delay that may add verses to the page.
-         * @note    Called by add_content_bottom_if_needed(), add_content_top_if_needed(), handle_new_verses(), resizing(), and scrolling().
+         * @return A function that checks if more content is needed.
+         * @note   Called immediately.
+         * @todo   This should be done better.
          */
-        function add_content_if_needed(direction)
+        add_content_if_needed = (function ()
         {
-            if (direction === additional) {
-                window.setTimeout(add_content_bottom_if_needed, lookup_speed_sitting);
-            } else {
-                window.setTimeout(add_content_top_if_needed,    lookup_speed_scrolling);
+            /**
+            * Add content to bottom of the page (off the screen)
+            *
+            * @example	add_content_bottom_if_needed();
+            * @return	NULL.  Adds content to the page if needed.
+            * @note	Called by scrolling() via setTimeout().
+            */
+            function add_content_bottom_if_needed()
+            {
+                var child = page.lastChild,
+                    newEl;
+                
+                if (child === null) {
+                    return null;
+                }
+                
+                /// Is the user scrolling close to the bottom of the page?
+                if (child.offsetTop + child.clientHeight < window.pageYOffset + doc_docEl.clientHeight + buffer_add) {
+                    /// Can the content be grabbed from cache?
+                    if (cached_count_bottom > 0) {
+                        newEl = document.createElement("div");
+                        /// First subtract 1 from the outer counter variable to point to the last cached passage, and then retrieve the cached content.
+                        newEl.innerHTML = cached_verses_bottom[--cached_count_bottom];
+                        ///NOTE: This is actually works like insertAfter() (if such a function existed).
+                        ///      By using "null" as the second parameter, it tells it to add the element to the end.
+                        page.insertBefore(newEl, null);
+                        
+                        /// This fixes an IE7+ bug that causes the page to scroll needlessly when an element is added.
+                        /*@cc_on
+                            scrollViewTo(0, window.pageYOffset);
+                        @*/
+                        
+                        /// Check to see if we need to add more content.
+                        add_content_if_needed(additional);
+                    } else {
+                        /// Did the user scroll all the way to the very bottom?  (If so, then there is no more content to be gotten.)
+                        if (scroll_maxed_bottom) {
+                            bottomLoader.style.visibility = "hidden";
+                            return null;
+                        }
+                        /// Get more content.
+                        run_search(additional);
+                    }
+                }
             }
-        }
+            
+            
+            /**
+            * Add content to top of the page (off the screen)
+            *
+            * @example	setTimeout(add_content_top_if_needed, lookup_speed_scrolling);
+            * @return	NULL.  Adds content to the page if needed.
+            * @note	Called by add_content_if_needed() via setTimeout().
+            */
+            function add_content_top_if_needed()
+            {
+                var child = page.firstChild,
+                    newEl;
+                
+                if (child === null) {
+                    return null;
+                }
+                
+                /// Is the user scrolling close to the top of the page?
+                if (child.clientHeight + buffer_add > window.pageYOffset) {
+                    /// Can the content be grabbed from cache?
+                    if (cached_count_top > 0) {
+                        newEl = document.createElement("div");
+                        
+                        /// First subtract 1 from the outer counter variable to point to the last cached passage, and then retrieve the cached content.
+                        newEl.innerHTML = cached_verses_top[--cached_count_top];
+                        
+                        page.insertBefore(newEl, child);
+                        
+                        /// The new content that was just added to the top of the page will push the other contents downward.
+                        /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was added.
+                        scrollViewTo(0, window.pageYOffset + newEl.clientHeight);
+                        
+                        /// Check to see if we need to add more content.
+                        add_content_if_needed(previous);
+                    } else {
+                        /// Did the user scroll all the way to the very top?  (If so, then there is no more content to be gotten.)
+                        if (scroll_maxed_top) {
+                            topLoader.style.visibility = "hidden";
+                            return null;
+                        }
+                        /// Get more content.
+                        run_search(previous);
+                    }
+                }
+            }
+            
+            /**
+            * Find a verse element that is within a certain Y coordinate on the screen.
+            *
+            * @example add_content_if_needed(additional);
+            * @param   direction (integer) The direction that verses should be added: additional || previous.
+            * @return  Null.  A function is run after a delay that may add verses to the page.
+            * @note    Called by add_content_bottom_if_needed(), add_content_top_if_needed(), handle_new_verses(), resizing(), and scrolling().
+            */
+            return function (direction)
+            {
+                if (direction === additional) {
+                    window.setTimeout(add_content_bottom_if_needed, lookup_speed_sitting);
+                } else {
+                    window.setTimeout(add_content_top_if_needed,    lookup_speed_scrolling);
+                }
+            };
+        }());
         
         
         /**
