@@ -122,7 +122,7 @@ BF.include = (function ()
  * @example get_top_position(element);
  * @param   obj (element) An element on the page.
  * @return  Returns the distance of obj from the top of the scroll.
- * @note    Called by scroll_to_verse().
+ * @note    Called by scroll_to_verse() and wrench button onclick() in secondary.js.
  */
 BF.get_position = function (obj)
 {
