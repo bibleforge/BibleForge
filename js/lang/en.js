@@ -50,6 +50,7 @@ BF.lang = (function ()
         
         ///TODO: Determine if texts should be categorized.
         /// Miscellaneous Text
+        about:             "About",                                               /// Context menu item
         app_name:          "BibleForge",                                          /// The name of the application
         blog:              "Blog",                                                /// Context menu item
         chapter:           "Chapter",                                             /// Chapter headings
