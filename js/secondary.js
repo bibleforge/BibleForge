@@ -101,7 +101,9 @@
                 
                 /// If the link is a string, then it is simply a URL; otherwise, it is a function.
                 if (typeof menu_items[i].link == "string") {
-                    menu_item.href = menu_items[i].link;
+                    menu_item.href   = menu_items[i].link;
+                    /// Force links open in a new tab.
+                    menu_item.target = "_blank";
                 } else {
                     ///TODO: Create a useful hash value.
                     menu_item.href    = "#contextmenu";
