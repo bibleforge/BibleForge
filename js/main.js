@@ -1781,6 +1781,11 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 
                 /// Is the query a verse lookup?
                 if (verse_id !== false) {
+                    /// Is the lookup verse possibly the beginning of a Psalm with a title?  If so, we need to start at the title, so go back one verse.
+                    ///NOTE: To get the titles of Psalms, select verse 0 instead of verse 1.
+                    if (verse_id > 19003000 && verse_id < 19145002 && verse_id % 1000 === 1) {
+                        --verse_id;
+                    }
                     query      = verse_id;
                     query_type = verse_lookup;
                 } else {
