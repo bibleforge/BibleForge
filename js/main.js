@@ -237,6 +237,28 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         additional	= 1,
         previous	= 2,
         
+        highlight_re				= [],	/// Highlighter regex array
+        last_book					= 0,	/// The number of the last book of the Bible that was returned
+        last_search					= "",
+        last_search_encoded			= "",	/// A cache of the last search query
+        last_type,							/// The type of lookup performed last (verse_lookup || mixed_search || standard_search || grammatical_search)
+        waiting_for_first_search	= false,
+        
+        /// Ajax objects
+        ajax_additional	= new window.XMLHttpRequest(),
+        ajax_previous	= new window.XMLHttpRequest(),
+        
+        /// Verse variables
+        /// top_verse and bottom_verse are the last verses displayed on the screen so that the same verse is not displayed twice when more search data is returned (currently just used for grammatical_search).
+        bottom_verse = 0,
+        top_verse    = 0,
+        
+        /// top_id and bottom_id are the last ids (either verse or word id) returned from a search or verse lookup.
+        /// These are the same as bottom_id and top_id for verse_lookup and standard_search since these deal with entire verses as a whole, not individual words.
+        /// For grammatical_search, the last word id is stored.
+        bottom_id,
+        top_id,
+        
         /// Cache
         cached_count_bottom  = 0,
         cached_count_top     = 0,
@@ -1730,65 +1752,12 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
     }
     
     
-    preform_query = function ()
-    {
-
-
-        
-        
-        
-        
-        
-        
-        
-        
-        return function (raw_query)
-        {
-            ///1 Determine search type and check to see if we need to search (not empty)
-            
-            var query = BF.lang.prepare_search(raw_query);
-            
-            if (query === "") {
-                /// TODO: Determine what else should be done to notifiy the user that no query will be preformed.
-                return;
-            }
-            
-            ///2 Stop current requests
-            
-            
-            
-            ///3 Request results
-            
-            ///4 Prepare for new results (clear page(?), prepare highlighter if applicable)
-            
-            /// ...
-            
-            ///5 Display verses
-            
-            ///6 Highlight as necessary
-        };
-    }
-    
-    
     /**************
      * Set Events *
      **************/
      
     /// Capture form submit event.
-    searchForm.onsubmit = function ()
-    {
-        var raw_query = q_obj.value,
-        
-        /// Is the query is the same as the explaination?  If so, do not submit the query; just draw attention to the query box.
-        if (raw_query == BF.lang.query_explanation) {
-            q_obj.focus();
-        } else {
-            preform_query(raw_query);
-        }
-        
-        ///NOTE: Must return false in order to stop the form submission.
-        return false;
-    };
+    searchForm.onsubmit = prepare_new_search;
     
     /**
      * Set the query input box text with an explanation of what the user can enter in.
