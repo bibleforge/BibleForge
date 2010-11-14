@@ -243,11 +243,6 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         cached_verses_bottom = [],
         cached_verses_top    = [],
         
-        /// Scrolling
-        ///TODO: Determine if these can be placed in the scrolling closure.
-        scroll_maxed_bottom = false,
-        scroll_maxed_top    = true,
-        
         /// Objects
         settings,
         content_manager;
@@ -341,6 +336,10 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             buffer_rem                     = 10000, /// In milliseconds
             checking_excess_content_bottom = false,
             checking_excess_content_top    = false,
+            
+            has_reached_top                = false,
+            has_reached_bottom             = true,
+            
             looking_up_verse_range         = false,
             lookup_delay                   = 200,
             lookup_range_speed             = 300,   /// In milliseconds
@@ -350,6 +349,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             remove_content_top_timeout,
             remove_speed                   = 3000,  /// In milliseconds
             scroll_pos                     = 0,
+            ///TODO: Determine if these should have default values and what they should be.
             update_verse_range;
         
         /**
@@ -697,7 +697,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         add_content_if_needed(additional);
                     } else {
                         /// Did the user scroll all the way to the very bottom?  (If so, then there is no more content to be gotten.)
-                        if (scroll_maxed_bottom) {
+                        if (has_reached_bottom) {
                             bottomLoader.style.visibility = "hidden";
                             return null;
                         }
@@ -743,7 +743,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         add_content_if_needed(previous);
                     } else {
                         /// Did the user scroll all the way to the very top?  (If so, then there is no more content to be gotten.)
-                        if (scroll_maxed_top) {
+                        if (has_reached_top) {
                             topLoader.style.visibility = "hidden";
                             return null;
                         }
@@ -937,7 +937,23 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         }
         
         ///NOTE: get_verse_at_position is temporary.
-        return {add_content_if_needed: add_content_if_needed, update_verse_range: update_verse_range, scrollViewTo: scrollViewTo, get_verse_at_position: get_verse_at_position};
+        return {add_content_if_needed: add_content_if_needed,
+                get_verse_at_position: get_verse_at_position, /// TEMP
+                update_verse_range:    update_verse_range,
+                reached_bottom:        function ()
+                {
+                    has_reached_bottom = true;
+                },
+                reached_top:           function ()
+                {
+                    has_reached_top    = true;
+                },
+                reset_scroll:          function ()
+                {
+                    has_reached_bottom = false;
+                    has_reached_top    = false;
+                },
+                scrollViewTo:          scrollViewTo};
     }());
     
     /****************************
@@ -1050,7 +1066,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         
         document.title = raw_search_terms + " - " + BF.lang.app_name;
         
-        /// Stop filling in the explaination text so that the user can make the input box blank.
+        /// Stop filling in the explanation text so that the user can make the input box blank.
         q_obj.onblur = function () {};
         
         return false;
@@ -1262,7 +1278,6 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
      */
     function handle_new_verses(res, extra_data)
     {
-        ///TODO: On a verse lookup that does not start with Genesis 1:1, scroll_maxed_top must be set to FALSE. (Has this been taken care of?)
         var action        = extra_data.action,
             b_tag,
             count,
@@ -1319,14 +1334,14 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             }
         } else {
             if (direction == additional) {
-                /// The user has reached the bottom by scrolling down (either RETURNED_SEARCH or RETURNED_VERSES_previous), so we need to hide the loading graphic.
+                /// The user has reached the bottom by scrolling down (either RETURNED_SEARCH or RETURNED_VERSES_PREVIOUS), so we need to hide the loading graphic.
                 /// This is cause by scrolling to Revelation 22:21 or end of search or there were no results.
-                scroll_maxed_bottom = true;
+                content_manager.reached_bottom();
                 bottomLoader.style.visibility = "hidden";
             }
             if (direction == previous || waiting_for_first_search) {
                 /// The user has reached the top of the page by scrolling up (either Genesis 1:1 or there were no search results), so we need to hide the loading graphic
-                scroll_maxed_top    = true;
+                content_manager.reached_top();
                 topLoader.style.visibility    = "hidden";
             }
         }
@@ -1805,17 +1820,33 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 
                 /// Step 4: Request results
                 
+                ///TODO: Implement
                 query_server(query, query_type);
                 
                 
                 /// Step 5: Prepare for new results (clear page(?), prepare highlighter if applicable)
                 
+                ///TODO: Implement
                 clear_scroll();
+                
+                ///TODO: Determine if this should be done by a separate function.
+                document.title = raw_query + " - " + BF.lang.app_name;
+                
+                /// Stop filling in the explanation text so that the user can make the query box blank.
+                q_obj.onblur = function () {};
                 
                 /// Was the query a search?  Searches need to have the highlighter function prepared for the incoming results.
                 if (query_type != verse_lookup) {
-                    prepare_highligher(query);
+                    prepare_highlighter(query);
                 }
+                
+                /// Is the query a search or a verse lookup starting at Genesis 1:1?
+                ///NOTE: In the future, it may be possible for searches to start midway.
+                if (query_type != verse_lookup || verse_id == "10100101") {
+                    /// There is no reason to look for previous verses when the results start at the beginning.
+                    content_manager.reached_top();
+                }
+                
                 
                 /// ...
                 
@@ -1836,7 +1867,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
     {
         var raw_query = q_obj.value,
         
-        /// Is the query is the same as the explaination?  If so, do not submit the query; just draw attention to the query box.
+        /// Is the query is the same as the explanation?  If so, do not submit the query; just draw attention to the query box.
         if (raw_query == BF.lang.query_explanation) {
             q_obj.focus();
         } else {
