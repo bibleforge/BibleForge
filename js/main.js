@@ -237,28 +237,6 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         additional	= 1,
         previous	= 2,
         
-        highlight_re				= [],	/// Highlighter regex array
-        last_book					= 0,	/// The number of the last book of the Bible that was returned
-        last_search					= "",
-        last_search_encoded			= "",	/// A cache of the last search query
-        last_type,							/// The type of lookup performed last (verse_lookup || mixed_search || standard_search || grammatical_search)
-        waiting_for_first_search	= false,
-        
-        /// Ajax objects
-        ajax_additional	= new window.XMLHttpRequest(),
-        ajax_previous	= new window.XMLHttpRequest(),
-        
-        /// Verse variables
-        /// top_verse and bottom_verse are the last verses displayed on the screen so that the same verse is not displayed twice when more search data is returned (currently just used for grammatical_search).
-        bottom_verse = 0,
-        top_verse    = 0,
-        
-        /// top_id and bottom_id are the last ids (either verse or word id) returned from a search or verse lookup.
-        /// These are the same as bottom_id and top_id for verse_lookup and standard_search since these deal with entire verses as a whole, not individual words.
-        /// For grammatical_search, the last word id is stored.
-        bottom_id,
-        top_id,
-        
         /// Cache
         cached_count_bottom  = 0,
         cached_count_top     = 0,
@@ -1082,14 +1060,14 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
     /**
      * Figure out what type of search is being attempted by the user.
      *
-     * @example	determine_search_type("God & love");							/// Returns [standard_search]
-     * @example	determine_search_type("love AS NOUN");							/// Returns [grammatical_search,'["love",[[1,1]],[1]]']
-     * @example	determine_search_type("go AS IMPERATIVE, -SINGULAR");			/// Returns [grammatical_search,'["go",[[9,3],[5,1]],[0,1]]']
-     * @example	determine_search_type("go* AS PASSIVE, -PERFECT,INDICATIVE");	/// Returns [grammatical_search,'["go*",[[8,3],[7,5],[9,1]],[0,1,0]]']
-     * @example	determine_search_type("* AS RED, IMPERATIVE");					/// Returns [grammatical_search,'["",[[3,1],[9,3]],[0,0]]']
-     * //@example determine_search_type("love AS NOUN & more | less -good AS ADJECTIVE"); /// Returns [grammatical_search, [0, "love", "NOUN"], standard_search, "& more | less -good", grammatical_search, [0, "good", "ADJECTIVE"]]
+     * @example	determine_search_type("God & love");							/// Returns [{type: standard_search,    query: '"God & love"'}]
+     * @example	determine_search_type("love AS NOUN");							/// Returns [{type: grammatical_search, query: '["love",[[4,1]],[0]]'}]
+     * @example	determine_search_type("go AS IMPERATIVE, -SINGULAR");			/// Returns [{type: grammatical_search, query: '["go",[[9,3],[5,1]],[0,1]]'}]
+     * @example	determine_search_type("go* AS PASSIVE, -PERFECT,INDICATIVE");	/// Returns [{type: grammatical_search, query: '["go*",[[8,3],[7,5],[9,1]],[0,1,0]]'}]
+     * @example	determine_search_type("* AS RED, IMPERATIVE");					/// Returns [{type: grammatical_search, query: '["",[[3,1],[9,3]],[0,0]]'}]
+     * //@example determine_search_type("love AS NOUN & more | less -good AS ADJECTIVE"); /// Returns [{type: grammatical_search, query: '["love",[[4,1]],[0]]'}, {type: standard_search, query: "& more | less -good"}, {type: grammatical_search, query: '["good",[[4,3]],[1]]'}]
      * @param	search_terms (string) The prepared terms to be examined.
-     * @return	An array describing the type of search.  Format: [(int)Type of search, (optional)(string)JSON array describing the search].
+     * @return	An array filled with objects describing the type of search.
      * @note	Called by run_search().
      * @note	Only a partial implementation currently.  Mixed searching is lacking.
      */
@@ -1152,12 +1130,12 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 } else {
                     ///TODO: Determine if trim() is necessary or if there is a better implementation.
                     ///NOTE: exclude_json.slice(0, -1) is used to remove the trailing comma.  This could be unnecessary.
-                    return [grammatical_search, grammar_json + grammar_attribute_json + BF.lang.grammar_keywords[grammar_attributes.slice(split_start).trim()] + "],[" + exclude_json.slice(0, -1) + "]]"];
+                    return [{type: grammatical_search, query: grammar_json + grammar_attribute_json + BF.lang.grammar_keywords[grammar_attributes.slice(split_start).trim()] + "],[" + exclude_json.slice(0, -1) + "]]"}];
                 }
             } while (true);
         }
         /// The search is just a standard search.
-        return [standard_search];
+        return [{type: standard_search, query: search_terms}];
     }
     
     
@@ -1752,12 +1730,102 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
     }
     
     
+    preform_query = function ()
+    {
+
+
+        
+        
+        
+        
+        
+        
+        
+        
+        return (function ()
+        {
+            var ajax_additional = new window.XMLHttpRequest(),
+                ajax_previous   = new window.XMLHttpRequest();
+            
+            
+            return function (raw_query)
+            {
+                /// Step 1: Prepare string and check to see if we need to search (not empty)
+                
+                ///NOTE: Whitespace must be trimmed after this function because it may create excess whitespace.
+                var query = BF.lang.prepare_search(raw_query).trim(),
+                    query_type,
+                    verse_id;
+                
+                if (query === "") {
+                    /// TODO: Determine what else should be done to notifiy the user that no query will be preformed.
+                    return;
+                }
+                
+                /// Step 2: Stop current requests
+                
+                /// Stop any old requests since we have a new one.
+                /// Is readyState > 0 and < 4?  (Anything 1-3 needs to be aborted.)
+                if (ajax_additional.readyState % 4) {
+                    ajax_additional.abort();
+                }
+                if (ajax_previous.readyState % 4) {
+                    ajax_previous.abort();
+                }
+                
+                /// Step 3: Determine type of query
+                
+                /// Determine if the user is preforming a search or looking up a verse.
+                /// If the query is a verse reference, a number is returned, if it is a search, then FALSE is returned.
+                verse_id = BF.lang.determine_reference(last_search_prepared);
+                
+                /// Is the query a verse lookup?
+                if (verse_id !== false) {
+                    query      = verse_id;
+                    query_type = verse_lookup;
+                } else {
+                    /// Break down the query string into separate components.
+                    /// Mainly, this is used to determine the different parts of a grammatical search.
+                    ///FIXME: Implement mixed searching (grammatical and normal together, e.g., "love AS NOUN & more").
+                    query = determine_search_type(query);
+                    
+                    /// The type of search is stored in the first index of the array.
+                    query_type = query[0].type;
+                }
+                
+                ///4 Request results
+                
+                ///5 Prepare for new results (clear page(?), prepare highlighter if applicable)
+                
+                /// ...
+                
+                ///6 Display verses
+                
+                ///7 Highlight as necessary
+            };
+        }());
+    }
+    
+    
     /**************
      * Set Events *
      **************/
      
     /// Capture form submit event.
-    searchForm.onsubmit = prepare_new_search;
+    searchForm.onsubmit = function ()
+    {
+        var raw_query = q_obj.value,
+        
+        /// Is the query is the same as the explaination?  If so, do not submit the query; just draw attention to the query box.
+        if (raw_query == BF.lang.query_explanation) {
+            q_obj.focus();
+        } else {
+            preform_query(raw_query);
+        }
+        
+        ///NOTE: Must return false in order to stop the form submission.
+        return false;
+    };
     
     /**
      * Set the query input box text with an explanation of what the user can enter in.
