@@ -1856,7 +1856,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
      */
     q_obj.onblur = function ()
     {
-        if (this.value === "") {
+        if (this.value.trim() === "") {
             this.value = BF.lang.query_explanation;
         }
     };
