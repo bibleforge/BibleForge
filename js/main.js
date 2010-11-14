@@ -1769,7 +1769,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 if (ajax_additional.readyState % 4) {
                     ajax_additional.abort();
                 }
-                if (ajax_previous.readyState % 4) {
+                if (ajax_previous.readyState   % 4) {
                     ajax_previous.abort();
                 }
                 
@@ -1791,16 +1791,31 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 } else {
                     /// Break down the query string into separate components.
                     /// Mainly, this is used to determine the different parts of a grammatical search.
-                    ///FIXME: Implement mixed searching (grammatical and normal together, e.g., "love AS NOUN & more").
+                    ///FIXME: Implement mixed searching (grammatical and standard together, e.g., "love AS NOUN & more").
                     query = determine_search_type(query);
                     
-                    /// The type of search is stored in the first index of the array.
-                    query_type = query[0].type;
+                    /// Is the query mixed (both standard and grammatical)?
+                    if (query.length > 1) {
+                        query_type = mixed_search;
+                    } else {
+                        ///NOTE: If it is not mixed, then there is currently only one array element.
+                        query_type = query[0].type;
+                    }
                 }
                 
-                ///4 Request results
+                /// Step 4: Request results
                 
-                ///5 Prepare for new results (clear page(?), prepare highlighter if applicable)
+                query_server(query, query_type);
+                
+                
+                /// Step 5: Prepare for new results (clear page(?), prepare highlighter if applicable)
+                
+                clear_scroll();
+                
+                /// Was the query a search?  Searches need to have the highlighter function prepared for the incoming results.
+                if (query_type != verse_lookup) {
+                    prepare_highligher(query);
+                }
                 
                 /// ...
                 
