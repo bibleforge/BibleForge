@@ -595,22 +595,23 @@ BF.lang = (function ()
             return book + chapter + verse;
         },
 
-        ///TODO: Determine if these functions (prepare_search() and filter_terms_for_highlighter())could be moved out of the language Dependant file and just use some language dependent variables.
+        ///TODO: Determine if these functions (prepare_search() and filter_terms_for_highlighter()) could be moved out of the language Dependant file and just use some language dependent variables.
 
         /**
          * Prepares search terms to adhere to Sphinx syntax before submission to the server.
          *
-         * Removes excess whitespace, converts special words to symbols, and converts certain characters to a format adhere to Sphinx syntax.
+         * Converts special words to symbols, and converts certain characters to a format adhere to Sphinx syntax.
          *
-         * @example	search_terms = prepare_search("NOT in  the  AND good OR  beginning  ");	/// Returns "-in the & good | beginning"
+         * @example	search_terms = prepare_search("NOT in  the  AND good OR  beginning  ");	/// Returns "-in the & good | beginning  "
          * @example	search_terms = prepare_search("ps 16:title");							/// Returns "ps 16:0"
          * @example	search_terms = prepare_search("“God is good”");							/// Returns '"God is good"' (Note the curly quotes.)
          * @param	search_terms (string) The terms to be examined.
-         * @return	A prepared string with leading and trailing white space removed.
-         * @note	Called by run_search() in js/main.js.
+         * @return	A string that conforms to Sphinx syntax.
+         * @note	Called by preform_query() in js/main.js.
          * @note	Replaces AND, OR, and NOT with &, |, and - respectively.
          * @note	Replaces curly quotes with straight.
          * @note	Replaces various hyphens, dashes, and minuses with the standard hyphen (-).
+         * @note    This function assumes that whitespace will be trimmed afterward.
          */
         prepare_search: function (search_terms)
         {
@@ -643,8 +644,8 @@ BF.lang = (function ()
                 new_arr_len			= 0;
             
             /// Remove punctuation and break up the query string into individual parts to filter out duplicates.
-            ///NOTE: (?:^|\s) makes sure not to filter out hyphenated words.
-            ///NOTE: (?:"[^"]*"?|[^\s]*) matches a single word or phrase starting with a double quote (").
+            ///NOTE: (?:^|\s)- makes sure not to filter out hyphenated words by ensuring that a hypen must occur at the beginning or before a space to be counted as a NOT operator.
+            ///NOTE: (?:"[^"]*"?|[^\s]*) matches a phrase starting with a double quote (") or a single word.
             ///NOTE: [~\/]\d* removes characters used for Sphinx query syntax.  I.e., proximity searches ("this that"~10) and quorum matching ("at least three of these"/3).
             ///NOTE: -\B removes trailing hyphens.  (This might be unnecessary.)
             initial_search_arr = search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?|[^\s]*)|[~\/]\d*|["',.:?!;&|\)\(\]\[\/\\`{}<$\^+]|-\B)/g, "").toLowerCase().split(" ");
@@ -654,7 +655,9 @@ BF.lang = (function ()
             for (i = 0; i < arr_len; ++i) {
                 for (j = 0; j < new_arr_len; ++j) {
                     if (final_search_arr[j] == initial_search_arr[i]) {
-                        continue first_loop; /// This words already exists; jump to the first loop and get the next word.  (This would be the same as "continue 2" in PHP.)
+                        /// This words already exists; jump to the first loop and get the next word.
+                        ///NOTE: This would be the same as "continue 2" in PHP.
+                        continue first_loop;
                     }
                 }
                 final_search_arr[new_arr_len++] = initial_search_arr[i];
