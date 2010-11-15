@@ -361,19 +361,18 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         {
             ///TODO: Determine if remove_excess_content_top and remove_excess_content_bottom can be combined.
             /**
-            * Remove content that is past the top of screen and store in cache.
-            *
-            * @example	remove_excess_content_top();
-            * @return	NULL.  Removes content from the page if required.
-            * @note	Called by scrolling() via setTimeout().  May call itself, too.
-            */
+             * Remove content that is past the top of screen and store in cache.
+             *
+             * @return NULL.  Removes content from the page if required.
+             * @note   Called by scrolling() via setTimeout().  May call itself, too.
+             */
             function remove_excess_content_top()
             {
                 var child = page.firstChild,
                     child_height;
                 
                 if (child === null) {
-                    return null;
+                    return;
                 }
                 
                 ///NOTE: Mozilla ignores .clientHeight, .offsetHeight, .scrollHeight for some objects (not <div> tags, however) when in standards mode (i.e., a doctype is present).
@@ -412,18 +411,17 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             
             
             /**
-            * Remove content from below the screen and store in cache.
-            *
-            * @example	remove_excess_content_bottom();
-            * @return	NULL.  Removes content from the page if required.
-            * @note	Called by scrolling() via setTimeout().  May call itself, too.
-            */
+             * Remove content from below the screen and store in cache.
+             *
+             * @return  NULL.  Removes content from the page if required.
+             * @note    Called by scrolling() via setTimeout().  May call itself, too.
+             */
             function remove_excess_content_bottom()
             {
                 var child = page.lastChild;
                 
                 if (child === null) {
-                    return null;
+                    return;
                 }
                 
                 /// Is the element is in the remove zone?
@@ -456,15 +454,15 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 ///TODO: Perhaps move scroll_pos in here too.
                 
                 /**
-                * The onscroll event.
-                *
-                * When the page scrolls this figures out the direction of the scroll and
-                * calls specific functions to determine whether content should be added or removed.
-                *
-                * @return NULL.  May call other functions via setTimeout().
-                * @note   Called when the window scrolls.  It may also call itself.
-                * @note   Set by the onscroll event.
-                */
+                 * The onscroll event.
+                 *
+                 * When the page scrolls this figures out the direction of the scroll and
+                 * calls specific functions to determine whether content should be added or removed.
+                 *
+                 * @return NULL.  May call other functions via setTimeout().
+                 * @note   Called when the window scrolls.  It may also call itself.
+                 * @note   Set by the onscroll event.
+                 */
                 function scrolling()
                 {
                     /// Trick IE 8- into understanding pageYOffset.
@@ -487,7 +485,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             /// Reset the counter and do not check anymore.
                             scroll_check_count = 0;
                         }
-                        return null;
+                        return;
                     }
                     scroll_check_count = 0;
                     
@@ -502,7 +500,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     
                     /// Don't look up more data until the first results come.
                     if (waiting_for_first_search) {
-                        return null;
+                        return;
                     }
                     
                     /// Since the page is scrolling, we need to determine if more content needs to be added or if some content should be hidden.
@@ -662,12 +660,12 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         add_content_if_needed = (function ()
         {
             /**
-            * Add content to bottom of the page (off the screen)
-            *
-            * @example	add_content_bottom_if_needed();
-            * @return	NULL.  Adds content to the page if needed.
-            * @note	Called by scrolling() via setTimeout().
-            */
+             * Add content to bottom of the page (off the screen)
+             *
+             * @example add_content_bottom_if_needed();
+             * @return  NULL.  Adds content to the page if needed.
+             * @note    Called by scrolling() via setTimeout().
+             */
             function add_content_bottom_if_needed()
             {
                 var child = page.lastChild,
@@ -709,12 +707,12 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             
             
             /**
-            * Add content to top of the page (off the screen)
-            *
-            * @example	setTimeout(add_content_top_if_needed, lookup_speed_scrolling);
-            * @return	NULL.  Adds content to the page if needed.
-            * @note	Called by add_content_if_needed() via setTimeout().
-            */
+             * Add content to top of the page (off the screen)
+             *
+             * @example setTimeout(add_content_top_if_needed, lookup_speed_scrolling);
+             * @return  NULL.  Adds content to the page if needed.
+             * @note    Called by add_content_if_needed() via setTimeout().
+             */
             function add_content_top_if_needed()
             {
                 var child = page.firstChild,
@@ -754,13 +752,13 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             }
             
             /**
-            * Find a verse element that is within a certain Y coordinate on the screen.
-            *
-            * @example add_content_if_needed(additional);
-            * @param   direction (integer) The direction that verses should be added: additional || previous.
-            * @return  Null.  A function is run after a delay that may add verses to the page.
-            * @note    Called by add_content_bottom_if_needed(), add_content_top_if_needed(), handle_new_verses(), window.onresize(), and scrolling().
-            */
+             * Find a verse element that is within a certain Y coordinate on the screen.
+             *
+             * @example add_content_if_needed(additional);
+             * @param   direction (integer) The direction that verses should be added: additional || previous.
+             * @return  Null.  A function is run after a delay that may add verses to the page.
+             * @note    Called by add_content_bottom_if_needed(), add_content_top_if_needed(), handle_new_verses(), window.onresize(), and scrolling().
+             */
             return function (direction)
             {
                 if (direction === additional) {
