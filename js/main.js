@@ -1829,12 +1829,14 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 /// Step 4: Request results
                 
                 ///TODO: Implement
+                ///NOTE: Don't forget to window.encodeURIComponent(query).
                 query_server(query, query_type);
                 
                 
                 /// Step 5: Prepare for new results (clear page(?), prepare highlighter if applicable)
                 
                 ///TODO: Implement
+                ///NOTE: Do we need to keep track of the last book?  I.e., last_book = 0;
                 content_manager.clear_scroll();
                 
                 ///TODO: Determine if this should be done by a separate function.
