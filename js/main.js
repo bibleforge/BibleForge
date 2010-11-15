@@ -2014,6 +2014,7 @@ if (window.opera) {
  * @param	limit	(int) (optional)	The number of times to split the string.
  * @return	Returns an array of the string now broken into pieces.
  * @see		http://blog.stevenlevithan.com/archives/cross-browser-split
+ * @todo    Determine if IE9 still needs this.
  */
 ///NOTE: The following conditional compilation code blocks only executes in IE.
 /*@cc_on
@@ -2093,11 +2094,9 @@ if (window.opera) {
     /// IE9+ CSS: Make the inputIcon appear next to the queryInput.
     ///NOTE: The query box is slightly off centered in IE9 with this CSS.
     @if (@_jscript_version >= 9)
-        document.body.appendChild(document.createElement("style").appendChild(document.createTextNode(".inputIcon { position: relative; }")).parentNode);
+        document.body.appendChild(document.createElement("style").appendChild(document.createTextNode(".inputIcon { position: relative; } .first_verse:first-letter, .first_paragraph:first-letter { margin-top: 5px; }")).parentNode);
     @end
 @*/
-
-///TODO: IE needs ".first_verse:first-letter, .first_paragraph:first-letter { margin-top: 5px; }" for drop caps to be aligned correctly.
 
 /***************************
  * End of IE Specific Code *
