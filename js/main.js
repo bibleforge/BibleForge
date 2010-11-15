@@ -1009,13 +1009,13 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             return false;
         }
         
-        waiting_for_first_search = true;
-        
         last_search_prepared = BF.lang.prepare_search(raw_search_terms);
         
         if (last_search_prepared === "") {
             return false;
         }
+        
+        waiting_for_first_search = true;
         
         /// Stop any old requests since we have a new one.
         /// Is readyState > 0 and < 4?  (Anything 1-3 needs to be aborted.)

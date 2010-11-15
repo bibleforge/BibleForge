@@ -102,7 +102,9 @@
                 
                 /// If the link is a string, then it is simply a URL; otherwise, it is a function.
                 if (typeof menu_items[i].link == "string") {
-                    menu_item.href = menu_items[i].link;
+                    menu_item.href   = menu_items[i].link;
+                    /// Force links open in a new tab.
+                    menu_item.target = "_blank";
                 } else {
                     ///TODO: Create a useful hash value.
                     menu_item.href    = "#contextmenu";
@@ -632,7 +634,7 @@
             wrench_button.className += " activeWrenchIcon";
             
             ///TODO: These need to be language specific.
-            show_context_menu(wrench_pos.left, wrench_pos.top + wrench_button.offsetHeight, [{text: BF.lang.configure, link: show_configure_panel}, {line: true, text: BF.lang.blog, link: "http://blog.bibleforge.com"}, {text: BF.lang.help, link: show_help_panel}], function ()
+            show_context_menu(wrench_pos.left, wrench_pos.top + wrench_button.offsetHeight, [{text: BF.lang.configure, link: show_configure_panel}, {line: true, text: BF.lang.blog, link: "http://blog.bibleforge.com"}, {text: BF.lang.about, link: "http://bibleforge.wordpress.com/about/"}, {text: BF.lang.help, link: show_help_panel}], function ()
             {
                 /// Because the context menu is open, make the wrench button look pressed.
                 wrench_button.className += " activeWrenchIcon";

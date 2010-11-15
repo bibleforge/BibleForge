@@ -50,6 +50,7 @@ BF.lang = (function ()
         
         ///TODO: Determine if texts should be categorized.
         /// Miscellaneous Text
+        about:             "About",                                               /// Context menu item
         app_name:          "BibleForge",                                          /// The name of the application
         blog:              "Blog",                                                /// Context menu item
         chapter:           "Chapter",                                             /// Chapter headings
@@ -89,7 +90,7 @@ BF.lang = (function ()
          * @note	Called by prepare_highlighter() in js/main.js.
          * @link	http://snowball.tartarus.org/algorithms/english/stemmer.html
          * @link	http://www.tartarus.org/~martin/PorterStemmer
-         * @todo    Document stem_word() better: give examples and reasonings for each regular expression, etc.
+         * @todo    Document stem_word() better: give examples (from the KJV if possible) and reasonings for each regular expression, etc.
          * @todo    Review stem_word() for optimizations: avoid regex when possible.
          */
         stem_word: function (w)
@@ -112,7 +113,15 @@ BF.lang = (function ()
                 return w;
             }
             
+            ///TODO: Determine if Step 0 is needed (see http://snowball.tartarus.org/algorithms/english/stemmer.html).
+            
             /// Step 1a
+            /// Find the longest suffix and preform the following:
+            /// Replace suffixes: sses             => ss     (witnesses => witness)
+            ///                   ??ied+ || ??ies* => ??i    (cried     => cri,      cries => cri)
+            ///                   ?ied+  || ?ies*  => ??ie   (tied      => tie,      ties  => tie)
+            ///                   {V}{C}s          => {V}{C} (gaps      => gap)
+            /// Ignore suffixes:  us+ && ss                  (grievous  => grievous, pass  => pass)
             re  = /^(.+?)(ss|i)es$/;
             re2 = /^(.+?)([^s])s$/;
             
