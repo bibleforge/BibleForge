@@ -676,7 +676,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     newEl;
                 
                 if (child === null) {
-                    return null;
+                    return;
                 }
                 
                 /// Is the user scrolling close to the bottom of the page?
@@ -701,7 +701,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         /// Did the user scroll all the way to the very bottom?  (If so, then there is no more content to be gotten.)
                         if (has_reached_bottom) {
                             bottomLoader.style.visibility = "hidden";
-                            return null;
+                            return;
                         }
                         /// Get more content.
                         run_search(additional);
@@ -723,7 +723,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     newEl;
                 
                 if (child === null) {
-                    return null;
+                    return;
                 }
                 
                 /// Is the user scrolling close to the top of the page?
@@ -747,7 +747,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         /// Did the user scroll all the way to the very top?  (If so, then there is no more content to be gotten.)
                         if (has_reached_top) {
                             topLoader.style.visibility = "hidden";
-                            return null;
+                            return;
                         }
                         /// Get more content.
                         run_search(previous);
@@ -1209,7 +1209,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         /// Is the server already working on this request?
         ///NOTE: readyState is between 0-4, and anything 1-3 means that the server is already working on this request.
         if (ajax.readyState % 4) {
-            return null;
+            return;
         }
         
         if (last_type == verse_lookup) {
