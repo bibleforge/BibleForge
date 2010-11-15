@@ -237,12 +237,6 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         additional	= 1,
         previous	= 2,
         
-        /// Cache
-        cached_count_bottom  = 0,
-        cached_count_top     = 0,
-        cached_verses_bottom = [],
-        cached_verses_top    = [],
-        
         /// Objects
         settings,
         content_manager;
@@ -309,7 +303,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             if (cur_verse !== false) {
                 ///FIXME: This should reload the verses.
                 ///FIXME: It does not necessarily need to reload the verses if switching from paragraph mode to non-paragraph mode.
-                clean_up_page();
+                content_manager.clear_scroll();
             }
         }), red_letters: create_get_set(true, function (values)
         {
@@ -332,23 +326,33 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
     content_manager = (function ()
     {
         var add_content_if_needed,
+            
             buffer_add                     = 1000,  /// In milliseconds
             buffer_rem                     = 10000, /// In milliseconds
+            
+            cached_count_bottom            = 0,
+            cached_count_top               = 0,
+            cached_verses_bottom           = [],
+            cached_verses_top              = [],
+            
             checking_excess_content_bottom = false,
             checking_excess_content_top    = false,
             
-            has_reached_top                = false,
-            has_reached_bottom             = true,
+            has_reached_top,
+            has_reached_bottom,
             
             looking_up_verse_range         = false,
             lookup_delay                   = 200,
             lookup_range_speed             = 300,   /// In milliseconds
             lookup_speed_scrolling         = 50,    /// In milliseconds
             lookup_speed_sitting           = 100,   /// In milliseconds
+            
             remove_content_bottom_timeout,
             remove_content_top_timeout,
             remove_speed                   = 3000,  /// In milliseconds
+            
             scroll_pos                     = 0,
+            
             ///TODO: Determine if these should have default values and what they should be.
             update_verse_range;
         
@@ -936,6 +940,27 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         
         ///NOTE: get_verse_at_position is temporary.
         return {add_content_if_needed: add_content_if_needed,
+                /**
+                 * Prepares the page for new verses.
+                 *
+                 * @return NULL.  The page is prepared for new verses.
+                 * @note   Called by prepare_new_search().
+                 * @todo   Determine if this is a good place for this function.
+                 */
+                clear_scroll:          function ()
+                {
+                    /// Clear cache.
+                    ///TODO: Determine a way to store the cache in a way that it can be used later.
+                    cached_verses_top    = [];
+                    cached_verses_bottom = [];
+                    cached_count_top     = 0;
+                    cached_count_bottom  = 0;
+                    
+                    ///TODO: This should have smooth scrolling effects, etc.
+                    bottomLoader.style.visibility = "hidden";
+                    topLoader.style.visibility    = "hidden";
+                    page.innerHTML                = "";
+                },
                 get_verse_at_position: get_verse_at_position, /// TEMP
                 update_verse_range:    update_verse_range,
                 reached_bottom:        function ()
@@ -1530,21 +1555,6 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
     
     
     /**
-     * Prepares the page for new verses.
-     *
-     * @example	clean_up_page();
-     * @return	NULL.  The page is prepared for new verses.
-     * @note	Called by prepare_new_search().
-     */
-    function clean_up_page() {
-        ///TODO: This should have smooth scrolling effects, etc.
-        bottomLoader.style.visibility	= "hidden";
-        topLoader.style.visibility		= "hidden";
-        page.innerHTML					= "";
-    }
-    
-    
-    /**
      * Highlight the verses.
      *
      * Highlights the words in the verses that match the search terms.
@@ -1825,12 +1835,12 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 /// Step 5: Prepare for new results (clear page(?), prepare highlighter if applicable)
                 
                 ///TODO: Implement
-                clear_scroll();
+                content_manager.clear_scroll();
                 
                 ///TODO: Determine if this should be done by a separate function.
                 document.title = raw_query + " - " + BF.lang.app_name;
                 
-                /// Stop filling in the explanation text so that the user can make the query box blank.
+                /// Stop filling in the explanation text so that the user can make the query box blank.  (Text in the query box can be distracting while reading.)
                 q_obj.onblur = function () {};
                 
                 /// Was the query a search?  Searches need to have the highlighter function prepared for the incoming results.
