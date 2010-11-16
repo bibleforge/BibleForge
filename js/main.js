@@ -1859,6 +1859,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
 
 /// Prototypes
 ///NOTE: Adds trim() to Strings for IE 8-/Opera 10.1-/Safari 4-/Mozilla 3.0-.
+///TODO: Remove this as soon as a non-JavaScript version of BibleForge is ready.
 if (!"".trim) {
     /**
      * Removes leading and trailing spaces.
