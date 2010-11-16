@@ -357,8 +357,7 @@
             show_cursor();
             hide_cursor_timeout = window.setTimeout(function ()
             {
-                ///NOTE: Only works in Mozilla.
-                ///      IE is the only other major browser family that supports transparent cursors (.CUR files only), but it cannot be set via a timeout.
+                ///NOTE: Works in Mozilla/IE9.
                 ///      WebKit (at least 532.9 (Safari 4/Chromium 4.0)) does not properly support completely transparent cursors.  It also cannot be set via a timeout (see http://code.google.com/p/chromium/issues/detail?id=26723).
                 ///      WebKit can use an almost completely transparent PNG, and it will change the mouse cursor, but it calls the onmousemove event when the cursor changes.
                 ///      It would be possible to manually determine if the onmousemove event was legitimate by checking the X and Y coordinates.
