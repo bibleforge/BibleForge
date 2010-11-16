@@ -1314,15 +1314,13 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
      * @param   verse_id (number) The id number of the verse in the format [B]BCCCVVV.
      * @return  Returns TRUE on success and FALSE if the verse cannot be found on the scroll.
      * @note    Called by handle_new_verses() after the first Ajax request of a particular verse lookup.
-     * @todo    Determine how to handle verses at chapter and book beginnings (e.g., Genesis 1:1).
+     * @bug     Verses at chapter and book beginnings (e.g., Genesis 1:1) are not scrolled to correctly.
+     * @todo    Move this function somewhere else.
      */
     function scroll_to_verse(verse_id)
     {
-        var div_tag,
-            padding_interval,
-            pixels_needed,
-            ///FIXME: This will not get the correct element if the verse is verse 1 (i.e., is at the beginning of a chapter or book).
-            verse_obj = document.getElementById(verse_id + "_verse");
+        ///FIXME: This will not get the correct element if the verse is verse 1 (i.e., is at the beginning of a chapter or book).
+        var verse_obj = document.getElementById(verse_id + "_verse");
         
         if (!verse_obj) {
             return false;
