@@ -1588,127 +1588,6 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
     }
     
     
-    ///TODO: Determine if this whole function should be in a language specific file.
-    /**
-     * Prepare search terms for highlighting.
-     *
-     * Create regex array to search through the verses that will soon be returned by the server.
-     *
-     * @example	prepare_highlighter(q_obj.value);
-     * @example	prepare_highlighter("search terms");
-     * @param	search_terms (string) The terms to look for.
-     * @return	NULL.  A regex array is created and stored in the outer variable highlight_re[].
-     * @note	Called by run_search().
-     */
-    function prepare_highlighter(search_terms)
-    {
-        var count				= 0,
-            i,
-            j,
-            len_before,
-            len_after,
-            no_morph,
-            term,
-            stemmed_arr			= [],
-            search_terms_arr,
-            stemmed_word;
-        
-        highlight_re = [];
-        
-        search_terms_arr = BF.lang.filter_terms_for_highlighter(search_terms);
-        
-        ///TODO: Determine if a normal for loop would be better.
-        first_loop:
-        for (i in search_terms_arr) {
-            term		= search_terms_arr[i];
-            len_before	= term.length;
-            
-            ///FIXME: Move this to the language specific file because it is language dependent.
-            /// Fix special/unique words that the stemmer won't stem correctly.
-            switch (term) {
-            case "does":
-            case "doth":
-            case "do":
-            case "doeth":
-            case "doest":
-                stemmed_word = "do[esth]*";
-                no_morph = true;
-                break;
-            case "haste":
-            case "hasted":
-                stemmed_word = "haste";
-                no_morph = false;
-                break;
-            case "shalt":
-            case "shall":
-                stemmed_word = "shal[lt]";
-                no_morph = true;
-                break;
-            case "wilt":
-            case "will":
-                stemmed_word = "wil[lt]";
-                no_morph = true;
-                break;
-            case "have":
-            case "hast":
-            case "hath":
-                stemmed_word = "ha[vesth]+";
-                no_morph = true;
-                break;
-            case "the":
-                stemmed_word = "the";
-                no_morph = true;
-                break;
-            case "for":
-                stemmed_word = "for";
-                no_morph = true;
-                break;
-            case "not":
-                stemmed_word = "not";
-                no_morph = true;
-                break;
-            default:
-                /// Does the word contain a wildcard symbol (*)?
-                if (term.indexOf("*") != -1) {
-                    /// Don't stem; change it to a regex compatible form.
-                    ///NOTE: Word breaks are found by looking for tag openings (<) or closings (>).
-                    stemmed_word = term.replace(/\*/g, "[^<>]*");
-                    no_morph = true;
-                } else {
-                    /// A normal word without a wildcard gets stemmed.
-                    stemmed_word = BF.lang.stem_word(term);
-                    no_morph = false;
-                }
-            }
-            len_after = stemmed_word.length;
-            
-            /// Skip words that are the same after stemming or regexing (e.g., "joy joyful" becomes "joy joy").
-            for (j = 0; j < count; ++j) {
-                if (stemmed_word == stemmed_arr[j]) {
-                    continue first_loop; ///NOTE: This is the same as "continue 2" in PHP.
-                }
-            }
-            
-            stemmed_arr[count] = stemmed_word;
-            
-            ///NOTE:  [<-] finds either the beginning of the close tag (</a>) or a hyphen (-).
-            ///       The hyphen is to highlight hyphenated words that would otherwise be missed (matching first word only) (i.e., "Beth").
-            ///       ([^>]+-)? finds words where the match is not the first of a hyphenated word (i.e., "Maachah").
-            ///       The current English version (KJV) does not use square brackets ([]).
-            ///FIXME: The punctuation ,.?!;:)( could be considered language specific.
-            ///TODO:  Bench mark different regex (creation and testing).
-            if (no_morph || (len_after == len_before && len_after < 3)) {
-                highlight_re[count++] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")[),.?!;:]*[<-]", "i");
-            } else {
-                /// Find most words based on stem morphology, but also can have false hits.
-                ///TODO: Compare different regexes.
-                //highlight_re[count++] = new RegExp("id=([0-9]+)>[(]*([^<]+-)?" + stemmed_word + "[a-z']{0,7}[),.?!;:]*[<-]", "i");
-                highlight_re[count++] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")[^<]{0,7}[),.?!;:]*[<-]", "i");
-            }
-        }
-    }
-    
-    
     /***************************
      * End of search functions *
      ***************************/
@@ -1768,7 +1647,9 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         return (function ()
         {
             var ajax_additional = new window.XMLHttpRequest(),
-                ajax_previous   = new window.XMLHttpRequest();
+                ajax_previous   = new window.XMLHttpRequest(),
+                
+                highlight_regex;
             
             
             return function (raw_query)
@@ -1847,7 +1728,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 
                 /// Was the query a search?  Searches need to have the highlighter function prepared for the incoming results.
                 if (query_type != verse_lookup) {
-                    prepare_highlighter(query);
+                    highlight_regex = BF.prepare_highlighter(query);
                 }
                 
                 /// Is the query a search or a verse lookup starting at Genesis 1:1?

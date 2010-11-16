@@ -93,152 +93,320 @@ BF.lang = (function ()
          * @todo    Document stem_word() better: give examples (from the KJV if possible) and reasonings for each regular expression, etc.
          * @todo    Review stem_word() for optimizations: avoid regex when possible.
          */
-        stem_word: function (w)
+        prepare_highlighter: (function ()
         {
-            var fp,
-                last_letter,
-                re,
-                re2,
-                re3,
-                re4,
-                stem,
-                suffix;
-            
-            /// Some quick checking to see if we even need to continue.
-            if (w.length < 3) {
-                return w;
-            }
-            
-            if (stop_words_re.test(w)) {
-                return w;
-            }
-            
-            ///TODO: Determine if Step 0 is needed (see http://snowball.tartarus.org/algorithms/english/stemmer.html).
-            
-            /// Step 1a
-            /// Find the longest suffix and preform the following:
-            /// Replace suffixes: sses             => ss     (witnesses => witness)
-            ///                   ??ied+ || ??ies* => ??i    (cried     => cri,      cries => cri)
-            ///                   ?ied+  || ?ies*  => ??ie   (tied      => tie,      ties  => tie)
-            ///                   {V}{C}s          => {V}{C} (gaps      => gap)
-            /// Ignore suffixes:  us+ && ss                  (grievous  => grievous, pass  => pass)
-            re  = /^(.+?)(ss|i)es$/;
-            re2 = /^(.+?)([^s])s$/;
-            
-            if (re.test(w)) {
-                w = w.replace(re,  "$1$2");
-            } else if (re2.test(w)) {
-                w = w.replace(re2, "$1$2");
-            }
-            
-            /// Step 1b
-            /// "Present-day" English: re = /^(.+?)eed$/;
-            re  = /^(.+?)ee$/; /// Early Modern English fix
-            /// "Present-day" English: re2 = /^(.+?)(ingly|edly|ed|ing|ly)$/;
-            re2 = /^(.+?)(ing(?:ly)?|ed(?:ly)?|ly|e(?:st|th))$/; /// Early Modern English fix
-            
-            if (re.test(w)) {
-                fp = re.exec(w);
-                if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(fp[1])) {
-                    w.slice(0, -1);
+            function stem_word(w)
+            {
+                var fp,
+                    last_letter,
+                    re,
+                    re2,
+                    re3,
+                    re4,
+                    stem,
+                    suffix;
+                
+                /// Some quick checking to see if we even need to continue.
+                if (w.length < 3) {
+                    return w;
                 }
-            } else if (re2.test(w)) {
-                fp   = re2.exec(w);
-                stem = fp[1];
-                if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy]/.test(stem)) {
-                    w   = stem;
-                    re2 = /(?:at|bl|iz)$/;
-                    re3 = /([^aeiouylsz])\1$/; /// Look for repeating characters.
-                    re4 = /^[^aeiou][^aeiouy]*[aeiouy][^aeiouwxy]$/;
-                    if (re2.test(w)) {
-                        /// TODO: Determine why if (re2.test(w)) and else if (re4.test(w)) should not be merged to the same line since they have the same code followoing.
-                        w += "e";
-                    } else if (re3.test(w)) {
-                        w = w.slice(0, -1);
-                    } else if (re4.test(w)) {
-                        w += "e";
+                
+                if (stop_words_re.test(w)) {
+                    return w;
+                }
+                
+                ///TODO: Determine if Step 0 is needed (see http://snowball.tartarus.org/algorithms/english/stemmer.html).
+                
+                /// Step 1a
+                /// Find the longest suffix and preform the following:
+                /// Replace suffixes: sses             => ss     (witnesses => witness)
+                ///                   ??ied+ || ??ies* => ??i    (cried     => cri,      cries => cri)
+                ///                   ?ied+  || ?ies*  => ??ie   (tied      => tie,      ties  => tie)
+                ///                   {V}{C}s          => {V}{C} (gaps      => gap)
+                /// Ignore suffixes:  us+ && ss                  (grievous  => grievous, pass  => pass)
+                re  = /^(.+?)(ss|i)es$/;
+                re2 = /^(.+?)([^s])s$/;
+                
+                if (re.test(w)) {
+                    w = w.replace(re,  "$1$2");
+                } else if (re2.test(w)) {
+                    w = w.replace(re2, "$1$2");
+                }
+                
+                /// Step 1b
+                /// "Present-day" English: re = /^(.+?)eed$/;
+                re  = /^(.+?)ee$/; /// Early Modern English fix
+                /// "Present-day" English: re2 = /^(.+?)(ingly|edly|ed|ing|ly)$/;
+                re2 = /^(.+?)(ing(?:ly)?|ed(?:ly)?|ly|e(?:st|th))$/; /// Early Modern English fix
+                
+                if (re.test(w)) {
+                    fp = re.exec(w);
+                    if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(fp[1])) {
+                        w.slice(0, -1);
+                    }
+                } else if (re2.test(w)) {
+                    fp   = re2.exec(w);
+                    stem = fp[1];
+                    if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy]/.test(stem)) {
+                        w   = stem;
+                        re2 = /(?:at|bl|iz)$/;
+                        re3 = /([^aeiouylsz])\1$/; /// Look for repeating characters.
+                        re4 = /^[^aeiou][^aeiouy]*[aeiouy][^aeiouwxy]$/;
+                        if (re2.test(w)) {
+                            /// TODO: Determine why if (re2.test(w)) and else if (re4.test(w)) should not be merged to the same line since they have the same code following.
+                            w += "e";
+                        } else if (re3.test(w)) {
+                            w = w.slice(0, -1);
+                        } else if (re4.test(w)) {
+                            w += "e";
+                        }
                     }
                 }
-            }
-            
-            /// Step 1c
-            re = /^(.+?)y$/;
-            if (re.test(w)) {
-                fp   = re.exec(w);
-                stem = fp[1];
-                if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy]/.test(stem)) {
-                    w = stem + "i";
-                }
-            }
-            
-            /// Step 2
-            re = /^(.+?)(a(?:t(?:ion(?:al)?|or)|nci|l(?:li|i(?:sm|ti)))|tional|e(?:n(?:ci|til)|li)|i(?:z(?:er|ation)|v(?:eness|iti))|b(?:li|iliti)|ous(?:li|ness)|fulness|logi)$/;
-            if (re.test(w)) {
-                fp     = re.exec(w);
-                stem   = fp[1];
-                suffix = fp[2];
-                if (/^([^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(stem)) {
-                    w = stem + step2list[suffix];
-                }
-            }
-            
-            /// Step 3
-            re = /^(.+?)(ic(?:a(?:te|l)|iti)|a(?:tive|lize)|ful|ness|self)$/;
-            if (re.test(w)) {
-                fp     = re.exec(w);
-                stem   = fp[1];
-                suffix = fp[2];
-                if (/^([^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(stem)) {
-                    w = stem + step3list[suffix];
-                }
-            }
-            
-            /// Step 4
-            re  = /^(.+?)(?:a(?:l|n(?:ce|t)|te|ble)|e(?:n(?:ce|t)|r|ment)|i(?:c|ble|sm|ti|ve|ze)|ment|ous?)$/;
-            re2 = /^(.+?)([st])ion$/;
-            
-            if (re.test(w)) {
-                fp   = re.exec(w);
-                stem = fp[1];
-                if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(stem)) {
-                    w = stem;
-                }
-            } else if (re2.test(w)) {
-                fp   = re2.exec(w);
-                stem = fp[1] + fp[2];
-                if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(stem)) {
-                    w = stem;
-                }
-            }
-            
-            /// Step 5
-            re = /^(.+?)e$/;
-            if (re.test(w)) {
-                fp   = re.exec(w);
-                stem = fp[1];
-                re   = /^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/;
-                re2  = /^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*(?:[aeiouy][aeiou]*)?$/;
-                re3  = /^[^aeiou][^aeiouy]*[aeiouy][^aeiouwxy]$/;
                 
-                if (re.test(stem) || (re2.test(stem) && !(re3.test(stem)))) {
-                    w = stem;
+                /// Step 1c
+                re = /^(.+?)y$/;
+                if (re.test(w)) {
+                    fp   = re.exec(w);
+                    stem = fp[1];
+                    if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy]/.test(stem)) {
+                        w = stem + "i";
+                    }
                 }
+                
+                /// Step 2
+                re = /^(.+?)(a(?:t(?:ion(?:al)?|or)|nci|l(?:li|i(?:sm|ti)))|tional|e(?:n(?:ci|til)|li)|i(?:z(?:er|ation)|v(?:eness|iti))|b(?:li|iliti)|ous(?:li|ness)|fulness|logi)$/;
+                if (re.test(w)) {
+                    fp     = re.exec(w);
+                    stem   = fp[1];
+                    suffix = fp[2];
+                    if (/^([^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(stem)) {
+                        w = stem + step2list[suffix];
+                    }
+                }
+                
+                /// Step 3
+                re = /^(.+?)(ic(?:a(?:te|l)|iti)|a(?:tive|lize)|ful|ness|self)$/;
+                if (re.test(w)) {
+                    fp     = re.exec(w);
+                    stem   = fp[1];
+                    suffix = fp[2];
+                    if (/^([^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(stem)) {
+                        w = stem + step3list[suffix];
+                    }
+                }
+                
+                /// Step 4
+                re  = /^(.+?)(?:a(?:l|n(?:ce|t)|te|ble)|e(?:n(?:ce|t)|r|ment)|i(?:c|ble|sm|ti|ve|ze)|ment|ous?)$/;
+                re2 = /^(.+?)([st])ion$/;
+                
+                if (re.test(w)) {
+                    fp   = re.exec(w);
+                    stem = fp[1];
+                    if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(stem)) {
+                        w = stem;
+                    }
+                } else if (re2.test(w)) {
+                    fp   = re2.exec(w);
+                    stem = fp[1] + fp[2];
+                    if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(stem)) {
+                        w = stem;
+                    }
+                }
+                
+                /// Step 5
+                re = /^(.+?)e$/;
+                if (re.test(w)) {
+                    fp   = re.exec(w);
+                    stem = fp[1];
+                    re   = /^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/;
+                    re2  = /^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*(?:[aeiouy][aeiou]*)?$/;
+                    re3  = /^[^aeiou][^aeiouy]*[aeiouy][^aeiouwxy]$/;
+                    
+                    if (re.test(stem) || (re2.test(stem) && !(re3.test(stem)))) {
+                        w = stem;
+                    }
+                }
+                
+                if (/ll$/.test(w) && (/^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(w))) {
+                    w = w.slice(0, -1);
+                }
+                
+                last_letter = w.slice(-1);
+                
+                if (last_letter == "y" || last_letter == "i") {
+                    w = w.slice(0, w.length - 1) + "[yi]";
+                } else if (last_letter == "e") {
+                    w = w.slice(0, w.length - 1) + "[ei]";
+                }
+                
+                return w;
             }
             
-            if (/ll$/.test(w) && (/^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(w))) {
-                w = w.slice(0, -1);
+            /**
+             * Prepare the search terms for the highlighter.
+             *
+             * Removes punctuation, words which should not be found in the search results, duplicate words, and converts all words to lower case
+             * so that the highlighter can parse the words properly.
+             *
+             * @example	filter_terms_for_highlighter('this one, -that one -"none of these" -"or these ones"~1 "but, these?"'); /// Returns ["this", "one", "but", "these"].
+             * @param	search_terms (string) The terms to be filtered.
+             * @return	An array of filtered words.
+             * @note	Called by prepare_highlighter().
+             * @todo    Determine if this should be moved out of the language specific file (and maybe just use some languge specific variables).
+             */
+            function filter_terms_for_highlighter(search_terms)
+            {
+                var arr_len,
+                    final_search_arr	= [],
+                    i,
+                    initial_search_arr,
+                    j,
+                    new_arr_len			= 0;
+                
+                /// Remove punctuation and break up the query string into individual parts to filter out duplicates.
+                ///NOTE: (?:^|\s)- makes sure not to filter out hyphenated words by ensuring that a hyphen must occur at the beginning or before a space to be counted as a NOT operator.
+                ///NOTE: (?:"[^"]*"?|[^\s]*) matches a phrase starting with a double quote (") or a single word.
+                ///NOTE: [~\/]\d* removes characters used for Sphinx query syntax.  I.e., proximity searches ("this that"~10) and quorum matching ("at least three of these"/3).
+                ///NOTE: -\B removes trailing hyphens.  (This might be unnecessary.)
+                initial_search_arr = search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?|[^\s]*)|[~\/]\d*|["',.:?!;&|\)\(\]\[\/\\`{}<$\^+]|-\B)/g, "").toLowerCase().split(" ");
+                arr_len = initial_search_arr.length;
+                
+                first_loop:
+                for (i = 0; i < arr_len; ++i) {
+                    for (j = 0; j < new_arr_len; ++j) {
+                        if (final_search_arr[j] == initial_search_arr[i]) {
+                            /// This words already exists; jump to the first loop and get the next word.
+                            ///NOTE: This would be the same as "continue 2" in PHP.
+                            continue first_loop;
+                        }
+                    }
+                    final_search_arr[new_arr_len++] = initial_search_arr[i];
+                }
+                
+                return final_search_arr;
             }
             
-            last_letter = w.slice(-1);
-            
-            if (last_letter == "y" || last_letter == "i") {
-                w = w.slice(0, w.length - 1) + "[yi]";
-            } else if (last_letter == "e") {
-                w = w.slice(0, w.length - 1) + "[ei]";
-            }
-            
-            return w;
-        },
+            /**
+             * Prepare search terms for highlighting.
+             *
+             * Create regex array to search through the verses that will soon be returned by the server.
+             *
+             * @example	BF.prepare_highlighter(q_obj.value);
+             * @example	BF.prepare_highlighter("search terms");
+             * @param	search_terms (string) The terms to look for.
+             * @return	An array of regular expressions.
+             * @note	Called by run_search().
+             */
+            return function (search_terms)
+            {
+                var count           = 0,
+                    highlight_regex = [],
+                    i,
+                    j,
+                    len_before,
+                    len_after,
+                    no_morph,
+                    term,
+                    stemmed_arr     = [],
+                    search_terms_arr,
+                    stemmed_word;
+                
+                search_terms_arr = filter_terms_for_highlighter(search_terms);
+                
+                ///TODO: Determine if a normal for loop would be better.
+                first_loop:
+                for (i in search_terms_arr) {
+                    term		= search_terms_arr[i];
+                    len_before	= term.length;
+                    
+                    /// Fix special/unique words that the stemmer won't stem correctly.
+                    switch (term) {
+                    case "does":
+                    case "doth":
+                    case "do":
+                    case "doeth":
+                    case "doest":
+                        stemmed_word = "do[esth]*";
+                        no_morph = true;
+                        break;
+                    case "haste":
+                    case "hasted":
+                        stemmed_word = "haste";
+                        no_morph = false;
+                        break;
+                    case "shalt":
+                    case "shall":
+                        stemmed_word = "shal[lt]";
+                        no_morph = true;
+                        break;
+                    case "wilt":
+                    case "will":
+                        stemmed_word = "wil[lt]";
+                        no_morph = true;
+                        break;
+                    case "have":
+                    case "hast":
+                    case "hath":
+                        stemmed_word = "ha[vesth]+";
+                        no_morph = true;
+                        break;
+                    case "the":
+                        stemmed_word = "the";
+                        no_morph = true;
+                        break;
+                    case "for":
+                        stemmed_word = "for";
+                        no_morph = true;
+                        break;
+                    case "not":
+                        stemmed_word = "not";
+                        no_morph = true;
+                        break;
+                    default:
+                        /// Does the word contain a wildcard symbol (*)?
+                        if (term.indexOf("*") != -1) {
+                            /// Don't stem; change it to a regex compatible form.
+                            ///NOTE: Word breaks are found by looking for tag openings (<) or closings (>).
+                            stemmed_word = term.replace(/\*/g, "[^<>]*");
+                            no_morph = true;
+                        } else {
+                            /// A normal word without a wildcard gets stemmed.
+                            stemmed_word = stem_word(term);
+                            no_morph = false;
+                        }
+                    }
+                    len_after = stemmed_word.length;
+                    
+                    /// Skip words that are the same after stemming or regex'ing (e.g., "joy joyful" becomes "joy joy").
+                    for (j = 0; j < count; ++j) {
+                        if (stemmed_word == stemmed_arr[j]) {
+                            ///NOTE: This is the same as "continue 2" in PHP.
+                            continue first_loop;
+                        }
+                    }
+                    
+                    stemmed_arr[count] = stemmed_word;
+                    
+                    ///NOTE:  [<-] finds either the beginning of the close tag (</a>) or a hyphen (-).
+                    ///       The hyphen is to highlight hyphenated words that would otherwise be missed (matching first word only) (i.e., "Beth").
+                    ///       ([^>]+-)? finds words where the match is not the first of a hyphenated word (i.e., "Maachah").
+                    ///       The current English version (KJV) does not use square brackets ([]).
+                    ///FIXME: The punctuation ,.?!;:)( could be considered language specific.
+                    ///TODO:  Bench mark different regex (creation and testing).
+                    if (no_morph || (len_after == len_before && len_after < 3)) {
+                        highlight_regex[count] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")[),.?!;:]*[<-]", "i");
+                    } else {
+                        /// Find most words based on stem morphology, but also can have false hits.
+                        ///TODO: Compare different regexes.
+                        //highlight_regex[count++] = new RegExp("id=([0-9]+)>[(]*([^<]+-)?" + stemmed_word + "[a-z']{0,7}[),.?!;:]*[<-]", "i");
+                        highlight_regex[count] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")[^<]{0,7}[),.?!;:]*[<-]", "i");
+                    }
+                    ++count;
+                }
+                
+                return highlight_regex;
+            };
+        }())},
 
 
         /**
@@ -604,8 +772,6 @@ BF.lang = (function ()
             return book + chapter + verse;
         },
 
-        ///TODO: Determine if these functions (prepare_search() and filter_terms_for_highlighter()) could be moved out of the language Dependant file and just use some language dependent variables.
-
         /**
          * Prepares search terms to adhere to Sphinx syntax before submission to the server.
          *
@@ -621,6 +787,7 @@ BF.lang = (function ()
          * @note	Replaces curly quotes with straight.
          * @note	Replaces various hyphens, dashes, and minuses with the standard hyphen (-).
          * @note    This function assumes that whitespace will be trimmed afterward.
+         * @todo    Determine if this should be moved out of the language specific file (and maybe just use some languge specific variables).
          */
         prepare_search: function (search_terms)
         {
@@ -629,50 +796,6 @@ BF.lang = (function ()
             ///NOTE: \u2011-\u2015 replaces various hyphens, dashes, and minuses with the standard hyphen (-).
             ///NOTE: replace(/([0-9]+)[:.;,\s]title/ig, "$1:0") replaces Psalm title references into an acceptable format (e.g., "Psalm 3:title" becomes "Psalm 3:0").
             return search_terms.replace(" IN RED", " AS RED").replace(/\s{2,}/g, " ").replace(/\sAND\s/g, " & ").replace(/\sOR\s/g, " | ").replace(/(?:\s-|\s*\bNOT)\s/g, " -").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[\u2011-\u2015]/g, "-").replace(/([0-9]+)[:.;,\s]title/ig, "$1:0");
-        },
-
-
-        /**
-         * Prepare the search terms for the highlighter.
-         *
-         * Removes punctuation, words which should not be found in the search results, duplicate words, and converts all words to lower case
-         * so that the highlighter can parse the words properly.
-         *
-         * @example	filter_terms_for_highlighter('this one, -that one -"none of these" -"or these ones"~1 "but, these?"'); /// Returns ["this", "one", "but", "these"].
-         * @param	search_terms (string) The terms to be filtered.
-         * @return	An array of filtered words.
-         * @note	Called by prepare_highlighter().
-         */
-        filter_terms_for_highlighter: function (search_terms)
-        {
-            var arr_len,
-                final_search_arr	= [],
-                i,
-                initial_search_arr,
-                j,
-                new_arr_len			= 0;
-            
-            /// Remove punctuation and break up the query string into individual parts to filter out duplicates.
-            ///NOTE: (?:^|\s)- makes sure not to filter out hyphenated words by ensuring that a hypen must occur at the beginning or before a space to be counted as a NOT operator.
-            ///NOTE: (?:"[^"]*"?|[^\s]*) matches a phrase starting with a double quote (") or a single word.
-            ///NOTE: [~\/]\d* removes characters used for Sphinx query syntax.  I.e., proximity searches ("this that"~10) and quorum matching ("at least three of these"/3).
-            ///NOTE: -\B removes trailing hyphens.  (This might be unnecessary.)
-            initial_search_arr = search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?|[^\s]*)|[~\/]\d*|["',.:?!;&|\)\(\]\[\/\\`{}<$\^+]|-\B)/g, "").toLowerCase().split(" ");
-            arr_len = initial_search_arr.length;
-            
-            first_loop:
-            for (i = 0; i < arr_len; ++i) {
-                for (j = 0; j < new_arr_len; ++j) {
-                    if (final_search_arr[j] == initial_search_arr[i]) {
-                        /// This words already exists; jump to the first loop and get the next word.
-                        ///NOTE: This would be the same as "continue 2" in PHP.
-                        continue first_loop;
-                    }
-                }
-                final_search_arr[new_arr_len++] = initial_search_arr[i];
-            }
-            
-            return final_search_arr;
         }
     };
 }());
