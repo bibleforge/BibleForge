@@ -24,22 +24,7 @@ if (!window.BF) {
  * @return  Returns an object containing language specific functions and variables.
  */
 BF.lang = (function ()
-{
-    /// Create variables used by these functions but hidden from the rest of the code via closure.
-    /// Book Regex
-    ///NOTE: Created in the Forge via create_reference_regex.php on 04-20-2010 from ref_array.php.
-    var books_re    = /^(?:1(?: (?:c(?:h(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|o(?:r(?:inthi(?:ans?|ons?))?)?)|j(?:n|o(?:hn)?)|k(?:gs?|i(?:ngs?)?)|p(?:e(?:t(?:er?)?)?|t)|s(?:a(?:m(?:uel)?)?|m)|t(?:h(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|i(?:m(?:othy)?)?|m))|c(?:h(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|o(?:r(?:inthi(?:ans?|ons?))?)?)|j(?:n|o(?:hn)?)|k(?:gs?|i(?:ngs?)?)|p(?:e(?:t(?:er?)?)?|t)|s(?:a(?:m(?:uel)?)?|m|t (?:c(?:h(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|o(?:r(?:inthi(?:ans?|ons?))?)?)|j(?:n|o(?:hn)?)|k(?:gs?|i(?:ngs?)?)|p(?:e(?:t(?:er?)?)?|t)|s(?:a(?:m(?:uel)?)?|m)|t(?:h(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|i(?:m(?:othy)?)?|m)))|t(?:h(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|i(?:m(?:othy)?)?|m))|2(?: (?:c(?:h(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|o(?:r(?:inthi(?:ans?|ons?))?)?)|j(?:n|o(?:hn)?)|k(?:gs?|i(?:ngs?)?)|p(?:e(?:t(?:er?)?)?|t)|s(?:a(?:m(?:uel)?)?|m)|t(?:h(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|i(?:m(?:othy)?)?|m))|c(?:h(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|o(?:r(?:inthi(?:ans?|ons?))?)?)|j(?:n|o(?:hn)?)|k(?:gs?|i(?:ngs?)?)|nd (?:c(?:h(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|o(?:r(?:inthi(?:ans?|ons?))?)?)|j(?:n|o(?:hn)?)|k(?:gs?|i(?:ngs?)?)|p(?:e(?:t(?:er?)?)?|t)|s(?:a(?:m(?:uel)?)?|m)|t(?:h(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|i(?:m(?:othy)?)?|m))|p(?:e(?:t(?:er?)?)?|t)|s(?:a(?:m(?:uel)?)?|m)|t(?:h(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|i(?:m(?:othy)?)?|m))|3(?: j(?:n|o(?:hn)?)|j(?:n|o(?:hn)?)|rd j(?:n|o(?:hn)?))|a(?:c(?:t(?: of the apostles?|s(?: of the apostles?)?)?)?|m(?:os?)?|p(?:a(?:c(?:al(?:ipse?|ypse?)|k(?:al(?:ipse?|ypse?))?)?|k(?:al(?:ipse?|ypse?))?)|o(?:c(?:al(?:ipse?|ypse?)|k(?:al(?:ipse?|ypse?))?)?|k(?:al(?:ipse?|ypse?))?)))|c(?:ant(?:e(?:cles?|sles?)|i(?:cles?|sles?))?|hron(?:i(?:c(?:hles?|les?)|kles?))?|ol(?:a(?:s(?:hi(?:ans?|ons?)|i(?:ans?|ons?)|si(?:ans?|ons?))|ti(?:ans?|ons?))|o(?:s(?:hi(?:ans?|ons?)|i(?:ans?|ons?)|si(?:ans?|ons?))|ti(?:ans?|ons?)))?)|d(?:a(?:n(?:e(?:il|l)|i(?:el|l))?)?|eu(?:t(?:eron(?:amy|omy))?)?|n|t|u(?:e(?:t(?:eron(?:amy|omy))?)?|t(?:eron(?:amy|omy))?)?)|e(?:c(?:c(?:l(?:es(?:iastes?)?)?)?|l(?:es(?:iast(?:es?|is?))?)?)?|f(?:e(?:si(?:ans?|ons?)|ti(?:ans?|ons?)))?|p(?:h(?:e(?:si(?:ans?|ons?)|ti(?:ans?|ons?)))?)?|r|st(?:er|h(?:er)?)?|x(?:o(?:d(?:us?)?)?)?|z(?:e(?:k(?:i(?:al|el))?)?|k|ra?)?)|first (?:c(?:h(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|o(?:r(?:inthi(?:ans?|ons?))?)?)|j(?:n|o(?:hn)?)|k(?:gs?|i(?:ngs?)?)|p(?:e(?:t(?:er?)?)?|t)|s(?:a(?:m(?:uel)?)?|m)|t(?:h(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|i(?:m(?:othy)?)?|m))|g(?:a(?:l(?:a(?:si(?:ans?|ons?)|ti(?:ans?|ons?)))?)?|e(?:n(?:asis?|esis?|isis?)?)?|n)|h(?:a(?:b(?:a(?:c(?:a(?:ck?|k)|u(?:ck?|k))|k(?:a(?:c|k)|k(?:a(?:c|k)|u(?:c|k))|u(?:c|k))))?|g(?:ai|g(?:ai)?)?)?|br?|eb(?:r(?:ews?)?)?|g|o(?:s(?:a(?:ya)?|eah?|ia)?)?)|i(?: (?:c(?:h(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|o(?:r(?:inthi(?:ans?|ons?))?)?)|j(?:n|o(?:hn)?)|k(?:gs?|i(?:ngs?)?)|p(?:e(?:t(?:er?)?)?|t)|s(?:a(?:m(?:uel)?)?|m)|t(?:h(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|i(?:m(?:othy)?)?|m))|i(?: (?:c(?:h(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|o(?:r(?:inthi(?:ans?|ons?))?)?)|j(?:n|o(?:hn)?)|k(?:gs?|i(?:ngs?)?)|p(?:e(?:t(?:er?)?)?|t)|s(?:a(?:m(?:uel)?)?|m)|t(?:h(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|i(?:m(?:othy)?)?|m))|i j(?:n|o(?:hn)?))|s(?:a(?:ah|i(?:ah?|h))?|iah?)?)|j(?:a(?:m(?:es?)?|s)?|b|d(?:gs?|s)?|er(?:amiah?|emiah?|imiah?)?|g(?:ds?|s)?|hn|l|nh?|o(?:b|el?|hn?|l|n(?:ah?)?|s(?:h(?:ua)?)?)?|r|u(?:d(?:e|g(?:es?|s)?)?)?)|kings?|l(?:a(?:m(?:antati(?:ans?|ons?)|entati(?:ans?|ons?)|intati(?:ans?|ons?))?|v(?:iti(?:c(?:as|us)|k(?:as|us)))?)?|ev(?:iti(?:c(?:as|us?)|k(?:as|us?)))?|ke?|m|u(?:ke?)?|v)|m(?:a(?:l(?:a(?:c(?:ai|h(?:ai|i)|i|k(?:ai|i))|k(?:ai|i))|e(?:c(?:ai|h(?:ai|i)|i|k(?:ai|i))|k(?:ai|i)))?|rk?|t(?:h(?:e(?:uw|w)|u(?:ew|w))|t(?:h(?:e(?:uw|w)|u(?:ew|w)))?)?)|ch|i(?:c(?:ah?|hah?)?|k(?:ah?|ea?))?|k|l|rk?|t)|n(?:a(?:h(?:um)?|m)?|e(?:amiah?|emiah?|h(?:amiah?|emiah?|imiah?)?|imiah?)?|i(?:amiah?|emiah?|h(?:amiah?|emiah?|imiah?)?)?|m|u(?:m(?:bers?)?)?)|ob(?:a(?:d(?:iah?)?)?|d)?|p(?:eter?|h(?:i(?:l(?:e(?:m(?:on)?)?|i(?:p(?:i(?:ans?|ons?)|pi(?:ans?|ons?)))?)?)?|lm|m|p)?|r(?:o(?:v(?:erbs?)?)?|v)?|s(?:a(?:lms?)?|s)?|v)|r(?:ev(?:alati(?:ans?|ons?)|elati(?:ans?|ons?))?|m|o(?:m(?:ans?|e)?)?|th?|u(?:th?)?|v)|s(?:a(?:lms?|m(?:uel)?)|econd (?:c(?:h(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|o(?:r(?:inthi(?:ans?|ons?))?)?)|j(?:n|o(?:hn)?)|k(?:gs?|i(?:ngs?)?)|p(?:e(?:t(?:er?)?)?|t)|s(?:a(?:m(?:uel)?)?|m)|t(?:h(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|i(?:m(?:othy)?)?|m))|g|ng|o(?:lomon|n(?:g(?: of so(?:lom(?:an|on)|ngs?)|s(?: of solom(?:an|on))?)?)?))|t(?:h(?:e (?:act(?: of the apostles?|s of the apostles?)|song(?: of so(?:lom(?:an|on)|ngs?)|s of solom(?:an|on)))|ird j(?:n|o(?:hn)?))|i(?:m(?:othy)?|t(?:us?)?)?|m|t)|z(?:a(?:c(?:h(?:ariah?|eriah?)?|k(?:ariah?|eriah?))?|k(?:ariah?|eriah?)?)?|c(?:h|k)?|e(?:c(?:h(?:ariah?|eriah?)?|k(?:ariah?|eriah?)?)?|k(?:ariah?|eriah?)?|p(?:h(?:aniah?|eniah?)?)?)?|k|p))[\s0-9:.;,\-]*$/i,
-        book_arr_re = [0, /^g(?:e(?:n(?:asis?|esis?|isis?)?)?|n)[\s0-9:.;,\-]*$/i, /^ex(?:o(?:d(?:us?)?)?)?[\s0-9:.;,\-]*$/i, /^l(?:av(?:iti(?:c(?:as|us)|k(?:as|us)))?|ev(?:iti(?:c(?:as|us?)|k(?:as|us?)))?|v)[\s0-9:.;,\-]*$/i, /^n(?:m|u(?:m(?:bers?)?)?)[\s0-9:.;,\-]*$/i, /^d(?:eu(?:t(?:eron(?:amy|omy))?)?|t|u(?:e(?:t(?:eron(?:amy|omy))?)?|t(?:eron(?:amy|omy))?)?)[\s0-9:.;,\-]*$/i, /^jos(?:h(?:ua)?)?[\s0-9:.;,\-]*$/i, /^j(?:d(?:gs?|s)?|g(?:ds?|s)?|udg(?:es?|s)?)[\s0-9:.;,\-]*$/i, /^r(?:th?|u(?:th?)?)[\s0-9:.;,\-]*$/i, /^(?:1(?: s(?:a(?:m(?:uel)?)?|m)|s(?:a(?:m(?:uel)?)?|m|t s(?:a(?:m(?:uel)?)?|m)))|first s(?:a(?:m(?:uel)?)?|m)|i s(?:a(?:m(?:uel)?)?|m)|sam(?:uel)?)[\s0-9:.;,\-]*$/i, /^(?:2(?: s(?:a(?:m(?:uel)?)?|m)|nd s(?:a(?:m(?:uel)?)?|m)|s(?:a(?:m(?:uel)?)?|m))|ii s(?:a(?:m(?:uel)?)?|m)|second s(?:a(?:m(?:uel)?)?|m))[\s0-9:.;,\-]*$/i, /^(?:1(?: k(?:gs?|i(?:ngs?)?)|k(?:gs?|i(?:ngs?)?)|st k(?:gs?|i(?:ngs?)?))|first k(?:gs?|i(?:ngs?)?)|i k(?:gs?|i(?:ngs?)?)|kings?)[\s0-9:.;,\-]*$/i, /^(?:2(?: k(?:gs?|i(?:ngs?)?)|k(?:gs?|i(?:ngs?)?)|nd k(?:gs?|i(?:ngs?)?))|ii k(?:gs?|i(?:ngs?)?)|second k(?:gs?|i(?:ngs?)?))[\s0-9:.;,\-]*$/i, /^(?:1(?: ch(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|ch(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|st ch(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?)|chron(?:i(?:c(?:hles?|les?)|kles?))?|first ch(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|i ch(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?)[\s0-9:.;,\-]*$/i, /^(?:2(?: ch(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|ch(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|nd ch(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?)|ii ch(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|second ch(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?)[\s0-9:.;,\-]*$/i, /^e(?:r|zra?)[\s0-9:.;,\-]*$/i, /^n(?:e(?:amiah?|emiah?|h(?:amiah?|emiah?|imiah?)?|imiah?)?|i(?:amiah?|emiah?|h(?:amiah?|emiah?|imiah?)?)?)[\s0-9:.;,\-]*$/i, /^est(?:er|h(?:er)?)?[\s0-9:.;,\-]*$/i, /^j(?:b|ob)[\s0-9:.;,\-]*$/i, /^(?:ps(?:a(?:lms?)?|s)?|salms?)[\s0-9:.;,\-]*$/i, /^p(?:r(?:o(?:v(?:erbs?)?)?|v)?|v)[\s0-9:.;,\-]*$/i, /^ec(?:c(?:l(?:es(?:iastes?)?)?)?|l(?:es(?:iast(?:es?|is?))?)?)?[\s0-9:.;,\-]*$/i, /^(?:cant(?:e(?:cles?|sles?)|i(?:cles?|sles?))?|s(?:g|ng|o(?:lomon|n(?:g(?: of so(?:lom(?:an|on)|ngs?)|s(?: of solom(?:an|on))?)?)?))|the song(?: of so(?:lom(?:an|on)|ngs?)|s of solom(?:an|on)))[\s0-9:.;,\-]*$/i, /^is(?:a(?:ah|i(?:ah?|h))?|iah?)?[\s0-9:.;,\-]*$/i, /^j(?:er(?:amiah?|emiah?|imiah?)?|r)[\s0-9:.;,\-]*$/i, /^l(?:a(?:m(?:antati(?:ans?|ons?)|entati(?:ans?|ons?)|intati(?:ans?|ons?))?)?|m)[\s0-9:.;,\-]*$/i, /^ez(?:e(?:k(?:i(?:al|el))?)?|k)?[\s0-9:.;,\-]*$/i, /^d(?:a(?:n(?:e(?:il|l)|i(?:el|l))?)?|n)[\s0-9:.;,\-]*$/i, /^ho(?:s(?:a(?:ya)?|eah?|ia)?)?[\s0-9:.;,\-]*$/i, /^j(?:l|o(?:el?|l))[\s0-9:.;,\-]*$/i, /^am(?:os?)?[\s0-9:.;,\-]*$/i, /^ob(?:a(?:d(?:iah?)?)?|d)?[\s0-9:.;,\-]*$/i, /^j(?:nh|on(?:ah?)?)[\s0-9:.;,\-]*$/i, /^m(?:ch|i(?:c(?:ah?|hah?)?|k(?:ah?|ea?))?)[\s0-9:.;,\-]*$/i, /^na(?:h(?:um)?|m)?[\s0-9:.;,\-]*$/i, /^h(?:a(?:b(?:a(?:c(?:a(?:ck?|k)|u(?:ck?|k))|k(?:a(?:c|k)|k(?:a(?:c|k)|u(?:c|k))|u(?:c|k))))?)?|b)[\s0-9:.;,\-]*$/i, /^z(?:ep(?:h(?:aniah?|eniah?)?)?|p)[\s0-9:.;,\-]*$/i, /^h(?:ag(?:ai|g(?:ai)?)?|g)[\s0-9:.;,\-]*$/i, /^z(?:a(?:c(?:h(?:ariah?|eriah?)?|k(?:ariah?|eriah?))?|k(?:ariah?|eriah?)?)?|c(?:h|k)?|e(?:c(?:h(?:ariah?|eriah?)?|k(?:ariah?|eriah?)?)?|k(?:ariah?|eriah?)?)?|k)[\s0-9:.;,\-]*$/i, /^m(?:al(?:a(?:c(?:ai|h(?:ai|i)|i|k(?:ai|i))|k(?:ai|i))|e(?:c(?:ai|h(?:ai|i)|i|k(?:ai|i))|k(?:ai|i)))?|l)[\s0-9:.;,\-]*$/i, /^m(?:at(?:h(?:e(?:uw|w)|u(?:ew|w))|t(?:h(?:e(?:uw|w)|u(?:ew|w)))?)?|t)[\s0-9:.;,\-]*$/i, /^m(?:ark?|k|rk?)[\s0-9:.;,\-]*$/i, /^l(?:ke?|u(?:ke?)?)[\s0-9:.;,\-]*$/i, /^j(?:hn|n|o(?:hn?)?)[\s0-9:.;,\-]*$/i, /^(?:ac(?:t(?: of the apostles?|s(?: of the apostles?)?)?)?|the act(?: of the apostles?|s of the apostles?))[\s0-9:.;,\-]*$/i, /^r(?:m|o(?:m(?:ans?|e)?)?)[\s0-9:.;,\-]*$/i, /^(?:1(?: co(?:r(?:inthi(?:ans?|ons?))?)?|co(?:r(?:inthi(?:ans?|ons?))?)?|st co(?:r(?:inthi(?:ans?|ons?))?)?)|first co(?:r(?:inthi(?:ans?|ons?))?)?|i co(?:r(?:inthi(?:ans?|ons?))?)?)[\s0-9:.;,\-]*$/i, /^(?:2(?: co(?:r(?:inthi(?:ans?|ons?))?)?|co(?:r(?:inthi(?:ans?|ons?))?)?|nd co(?:r(?:inthi(?:ans?|ons?))?)?)|ii co(?:r(?:inthi(?:ans?|ons?))?)?|second co(?:r(?:inthi(?:ans?|ons?))?)?)[\s0-9:.;,\-]*$/i, /^ga(?:l(?:a(?:si(?:ans?|ons?)|ti(?:ans?|ons?)))?)?[\s0-9:.;,\-]*$/i, /^e(?:f(?:e(?:si(?:ans?|ons?)|ti(?:ans?|ons?)))?|p(?:h(?:e(?:si(?:ans?|ons?)|ti(?:ans?|ons?)))?)?)[\s0-9:.;,\-]*$/i, /^ph(?:i(?:l(?:i(?:p(?:i(?:ans?|ons?)|pi(?:ans?|ons?)))?)?)?|p)?[\s0-9:.;,\-]*$/i, /^col(?:a(?:s(?:hi(?:ans?|ons?)|i(?:ans?|ons?)|si(?:ans?|ons?))|ti(?:ans?|ons?))|o(?:s(?:hi(?:ans?|ons?)|i(?:ans?|ons?)|si(?:ans?|ons?))|ti(?:ans?|ons?)))?[\s0-9:.;,\-]*$/i, /^(?:1(?: th(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|st th(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|th(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?)|first th(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|i th(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?)[\s0-9:.;,\-]*$/i, /^(?:2(?: th(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|nd th(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|th(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?)|ii th(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|second th(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?)[\s0-9:.;,\-]*$/i, /^(?:1(?: t(?:i(?:m(?:othy)?)?|m)|st t(?:i(?:m(?:othy)?)?|m)|t(?:i(?:m(?:othy)?)?|m))|first t(?:i(?:m(?:othy)?)?|m)|i t(?:i(?:m(?:othy)?)?|m)|t(?:i(?:m(?:othy)?)?|m))[\s0-9:.;,\-]*$/i, /^(?:2(?: t(?:i(?:m(?:othy)?)?|m)|nd t(?:i(?:m(?:othy)?)?|m)|t(?:i(?:m(?:othy)?)?|m))|ii t(?:i(?:m(?:othy)?)?|m)|second t(?:i(?:m(?:othy)?)?|m))[\s0-9:.;,\-]*$/i, /^t(?:it(?:us?)?|t)[\s0-9:.;,\-]*$/i, /^ph(?:ile(?:m(?:on)?)?|lm|m)[\s0-9:.;,\-]*$/i, /^h(?:br?|eb(?:r(?:ews?)?)?)[\s0-9:.;,\-]*$/i, /^ja(?:m(?:es?)?|s)?[\s0-9:.;,\-]*$/i, /^(?:1(?: p(?:e(?:t(?:er?)?)?|t)|p(?:e(?:t(?:er?)?)?|t)|st p(?:e(?:t(?:er?)?)?|t))|first p(?:e(?:t(?:er?)?)?|t)|i p(?:e(?:t(?:er?)?)?|t)|peter?)[\s0-9:.;,\-]*$/i, /^(?:2(?: p(?:e(?:t(?:er?)?)?|t)|nd p(?:e(?:t(?:er?)?)?|t)|p(?:e(?:t(?:er?)?)?|t))|ii p(?:e(?:t(?:er?)?)?|t)|second p(?:e(?:t(?:er?)?)?|t))[\s0-9:.;,\-]*$/i, /^(?:1(?: j(?:n|o(?:hn)?)|j(?:n|o(?:hn)?)|st j(?:n|o(?:hn)?))|first j(?:n|o(?:hn)?)|i j(?:n|o(?:hn)?))[\s0-9:.;,\-]*$/i, /^(?:2(?: j(?:n|o(?:hn)?)|j(?:n|o(?:hn)?)|nd j(?:n|o(?:hn)?))|ii j(?:n|o(?:hn)?)|second j(?:n|o(?:hn)?))[\s0-9:.;,\-]*$/i, /^(?:3(?: j(?:n|o(?:hn)?)|j(?:n|o(?:hn)?)|rd j(?:n|o(?:hn)?))|iii j(?:n|o(?:hn)?)|third j(?:n|o(?:hn)?))[\s0-9:.;,\-]*$/i, /^ju(?:de?)?[\s0-9:.;,\-]*$/i, /^(?:ap(?:a(?:c(?:al(?:ipse?|ypse?)|k(?:al(?:ipse?|ypse?))?)?|k(?:al(?:ipse?|ypse?))?)|o(?:c(?:al(?:ipse?|ypse?)|k(?:al(?:ipse?|ypse?))?)?|k(?:al(?:ipse?|ypse?))?))|r(?:ev(?:alati(?:ans?|ons?)|elati(?:ans?|ons?))?|v))[\s0-9:.;,\-]*$/i],
-
-        /// Stemming variables
-        step2list = {ational: "ate", tional: "tion", enci: "ence", anci: "ance", izer: "ize", bli: "ble", alli: "al", entli: "ent", eli: "e", ousli: "ous", ization: "ize", ation: "ate", ator: "ate", alism: "al", iveness: "ive", fulness: "ful", ousness: "ous", aliti: "al", iviti: "ive", biliti: "ble", logi: "log"},
-        step3list = {icate: "ic", ative: "", alize: "al", iciti: "ic", ical: "ic", ful: "", ness: "", self: ""},
-
-        ///TODO: Determine if there is a faster way to do this.  E.g., using a in_array() or isset() function.
-        /// Words to ignore that are already the root word but don't look like it.
-        stop_words_re = /^th[iu]s|h[ai]s|was|yes|succeed|proceed|e(?:arly|xceed)|only|news$/i;
-    
-    
+{    
     /// Return the language variables and functions.
     return {
         /// Book names
@@ -78,169 +63,187 @@ BF.lang = (function ()
         grammar_marker_len: 4,   /// The length of grammar_marker.
         grammar_separator:  ",", /// The punctuation that separates two attributes.
         
-        /**
-         * Convert an English word to its root form.
-         *
-         * Based on the Porter stemmer in Javascript.
-         * Improved for BibleForge.
-         *
-         * @example	root_word = stem_word("loving"); /// Returns "lov[ei]"
-         * @param	w (string) Word to stem.
-         * @return	Root word string.
-         * @note	Called by prepare_highlighter() in js/main.js.
-         * @link	http://snowball.tartarus.org/algorithms/english/stemmer.html
-         * @link	http://www.tartarus.org/~martin/PorterStemmer
-         * @todo    Document stem_word() better: give examples (from the KJV if possible) and reasonings for each regular expression, etc.
-         * @todo    Review stem_word() for optimizations: avoid regex when possible.
-         */
         prepare_highlighter: (function ()
         {
-            function stem_word(w)
+            /**
+             * Create the stem_word closure
+             *
+             * @return A function with variables inside the closure.
+             * @note   This function is executed immediately.
+             */
+            var stem_word = (function ()
             {
-                var fp,
-                    last_letter,
-                    re,
-                    re2,
-                    re3,
-                    re4,
-                    stem,
-                    suffix;
+                /// Create stem arrays for stem_word().
+                var step2list = {ational: "ate", tional: "tion", enci: "ence", anci: "ance", izer: "ize", bli: "ble", alli: "al", entli: "ent", eli: "e", ousli: "ous", ization: "ize", ation: "ate", ator: "ate", alism: "al", iveness: "ive", fulness: "ful", ousness: "ous", aliti: "al", iviti: "ive", biliti: "ble", logi: "log"},
+                    step3list = {icate: "ic", ative: "", alize: "al", iciti: "ic", ical: "ic", ful: "", ness: "", self: ""},
+                    
+                    ///TODO: Determine if there is a faster way to do this.  E.g., using a in_array() or isset() function.
+                    /// Words to ignore that are already the root word but don't look like it.
+                    stop_words_re = /^th[iu]s|h[ai]s|was|yes|succeed|proceed|e(?:arly|xceed)|only|news$/i;
                 
-                /// Some quick checking to see if we even need to continue.
-                if (w.length < 3) {
-                    return w;
-                }
-                
-                if (stop_words_re.test(w)) {
-                    return w;
-                }
-                
-                ///TODO: Determine if Step 0 is needed (see http://snowball.tartarus.org/algorithms/english/stemmer.html).
-                
-                /// Step 1a
-                /// Find the longest suffix and preform the following:
-                /// Replace suffixes: sses             => ss     (witnesses => witness)
-                ///                   ??ied+ || ??ies* => ??i    (cried     => cri,      cries => cri)
-                ///                   ?ied+  || ?ies*  => ??ie   (tied      => tie,      ties  => tie)
-                ///                   {V}{C}s          => {V}{C} (gaps      => gap)
-                /// Ignore suffixes:  us+ && ss                  (grievous  => grievous, pass  => pass)
-                re  = /^(.+?)(ss|i)es$/;
-                re2 = /^(.+?)([^s])s$/;
-                
-                if (re.test(w)) {
-                    w = w.replace(re,  "$1$2");
-                } else if (re2.test(w)) {
-                    w = w.replace(re2, "$1$2");
-                }
-                
-                /// Step 1b
-                /// "Present-day" English: re = /^(.+?)eed$/;
-                re  = /^(.+?)ee$/; /// Early Modern English fix
-                /// "Present-day" English: re2 = /^(.+?)(ingly|edly|ed|ing|ly)$/;
-                re2 = /^(.+?)(ing(?:ly)?|ed(?:ly)?|ly|e(?:st|th))$/; /// Early Modern English fix
-                
-                if (re.test(w)) {
-                    fp = re.exec(w);
-                    if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(fp[1])) {
-                        w.slice(0, -1);
+                /**
+                 * Convert an English word to its root form.
+                 *
+                 * Based on the Porter stemmer in Javascript.
+                 * Improved for BibleForge.
+                 *
+                 * @example root_word = stem_word("loving"); /// Returns "lov[ei]"
+                 * @param   w (string) Word to stem.
+                 * @return  Root word string.
+                 * @note    Called by prepare_highlighter() in js/main.js.
+                 * @link    http://snowball.tartarus.org/algorithms/english/stemmer.html
+                 * @link    http://www.tartarus.org/~martin/PorterStemmer
+                 * @todo    Document stem_word() better: give examples (from the KJV if possible) and reasonings for each regular expression, etc.
+                 * @todo    Review stem_word() for optimizations: avoid regex when possible.
+                 */
+                return function (w)
+                {
+                    var fp,
+                        last_letter,
+                        re,
+                        re2,
+                        re3,
+                        re4,
+                        stem,
+                        suffix;
+                    
+                    /// Some quick checking to see if we even need to continue.
+                    if (w.length < 3) {
+                        return w;
                     }
-                } else if (re2.test(w)) {
-                    fp   = re2.exec(w);
-                    stem = fp[1];
-                    if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy]/.test(stem)) {
-                        w   = stem;
-                        re2 = /(?:at|bl|iz)$/;
-                        re3 = /([^aeiouylsz])\1$/; /// Look for repeating characters.
-                        re4 = /^[^aeiou][^aeiouy]*[aeiouy][^aeiouwxy]$/;
-                        if (re2.test(w)) {
-                            /// TODO: Determine why if (re2.test(w)) and else if (re4.test(w)) should not be merged to the same line since they have the same code following.
-                            w += "e";
-                        } else if (re3.test(w)) {
-                            w = w.slice(0, -1);
-                        } else if (re4.test(w)) {
-                            w += "e";
+                    
+                    if (stop_words_re.test(w)) {
+                        return w;
+                    }
+                    
+                    ///TODO: Determine if Step 0 is needed (see http://snowball.tartarus.org/algorithms/english/stemmer.html).
+                    
+                    /// Step 1a
+                    /// Find the longest suffix and preform the following:
+                    /// Replace suffixes: sses             => ss     (witnesses => witness)
+                    ///                   ??ied+ || ??ies* => ??i    (cried     => cri,      cries => cri)
+                    ///                   ?ied+  || ?ies*  => ??ie   (tied      => tie,      ties  => tie)
+                    ///                   {V}{C}s          => {V}{C} (gaps      => gap)
+                    /// Ignore suffixes:  us+ && ss                  (grievous  => grievous, pass  => pass)
+                    re  = /^(.+?)(ss|i)es$/;
+                    re2 = /^(.+?)([^s])s$/;
+                    
+                    if (re.test(w)) {
+                        w = w.replace(re,  "$1$2");
+                    } else if (re2.test(w)) {
+                        w = w.replace(re2, "$1$2");
+                    }
+                    
+                    /// Step 1b
+                    /// "Present-day" English: re = /^(.+?)eed$/;
+                    re  = /^(.+?)ee$/; /// Early Modern English fix
+                    /// "Present-day" English: re2 = /^(.+?)(ingly|edly|ed|ing|ly)$/;
+                    re2 = /^(.+?)(ing(?:ly)?|ed(?:ly)?|ly|e(?:st|th))$/; /// Early Modern English fix
+                    
+                    if (re.test(w)) {
+                        fp = re.exec(w);
+                        if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(fp[1])) {
+                            w.slice(0, -1);
+                        }
+                    } else if (re2.test(w)) {
+                        fp   = re2.exec(w);
+                        stem = fp[1];
+                        if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy]/.test(stem)) {
+                            w   = stem;
+                            re2 = /(?:at|bl|iz)$/;
+                            re3 = /([^aeiouylsz])\1$/; /// Look for repeating characters.
+                            re4 = /^[^aeiou][^aeiouy]*[aeiouy][^aeiouwxy]$/;
+                            if (re2.test(w)) {
+                                /// TODO: Determine why if (re2.test(w)) and else if (re4.test(w)) should not be merged to the same line since they have the same code following.
+                                w += "e";
+                            } else if (re3.test(w)) {
+                                w = w.slice(0, -1);
+                            } else if (re4.test(w)) {
+                                w += "e";
+                            }
                         }
                     }
-                }
-                
-                /// Step 1c
-                re = /^(.+?)y$/;
-                if (re.test(w)) {
-                    fp   = re.exec(w);
-                    stem = fp[1];
-                    if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy]/.test(stem)) {
-                        w = stem + "i";
-                    }
-                }
-                
-                /// Step 2
-                re = /^(.+?)(a(?:t(?:ion(?:al)?|or)|nci|l(?:li|i(?:sm|ti)))|tional|e(?:n(?:ci|til)|li)|i(?:z(?:er|ation)|v(?:eness|iti))|b(?:li|iliti)|ous(?:li|ness)|fulness|logi)$/;
-                if (re.test(w)) {
-                    fp     = re.exec(w);
-                    stem   = fp[1];
-                    suffix = fp[2];
-                    if (/^([^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(stem)) {
-                        w = stem + step2list[suffix];
-                    }
-                }
-                
-                /// Step 3
-                re = /^(.+?)(ic(?:a(?:te|l)|iti)|a(?:tive|lize)|ful|ness|self)$/;
-                if (re.test(w)) {
-                    fp     = re.exec(w);
-                    stem   = fp[1];
-                    suffix = fp[2];
-                    if (/^([^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(stem)) {
-                        w = stem + step3list[suffix];
-                    }
-                }
-                
-                /// Step 4
-                re  = /^(.+?)(?:a(?:l|n(?:ce|t)|te|ble)|e(?:n(?:ce|t)|r|ment)|i(?:c|ble|sm|ti|ve|ze)|ment|ous?)$/;
-                re2 = /^(.+?)([st])ion$/;
-                
-                if (re.test(w)) {
-                    fp   = re.exec(w);
-                    stem = fp[1];
-                    if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(stem)) {
-                        w = stem;
-                    }
-                } else if (re2.test(w)) {
-                    fp   = re2.exec(w);
-                    stem = fp[1] + fp[2];
-                    if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(stem)) {
-                        w = stem;
-                    }
-                }
-                
-                /// Step 5
-                re = /^(.+?)e$/;
-                if (re.test(w)) {
-                    fp   = re.exec(w);
-                    stem = fp[1];
-                    re   = /^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/;
-                    re2  = /^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*(?:[aeiouy][aeiou]*)?$/;
-                    re3  = /^[^aeiou][^aeiouy]*[aeiouy][^aeiouwxy]$/;
                     
-                    if (re.test(stem) || (re2.test(stem) && !(re3.test(stem)))) {
-                        w = stem;
+                    /// Step 1c
+                    re = /^(.+?)y$/;
+                    if (re.test(w)) {
+                        fp   = re.exec(w);
+                        stem = fp[1];
+                        if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy]/.test(stem)) {
+                            w = stem + "i";
+                        }
                     }
-                }
-                
-                if (/ll$/.test(w) && (/^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(w))) {
-                    w = w.slice(0, -1);
-                }
-                
-                last_letter = w.slice(-1);
-                
-                if (last_letter == "y" || last_letter == "i") {
-                    w = w.slice(0, w.length - 1) + "[yi]";
-                } else if (last_letter == "e") {
-                    w = w.slice(0, w.length - 1) + "[ei]";
-                }
-                
-                return w;
-            }
+                    
+                    /// Step 2
+                    re = /^(.+?)(a(?:t(?:ion(?:al)?|or)|nci|l(?:li|i(?:sm|ti)))|tional|e(?:n(?:ci|til)|li)|i(?:z(?:er|ation)|v(?:eness|iti))|b(?:li|iliti)|ous(?:li|ness)|fulness|logi)$/;
+                    if (re.test(w)) {
+                        fp     = re.exec(w);
+                        stem   = fp[1];
+                        suffix = fp[2];
+                        if (/^([^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(stem)) {
+                            w = stem + step2list[suffix];
+                        }
+                    }
+                    
+                    /// Step 3
+                    re = /^(.+?)(ic(?:a(?:te|l)|iti)|a(?:tive|lize)|ful|ness|self)$/;
+                    if (re.test(w)) {
+                        fp     = re.exec(w);
+                        stem   = fp[1];
+                        suffix = fp[2];
+                        if (/^([^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(stem)) {
+                            w = stem + step3list[suffix];
+                        }
+                    }
+                    
+                    /// Step 4
+                    re  = /^(.+?)(?:a(?:l|n(?:ce|t)|te|ble)|e(?:n(?:ce|t)|r|ment)|i(?:c|ble|sm|ti|ve|ze)|ment|ous?)$/;
+                    re2 = /^(.+?)([st])ion$/;
+                    
+                    if (re.test(w)) {
+                        fp   = re.exec(w);
+                        stem = fp[1];
+                        if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(stem)) {
+                            w = stem;
+                        }
+                    } else if (re2.test(w)) {
+                        fp   = re2.exec(w);
+                        stem = fp[1] + fp[2];
+                        if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(stem)) {
+                            w = stem;
+                        }
+                    }
+                    
+                    /// Step 5
+                    re = /^(.+?)e$/;
+                    if (re.test(w)) {
+                        fp   = re.exec(w);
+                        stem = fp[1];
+                        re   = /^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/;
+                        re2  = /^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*(?:[aeiouy][aeiou]*)?$/;
+                        re3  = /^[^aeiou][^aeiouy]*[aeiouy][^aeiouwxy]$/;
+                        
+                        if (re.test(stem) || (re2.test(stem) && !(re3.test(stem)))) {
+                            w = stem;
+                        }
+                    }
+                    
+                    if (/ll$/.test(w) && (/^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(w))) {
+                        w = w.slice(0, -1);
+                    }
+                    
+                    last_letter = w.slice(-1);
+                    
+                    if (last_letter == "y" || last_letter == "i") {
+                        w = w.slice(0, w.length - 1) + "[yi]";
+                    } else if (last_letter == "e") {
+                        w = w.slice(0, w.length - 1) + "[ei]";
+                    }
+                    
+                    return w;
+                };
+            }());
+            
             
             /**
              * Prepare the search terms for the highlighter.
@@ -248,10 +251,10 @@ BF.lang = (function ()
              * Removes punctuation, words which should not be found in the search results, duplicate words, and converts all words to lower case
              * so that the highlighter can parse the words properly.
              *
-             * @example	filter_terms_for_highlighter('this one, -that one -"none of these" -"or these ones"~1 "but, these?"'); /// Returns ["this", "one", "but", "these"].
-             * @param	search_terms (string) The terms to be filtered.
-             * @return	An array of filtered words.
-             * @note	Called by prepare_highlighter().
+             * @example filter_terms_for_highlighter('this one, -that one -"none of these" -"or these ones"~1 "but, these?"'); /// Returns ["this", "one", "but", "these"].
+             * @param   search_terms (string) The terms to be filtered.
+             * @return  An array of filtered words.
+             * @note    Called by prepare_highlighter().
              * @todo    Determine if this should be moved out of the language specific file (and maybe just use some languge specific variables).
              */
             function filter_terms_for_highlighter(search_terms)
@@ -426,351 +429,359 @@ BF.lang = (function ()
          * @note	Called by run_search() in js/main.js.
          * @note	Requires books_re and book_arr_re global regex variables.
          */
-        determine_reference: function (ref)
+        determine_reference: (function ()
         {
-            var book = 0,
-                chapter,
-                cv,
-                verse,
-                zeros;
+            /// Book Regex
+            ///NOTE: Created in the Forge via create_reference_regex.php on 04-20-2010 from ref_array.php.
+            var books_re    = /^(?:1(?: (?:c(?:h(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|o(?:r(?:inthi(?:ans?|ons?))?)?)|j(?:n|o(?:hn)?)|k(?:gs?|i(?:ngs?)?)|p(?:e(?:t(?:er?)?)?|t)|s(?:a(?:m(?:uel)?)?|m)|t(?:h(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|i(?:m(?:othy)?)?|m))|c(?:h(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|o(?:r(?:inthi(?:ans?|ons?))?)?)|j(?:n|o(?:hn)?)|k(?:gs?|i(?:ngs?)?)|p(?:e(?:t(?:er?)?)?|t)|s(?:a(?:m(?:uel)?)?|m|t (?:c(?:h(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|o(?:r(?:inthi(?:ans?|ons?))?)?)|j(?:n|o(?:hn)?)|k(?:gs?|i(?:ngs?)?)|p(?:e(?:t(?:er?)?)?|t)|s(?:a(?:m(?:uel)?)?|m)|t(?:h(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|i(?:m(?:othy)?)?|m)))|t(?:h(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|i(?:m(?:othy)?)?|m))|2(?: (?:c(?:h(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|o(?:r(?:inthi(?:ans?|ons?))?)?)|j(?:n|o(?:hn)?)|k(?:gs?|i(?:ngs?)?)|p(?:e(?:t(?:er?)?)?|t)|s(?:a(?:m(?:uel)?)?|m)|t(?:h(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|i(?:m(?:othy)?)?|m))|c(?:h(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|o(?:r(?:inthi(?:ans?|ons?))?)?)|j(?:n|o(?:hn)?)|k(?:gs?|i(?:ngs?)?)|nd (?:c(?:h(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|o(?:r(?:inthi(?:ans?|ons?))?)?)|j(?:n|o(?:hn)?)|k(?:gs?|i(?:ngs?)?)|p(?:e(?:t(?:er?)?)?|t)|s(?:a(?:m(?:uel)?)?|m)|t(?:h(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|i(?:m(?:othy)?)?|m))|p(?:e(?:t(?:er?)?)?|t)|s(?:a(?:m(?:uel)?)?|m)|t(?:h(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|i(?:m(?:othy)?)?|m))|3(?: j(?:n|o(?:hn)?)|j(?:n|o(?:hn)?)|rd j(?:n|o(?:hn)?))|a(?:c(?:t(?: of the apostles?|s(?: of the apostles?)?)?)?|m(?:os?)?|p(?:a(?:c(?:al(?:ipse?|ypse?)|k(?:al(?:ipse?|ypse?))?)?|k(?:al(?:ipse?|ypse?))?)|o(?:c(?:al(?:ipse?|ypse?)|k(?:al(?:ipse?|ypse?))?)?|k(?:al(?:ipse?|ypse?))?)))|c(?:ant(?:e(?:cles?|sles?)|i(?:cles?|sles?))?|hron(?:i(?:c(?:hles?|les?)|kles?))?|ol(?:a(?:s(?:hi(?:ans?|ons?)|i(?:ans?|ons?)|si(?:ans?|ons?))|ti(?:ans?|ons?))|o(?:s(?:hi(?:ans?|ons?)|i(?:ans?|ons?)|si(?:ans?|ons?))|ti(?:ans?|ons?)))?)|d(?:a(?:n(?:e(?:il|l)|i(?:el|l))?)?|eu(?:t(?:eron(?:amy|omy))?)?|n|t|u(?:e(?:t(?:eron(?:amy|omy))?)?|t(?:eron(?:amy|omy))?)?)|e(?:c(?:c(?:l(?:es(?:iastes?)?)?)?|l(?:es(?:iast(?:es?|is?))?)?)?|f(?:e(?:si(?:ans?|ons?)|ti(?:ans?|ons?)))?|p(?:h(?:e(?:si(?:ans?|ons?)|ti(?:ans?|ons?)))?)?|r|st(?:er|h(?:er)?)?|x(?:o(?:d(?:us?)?)?)?|z(?:e(?:k(?:i(?:al|el))?)?|k|ra?)?)|first (?:c(?:h(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|o(?:r(?:inthi(?:ans?|ons?))?)?)|j(?:n|o(?:hn)?)|k(?:gs?|i(?:ngs?)?)|p(?:e(?:t(?:er?)?)?|t)|s(?:a(?:m(?:uel)?)?|m)|t(?:h(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|i(?:m(?:othy)?)?|m))|g(?:a(?:l(?:a(?:si(?:ans?|ons?)|ti(?:ans?|ons?)))?)?|e(?:n(?:asis?|esis?|isis?)?)?|n)|h(?:a(?:b(?:a(?:c(?:a(?:ck?|k)|u(?:ck?|k))|k(?:a(?:c|k)|k(?:a(?:c|k)|u(?:c|k))|u(?:c|k))))?|g(?:ai|g(?:ai)?)?)?|br?|eb(?:r(?:ews?)?)?|g|o(?:s(?:a(?:ya)?|eah?|ia)?)?)|i(?: (?:c(?:h(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|o(?:r(?:inthi(?:ans?|ons?))?)?)|j(?:n|o(?:hn)?)|k(?:gs?|i(?:ngs?)?)|p(?:e(?:t(?:er?)?)?|t)|s(?:a(?:m(?:uel)?)?|m)|t(?:h(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|i(?:m(?:othy)?)?|m))|i(?: (?:c(?:h(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|o(?:r(?:inthi(?:ans?|ons?))?)?)|j(?:n|o(?:hn)?)|k(?:gs?|i(?:ngs?)?)|p(?:e(?:t(?:er?)?)?|t)|s(?:a(?:m(?:uel)?)?|m)|t(?:h(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|i(?:m(?:othy)?)?|m))|i j(?:n|o(?:hn)?))|s(?:a(?:ah|i(?:ah?|h))?|iah?)?)|j(?:a(?:m(?:es?)?|s)?|b|d(?:gs?|s)?|er(?:amiah?|emiah?|imiah?)?|g(?:ds?|s)?|hn|l|nh?|o(?:b|el?|hn?|l|n(?:ah?)?|s(?:h(?:ua)?)?)?|r|u(?:d(?:e|g(?:es?|s)?)?)?)|kings?|l(?:a(?:m(?:antati(?:ans?|ons?)|entati(?:ans?|ons?)|intati(?:ans?|ons?))?|v(?:iti(?:c(?:as|us)|k(?:as|us)))?)?|ev(?:iti(?:c(?:as|us?)|k(?:as|us?)))?|ke?|m|u(?:ke?)?|v)|m(?:a(?:l(?:a(?:c(?:ai|h(?:ai|i)|i|k(?:ai|i))|k(?:ai|i))|e(?:c(?:ai|h(?:ai|i)|i|k(?:ai|i))|k(?:ai|i)))?|rk?|t(?:h(?:e(?:uw|w)|u(?:ew|w))|t(?:h(?:e(?:uw|w)|u(?:ew|w)))?)?)|ch|i(?:c(?:ah?|hah?)?|k(?:ah?|ea?))?|k|l|rk?|t)|n(?:a(?:h(?:um)?|m)?|e(?:amiah?|emiah?|h(?:amiah?|emiah?|imiah?)?|imiah?)?|i(?:amiah?|emiah?|h(?:amiah?|emiah?|imiah?)?)?|m|u(?:m(?:bers?)?)?)|ob(?:a(?:d(?:iah?)?)?|d)?|p(?:eter?|h(?:i(?:l(?:e(?:m(?:on)?)?|i(?:p(?:i(?:ans?|ons?)|pi(?:ans?|ons?)))?)?)?|lm|m|p)?|r(?:o(?:v(?:erbs?)?)?|v)?|s(?:a(?:lms?)?|s)?|v)|r(?:ev(?:alati(?:ans?|ons?)|elati(?:ans?|ons?))?|m|o(?:m(?:ans?|e)?)?|th?|u(?:th?)?|v)|s(?:a(?:lms?|m(?:uel)?)|econd (?:c(?:h(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|o(?:r(?:inthi(?:ans?|ons?))?)?)|j(?:n|o(?:hn)?)|k(?:gs?|i(?:ngs?)?)|p(?:e(?:t(?:er?)?)?|t)|s(?:a(?:m(?:uel)?)?|m)|t(?:h(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|i(?:m(?:othy)?)?|m))|g|ng|o(?:lomon|n(?:g(?: of so(?:lom(?:an|on)|ngs?)|s(?: of solom(?:an|on))?)?)?))|t(?:h(?:e (?:act(?: of the apostles?|s of the apostles?)|song(?: of so(?:lom(?:an|on)|ngs?)|s of solom(?:an|on)))|ird j(?:n|o(?:hn)?))|i(?:m(?:othy)?|t(?:us?)?)?|m|t)|z(?:a(?:c(?:h(?:ariah?|eriah?)?|k(?:ariah?|eriah?))?|k(?:ariah?|eriah?)?)?|c(?:h|k)?|e(?:c(?:h(?:ariah?|eriah?)?|k(?:ariah?|eriah?)?)?|k(?:ariah?|eriah?)?|p(?:h(?:aniah?|eniah?)?)?)?|k|p))[\s0-9:.;,\-]*$/i,
+                book_arr_re = [0, /^g(?:e(?:n(?:asis?|esis?|isis?)?)?|n)[\s0-9:.;,\-]*$/i, /^ex(?:o(?:d(?:us?)?)?)?[\s0-9:.;,\-]*$/i, /^l(?:av(?:iti(?:c(?:as|us)|k(?:as|us)))?|ev(?:iti(?:c(?:as|us?)|k(?:as|us?)))?|v)[\s0-9:.;,\-]*$/i, /^n(?:m|u(?:m(?:bers?)?)?)[\s0-9:.;,\-]*$/i, /^d(?:eu(?:t(?:eron(?:amy|omy))?)?|t|u(?:e(?:t(?:eron(?:amy|omy))?)?|t(?:eron(?:amy|omy))?)?)[\s0-9:.;,\-]*$/i, /^jos(?:h(?:ua)?)?[\s0-9:.;,\-]*$/i, /^j(?:d(?:gs?|s)?|g(?:ds?|s)?|udg(?:es?|s)?)[\s0-9:.;,\-]*$/i, /^r(?:th?|u(?:th?)?)[\s0-9:.;,\-]*$/i, /^(?:1(?: s(?:a(?:m(?:uel)?)?|m)|s(?:a(?:m(?:uel)?)?|m|t s(?:a(?:m(?:uel)?)?|m)))|first s(?:a(?:m(?:uel)?)?|m)|i s(?:a(?:m(?:uel)?)?|m)|sam(?:uel)?)[\s0-9:.;,\-]*$/i, /^(?:2(?: s(?:a(?:m(?:uel)?)?|m)|nd s(?:a(?:m(?:uel)?)?|m)|s(?:a(?:m(?:uel)?)?|m))|ii s(?:a(?:m(?:uel)?)?|m)|second s(?:a(?:m(?:uel)?)?|m))[\s0-9:.;,\-]*$/i, /^(?:1(?: k(?:gs?|i(?:ngs?)?)|k(?:gs?|i(?:ngs?)?)|st k(?:gs?|i(?:ngs?)?))|first k(?:gs?|i(?:ngs?)?)|i k(?:gs?|i(?:ngs?)?)|kings?)[\s0-9:.;,\-]*$/i, /^(?:2(?: k(?:gs?|i(?:ngs?)?)|k(?:gs?|i(?:ngs?)?)|nd k(?:gs?|i(?:ngs?)?))|ii k(?:gs?|i(?:ngs?)?)|second k(?:gs?|i(?:ngs?)?))[\s0-9:.;,\-]*$/i, /^(?:1(?: ch(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|ch(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|st ch(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?)|chron(?:i(?:c(?:hles?|les?)|kles?))?|first ch(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|i ch(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?)[\s0-9:.;,\-]*$/i, /^(?:2(?: ch(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|ch(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|nd ch(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?)|ii ch(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?|second ch(?:r(?:on(?:i(?:c(?:hles?|les?)|kles?))?)?)?)[\s0-9:.;,\-]*$/i, /^e(?:r|zra?)[\s0-9:.;,\-]*$/i, /^n(?:e(?:amiah?|emiah?|h(?:amiah?|emiah?|imiah?)?|imiah?)?|i(?:amiah?|emiah?|h(?:amiah?|emiah?|imiah?)?)?)[\s0-9:.;,\-]*$/i, /^est(?:er|h(?:er)?)?[\s0-9:.;,\-]*$/i, /^j(?:b|ob)[\s0-9:.;,\-]*$/i, /^(?:ps(?:a(?:lms?)?|s)?|salms?)[\s0-9:.;,\-]*$/i, /^p(?:r(?:o(?:v(?:erbs?)?)?|v)?|v)[\s0-9:.;,\-]*$/i, /^ec(?:c(?:l(?:es(?:iastes?)?)?)?|l(?:es(?:iast(?:es?|is?))?)?)?[\s0-9:.;,\-]*$/i, /^(?:cant(?:e(?:cles?|sles?)|i(?:cles?|sles?))?|s(?:g|ng|o(?:lomon|n(?:g(?: of so(?:lom(?:an|on)|ngs?)|s(?: of solom(?:an|on))?)?)?))|the song(?: of so(?:lom(?:an|on)|ngs?)|s of solom(?:an|on)))[\s0-9:.;,\-]*$/i, /^is(?:a(?:ah|i(?:ah?|h))?|iah?)?[\s0-9:.;,\-]*$/i, /^j(?:er(?:amiah?|emiah?|imiah?)?|r)[\s0-9:.;,\-]*$/i, /^l(?:a(?:m(?:antati(?:ans?|ons?)|entati(?:ans?|ons?)|intati(?:ans?|ons?))?)?|m)[\s0-9:.;,\-]*$/i, /^ez(?:e(?:k(?:i(?:al|el))?)?|k)?[\s0-9:.;,\-]*$/i, /^d(?:a(?:n(?:e(?:il|l)|i(?:el|l))?)?|n)[\s0-9:.;,\-]*$/i, /^ho(?:s(?:a(?:ya)?|eah?|ia)?)?[\s0-9:.;,\-]*$/i, /^j(?:l|o(?:el?|l))[\s0-9:.;,\-]*$/i, /^am(?:os?)?[\s0-9:.;,\-]*$/i, /^ob(?:a(?:d(?:iah?)?)?|d)?[\s0-9:.;,\-]*$/i, /^j(?:nh|on(?:ah?)?)[\s0-9:.;,\-]*$/i, /^m(?:ch|i(?:c(?:ah?|hah?)?|k(?:ah?|ea?))?)[\s0-9:.;,\-]*$/i, /^na(?:h(?:um)?|m)?[\s0-9:.;,\-]*$/i, /^h(?:a(?:b(?:a(?:c(?:a(?:ck?|k)|u(?:ck?|k))|k(?:a(?:c|k)|k(?:a(?:c|k)|u(?:c|k))|u(?:c|k))))?)?|b)[\s0-9:.;,\-]*$/i, /^z(?:ep(?:h(?:aniah?|eniah?)?)?|p)[\s0-9:.;,\-]*$/i, /^h(?:ag(?:ai|g(?:ai)?)?|g)[\s0-9:.;,\-]*$/i, /^z(?:a(?:c(?:h(?:ariah?|eriah?)?|k(?:ariah?|eriah?))?|k(?:ariah?|eriah?)?)?|c(?:h|k)?|e(?:c(?:h(?:ariah?|eriah?)?|k(?:ariah?|eriah?)?)?|k(?:ariah?|eriah?)?)?|k)[\s0-9:.;,\-]*$/i, /^m(?:al(?:a(?:c(?:ai|h(?:ai|i)|i|k(?:ai|i))|k(?:ai|i))|e(?:c(?:ai|h(?:ai|i)|i|k(?:ai|i))|k(?:ai|i)))?|l)[\s0-9:.;,\-]*$/i, /^m(?:at(?:h(?:e(?:uw|w)|u(?:ew|w))|t(?:h(?:e(?:uw|w)|u(?:ew|w)))?)?|t)[\s0-9:.;,\-]*$/i, /^m(?:ark?|k|rk?)[\s0-9:.;,\-]*$/i, /^l(?:ke?|u(?:ke?)?)[\s0-9:.;,\-]*$/i, /^j(?:hn|n|o(?:hn?)?)[\s0-9:.;,\-]*$/i, /^(?:ac(?:t(?: of the apostles?|s(?: of the apostles?)?)?)?|the act(?: of the apostles?|s of the apostles?))[\s0-9:.;,\-]*$/i, /^r(?:m|o(?:m(?:ans?|e)?)?)[\s0-9:.;,\-]*$/i, /^(?:1(?: co(?:r(?:inthi(?:ans?|ons?))?)?|co(?:r(?:inthi(?:ans?|ons?))?)?|st co(?:r(?:inthi(?:ans?|ons?))?)?)|first co(?:r(?:inthi(?:ans?|ons?))?)?|i co(?:r(?:inthi(?:ans?|ons?))?)?)[\s0-9:.;,\-]*$/i, /^(?:2(?: co(?:r(?:inthi(?:ans?|ons?))?)?|co(?:r(?:inthi(?:ans?|ons?))?)?|nd co(?:r(?:inthi(?:ans?|ons?))?)?)|ii co(?:r(?:inthi(?:ans?|ons?))?)?|second co(?:r(?:inthi(?:ans?|ons?))?)?)[\s0-9:.;,\-]*$/i, /^ga(?:l(?:a(?:si(?:ans?|ons?)|ti(?:ans?|ons?)))?)?[\s0-9:.;,\-]*$/i, /^e(?:f(?:e(?:si(?:ans?|ons?)|ti(?:ans?|ons?)))?|p(?:h(?:e(?:si(?:ans?|ons?)|ti(?:ans?|ons?)))?)?)[\s0-9:.;,\-]*$/i, /^ph(?:i(?:l(?:i(?:p(?:i(?:ans?|ons?)|pi(?:ans?|ons?)))?)?)?|p)?[\s0-9:.;,\-]*$/i, /^col(?:a(?:s(?:hi(?:ans?|ons?)|i(?:ans?|ons?)|si(?:ans?|ons?))|ti(?:ans?|ons?))|o(?:s(?:hi(?:ans?|ons?)|i(?:ans?|ons?)|si(?:ans?|ons?))|ti(?:ans?|ons?)))?[\s0-9:.;,\-]*$/i, /^(?:1(?: th(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|st th(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|th(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?)|first th(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|i th(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?)[\s0-9:.;,\-]*$/i, /^(?:2(?: th(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|nd th(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|th(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?)|ii th(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?|second th(?:e(?:s(?:aloni(?:ans?|ons?)|s(?:aloni(?:ans?|ons?))?)?)?)?)[\s0-9:.;,\-]*$/i, /^(?:1(?: t(?:i(?:m(?:othy)?)?|m)|st t(?:i(?:m(?:othy)?)?|m)|t(?:i(?:m(?:othy)?)?|m))|first t(?:i(?:m(?:othy)?)?|m)|i t(?:i(?:m(?:othy)?)?|m)|t(?:i(?:m(?:othy)?)?|m))[\s0-9:.;,\-]*$/i, /^(?:2(?: t(?:i(?:m(?:othy)?)?|m)|nd t(?:i(?:m(?:othy)?)?|m)|t(?:i(?:m(?:othy)?)?|m))|ii t(?:i(?:m(?:othy)?)?|m)|second t(?:i(?:m(?:othy)?)?|m))[\s0-9:.;,\-]*$/i, /^t(?:it(?:us?)?|t)[\s0-9:.;,\-]*$/i, /^ph(?:ile(?:m(?:on)?)?|lm|m)[\s0-9:.;,\-]*$/i, /^h(?:br?|eb(?:r(?:ews?)?)?)[\s0-9:.;,\-]*$/i, /^ja(?:m(?:es?)?|s)?[\s0-9:.;,\-]*$/i, /^(?:1(?: p(?:e(?:t(?:er?)?)?|t)|p(?:e(?:t(?:er?)?)?|t)|st p(?:e(?:t(?:er?)?)?|t))|first p(?:e(?:t(?:er?)?)?|t)|i p(?:e(?:t(?:er?)?)?|t)|peter?)[\s0-9:.;,\-]*$/i, /^(?:2(?: p(?:e(?:t(?:er?)?)?|t)|nd p(?:e(?:t(?:er?)?)?|t)|p(?:e(?:t(?:er?)?)?|t))|ii p(?:e(?:t(?:er?)?)?|t)|second p(?:e(?:t(?:er?)?)?|t))[\s0-9:.;,\-]*$/i, /^(?:1(?: j(?:n|o(?:hn)?)|j(?:n|o(?:hn)?)|st j(?:n|o(?:hn)?))|first j(?:n|o(?:hn)?)|i j(?:n|o(?:hn)?))[\s0-9:.;,\-]*$/i, /^(?:2(?: j(?:n|o(?:hn)?)|j(?:n|o(?:hn)?)|nd j(?:n|o(?:hn)?))|ii j(?:n|o(?:hn)?)|second j(?:n|o(?:hn)?))[\s0-9:.;,\-]*$/i, /^(?:3(?: j(?:n|o(?:hn)?)|j(?:n|o(?:hn)?)|rd j(?:n|o(?:hn)?))|iii j(?:n|o(?:hn)?)|third j(?:n|o(?:hn)?))[\s0-9:.;,\-]*$/i, /^ju(?:de?)?[\s0-9:.;,\-]*$/i, /^(?:ap(?:a(?:c(?:al(?:ipse?|ypse?)|k(?:al(?:ipse?|ypse?))?)?|k(?:al(?:ipse?|ypse?))?)|o(?:c(?:al(?:ipse?|ypse?)|k(?:al(?:ipse?|ypse?))?)?|k(?:al(?:ipse?|ypse?))?))|r(?:ev(?:alati(?:ans?|ons?)|elati(?:ans?|ons?))?|v))[\s0-9:.;,\-]*$/i];
             
-            /// First determine if it is likely a verse reference.
-            if (!books_re.test(ref)) {
-                return false;
-            }
-            
-            switch (ref.slice(0, 1).toLowerCase()) {
-            case "j":
-                if (book_arr_re[43].test(ref)) {		/// John
-                    book = "43";
-                    break;
-                } else if (book_arr_re[32].test(ref)) {	/// Jonah
-                    book = "32";
-                    break;
-                } else if (book_arr_re[59].test(ref)) {	/// James
-                    book = "59";
-                    break;
-                } else if (book_arr_re[6].test(ref)) {	/// Joshua
-                    book = "6";
-                    break;
-                } else if (book_arr_re[7].test(ref)) {	/// Judges
-                    book = "7";
-                    break;
-                } else if (book_arr_re[18].test(ref)) {	/// Job
-                    book = "18";
-                    break;
-                } else if (book_arr_re[65].test(ref)) {	/// Jude
-                    book = "65";
-                    break;
-                } else if (book_arr_re[24].test(ref)) {	/// Jeremiah
-                    book = "24";
-                    break;
-                } else if (book_arr_re[29].test(ref)) {	/// Joel
-                    book = "29";
-                    break;
+            return function (ref)
+            {
+                var book = 0,
+                    chapter,
+                    cv,
+                    verse,
+                    zeros;
+                
+                /// First determine if it is likely a verse reference.
+                if (!books_re.test(ref)) {
+                    return false;
                 }
-                break;
-            case "r":
-                if (book_arr_re[45].test(ref)) {		/// Romans
-                    book = "45";
-                    break;
-                } else if (book_arr_re[66].test(ref)) {	/// Revelation
-                    book = "66";
-                    break;
-                } else if (book_arr_re[8].test(ref)) {	/// Ruth
-                    book = "8";
-                    break;
-                }
-                break;
-            case "g":
-                if (book_arr_re[1].test(ref)) {			/// Genesis
-                    book = "1";
-                    break;
-                } else if (book_arr_re[48].test(ref)) {	/// Galatians
-                    book = "48";
-                    break;
-                }
-                break;
-            case "e":
-                if (book_arr_re[2].test(ref)) {			/// Exodus
-                    book = "2";
-                    break;
-                } else if (book_arr_re[49].test(ref)) {	/// Ephesians
-                    book = "49";
-                    break;
-                } else if (book_arr_re[26].test(ref)) {	/// Ezekiel
-                    book = "26";
-                    break;
-                } else if (book_arr_re[21].test(ref)) {	/// Ecclesiastes
-                    book = "21";
-                    break;
-                } else if (book_arr_re[17].test(ref)) {	/// Esther
-                    book = "17";
-                    break;
-                } else if (book_arr_re[15].test(ref)) {	/// Ezra
-                    book = "15";
-                    break;
-                }
-                break;
-            case "m":
-                if (book_arr_re[40].test(ref)) {		/// Matthew
-                    book = "40";
-                    break;
-                } else if (book_arr_re[41].test(ref)) {	/// Mark
-                    book = "41";
-                    break;
-                } else if (book_arr_re[39].test(ref)) {	/// Malachi
-                    book = "39";
-                    break;
-                } else if (book_arr_re[33].test(ref)) {	/// Micah
-                    book = "33";
-                    break;
-                }
-                break;
-            case "l":
-                if (book_arr_re[42].test(ref)) {		/// Luke
-                    book = "42";
-                    break;
-                } else if (book_arr_re[3].test(ref)) {	/// Leviticus
-                    book = "3";
-                    break;
-                } else if (book_arr_re[25].test(ref)) {	/// Lamentations
-                    book = "25";
-                    break;
-                }
-                break;
-            case "p":
-                if (book_arr_re[19].test(ref)) {		/// Psalms
-                    book = "19";
-                    break;
-                } else if (book_arr_re[20].test(ref)) {	/// Proverbs
-                    book = "20";
-                    break;
-                } else if (book_arr_re[50].test(ref)) {	/// Philippians
-                    book = "50";
-                    break;
-                } else if (book_arr_re[57].test(ref)) {	/// Philemon
-                    book = "57";
-                    break;
-                } else if (book_arr_re[60].test(ref)) {	/// 1 Peter (Peter)
-                    book = "60";
-                    break;
-                }
-                break;
-            case "d":
-                if (book_arr_re[5].test(ref)) {			/// Deuteronomy
-                    book = "5";
-                    break;
-                } else if (book_arr_re[27].test(ref)) {	/// Daniel
-                    book = "27";
-                    break;
-                }
-                break;
-            case "i":
-                if (book_arr_re[23].test(ref)) {		/// Isaiah
-                    book = "23";
-                    break;
-                }
-                ///NOTE: Don't break so that references like "I Kings" will be checked.
-            case "1":
-            case "f":
-                if (book_arr_re[46].test(ref)) {		/// 1 Corinthians | First Corinthians| I Corinthians
-                    book = "46";
-                    break;
-                } else if (book_arr_re[62].test(ref)) {	/// 1 John | First John | I John
-                    book = "62";
-                    break;
-                } else if (book_arr_re[54].test(ref)) {	/// 1 Timothy | First Timothy | I Timothy
-                    book = "54";
-                    break;
-                } else if (book_arr_re[52].test(ref)) {	/// 1 Thessalonians | First Thessalonians | I Thessalonians
-                    book = "52";
-                    break;
-                } else if (book_arr_re[60].test(ref)) {	/// 1 Peter | First Peter | I Peter
-                    book = "60";
-                    break;
-                } else if (book_arr_re[9].test(ref)) {	/// 1 Samuel | First Samuel | I Samuel
-                    book = "9";
-                    break;
-                } else if (book_arr_re[11].test(ref)) {	/// 1 Kings | First Kings | I Kings
-                    book = "11";
-                    break;
-                } else if (book_arr_re[13].test(ref)) {	/// 1 Chronicles | First Chronicles | I Chronicles
-                    book = "13";
-                    break;
-                }
-                ///NOTE: Don't break so that references like "II Kings" will be checked.
-            case "2":
-            case "s":
-                if (book_arr_re[47].test(ref)) {		/// 2 Corinthians | Second Corinthians| II Corinthians
-                    book = "47";
-                    break;
-                } else if (book_arr_re[63].test(ref)) {	/// 2 John | Second John | II John
-                    book = "63";
-                    break;
-                } else if (book_arr_re[55].test(ref)) {	/// 2 Timothy | Second Timothy | II Timothy
-                    book = "55";
-                    break;
-                } else if (book_arr_re[53].test(ref)) {	/// 2 Thessalonians | Second Thessalonians | II Thessalonians
-                    book = "53";
-                    break;
-                } else if (book_arr_re[61].test(ref)) {	/// 2 Peter | Second Peter | II Peter
-                    book = "61";
-                    break;
-                } else if (book_arr_re[22].test(ref)) {	/// Song of Songs
-                    book = "22";
-                    break;
-                } else if (book_arr_re[10].test(ref)) {	/// 2 Samuel | Second Samuel | II Samuel
-                    book = "10";
-                    break;
-                } else if (book_arr_re[12].test(ref)) {	/// 2 Kings | Second Kings | II Kings
-                    book = "12";
-                    break;
-                } else if (book_arr_re[14].test(ref)) {	/// 2 Chronicles | Second Chronicles | II Chronicles
-                    book = "14";
-                    break;
-                } else if (book_arr_re[9].test(ref)) {	/// 1 Samuel (Samuel)
-                    book = "9";
-                    break;
-                } else if (book_arr_re[19].test(ref)) {	/// Psalms (Salms)
-                    book = "19";
-                    break;
-                }
-                ///NOTE: Don't break so that references like "III John" will be checked.
-            case "3":
-            case "t":
-                if (book_arr_re[64].test(ref)) {		/// 3 John | Third John | III John
-                    book = "64";
-                    break;
-                } else if (book_arr_re[56].test(ref)) {	/// Titus
-                    book = "56";
-                    break;
-                } else if (book_arr_re[54].test(ref)) {	/// 1 Timothy (Timothy)
-                    book = "54";
-                    break;
-                } else if (book_arr_re[52].test(ref)) {	/// 1 Thessalonians (Thessalonians)
-                    book = "52";
-                    break;
-                } else if (book_arr_re[44].test(ref)) {	/// The Acts of the Apostles
-                    book = "44";
-                    break;
-                } else if (book_arr_re[22].test(ref)) {	/// The Song of Songs
-                    book = "22";
-                    break;
-                }
-                break;
-            case "a":
-                if (book_arr_re[44].test(ref)) {		/// Acts
-                    book = "44";
-                    break;
-                } else if (book_arr_re[30].test(ref)) {	/// Amos
-                    book = "30";
-                    break;
-                } else if (book_arr_re[66].test(ref)) {	/// Revelation (Apocalypse)
-                    book = "66";
-                    break;
-                }
-                break;
-            case "c":
-                if (book_arr_re[51].test(ref)) {		/// Colossians
-                    book = "51";
-                    break;
-                } else if (book_arr_re[46].test(ref)) {	/// 1 Corinthians (Corinthians)
-                    book = "46";
-                    break;
-                } else if (book_arr_re[22].test(ref)) {	/// Song of Songs (Canticles)
-                    book = "22";
-                    break;
-                } else if (book_arr_re[13].test(ref)) {	/// 1 Chronicles (Chronicles)
-                    book = "13";
-                    break;
-                }
-                break;
-            case "h":
-                if (book_arr_re[58].test(ref)) {		/// Hebrews
-                    book = "58";
-                    break;
-                } else if (book_arr_re[28].test(ref)) {	/// Hosea
-                    book = "28";
-                    break;
-                } else if (book_arr_re[35].test(ref)) {	/// Habakkuk
-                    book = "35";
-                    break;
-                } else if (book_arr_re[37].test(ref)) {	/// Haggai
-                    book = "37";
-                    break;
-                }
-                break;
-            case "n":
-                if (book_arr_re[4].test(ref)) {			/// Numbers
-                    book = "4";
-                    break;
-                } else if (book_arr_re[16].test(ref)) {	/// Nehemiah
-                    book = "16";
-                    break;
-                } else if (book_arr_re[34].test(ref)) {	/// Nahum
-                    book = "34";
-                    break;
-                }
-                break;
-            case "z":
-                if (book_arr_re[38].test(ref)) {		/// Zechariah
-                    book = "38";
-                    break;
-                } else if (book_arr_re[36].test(ref)) {	/// Zephaniah
-                    book = "36";
-                    break;
-                }
-                break;
-            case "k":
-                if (book_arr_re[11].test(ref)) {		/// 1 Kings (Kings)
-                    book = "11";
-                    break;
-                }
-                break;
-            case "o":
-                if (book_arr_re[31].test(ref)) {		/// Obadiah
-                    book = "31";
-                    break;
-                }
-                break;
-            }
-            
-            if (book === 0) {
-                return false;
-            }
-            
-            chapter	= "001";
-            verse	= "001";
-            
-            /// Finally, we need to determine the chapter and/or verse reference is they are supplied.
-            cv = ref.split(/\s*([0-9]{1,3})(?:[:.;,\s]([0-9]{0,3})[\-0-9]*)?$/);
-            
-            if (cv.length > 1) {
-                if (cv[1] != "") {
-                    chapter = cv[1] + "";
-                }
-                if (cv[2] != "" && typeof cv[2] != "undefined") {
-                    verse = cv[2] + "";
-                } else {
-                    /// For books with only 1 chapter, the chapter reference is optional (i.e., Jude 4 == Jude 1:4).
-                    switch (book) {
-                    case "31":
-                    case "57":
-                    case "63":
-                    case "64":
-                    case "65":
-                        verse   = chapter;
-                        chapter = "001";
+                
+                switch (ref.slice(0, 1).toLowerCase()) {
+                case "j":
+                    if (book_arr_re[43].test(ref)) {		/// John
+                        book = "43";
+                        break;
+                    } else if (book_arr_re[32].test(ref)) {	/// Jonah
+                        book = "32";
+                        break;
+                    } else if (book_arr_re[59].test(ref)) {	/// James
+                        book = "59";
+                        break;
+                    } else if (book_arr_re[6].test(ref)) {	/// Joshua
+                        book = "6";
+                        break;
+                    } else if (book_arr_re[7].test(ref)) {	/// Judges
+                        book = "7";
+                        break;
+                    } else if (book_arr_re[18].test(ref)) {	/// Job
+                        book = "18";
+                        break;
+                    } else if (book_arr_re[65].test(ref)) {	/// Jude
+                        book = "65";
+                        break;
+                    } else if (book_arr_re[24].test(ref)) {	/// Jeremiah
+                        book = "24";
+                        break;
+                    } else if (book_arr_re[29].test(ref)) {	/// Joel
+                        book = "29";
+                        break;
                     }
+                    break;
+                case "r":
+                    if (book_arr_re[45].test(ref)) {		/// Romans
+                        book = "45";
+                        break;
+                    } else if (book_arr_re[66].test(ref)) {	/// Revelation
+                        book = "66";
+                        break;
+                    } else if (book_arr_re[8].test(ref)) {	/// Ruth
+                        book = "8";
+                        break;
+                    }
+                    break;
+                case "g":
+                    if (book_arr_re[1].test(ref)) {			/// Genesis
+                        book = "1";
+                        break;
+                    } else if (book_arr_re[48].test(ref)) {	/// Galatians
+                        book = "48";
+                        break;
+                    }
+                    break;
+                case "e":
+                    if (book_arr_re[2].test(ref)) {			/// Exodus
+                        book = "2";
+                        break;
+                    } else if (book_arr_re[49].test(ref)) {	/// Ephesians
+                        book = "49";
+                        break;
+                    } else if (book_arr_re[26].test(ref)) {	/// Ezekiel
+                        book = "26";
+                        break;
+                    } else if (book_arr_re[21].test(ref)) {	/// Ecclesiastes
+                        book = "21";
+                        break;
+                    } else if (book_arr_re[17].test(ref)) {	/// Esther
+                        book = "17";
+                        break;
+                    } else if (book_arr_re[15].test(ref)) {	/// Ezra
+                        book = "15";
+                        break;
+                    }
+                    break;
+                case "m":
+                    if (book_arr_re[40].test(ref)) {		/// Matthew
+                        book = "40";
+                        break;
+                    } else if (book_arr_re[41].test(ref)) {	/// Mark
+                        book = "41";
+                        break;
+                    } else if (book_arr_re[39].test(ref)) {	/// Malachi
+                        book = "39";
+                        break;
+                    } else if (book_arr_re[33].test(ref)) {	/// Micah
+                        book = "33";
+                        break;
+                    }
+                    break;
+                case "l":
+                    if (book_arr_re[42].test(ref)) {		/// Luke
+                        book = "42";
+                        break;
+                    } else if (book_arr_re[3].test(ref)) {	/// Leviticus
+                        book = "3";
+                        break;
+                    } else if (book_arr_re[25].test(ref)) {	/// Lamentations
+                        book = "25";
+                        break;
+                    }
+                    break;
+                case "p":
+                    if (book_arr_re[19].test(ref)) {		/// Psalms
+                        book = "19";
+                        break;
+                    } else if (book_arr_re[20].test(ref)) {	/// Proverbs
+                        book = "20";
+                        break;
+                    } else if (book_arr_re[50].test(ref)) {	/// Philippians
+                        book = "50";
+                        break;
+                    } else if (book_arr_re[57].test(ref)) {	/// Philemon
+                        book = "57";
+                        break;
+                    } else if (book_arr_re[60].test(ref)) {	/// 1 Peter (Peter)
+                        book = "60";
+                        break;
+                    }
+                    break;
+                case "d":
+                    if (book_arr_re[5].test(ref)) {			/// Deuteronomy
+                        book = "5";
+                        break;
+                    } else if (book_arr_re[27].test(ref)) {	/// Daniel
+                        book = "27";
+                        break;
+                    }
+                    break;
+                case "i":
+                    if (book_arr_re[23].test(ref)) {		/// Isaiah
+                        book = "23";
+                        break;
+                    }
+                    ///NOTE: Don't break so that references like "I Kings" will be checked.
+                case "1":
+                case "f":
+                    if (book_arr_re[46].test(ref)) {		/// 1 Corinthians | First Corinthians| I Corinthians
+                        book = "46";
+                        break;
+                    } else if (book_arr_re[62].test(ref)) {	/// 1 John | First John | I John
+                        book = "62";
+                        break;
+                    } else if (book_arr_re[54].test(ref)) {	/// 1 Timothy | First Timothy | I Timothy
+                        book = "54";
+                        break;
+                    } else if (book_arr_re[52].test(ref)) {	/// 1 Thessalonians | First Thessalonians | I Thessalonians
+                        book = "52";
+                        break;
+                    } else if (book_arr_re[60].test(ref)) {	/// 1 Peter | First Peter | I Peter
+                        book = "60";
+                        break;
+                    } else if (book_arr_re[9].test(ref)) {	/// 1 Samuel | First Samuel | I Samuel
+                        book = "9";
+                        break;
+                    } else if (book_arr_re[11].test(ref)) {	/// 1 Kings | First Kings | I Kings
+                        book = "11";
+                        break;
+                    } else if (book_arr_re[13].test(ref)) {	/// 1 Chronicles | First Chronicles | I Chronicles
+                        book = "13";
+                        break;
+                    }
+                    ///NOTE: Don't break so that references like "II Kings" will be checked.
+                case "2":
+                case "s":
+                    if (book_arr_re[47].test(ref)) {		/// 2 Corinthians | Second Corinthians| II Corinthians
+                        book = "47";
+                        break;
+                    } else if (book_arr_re[63].test(ref)) {	/// 2 John | Second John | II John
+                        book = "63";
+                        break;
+                    } else if (book_arr_re[55].test(ref)) {	/// 2 Timothy | Second Timothy | II Timothy
+                        book = "55";
+                        break;
+                    } else if (book_arr_re[53].test(ref)) {	/// 2 Thessalonians | Second Thessalonians | II Thessalonians
+                        book = "53";
+                        break;
+                    } else if (book_arr_re[61].test(ref)) {	/// 2 Peter | Second Peter | II Peter
+                        book = "61";
+                        break;
+                    } else if (book_arr_re[22].test(ref)) {	/// Song of Songs
+                        book = "22";
+                        break;
+                    } else if (book_arr_re[10].test(ref)) {	/// 2 Samuel | Second Samuel | II Samuel
+                        book = "10";
+                        break;
+                    } else if (book_arr_re[12].test(ref)) {	/// 2 Kings | Second Kings | II Kings
+                        book = "12";
+                        break;
+                    } else if (book_arr_re[14].test(ref)) {	/// 2 Chronicles | Second Chronicles | II Chronicles
+                        book = "14";
+                        break;
+                    } else if (book_arr_re[9].test(ref)) {	/// 1 Samuel (Samuel)
+                        book = "9";
+                        break;
+                    } else if (book_arr_re[19].test(ref)) {	/// Psalms (Salms)
+                        book = "19";
+                        break;
+                    }
+                    ///NOTE: Don't break so that references like "III John" will be checked.
+                case "3":
+                case "t":
+                    if (book_arr_re[64].test(ref)) {		/// 3 John | Third John | III John
+                        book = "64";
+                        break;
+                    } else if (book_arr_re[56].test(ref)) {	/// Titus
+                        book = "56";
+                        break;
+                    } else if (book_arr_re[54].test(ref)) {	/// 1 Timothy (Timothy)
+                        book = "54";
+                        break;
+                    } else if (book_arr_re[52].test(ref)) {	/// 1 Thessalonians (Thessalonians)
+                        book = "52";
+                        break;
+                    } else if (book_arr_re[44].test(ref)) {	/// The Acts of the Apostles
+                        book = "44";
+                        break;
+                    } else if (book_arr_re[22].test(ref)) {	/// The Song of Songs
+                        book = "22";
+                        break;
+                    }
+                    break;
+                case "a":
+                    if (book_arr_re[44].test(ref)) {		/// Acts
+                        book = "44";
+                        break;
+                    } else if (book_arr_re[30].test(ref)) {	/// Amos
+                        book = "30";
+                        break;
+                    } else if (book_arr_re[66].test(ref)) {	/// Revelation (Apocalypse)
+                        book = "66";
+                        break;
+                    }
+                    break;
+                case "c":
+                    if (book_arr_re[51].test(ref)) {		/// Colossians
+                        book = "51";
+                        break;
+                    } else if (book_arr_re[46].test(ref)) {	/// 1 Corinthians (Corinthians)
+                        book = "46";
+                        break;
+                    } else if (book_arr_re[22].test(ref)) {	/// Song of Songs (Canticles)
+                        book = "22";
+                        break;
+                    } else if (book_arr_re[13].test(ref)) {	/// 1 Chronicles (Chronicles)
+                        book = "13";
+                        break;
+                    }
+                    break;
+                case "h":
+                    if (book_arr_re[58].test(ref)) {		/// Hebrews
+                        book = "58";
+                        break;
+                    } else if (book_arr_re[28].test(ref)) {	/// Hosea
+                        book = "28";
+                        break;
+                    } else if (book_arr_re[35].test(ref)) {	/// Habakkuk
+                        book = "35";
+                        break;
+                    } else if (book_arr_re[37].test(ref)) {	/// Haggai
+                        book = "37";
+                        break;
+                    }
+                    break;
+                case "n":
+                    if (book_arr_re[4].test(ref)) {			/// Numbers
+                        book = "4";
+                        break;
+                    } else if (book_arr_re[16].test(ref)) {	/// Nehemiah
+                        book = "16";
+                        break;
+                    } else if (book_arr_re[34].test(ref)) {	/// Nahum
+                        book = "34";
+                        break;
+                    }
+                    break;
+                case "z":
+                    if (book_arr_re[38].test(ref)) {		/// Zechariah
+                        book = "38";
+                        break;
+                    } else if (book_arr_re[36].test(ref)) {	/// Zephaniah
+                        book = "36";
+                        break;
+                    }
+                    break;
+                case "k":
+                    if (book_arr_re[11].test(ref)) {		/// 1 Kings (Kings)
+                        book = "11";
+                        break;
+                    }
+                    break;
+                case "o":
+                    if (book_arr_re[31].test(ref)) {		/// Obadiah
+                        book = "31";
+                        break;
+                    }
+                    break;
                 }
-                zeros   = ["", "00", "0", ""];
-                chapter = zeros[chapter.length] + chapter;
-                verse   = zeros[verse.length]   + verse;
-            }
-            
-            return book + chapter + verse;
-        },
+                
+                if (book === 0) {
+                    return false;
+                }
+                
+                chapter	= "001";
+                verse	= "001";
+                
+                /// Finally, we need to determine the chapter and/or verse reference is they are supplied.
+                cv = ref.split(/\s*([0-9]{1,3})(?:[:.;,\s]([0-9]{0,3})[\-0-9]*)?$/);
+                
+                if (cv.length > 1) {
+                    if (cv[1] != "") {
+                        chapter = cv[1] + "";
+                    }
+                    if (cv[2] != "" && typeof cv[2] != "undefined") {
+                        verse = cv[2] + "";
+                    } else {
+                        /// For books with only 1 chapter, the chapter reference is optional (i.e., Jude 4 == Jude 1:4).
+                        switch (book) {
+                        case "31":
+                        case "57":
+                        case "63":
+                        case "64":
+                        case "65":
+                            verse   = chapter;
+                            chapter = "001";
+                        }
+                    }
+                    zeros   = ["", "00", "0", ""];
+                    chapter = zeros[chapter.length] + chapter;
+                    verse   = zeros[verse.length]   + verse;
+                }
+                
+                return book + chapter + verse;
+            };
+        }()),
 
         /**
          * Prepares search terms to adhere to Sphinx syntax before submission to the server.
