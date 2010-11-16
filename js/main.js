@@ -1758,7 +1758,10 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 
                 ///TODO: Implement
                 ///NOTE: Don't forget to window.encodeURIComponent(query).
-                query_server(query, query_type);
+                
+                ///NOTE: There needs to be a way to create the additional and previous functions here and send them to the content manager.
+                //query_server(query, query_type);
+                
                 
                 
                 /// Step 5: Prepare for new results (clear page(?), prepare highlighter if applicable)
