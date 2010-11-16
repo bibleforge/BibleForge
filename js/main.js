@@ -13,7 +13,61 @@
 /*jslint white: true, browser: true, devel: true, evil: true, forin: true, onevar: true, undef: true, nomen: true, bitwise: true, newcap: true, immed: true */
 
 /// Declare helper function(s) attached to the global BibleForge object (BF).
-///TODO: Determine if the BF object can be created here, in main.js, instead of in the language specific code.
+///TODO: Create the BF object in index.html instead of the language file.
+
+///TODO: Determine if this should be moved inside a closure.
+BF.create_simple_ajax = (function ()
+{
+    var ajax = new window.XMLHttpRequest();
+    
+    return {abort: function ()
+    {
+        /// Is currently working?  If readyState > 0 and < 4 it needs to be aborted.
+        if (ajax.readyState % 4) {
+            ajax.abort();
+        }
+        
+        return this;
+    },
+    /**
+     * Send an Ajax request to the server.
+     *
+     * @example query("search.php", "q=search",            ajax, {action: last_type, "direction": direction});
+     * @example query("search.php", "q=search&s=48003027", ajax, {action: 1, "direction": 1});
+     * @param   server_URL (string)              The file on the server to run.
+     * @param   message    (string)              The variables to send.
+     *	                                         URI format: "name1=value1&name2=value%202"
+     * @param   onsucess   (function) (optional) The function to run on a successful query.
+     * @param   onfailure  (function) (optional) The function to run if the query fails.
+     * @return  This object.
+     * @note    Called by ???.
+     */
+    query: function(path, message, onsucess, onfailure)
+    {
+        ///TODO: Determine if the method parameter needs to be customizable.
+        ajax.open("POST", path);
+        ajax.onreadystatechange = function ()
+        {
+            if (ajax.readyState == 4) {
+                
+                /// Was the request successful?
+                if (ajax.status == 200) {
+                    if (typeof onsucess == "function") {
+                        onsucess(eval("(" + ajax.responseText + ")");
+                    }
+                } else {
+                    if (typeof onfailure == "function") {
+                        onfailure(ajax.status, ajax.responseText);
+                    }
+                }
+            }
+        };
+        
+        ajax.send(message);
+        
+        return this;
+    }};
+}());
 
 /**
  * Load some Javascript and optionally send it some variables from the closure.
@@ -1646,11 +1700,12 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         
         return (function ()
         {
-            var ajax_additional = new window.XMLHttpRequest(),
-                ajax_previous   = new window.XMLHttpRequest(),
+            var ajax_additional = BF.create_simple_ajax(),
+                ajax_previous   = BF.create_simple_ajax(),
                 
                 highlight_regex;
             
+
             
             return function (raw_query)
             {
@@ -1669,13 +1724,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 /// Step 2: Stop current requests
                 
                 /// Stop any old requests since we have a new one.
-                /// Is readyState > 0 and < 4?  (Anything 1-3 needs to be aborted.)
-                if (ajax_additional.readyState % 4) {
-                    ajax_additional.abort();
-                }
-                if (ajax_previous.readyState   % 4) {
-                    ajax_previous.abort();
-                }
+                ajax_additional.abort();
+                ajax_previous.abort();
                 
                 /// Step 3: Determine type of query
                 
