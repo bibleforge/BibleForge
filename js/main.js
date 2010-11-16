@@ -13,7 +13,6 @@
 /*jslint white: true, browser: true, devel: true, evil: true, forin: true, onevar: true, undef: true, nomen: true, bitwise: true, newcap: true, immed: true */
 
 /// Declare helper function(s) attached to the global BibleForge object (BF).
-///TODO: Create the BF object in index.html instead of the language file.
 
 ///TODO: Determine if this should be moved inside a closure.
 BF.create_simple_ajax = (function ()

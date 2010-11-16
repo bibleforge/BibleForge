@@ -12,11 +12,6 @@
 /*global window */
 /*jslint white: true, browser: true, devel: true, evil: true, forin: true, onevar: true, undef: true, nomen: true, bitwise: true, newcap: true, immed: true */
 
-/// Create the global BibleForge variable if it does not exist.
-if (!window.BF) {
-    var BF = {};
-}
-
 /**
  * Create the BibleForge language specific object for the English language.
  *
