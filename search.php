@@ -67,25 +67,9 @@ if (isset($_REQUEST['d'])) {
     $direction = ADDITIONAL;
 }
 
-
-/**
- * Run a search.
- *
- * This is the first function to handle searches and verse lookups.
- * It figures out what type of search is being preformed and calls the corresponding functions.
- *
- * @example	run_search(1001001, VERSE_LOOKUP, ADDITIONAL);							/// Find verses starting with Genesis 1:1.
- * @example	run_search(40000100, VERSE_LOOKUP, PREVIOUS);							/// Find verses before the book of Matthew.
- * @example	run_search("love", STANDARD_SEARCH, ADDITIONAL, 40000101);				/// Search for the word "love" starting at Matthew 1:1.
- * @example	run_search("God & love", STANDARD_SEARCH, ADDITIONAL);					/// Find both words "God" and "love" in the same verse.
- * @example	run_search('["love", [[4,1]], [0]]', MORPHOLOGICAL_SEARCH, ADDITIONAL);	/// Find the word "love" only when it is used as a noun.
- * @param	$query		(string)				The input to be searched for or a stringified JSON array for advanced searching.
- * @param	$type		(integer)				The type of query: SEARCH || VERSE_LOOKUP.
- * @param	$direction	(integer)				The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
- * @param	$start_id	(integer) (optional)	The verse_id whence to start.
- * @return NULL.  Data is sent to the buffer.  Intended for AJAX requests.
- * @note The script should stop execution before this function ends.
- */
+/******************/
+/* Run the query. */
+/******************/
 
 if ($type == VERSE_LOOKUP) {
     require_once 'functions/database_lookup.php';
