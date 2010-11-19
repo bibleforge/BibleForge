@@ -17,13 +17,16 @@
 ///TODO: Determine if this should be moved inside a closure.
 BF.create_simple_ajax = (function ()
 {
-    var ajax = new window.XMLHttpRequest();
+    var ajax = new window.XMLHttpRequest(),
+        ajax_timeout;
     
     return {
         abort: function ()
         {
             /// Is a query in progress?  If readyState > 0 and < 4, it needs to be aborted.
             if (ajax.readyState % 4) {
+                /// Stop it from retrying first.
+                clearTimeout(ajax_timeout);
                 ajax.abort();
             }
             
@@ -49,7 +52,7 @@ BF.create_simple_ajax = (function ()
          * @todo    Add a timeout parameter.
          * @todo    Replace the Ajax variable in BF.include().
          */
-        query: function(path, message, onsucess, onfailure)
+        query: function(path, message, onsucess, onfailure, timeout)
         {
             ///TODO: Determine if the method parameter needs to be customizable.
             ajax.open("POST", path);
@@ -75,6 +78,81 @@ BF.create_simple_ajax = (function ()
             
             return this;
         }
+        
+        
+        
+        query: function ()
+        {
+            
+            /**
+             * Send the Ajax request and start timeout timer.
+             *
+             * @return NULL.
+             * @note   This code is a separate function to reduce code duplication.
+             * @note   Called by the parent function.
+             */
+            function send_query(timeout, retry)
+            {
+                ajax.send();
+                
+                if (timeout) {
+                    /// Begin the timeout timer to ensure that the download does not freeze.
+                    ajax_timeout = window.setTimeout(function ()
+                    {
+                        ajax.abort();
+                        if (retry) {
+                            send_query(timeout, retry);
+                        }
+                    }, timeout);
+                }
+            }
+            
+            return function (path, context, timeout, retry, onsucess, onfailure)
+            {
+                
+                
+                /// Determine if arguments were passed to the last two parameters.  If not, set the defaults.
+                if (typeof timeout == "undefined") {
+                    /// Default to 10 seconds.
+                    ///TODO: This should be dynamic based on the quality of the connection to the server.
+                    timeout = 10000;
+                }
+                
+                if (typeof retry == "undefined") {
+                    retry = true;
+                }
+                
+                ///TODO: determine if the first parameter should be different.
+                ajax.open("GET", path);
+                ajax.onreadystatechange = function ()
+                {
+                    if (ajax.readyState == 4) {
+                        /// Stop the timeout timer that may be running so it does not try again.
+                        clearTimeout(ajax_timeout);
+                        
+                        /// Was the request successful?
+                        if (ajax.status == 200) {
+                            ///NOTE: It is not eval'ed here because it may be needed to be eval'ed in a different (and safer) context, or not parsed at all.
+                            if (onsucess) {
+                                onsucess(ajax.responseText);
+                            }
+                        } else {
+                            if (onfailure) {
+                                onfailure(ajax.status, ajax.responseText);
+                            }
+                            
+                            /// Should it retry?
+                            ///NOTE: ajax.status !== 0 prevents it from retrying when it was aborted intentionally.
+                            if (retry && ajax.status !== 0) {
+                                send_query(timeout, retry);
+                            }
+                        }
+                    }
+                };
+                send_query(timeout, retry);
+            };
+        }
+        
     };
 }());
 
@@ -118,7 +196,7 @@ BF.include = (function ()
                 include_timeout;
             
             /**
-             * Send the Ajax requst and start timeout timer.
+             * Send the Ajax request and start timeout timer.
              *
              * @return NULL.
              * @note   This code is a separate function to reduce code duplication.
