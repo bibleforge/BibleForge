@@ -14,7 +14,7 @@
 
 /// Declare helper function(s) attached to the global BibleForge object (BF).
 
-BF.create_simple_ajax = (function ()
+BF.create_simple_ajax = function ()
 {
     var ajax = new window.XMLHttpRequest(),
         ajax_timeout;
@@ -121,7 +121,7 @@ BF.create_simple_ajax = (function ()
             };
         }())
     };
-}());
+};
 
 /**
  * Load some Javascript and optionally send it some variables from the closure.
