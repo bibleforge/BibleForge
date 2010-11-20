@@ -160,66 +160,16 @@ BF.include = (function ()
         
         return function (path, context, timeout, retry)
         {
-            var ajax = new window.XMLHttpRequest(),
-                include_timeout;
+            var ajax = BF.create_simple_ajax();
             
-            /**
-             * Send the Ajax request and start timeout timer.
-             *
-             * @return NULL.
-             * @note   This code is a separate function to reduce code duplication.
-             * @note   Called by the parent function.
-             */
-            function begin_include()
+            ajax.query("GET", path, "", function (response)
             {
-                ajax.send();
-                
-                if (timeout) {
-                    /// Begin the timeout timer to ensure that the download does not freeze.
-                    include_timeout = window.setTimeout(function ()
-                    {
-                        ajax.abort();
-                        if (retry) {
-                            begin_include();
-                        }
-                    }, timeout);
+                files[path] = evaler(response);
+                ///TODO: Determine what kind of error handling should be done.
+                if (typeof files[path] == "function") {
+                    files[path](context);
                 }
-            }
-            
-            /// Determine if arguments were passed to the last two parameters.  If not, set the defaults.
-            if (typeof timeout == "undefined") {
-                /// Default to 10 seconds.
-                ///TODO: This should be dynamic based on the quality of the connection to the server.
-                timeout = 10000;
-            }
-            
-            if (typeof retry == "undefined") {
-                retry = true;
-            }
-            
-            ///TODO: determine if the first parameter should be different.
-            ajax.open("GET", path);
-            ajax.onreadystatechange = function ()
-            {
-                if (ajax.readyState == 4) {
-                    /// Stop the timeout timer that may be running so it does not try again.
-                    clearTimeout(include_timeout);
-                    
-                    /// Was the request successful?
-                    if (ajax.status == 200) {
-                        /// Load and run the new code.
-                        ///NOTE: This will not work in IE8-.
-                        files[path] = evaler(ajax.responseText);
-                        ///TODO: Determine what kind of error handling should be done.
-                        if (typeof files[path] == "function") {
-                            files[path](context);
-                        }
-                    } else if (retry) {
-                        begin_include();
-                    }
-                }
-            };
-            begin_include();
+            }, null, timeout, retry);
         };
     }());
 }());
