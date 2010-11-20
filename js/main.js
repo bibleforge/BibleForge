@@ -14,7 +14,6 @@
 
 /// Declare helper function(s) attached to the global BibleForge object (BF).
 
-///TODO: Determine if this should be moved inside a closure.
 BF.create_simple_ajax = (function ()
 {
     var ajax = new window.XMLHttpRequest(),
@@ -155,7 +154,7 @@ BF.include = (function ()
     return (function ()
     {
         /// Stores files that have already been loaded so that they do not have to be downloaded more than once.
-        ///TODO: Use this, and maybe make a way to ignore the cache is needed.
+        ///TODO: Use the data in this variable and maybe make a way to ignore the cache is needed.
         var files = {};
         
         return function (path, context, timeout, retry)
