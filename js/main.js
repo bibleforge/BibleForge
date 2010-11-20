@@ -306,7 +306,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             settings,
             content_manager;
         
-        /// Keep track of which view port this is. (In the future, there may be a split view mode.  Currently, this is not used.)
+        /// Keep track of which view port this is.
+        ///NOTE: In the future, there may be a split view mode.  Currently, this is NOT used.
         if (!BF.viewPort_count) {
             BF.viewPort_count = 0;
         }
@@ -315,22 +316,22 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         
         
         /**
-        * Load settings.
-        *
-        * @todo Document
-        */
+         * Load settings.
+         *
+         * @todo Document
+         */
         (function ()
         {
             /**
-            * Create an object with getter and setter abilities.
-            *
-            * @param  cur_val  (mixed)    (optional) The default value.
-            * @param  onchange (function) (optional) The function to be called after the set method is called.
-            * @return An object containing get and set methods.
-            * @note   This is used to handle data in the settings object.
-            * @todo   Determine if there should be a validate_change function as a parameter that can accept or reject a change.
-            * @todo   Determine if it is a good idea to delete this and other functions after they are no longer needed.
-            */
+             * Create an object with getter and setter abilities.
+             *
+             * @param  cur_val  (mixed)    (optional) The default value.
+             * @param  onchange (function) (optional) The function to be called after the set method is called.
+             * @return An object containing get and set methods.
+             * @note   This is used to handle data in the settings object.
+             * @todo   Determine if there should be a validate_change function as a parameter that can accept or reject a change.
+             * @todo   Determine if it is a good idea to delete this and other functions after they are no longer needed.
+             */
             function create_get_set(cur_val, onchange)
             {
                 return {get: function ()
@@ -383,10 +384,11 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         ******************************/
         
         /**
-        * The functions that handle the scrolling of the page and other related functions.
-        *
-        * @return Returns an object with functions for adding content, updating the verse range, and scrollng the view.
-        */
+         * The functions that handle the scrolling of the page and other related functions.
+         *
+         * @return Returns an object with functions for adding content, updating the verse range, and scrollng the view.
+         * @todo   Restructure this closure more.
+         */
         content_manager = (function ()
         {
             var add_content_if_needed,
@@ -421,19 +423,19 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 update_verse_range;
             
             /**
-            * The scrolling closure
-            *
-            * @todo Determine if any variables can be placed in here.
-            */
+             * The scrolling closure
+             *
+             * @todo Determine if any variables can be placed in here.
+             */
             (function ()
             {
                 ///TODO: Determine if remove_excess_content_top and remove_excess_content_bottom can be combined.
                 /**
-                * Remove content that is past the top of screen and store in cache.
-                *
-                * @return NULL.  Removes content from the page if required.
-                * @note   Called by scrolling() via setTimeout().  May call itself, too.
-                */
+                 * Remove content that is past the top of screen and store in cache.
+                 *
+                 * @return NULL.  Removes content from the page if required.
+                 * @note   Called by scrolling() via setTimeout().  May call itself, too.
+                 */
                 function remove_excess_content_top()
                 {
                     var child = page.firstChild,
@@ -479,11 +481,11 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 
                 
                 /**
-                * Remove content from below the screen and store in cache.
-                *
-                * @return  NULL.  Removes content from the page if required.
-                * @note    Called by scrolling() via setTimeout().  May call itself, too.
-                */
+                 * Remove content from below the screen and store in cache.
+                 *
+                 * @return  NULL.  Removes content from the page if required.
+                 * @note    Called by scrolling() via setTimeout().  May call itself, too.
+                 */
                 function remove_excess_content_bottom()
                 {
                     var child = page.lastChild;
@@ -522,15 +524,15 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     ///TODO: Perhaps move scroll_pos in here too.
                     
                     /**
-                    * The onscroll event.
-                    *
-                    * When the page scrolls this figures out the direction of the scroll and
-                    * calls specific functions to determine whether content should be added or removed.
-                    *
-                    * @return NULL.  May call other functions via setTimeout().
-                    * @note   Called when the window scrolls.  It may also call itself.
-                    * @note   Set by the onscroll event.
-                    */
+                     * The onscroll event.
+                     *
+                     * When the page scrolls this figures out the direction of the scroll and
+                     * calls specific functions to determine whether content should be added or removed.
+                     *
+                     * @return NULL.  May call other functions via setTimeout().
+                     * @note   Called when the window scrolls.  It may also call itself.
+                     * @note   Set by the onscroll event.
+                     */
                     function scrolling()
                     {
                         /// Trick IE 8- into understanding pageYOffset.
@@ -599,15 +601,15 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             
             
             /**
-            * Find a verse element that is within a certain Y coordinate on the screen.
-            *
-            * @example verse = get_verse_at_position(window.pageYOffset + topLoader.offsetHeight + 8,  true,  page); /// Could return {b: 1, c: 1, v: 1} for Genesis 1:1.
-            * @param   the_pos        (number)  The vertical position on the page.
-            * @param   looking_upward (boolean) Whether the verses at the top or bottom of the page.
-            * @param   parent_el      (element) The HTML element that ultimately contains the verse.
-            * @return  Returns an object containing the book, chapter, and verse of the verse element.  Format {b: BB, c: CCC, v: VVV}.
-            * @note    Called by update_verse_range() and itself.
-            */
+             * Find a verse element that is within a certain Y coordinate on the screen.
+             *
+             * @example verse = get_verse_at_position(window.pageYOffset + topLoader.offsetHeight + 8,  true,  page); /// Could return {b: 1, c: 1, v: 1} for Genesis 1:1.
+             * @param   the_pos        (number)  The vertical position on the page.
+             * @param   looking_upward (boolean) Whether the verses at the top or bottom of the page.
+             * @param   parent_el      (element) The HTML element that ultimately contains the verse.
+             * @return  Returns an object containing the book, chapter, and verse of the verse element.  Format {b: BB, c: CCC, v: VVV}.
+             * @note    Called by update_verse_range() and itself.
+             */
             function get_verse_at_position(the_pos, looking_upward, parent_el)
             {
                 var b,
@@ -719,21 +721,21 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             
             
             /**
-            * Create add_content_if_needed().
-            *
-            * @return A function that checks if more content is needed.
-            * @note   Called immediately.
-            * @todo   This should be done better.
-            */
+             * Create add_content_if_needed().
+             *
+             * @return A function that checks if more content is needed.
+             * @note   Called immediately.
+             * @todo   This should be done better.
+             */
             add_content_if_needed = (function ()
             {
                 /**
-                * Add content to bottom of the page (off the screen)
-                *
-                * @example add_content_bottom_if_needed();
-                * @return  NULL.  Adds content to the page if needed.
-                * @note    Called by scrolling() via setTimeout().
-                */
+                 * Add content to bottom of the page (off the screen)
+                 *
+                 * @example add_content_bottom_if_needed();
+                 * @return  NULL.  Adds content to the page if needed.
+                 * @note    Called by scrolling() via setTimeout().
+                 */
                 function add_content_bottom_if_needed()
                 {
                     var child = page.lastChild,
@@ -775,12 +777,12 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 
                 
                 /**
-                * Add content to top of the page (off the screen)
-                *
-                * @example setTimeout(add_content_top_if_needed, lookup_speed_scrolling);
-                * @return  NULL.  Adds content to the page if needed.
-                * @note    Called by add_content_if_needed() via setTimeout().
-                */
+                 * Add content to top of the page (off the screen)
+                 *
+                 * @example setTimeout(add_content_top_if_needed, lookup_speed_scrolling);
+                 * @return  NULL.  Adds content to the page if needed.
+                 * @note    Called by add_content_if_needed() via setTimeout().
+                 */
                 function add_content_top_if_needed()
                 {
                     var child = page.firstChild,
@@ -820,13 +822,13 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 }
                 
                 /**
-                * Find a verse element that is within a certain Y coordinate on the screen.
-                *
-                * @example add_content_if_needed(additional);
-                * @param   direction (integer) The direction that verses should be added: additional || previous.
-                * @return  Null.  A function is run after a delay that may add verses to the page.
-                * @note    Called by add_content_bottom_if_needed(), add_content_top_if_needed(), handle_new_verses(), window.onresize(), and scrolling().
-                */
+                 * Find a verse element that is within a certain Y coordinate on the screen.
+                 *
+                 * @example add_content_if_needed(additional);
+                 * @param   direction (integer) The direction that verses should be added: additional || previous.
+                 * @return  Null.  A function is run after a delay that may add verses to the page.
+                 * @note    Called by add_content_bottom_if_needed(), add_content_top_if_needed(), handle_new_verses(), window.onresize(), and scrolling().
+                 */
                 return function (direction)
                 {
                     if (direction === additional) {
@@ -839,20 +841,20 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             
             
             /**
-            * Creates update_verse_range().
-            *
-            * @return A function that runs update_verse_range_delayed() after a short delay if needed.
-            * @note   Called by window.onresize(), scrolling(), and write_verses().
-            * @note   The anonymous function runs once and returns a small function with the bigger update_verse_range_delayed() in the closure.
-            */
+             * Creates update_verse_range().
+             *
+             * @return A function that runs update_verse_range_delayed() after a short delay if needed.
+             * @note   Called by window.onresize(), scrolling(), and write_verses().
+             * @note   The anonymous function runs once and returns a small function with the bigger update_verse_range_delayed() in the closure.
+             */
             update_verse_range = (function ()
             {
                 /**
-                * Determine and set the range of verses currently visible on the screen.
-                *
-                * @return Null.  The verse range is updated if need be.
-                * @note   Called by update_verse_range().
-                */
+                 * Determine and set the range of verses currently visible on the screen.
+                 *
+                 * @return Null.  The verse range is updated if need be.
+                 * @note   Called by update_verse_range().
+                 */
                 function update_verse_range_delayed()
                 {
                     var new_title,
@@ -985,15 +987,15 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             
             
             /**
-            * The onresize event.
-            *
-            * When the page is resized, check to see if more content should be loaded.
-            *
-            * @return NULL.  Calls other functions.
-            * @note   Called when the window is resized.
-            * @note   Set by the onresize event.
-            * @todo   Make a function that allows for adding and removing more global events.
-            */
+             * The onresize event.
+             *
+             * When the page is resized, check to see if more content should be loaded.
+             *
+             * @return NULL.  Calls other functions.
+             * @note   Called when the window is resized.
+             * @note   Set by the onresize event.
+             * @todo   Make a function that allows for adding and removing more global events.
+             */
             window.onresize = function ()
             {
                 add_content_if_needed(additional);
@@ -1005,12 +1007,12 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             ///NOTE: get_verse_at_position is temporary.
             return {add_content_if_needed: add_content_if_needed,
                     /**
-                    * Prepares the page for new verses.
-                    *
-                    * @return NULL.  The page is prepared for new verses.
-                    * @note   Called by prepare_new_search().
-                    * @todo   Determine if this is a good place for this function.
-                    */
+                     * Prepares the page for new verses.
+                     *
+                     * @return NULL.  The page is prepared for new verses.
+                     * @note   Called by prepare_new_search().
+                     * @todo   Determine if this is a good place for this function.
+                     */
                     clear_scroll:          function ()
                     {
                         /// Clear cache.
