@@ -155,7 +155,7 @@
             {
                 context_menu.style.opacity = 1;
                 
-                if (open_callback && typeof open_callback == "function") {
+                if (open_callback) {
                     open_callback();
                 }
             }, 0);
@@ -183,7 +183,7 @@
             if (is_open) {
                 close_menu(function ()
                 {
-                    if (close_callback && typeof close_callback == "function") {
+                    if (close_callback) {
                         close_callback();
                     }
                     open_menu(x_pos, y_pos, menu_items, open_callback, close_callback);
