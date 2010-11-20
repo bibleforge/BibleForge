@@ -363,7 +363,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 }
                 
                 ///FIXME: There should be a dedicated function for getting the current verse (or better yet, a variable that stores that information).
-                cur_verse = content_manager.get_verse_at_position(window.pageYOffset + topLoader.offsetHeight + 8,  true,  page);
+                cur_verse = content_manager.get_verse_at_position(window.pageYOffset + topLoader.offsetHeight + 8, true, page);
                 
                 if (cur_verse !== false) {
                     ///FIXME: This should reload the verses.
@@ -1120,7 +1120,6 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 
                 /// Step 5: Prepare for new results (clear page(?), prepare highlighter if applicable)
                 
-                ///TODO: Implement
                 ///NOTE: Do we need to keep track of the last book?  I.e., last_book = 0;
                 content_manager.clear_scroll();
                 
@@ -1152,7 +1151,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         }());
         
         /// After a short delay, lazily load extra, nonessential (or at least not immediately essential) code, like the wrench menu.
-        ///TODO: Determine if there is any problem hitting the server so quickly.
+        ///TODO: Determine if there is any problem hitting the server again so quickly.
         window.setTimeout(function ()
         {
             BF.include("js/secondary.js", {settings: settings, topBar: viewPort.firstChild, viewPort_num: viewPort_num, page: page});
