@@ -1162,7 +1162,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
     /// Capture form submit event.
     searchForm.onsubmit = function ()
     {
-        var raw_query = q_obj.value,
+        var raw_query = q_obj.value;
         
         /// Is the query is the same as the explanation?  If so, do not submit the query; just draw attention to the query box.
         if (raw_query == BF.lang.query_explanation) {
