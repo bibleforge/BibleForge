@@ -37,63 +37,18 @@ BF.create_simple_ajax = (function ()
             ///NOTE: Anything not 0 or 4 is busy.
             return ajax.readyState % 4;
         },
-        /**
-         * Send an Ajax request to the server.
-         *
-         * @example query("search.php", "q=search",            ajax, {action: last_type, "direction": direction});
-         * @example query("search.php", "q=search&s=48003027", ajax, {action: 1, "direction": 1});
-         * @param   server_URL (string)              The file on the server to run.
-         * @param   message    (string)              The variables to send.
-         *	                                         URI format: "name1=value1&name2=value%202"
-         * @param   onsucess   (function) (optional) The function to run on a successful query.
-         * @param   onfailure  (function) (optional) The function to run if the query fails.
-         * @return  This object.
-         * @note    Called by ???.
-         * @todo    Add a timeout parameter.
-         * @todo    Replace the Ajax variable in BF.include().
-         */
-        query: function(path, message, onsucess, onfailure, timeout)
+        query: (function ()
         {
-            ///TODO: Determine if the method parameter needs to be customizable.
-            ajax.open("POST", path);
-            ajax.onreadystatechange = function ()
-            {
-                if (ajax.readyState == 4) {
-                    
-                    /// Was the request successful?
-                    if (ajax.status == 200) {
-                        if (typeof onsucess == "function") {
-                            ///NOTE: It is not eval'ed here because it may be needed to be eval'ed in a different (and safer) context, or not parsed at all.
-                            onsucess(ajax.responseText);
-                        }
-                    } else {
-                        if (typeof onfailure == "function") {
-                            onfailure(ajax.status, ajax.responseText);
-                        }
-                    }
-                }
-            };
-            
-            ajax.send(message);
-            
-            return this;
-        }
-        
-        
-        
-        query: function ()
-        {
-            
             /**
              * Send the Ajax request and start timeout timer.
              *
              * @return NULL.
              * @note   This code is a separate function to reduce code duplication.
-             * @note   Called by the parent function.
+             * @note   Called by the BF.create_simple_ajax.query().
              */
-            function send_query(timeout, retry)
+            function send_query(message, timeout, retry)
             {
-                ajax.send();
+                ajax.send(message);
                 
                 if (timeout) {
                     /// Begin the timeout timer to ensure that the download does not freeze.
@@ -101,16 +56,30 @@ BF.create_simple_ajax = (function ()
                     {
                         ajax.abort();
                         if (retry) {
-                            send_query(timeout, retry);
+                            send_query(message, timeout, retry);
                         }
                     }, timeout);
                 }
             }
             
-            return function (path, context, timeout, retry, onsucess, onfailure)
+            /**
+             * Send an Ajax request to the server.
+             *
+             * @example query("POST", "query.php", "q=search", function () {/// success}, function () {/// failure}, 10000, true);
+             * @param   method    (string)              The HTTP method to use (GET || POST).
+             * @param   path      (string)              The URL to query.
+             * @param   message   (string)   (optional) The variables to send (URI format: "name1=value1&name2=value%202").
+             * @param   onsuccess (function) (optional) The function to run on a successful query.
+             * @param   onfailure (function) (optional) The function to run if the query fails.
+             * @param   timeout   (number)   (optional) How long to wait before giving up on the script to load (in milliseconds).
+             *                                          A falsey value (such as 0 or FALSE) disables timing out.         (Default is 10,000 milliseconds.)
+             * @param   retry     (boolean)  (optional) Whether or not to retry loading the script if a timeout occurs.  (Default is TRUE.)
+             * @return  NULL.
+             * @note    Called by ???.
+             * @todo    Determine if it should change a method from GET to POST if it exceeds 2,083 characters (IE's rather small limit).
+             */
+            return function (method, path, message, onsuccess, onfailure, timeout, retry)
             {
-                
-                
                 /// Determine if arguments were passed to the last two parameters.  If not, set the defaults.
                 if (typeof timeout == "undefined") {
                     /// Default to 10 seconds.
@@ -123,7 +92,7 @@ BF.create_simple_ajax = (function ()
                 }
                 
                 ///TODO: determine if the first parameter should be different.
-                ajax.open("GET", path);
+                ajax.open(method, path);
                 ajax.onreadystatechange = function ()
                 {
                     if (ajax.readyState == 4) {
@@ -132,9 +101,9 @@ BF.create_simple_ajax = (function ()
                         
                         /// Was the request successful?
                         if (ajax.status == 200) {
-                            ///NOTE: It is not eval'ed here because it may be needed to be eval'ed in a different (and safer) context, or not parsed at all.
-                            if (onsucess) {
-                                onsucess(ajax.responseText);
+                            ///NOTE: It is not eval'ed here because it may be needed to be eval'ed in a different (and safer) context or not be parsed at all.
+                            if (onsuccess) {
+                                onsuccess(ajax.responseText);
                             }
                         } else {
                             if (onfailure) {
@@ -144,15 +113,14 @@ BF.create_simple_ajax = (function ()
                             /// Should it retry?
                             ///NOTE: ajax.status !== 0 prevents it from retrying when it was aborted intentionally.
                             if (retry && ajax.status !== 0) {
-                                send_query(timeout, retry);
+                                send_query(message, timeout, retry);
                             }
                         }
                     }
                 };
-                send_query(timeout, retry);
+                send_query(message, timeout, retry);
             };
-        }
-        
+        }())
     };
 }());
 
