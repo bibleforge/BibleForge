@@ -210,9 +210,11 @@ BF.get_position = function (obj)
 BF.format_number = function (num)
 {
     var rgx;
+    
     if (num < 1000) {
         return num;
     }
+    
     /// Quickly converts a number to a string quickly.
     num += "";
     rgx  = /^([0-9]+)([0-9][0-9][0-9])/;
@@ -220,6 +222,7 @@ BF.format_number = function (num)
     while (rgx.test(num)) {
         num = num.replace(rgx, "$1,$2");
     }
+    
     return num;
 };
 
@@ -239,7 +242,7 @@ BF.changeCSS = function (selector, new_CSS, change_all)
 {
     var CSS_rules,
         CSS_rules_len,
-        i           = 0,
+        i = 0,
         ///TODO: Determine if it should loop through all styles sheets.
         style_sheet = document.styleSheets[0];
     
@@ -283,102 +286,97 @@ BF.cssTransitions = typeof document.body.style.webkitTransition !== "undefined" 
  */
 BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLoader, bottomLoader, doc_docEl)
 {
-    var viewPort_num,
-        
-        /// Query type "constants"
-        verse_lookup			= 1,
-        mixed_search			= 2,
-        standard_search			= 3,
-        grammatical_search		= 4,
-        
-        /// Direction "constants"
-        additional	= 1,
-        previous	= 2,
-        
-        /// Objects
-        settings,
-        content_manager,
-        query_manager;
+    var run_new_query;
     
-    /// Keep track of which view port this is. (In the future, there may be a split view mode.  Currently, this is not used.)
-    if (!BF.viewPort_count) {
-        BF.viewPort_count = 0;
-    }
-    viewPort_num = BF.viewPort_count;
-    ++BF.viewPort_count;
-    
-    
-    /**
-     * Load settings.
-     *
-     * @todo Document
-     */
     (function ()
     {
-        /**
-        * Create an object with getter and setter abilities.
-        *
-        * @param  cur_val  (mixed)    (optional) The default value.
-        * @param  onchange (function) (optional) The function to be called after the set method is called.
-        * @return An object containing get and set methods.
-        * @note   This is used to handle data in the settings object.
-        * @todo   Determine if there should be a validate_change function as a parameter that can accept or reject a change.
-        * @todo   Determine if it is a good idea to delete this and other functions after they are no longer needed.
-        */
-        function create_get_set(cur_val, onchange)
-        {
-            return {get: function ()
-            {
-                return cur_val;
-            }, set: function (new_val)
-            {
-                /// Temporarily store the original value to be sent to the onchange function.
-                var old_val = cur_val;
-                
-                cur_val = new_val;
-                
-                /// Optionally, run a function after the value is changed.
-                if (onchange) {
-                    window.setTimeout(function ()
-                    {
-                        onchange({old_val: old_val, new_val: new_val});
-                    }, 0);
-                }
-            }};
+        var viewPort_num,
+            
+            /// Query type "constants"
+            verse_lookup       = 1,
+            mixed_search       = 2,
+            standard_search    = 3,
+            grammatical_search = 4,
+            
+            /// Direction "constants"
+            additional = 1,
+            previous   = 2,
+            
+            /// Objects
+            settings,
+            content_manager;
+        
+        /// Keep track of which view port this is. (In the future, there may be a split view mode.  Currently, this is not used.)
+        if (!BF.viewPort_count) {
+            BF.viewPort_count = 0;
         }
+        viewPort_num = BF.viewPort_count;
+        ++BF.viewPort_count;
         
-        ///TODO: Determine how this should be created.
-        settings = {view: {in_paragraphs: create_get_set(true, function (values)
+        
+        /**
+        * Load settings.
+        *
+        * @todo Document
+        */
+        (function ()
         {
-            var cur_verse;
-            
-            if (last_type != verse_lookup) {
-                return;
+            /**
+            * Create an object with getter and setter abilities.
+            *
+            * @param  cur_val  (mixed)    (optional) The default value.
+            * @param  onchange (function) (optional) The function to be called after the set method is called.
+            * @return An object containing get and set methods.
+            * @note   This is used to handle data in the settings object.
+            * @todo   Determine if there should be a validate_change function as a parameter that can accept or reject a change.
+            * @todo   Determine if it is a good idea to delete this and other functions after they are no longer needed.
+            */
+            function create_get_set(cur_val, onchange)
+            {
+                return {get: function ()
+                {
+                    return cur_val;
+                }, set: function (new_val)
+                {
+                    /// Temporarily store the original value to be sent to the onchange function.
+                    var old_val = cur_val;
+                    
+                    cur_val = new_val;
+                    
+                    /// Optionally, run a function after the value is changed.
+                    if (onchange) {
+                        window.setTimeout(function ()
+                        {
+                            onchange({old_val: old_val, new_val: new_val});
+                        }, 0);
+                    }
+                }};
             }
             
-            ///FIXME: There should be a dedicated function for getting the current verse (or better yet, a variable that stores that information).
-            cur_verse = content_manager.get_verse_at_position(window.pageYOffset + topLoader.offsetHeight + 8,  true,  page);
-            
-            if (cur_verse !== false) {
-                ///FIXME: This should reload the verses.
-                ///FIXME: It does not necessarily need to reload the verses if switching from paragraph mode to non-paragraph mode.
-                content_manager.clear_scroll();
-            }
-        }), red_letters: create_get_set(true, function (values)
-        {
-            /// Alternate between red and black letters.
-            ///TODO: Add other options, such as custom color, and (in the future) highlighting of other people's words (e.g., highlight the words of Paul in blue).
-            BF.changeCSS(".q", "color: " + (values.new_val ? "#D00;" : "#000;"));
-        })}};
-    }());
-    
-    
-
-    
-    
-    query_manager = (function ()
-    {
-        
+            ///TODO: Determine how this should be created.
+            settings = {view: {in_paragraphs: create_get_set(true, function (values)
+            {
+                var cur_verse;
+                
+                if (last_type != verse_lookup) {
+                    return;
+                }
+                
+                ///FIXME: There should be a dedicated function for getting the current verse (or better yet, a variable that stores that information).
+                cur_verse = content_manager.get_verse_at_position(window.pageYOffset + topLoader.offsetHeight + 8,  true,  page);
+                
+                if (cur_verse !== false) {
+                    ///FIXME: This should reload the verses.
+                    ///FIXME: It does not necessarily need to reload the verses if switching from paragraph mode to non-paragraph mode.
+                    content_manager.clear_scroll();
+                }
+            }), red_letters: create_get_set(true, function (values)
+            {
+                /// Alternate between red and black letters.
+                ///TODO: Add other options, such as custom color, and (in the future) highlighting of other people's words (e.g., highlight the words of Paul in blue).
+                BF.changeCSS(".q", "color: " + (values.new_val ? "#D00;" : "#000;"));
+            })}};
+        }());
         
         /******************************
         * Start of Scrolling Closure *
@@ -1051,7 +1049,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
 
         
         
-        return (function ()
+        run_new_query = (function ()
         {
             var ajax_additional = BF.create_simple_ajax(),
                 ajax_previous   = BF.create_simple_ajax(),
@@ -1115,7 +1113,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 ///TODO: Implement
                 ///NOTE: Don't forget to window.encodeURIComponent(query).
                 
-                ///NOTE: There needs to be a way to create the additional and previous functions here and send them to the content manager.
+                /// Prepare the initial query, create functions to handle additional and previous queries.
                 //query_server(query, query_type);
                 
                 
@@ -1152,6 +1150,13 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 ///7 Highlight as necessary
             };
         }());
+        
+        /// After a short delay, lazily load extra, nonessential (or at least not immediately essential) code, like the wrench menu.
+        ///TODO: Determine if there is any problem hitting the server so quickly.
+        window.setTimeout(function ()
+        {
+            BF.include("js/secondary.js", {settings: settings, topBar: viewPort.firstChild, viewPort_num: viewPort_num, page: page});
+        }, 1000);
     }());
     
     
@@ -1168,7 +1173,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         if (raw_query == BF.lang.query_explanation) {
             q_obj.focus();
         } else {
-            query_manager.run(raw_query);
+            run_new_query(raw_query);
         }
         
         ///NOTE: Must return false in order to stop the form submission.
@@ -1204,15 +1209,6 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
     };
     
     q_obj.onblur();
-    
-    
-    /// After a short delay, lazily load extra, nonessential (or at least not immediately essential) code, like the wrench menu.
-    ///TODO: Determine if there is any problem hitting the server so quickly.
-    window.setTimeout(function ()
-    {
-        BF.include("js/secondary.js", {settings: settings, topBar: viewPort.firstChild, viewPort_num: viewPort_num, page: page});
-    }, 1000);
-
 };
 
 
