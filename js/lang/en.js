@@ -404,7 +404,7 @@ BF.lang = (function ()
                 
                 return highlight_regex;
             };
-        }())},
+        }()),
 
 
         /**
