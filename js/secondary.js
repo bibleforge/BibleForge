@@ -602,7 +602,7 @@
          * @note   Called immediately in order to create another function that shows the panel.
          */
         show_help_panel = (function ()
-        {            
+        {
             var panel_element = document.createElement("div");
             
             ///FIXME: Make a real help panel.

@@ -1058,8 +1058,6 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 
                 highlight_regex;
             
-
-            
             return function (raw_query)
             {
                 /// Step 1: Prepare string and check to see if we need to search (not empty)
