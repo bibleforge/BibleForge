@@ -1067,13 +1067,142 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         ****************************/
 
         
-        
-        run_new_query = (function ()
+        query_manager = (function ()
         {
             var ajax_additional = BF.create_simple_ajax(),
                 ajax_previous   = BF.create_simple_ajax(),
                 
                 highlight_regex;
+            
+            function create_query_message(options)
+            {
+                var context = {
+                    direction:     options.direction,
+                    in_paragraphs: settings.view.in_paragraphs.get(),
+                    type:          options.type,
+                    verse:         options.verse
+                };
+                
+                
+            }
+            
+            return {
+                query_additional: function ()
+                {
+                    
+                },
+                query: function (options)
+                {
+                    /// Stop any old requests since we have a new one.
+                    ajax_additional.abort();
+                    ajax_previous.abort();
+                    
+                    ajax_additional.query("post", "query.php", create_query_message(options), function ()
+                    {
+                        /// success
+                    });
+                },
+                query_previous: function ()
+                {
+                    
+                }
+            };
+        }());
+        
+        run_new_query = (function ()
+        {
+            /**
+             * Figure out what type of search is being attempted by the user.
+             *
+             * @example determine_search_type("God & love");							/// Returns [{type: standard_search,    query: '"God & love"'}]
+             * @example determine_search_type("love AS NOUN");							/// Returns [{type: grammatical_search, query: '["love",[[4,1]],[0]]'}]
+             * @example determine_search_type("go AS IMPERATIVE, -SINGULAR");			/// Returns [{type: grammatical_search, query: '["go",[[9,3],[5,1]],[0,1]]'}]
+             * @example determine_search_type("go* AS PASSIVE, -PERFECT,INDICATIVE");	/// Returns [{type: grammatical_search, query: '["go*",[[8,3],[7,5],[9,1]],[0,1,0]]'}]
+             * @example determine_search_type("* AS RED, IMPERATIVE");					/// Returns [{type: grammatical_search, query: '["",[[3,1],[9,3]],[0,0]]'}]
+             * //@example determine_search_type("love AS NOUN & more | less -good AS ADJECTIVE"); /// Returns [{type: grammatical_search, query: '["love",[[4,1]],[0]]'}, {type: standard_search, query: "& more | less -good"}, {type: grammatical_search, query: '["good",[[4,3]],[1]]'}]
+             * @param   search_terms (string) The prepared terms to be examined.
+             * @return  An array filled with objects describing the type of search.
+             * @note    Called by run_new_query().
+             * @note    Only a partial implementation currently.  Mixed searching is lacking.
+             */
+            function determine_search_type(search_terms)
+            {
+                var exclude_json			= "",	/// Used to concatenate data. TODO: Make description better.
+                    grammar_attribute_json	= "",	/// Used to concatenate data. TODO: Make description better.
+                    grammar_attributes,
+                    grammar_json			= "",	/// Used to concatenate data. TODO: Make description better.
+                    grammar_search_term,
+                    split_start,
+                    split_pos;
+                
+                /// Did the user use the grammatical keyword in his search?
+                if ((split_pos = search_terms.indexOf(BF.lang.grammar_marker)) != -1) {
+                    ///TODO: Determine what is better: a JSON array or POST/GET string (i.e., word1=word&grammar_type1=1&value1=3&include1=1&...).
+                    ///NOTE: A JSON array is used to contain the information about the search.
+                    ///      JSON format: '["WORD",[[GRAMMAR_TYPE1,VALUE1],[...]],[INCLUDE1,...]]'
+                    
+                    /// Get the search term (e.g., in "go AS IMPERATIVE, -SINGULAR", grammar_search_term = "go").
+                    grammar_search_term = search_terms.slice(0, split_pos);
+                    
+                    /// Is the user trying to find all words that match the grammatical attributes?
+                    if (grammar_search_term == "*") {
+                        /// Sphinx will find all words if no query is present, so we need to send a blank search request.
+                        grammar_search_term = "";
+                    }
+                    
+                    ///NOTE: replace(/(["'])/g, "\\$1") adds slashes to sanitize the data.  (It is essentially the same as addslashes() in PHP.)
+                    grammar_json = '["' + grammar_search_term.replace(/(["'])/g, "\\$1") + '",[';
+                    
+                    /// Get the grammatical attributes (e.g., in "go AS IMPERATIVE, -SINGULAR", grammar_attributes = IMPERATIVE, -SINGULAR").
+                    grammar_attributes = search_terms.slice(split_pos + BF.lang.grammar_marker_len);
+                    split_start        = 0;
+                    
+                    ///TODO: Determine if there is a benefit to using do() over while().
+                    ///NOTE: An infinite loop is used because the data is returned when it reaches the end of the string.
+                    do {
+                        /// Find where the attributes separate (e.g., "NOUN, GENITIVE" would separate at character 4).
+                        split_pos = grammar_attributes.indexOf(BF.lang.grammar_separator, split_start);
+                        /// Trim leading white space.
+                        if (grammar_attributes.slice(split_start, split_start + 1) === " ") {
+                            ++split_start;
+                        }
+                        /// Is this grammatical feature to be excluded?
+                        if (grammar_attributes.slice(split_start, split_start + 1) == "-") {
+                            /// Skip the hyphen so that we just get the grammatical word (e.g., "love AS -NOUN" we just want "NOUN").
+                            ++split_start;
+                            exclude_json += "1,";
+                        } else {
+                            exclude_json += "0,";
+                        }
+                        
+                        if (split_pos > -1) {
+                            ///TODO: Determine if there should be error handling when a grammar keyword does not exist.
+                            ///NOTE: The slice() function separates the various grammatical attributes and then that word is
+                            ///      looked up in the grammar_keywords object in order to find the JSON code to send to the server.
+                            grammar_attribute_json += BF.lang.grammar_keywords[grammar_attributes.slice(split_start, split_pos).trim()] + ",";
+                            split_start = split_pos + 1;
+                        } else {
+                            ///TODO: Determine if trim() is necessary or if there is a better implementation.
+                            ///NOTE: exclude_json.slice(0, -1) is used to remove the trailing comma.  This could be unnecessary.
+                            return [
+                                {
+                                    type:  grammatical_search,
+                                    ///TODO: Document what is going on here.
+                                    query: grammar_json + grammar_attribute_json + BF.lang.grammar_keywords[grammar_attributes.slice(split_start).trim()] + "],[" + exclude_json.slice(0, -1) + "]]"
+                                }
+                            ];
+                        }
+                    } while (true);
+                }
+                
+                /// The search is just a standard search, so just return the type and the original query.
+                return [
+                    {
+                        type:  standard_search,
+                        query: search_terms
+                    }
+                ];
+            }
             
             return function (raw_query)
             {
@@ -1089,13 +1218,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     return;
                 }
                 
-                /// Step 2: Stop current requests
-                
-                /// Stop any old requests since we have a new one.
-                ajax_additional.abort();
-                ajax_previous.abort();
-                
-                /// Step 3: Determine type of query
+                /// Step 2: Determine type of query
                 
                 /// Determine if the user is preforming a search or looking up a verse.
                 /// If the query is a verse reference, a number is returned, if it is a search, then FALSE is returned.
@@ -1125,17 +1248,17 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     }
                 }
                 
-                /// Step 4: Request results
+                /// Step 3: Request results
                 
                 ///TODO: Implement
                 ///NOTE: Don't forget to window.encodeURIComponent(query).
                 
                 /// Prepare the initial query, create functions to handle additional and previous queries.
-                //query_server(query, query_type);
+                query_manager.query(query, query_type);
                 
                 
                 
-                /// Step 5: Prepare for new results (clear page(?), prepare highlighter if applicable)
+                /// Step 4: Prepare for new results (clear page(?), prepare highlighter if applicable)
                 
                 ///NOTE: Do we need to keep track of the last book?  I.e., last_book = 0;
                 content_manager.clear_scroll();
@@ -1161,9 +1284,9 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 
                 /// ...
                 
-                ///6 Display verses
+                /// Step 5 Display verses
                 
-                ///7 Highlight as necessary
+                /// Step 6 Highlight as necessary
             };
         }());
         
