@@ -195,7 +195,10 @@ BF.get_position = function (obj)
         } while (obj = obj.offsetParent);
     }
     
-    return {left: left_pos, top: top_pos};
+    return {
+        left: left_pos,
+        top:  top_pos
+    };
 };
 
 
@@ -334,49 +337,57 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
              */
             function create_get_set(cur_val, onchange)
             {
-                return {get: function ()
-                {
-                    return cur_val;
-                }, set: function (new_val)
-                {
-                    /// Temporarily store the original value to be sent to the onchange function.
-                    var old_val = cur_val;
-                    
-                    cur_val = new_val;
-                    
-                    /// Optionally, run a function after the value is changed.
-                    if (onchange) {
-                        window.setTimeout(function ()
-                        {
-                            onchange({old_val: old_val, new_val: new_val});
-                        }, 0);
+                return {
+                    get: function ()
+                    {
+                        return cur_val;
+                    },
+                    set: function (new_val)
+                    {
+                        /// Temporarily store the original value to be sent to the onchange function.
+                        var old_val = cur_val;
+                        
+                        cur_val = new_val;
+                        
+                        /// Optionally, run a function after the value is changed.
+                        if (onchange) {
+                            window.setTimeout(function ()
+                            {
+                                onchange({old_val: old_val, new_val: new_val});
+                            }, 0);
+                        }
                     }
-                }};
+                };
             }
             
             ///TODO: Determine how this should be created.
-            settings = {view: {in_paragraphs: create_get_set(true, function (values)
-            {
-                var cur_verse;
-                
-                if (last_type != verse_lookup) {
-                    return;
+            settings = {
+                view: {
+                    in_paragraphs: create_get_set(true, function (values)
+                    {
+                        var cur_verse;
+                        
+                        if (last_type != verse_lookup) {
+                            return;
+                        }
+                        
+                        ///FIXME: There should be a dedicated function for getting the current verse (or better yet, a variable that stores that information).
+                        cur_verse = content_manager.get_verse_at_position(window.pageYOffset + topLoader.offsetHeight + 8, true, page);
+                        
+                        if (cur_verse !== false) {
+                            ///FIXME: This should reload the verses.
+                            ///FIXME: It does not necessarily need to reload the verses if switching from paragraph mode to non-paragraph mode.
+                            content_manager.clear_scroll();
+                        }
+                    }),
+                    red_letters: create_get_set(true, function (values)
+                    {
+                        /// Alternate between red and black letters.
+                        ///TODO: Add other options, such as custom color, and (in the future) highlighting of other people's words (e.g., highlight the words of Paul in blue).
+                        BF.changeCSS(".q", "color: " + (values.new_val ? "#D00;" : "#000;"));
+                    })
                 }
-                
-                ///FIXME: There should be a dedicated function for getting the current verse (or better yet, a variable that stores that information).
-                cur_verse = content_manager.get_verse_at_position(window.pageYOffset + topLoader.offsetHeight + 8, true, page);
-                
-                if (cur_verse !== false) {
-                    ///FIXME: This should reload the verses.
-                    ///FIXME: It does not necessarily need to reload the verses if switching from paragraph mode to non-paragraph mode.
-                    content_manager.clear_scroll();
-                }
-            }), red_letters: create_get_set(true, function (values)
-            {
-                /// Alternate between red and black letters.
-                ///TODO: Add other options, such as custom color, and (in the future) highlighting of other people's words (e.g., highlight the words of Paul in blue).
-                BF.changeCSS(".q", "color: " + (values.new_val ? "#D00;" : "#000;"));
-            })}};
+            };
         }());
         
         /******************************
@@ -1005,44 +1016,46 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             }
             
             ///NOTE: get_verse_at_position is temporary.
-            return {add_content_if_needed: add_content_if_needed,
-                    /**
-                     * Prepares the page for new verses.
-                     *
-                     * @return NULL.  The page is prepared for new verses.
-                     * @note   Called by prepare_new_search().
-                     * @todo   Determine if this is a good place for this function.
-                     */
-                    clear_scroll:          function ()
-                    {
-                        /// Clear cache.
-                        ///TODO: Determine a way to store the cache in a way that it can be used later.
-                        cached_verses_top    = [];
-                        cached_verses_bottom = [];
-                        cached_count_top     = 0;
-                        cached_count_bottom  = 0;
-                        
-                        ///TODO: This should have smooth scrolling effects, etc.
-                        bottomLoader.style.visibility = "hidden";
-                        topLoader.style.visibility    = "hidden";
-                        page.innerHTML                = "";
-                    },
-                    get_verse_at_position: get_verse_at_position, /// TEMP
-                    update_verse_range:    update_verse_range,
-                    reached_bottom:        function ()
-                    {
-                        has_reached_bottom = true;
-                    },
-                    reached_top:           function ()
-                    {
-                        has_reached_top    = true;
-                    },
-                    reset_scroll:          function ()
-                    {
-                        has_reached_bottom = false;
-                        has_reached_top    = false;
-                    },
-                    scrollViewTo:          scrollViewTo};
+            return {
+                add_content_if_needed: add_content_if_needed,
+                /**
+                 * Prepares the page for new verses.
+                 *
+                 * @return NULL.  The page is prepared for new verses.
+                 * @note   Called by prepare_new_search().
+                 * @todo   Determine if this is a good place for this function.
+                 */
+                clear_scroll:          function ()
+                {
+                    /// Clear cache.
+                    ///TODO: Determine a way to store the cache in a way that it can be used later.
+                    cached_verses_top    = [];
+                    cached_verses_bottom = [];
+                    cached_count_top     = 0;
+                    cached_count_bottom  = 0;
+                    
+                    ///TODO: This should have smooth scrolling effects, etc.
+                    bottomLoader.style.visibility = "hidden";
+                    topLoader.style.visibility    = "hidden";
+                    page.innerHTML                = "";
+                },
+                get_verse_at_position: get_verse_at_position, /// TEMP
+                update_verse_range:    update_verse_range,
+                reached_bottom:        function ()
+                {
+                    has_reached_bottom = true;
+                },
+                reached_top:           function ()
+                {
+                    has_reached_top    = true;
+                },
+                reset_scroll:          function ()
+                {
+                    has_reached_bottom = false;
+                    has_reached_top    = false;
+                },
+                scrollViewTo:          scrollViewTo
+            };
         }());
         
         /****************************
@@ -1356,11 +1369,13 @@ if (window.opera) {
         lastLastIndex	= 0;
         i = 0;
         
-        if (limit === undefined || +limit < 0) {
+        if (typeof limit == "undefined" || +limit < 0) {
             limit = false;
         } else {
             limit = Math.floor(+limit);
-            if (!limit) return [];
+            if (!limit) {
+                return [];
+            }
         }
         if (s.global) {
             s.lastIndex = 0;
@@ -1377,7 +1392,7 @@ if (window.opera) {
                     match[0].replace(s2, function ()
                     {
                         for (j = 1; j < arguments.length - 2; ++j) {
-                            if (arguments[j] === undefined) {
+                            if (typeof arguments[j] == "undefined") {
                                 match[j] = undefined;
                             }
                         }
@@ -1385,13 +1400,15 @@ if (window.opera) {
                 }
                 
                 output = output.concat(this.slice(lastLastIndex, match.index));
-                if (1 < match.length && match.index < this.length) {
+                if (match.length > 1 && match.index < this.length) {
                     output = output.concat(match.slice(1));
                 }
                 lastLength		= match[0].length;
                 lastLastIndex	= s.lastIndex;
             }
-            if (emptyMatch) ++s.lastIndex;
+            if (emptyMatch) {
+                ++s.lastIndex;
+            }
         }
         output = lastLastIndex === this.length ? (s.test("") && !lastLength ? output : output.concat("")) : (limit ? output : output.concat(this.slice(lastLastIndex)));
         /// TODO: Determine if this next line of code is necessary.
