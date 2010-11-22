@@ -67,9 +67,9 @@ if (isset($_REQUEST['d'])) {
     $direction = ADDITIONAL;
 }
 
-/******************/
-/* Run the query. */
-/******************/
+/******************
+ * Run the query. *
+ ******************/
 
 if ($type == VERSE_LOOKUP) {
     require_once 'functions/database_lookup.php';

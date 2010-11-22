@@ -88,8 +88,8 @@ function standard_search($query, $direction, $limit, $start_id = 0, $output_JSON
     require_once 'functions/database.php';
     connect_to_database();
     
-    $SQL_query  = 'SELECT words FROM ' . BIBLE_VERSES . ' WHERE id IN (' . $simple_matches . ')';
-    $SQL_res    = mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
+    $SQL_query = 'SELECT words FROM ' . BIBLE_VERSES . ' WHERE id IN (' . $simple_matches . ')';
+    $SQL_res   = mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
     
     /// Convert SQL results into one comma delineated string.
     $verses_str = "";

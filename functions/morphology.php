@@ -67,8 +67,8 @@ function morphology_search($json, $direction, $limit, $start_id = 0)
     require_once 'functions/database.php';
     connect_to_database();
     
-    $SQL_query	= 'SELECT words FROM ' . BIBLE_VERSES . ' WHERE id IN (' . $simple_matches . ')';
-    $SQL_res	= mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
+    $SQL_query = 'SELECT words FROM ' . BIBLE_VERSES . ' WHERE id IN (' . $simple_matches . ')';
+    $SQL_res   = mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
     
     /// Convert SQL results into one comma delineated string.
     $verses_str = "";
@@ -101,73 +101,73 @@ function set_morphology_attributes($attribute_arr, $exclude_arr, $sphinx)
     foreach ((array)$attribute_arr as $key => $morphology_arr) {
         ///NOTE: Created in the Forge via grammar_constants_parser.php on 12-22-2009 from Grammar Constants.txt.
         switch ($morphology_arr[0]) {
-            case 1:
-                $attr = 'implied';
-                break;
-            case 2:
-                $attr = 'divine';
-                break;
-            case 3:
-                $attr = 'red';
-                break;
-            case 4:
-                $attr = 'part_of_speech';
-                break;
-            case 5:
-                $attr = 'number';
-                break;
-            case 6:
-                $attr = 'person';
-                break;
-            case 7:
-                $attr = 'tense';
-                break;
-            case 8:
-                $attr = 'voice';
-                break;
-            case 9:
-                $attr = 'mood';
-                break;
-            case 10:
-                $attr = 'gender';
-                break;
-            case 11:
-                $attr = 'case_5';
-                break;
-            case 12:
-                $attr = 'pronoun_type';
-                break;
-            case 13:
-                $attr = 'degree';
-                break;
-            case 14:
-                $attr = 'declinability';
-                break;
-            case 15:
-                $attr = 'numerical';
-                break;
-            case 16:
-                $attr = 'noun_type';
-                break;
-            case 17:
-                $attr = 'type';
-                break;
-            case 18:
-                $attr = 'dialect';
-                break;
-            case 19:
-                $attr = 'transitivity';
-                break;
-            case 20:
-                $attr = 'form';
-                break;
-            case 21:
-                $attr = 'miscellaneous';
-                break;
-            default:
-                ///TODO: Determine if an error should be thrown.
-                /// Skip the invalid grammatical form.
-                continue 2;
+        case 1:
+            $attr = 'implied';
+            break;
+        case 2:
+            $attr = 'divine';
+            break;
+        case 3:
+            $attr = 'red';
+            break;
+        case 4:
+            $attr = 'part_of_speech';
+            break;
+        case 5:
+            $attr = 'number';
+            break;
+        case 6:
+            $attr = 'person';
+            break;
+        case 7:
+            $attr = 'tense';
+            break;
+        case 8:
+            $attr = 'voice';
+            break;
+        case 9:
+            $attr = 'mood';
+            break;
+        case 10:
+            $attr = 'gender';
+            break;
+        case 11:
+            $attr = 'case_5';
+            break;
+        case 12:
+            $attr = 'pronoun_type';
+            break;
+        case 13:
+            $attr = 'degree';
+            break;
+        case 14:
+            $attr = 'declinability';
+            break;
+        case 15:
+            $attr = 'numerical';
+            break;
+        case 16:
+            $attr = 'noun_type';
+            break;
+        case 17:
+            $attr = 'type';
+            break;
+        case 18:
+            $attr = 'dialect';
+            break;
+        case 19:
+            $attr = 'transitivity';
+            break;
+        case 20:
+            $attr = 'form';
+            break;
+        case 21:
+            $attr = 'miscellaneous';
+            break;
+        default:
+            ///TODO: Determine if an error should be thrown.
+            /// Skip the invalid grammatical form.
+            continue 2;
         }
         
         $sphinx->SetFilter($attr, array((int)$morphology_arr[1]), (bool)$exclude_arr[$key]);

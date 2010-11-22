@@ -50,9 +50,9 @@ function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true, $
         /// The longest paragraph in the English version is 57 verses.  By selecting 90, it ensures that plenty of verses should be found.
         /// The limit must be at least that long because paragraphs cannot be split.
         ///TODO: Determine if $limit should be stored in a config file or variable somewhere (maybe in a builder).
-        $limit          = 90;
+        $limit                  = 90;
         $minimum_desired_verses = 40;
-        $extra_fields   = ', paragraph';
+        $extra_fields           = ', paragraph';
     } else {
         $extra_fields = "";
     }
