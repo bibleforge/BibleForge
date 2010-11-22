@@ -1016,7 +1016,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 add_content_if_needed(previous);
                 
                 update_verse_range();
-            }
+            };
             
             ///NOTE: get_verse_at_position is temporary.
             return {
