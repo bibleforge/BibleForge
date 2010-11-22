@@ -480,7 +480,24 @@
         show_configure_panel = (function ()
         {
             var panel_element   = document.createElement("div"),
-                settings_config = [{name: BF.lang.view, settings_value: "view", options: [{name: BF.lang.red_letters, type: "checkbox", settings_value: "red_letters"}, {name: BF.lang.paragraphs, type: "checkbox", settings_value: "in_paragraphs"}]}];
+                settings_config = [
+                    {
+                        name:     BF.lang.view,
+                        settings: "view",
+                        options:  [
+                            {
+                                name:     BF.lang.red_letters,
+                                type:     "checkbox",
+                                settings: "red_letters"
+                            },
+                            {
+                                name:     BF.lang.paragraphs,
+                                type:     "checkbox",
+                                settings: "in_paragraphs"
+                            }
+                        ]
+                    }
+                ];
             
             function create_element_from_config(config)
             {
@@ -551,7 +568,7 @@
                     label_el   = document.createElement("label");
                     
                     /// The label identifies with the input element via a unique id.
-                    label_el.htmlFor = context.settings[config.settings_value] + "_" + config.options[cur_option].settings_value;
+                    label_el.htmlFor = context.settings[config.settings] + "_" + config.options[cur_option].settings;
                     ///NOTE: document.createTextNode() is akin to innerText.  It does not inject HTML.
                     label_el.appendChild(document.createTextNode(config.options[cur_option].name));
                     table_cell.appendChild(label_el);
@@ -560,7 +577,7 @@
                     table_cell = table_row.insertCell(-1);
                     
                     /// Create the function that changes the proper settings before the switch statement so that it can be used multiple times inside of it.
-                    apply_change = make_apply_change(context.settings[config.settings_value], config.options[cur_option].settings_value);
+                    apply_change = make_apply_change(context.settings[config.settings], config.options[cur_option].settings);
                     
                     switch (config.options[cur_option].type) {
                     case "checkbox":
@@ -568,7 +585,7 @@
                         input_el.type = "checkbox";
                         
                         /// Set the current value.
-                        input_el.checked = context.settings[config.settings_value][config.options[cur_option].settings_value].get();
+                        input_el.checked = context.settings[config.settings][config.options[cur_option].settings].get();
                         
                         input_el.onclick = make_checkbox_onclick(apply_change);
                     }
@@ -633,14 +650,32 @@
             wrench_button.className += " activeWrenchIcon";
             
             ///TODO: These need to be language specific.
-            show_context_menu(wrench_pos.left, wrench_pos.top + wrench_button.offsetHeight, [{text: BF.lang.configure, link: show_configure_panel}, {line: true, text: BF.lang.blog, link: "http://blog.bibleforge.com"}, {text: BF.lang.about, link: "http://bibleforge.wordpress.com/about/"}, {text: BF.lang.help, link: show_help_panel}], function ()
+            show_context_menu(wrench_pos.left, wrench_pos.top + wrench_button.offsetHeight, [
+                {
+                    text: BF.lang.configure,
+                    link: show_configure_panel
+                },
+                {
+                    line: true,
+                    text: BF.lang.blog,
+                    link: "http://blog.bibleforge.com"
+                },
+                {
+                    text: BF.lang.about,
+                    link: "http://bibleforge.wordpress.com/about/"
+                },
+                {
+                    text: BF.lang.help,
+                    link: show_help_panel
+                }
+            ], function ()
             {
                 /// Because the context menu is open, make the wrench button look pressed.
                 wrench_button.className += " activeWrenchIcon";
             }, function ()
             {
                 /// When the menu closes, the wrench button should no longer look pressed.
-                wrench_button.className = "wrenchIcon";
+                wrench_button.className  = "wrenchIcon";
             });
             
             /// Stop the even from bubbling so that document.onclick() does not fire and attempt to close the menu immediately.
