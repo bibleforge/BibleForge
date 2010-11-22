@@ -1170,7 +1170,12 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         ///TODO: Determine if there is any problem hitting the server again so quickly.
         window.setTimeout(function ()
         {
-            BF.include("js/secondary.js", {settings: settings, topBar: viewPort.firstChild, viewPort_num: viewPort_num, page: page});
+            BF.include("js/secondary.js", {
+                settings:     settings,
+                topBar:       viewPort.firstChild,
+                viewPort_num: viewPort_num,
+                page:         page
+            });
         }, 1000);
     }());
     
