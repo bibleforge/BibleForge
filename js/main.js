@@ -936,7 +936,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         /// Display the verse range on the page if looking up verses.
                         ///FIXME: There should be a variable that shows the current view mode and not rely on last_type.
                         if (last_type == verse_lookup) {
-                            ///TODO: Find a better way to clear infoBar than innerHTML.
+                            ///TODO: Find a better way to clear infoBar than using innerHTML.
                             infoBar.innerHTML = "";
                             infoBar.appendChild(document.createTextNode(ref_range));
                         }
@@ -980,8 +980,11 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             padding_el.style.height = (pixels_needed + extra_padding) + 'px';
                             viewPort.insertBefore(padding_el, null);
                             
+                            /// Create a timer to check to see if the padding is no longer needed.
+                            ///NOTE: The padding element should be removed when more text loaded or the user scrolls up.
                             padding_interval = window.setInterval(function ()
                             {
+                                ///TODO: Document what scrollHeight, pageYOffset, and clientHeight actually measure.
                                 if (doc_docEl.scrollHeight - (window.pageYOffset + doc_docEl.clientHeight) > pixels_needed + extra_padding) {
                                     viewPort.removeChild(padding_el);
                                     window.clearInterval(padding_interval);
