@@ -306,8 +306,9 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             previous   = 2,
             
             /// Objects
+            content_manager,
             settings,
-            content_manager;
+            query_manager;
         
         /// Keep track of which view port this is.
         ///NOTE: In the future, there may be a split view mode.  Currently, this is NOT used.
@@ -1028,7 +1029,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                  * @note   Called by prepare_new_search().
                  * @todo   Determine if this is a good place for this function.
                  */
-                clear_scroll:          function ()
+                clear_scroll: function ()
                 {
                     /// Clear cache.
                     ///TODO: Determine a way to store the cache in a way that it can be used later.
@@ -1044,20 +1045,20 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 },
                 get_verse_at_position: get_verse_at_position, /// TEMP
                 update_verse_range:    update_verse_range,
-                reached_bottom:        function ()
+                reached_bottom: function ()
                 {
                     has_reached_bottom = true;
                 },
-                reached_top:           function ()
+                reached_top: function ()
                 {
-                    has_reached_top    = true;
+                    has_reached_top = true;
                 },
-                reset_scroll:          function ()
+                reset_scroll: function ()
                 {
                     has_reached_bottom = false;
                     has_reached_top    = false;
                 },
-                scrollViewTo:          scrollViewTo
+                scrollViewTo: scrollViewTo
             };
         }());
         
