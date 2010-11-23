@@ -1076,9 +1076,14 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             
             function create_query_message(options)
             {
+                ///FIXME: How does the context variable follow along with the Ajax?
+                ///       Should this function also send the query?
+                ///       Or should it return an object with the context and message as different properties?  return {message: query_str, context: context};
+                ///       Creating context out of options seems to be pointlessly redundant, except for in_paragraphs.
                 var context = {
                     direction:     options.direction,
                     in_paragraphs: settings.view.in_paragraphs.get(),
+                    search_terms:  options.search_terms,
                     type:          options.type,
                     verse:         options.verse
                 },
@@ -1087,15 +1092,31 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 query_str = "t=" + context.type;
                 
                 if (context.type === verse_lookup) {
-                    ///NOTE: Queries are asumed to be additional unless otherwise stated.
+                    query_str += "&q=" + context.verse;
+                    
+                    ///NOTE: Lookups are assumed to be in paragraph mode; therefore, p only needs to be set if it is not in paragraph mode.
+                    if (!context.in_paragraphs) {
+                        query_str += "&p=0";
+                    }
+                    
+                    ///NOTE: Queries are assumed to be additional unless; therefore, d only needs to be set for previous lookups.
                     if (context.direction == previous) {
                         query_str += "&d=" + context.direction;
+                        
                     /// Is it possible that this query does not begin at a paragraph break?
-                    ///NOTE: This can only be for intial verse lookups (which are always additional) that do not start at verse 1 or 0.
+                    ///NOTE: This can only be for initial verse lookups (which are always additional) that do not start at verse 1 or 0.
                     } else if (options.initial_query && context.in_paragraphs && context.verse % 1000 > 1) {
                         query_str += "&f=1";
                     }
+                } else {
+                    ///TODO: Make sure that the search terms get window.encodeURIComponent() encoded.
+                    query_str += "&q=" + options.encoded_search_terms;
+                    
+                    if (context.verse) {
+                        query_str += "&s=" + context.verse;
+                    }
                 }
+                
                 return query_str;
             }
             
@@ -1110,7 +1131,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     ajax_additional.abort();
                     ajax_previous.abort();
                     
-                    /// Initial queries may need special options (e.g., the f variable (to find paragraph breaks) is only passed on intial queries).
+                    /// Initial queries may need special options (e.g., the f variable (to find paragraph breaks) is only passed on initial queries).
                     options.initial_query = true;
                     
                     ajax_additional.query("post", "query.php", create_query_message(options), function ()
