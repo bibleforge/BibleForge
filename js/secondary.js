@@ -668,14 +668,16 @@
                     text: BF.lang.help,
                     link: show_help_panel
                 }
-            ], function ()
+            ],
+            function ()
             {
                 /// Because the context menu is open, make the wrench button look pressed.
                 wrench_button.className += " activeWrenchIcon";
-            }, function ()
+            },
+            function ()
             {
                 /// When the menu closes, the wrench button should no longer look pressed.
-                wrench_button.className  = "wrenchIcon";
+                wrench_button.className = "wrenchIcon";
             });
             
             /// Stop the even from bubbling so that document.onclick() does not fire and attempt to close the menu immediately.
