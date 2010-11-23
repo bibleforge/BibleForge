@@ -1081,9 +1081,22 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     in_paragraphs: settings.view.in_paragraphs.get(),
                     type:          options.type,
                     verse:         options.verse
-                };
+                },
+                    query_str;
                 
+                query_str = "t=" + context.type;
                 
+                if (context.type === verse_lookup) {
+                    ///NOTE: Queries are asumed to be additional unless otherwise stated.
+                    if (context.direction == previous) {
+                        query_str += "&d=" + context.direction;
+                    /// Is it possible that this query does not begin at a paragraph break?
+                    ///NOTE: This can only be for intial verse lookups (which are always additional) that do not start at verse 1 or 0.
+                    } else if (options.initial_query && context.in_paragraphs && context.verse % 1000 > 1) {
+                        query_str += "&f=1";
+                    }
+                }
+                return query_str;
             }
             
             return {
@@ -1096,6 +1109,9 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     /// Stop any old requests since we have a new one.
                     ajax_additional.abort();
                     ajax_previous.abort();
+                    
+                    /// Initial queries may need special options (e.g., the f variable (to find paragraph breaks) is only passed on intial queries).
+                    options.initial_query = true;
                     
                     ajax_additional.query("post", "query.php", create_query_message(options), function ()
                     {
