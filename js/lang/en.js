@@ -9,8 +9,8 @@
  */
 
 /// Set JSLint options.
-/*global window */
-/*jslint white: true, browser: true, devel: true, evil: true, forin: true, onevar: true, undef: true, nomen: true, bitwise: true, newcap: true, immed: true */
+/*global window, BF */
+/*jslint white: true, browser: true, devel: true, evil: true, onevar: true, undef: true, nomen: true, bitwise: true, newcap: true, immed: true */
 
 /**
  * Create the BibleForge language specific object for the English language.
@@ -299,7 +299,7 @@ BF.lang = (function ()
             {
                 var count           = 0,
                     highlight_regex = [],
-                    i,
+                    i               = 0,
                     j,
                     len_before,
                     len_after,
@@ -307,15 +307,17 @@ BF.lang = (function ()
                     term,
                     stemmed_arr     = [],
                     search_terms_arr,
+                    search_terms_arr_len,
                     stemmed_word;
                 
-                search_terms_arr = filter_terms_for_highlighter(search_terms);
+                search_terms_arr     = filter_terms_for_highlighter(search_terms);
+                search_terms_arr_len = search_terms_arr.length;
                 
                 ///TODO: Determine if a normal for loop would be better.
-                first_loop:
-                for (i in search_terms_arr) {
-                    term		= search_terms_arr[i];
-                    len_before	= term.length;
+first_loop:     while (i < search_terms_arr_len) {
+                    term       = search_terms_arr[i];
+                    len_before = term.length;
+                    ++i;
                     
                     /// Fix special/unique words that the stemmer won't stem correctly.
                     switch (term) {

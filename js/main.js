@@ -10,7 +10,7 @@
 
 /// Set JSLint options.
 /*global window, BF */
-/*jslint white: true, browser: true, devel: true, evil: true, forin: true, onevar: true, undef: true, nomen: true, bitwise: true, newcap: true, immed: true */
+/*jslint white: true, browser: true, devel: true, evil: true, onevar: true, undef: true, nomen: true, bitwise: true, newcap: true, immed: true */
 
 /// Declare helper function(s) attached to the global BibleForge object (BF).
 
