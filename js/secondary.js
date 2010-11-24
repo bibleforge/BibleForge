@@ -77,7 +77,7 @@
         /**
          * Display the context menu.
          *
-         * @example open_menu(leftOffset, topOffset, [{text: "Menu Item 1", link: "http://link.com"}, [text: "Menu Item 2", link: some_function, true}]); /// Creates a menu with one external link and one link that runs a function with a line break separating the two.
+         * @example open_menu(leftOffset, topOffset, [{text: "Menu Item 1", link: "http://link.com"}, [text: "Menu Item 2", link: some_function, line: true}]); /// Creates a menu with one external link and one link that runs a function with a line break separating the two.
          * @param   x_pos          (number)              The X position of the menu.
          * @param   y_pos          (number)              The Y position of the menu.
          * @param   menu_items     (array)               An array containing object(s) specifying the text of the menu items, the corresponding links, and whether or not to add a line break.
@@ -103,7 +103,7 @@
                 /// If the link is a string, then it is simply a URL; otherwise, it is a function.
                 if (typeof menu_items[i].link == "string") {
                     menu_item.href   = menu_items[i].link;
-                    /// Force links open in a new tab.
+                    /// Force links to open in a new tab.
                     menu_item.target = "_blank";
                 } else {
                     ///TODO: Create a useful hash value.
@@ -165,7 +165,7 @@
         /**
          * Handle opening the context menu, even if one is already open.
          *
-         * @example show_context_menu(leftOffset, topOffset, [{text: "Menu Item 1", link: "http://link.com"}, [text: "Menu Item 2", link: some_function, true}]); /// Creates a menu with one external link and one link that runs a function with a line break separating the two.
+         * @example show_context_menu(leftOffset, topOffset, [{text: "Menu Item 1", link: "http://link.com"}, [text: "Menu Item 2", link: some_function, line: true}]); /// Creates a menu with one external link and one link that runs a function with a line break separating the two.
          * @param   x_pos          (number)              The X position of the menu.
          * @param   y_pos          (number)              The Y position of the menu.
          * @param   menu_items     (array)               An array containing object(s) specifying the text of the menu items, the corresponding links, and whether or not to add a line break.
