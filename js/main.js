@@ -192,7 +192,8 @@ BF.get_position = function (obj)
         do {
             left_pos += obj.offsetLeft;
             top_pos  += obj.offsetTop;
-        } while (obj = obj.offsetParent);
+        ///NOTE: The condition intentionally assigns obj.offsetParent to obj, which is falsey (null) when no more parents exist.
+        } while ((obj = obj.offsetParent));
     }
     
     return {
