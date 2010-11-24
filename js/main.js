@@ -1077,44 +1077,38 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             
             function create_query_message(options)
             {
-                ///FIXME: How does the context variable follow along with the Ajax?
-                ///       Should this function also send the query?
-                ///       Or should it return an object with the context and message as different properties?  return {message: query_str, context: context};
-                ///       Creating context out of options seems to be pointlessly redundant, except for in_paragraphs.
-                var context = {
-                    direction:     options.direction,
-                    in_paragraphs: settings.view.in_paragraphs.get(),
-                    search_terms:  options.search_terms,
-                    type:          options.type,
-                    verse:         options.verse
-                },
-                    query_str;
+                /// Query Variables:
+                /// d Direction (number)  The direction of the query (additional, previous).       (lookup only)
+                /// f Find      (boolean) Whether or not to find a paragraph break to start at.   (lookup only)
+                /// p Paragraph (boolean) Whether or not verses will be displayed in paragraphs.  (lookup only)
+                /// q Query     (string)  The verse reference or search string to query.
+                /// s Start at  (string)  The verse id at which to start the query,               (search only)
+                /// t Type      (number)  The type of query (verse_lookup, mixed_search, standard_search, grammatical_search).
+                var query_str = "t=" + options.type;
                 
-                query_str = "t=" + context.type;
-                
-                if (context.type === verse_lookup) {
-                    query_str += "&q=" + context.verse;
+                if (options.type === verse_lookup) {
+                    query_str += "&q=" + options.verse;
                     
-                    ///NOTE: Lookups are assumed to be in paragraph mode; therefore, p only needs to be set if it is not in paragraph mode.
-                    if (!context.in_paragraphs) {
+                    ///NOTE: Paragraph mode is default for verse lookups; therefore, p only needs to be set if it is not in paragraph mode.
+                    if (!options.in_paragraphs) {
                         query_str += "&p=0";
                     }
                     
-                    ///NOTE: Queries are assumed to be additional unless; therefore, d only needs to be set for previous lookups.
-                    if (context.direction == previous) {
-                        query_str += "&d=" + context.direction;
+                    ///NOTE: Queries are additional by default; therefore, d only needs to be set for previous lookups.
+                    if (options.direction == previous) {
+                        query_str += "&d=" + options.direction;
                         
                     /// Is it possible that this query does not begin at a paragraph break?
-                    ///NOTE: This can only be for initial verse lookups (which are always additional) that do not start at verse 1 or 0.
-                    } else if (options.initial_query && context.in_paragraphs && context.verse % 1000 > 1) {
+                    ///NOTE: This can only be initial verse lookups (which are always additional; hence the else if) that do not start at verse 1 or 0.
+                    } else if (options.initial_query && options.in_paragraphs && options.verse % 1000 > 1) {
                         query_str += "&f=1";
                     }
                 } else {
                     ///TODO: Make sure that the search terms get window.encodeURIComponent() encoded.
                     query_str += "&q=" + options.encoded_search_terms;
                     
-                    if (context.verse) {
-                        query_str += "&s=" + context.verse;
+                    if (options.verse) {
+                        query_str += "&s=" + options.verse;
                     }
                 }
                 
@@ -1134,6 +1128,9 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     
                     /// Initial queries may need special options (e.g., the f variable (to find paragraph breaks) is only passed on initial queries).
                     options.initial_query = true;
+                    
+                    /// Since this settings can be changed by the user at run time, it must be retrieved before each query.
+                    options.in_paragraphs = settings.view.in_paragraphs.get();
                     
                     ajax_additional.query("post", "query.php", create_query_message(options), function ()
                     {
@@ -1276,6 +1273,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     /// Mainly, this is used to determine the different parts of a grammatical search.
                     ///FIXME: Implement mixed searching (grammatical and standard together, e.g., "love AS NOUN & more").
                     query = determine_search_type(query);
+                    
+                    ///TODO: Figure out where to set options.encoded_search_terms gets window.encodeURIComponent() encoded.
                     
                     /// Is the query mixed (both standard and grammatical)?
                     if (query.length > 1) {
