@@ -751,12 +751,15 @@ first_loop:     while (i < search_terms_arr_len) {
                 verse	= "001";
                 
                 /// Finally, we need to determine the chapter and/or verse reference is they are supplied.
+                ///TODO: Explain regex and give examples.
                 cv = ref.split(/\s*([0-9]{1,3})(?:[:.;,\s]([0-9]{0,3})[\-0-9]*)?$/);
                 
                 if (cv.length > 1) {
+                    ///TODO: Determine if this should be !==.
                     if (cv[1] != "") {
                         chapter = cv[1] + "";
                     }
+                    ///TODO: Determine if this should be !==.
                     if (cv[2] != "" && typeof cv[2] != "undefined") {
                         verse = cv[2] + "";
                     } else {
