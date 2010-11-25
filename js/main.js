@@ -1186,11 +1186,13 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     }
                     
                     ///NOTE: .replace(/(["'])/g, "\\$1") adds slashes to sanitize the data.  (It is essentially the same as addslashes() in PHP.)
+                    ///TODO: Determine if the entire query should be passed through encodeURIComponent().  It would make the text much longer.
                     grammar_json = '["' + window.encodeURIComponent(grammar_search_term.replace(/(["'])/g, "\\$1")) + '",[';
                     
                     /// Get the grammatical attributes (e.g., in "go AS IMPERATIVE, -SINGULAR", grammar_attributes = IMPERATIVE, -SINGULAR").
                     grammar_attributes = search_terms.slice(split_pos + BF.lang.grammar_marker_len);
-                    split_start        = 0;
+                    
+                    split_start = 0;
                     
                     ///TODO: Determine if there is a benefit to using do() over while().
                     ///NOTE: An infinite loop is used because the data is returned when it reaches the end of the string.
