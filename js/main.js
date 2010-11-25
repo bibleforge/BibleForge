@@ -1104,8 +1104,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         query_str += "&f=1";
                     }
                 } else {
-                    ///TODO: Make sure that the search terms get window.encodeURIComponent() encoded.
-                    query_str += "&q=" + options.encoded_search_terms;
+                    query_str += "&q=" + options.query;
                     
                     if (options.verse) {
                         query_str += "&s=" + options.verse;
@@ -1128,7 +1127,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     
                     /// Initial queries may need special options (e.g., the f variable (to find paragraph breaks) is only passed on initial queries).
                     options.initial_query = true;
-                    
+                    /// Initial queries are always additional.
+                    options.direction     = additional;
                     /// Since this settings can be changed by the user at run time, it must be retrieved before each query.
                     options.in_paragraphs = settings.view.in_paragraphs.get();
                     
@@ -1162,10 +1162,10 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
              */
             function determine_search_type(search_terms)
             {
-                var exclude_json			= "",	/// Used to concatenate data. TODO: Make description better.
-                    grammar_attribute_json	= "",	/// Used to concatenate data. TODO: Make description better.
+                var exclude_json           = "", /// Used to concatenate data. TODO: Make description better.
+                    grammar_attribute_json = "", /// Used to concatenate data. TODO: Make description better.
                     grammar_attributes,
-                    grammar_json			= "",	/// Used to concatenate data. TODO: Make description better.
+                    grammar_json           = "", /// Used to concatenate data. TODO: Make description better.
                     grammar_search_term,
                     split_start,
                     split_pos;
@@ -1185,8 +1185,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         grammar_search_term = "";
                     }
                     
-                    ///NOTE: replace(/(["'])/g, "\\$1") adds slashes to sanitize the data.  (It is essentially the same as addslashes() in PHP.)
-                    grammar_json = '["' + grammar_search_term.replace(/(["'])/g, "\\$1") + '",[';
+                    ///NOTE: .replace(/(["'])/g, "\\$1") adds slashes to sanitize the data.  (It is essentially the same as addslashes() in PHP.)
+                    grammar_json = '["' + window.encodeURIComponent(grammar_search_term.replace(/(["'])/g, "\\$1")) + '",[';
                     
                     /// Get the grammatical attributes (e.g., in "go AS IMPERATIVE, -SINGULAR", grammar_attributes = IMPERATIVE, -SINGULAR").
                     grammar_attributes = search_terms.slice(split_pos + BF.lang.grammar_marker_len);
@@ -1215,15 +1215,16 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             ///NOTE: The slice() function separates the various grammatical attributes and then that word is
                             ///      looked up in the grammar_keywords object in order to find the JSON code to send to the server.
                             grammar_attribute_json += BF.lang.grammar_keywords[grammar_attributes.slice(split_start, split_pos).trim()] + ",";
+                            
                             split_start = split_pos + 1;
                         } else {
                             ///TODO: Determine if trim() is necessary or if there is a better implementation.
                             ///NOTE: exclude_json.slice(0, -1) is used to remove the trailing comma.  This could be unnecessary.
                             return [
                                 {
-                                    type:  grammatical_search,
                                     ///TODO: Document what is going on here.
                                     query: grammar_json + grammar_attribute_json + BF.lang.grammar_keywords[grammar_attributes.slice(split_start).trim()] + "],[" + exclude_json.slice(0, -1) + "]]"
+                                    type:  grammatical_search,
                                 }
                             ];
                         }
@@ -1233,8 +1234,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 /// The search is just a standard search, so just return the type and the original query.
                 return [
                     {
+                        query: window.encodeURIComponent(search_terms)
                         type:  standard_search,
-                        query: search_terms
                     }
                 ];
             }
@@ -1244,8 +1245,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 /// Step 1: Prepare string and check to see if we need to search (not empty)
                 
                 ///NOTE: Whitespace must be trimmed after this function because it may create excess whitespace.
-                var query = BF.lang.prepare_search(raw_query).trim(),
-                    query_type,
+                var options = {raw_query: raw_query},
+                    query   = BF.lang.prepare_search(raw_query).trim(),
                     verse_id;
                 
                 if (query === "") {
@@ -1257,7 +1258,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 
                 /// Determine if the user is preforming a search or looking up a verse.
                 /// If the query is a verse reference, a number is returned, if it is a search, then FALSE is returned.
-                verse_id = BF.lang.determine_reference(last_search_prepared);
+                verse_id = BF.lang.determine_reference(query);
                 
                 /// Is the query a verse lookup?
                 if (verse_id !== false) {
@@ -1266,32 +1267,29 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     if (verse_id > 19003000 && verse_id < 19145002 && verse_id % 1000 === 1) {
                         --verse_id;
                     }
-                    query      = verse_id;
-                    query_type = verse_lookup;
+                    options.verse = verse_id;
+                    options.type  = verse_lookup;
                 } else {
                     /// Break down the query string into separate components.
                     /// Mainly, this is used to determine the different parts of a grammatical search.
                     ///FIXME: Implement mixed searching (grammatical and standard together, e.g., "love AS NOUN & more").
                     query = determine_search_type(query);
                     
-                    ///TODO: Figure out where to set options.encoded_search_terms gets window.encodeURIComponent() encoded.
-                    
                     /// Is the query mixed (both standard and grammatical)?
                     if (query.length > 1) {
-                        query_type = mixed_search;
+                        options.query = query;
+                        options.type  = mixed_search;
                     } else {
-                        ///NOTE: If it is not mixed, then there is currently only one array element.
-                        query_type = query[0].type;
+                        ///NOTE: If it is not mixed, then there is currently only one array element, so get the variables out of it.
+                        options.query = query[0].query;
+                        options.type  = query[0].type;
                     }
                 }
                 
                 /// Step 3: Request results
                 
-                ///TODO: Implement
-                ///NOTE: Don't forget to window.encodeURIComponent(query).
-                
                 /// Prepare the initial query, create functions to handle additional and previous queries.
-                query_manager.query(query, query_type);
+                query_manager.query(options);
                 
                 
                 
@@ -1307,14 +1305,14 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 q_obj.onblur = function () {};
                 
                 /// Was the query a search?  Searches need to have the highlighter function prepared for the incoming results.
-                if (query_type != verse_lookup) {
+                if (options.type != verse_lookup) {
                     highlight_regex = BF.prepare_highlighter(query);
                 }
                 
                 /// Is there any chance that there are verses above the starting verse?
                 /// Or, in other words, is the query a search or a verse lookup starting at Genesis 1:1?
                 ///NOTE: In the future, it may be possible for searches to start midway.
-                if (query_type != verse_lookup || verse_id == "1001001") {
+                if (options.type != verse_lookup || options.verse == "1001001") {
                     /// There is no reason to look for previous verses when the results start at the beginning.
                     content_manager.reached_top();
                 }
