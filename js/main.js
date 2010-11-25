@@ -1114,34 +1114,45 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 return query_str;
             }
             
-            return {
-                query_additional: function ()
-                {
-                    
-                },
-                query: function (options)
-                {
-                    /// Stop any old requests since we have a new one.
-                    ajax_additional.abort();
-                    ajax_previous.abort();
-                    
-                    /// Initial queries may need special options (e.g., the f variable (to find paragraph breaks) is only passed on initial queries).
-                    options.initial_query = true;
-                    /// Initial queries are always additional.
-                    options.direction     = additional;
-                    /// Since this settings can be changed by the user at run time, it must be retrieved before each query.
-                    options.in_paragraphs = settings.view.in_paragraphs.get();
-                    
-                    ajax_additional.query("post", "query.php", create_query_message(options), function ()
-                    {
-                        /// success
-                    });
-                },
-                query_previous: function ()
+            return (function ()
+            {
+                function handle_new_verses(res, options)
                 {
                     
                 }
-            };
+                
+                return {
+                    query_additional: function ()
+                    {
+                        
+                    },
+                    query: function (options)
+                    {
+                        /// Stop any old requests since we have a new one.
+                        ajax_additional.abort();
+                        ajax_previous.abort();
+                        
+                        /// Initial queries may need special options (e.g., the f variable (to find paragraph breaks) is only passed on initial queries).
+                        options.initial_query = true;
+                        /// Initial queries are always additional.
+                        options.direction     = additional;
+                        /// Since this settings can be changed by the user at run time, it must be retrieved before each query.
+                        options.in_paragraphs = settings.view.in_paragraphs.get();
+                        
+                        ajax_additional.query("post", "query.php", create_query_message(options), function (data)
+                        {
+                            /// On Success
+                            ///TODO: What should be done from here?  Should it be sent to a function, like handle_new_verses()?
+                            ///TODO: Consider using JSON.parse() again.
+                            handle_new_verses(eval("(" + data + ")"), options);
+                        });
+                    },
+                    query_previous: function ()
+                    {
+                        
+                    }
+                };
+            }());
         }());
         
         run_new_query = (function ()
