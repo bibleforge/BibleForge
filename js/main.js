@@ -1311,9 +1311,10 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     highlight_regex = BF.prepare_highlighter(query);
                 }
                 
-                /// Is the query a search or a verse lookup starting at Genesis 1:1?
+                /// Is there any chance that there are verses above the starting verse?
+                /// Or, in other words, is the query a search or a verse lookup starting at Genesis 1:1?
                 ///NOTE: In the future, it may be possible for searches to start midway.
-                if (query_type != verse_lookup || verse_id == "10100101") {
+                if (query_type != verse_lookup || verse_id == "1001001") {
                     /// There is no reason to look for previous verses when the results start at the beginning.
                     content_manager.reached_top();
                 }
