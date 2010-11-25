@@ -1236,8 +1236,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             return [
                                 {
                                     ///TODO: Document what is going on here.
-                                    query: grammar_json + grammar_attribute_json + BF.lang.grammar_keywords[grammar_attributes.slice(split_start).trim()] + "],[" + exclude_json.slice(0, -1) + "]]"
-                                    type:  grammatical_search,
+                                    query: grammar_json + grammar_attribute_json + BF.lang.grammar_keywords[grammar_attributes.slice(split_start).trim()] + "],[" + exclude_json.slice(0, -1) + "]]",
+                                    type:  grammatical_search
                                 }
                             ];
                         }
@@ -1247,8 +1247,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 /// The search is just a standard search, so just return the type and the original query.
                 return [
                     {
-                        query: window.encodeURIComponent(search_terms)
-                        type:  standard_search,
+                        query: window.encodeURIComponent(search_terms),
+                        type:  standard_search
                     }
                 ];
             }
