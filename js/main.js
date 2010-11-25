@@ -1398,12 +1398,11 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
 ///TODO: Remove this as soon as a non-JavaScript version of BibleForge is ready.
 if (!"".trim) {
     /**
-     * Removes leading and trailing spaces.
+     * Extend the String Prototype to remove leading and trailing spaces.
      *
-     * @example	trimmed = trim("  God is   good  "); /// Returns "God is   good"
-     * @param	str (string) The string to trim.
-     * @return	A String with leading and trailing spaces removed.
-     * @note	This does not remove all types of whitespace.  It actually removes anything under character code 33.
+     * @example trimmed = "  God is   good  ".trim(); /// Returns "God is   good"
+     * @return  A string with leading and trailing spaces removed.
+     * @note    This does not remove all types of whitespace.  It actually removes anything under character code 33.
      */
     String.prototype.trim = function ()
     {
