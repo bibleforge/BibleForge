@@ -92,6 +92,8 @@ BF.create_simple_ajax = function ()
                 
                 ///TODO: determine if the first parameter should be different.
                 ajax.open(method, path);
+                /// Without the correct content-type, the data in the message will not become variables on the server.
+                ajax.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
                 ajax.onreadystatechange = function ()
                 {
                     if (ajax.readyState == 4) {
