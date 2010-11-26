@@ -27,7 +27,7 @@ function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true, $
     ///TODO: Determine if $verse_id < 1001001 should default to 1001001 and $verse_id > 66022021 to 66022021.
     ///TODO: 66022021 may need to be language dependent because different languages have different verse breaks.
     if ($verse_id < 1001001 || $verse_id > 66022021) {
-        echo '{n:[],v:[],t:0}';
+        echo '0';
         die;
     }
     
@@ -125,7 +125,7 @@ function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true, $
         }
         
         ///FIXME: handle_new_verses() in js/main.js is expecting the total number of verses, not success/fail for the last value.
-        echo '{n:[', implode(',', $verse_numbers), '],v:["', implode('","', $verse_HTML), '"],p:[', implode(',', $paragraphs), '],t:1}';
+        echo '{"n":[', implode(',', $verse_numbers), '],"v":["', implode('","', $verse_HTML), '"],"p":[', implode(',', $paragraphs), '],"t":1}';
         
         /// Flush the results to the server as quickly as possible because it may take a while for the 
         /// script to end because it has to fetch and clear the MySQL buffer.
@@ -155,7 +155,7 @@ function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true, $
         ///NOTE:  rtrim(..., ',') removes trailing commas.  It seems to be slightly faster than substr(..., 0, -1).
         ///TODO:  It would be nice to indicate if there are no more verses to find when it gets to the end.
         ///FIXME: handle_new_verses() in js/main.js is expecting the total number of verses, not success/fail for the last value.
-        echo '{n:[', rtrim($verses_num, ','), '],v:[', rtrim($verses_str, ','), '],t:1}';
+        echo '{"n":[', rtrim($verses_num, ','), '],"v":[', rtrim($verses_str, ','), '],"t":1}';
     }
     die;
 }
