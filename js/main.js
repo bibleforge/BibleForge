@@ -14,6 +14,20 @@
 
 /// Declare helper function(s) attached to the global BibleForge object (BF).
 
+BF.is_WebKit = window.chrome || /AppleWebKit\//.test(window.navigator.userAgent);
+
+/// The status of JSON.parse() vs eval()/Function Constructor:
+/// Firefox: 3.6:    eval() is slightly faster.
+/// Firefox: 4 beta: JSON.parse() is slightly faster.
+/// Chrome 7:        Function Constructor is much faster.
+/// Chrome 9 dev:    Function Constructor is 10x faster.
+/// Opera 10.63:     They are equivalent.
+/// Safari 5.0.3:    eval() is a little faster.
+BF.parse_json = (window.chrome ? function (str)
+{
+	return (new Function("return " + str))();
+} : JSON.parse);
+
 BF.create_simple_ajax = function ()
 {
     var ajax = new window.XMLHttpRequest(),
@@ -1118,9 +1132,10 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             
             return (function ()
             {
-                function handle_new_verses(res, options)
+                function handle_new_verses(data, options)
                 {
-                    
+                    data = BF.parse_json(data);
+                    alert(data.n);
                 }
                 
                 return {
@@ -1145,8 +1160,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         {
                             /// On Success
                             ///TODO: What should be done from here?  Should it be sent to a function, like handle_new_verses()?
-                            ///TODO: Consider using JSON.parse() again.
-                            handle_new_verses(eval("(" + data + ")"), options);
+                            ///TODO: Removed unnecessary slashes from verse data.
+                            handle_new_verses(data, options);
                         });
                     },
                     query_previous: function ()
@@ -1486,7 +1501,7 @@ document.onkeydown = function (e)
  ******************************/
 
 /// Is the browser Chromium or WebKit based?
-if (window.chrome || /AppleWebKit\//.test(window.navigator.userAgent)) {
+if (BF.is_WebKit) {
     /// Inject CSS to make the drop caps aligned with the second line of text and add an inset shadow to the input box.
     ///NOTE: Needed for at least Chromium 8.
     ///TODO: Determine if this would be better as a function.
