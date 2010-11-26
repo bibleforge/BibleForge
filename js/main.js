@@ -14,15 +14,13 @@
 
 /// Declare helper function(s) attached to the global BibleForge object (BF).
 
-BF.is_WebKit = window.chrome || /AppleWebKit\//.test(window.navigator.userAgent);
+/// Detect WebKit based browsers.
+///NOTE: Since the user agent string can be modified by the user, it is not bulletproof.
+BF.is_WebKit = window.chrome || /WebKit\//.test(window.navigator.userAgent);
 
-/// The status of JSON.parse() vs eval()/Function Constructor:
-/// Firefox: 3.6:    eval() is slightly faster.
-/// Firefox: 4 beta: JSON.parse() is slightly faster.
-/// Chrome 7:        Function Constructor is much faster.
-/// Chrome 9 dev:    Function Constructor is 10x faster.
-/// Opera 10.63:     They are equivalent.
-/// Safari 5.0.3:    eval() is a little faster.
+/// NOTE: Usually, eval() and JSON.parse() are similar in speed and the Function Constructor is really slow.
+///       However, in Chrome, eval() is really fast, the Function Constructor is even faster, and JSON.parse() is ridiculously slow.
+///       Therefore, use the Function Constructor for Chrome and JSON.parse() for all others.
 BF.parse_json = (window.chrome ? function (str)
 {
 	return (new Function("return " + str))();
