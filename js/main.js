@@ -1614,7 +1614,9 @@ if (window.opera) {
             output,
             s2;
         
-        if (!(s instanceof RegExp)) return String.prototype._$$split.apply(this, arguments);
+        if (!(s instanceof RegExp)) {
+            return String.prototype._$$split.apply(this, arguments);
+        }
         
         flags			= (s.global ? "g" : "") + (s.ignoreCase ? "i" : "") + (s.multiline ? "m" : "");
         s2				= new RegExp("^" + s.source + "$", flags);
