@@ -1089,9 +1089,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         query_manager = (function ()
         {
             var ajax_additional = BF.create_simple_ajax(),
-                ajax_previous   = BF.create_simple_ajax(),
-                
-                highlight_regex;
+                ajax_previous   = BF.create_simple_ajax();
             
             function create_query_message(options)
             {
@@ -1393,7 +1391,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 
                 /// Was the query a search?  Searches need to have the highlighter function prepared for the incoming results.
                 if (options.type != verse_lookup) {
-                    highlight_regex = BF.prepare_highlighter(query);
+                    ///TODO: Implement
+                    options.highlight = BF.prepare_highlighter(query);
                 }
                 
                 /// Is there any chance that there are verses above the starting verse?
