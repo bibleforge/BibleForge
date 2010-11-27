@@ -1136,8 +1136,60 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             {
                 function handle_new_verses(data, options)
                 {
-                    data = BF.parse_json(data);
-                    alert(data.n);
+                    /// Data object format:
+                    /// i Word IDs      (array)  (optional) An array containing word IDs indicating which words should be highlighted in grammatical searches.
+                    /// n Verse Numbers (array)             An array containing verse IDs for each verse returned.
+                    /// p Paragraphs    (array)             An array of 1's and 0's corresponding to n array indicating which verses are at the beginning of a paragraph.
+                    /// t Total         (number)            The total number of verses returned
+                    /// v Verse HTML    (array)             An array containing the HTML of the verses returned.
+                    var type          = options.type,
+                        b_tag,
+                        count,
+                        direction     = options.direction,
+                        i,
+                        total         = data.t,
+                        paragraphs    = data.p,
+                        verse_numbers = data.n,
+                        verse_html    = data.v,
+                        word_ids      = data.i;
+                    
+                    /// Where there any verses returned?
+                    ///FIXME: Lookups always return 1 for success instead of the number of verses.  See functions/database_lookup.php.
+                    if (total) {
+                        write_verses(type, direction, verse_numbers, verse_html, paragraphs, options.in_paragraphs);
+                        
+                        if (type != verse_lookup) {
+                            ///TODO: Implement
+                            ///TODO: Determine if it should send an object?
+                            options.highlight(verse_html.join(""), word_ids);
+                        }
+                        
+                        /// Indicate to the user that more content may be loading, and check for more content.
+                        ///TODO: Make a separate function for this.
+                        if (direction === additional && verse_numbers[verse_numbers.length - 1] < 66022021) {
+                            bottomLoader.style.visibility = "visible";
+                            content_manager.add_content_if_needed(direction);
+                        }
+                        if ((direction == previous || options.initial_query) && verse_numbers[0] > 1001001) {
+                            topLoader.style.visibility    = "visible";
+                            content_manager.add_content_if_needed(previous);
+                        }
+
+                    } else {
+                        ///TODO: Make a separate function for this.
+                        if (direction === additional) {
+                            /// The user has reached the bottom by scrolling down (either RETURNED_SEARCH or RETURNED_VERSES_PREVIOUS), so we need to hide the loading graphic.
+                            /// This is cause by scrolling to Revelation 22:21 or end of search or there were no results.
+                            content_manager.reached_bottom();
+                            bottomLoader.style.visibility = "hidden";
+                        }
+                        ///BUG: there can be no results if looking up beyond rev 22.21 (e.g., rev 23). FIX: Prevent lookingup past 66022021
+                        if (direction == previous || options.initial_query) {
+                            /// The user has reached the top of the page by scrolling up (either Genesis 1:1 or there were no search results), so we need to hide the loading graphic
+                            content_manager.reached_top();
+                            topLoader.style.visibility    = "hidden";
+                        }
+                    }
                 }
                 
                 return {
@@ -1147,6 +1199,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     },
                     query: function (options)
                     {
+                        ///TODO: At some point, there needs to be feedback to the user that the query is taking place.
+                        
                         /// Stop any old requests since we have a new one.
                         ajax_additional.abort();
                         ajax_previous.abort();
@@ -1163,7 +1217,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             /// On Success
                             ///TODO: What should be done from here?  Should it be sent to a function, like handle_new_verses()?
                             ///TODO: Removed unnecessary slashes from verse data.
-                            handle_new_verses(data, options);
+                            handle_new_verses(BF.parse_json(data), options);
                         });
                     },
                     query_previous: function ()
