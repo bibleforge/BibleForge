@@ -1161,7 +1161,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         if (type != verse_lookup) {
                             ///TODO: Implement
                             ///TODO: Determine if it should send an object?
-                            options.highlight(verse_html.join(""), word_ids);
+                            ///NOTE: Only standard and mixed searches need verse_html data to be sent.
+                            options.highlight((type != grammatical_search ? verse_html.join("") : ""), word_ids);
                         }
                         
                         /// Indicate to the user that more content may be loading, and check for more content.
