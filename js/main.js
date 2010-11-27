@@ -145,7 +145,7 @@ BF.create_simple_ajax = function ()
  * Load some Javascript and optionally send it some variables from the closure.
  *
  * @example BF.include("path/to/script.js", {needed_var: var_from_the_closure}, 20000, false);
- * @example BF.include("js/secondary.js", {topBar: viewPort.firstChild, viewPort_num: viewPort_num});
+ * @example BF.include("js/secondary.js",   {topBar: viewPort.firstChild, viewPort_num: viewPort_num});
  * @param   path    (string)             The location of the JavaScript to load.
  * @param   context (object)             The variable to send to the included JavaScript.
  * @param   timeout (number)  (optional) How long to wait before giving up on the script to load (in milliseconds).
@@ -1096,12 +1096,12 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             function create_query_message(options)
             {
                 /// Query Variables:
-                /// d Direction (number)  The direction of the query (additional, previous).      (lookup only)
-                /// f Find      (boolean) Whether or not to find a paragraph break to start at.   (lookup only)
-                /// p Paragraph (boolean) Whether or not verses will be displayed in paragraphs.  (lookup only)
-                /// q Query     (string)  The verse reference or search string to query.
-                /// s Start At  (string)  The verse or word id at which to start the query.       (search only)
-                /// t Type      (number)  The type of query (verse_lookup, mixed_search, standard_search, grammatical_search).
+                /// d Direction (number)  The direction of the query (additional, previous)      (lookup only)
+                /// f Find      (boolean) Whether or not to find a paragraph break to start at   (lookup only)
+                /// p Paragraph (boolean) Whether or not verses will be displayed in paragraphs  (lookup only)
+                /// q Query     (string)  The verse reference or search string to query
+                /// s Start At  (string)  The verse or word id at which to start the query       (search only)
+                /// t Type      (number)  The type of query (verse_lookup, mixed_search, standard_search, grammatical_search)
                 var query_str = "t=" + options.type;
                 
                 if (options.type === verse_lookup) {
@@ -1137,11 +1137,11 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 function handle_new_verses(data, options)
                 {
                     /// Data object format:
-                    /// i Word IDs      (array)  (optional) An array containing word IDs indicating which words should be highlighted in grammatical searches.
-                    /// n Verse Numbers (array)             An array containing verse IDs for each verse returned.
-                    /// p Paragraphs    (array)             An array of 1's and 0's corresponding to n array indicating which verses are at the beginning of a paragraph.
+                    /// i Word IDs      (array)  (optional) An array containing word IDs indicating which words should be highlighted in grammatical searches
+                    /// n Verse Numbers (array)             An array containing verse IDs for each verse returned
+                    /// p Paragraphs    (array)             An array of 1's and 0's corresponding to n array indicating which verses are at the beginning of a paragraph
                     /// t Total         (number)            The total number of verses returned
-                    /// v Verse HTML    (array)             An array containing the HTML of the verses returned.
+                    /// v Verse HTML    (array)             An array containing the HTML of the verses returned
                     var type          = options.type,
                         b_tag,
                         count,
@@ -1154,7 +1154,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         word_ids      = data.i;
                     
                     /// Where there any verses returned?
-                    ///FIXME: Lookups always return 1 for success instead of the number of verses.  See functions/database_lookup.php.
+                    ///FIXME: Lookups always return 1 for success instead of the number of verses.  See functions/verse_lookup.php.
                     if (total) {
                         write_verses(type, direction, verse_numbers, verse_html, paragraphs, options.in_paragraphs);
                         
