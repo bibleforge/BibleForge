@@ -21,10 +21,14 @@ BF.is_WebKit = !!window.chrome || window.navigator.userAgent.indexOf("WebKit/") 
 /// NOTE: Usually, eval() and JSON.parse() are similar in speed and the Function Constructor is really slow.
 ///       However, in Chrome, eval() is really fast, the Function Constructor is even faster, and JSON.parse() is ridiculously slow.
 ///       Therefore, use the Function Constructor for Chrome and JSON.parse() for all others.
-BF.parse_json = (window.chrome ? function (str)
+///NOTE: It could also check to make sure that the string starts with a curly bracket ({) straight bracket ([) double quote (") or number (hyphen (-) or digit)to attempt to ensure that it is valid JSON.
+BF.parse_json = window.chrome ? function (str)
 {
-	return (new Function("return " + str))();
-} : JSON.parse);
+	return str === "" ? "" : (new Function("return " + str))();
+} : function (str)
+{
+    return str === "" ? "" : JSON.parse(str);
+};
 
 BF.create_simple_ajax = function ()
 {
