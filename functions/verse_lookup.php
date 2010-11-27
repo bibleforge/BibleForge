@@ -13,8 +13,8 @@
 /**
  * Retrieve verses from the MySQL database.
  *
- * @example retrieve_verses(1001001, ADDITIONAL, 40);
- * @example retrieve_verses(40000100, PREVIOUS, LIMIT);
+ * @example retrieve_verses(1001001,  ADDITIONAL, 40);
+ * @example retrieve_verses(40000100, PREVIOUS,   LIMIT);
  * @param   $verse_id   (integer) The verse id from which to begin retrieving.
  * @param   $direction  (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
  * @param   $limit      (integer) The maximum number of verses to return.
@@ -39,7 +39,7 @@ function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true, $
         $order_by = '';
     } else {
         $operator = '<=';
-        ///NOTE: Leading space is needed in case the preceeding variable does end with whitespace.
+        ///NOTE: Leading space is needed in case the preceding variable does end with whitespace.
         $order_by = ' ORDER BY id DESC';
     }
     

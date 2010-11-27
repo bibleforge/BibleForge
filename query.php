@@ -72,7 +72,7 @@ if (isset($_REQUEST['d'])) {
  ******************/
 
 if ($type == VERSE_LOOKUP) {
-    require_once 'functions/database_lookup.php';
+    require_once 'functions/verse_lookup.php';
     
     /// Should verses be returned in paragraph form?
     if (isset($_REQUEST['p'])) {
