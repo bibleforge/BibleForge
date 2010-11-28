@@ -1246,7 +1246,39 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         }
                     }
                     
-                    
+                    /// Is this is the first results of a search or lookup?
+                    if (initial_query) {
+                        /// Are the results displayed in paragraphs and the verse looked up not at the beginning of a paragraph?
+                        ///TODO: Determine if this should require the search type to be a verse lookup.
+                        if (type == verse_lookup && in_paragraphs && verse_numbers[0] != options.verse) {
+                            /// Because the verse the user is looking for is not at the beginning of a paragraph
+                            /// the text needs to be scrolled so that the verse is at the top.
+                            content_manager.scroll_to_verse(options.verse);
+                        } else {
+                            /// If the user had scrolled down the page and then pressed the refresh button,
+                            /// the page will keep scrolling down as content is loaded, so to prevent this, force the window to scroll to the top of the page.
+                            content_manager.scroll_view_to(0);
+                        }
+                        
+                        /// Since the first query is done, set the initial_query property to FALSE.
+                        options.initial_query = false;
+                        
+                        infoBar.innerHTML = "";
+                        
+                        if (type != verse_lookup) {
+                            /// Create the inital text.
+                            infoBar.appendChild(document.createTextNode(BF.format_number(total) + BF.lang["found_" + (total === 1 ? "singular" : "plural")]));
+                            /// Create a <b> for the search terms.
+                            b_tag = document.createElement("b");
+                            ///NOTE: We use this method instead of straight innerHTML to prevent HTML elements from appearing inside the <b></b>.
+                            ///TODO: Preserve excess whitespace in the raw query.
+                            b_tag.appendChild(document.createTextNode(options.raw_query));
+                            infoBar.appendChild(b_tag);
+                        }
+                        
+                        /// Store the first verse reference for later.
+                        options.top_verse = verse_numbers[0];
+                    }
                 }
                 
                 return {
