@@ -387,7 +387,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     {
                         var cur_verse;
                         
-                        if (last_type != verse_lookup) {
+                        if (last_type !== verse_lookup) {
                             return;
                         }
                         
@@ -942,7 +942,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     /// last_type is set in prepare_new_search().
                     /// The verse range is displayed differently based on the type of search (i.e., a verse lookup or a search).
                     ///TODO: Set the date of the verse (or when it was written).
-                    if (last_type == verse_lookup) {
+                    if (last_type === verse_lookup) {
                         new_title = ref_range + " - " + BF.lang.app_name;
                     } else {
                         new_title = last_search + " (" + ref_range + ") - " + BF.lang.app_name;
@@ -955,7 +955,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         
                         /// Display the verse range on the page if looking up verses.
                         ///FIXME: There should be a variable that shows the current view mode and not rely on last_type.
-                        if (last_type == verse_lookup) {
+                        if (last_type === verse_lookup) {
                             ///TODO: Find a better way to clear infoBar than using innerHTML.
                             infoBar.innerHTML = "";
                             infoBar.appendChild(document.createTextNode(ref_range));
@@ -1202,11 +1202,11 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     if (total) {
                         write_verses(type, direction, verse_ids, verse_html, paragraphs, in_paragraphs);
                         
-                        if (type != verse_lookup) {
+                        if (type !== verse_lookup) {
                             ///TODO: Implement
                             ///TODO: Determine if it should send an object?
                             ///NOTE: Only standard and mixed searches need verse_html data to be sent.
-                            options.highlight((type != grammatical_search ? verse_html.join("") : ""), word_ids);
+                            options.highlight((type != grammatical_search ? verse_html.join("") : false), word_ids);
                         }
                         
                         /// Indicate to the user that more content may be loading, and check for more content.
@@ -1228,9 +1228,9 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                                 options.bottom_id = word_ids[count - 1];
                             }
                         } else {
-                            options.top_verse    = verse_ids[0];
+                            options.top_verse = verse_ids[0];
                             if (word_ids) {
-                                options.top_id    = word_ids[0];
+                                options.top_id = word_ids[0];
                             }
                         }
 
@@ -1254,7 +1254,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     if (initial_query) {
                         /// Are the results displayed in paragraphs and the verse looked up not at the beginning of a paragraph?
                         ///TODO: Determine if this should require the search type to be a verse lookup.
-                        if (type == verse_lookup && in_paragraphs && verse_ids[0] != options.verse) {
+                        if (type === verse_lookup && in_paragraphs && verse_ids[0] != options.verse) {
                             /// Because the verse the user is looking for is not at the beginning of a paragraph
                             /// the text needs to be scrolled so that the verse is at the top.
                             content_manager.scroll_to_verse(options.verse);
@@ -1269,7 +1269,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         
                         infoBar.innerHTML = "";
                         
-                        if (type != verse_lookup) {
+                        if (type !== verse_lookup) {
                             /// Create the inital text.
                             infoBar.appendChild(document.createTextNode(BF.format_number(total) + BF.lang["found_" + (total === 1 ? "singular" : "plural")]));
                             /// Create a <b> for the search terms.
@@ -1481,7 +1481,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 q_obj.onblur = function () {};
                 
                 /// Was the query a search?  Searches need to have the highlighter function prepared for the incoming results.
-                if (options.type != verse_lookup) {
+                if (options.type !== verse_lookup) {
                     ///TODO: Implement
                     options.highlight = BF.prepare_highlighter(query);
                 }
@@ -1489,7 +1489,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 /// Is there any chance that there are verses above the starting verse?
                 /// Or, in other words, is the query a search or a verse lookup starting at Genesis 1:1?
                 ///NOTE: In the future, it may be possible for searches to start midway.
-                if (options.type != verse_lookup || options.verse == "1001001") {
+                if (options.type !== verse_lookup || options.verse == "1001001") {
                     /// There is no reason to look for previous verses when the results start at the beginning.
                     content_manager.reached_top();
                 }
