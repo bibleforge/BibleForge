@@ -1096,6 +1096,32 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     has_reached_bottom = false;
                     has_reached_top    = false;
                 },
+                /**
+                 * Scrolls that page to make the specified verse at the top of the viewable area.
+                 *
+                 * @example content_manager.scroll_to_verse("45001014"); /// Scrolls to Romans 1:14 if that verse element is in the DOM.
+                 * @param   verse_id (number) The id number of the verse in the format [B]BCCCVVV.
+                 * @return  Returns TRUE on success and FALSE if the verse cannot be found on the scroll.
+                 * @note    Called by handle_new_verses() after the first Ajax request of a particular verse lookup.
+                 * @bug     Verses at chapter and book beginnings (e.g., Genesis 1:1) are not scrolled to correctly.
+                 * @todo    Move this function somewhere else.
+                 */
+                scroll_to_verse: function (verse_id)
+                {
+                    ///FIXME: This will not get the correct element if the verse is verse 1 (i.e., is at the beginning of a chapter or book).
+                    var verse_obj = document.getElementById(verse_id + "_verse");
+                    
+                    if (!verse_obj) {
+                        return false;
+                    }
+                    
+                    /// Calculate the verse's Y coordinate.
+                    ///NOTE: "- topLoader.offsetHeight" subtracts off the height of the top bar.
+                    scroll_view_to(0, BF.get_position(verse_obj).top - topLoader.offsetHeight);
+                    
+                    ///TODO: Determine if there is any value to returning TRUE and FALSE.
+                    return true;
+                },
                 scroll_view_to: scroll_view_to
             };
         }());
