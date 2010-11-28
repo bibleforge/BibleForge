@@ -1191,16 +1191,16 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         /// p Paragraphs    (array)             An array of 1's and 0's corresponding to n array indicating which verses are at the beginning of a paragraph
                         /// t Total         (number)            The total number of verses returned
                         /// v Verse HTML    (array)             An array containing the HTML of the verses returned
-                        total         = data.t,
-                        paragraphs    = data.p,
-                        verse_numbers = data.n,
-                        verse_html    = data.v,
-                        word_ids      = data.i;
+                        total      = data.t,
+                        paragraphs = data.p,
+                        verse_ids  = data.n,
+                        verse_html = data.v,
+                        word_ids   = data.i;
                     
                     /// Where there any verses returned?
                     ///FIXME: Lookups always return 1 for success instead of the number of verses.  See functions/verse_lookup.php.
                     if (total) {
-                        write_verses(type, direction, verse_numbers, verse_html, paragraphs, in_paragraphs);
+                        write_verses(type, direction, verse_ids, verse_html, paragraphs, in_paragraphs);
                         
                         if (type != verse_lookup) {
                             ///TODO: Implement
@@ -1211,21 +1211,25 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         
                         /// Indicate to the user that more content may be loading, and check for more content.
                         ///TODO: Make a separate function for this.
-                        if (direction === additional && verse_numbers[verse_numbers.length - 1] < 66022021) {
+                        if (direction === additional && verse_ids[verse_ids.length - 1] < 66022021) {
                             bottomLoader.style.visibility = "visible";
                             content_manager.add_content_if_needed(direction);
                         }
-                        if ((direction == previous || initial_query) && verse_numbers[0] > 1001001) {
+                        if ((direction == previous || initial_query) && verse_ids[0] > 1001001) {
                             topLoader.style.visibility    = "visible";
                             content_manager.add_content_if_needed(previous);
                         }
                         
-                        /// The first or last word IDs need to be stored so that the server knows where to start future queries.
-                        ///NOTE: Only grammatical (and in the future, mixed) searches return word_ids.
-                        if (word_ids) {
-                            if (direction == additional) {
+                        /// The first or last verse IDs need to be store so that the server knowns where to start future queries.
+                        /// The first or last word IDs also need to be stored for future grammatical (and in the future, mixed) searches.
+                        if (direction === additional) {
+                            options.bottom_verse = verse_ids[verse_ids.length - 1];
+                            if (word_ids) {
                                 options.bottom_id = word_ids[count - 1];
-                            } else {
+                            }
+                        } else {
+                            options.top_verse    = verse_ids[0];
+                            if (word_ids) {
                                 options.top_id    = word_ids[0];
                             }
                         }
@@ -1250,7 +1254,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     if (initial_query) {
                         /// Are the results displayed in paragraphs and the verse looked up not at the beginning of a paragraph?
                         ///TODO: Determine if this should require the search type to be a verse lookup.
-                        if (type == verse_lookup && in_paragraphs && verse_numbers[0] != options.verse) {
+                        if (type == verse_lookup && in_paragraphs && verse_ids[0] != options.verse) {
                             /// Because the verse the user is looking for is not at the beginning of a paragraph
                             /// the text needs to be scrolled so that the verse is at the top.
                             content_manager.scroll_to_verse(options.verse);
@@ -1275,9 +1279,6 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             b_tag.appendChild(document.createTextNode(options.raw_query));
                             infoBar.appendChild(b_tag);
                         }
-                        
-                        /// Store the first verse reference for later.
-                        options.top_verse = verse_numbers[0];
                     }
                 }
                 
