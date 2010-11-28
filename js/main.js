@@ -496,7 +496,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         /// Calculate and set the new scroll position.
                         /// Because content is being removed from the top of the page, the rest of the content will be shifted upward.
                         /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was removed.
-                        scrollViewTo(0, window.pageYOffset - child_height);
+                        scrollViewTo(window.pageYOffset - child_height);
                         
                         page.removeChild(child);
                         
@@ -535,7 +535,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         /// This fixes an IE7+ bug that causes the page to scroll needlessly when an element is added.
                         ///TODO: Determine if this is still an issue with IE9.
                         /*@cc_on
-                            scrollViewTo(0, window.pageYOffset);
+                            scrollViewTo(window.pageYOffset);
                         @*/
                         
                         /// End execution to keep the checking_content_top_interval running because there might be even more content that should be removed.
@@ -789,7 +789,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             
                             /// This fixes an IE7+ bug that causes the page to scroll needlessly when an element is added.
                             /*@cc_on
-                                scrollViewTo(0, window.pageYOffset);
+                                scrollViewTo(window.pageYOffset);
                             @*/
                             
                             /// Check to see if we need to add more content.
@@ -836,7 +836,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             
                             /// The new content that was just added to the top of the page will push the other contents downward.
                             /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was added.
-                            scrollViewTo(0, window.pageYOffset + newEl.clientHeight);
+                            scrollViewTo(window.pageYOffset + newEl.clientHeight);
                             
                             /// Check to see if we need to add more content.
                             add_content_if_needed(previous);
@@ -979,13 +979,26 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             }());
             
             
-            function scrollViewTo(x, y, smooth)
+            /**
+             * Scroll the page to a specific point.
+             *
+             * @param y      (number)             The Y position to scroll to (i.e, vertical position).
+             * @param x      (number)  (optional) The X position to scroll to (i.e, horizontal position).  If left undefined, it will maintin the current Y position.
+             * @param smooth (boolean) (optional) Whether or not to scroll smoothly.  By default, or if fasely, it will scroll instantaneously.
+             * @note  The y value is first because x value is rarely used.
+             * @todo  Indicate where used.
+             */
+            function scrollViewTo(y, x, smooth)
             {
                 /// A small amount of extra padding is added just to ensure that the padding element will be large enough.
                 var extra_padding = 10,
                     padding_el,
                     padding_interval,
                     pixels_needed;
+                
+                if (typeof x == "undefined") {
+                    x = window.pageXOffset;
+                }
                 
                 if (!smooth) {
                     scroll_pos = y;
@@ -1189,6 +1202,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             topLoader.style.visibility    = "hidden";
                         }
                     }
+                    
+                    
                 }
                 
                 return {
@@ -1198,7 +1213,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     },
                     query: function (options)
                     {
-                        ///TODO: At some point, there needs to be feedback to the user that the query is taking place.
+                        ///TODO: At some point, there needs to be feedback to the user that the query is taking place.  Maybe have something in the infoBar.
                         
                         /// Stop any old requests since we have a new one.
                         ajax_additional.abort();
@@ -1402,13 +1417,6 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     /// There is no reason to look for previous verses when the results start at the beginning.
                     content_manager.reached_top();
                 }
-                
-                
-                /// ...
-                
-                /// Step 5 Display verses
-                
-                /// Step 6 Highlight as necessary
             };
         }());
         
