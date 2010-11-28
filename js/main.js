@@ -997,6 +997,12 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     pixels_needed;
                 
                 if (typeof x == "undefined") {
+                    /// IE8- does not set pageXOffset.
+                    /*@cc_on
+                        @if (@_jscript_version < 9)
+                            window.pageXOffset = document.documentElement.scrollLeft;
+                        @end
+                    @*/
                     x = window.pageXOffset;
                 }
                 
