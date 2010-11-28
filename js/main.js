@@ -1114,7 +1114,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     
                     /// Calculate the verse's Y coordinate.
                     ///NOTE: "- topLoader.offsetHeight" subtracts off the height of the top bar.
-                    scroll_view_to(0, BF.get_position(verse_obj).top - topLoader.offsetHeight);
+                    scroll_view_to(BF.get_position(verse_obj).top - topLoader.offsetHeight);
                     
                     ///TODO: Determine if there is any value to returning TRUE and FALSE.
                     return true;
