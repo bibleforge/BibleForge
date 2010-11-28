@@ -198,7 +198,7 @@ BF.include = (function ()
  * @example get_top_position(element);
  * @param   obj (element) An element on the page.
  * @return  Returns the distance of obj from the top of the scroll.
- * @note    Called by scroll_to_verse() and wrench button onclick() in secondary.js.
+ * @note    Called by content_manager.scroll_to_verse() and wrench button onclick() in secondary.js.
  */
 BF.get_position = function (obj)
 {
@@ -496,7 +496,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         /// Calculate and set the new scroll position.
                         /// Because content is being removed from the top of the page, the rest of the content will be shifted upward.
                         /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was removed.
-                        scrollViewTo(window.pageYOffset - child_height);
+                        scroll_view_to(window.pageYOffset - child_height);
                         
                         page.removeChild(child);
                         
@@ -535,7 +535,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         /// This fixes an IE7+ bug that causes the page to scroll needlessly when an element is added.
                         ///TODO: Determine if this is still an issue with IE9.
                         /*@cc_on
-                            scrollViewTo(window.pageYOffset);
+                            scroll_view_to(window.pageYOffset);
                         @*/
                         
                         /// End execution to keep the checking_content_top_interval running because there might be even more content that should be removed.
@@ -789,7 +789,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             
                             /// This fixes an IE7+ bug that causes the page to scroll needlessly when an element is added.
                             /*@cc_on
-                                scrollViewTo(window.pageYOffset);
+                                scroll_view_to(window.pageYOffset);
                             @*/
                             
                             /// Check to see if we need to add more content.
@@ -836,7 +836,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             
                             /// The new content that was just added to the top of the page will push the other contents downward.
                             /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was added.
-                            scrollViewTo(window.pageYOffset + newEl.clientHeight);
+                            scroll_view_to(window.pageYOffset + newEl.clientHeight);
                             
                             /// Check to see if we need to add more content.
                             add_content_if_needed(previous);
@@ -988,7 +988,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
              * @note  The y value is first because x value is rarely used.
              * @todo  Indicate where used.
              */
-            function scrollViewTo(y, x, smooth)
+            function scroll_view_to(y, x, smooth)
             {
                 /// A small amount of extra padding is added just to ensure that the padding element will be large enough.
                 var extra_padding = 10,
@@ -1096,7 +1096,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     has_reached_bottom = false;
                     has_reached_top    = false;
                 },
-                scrollViewTo: scrollViewTo
+                scroll_view_to: scroll_view_to
             };
         }());
         
