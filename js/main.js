@@ -1176,17 +1176,21 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             {
                 function handle_new_verses(data, options)
                 {
-                    /// Data object format:
-                    /// i Word IDs      (array)  (optional) An array containing word IDs indicating which words should be highlighted in grammatical searches
-                    /// n Verse Numbers (array)             An array containing verse IDs for each verse returned
-                    /// p Paragraphs    (array)             An array of 1's and 0's corresponding to n array indicating which verses are at the beginning of a paragraph
-                    /// t Total         (number)            The total number of verses returned
-                    /// v Verse HTML    (array)             An array containing the HTML of the verses returned
-                    var type          = options.type,
-                        b_tag,
+                    var b_tag,
                         count,
-                        direction     = options.direction,
                         i,
+                        
+                        direction     = options.direction,
+                        in_paragraphs = options.in_paragraphs,
+                        initial_query = options.initial_query,
+                        type          = options.type,
+                        
+                        /// Data object format:
+                        /// i Word IDs      (array)  (optional) An array containing word IDs indicating which words should be highlighted in grammatical searches
+                        /// n Verse Numbers (array)             An array containing verse IDs for each verse returned
+                        /// p Paragraphs    (array)             An array of 1's and 0's corresponding to n array indicating which verses are at the beginning of a paragraph
+                        /// t Total         (number)            The total number of verses returned
+                        /// v Verse HTML    (array)             An array containing the HTML of the verses returned
                         total         = data.t,
                         paragraphs    = data.p,
                         verse_numbers = data.n,
@@ -1196,7 +1200,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     /// Where there any verses returned?
                     ///FIXME: Lookups always return 1 for success instead of the number of verses.  See functions/verse_lookup.php.
                     if (total) {
-                        write_verses(type, direction, verse_numbers, verse_html, paragraphs, options.in_paragraphs);
+                        write_verses(type, direction, verse_numbers, verse_html, paragraphs, in_paragraphs);
                         
                         if (type != verse_lookup) {
                             ///TODO: Implement
@@ -1211,9 +1215,19 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             bottomLoader.style.visibility = "visible";
                             content_manager.add_content_if_needed(direction);
                         }
-                        if ((direction == previous || options.initial_query) && verse_numbers[0] > 1001001) {
+                        if ((direction == previous || initial_query) && verse_numbers[0] > 1001001) {
                             topLoader.style.visibility    = "visible";
                             content_manager.add_content_if_needed(previous);
+                        }
+                        
+                        /// The first or last word IDs need to be stored so that the server knows where to start future queries.
+                        ///NOTE: Only grammatical (and in the future, mixed) searches return word_ids.
+                        if (word_ids) {
+                            if (direction == additional) {
+                                options.bottom_id = word_ids[count - 1];
+                            } else {
+                                options.top_id    = word_ids[0];
+                            }
                         }
 
                     } else {
@@ -1225,7 +1239,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             bottomLoader.style.visibility = "hidden";
                         }
                         ///BUG: there can be no results if looking up beyond rev 22.21 (e.g., rev 23). FIX: Prevent lookingup past 66022021
-                        if (direction == previous || options.initial_query) {
+                        if (direction == previous || initial_query) {
                             /// The user has reached the top of the page by scrolling up (either Genesis 1:1 or there were no search results), so we need to hide the loading graphic
                             content_manager.reached_top();
                             topLoader.style.visibility    = "hidden";
