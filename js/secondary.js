@@ -450,6 +450,8 @@
         ///TODO: Determine where this gif data should be.
         wrench_button.src   = "data:image/gif;base64,R0lGODdhEAAQAMIIAAEDADAyL05OSWlpYYyLg7GwqNjVyP/97iwAAAAAEAAQAAADQ3i6OwBhsGnCe2Qy+4LRS3EBn5JNxCgchgBo6ThwFDc+61LdY6m4vEeBAbwMBBHfoYgBLW8njUPmPNwk1SkAW31yqwkAOw==";
         wrench_button.title = BF.lang.wrench_title;
+        ///TODO: Determine if the alt tag should be shorter, like "Configure."
+        wrench_button.alt   = BF.lang.wrench_title;
         
         wrench_label.htmlFor = wrench_button.id;
         
