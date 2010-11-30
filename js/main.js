@@ -24,7 +24,7 @@ BF.is_WebKit = !!window.chrome || window.navigator.userAgent.indexOf("WebKit/") 
 ///NOTE: It could also check to make sure that the string starts with a curly bracket ({) straight bracket ([) double quote (") or number (hyphen (-) or digit)to attempt to ensure that it is valid JSON.
 BF.parse_json = window.chrome ? function (str)
 {
-	return str === "" ? "" : (new Function("return " + str))();
+    return str === "" ? "" : (new Function("return " + str))();
 } : function (str)
 {
     return str === "" ? "" : JSON.parse(str);
@@ -225,10 +225,10 @@ BF.get_position = function (obj)
 /**
  * Formats a positive number with appropriate commas.
  *
- * @example	format_number(1000); /// Returns "1,000"
- * @param	num (positive number) The number to format.
- * @return	A formatted number as a string.
- * @note	To be faster, this will not format a negative number.
+ * @example format_number(1000); /// Returns "1,000"
+ * @param   num (positive number) The number to format.
+ * @return  A formatted number as a string.
+ * @note    To be faster, this will not format a negative number.
  */
 BF.format_number = function (num)
 {
@@ -680,8 +680,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     return false;
                 }
                 
-                looked_next		= false;
-                looked_previous	= false;
+                looked_next     = false;
+                looked_previous = false;
                 
                 do {
                     el_offset_top    = el.offsetTop;
@@ -695,10 +695,10 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         /// Is the position in question lower?
                         if (the_pos > el_offset_top) {
                             el = el.nextSibling;
-                            looked_next	    = true;
+                            looked_next     = true;
                         } else {
                             el = el.previousSibling;
-                            looked_previous	= true;
+                            looked_previous = true;
                         }
                         /// Is it stuck in an infinite loop?  (If so, then give up.)
                         if (looked_next && looked_previous) {
@@ -1327,11 +1327,11 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             /**
              * Figure out what type of search is being attempted by the user.
              *
-             * @example determine_search_type("God & love");							/// Returns [{type: standard_search,    query: '"God & love"'}]
-             * @example determine_search_type("love AS NOUN");							/// Returns [{type: grammatical_search, query: '["love",[[4,1]],[0]]'}]
-             * @example determine_search_type("go AS IMPERATIVE, -SINGULAR");			/// Returns [{type: grammatical_search, query: '["go",[[9,3],[5,1]],[0,1]]'}]
-             * @example determine_search_type("go* AS PASSIVE, -PERFECT,INDICATIVE");	/// Returns [{type: grammatical_search, query: '["go*",[[8,3],[7,5],[9,1]],[0,1,0]]'}]
-             * @example determine_search_type("* AS RED, IMPERATIVE");					/// Returns [{type: grammatical_search, query: '["",[[3,1],[9,3]],[0,0]]'}]
+             * @example determine_search_type("God & love");                          /// Returns [{type: standard_search,    query: '"God & love"'}]
+             * @example determine_search_type("love AS NOUN");                        /// Returns [{type: grammatical_search, query: '["love",[[4,1]],[0]]'}]
+             * @example determine_search_type("go AS IMPERATIVE, -SINGULAR");         /// Returns [{type: grammatical_search, query: '["go",[[9,3],[5,1]],[0,1]]'}]
+             * @example determine_search_type("go* AS PASSIVE, -PERFECT,INDICATIVE"); /// Returns [{type: grammatical_search, query: '["go*",[[8,3],[7,5],[9,1]],[0,1,0]]'}]
+             * @example determine_search_type("* AS RED, IMPERATIVE");                /// Returns [{type: grammatical_search, query: '["",[[3,1],[9,3]],[0,0]]'}]
              * //@example determine_search_type("love AS NOUN & more | less -good AS ADJECTIVE"); /// Returns [{type: grammatical_search, query: '["love",[[4,1]],[0]]'}, {type: standard_search, query: "& more | less -good"}, {type: grammatical_search, query: '["good",[[4,3]],[1]]'}]
              * @param   search_terms (string) The prepared terms to be examined.
              * @return  An array filled with objects describing the type of search.
@@ -1579,8 +1579,8 @@ if (!"".trim) {
      */
     String.prototype.trim = function ()
     {
-        var end		= this.length,
-            start	= -1;
+        var end   = this.length,
+            start = -1;
         while (this.charCodeAt(--end) < 33) {}
         while (++start < end && this.charCodeAt(start) < 33) {}
         return this.slice(start, end + 1);
@@ -1678,10 +1678,10 @@ if (window.opera) {
 /**
  * Fix IE's string.split.
  *
- * @param	s		(regexp || string)	The regular expression or string with which to break the string.
- * @param	limit	(int) (optional)	The number of times to split the string.
- * @return	Returns an array of the string now broken into pieces.
- * @see		http://blog.stevenlevithan.com/archives/cross-browser-split
+ * @param   s     (regexp || string) The regular expression or string with which to break the string.
+ * @param   limit (int) (optional)   The number of times to split the string.
+ * @return  Returns an array of the string now broken into pieces.
+ * @see     http://blog.stevenlevithan.com/archives/cross-browser-split
  * @todo    Determine if IE9 still needs this.
  */
 ///NOTE: The following conditional compilation code blocks only executes in IE.
@@ -1704,11 +1704,11 @@ if (window.opera) {
             return String.prototype._$$split.apply(this, arguments);
         }
         
-        flags			= (s.global ? "g" : "") + (s.ignoreCase ? "i" : "") + (s.multiline ? "m" : "");
-        s2				= new RegExp("^" + s.source + "$", flags);
-        output			= [];
-        origLastIndex	= s.lastIndex;
-        lastLastIndex	= 0;
+        flags         = (s.global ? "g" : "") + (s.ignoreCase ? "i" : "") + (s.multiline ? "m" : "");
+        s2            = new RegExp("^" + s.source + "$", flags);
+        output        = [];
+        origLastIndex = s.lastIndex;
+        lastLastIndex = 0;
         i = 0;
         
         if (typeof limit == "undefined" || +limit < 0) {
@@ -1745,8 +1745,8 @@ if (window.opera) {
                 if (match.length > 1 && match.index < this.length) {
                     output = output.concat(match.slice(1));
                 }
-                lastLength		= match[0].length;
-                lastLastIndex	= s.lastIndex;
+                lastLength    = match[0].length;
+                lastLastIndex = s.lastIndex;
             }
             if (emptyMatch) {
                 ++s.lastIndex;
