@@ -1179,114 +1179,257 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             
             return (function ()
             {
-                function handle_new_verses(data, options)
+                var handle_new_verses = (function ()
                 {
-                    var b_tag,
-                        count,
-                        i,
+                    /**
+                     * Writes new verses to page.
+                     *
+                     * @example write_verses(type, direction, [verse_ids, ...], [verse_html, ...]);
+                     * @example write_verses(verse_lookup, additional, [1001001], ["<a id=1>In</a> <a id=2>the</a> <a id=3>beginning....</a>"]);
+                     * @param   type       (integer) The type of query: verse_lookup || mixed_search || standard_search || grammatical_search.
+                     * @param   direction  (integer) The direction of the verses to be retrieved: additional || previous.
+                     * @param   verse_ids  (array)   An array of integers representing Bible verse references.
+                     * @param   verse_html (array)   An array of strings containing verses in HTML.
+                     * @return  NULL.  Writes HTML to the page.
+                     * @note    Called by handle_new_verses().
+                     * @note    verse_ids contains an array of verses in the following format: [B]BCCCVVV (e.g., Genesis 1:1 == 1001001).
+                     */
+                    function write_verses(type, direction, verse_ids, verse_html, paragraphs, in_paragraphs, top_verse, bottom_verse)
+                    {
+                        var b,
+                            c,
+                            chapter_text         = "",
+                            end_paragraph_HTML   = "",
+                            first_paragraph_HTML = "",
+                            i,
+                            html_str             = "",
+                            newEl,
+                            num,
+                            start_key            = 0,
+                            start_paragraph_HTML = "",
+                            stop_key             = verse_ids.length,
+                            v;
                         
-                        direction     = options.direction,
-                        in_paragraphs = options.in_paragraphs,
-                        initial_query = options.initial_query,
-                        type          = options.type,
-                        
-                        /// Data object format:
-                        /// i Word IDs      (array)  (optional) An array containing word IDs indicating which words should be highlighted in grammatical searches
-                        /// n Verse Numbers (array)             An array containing verse IDs for each verse returned
-                        /// p Paragraphs    (array)             An array of 1's and 0's corresponding to n array indicating which verses are at the beginning of a paragraph
-                        /// t Total         (number)            The total number of verses returned
-                        /// v Verse HTML    (array)             An array containing the HTML of the verses returned
-                        total      = data.t,
-                        paragraphs = data.p,
-                        verse_ids  = data.n,
-                        verse_html = data.v,
-                        word_ids   = data.i;
-                    
-                    /// Where there any verses returned?
-                    ///FIXME: Lookups always return 1 for success instead of the number of verses.  See functions/verse_lookup.php.
-                    if (total) {
-                        write_verses(type, direction, verse_ids, verse_html, paragraphs, in_paragraphs);
-                        
-                        if (type !== verse_lookup) {
-                            ///TODO: Implement
-                            ///TODO: Determine if it should send an object?
-                            ///NOTE: Only standard and mixed searches need verse_html data to be sent.
-                            options.highlight((type != grammatical_search ? verse_html.join("") : false), word_ids);
-                        }
-                        
-                        /// Indicate to the user that more content may be loading, and check for more content.
-                        ///TODO: Make a separate function for this.
-                        if (direction === additional && verse_ids[verse_ids.length - 1] < 66022021) {
-                            bottomLoader.style.visibility = "visible";
-                            content_manager.add_content_if_needed(direction);
-                        }
-                        if ((direction == previous || initial_query) && verse_ids[0] > 1001001) {
-                            topLoader.style.visibility    = "visible";
-                            content_manager.add_content_if_needed(previous);
-                        }
-                        
-                        /// The first or last verse IDs need to be store so that the server knowns where to start future queries.
-                        /// The first or last word IDs also need to be stored for future grammatical (and in the future, mixed) searches.
-                        if (direction === additional) {
-                            options.bottom_verse = verse_ids[verse_ids.length - 1];
-                            if (word_ids) {
-                                options.bottom_id = word_ids[count - 1];
-                            }
-                        } else {
-                            options.top_verse = verse_ids[0];
-                            if (word_ids) {
-                                options.top_id = word_ids[0];
+                        ///NOTE: Currently only grammatical_search searches data at the word level, so it is the only type that might stop in the middle of a verse and find more words in the same verse as the user scrolls.
+                        if (type == grammatical_search) {
+                            if (direction === additional) {
+                                /// Is the first verse returned the same as the bottom verse on the page?
+                                if (bottom_verse == verse_ids[0]) {
+                                    start_key = 1;
+                                }
+                            /// Is the last verse returned the same as the top verse on the page?
+                            ///NOTE: Currently, searches are always additional, so this cannot happen yet.
+                            } else if (top_verse == verse_ids[stop_key - 1]) {
+                                /// Stop one verse early because the last verse is already on the page.
+                                --stop_key;
                             }
                         }
-
-                    } else {
-                        ///TODO: Make a separate function for this.
+                        
+                        if (in_paragraphs) {
+                            start_paragraph_HTML = "<div class=paragraph>";
+                            first_paragraph_HTML = '<div class="paragraph first_paragraph">';
+                            end_paragraph_HTML   = "</div>";
+                        }
+                        
+                        for (i = start_key; i < stop_key; ++i) {
+                            num = verse_ids[i];
+                            v   = num % 1000;                     /// Calculate the verse.
+                            c   = ((num - v) % 1000000) / 1000;   /// Calculate the chapter.
+                            b   = (num - v - c * 1000) / 1000000; /// Calculate the book by number (e.g., Genesis == 1).
+                            
+                            ///TODO: Determine if it would be better to have two for loops instead of the if statement inside of this one.
+                            if (type === verse_lookup) {
+                                /// Is this the first verse or the Psalm title?
+                                if (v < 2) {
+                                    if (i !== start_key) {
+                                        html_str += end_paragraph_HTML;
+                                    }
+                                    /// Is this chapter 1?  (We need to know if we should display the book name.)
+                                    if (c === 1) {
+                                        html_str += "<div class=book id=" + num + "_title><h2>" + BF.lang.books_long_pretitle[b] + "</h2><h1>" + BF.lang.books_long_main[b] + "</h1><h2>" + BF.lang.books_long_posttitle[b] + "</h2></div>";
+                                    /// Display chapter/psalm number (but not on verse 1 of psalms that have titles).
+                                    } else if (b != 19 || v === 0 || (c <= 2 || c == 10 || c == 33 || c == 43 || c == 71 || c == 91 || (c >= 93 && c <= 97) || c == 99 || (c >= 104 && c <= 107) || (c >= 111 && c <= 119) || (c >= 135 && c <= 137) || c >= 146)) {
+                                        /// Is this the book of Psalms?  (Psalms have a special name.)
+                                        if (b == 19) {
+                                            chapter_text = BF.lang.psalm;
+                                        } else {
+                                            chapter_text = BF.lang.chapter;
+                                        }
+                                        html_str += "<h3 class=chapter id=" + num + "_chapter>" + chapter_text + " " + c + "</h3>";
+                                    }
+                                    /// Is this a Psalm title (i.e., verse 0)?  (Psalm titles are displayed specially.)
+                                    if (v === 0) {
+                                        html_str += "<div class=psalm_title id=" + num + "_verse>" + verse_html[i] + "</div>";
+                                    } else {
+                                        ///NOTE: The trailing space adds a space between verses in a paragraph and does not effect paragraph final verses.
+                                        html_str += first_paragraph_HTML + "<div class=first_verse id=" + num + "_verse>" + verse_html[i] + " </div>";
+                                    }
+                                } else {
+                                    /// Is there a paragraph break here?
+                                    if (in_paragraphs && paragraphs[i]) {
+                                        /// Is this not the first paragraph?  (The first paragraph does not need to be closed.)
+                                        if (i != start_key) {
+                                            html_str += end_paragraph_HTML;
+                                        }
+                                        
+                                        html_str += start_paragraph_HTML;
+                                    }
+                                    
+                                    ///NOTE: The trailing space adds a space between verses in a paragraph and does not effect paragraph final verses.
+                                    html_str += "<div class=verse id=" + num + "_verse><span class=verse_number>" + v + "&nbsp;</span>" + verse_html[i] + " </div>";
+                                }
+                                
+                            /// Searching
+                            } else {
+                                /// Change verse 0 to "title" (e.g., Psalm 3:title instead of Psalm 3:0).
+                                if (v === 0) {
+                                    v = BF.lang.title;
+                                }
+                                
+                                /// Is this verse from a different book than the last verse?
+                                ///TODO: last_book is no longer stored in the closure.  Pass it somehow.
+                                if (b !== last_book) {
+                                    /// We only need to print out the book if it is different from the last verse.
+                                    last_book = b;
+                                    
+                                    html_str += "<h1 class=short_book id=" + num + "_title>" + BF.lang.books_short[b] + "</h1>"; /// Convert the book number to text.
+                                }
+                                
+                                html_str += "<div class=search_verse id=" + num + "_search>" + c + ":" + v + " " + verse_html[i] + "</div>";
+                            }
+                        }
+                        
+                        if (in_paragraphs) {
+                            html_str += end_paragraph_HTML;
+                        }
+                        
+                        newEl = document.createElement("div");
+                        ///NOTE: If innerHTML disappears in the future (because it is not (yet) in the "standards"),
+                        ///      a simple (but slow) alternative is to use the innerDOM script from http://innerdom.sourceforge.net/ or BetterInnerHTML from http://www.optimalworks.net/resources/betterinnerhtml/.
+                        ///      Also using "range = document.createRange(); newEl = range.createContextualFragment(html_str); is also a possibility.
+                        newEl.innerHTML = html_str;
+                        
                         if (direction === additional) {
-                            /// The user has reached the bottom by scrolling down (either RETURNED_SEARCH or RETURNED_VERSES_PREVIOUS), so we need to hide the loading graphic.
-                            /// This is cause by scrolling to Revelation 22:21 or end of search or there were no results.
-                            content_manager.reached_bottom();
-                            bottomLoader.style.visibility = "hidden";
+                            page.appendChild(newEl);
+                        } else {
+                            page.insertBefore(newEl, page.childNodes[0]);
+                            
+                            /// The new content that was just added to the top of the page will push the other contents downward.
+                            /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was added.
+                            content_manager.scrollViewTo(0, window.pageYOffset + newEl.clientHeight);
                         }
-                        ///BUG: there can be no results if looking up beyond rev 22.21 (e.g., rev 23). FIX: Prevent lookingup past 66022021
-                        if (direction == previous || initial_query) {
-                            /// The user has reached the top of the page by scrolling up (either Genesis 1:1 or there were no search results), so we need to hide the loading graphic
-                            content_manager.reached_top();
-                            topLoader.style.visibility    = "hidden";
-                        }
+                        content_manager.update_verse_range();
                     }
                     
-                    /// Is this is the first results of a search or lookup?
-                    if (initial_query) {
-                        /// Are the results displayed in paragraphs and the verse looked up not at the beginning of a paragraph?
-                        ///TODO: Determine if this should require the search type to be a verse lookup.
-                        if (type === verse_lookup && in_paragraphs && verse_ids[0] != options.verse) {
-                            /// Because the verse the user is looking for is not at the beginning of a paragraph
-                            /// the text needs to be scrolled so that the verse is at the top.
-                            content_manager.scroll_to_verse(options.verse);
+                    
+                    return function (data, options)
+                    {
+                        var b_tag,
+                            count,
+                            i,
+                            
+                            direction     = options.direction,
+                            in_paragraphs = options.in_paragraphs,
+                            initial_query = options.initial_query,
+                            type          = options.type,
+                            
+                            /// Data object format:
+                            /// i Word IDs      (array)  (optional) An array containing word IDs indicating which words should be highlighted in grammatical searches
+                            /// n Verse Numbers (array)             An array containing verse IDs for each verse returned
+                            /// p Paragraphs    (array)             An array of 1's and 0's corresponding to n array indicating which verses are at the beginning of a paragraph
+                            /// t Total         (number)            The total number of verses returned
+                            /// v Verse HTML    (array)             An array containing the HTML of the verses returned
+                            total      = data.t,
+                            paragraphs = data.p,
+                            verse_ids  = data.n,
+                            verse_html = data.v,
+                            word_ids   = data.i;
+                        
+                        /// Where there any verses returned?
+                        ///FIXME: Lookups always return 1 for success instead of the number of verses.  See functions/verse_lookup.php.
+                        if (total) {
+                            write_verses(type, direction, verse_ids, verse_html, paragraphs, in_paragraphs, options.top_verse, options.bottom_verse);
+                            
+                            if (type !== verse_lookup) {
+                                ///TODO: Implement
+                                ///TODO: Determine if it should send an object?
+                                ///NOTE: Only standard and mixed searches need verse_html data to be sent.
+                                options.highlight((type != grammatical_search ? verse_html.join("") : false), word_ids);
+                            }
+                            
+                            /// Indicate to the user that more content may be loading, and check for more content.
+                            ///TODO: Make a separate function for this.
+                            if (direction === additional && verse_ids[verse_ids.length - 1] < 66022021) {
+                                bottomLoader.style.visibility = "visible";
+                                content_manager.add_content_if_needed(direction);
+                            }
+                            if ((direction == previous || initial_query) && verse_ids[0] > 1001001) {
+                                topLoader.style.visibility    = "visible";
+                                content_manager.add_content_if_needed(previous);
+                            }
+                            
+                            /// The first or last verse IDs need to be store so that the server knowns where to start future queries.
+                            /// The first or last word IDs also need to be stored for future grammatical (and in the future, mixed) searches.
+                            if (direction === additional) {
+                                options.bottom_verse = verse_ids[verse_ids.length - 1];
+                                if (word_ids) {
+                                    options.bottom_id = word_ids[count - 1];
+                                }
+                            } else {
+                                options.top_verse = verse_ids[0];
+                                if (word_ids) {
+                                    options.top_id = word_ids[0];
+                                }
+                            }
+    
                         } else {
-                            /// If the user had scrolled down the page and then pressed the refresh button,
-                            /// the page will keep scrolling down as content is loaded, so to prevent this, force the window to scroll to the top of the page.
-                            content_manager.scroll_view_to(0);
+                            ///TODO: Make a separate function for this.
+                            if (direction === additional) {
+                                /// The user has reached the bottom by scrolling down (either RETURNED_SEARCH or RETURNED_VERSES_PREVIOUS), so we need to hide the loading graphic.
+                                /// This is cause by scrolling to Revelation 22:21 or end of search or there were no results.
+                                content_manager.reached_bottom();
+                                bottomLoader.style.visibility = "hidden";
+                            }
+                            ///BUG: there can be no results if looking up beyond rev 22.21 (e.g., rev 23). FIX: Prevent looking up past 66022021
+                            if (direction == previous || initial_query) {
+                                /// The user has reached the top of the page by scrolling up (either Genesis 1:1 or there were no search results), so we need to hide the loading graphic
+                                content_manager.reached_top();
+                                topLoader.style.visibility    = "hidden";
+                            }
                         }
                         
-                        /// Since the first query is done, set the initial_query property to FALSE.
-                        options.initial_query = false;
-                        
-                        infoBar.innerHTML = "";
-                        
-                        if (type !== verse_lookup) {
-                            /// Create the inital text.
-                            infoBar.appendChild(document.createTextNode(BF.format_number(total) + BF.lang["found_" + (total === 1 ? "singular" : "plural")]));
-                            /// Create a <b> for the search terms.
-                            b_tag = document.createElement("b");
-                            ///NOTE: We use this method instead of straight innerHTML to prevent HTML elements from appearing inside the <b></b>.
-                            ///TODO: Preserve excess whitespace in the raw query.
-                            b_tag.appendChild(document.createTextNode(options.raw_query));
-                            infoBar.appendChild(b_tag);
+                        /// Is this is the first results of a search or lookup?
+                        if (initial_query) {
+                            /// Are the results displayed in paragraphs and the verse looked up not at the beginning of a paragraph?
+                            ///TODO: Determine if this should require the search type to be a verse lookup.
+                            if (type === verse_lookup && in_paragraphs && verse_ids[0] != options.verse) {
+                                /// Because the verse the user is looking for is not at the beginning of a paragraph
+                                /// the text needs to be scrolled so that the verse is at the top.
+                                content_manager.scroll_to_verse(options.verse);
+                            } else {
+                                /// If the user had scrolled down the page and then pressed the refresh button,
+                                /// the page will keep scrolling down as content is loaded, so to prevent this, force the window to scroll to the top of the page.
+                                content_manager.scroll_view_to(0);
+                            }
+                            
+                            /// Since the first query is done, set the initial_query property to FALSE.
+                            options.initial_query = false;
+                            
+                            infoBar.innerHTML = "";
+                            
+                            if (type !== verse_lookup) {
+                                /// Create the inital text.
+                                infoBar.appendChild(document.createTextNode(BF.format_number(total) + BF.lang["found_" + (total === 1 ? "singular" : "plural")]));
+                                /// Create a <b> for the search terms.
+                                b_tag = document.createElement("b");
+                                ///NOTE: We use this method instead of straight innerHTML to prevent HTML elements from appearing inside the <b></b>.
+                                ///TODO: Preserve excess whitespace in the raw query.
+                                b_tag.appendChild(document.createTextNode(options.raw_query));
+                                infoBar.appendChild(b_tag);
+                            }
                         }
-                    }
-                }
-                
+                    };
+                }());
                 return {
                     query_additional: function ()
                     {
