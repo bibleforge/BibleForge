@@ -232,7 +232,7 @@ BF.get_position = function (obj)
  */
 BF.format_number = function (num)
 {
-    var rgx;
+    var re;
     
     if (num < 1000) {
         return num;
@@ -240,10 +240,10 @@ BF.format_number = function (num)
     
     /// Quickly converts a number to a string quickly.
     num += "";
-    rgx  = /^([0-9]+)([0-9][0-9][0-9])/;
+    re   = /^([0-9]+)([0-9][0-9][0-9])/;
     
-    while (rgx.test(num)) {
-        num = num.replace(rgx, "$1,$2");
+    while (re.test(num)) {
+        num = num.replace(re, "$1,$2");
     }
     
     return num;
