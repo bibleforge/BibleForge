@@ -1455,11 +1455,11 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         options.in_paragraphs = settings.view.in_paragraphs.get();
                         /// Create an empty verse_range object, which will be filled in as verses are retrieved.
                         options.verse_range   = {
-                            bottom_id,
-                            bottom_verse,
-                            top_id,
-                            top_verse
-                        }
+                            bottom_id:    0,
+                            bottom_verse: 0,
+                            top_id:       0,
+                            top_verse:    0
+                        };
                         
                         ajax_additional.query("post", "query.php", create_query_message(options), function (data)
                         {
