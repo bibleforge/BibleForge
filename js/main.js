@@ -412,8 +412,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         }());
         
         /******************************
-        * Start of Scrolling Closure *
-        ******************************/
+         * Start of Scrolling Closure *
+         ******************************/
         
         /**
          * The functions that handle the scrolling of the page and other related functions.
@@ -1004,6 +1004,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             window.pageXOffset = document.documentElement.scrollLeft;
                         @end
                     @*/
+                    /// Preserve the current x position by default.
                     x = window.pageXOffset;
                 }
                 
@@ -1016,7 +1017,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         /// If the scroll position is near the bottom (e.g., Revelation 22:21 or Proverbs 28:28) there needs to be extra space on the bottom.
                         pixels_needed = doc_docEl.clientHeight - (document.body.clientHeight - scroll_pos);
                         if (pixels_needed > 0) {
-                            padding_el              = document.createElement("div");
+                            padding_el = document.createElement("div");
+                            
                             padding_el.style.height = (pixels_needed + extra_padding) + 'px';
                             viewPort.insertBefore(padding_el, null);
                             
@@ -1082,10 +1084,11 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     topLoader.style.visibility    = "hidden";
                     has_reached_bottom = false;
                     has_reached_top    = false;
-                    page.innerHTML                = "";
+                    page.innerHTML = "";
                 },
                 get_verse_at_position: get_verse_at_position, /// TEMP
                 update_verse_range:    update_verse_range,
+                
                 reached_bottom: function ()
                 {
                     has_reached_bottom = true;
@@ -1125,8 +1128,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         }());
         
         /****************************
-        * End of Scrolling Closure *
-        ****************************/
+         * End of Scrolling Closure *
+         ****************************/
 
         
         query_manager = (function ()
