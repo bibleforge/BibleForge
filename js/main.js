@@ -80,7 +80,7 @@ BF.create_simple_ajax = function ()
             /**
              * Send an Ajax request to the server.
              *
-             * @example query("POST", "query.php", "q=search", function () {/// success}, function () {/// failure}, 10000, true);
+             * @example query("POST", "query.php", "q=search", function (data) {/// success}, function (status, data) {/// failure}, 10000, true);
              * @param   method    (string)              The HTTP method to use (GET || POST).
              * @param   path      (string)              The URL to query.
              * @param   message   (string)   (optional) The variables to send (URI format: "name1=value1&name2=value%202").
@@ -153,6 +153,7 @@ BF.create_simple_ajax = function ()
  * @param   retry   (boolean) (optional) Whether or not to retry loading the script if a timeout occurs.  (Default is TRUE.)
  * @return  NULL.   Runs code.
  * @todo    If the code has already been loaded, simply run the script without re-downloading anything.
+ * @todo    Determine if it would be better to use a callback function rather than passing context.
  */
 BF.include = (function ()
 {
@@ -161,7 +162,7 @@ BF.include = (function ()
      *
      * @param  code (string) The string to eval.
      * @return The result of the eval'ed code.
-     * @note   Called by ajax.onreadystatechange().
+     * @note   Called when the Ajax request returns successfully.
      * @note   This is used to prevent included code from having access to the variables inside of the function's scope.
      */
     function evaler(code)
@@ -1640,7 +1641,6 @@ document.onkeydown = function (e)
  * Start WebKit specific code *
  ******************************/
 
-/// Is the browser Chromium or WebKit based?
 if (BF.is_WebKit) {
     /// Inject CSS to make the drop caps aligned with the second line of text and add an inset shadow to the input box.
     ///NOTE: Needed for at least Chromium 8.
