@@ -983,11 +983,12 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             /**
              * Scroll the page to a specific point.
              *
-             * @param y      (number)             The Y position to scroll to (i.e, vertical position).
-             * @param x      (number)  (optional) The X position to scroll to (i.e, horizontal position).  If left undefined, it will maintin the current Y position.
-             * @param smooth (boolean) (optional) Whether or not to scroll smoothly.  By default, or if fasely, it will scroll instantaneously.
-             * @note  The y value is first because x value is rarely used.
-             * @todo  Indicate where used.
+             * @param  y      (number)             The Y position to scroll to (i.e, vertical position).
+             * @param  x      (number)  (optional) The X position to scroll to (i.e, horizontal position).  If left undefined, it will maintain the current Y position.
+             * @param  smooth (boolean) (optional) Whether or not to scroll smoothly.  By default, or if falsey, it will scroll instantaneously.
+             * @return NULL.
+             * @note   The y value is first because x value is rarely used.
+             * @todo   Indicate where used.
              */
             function scroll_view_to(y, x, smooth)
             {
@@ -1678,11 +1679,11 @@ if (window.opera) {
 /**
  * Fix IE's string.split.
  *
- * @param   s     (regexp || string) The regular expression or string with which to break the string.
- * @param   limit (int) (optional)   The number of times to split the string.
- * @return  Returns an array of the string now broken into pieces.
- * @see     http://blog.stevenlevithan.com/archives/cross-browser-split
- * @todo    Determine if IE9 still needs this.
+ * @param  s     (regexp || string) The regular expression or string with which to break the string.
+ * @param  limit (int) (optional)   The number of times to split the string.
+ * @return Returns an array of the string now broken into pieces.
+ * @see    http://blog.stevenlevithan.com/archives/cross-browser-split
+ * @todo   Determine if IE9 still needs this.
  */
 ///NOTE: The following conditional compilation code blocks only executes in IE.
 /*@cc_on
