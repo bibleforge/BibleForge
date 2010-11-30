@@ -292,7 +292,7 @@ first_loop:     for (i = 0; i < arr_len; ++i) {
              * @example	BF.prepare_highlighter("search terms");
              * @param	search_terms (string) The terms to look for.
              * @return	An array of regular expressions.
-             * @note	Called by run_search().
+             * @note	Called by run_new_query().
              */
             return function (search_terms)
             {
