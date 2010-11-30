@@ -1186,15 +1186,16 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                      *
                      * @example write_verses(type, direction, [verse_ids, ...], [verse_html, ...]);
                      * @example write_verses(verse_lookup, additional, [1001001], ["<a id=1>In</a> <a id=2>the</a> <a id=3>beginning....</a>"]);
-                     * @param   type       (integer) The type of query: verse_lookup || mixed_search || standard_search || grammatical_search.
-                     * @param   direction  (integer) The direction of the verses to be retrieved: additional || previous.
-                     * @param   verse_ids  (array)   An array of integers representing Bible verse references.
-                     * @param   verse_html (array)   An array of strings containing verses in HTML.
+                     * @param   type        (integer) The type of query: verse_lookup || mixed_search || standard_search || grammatical_search.
+                     * @param   direction   (integer) The direction of the verses to be retrieved: additional || previous.
+                     * @param   verse_ids   (array)   An array of integers representing Bible verse references.
+                     * @param   verse_html  (array)   An array of strings containing verses in HTML.
+                     * @param   verse_range (object)  An object containing the top and bottom verses, word IDs, and books.
                      * @return  NULL.  Writes HTML to the page.
                      * @note    Called by handle_new_verses().
                      * @note    verse_ids contains an array of verses in the following format: [B]BCCCVVV (e.g., Genesis 1:1 == 1001001).
                      */
-                    function write_verses(type, direction, verse_ids, verse_html, paragraphs, in_paragraphs, top_verse, bottom_verse)
+                    function write_verses(type, direction, verse_ids, verse_html, paragraphs, in_paragraphs, verse_range)
                     {
                         var b,
                             c,
@@ -1214,12 +1215,12 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         if (type == grammatical_search) {
                             if (direction === additional) {
                                 /// Is the first verse returned the same as the bottom verse on the page?
-                                if (bottom_verse == verse_ids[0]) {
+                                if (verse_range.bottom_verse == verse_ids[0]) {
                                     start_key = 1;
                                 }
                             /// Is the last verse returned the same as the top verse on the page?
                             ///NOTE: Currently, searches are always additional, so this cannot happen yet.
-                            } else if (top_verse == verse_ids[stop_key - 1]) {
+                            } else if (verse_range.top_verse == verse_ids[stop_key - 1]) {
                                 /// Stop one verse early because the last verse is already on the page.
                                 --stop_key;
                             }
@@ -1287,10 +1288,10 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                                 }
                                 
                                 /// Is this verse from a different book than the last verse?
-                                ///TODO: last_book is no longer stored in the closure.  Pass it somehow.
-                                if (b !== last_book) {
+                                ///NOTE: This assumes that searches are always additional (which is correct, currently).
+                                if (b !== verse_range.bottom_book) {
                                     /// We only need to print out the book if it is different from the last verse.
-                                    last_book = b;
+                                    verse_range.bottom_book = b;
                                     
                                     html_str += "<h1 class=short_book id=" + num + "_title>" + BF.lang.books_short[b] + "</h1>"; /// Convert the book number to text.
                                 }
@@ -1348,7 +1349,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         /// Where there any verses returned?
                         ///FIXME: Lookups always return 1 for success instead of the number of verses.  See functions/verse_lookup.php.
                         if (total) {
-                            write_verses(type, direction, verse_ids, verse_html, paragraphs, in_paragraphs, options.top_verse, options.bottom_verse);
+                            write_verses(type, direction, verse_ids, verse_html, paragraphs, in_paragraphs, options.verse_range);
                             
                             if (type !== verse_lookup) {
                                 ///TODO: Implement
@@ -1368,20 +1369,23 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                                 content_manager.add_content_if_needed(previous);
                             }
                             
-                            /// The first or last verse IDs need to be store so that the server knowns where to start future queries.
-                            /// The first or last word IDs also need to be stored for future grammatical (and in the future, mixed) searches.
                             if (direction === additional) {
-                                options.bottom_verse = verse_ids[verse_ids.length - 1];
+                                /// The last verse ID need to be store so that the server knowns where to start future queries.
+                                options.verse_range.bottom_verse = verse_ids[verse_ids.length - 1];
+                                
                                 if (word_ids) {
-                                    options.bottom_id = word_ids[count - 1];
+                                    /// The last word ID also need to be stored for future grammatical (and in the future, mixed) searches.
+                                    options.verse_range.bottom_id = word_ids[count - 1];
                                 }
                             } else {
-                                options.top_verse = verse_ids[0];
+                                /// The first verse ID need to be store so that the server knowns where to start future previous queries.
+                                options.verse_range.top_verse = verse_ids[0];
+                                ///NOTE: Not currently needed because all searches are additional.
                                 if (word_ids) {
-                                    options.top_id = word_ids[0];
+                                    /// The first word ID also need to be stored for future previous grammatical (and in the future, mixed) searches.
+                                    options.verse_range.top_id = word_ids[0];
                                 }
                             }
-    
                         } else {
                             ///TODO: Make a separate function for this.
                             if (direction === additional) {
@@ -1449,6 +1453,13 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         options.direction     = additional;
                         /// Since this settings can be changed by the user at run time, it must be retrieved before each query.
                         options.in_paragraphs = settings.view.in_paragraphs.get();
+                        /// Create an empty verse_range object, which will be filled in as verses are retrieved.
+                        options.verse_range   = {
+                            bottom_id,
+                            bottom_verse,
+                            top_id,
+                            top_verse
+                        }
                         
                         ajax_additional.query("post", "query.php", create_query_message(options), function (data)
                         {
