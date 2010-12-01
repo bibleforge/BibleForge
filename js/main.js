@@ -388,7 +388,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     {
                         var cur_verse;
                         
-                        if (last_type !== verse_lookup) {
+                        if (query_manager.get_query_type() !== verse_lookup) {
                             return;
                         }
                         
@@ -1136,7 +1136,9 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         query_manager = (function ()
         {
             var ajax_additional = BF.create_simple_ajax(),
-                ajax_previous   = BF.create_simple_ajax();
+                ajax_previous   = BF.create_simple_ajax(),
+                
+                query_type;
             
             function create_query_message(options)
             {
@@ -1435,6 +1437,10 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     };
                 }());
                 return {
+                    get_query_type: function ()
+                    {
+                        return query_type;
+                    },
                     query_additional: function ()
                     {
                         
@@ -1468,6 +1474,9 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             ///TODO: Removed unnecessary slashes from verse data.
                             handle_new_verses(BF.parse_json(data), options);
                         });
+                        
+                        /// Store the current query type so that outer functions can access this information.
+                        query_type = options.type;
                     },
                     query_previous: function ()
                     {
