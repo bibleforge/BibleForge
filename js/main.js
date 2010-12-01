@@ -455,6 +455,69 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 update_verse_range;
             
             /**
+             * Scroll the page to a specific point.
+             *
+             * @param  y      (number)             The Y position to scroll to (i.e, vertical position).
+             * @param  x      (number)  (optional) The X position to scroll to (i.e, horizontal position).  If left undefined, it will maintain the current Y position.
+             * @param  smooth (boolean) (optional) Whether or not to scroll smoothly.  By default, or if falsey, it will scroll instantaneously.
+             * @return NULL.
+             * @note   The y value is first because x value is rarely used.
+             * @todo   Indicate where used.
+             */
+            function scroll_view_to(y, x, smooth)
+            {
+                /// A small amount of extra padding is added just to ensure that the padding element will be large enough.
+                var extra_padding = 10,
+                    padding_el,
+                    padding_interval,
+                    pixels_needed;
+                
+                if (typeof x == "undefined") {
+                    /// IE8- does not set pageXOffset.
+                    /*@cc_on
+                        @if (@_jscript_version < 9)
+                            window.pageXOffset = document.documentElement.scrollLeft;
+                        @end
+                    @*/
+                    /// Preserve the current x position by default.
+                    x = window.pageXOffset;
+                }
+                
+                if (!smooth) {
+                    scroll_pos = y;
+                    
+                    /// Is the scroll position not the top of the page.
+                    if (scroll_pos > 0) {
+                        /// Calculate how many pixels (if any) need to be added in order to be able to scroll to the specified position.
+                        /// If the scroll position is near the bottom (e.g., Revelation 22:21 or Proverbs 28:28) there needs to be extra space on the bottom.
+                        pixels_needed = doc_docEl.clientHeight - (document.body.clientHeight - scroll_pos);
+                        if (pixels_needed > 0) {
+                            padding_el = document.createElement("div");
+                            
+                            padding_el.style.height = (pixels_needed + extra_padding) + 'px';
+                            viewPort.insertBefore(padding_el, null);
+                            
+                            /// Create a timer to check to see if the padding is no longer needed.
+                            ///NOTE: The padding element should be removed when more text loaded or the user scrolls up.
+                            padding_interval = window.setInterval(function ()
+                            {
+                                ///TODO: Document what scrollHeight, pageYOffset, and clientHeight actually measure.
+                                if (doc_docEl.scrollHeight - (window.pageYOffset + doc_docEl.clientHeight) > pixels_needed + extra_padding) {
+                                    viewPort.removeChild(padding_el);
+                                    window.clearInterval(padding_interval);
+                                }
+                            }, 1000);
+                        }
+                    }
+                    
+                    window.scrollTo(x, y);
+                } else {
+                    ///TODO: Do smooth scrolling.
+                }
+            }
+            
+            
+            /**
              * The scrolling closure
              *
              * @todo Determine if any variables can be placed in here.
@@ -978,69 +1041,6 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     }
                 };
             }());
-            
-            
-            /**
-             * Scroll the page to a specific point.
-             *
-             * @param  y      (number)             The Y position to scroll to (i.e, vertical position).
-             * @param  x      (number)  (optional) The X position to scroll to (i.e, horizontal position).  If left undefined, it will maintain the current Y position.
-             * @param  smooth (boolean) (optional) Whether or not to scroll smoothly.  By default, or if falsey, it will scroll instantaneously.
-             * @return NULL.
-             * @note   The y value is first because x value is rarely used.
-             * @todo   Indicate where used.
-             */
-            function scroll_view_to(y, x, smooth)
-            {
-                /// A small amount of extra padding is added just to ensure that the padding element will be large enough.
-                var extra_padding = 10,
-                    padding_el,
-                    padding_interval,
-                    pixels_needed;
-                
-                if (typeof x == "undefined") {
-                    /// IE8- does not set pageXOffset.
-                    /*@cc_on
-                        @if (@_jscript_version < 9)
-                            window.pageXOffset = document.documentElement.scrollLeft;
-                        @end
-                    @*/
-                    /// Preserve the current x position by default.
-                    x = window.pageXOffset;
-                }
-                
-                if (!smooth) {
-                    scroll_pos = y;
-                    
-                    /// Is the scroll position not the top of the page.
-                    if (scroll_pos > 0) {
-                        /// Calculate how many pixels (if any) need to be added in order to be able to scroll to the specified position.
-                        /// If the scroll position is near the bottom (e.g., Revelation 22:21 or Proverbs 28:28) there needs to be extra space on the bottom.
-                        pixels_needed = doc_docEl.clientHeight - (document.body.clientHeight - scroll_pos);
-                        if (pixels_needed > 0) {
-                            padding_el = document.createElement("div");
-                            
-                            padding_el.style.height = (pixels_needed + extra_padding) + 'px';
-                            viewPort.insertBefore(padding_el, null);
-                            
-                            /// Create a timer to check to see if the padding is no longer needed.
-                            ///NOTE: The padding element should be removed when more text loaded or the user scrolls up.
-                            padding_interval = window.setInterval(function ()
-                            {
-                                ///TODO: Document what scrollHeight, pageYOffset, and clientHeight actually measure.
-                                if (doc_docEl.scrollHeight - (window.pageYOffset + doc_docEl.clientHeight) > pixels_needed + extra_padding) {
-                                    viewPort.removeChild(padding_el);
-                                    window.clearInterval(padding_interval);
-                                }
-                            }, 1000);
-                        }
-                    }
-                    
-                    window.scrollTo(x, y);
-                } else {
-                    ///TODO: Do smooth scrolling.
-                }
-            }
             
             
             /**
