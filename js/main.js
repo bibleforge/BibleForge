@@ -1437,6 +1437,12 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     };
                 }());
                 return {
+                    /**
+                     * Get the current query type.
+                     *
+                     * @note Called by settings.in_paragraphs.set().
+                     * @todo Document
+                     */
                     get_query_type: function ()
                     {
                         return query_type;
