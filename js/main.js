@@ -1630,7 +1630,6 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 
                 /// Step 4: Prepare for new results (clear page(?), prepare highlighter if applicable)
                 
-                ///NOTE: Do we need to keep track of the last book?  I.e., last_book = 0;
                 content_manager.clear_scroll();
                 
                 ///TODO: Determine if this should be done by a separate function.
@@ -1639,10 +1638,18 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 /// Stop filling in the explanation text so that the user can make the query box blank.  (Text in the query box can be distracting while reading.)
                 q_obj.onblur = function () {};
                 
-                /// Was the query a search?  Searches need to have the highlighter function prepared for the incoming results.
+                /// Was the query a search?  Searches need to have the highlight function prepared for the incoming results.
                 if (options.type !== verse_lookup) {
-                    ///TODO: Implement
-                    options.highlight = BF.prepare_highlighter(query);
+                    ///TODO: Determine a good way to cache the highlight function/array.
+                    options.highlight = (function ()
+                    {
+                        var highlight_re = BF.prepare_highlighter(query);
+                        
+                        return function (html, word_ids)
+                        {
+                            ///TODO: Implement highlighting.
+                        };
+                    }());
                 }
                 
                 /// Is there any chance that there are verses above the starting verse?
