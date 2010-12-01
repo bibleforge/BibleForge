@@ -663,10 +663,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         /// Find and indicate the range of verses displayed on the screen.
                         update_verse_range();
                         
-                        /// Don't look up more data until the first results come.
-                        if (waiting_for_first_search) {
-                            return;
-                        }
+                        ///TODO: Determine if this function stop if the initial query is still being loaded?  How often would this occur?
                         
                         /// Since the page is scrolling, we need to determine if more content needs to be added or if some content should be hidden.
                         
