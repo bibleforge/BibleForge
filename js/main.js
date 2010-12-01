@@ -440,10 +440,9 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 has_reached_bottom,
                 
                 looking_up_verse_range         = false,
-                lookup_delay                   = 200,
+                
+                lookup_delay                   = 50,    /// In milliseconds
                 lookup_range_speed             = 300,   /// In milliseconds
-                lookup_speed_scrolling         = 50,    /// In milliseconds
-                lookup_speed_sitting           = 100,   /// In milliseconds
                 
                 remove_content_bottom_timeout,
                 remove_content_top_timeout,
@@ -920,13 +919,14 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                  * @param   direction (integer) The direction that verses should be added: additional || previous.
                  * @return  Null.  A function is run after a delay that may add verses to the page.
                  * @note    Called by add_content_bottom_if_needed(), add_content_top_if_needed(), handle_new_verses(), window.onresize(), and scrolling().
+                 * @todo    Get rid of this unnecessary function.
                  */
                 return function (direction)
                 {
                     if (direction === additional) {
-                        window.setTimeout(add_content_bottom_if_needed, lookup_speed_sitting);
+                        window.setTimeout(add_content_bottom_if_needed, lookup_delay);
                     } else {
-                        window.setTimeout(add_content_top_if_needed,    lookup_speed_scrolling);
+                        window.setTimeout(add_content_top_if_needed,    lookup_delay);
                     }
                 };
             }());
@@ -1362,7 +1362,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             ///TODO: Make a separate function for this.
                             if (direction === additional && verse_ids[verse_ids.length - 1] < 66022021) {
                                 bottomLoader.style.visibility = "visible";
-                                content_manager.add_content_if_needed(direction);
+                                content_manager.add_content_if_needed(additional);
                             }
                             if ((direction == previous || initial_query) && verse_ids[0] > 1001001) {
                                 topLoader.style.visibility    = "visible";
