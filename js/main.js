@@ -950,6 +950,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 function update_verse_range_delayed()
                 {
                     var new_title,
+                        query_type,
                         ref_range,
                         verse1,
                         verse2;
@@ -1000,13 +1001,14 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         ref_range = verse1.b + " " + verse1.c + ":" + verse1.v + "\u2013" + verse2.b + " " + verse2.c + ":" + verse2.v;
                     }
                     
-                    /// last_type is set in prepare_new_search().
+                    /// Store the query type in a variable because it needs to be accessed more than once.
+                    query_type = query_manager.get_query_type();
                     /// The verse range is displayed differently based on the type of search (i.e., a verse lookup or a search).
                     ///TODO: Set the date of the verse (or when it was written).
-                    if (last_type === verse_lookup) {
+                    if (query_type === verse_lookup) {
                         new_title = ref_range + " - " + BF.lang.app_name;
                     } else {
-                        new_title = last_search + " (" + ref_range + ") - " + BF.lang.app_name;
+                        new_title = query_manager.get_raw_query() + " (" + ref_range + ") - " + BF.lang.app_name;
                     }
                     
                     /// Is the new verse range the same as the old one?
@@ -1015,8 +1017,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         document.title = new_title;
                         
                         /// Display the verse range on the page if looking up verses.
-                        ///FIXME: There should be a variable that shows the current view mode and not rely on last_type.
-                        if (last_type === verse_lookup) {
+                        if (query_type === verse_lookup) {
                             ///TODO: Find a better way to clear infoBar than using innerHTML.
                             infoBar.innerHTML = "";
                             infoBar.appendChild(document.createTextNode(ref_range));
@@ -1135,7 +1136,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             var ajax_additional = BF.create_simple_ajax(),
                 ajax_previous   = BF.create_simple_ajax(),
                 
-                query_type;
+                query_type,
+                raw_query;
             
             function create_query_message(options)
             {
@@ -1444,6 +1446,16 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     {
                         return query_type;
                     },
+                    /**
+                     * Get the current query type.
+                     *
+                     * @note Called by content_manager.update_verse_range_delayed().
+                     * @todo Document
+                     */
+                    get_raw_query: function ()
+                    {
+                        return raw_query;
+                    },
                     query_additional: function ()
                     {
                         
@@ -1480,6 +1492,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         
                         /// Store the current query type so that outer functions can access this information.
                         query_type = options.type;
+                        /// Store the current query so that outer functions can access this information.
+                        raw_query  = options.raw_query;
                     },
                     query_previous: function ()
                     {
