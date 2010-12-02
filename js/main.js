@@ -1470,6 +1470,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         /// Initial queries may need special options (e.g., the f variable (to find paragraph breaks) is only passed on initial queries).
                         options.initial_query = true;
                         /// Initial queries are always additional.
+                        ///TODO: Determine if it should not store direction in the options because it changes between previous and additional searches.
                         options.direction     = additional;
                         /// Since this settings can be changed by the user at run time, it must be retrieved before each query.
                         options.in_paragraphs = settings.view.in_paragraphs.get();
@@ -1493,6 +1494,34 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         query_type = options.type;
                         /// Store the current query so that outer functions can access this information.
                         raw_query  = options.raw_query;
+                        
+                        this.query_additional = function ()
+                        {
+                            options.direction = additional;
+                            /// Since this settings can be changed by the user at run time, it must be retrieved before each query.
+                            options.in_paragraphs = settings.view.in_paragraphs.get();
+                            ajax_additional.query("post", "query.php", create_query_message(options), function (data)
+                            {
+                                /// On Success
+                                ///TODO: What should be done from here?  Should it be sent to a function, like handle_new_verses()?
+                                ///TODO: Removed unnecessary slashes from verse data.
+                                handle_new_verses(BF.parse_json(data), options);
+                            });
+                        };
+                        
+                        this.query_previous = function ()
+                        {
+                            options.direction = previous;
+                            /// Since this settings can be changed by the user at run time, it must be retrieved before each query.
+                            options.in_paragraphs = settings.view.in_paragraphs.get();
+                            ajax_additional.query("post", "query.php", create_query_message(options), function (data)
+                            {
+                                /// On Success
+                                ///TODO: What should be done from here?  Should it be sent to a function, like handle_new_verses()?
+                                ///TODO: Removed unnecessary slashes from verse data.
+                                handle_new_verses(BF.parse_json(data), options);
+                            });
+                        };
                     },
                     query_previous: function ()
                     {
