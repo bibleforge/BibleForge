@@ -861,7 +861,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                                 return;
                             }
                             /// Get more content.
-                            run_search(additional);
+                            query_manager.query_additional();
                         }
                     }
                 }
@@ -907,7 +907,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                                 return;
                             }
                             /// Get more content.
-                            run_search(previous);
+                            query_manager.query_previous();
                         }
                     }
                 }
