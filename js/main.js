@@ -1705,7 +1705,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     ///TODO: Determine a good way to cache the highlight function/array.
                     options.highlight = (function ()
                     {
-                        var highlight_re = BF.prepare_highlighter(query);
+                        var highlight_re = BF.lang.prepare_highlighter(query);
                         
                         return function (html, word_ids)
                         {
