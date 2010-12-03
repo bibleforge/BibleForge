@@ -1631,8 +1631,9 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 /// The search is just a standard search, so just return the type and the original query.
                 return [
                     {
-                        query: window.encodeURIComponent(search_terms),
-                        type:  standard_search
+                        query:          window.encodeURIComponent(search_terms),
+                        standard_terms: search_terms,
+                        type:           standard_search
                     }
                 ];
             }
@@ -1644,6 +1645,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 ///NOTE: Whitespace must be trimmed after this function because it may create excess whitespace.
                 var options = {raw_query: raw_query},
                     query   = BF.lang.prepare_search(raw_query).trim(),
+                    /// Search terms that are not grammatical.
+                    standard_terms,
                     verse_id;
                 
                 if (query === "") {
@@ -1674,12 +1677,14 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     
                     /// Is the query mixed (both standard and grammatical)?
                     if (query.length > 1) {
+                        ///TODO: Implement mixed searching.
                         options.query = query;
                         options.type  = mixed_search;
                     } else {
                         ///NOTE: If it is not mixed, then there is currently only one array element, so get the variables out of it.
-                        options.query = query[0].query;
-                        options.type  = query[0].type;
+                        options.query  = query[0].query;
+                        options.type   = query[0].type;
+                        standard_terms = query[0].standard_terms;
                     }
                 }
                 
@@ -1703,16 +1708,40 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     ///TODO: Determine a good way to cache the highlight function/array.
                     options.highlight = (function ()
                     {
-                        var highlight_re;
+                        var highlight_re,
+                            highlight_re_length;
                         
                         /// TODO: Handle mixed searches.
                         if (options.type == standard_search) {
-                            highlight_re = BF.lang.prepare_highlighter(options.query);
+                            /// standard_terms is a string containing all of the terms in a standard search (i.e., excluding grammatical search terms when preforming a mixed search).
+                            highlight_re        = BF.lang.prepare_highlighter(standard_terms);
+                            highlight_re_length = highlight_re.length;
                         }
                         
                         return function (html, word_ids)
                         {
-                            ///TODO: Implement highlighting.
+                            var i,
+                                ids,
+                                re_id,
+                                tmp_found_ids = [];
+                            
+                            /// Are there standard verses to 
+                            /// TODO: Handle mixed searches too.
+                            if (options.type == standard_search) {
+                                re_id = 0;
+                                while (re_id < highlight_re_length) {
+                                    tmp_found_ids = html.split(highlight_re[re_id]);
+                                    
+                                    ids = tmp_found_ids.length;
+                                    ///NOTE: search_str.split() creates an array of the HTML with the correct ids every third one.
+                                    for (i = 1; i < ids; i += 2) {
+                                        ///TODO: Determine if there is a downside to having a space at the start of the className.
+                                        ///TODO: Determine if we ever need to replace an existing f* className.
+                                        document.getElementById(tmp_found_ids[i]).className += " f" + (re_id + 1);
+                                    }
+                                    ++re_id;
+                                }
+                            }
                         };
                     }());
                 }
