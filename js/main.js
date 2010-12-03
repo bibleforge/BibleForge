@@ -1361,6 +1361,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             if (direction === additional) {
                                 /// The last verse ID need to be store so that the server knowns where to start future queries.
                                 options.verse_range.bottom_verse = verse_ids[verse_ids.length - 1];
+                                
                                 if (word_ids) {
                                     /// The last word ID also need to be stored for future grammatical (and in the future, mixed) searches.
                                     options.verse_range.bottom_id = word_ids[count - 1];
@@ -1376,19 +1377,19 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             }
                             
                             if (direction == previous || initial_query) {
-                                /// The last verse ID need to be store so that the server knowns where to start future queries.
-                                options.verse_range.bottom_verse = verse_ids[verse_ids.length - 1];
+                                /// The first verse ID need to be store so that the server knowns where to start future previous queries.
+                                options.verse_range.top_verse = verse_ids[0];
                                 
                                 if (word_ids) {
-                                    /// The last word ID also need to be stored for future grammatical (and in the future, mixed) searches.
-                                    options.verse_range.bottom_id = word_ids[count - 1];
+                                    /// The first word ID also need to be stored for future previous grammatical (and in the future, mixed) searches.
+                                    options.verse_range.top_id = word_ids[0];
                                 }
                                 
                                 /// Are there still more verses to be retreved?
                                 if (verse_ids[0] > 1001001) {
                                     /// Indicate to the user that more content may be loading, and check for more content.
                                     ///TODO: Make a separate function for this.
-                                    topLoader.style.visibility    = "visible";
+                                    topLoader.style.visibility = "visible";
                                     content_manager.add_content_if_needed(previous);
                                 }
                             }
@@ -1506,12 +1507,11 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             options.direction = additional;
                             /// Since this settings can be changed by the user at run time, it must be retrieved before each query.
                             options.in_paragraphs = settings.view.in_paragraphs.get();
+                            options.verse = options.verse_range.bottom_verse + 1;
                             ajax_additional.query("post", "query.php", create_query_message(options), function (data)
                             {
                                 /// On Success
                                 ///TODO: What should be done from here?  Should it be sent to a function, like handle_new_verses()?
-                                ///TODO: Removed unnecessary slashes from verse data.
-                                console.log(options);
                                 handle_new_verses(BF.parse_json(data), options);
                             });
                         };
@@ -1521,12 +1521,12 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             options.direction = previous;
                             /// Since this settings can be changed by the user at run time, it must be retrieved before each query.
                             options.in_paragraphs = settings.view.in_paragraphs.get();
+                            options.verse = options.verse_range.top_verse - 1;
+                            
                             ajax_additional.query("post", "query.php", create_query_message(options), function (data)
                             {
                                 /// On Success
                                 ///TODO: What should be done from here?  Should it be sent to a function, like handle_new_verses()?
-                                ///TODO: Removed unnecessary slashes from verse data.
-                                console.log(options);
                                 handle_new_verses(BF.parse_json(data), options);
                             });
                         };
