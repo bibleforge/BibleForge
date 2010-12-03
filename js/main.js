@@ -1688,8 +1688,6 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 /// Prepare the initial query, create functions to handle additional and previous queries.
                 query_manager.query(options);
                 
-                
-                
                 /// Step 4: Prepare for new results (clear page(?), prepare highlighter if applicable)
                 
                 content_manager.clear_scroll();
@@ -1705,7 +1703,12 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     ///TODO: Determine a good way to cache the highlight function/array.
                     options.highlight = (function ()
                     {
-                        var highlight_re = BF.lang.prepare_highlighter(query);
+                        var highlight_re;
+                        
+                        /// TODO: Handle mixed searches.
+                        if (options.type == standard_search) {
+                            highlight_re = BF.lang.prepare_highlighter(options.query);
+                        }
                         
                         return function (html, word_ids)
                         {
