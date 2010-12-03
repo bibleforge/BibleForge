@@ -1358,18 +1358,24 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                                 options.highlight((type != grammatical_search ? verse_html.join("") : false), word_ids);
                             }
                             
-                            /// Indicate to the user that more content may be loading, and check for more content.
-                            ///TODO: Make a separate function for this.
-                            if (direction === additional && verse_ids[verse_ids.length - 1] < 66022021) {
-                                bottomLoader.style.visibility = "visible";
-                                content_manager.add_content_if_needed(additional);
-                            }
-                            if ((direction == previous || initial_query) && verse_ids[0] > 1001001) {
-                                topLoader.style.visibility    = "visible";
-                                content_manager.add_content_if_needed(previous);
+                            if (direction === additional) {
+                                /// The last verse ID need to be store so that the server knowns where to start future queries.
+                                options.verse_range.bottom_verse = verse_ids[verse_ids.length - 1];
+                                if (word_ids) {
+                                    /// The last word ID also need to be stored for future grammatical (and in the future, mixed) searches.
+                                    options.verse_range.bottom_id = word_ids[count - 1];
+                                }
+                                
+                                /// Are there still more verses to be retreved?
+                                if (verse_ids[verse_ids.length - 1] < 66022021) {
+                                    /// Indicate to the user that more content may be loading, and check for more content.
+                                    ///TODO: Make a separate function for this.
+                                    bottomLoader.style.visibility = "visible";
+                                    content_manager.add_content_if_needed(additional);
+                                }
                             }
                             
-                            if (direction === additional) {
+                            if (direction == previous || initial_query) {
                                 /// The last verse ID need to be store so that the server knowns where to start future queries.
                                 options.verse_range.bottom_verse = verse_ids[verse_ids.length - 1];
                                 
@@ -1377,13 +1383,13 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                                     /// The last word ID also need to be stored for future grammatical (and in the future, mixed) searches.
                                     options.verse_range.bottom_id = word_ids[count - 1];
                                 }
-                            } else {
-                                /// The first verse ID need to be store so that the server knowns where to start future previous queries.
-                                options.verse_range.top_verse = verse_ids[0];
-                                ///NOTE: Not currently needed because all searches are additional.
-                                if (word_ids) {
-                                    /// The first word ID also need to be stored for future previous grammatical (and in the future, mixed) searches.
-                                    options.verse_range.top_id = word_ids[0];
+                                
+                                /// Are there still more verses to be retreved?
+                                if (verse_ids[0] > 1001001) {
+                                    /// Indicate to the user that more content may be loading, and check for more content.
+                                    ///TODO: Make a separate function for this.
+                                    topLoader.style.visibility    = "visible";
+                                    content_manager.add_content_if_needed(previous);
                                 }
                             }
                         } else {
@@ -1505,6 +1511,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                                 /// On Success
                                 ///TODO: What should be done from here?  Should it be sent to a function, like handle_new_verses()?
                                 ///TODO: Removed unnecessary slashes from verse data.
+                                console.log(options);
                                 handle_new_verses(BF.parse_json(data), options);
                             });
                         };
@@ -1519,6 +1526,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                                 /// On Success
                                 ///TODO: What should be done from here?  Should it be sent to a function, like handle_new_verses()?
                                 ///TODO: Removed unnecessary slashes from verse data.
+                                console.log(options);
                                 handle_new_verses(BF.parse_json(data), options);
                             });
                         };
