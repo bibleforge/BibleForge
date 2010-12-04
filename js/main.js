@@ -1492,8 +1492,53 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         ajax_additional.query("post", "query.php", create_query_message(options), function (data)
                         {
                             /// On Success
-                            ///TODO: What should be done from here?  Should it be sent to a function, like handle_new_verses()?
-                            ///TODO: Removed unnecessary slashes from verse data.
+                            
+                            /// Set the additional and previous query functions now that the initial query has loaded.
+                            ///TODO: Determine if it would be better to have a delay.
+                            ///TODO: Determine if it would be better to store the old this variable and use that instead of query_manager to reference the functions.
+                            query_manager.query_additional = function ()
+                            {
+                                var in_paragraphs = settings.view.in_paragraphs.get(),
+                                    verse         = options.verse_range.bottom_verse + 1;
+                                
+                                options.direction     = additional;
+                                /// Since this settings can be changed by the user at run time, it must be retrieved before each query.
+                                options.in_paragraphs = in_paragraphs;
+                                options.verse         = verse;
+                                ajax_additional.query("post", "query.php", create_query_message(options), function (data)
+                                {
+                                    /// On Success
+                                    /// Reset the options just in case they were change in the mean time.
+                                    ///TODO: IS there a better way to do this?
+                                    options.direction     = additional;
+                                    options.in_paragraphs = in_paragraphs;
+                                    options.verse         = verse;
+                                    handle_new_verses(BF.parse_json(data), options);
+                                });
+                            };
+                            
+                            query_manager.query_previous = function ()
+                            {
+                                var in_paragraphs = settings.view.in_paragraphs.get(),
+                                    verse         = options.verse_range.top_verse - 1;
+                                
+                                options.direction     = previous;
+                                /// Since this settings can be changed by the user at run time, it must be retrieved before each query.
+                                options.in_paragraphs = in_paragraphs;
+                                options.verse         = verse;
+                                
+                                ajax_additional.query("post", "query.php", create_query_message(options), function (data)
+                                {
+                                    /// On Success
+                                    ///TODO: What should be done from here?  Should it be sent to a function, like handle_new_verses()?
+                                    options.direction     = previous;
+                                    options.in_paragraphs = in_paragraphs;
+                                    options.verse         = verse;
+                                
+                                    handle_new_verses(BF.parse_json(data), options);
+                                });
+                            };
+                            
                             handle_new_verses(BF.parse_json(data), options);
                         });
                         
@@ -1502,34 +1547,9 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         /// Store the current query so that outer functions can access this information.
                         raw_query  = options.raw_query;
                         
-                        this.query_additional = function ()
-                        {
-                            options.direction = additional;
-                            /// Since this settings can be changed by the user at run time, it must be retrieved before each query.
-                            options.in_paragraphs = settings.view.in_paragraphs.get();
-                            options.verse = options.verse_range.bottom_verse + 1;
-                            ajax_additional.query("post", "query.php", create_query_message(options), function (data)
-                            {
-                                /// On Success
-                                ///TODO: What should be done from here?  Should it be sent to a function, like handle_new_verses()?
-                                handle_new_verses(BF.parse_json(data), options);
-                            });
-                        };
-                        
-                        this.query_previous = function ()
-                        {
-                            options.direction = previous;
-                            /// Since this settings can be changed by the user at run time, it must be retrieved before each query.
-                            options.in_paragraphs = settings.view.in_paragraphs.get();
-                            options.verse = options.verse_range.top_verse - 1;
-                            
-                            ajax_additional.query("post", "query.php", create_query_message(options), function (data)
-                            {
-                                /// On Success
-                                ///TODO: What should be done from here?  Should it be sent to a function, like handle_new_verses()?
-                                handle_new_verses(BF.parse_json(data), options);
-                            });
-                        };
+                        /// Clear additional and previous query functions to prevent queries while the initial query is loading.
+                        this.query_additional = function () {};
+                        this.query_previous   = function () {};
                     },
                     query_previous: function ()
                     {
