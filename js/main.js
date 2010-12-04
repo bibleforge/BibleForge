@@ -1496,6 +1496,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             /// Set the additional and previous query functions now that the initial query has loaded.
                             ///TODO: Determine if it would be better to have a delay.
                             ///TODO: Determine if it would be better to store the old this variable and use that instead of query_manager to reference the functions.
+                            ///TODO: Merge query_additional() and query_previous().
                             query_manager.query_additional = function ()
                             {
                                 var in_paragraphs = settings.view.in_paragraphs.get(),
