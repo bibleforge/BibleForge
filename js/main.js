@@ -884,7 +884,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     }
                     
                     /// Is the user scrolling close to the top of the page?
-                    if (child.clientHeight + buffer_add > window.pageYOffset) {
+                    if (buffer_add > window.pageYOffset) {
                         /// Can the content be grabbed from cache?
                         if (cached_count_top > 0) {
                             newEl = document.createElement("div");
