@@ -388,7 +388,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     {
                         var cur_verse;
                         
-                        if (query_manager.get_query_type() !== verse_lookup) {
+                        if (query_manager.query_type !== verse_lookup) {
                             return;
                         }
                         
@@ -1008,7 +1008,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     if (query_type === verse_lookup) {
                         new_title = ref_range + " - " + BF.lang.app_name;
                     } else {
-                        new_title = query_manager.get_raw_query() + " (" + ref_range + ") - " + BF.lang.app_name;
+                        new_title = query_manager.raw_query + " (" + ref_range + ") - " + BF.lang.app_name;
                     }
                     
                     /// Is the new verse range the same as the old one?
@@ -1134,10 +1134,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         query_manager = (function ()
         {
             var ajax_additional = BF.create_simple_ajax(),
-                ajax_previous   = BF.create_simple_ajax(),
-                
-                query_type,
-                raw_query;
+                ajax_previous   = BF.create_simple_ajax();
             
             function create_query_message(options)
             {
@@ -1441,27 +1438,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         }
                     };
                 }());
+                
                 return {
-                    /**
-                     * Get the current query type.
-                     *
-                     * @note Called by settings.in_paragraphs.set().
-                     * @todo Document
-                     */
-                    get_query_type: function ()
-                    {
-                        return query_type;
-                    },
-                    /**
-                     * Get the current query type.
-                     *
-                     * @note Called by content_manager.update_verse_range_delayed().
-                     * @todo Document
-                     */
-                    get_raw_query: function ()
-                    {
-                        return raw_query;
-                    },
                     query_additional: function ()
                     {
                         
@@ -1496,9 +1474,9 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         });
                         
                         /// Store the current query type so that outer functions can access this information.
-                        query_type = options.type;
+                        this.query_type = options.type;
                         /// Store the current query so that outer functions can access this information.
-                        raw_query  = options.raw_query;
+                        this.raw_query  = options.raw_query;
                         
                         
                         ///TODO: Merge query_additional() and query_previous().
@@ -1563,7 +1541,11 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     query_previous: function ()
                     {
                         
-                    }
+                    },
+                    
+                    /// Variables excessable to outer functions.
+                    query_type: "",
+                    raw_query:  ""
                 };
             }());
         }());
