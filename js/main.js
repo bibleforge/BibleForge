@@ -1984,7 +1984,7 @@ if (window.opera) {
         output        = [];
         origLastIndex = s.lastIndex;
         lastLastIndex = 0;
-        i = 0;
+        i             = 0;
         
         if (typeof limit == "undefined" || +limit < 0) {
             limit = false;
