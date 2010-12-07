@@ -1002,7 +1002,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     }
                     
                     /// Store the query type in a variable because it needs to be accessed more than once.
-                    query_type = query_manager.get_query_type();
+                    query_type = query_manager.query_type;
                     /// The verse range is displayed differently based on the type of search (i.e., a verse lookup or a search).
                     ///TODO: Set the date of the verse (or when it was written).
                     if (query_type === verse_lookup) {
