@@ -1738,6 +1738,14 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                                     }
                                     ++re_id;
                                 }
+                            ///NOTE: In order to support mixed searches, this will have to be a separate IF statement.
+                            } else {
+                                ids = word_ids.length;
+                                for (i = 0; i < ids; ++i) {
+                                    ///TODO: Determine if there is a downside to having a space at the start of the className.
+                                    ///TODO: Determine if we ever need to replace an existing f* className.
+                                    document.getElementById(word_ids[i]).className += " f" + 1;
+                                }
                             }
                         };
                     }());
