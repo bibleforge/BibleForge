@@ -2052,4 +2052,5 @@ if (window.opera) {
  ***************************/
 
 /// Initialize BibleForge.
+///TODO: Require just one element and find the rest dynamically.
 BF.create_viewport(document.getElementById("viewPort0"), document.getElementById("searchForm0"), document.getElementById("q0"), document.getElementById("scroll0"), document.getElementById("infoBar0"), document.getElementById("topLoader0"), document.getElementById("bottomLoader0"), document.documentElement);
