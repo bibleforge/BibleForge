@@ -1365,7 +1365,6 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     /// Is this is the first results of a search or lookup?
                     if (initial_query) {
                         /// Are the results displayed in paragraphs and the verse looked up not at the beginning of a paragraph?
-                        ///TODO: Determine if this should require the search type to be a verse lookup.
                         if (type === verse_lookup && in_paragraphs && verse_ids[0] != options.verse) {
                             /// Because the verse the user is looking for is not at the beginning of a paragraph
                             /// the text needs to be scrolled so that the verse is at the top.
@@ -1410,6 +1409,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         /// q Query     (string)  The verse reference or search string to query
                         /// s Start At  (string)  The verse or word id at which to start the query       (search only)
                         /// t Type      (number)  The type of query (verse_lookup, mixed_search, standard_search, grammatical_search)
+                        
                         var query_str = "t=" + options.type;
                         
                         if (options.type === verse_lookup) {
@@ -1432,7 +1432,11 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         } else {
                             query_str += "&q=" + options.query;
                             
-                            if (options.verse) {
+                            /// Grammatical and mixed searches set start_at (except for initial searches).
+                            if (options.start_at) {
+                                query_str += "&s=" + options.start_at;
+                            /// Standard searches set the verse (except for initial searches).
+                            } else if (options.verse) {
                                 query_str += "&s=" + options.verse;
                             }
                         }
@@ -1446,8 +1450,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         {
                             return function ()
                             {
-                                var in_paragraphs,
-                                    verse;
+                                var in_paragraphs;
                                 
                                 if (options.initial_query || ajax.is_busy()) {
                                     return;
@@ -1455,28 +1458,39 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                                 
                                 in_paragraphs = settings.view.in_paragraphs.get();
                                 
-                                /// Determine which verse to start from for the next query.
-                                ///NOTE: It does not matter whether or not the verse exists.  The server will simply retrieve the next avaiable verse.
-                                ///      For example, Romans 1:33 will retreieve verses starting at Romans 2:1 (when the direction is additional).
-                                if (direction === additional) {
-                                    verse = options.verse_range.bottom_verse + 1;
+                                if (options.type === verse_lookup || options.type == standard_search) {
+                                    /// Determine which verse to start from for the next query.
+                                    ///NOTE: It does not matter whether or not the verse exists.  The server will simply retrieve the next available verse.
+                                    ///      For example, Romans 1:33 will retrieve verses starting at Romans 2:1 (when the direction is additional).
+                                    if (direction === additional) {
+                                        options.verse = options.verse_range.bottom_verse + 1;
+                                    } else {
+                                        options.verse = options.verse_range.top_verse    - 1;
+                                    }
                                 } else {
-                                    verse = options.verse_range.top_verse    - 1;
+                                    /// Determine which word to begin searching at for grammatical/mixed searches.
+                                    if (direction === additional) {
+                                        options.start_at = options.verse_range.bottom_id + 1;
+                                    } else {
+                                        ///NOTE: Currently, all searches are additional, so this code does not yet run.
+                                        options.start_at = options.verse_range.top_id    - 1;
+                                    }
                                 }
                                 
                                 options.direction     = direction;
                                 /// Since this settings can be changed by the user at run time, it must be retrieved before each query.
                                 options.in_paragraphs = in_paragraphs;
-                                options.verse         = verse;
                                 
                                 ajax.query("post", "query.php", create_query_message(options), function (data)
                                 {
                                     /// On Success
-                                    ///TODO: What should be done from here?  Should it be sent to a function, like handle_new_verses()?
+                                    ///NOTE: direction and in_paragraphs need to be set again because they could have been changed by another query in the mean time.
+                                    ///      options.verse and options.start_at could also be changed but they are not needed in handle_new_verses().
+                                    ///      options.verse is used in handle_new_verses() for initial queries, but it will not be changed until after the initial query loads.
+                                    ///TODO: Determine if there is a better way to store variables that change, like direction, in_paragraphs, verse, and start_at.
                                     options.direction     = direction;
                                     options.in_paragraphs = in_paragraphs;
-                                    options.verse         = verse;
-                                
+                                    
                                     handle_new_verses(BF.parse_json(data), options);
                                 });
                             };
