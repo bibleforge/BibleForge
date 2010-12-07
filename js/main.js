@@ -1317,7 +1317,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             
                             if (word_ids) {
                                 /// The last word ID also need to be stored for future grammatical (and in the future, mixed) searches.
-                                options.verse_range.bottom_id = word_ids[count - 1];
+                                options.verse_range.bottom_id = word_ids[word_ids.length - 1];
                             }
                             
                             /// Are there still more verses to be retreved?
