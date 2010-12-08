@@ -1079,8 +1079,10 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     ///TODO: This should have smooth scrolling effects, etc.
                     bottomLoader.style.visibility = "hidden";
                     topLoader.style.visibility    = "hidden";
+                    
                     has_reached_bottom = false;
                     has_reached_top    = false;
+                    
                     page.innerHTML = "";
                 },
                 get_verse_at_position: get_verse_at_position, /// TEMP
