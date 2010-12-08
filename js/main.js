@@ -510,8 +510,6 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     }
                     
                     window.scrollTo(x, y);
-                } else {
-                    ///TODO: Do smooth scrolling.
                 }
             }
             
