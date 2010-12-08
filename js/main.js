@@ -1280,7 +1280,6 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 return function (data, options)
                 {
                     var b_tag,
-                        count,
                         
                         direction     = options.direction,
                         in_paragraphs = options.in_paragraphs,
