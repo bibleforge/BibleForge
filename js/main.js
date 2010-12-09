@@ -423,96 +423,18 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
          */
         content_manager = (function ()
         {
-            var add_content_if_needed,
-                
-                buffer_add                     = 1000,  /// In milliseconds
-                buffer_rem                     = 10000, /// In milliseconds
-                
-                cached_count_bottom            = 0,
-                cached_count_top               = 0,
-                cached_verses_bottom           = [],
-                cached_verses_top              = [],
-                
-                checking_excess_content_bottom = false,
-                checking_excess_content_top    = false,
+            var cached_count_bottom  = 0,
+                cached_count_top     = 0,
+                cached_verses_bottom = [],
+                cached_verses_top    = [],
                 
                 has_reached_top,
                 has_reached_bottom,
                 
-                looking_up_verse_range         = false,
-                
-                lookup_delay                   = 50,    /// In milliseconds
-                lookup_range_speed             = 300,   /// In milliseconds
-                
-                remove_content_bottom_timeout,
-                remove_content_top_timeout,
-                remove_speed                   = 3000,  /// In milliseconds
-                
-                scroll_pos                     = 0,
-                
-                ///TODO: Determine if these should have default values and what they should be.
-                update_verse_range;
-            
-            /**
-             * Scroll the page to a specific point.
-             *
-             * @param  y      (number)             The Y position to scroll to (i.e, vertical position).
-             * @param  x      (number)  (optional) The X position to scroll to (i.e, horizontal position).  If left undefined, it will maintain the current Y position.
-             * @param  smooth (boolean) (optional) Whether or not to scroll smoothly.  By default, or if falsey, it will scroll instantaneously.
-             * @return NULL.
-             * @note   The y value is first because x value is rarely used.
-             * @todo   Indicate where used.
-             */
-            function scroll_view_to(y, x, smooth)
-            {
-                /// A small amount of extra padding is added just to ensure that the padding element will be large enough.
-                var extra_padding = 10,
-                    padding_el,
-                    padding_interval,
-                    pixels_needed;
-                
-                if (typeof x == "undefined") {
-                    /// IE8- does not set pageXOffset.
-                    /*@cc_on
-                        @if (@_jscript_version < 9)
-                            window.pageXOffset = document.documentElement.scrollLeft;
-                        @end
-                    @*/
-                    /// Preserve the current x position by default.
-                    x = window.pageXOffset;
-                }
-                
-                if (!smooth) {
-                    scroll_pos = y;
-                    
-                    /// Is the scroll position not the top of the page.
-                    if (scroll_pos > 0) {
-                        /// Calculate how many pixels (if any) need to be added in order to be able to scroll to the specified position.
-                        /// If the scroll position is near the bottom (e.g., Revelation 22:21 or Proverbs 28:28) there needs to be extra space on the bottom.
-                        pixels_needed = doc_docEl.clientHeight - (document.body.clientHeight - scroll_pos);
-                        if (pixels_needed > 0) {
-                            padding_el = document.createElement("div");
-                            
-                            padding_el.style.height = (pixels_needed + extra_padding) + 'px';
-                            viewPort.insertBefore(padding_el, null);
-                            
-                            /// Create a timer to check to see if the padding is no longer needed.
-                            ///NOTE: The padding element should be removed when more text loaded or the user scrolls up.
-                            padding_interval = window.setInterval(function ()
-                            {
-                                ///TODO: Document what scrollHeight, pageYOffset, and clientHeight actually measure.
-                                if (doc_docEl.scrollHeight - (window.pageYOffset + doc_docEl.clientHeight) > pixels_needed + extra_padding) {
-                                    viewPort.removeChild(padding_el);
-                                    window.clearInterval(padding_interval);
-                                }
-                            }, 1000);
-                        }
-                    }
-                    
-                    window.scrollTo(x, y);
-                }
-            }
-            
+                /// Create functions that need to be declared in a different scope or with functions in their closure.
+                add_content_if_needed,
+                scroll_view_to,
+                update_verse_range;            
             
             /**
              * The scrolling closure
@@ -521,173 +443,246 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
              */
             (function ()
             {
-                ///TODO: Determine if remove_excess_content_top and remove_excess_content_bottom can be combined.
-                /**
-                 * Remove content that is past the top of screen and store in cache.
-                 *
-                 * @return NULL.  Removes content from the page if required.
-                 * @note   Called by scrolling() via setTimeout().  May call itself, too.
-                 */
-                function remove_excess_content_top()
-                {
-                    var child = page.firstChild,
-                        child_height;
-                    
-                    if (child === null) {
-                        return;
-                    }
-                    
-                    ///NOTE: Mozilla ignores .clientHeight, .offsetHeight, .scrollHeight for some objects (not <div> tags, however) when in standards mode (i.e., a doctype is present).
-                    ///      If Mozilla has problems in the future, you can use this as a replacement:
-                    ///      child_height = parseInt(getComputedStyle(child, null).getPropertyValue("height"));
-                    
-                    ///NOTE: Opera wrongly subtracts the scroll position from .offsetTop.
-                    
-                    child_height = child.clientHeight;
-                    
-                    ///NOTE: Mozilla also has scrollMaxY, which is slightly different from document.documentElement.scrollHeight (document.body.scrollHeight should work too).
-                    
-                    /// Is the object in the remove zone, and is its height less than the remaining space to scroll to prevent jumping?
-                    if (child_height + buffer_rem < window.pageYOffset && child_height < doc_docEl.scrollHeight - window.pageYOffset - doc_docEl.clientHeight) {
-                        /// Store the content in the cache, and then add 1 to the outer counter variable so that we know how much cache we have.
-                        cached_verses_top[cached_count_top++] = child.innerHTML;
-                        ///TODO: Determine if setting the display to "none" actually helps at all.
-                        /// Remove quickly from the page.
-                        child.style.display = "none";
-                        /// Calculate and set the new scroll position.
-                        /// Because content is being removed from the top of the page, the rest of the content will be shifted upward.
-                        /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was removed.
-                        scroll_view_to(window.pageYOffset - child_height);
-                        
-                        page.removeChild(child);
-                        
-                        /// Indicates to the user that content will load if they scroll to the top of the screen.
-                        topLoader.style.visibility = "visible";
-                        
-                        /// Check again soon for more content to be removed.
-                        remove_content_top_timeout = window.setTimeout(remove_excess_content_top, remove_speed);
-                    } else {
-                        checking_excess_content_top = false;
-                    }
-                }
-                
+                var scroll_pos = 0;
                 
                 /**
-                 * Remove content from below the screen and store in cache.
+                 * Scroll the page to a specific point.
                  *
-                 * @return  NULL.  Removes content from the page if required.
-                 * @note    Called by scrolling() via setTimeout().  May call itself, too.
+                 * @param  y      (number)             The Y position to scroll to (i.e, vertical position).
+                 * @param  x      (number)  (optional) The X position to scroll to (i.e, horizontal position).  If left undefined, it will maintain the current Y position.
+                 * @param  smooth (boolean) (optional) Whether or not to scroll smoothly.  By default, or if falsey, it will scroll instantaneously.
+                 * @return NULL.
+                 * @note   The y value is first because x value is rarely used.
+                 * @todo   Indicate where used.
                  */
-                function remove_excess_content_bottom()
+                scroll_view_to = function (y, x, smooth)
                 {
-                    var child = page.lastChild;
+                    /// A small amount of extra padding is added just to ensure that the padding element will be large enough.
+                    var extra_padding = 10,
+                        padding_el,
+                        padding_interval,
+                        pixels_needed;
                     
-                    if (child === null) {
-                        return;
-                    }
-                    
-                    /// Is the element is in the remove zone?
-                    if (child.offsetTop > window.pageYOffset + doc_docEl.clientHeight + buffer_rem) {
-                        /// Store the content in the cache, and then add 1 to the outer counter variable so that we know how much cache we have.
-                        cached_verses_bottom[cached_count_bottom++] = child.innerHTML;
-                        
-                        page.removeChild(child);
-                        
-                        /// This fixes an IE7+ bug that causes the page to scroll needlessly when an element is added.
-                        ///TODO: Determine if this is still an issue with IE9.
+                    if (typeof x == "undefined") {
+                        /// IE8- does not set pageXOffset.
                         /*@cc_on
-                            scroll_view_to(window.pageYOffset);
+                            @if (@_jscript_version < 9)
+                                window.pageXOffset = document.documentElement.scrollLeft;
+                            @end
                         @*/
+                        /// Preserve the current x position by default.
+                        x = window.pageXOffset;
+                    }
+                    
+                    if (!smooth) {
+                        scroll_pos = y;
                         
-                        /// End execution to keep the checking_content_top_interval running because there might be even more content that should be removed.
-                        bottomLoader.style.visibility = "visible";
+                        /// Is the scroll position not the top of the page.
+                        if (scroll_pos > 0) {
+                            /// Calculate how many pixels (if any) need to be added in order to be able to scroll to the specified position.
+                            /// If the scroll position is near the bottom (e.g., Revelation 22:21 or Proverbs 28:28) there needs to be extra space on the bottom.
+                            pixels_needed = doc_docEl.clientHeight - (document.body.clientHeight - scroll_pos);
+                            if (pixels_needed > 0) {
+                                padding_el = document.createElement("div");
+                                
+                                padding_el.style.height = (pixels_needed + extra_padding) + 'px';
+                                viewPort.insertBefore(padding_el, null);
+                                
+                                /// Create a timer to check to see if the padding is no longer needed.
+                                ///NOTE: The padding element should be removed when more text loaded or the user scrolls up.
+                                padding_interval = window.setInterval(function ()
+                                {
+                                    ///TODO: Document what scrollHeight, pageYOffset, and clientHeight actually measure.
+                                    if (doc_docEl.scrollHeight - (window.pageYOffset + doc_docEl.clientHeight) > pixels_needed + extra_padding) {
+                                        viewPort.removeChild(padding_el);
+                                        window.clearInterval(padding_interval);
+                                    }
+                                }, 1000);
+                            }
+                        }
                         
-                        /// Check again soon for more content to be removed.
-                        remove_content_bottom_timeout = window.setTimeout(remove_excess_content_bottom, remove_speed);
-                    } else {
-                        checking_excess_content_bottom = false;
+                        window.scrollTo(x, y);
                     }
                 }
-                
                 
                 (function ()
                 {
-                    var scroll_check_count = 0;
-                    ///TODO: Perhaps move scroll_pos in here too.
-                    
-                    /**
-                     * The onscroll event.
-                     *
-                     * When the page scrolls this figures out the direction of the scroll and
-                     * calls specific functions to determine whether content should be added or removed.
-                     *
-                     * @return NULL.  May call other functions via setTimeout().
-                     * @note   Called when the window scrolls.  It may also call itself.
-                     * @note   Set by the onscroll event.
-                     */
-                    function scrolling()
-                    {
-                        /// Trick IE 8- into understanding pageYOffset.
-                        /*@cc_on
-                            @if (@_jscript_version < 9)
-                                window.pageYOffset = doc_docEl.scrollTop;
-                            @end
-                        @*/
-                        var new_scroll_pos = window.pageYOffset,
-                            scrolling_down;
+                    var buffer_rem = 10000, /// In milliseconds
                         
-                        /// Has the scroll position actually not changed?
-                        ///NOTE: IE/Opera sometimes don't update scroll position until after this function is run.
-                        ///      Mozilla/WebKit can have the same problem.
-                        if (new_scroll_pos == scroll_pos) {
-                            /// Should we wait a moment and see if the scroll position changes.
-                            if (++scroll_check_count < 10) {
-                                window.setTimeout(scrolling, 30);
-                            } else {
-                                /// Reset the counter and do not check anymore.
-                                scroll_check_count = 0;
-                            }
+                        checking_excess_content_bottom = false,
+                        checking_excess_content_top    = false,
+                        
+                        remove_content_bottom_timeout,
+                        remove_content_top_timeout,
+                        remove_speed = 3000;  /// In milliseconds
+                    
+                    ///TODO: Determine if remove_excess_content_top and remove_excess_content_bottom can be combined.
+                    /**
+                    * Remove content that is past the top of screen and store in cache.
+                    *
+                    * @return NULL.  Removes content from the page if required.
+                    * @note   Called by scrolling() via setTimeout().  May call itself, too.
+                    */
+                    function remove_excess_content_top()
+                    {
+                        var child = page.firstChild,
+                            child_height;
+                        
+                        if (child === null) {
                             return;
                         }
-                        scroll_check_count = 0;
                         
+                        ///NOTE: Mozilla ignores .clientHeight, .offsetHeight, .scrollHeight for some objects (not <div> tags, however) when in standards mode (i.e., a doctype is present).
+                        ///      If Mozilla has problems in the future, you can use this as a replacement:
+                        ///      child_height = parseInt(getComputedStyle(child, null).getPropertyValue("height"));
                         
-                        scrolling_down = (new_scroll_pos > scroll_pos);
+                        ///NOTE: Opera wrongly subtracts the scroll position from .offsetTop.
                         
-                        /// This keeps track of the current scroll position so we can tell the direction of the scroll.
-                        scroll_pos = new_scroll_pos;
+                        child_height = child.clientHeight;
                         
-                        /// Find and indicate the range of verses displayed on the screen.
-                        update_verse_range();
+                        ///NOTE: Mozilla also has scrollMaxY, which is slightly different from document.documentElement.scrollHeight (document.body.scrollHeight should work too).
                         
-                        ///TODO: Determine if this function stop if the initial query is still being loaded?  How often would this occur?
-                        
-                        /// Since the page is scrolling, we need to determine if more content needs to be added or if some content should be hidden.
-                        
-                        if (scrolling_down) {
-                            add_content_if_needed(additional);
-                            checking_excess_content_top = true;
+                        /// Is the object in the remove zone, and is its height less than the remaining space to scroll to prevent jumping?
+                        if (child_height + buffer_rem < window.pageYOffset && child_height < doc_docEl.scrollHeight - window.pageYOffset - doc_docEl.clientHeight) {
+                            /// Store the content in the cache, and then add 1 to the outer counter variable so that we know how much cache we have.
+                            cached_verses_top[cached_count_top++] = child.innerHTML;
+                            ///TODO: Determine if setting the display to "none" actually helps at all.
+                            /// Remove quickly from the page.
+                            child.style.display = "none";
+                            /// Calculate and set the new scroll position.
+                            /// Because content is being removed from the top of the page, the rest of the content will be shifted upward.
+                            /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was removed.
+                            scroll_view_to(window.pageYOffset - child_height);
+                            
+                            page.removeChild(child);
+                            
+                            /// Indicates to the user that content will load if they scroll to the top of the screen.
+                            topLoader.style.visibility = "visible";
+                            
+                            /// Check again soon for more content to be removed.
+                            remove_content_top_timeout = window.setTimeout(remove_excess_content_top, remove_speed);
                         } else {
-                            add_content_if_needed(previous);
-                            checking_excess_content_bottom = true;
-                        }
-                        
-                        if (checking_excess_content_top) {
-                            window.clearTimeout(remove_content_top_timeout);
-                            remove_content_top_timeout    = window.setTimeout(remove_excess_content_top,    remove_speed);
-                        }
-                        if (checking_excess_content_bottom) {
-                            window.clearTimeout(remove_content_bottom_timeout);
-                            remove_content_bottom_timeout = window.setTimeout(remove_excess_content_bottom, remove_speed);
+                            checking_excess_content_top = false;
                         }
                     }
                     
-                    ///NOTE: Could use the wheel event if the scroll bars need to be invisible.
-                    ///TODO: Determine how to handle scrolling if there were multiple viewports (i.e., split view).
-                    window.onscroll = scrolling;
+                    
+                    /**
+                    * Remove content from below the screen and store in cache.
+                    *
+                    * @return  NULL.  Removes content from the page if required.
+                    * @note    Called by scrolling() via setTimeout().  May call itself, too.
+                    */
+                    function remove_excess_content_bottom()
+                    {
+                        var child = page.lastChild;
+                        
+                        if (child === null) {
+                            return;
+                        }
+                        
+                        /// Is the element is in the remove zone?
+                        if (child.offsetTop > window.pageYOffset + doc_docEl.clientHeight + buffer_rem) {
+                            /// Store the content in the cache, and then add 1 to the outer counter variable so that we know how much cache we have.
+                            cached_verses_bottom[cached_count_bottom++] = child.innerHTML;
+                            
+                            page.removeChild(child);
+                            
+                            /// This fixes an IE7+ bug that causes the page to scroll needlessly when an element is added.
+                            ///TODO: Determine if this is still an issue with IE9.
+                            /*@cc_on
+                                scroll_view_to(window.pageYOffset);
+                            @*/
+                            
+                            /// End execution to keep the checking_content_top_interval running because there might be even more content that should be removed.
+                            bottomLoader.style.visibility = "visible";
+                            
+                            /// Check again soon for more content to be removed.
+                            remove_content_bottom_timeout = window.setTimeout(remove_excess_content_bottom, remove_speed);
+                        } else {
+                            checking_excess_content_bottom = false;
+                        }
+                    }
+                    
+                    
+                    (function ()
+                    {
+                        var scroll_check_count = 0;
+                        ///TODO: Perhaps move scroll_pos in here too.
+                        
+                        /**
+                        * The onscroll event.
+                        *
+                        * When the page scrolls this figures out the direction of the scroll and
+                        * calls specific functions to determine whether content should be added or removed.
+                        *
+                        * @return NULL.  May call other functions via setTimeout().
+                        * @note   Called when the window scrolls.  It may also call itself.
+                        * @note   Set by the onscroll event.
+                        */
+                        function scrolling()
+                        {
+                            /// Trick IE 8- into understanding pageYOffset.
+                            /*@cc_on
+                                @if (@_jscript_version < 9)
+                                    window.pageYOffset = doc_docEl.scrollTop;
+                                @end
+                            @*/
+                            var new_scroll_pos = window.pageYOffset,
+                                scrolling_down;
+                            
+                            /// Has the scroll position actually not changed?
+                            ///NOTE: IE/Opera sometimes don't update scroll position until after this function is run.
+                            ///      Mozilla/WebKit can have the same problem.
+                            if (new_scroll_pos == scroll_pos) {
+                                /// Should we wait a moment and see if the scroll position changes.
+                                if (++scroll_check_count < 10) {
+                                    window.setTimeout(scrolling, 30);
+                                } else {
+                                    /// Reset the counter and do not check anymore.
+                                    scroll_check_count = 0;
+                                }
+                                return;
+                            }
+                            scroll_check_count = 0;
+                            
+                            
+                            scrolling_down = (new_scroll_pos > scroll_pos);
+                            
+                            /// This keeps track of the current scroll position so we can tell the direction of the scroll.
+                            scroll_pos = new_scroll_pos;
+                            
+                            /// Find and indicate the range of verses displayed on the screen.
+                            update_verse_range();
+                            
+                            ///TODO: Determine if this function stop if the initial query is still being loaded?  How often would this occur?
+                            
+                            /// Since the page is scrolling, we need to determine if more content needs to be added or if some content should be hidden.
+                            
+                            if (scrolling_down) {
+                                add_content_if_needed(additional);
+                                checking_excess_content_top = true;
+                            } else {
+                                add_content_if_needed(previous);
+                                checking_excess_content_bottom = true;
+                            }
+                            
+                            if (checking_excess_content_top) {
+                                window.clearTimeout(remove_content_top_timeout);
+                                remove_content_top_timeout    = window.setTimeout(remove_excess_content_top,    remove_speed);
+                            }
+                            if (checking_excess_content_bottom) {
+                                window.clearTimeout(remove_content_bottom_timeout);
+                                remove_content_bottom_timeout = window.setTimeout(remove_excess_content_bottom, remove_speed);
+                            }
+                        }
+                        
+                        ///NOTE: Could use the wheel event if the scroll bars need to be invisible.
+                        ///TODO: Determine how to handle scrolling if there were multiple viewports (i.e., split view).
+                        window.onscroll = scrolling;
+                    }());
                 }());
             }());
-            
             
             /**
              * Find a verse element that is within a certain Y coordinate on the screen.
@@ -818,6 +813,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
              */
             add_content_if_needed = (function ()
             {
+                var buffer_add = 1000;  /// In milliseconds
+                
                 /**
                  * Add content to bottom of the page (off the screen)
                  *
@@ -921,6 +918,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                  */
                 return function (direction)
                 {
+                    var lookup_delay = 50; /// In milliseconds
+                    
                     if (direction === additional) {
                         window.setTimeout(add_content_bottom_if_needed, lookup_delay);
                     } else {
@@ -939,6 +938,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
              */
             update_verse_range = (function ()
             {
+                var looking_up_verse_range = false;
+                
                 /**
                  * Determine and set the range of verses currently visible on the screen.
                  *
@@ -1028,6 +1029,9 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 /// Return the small function to call update_verse_range_delayed().
                 return function ()
                 {
+                    ///TODO: Determine if this variable is useful since it is only used once.
+                    var lookup_range_speed = 300; /// In milliseconds
+                    
                     /// Is it not already looking for the verse range?
                     if (!looking_up_verse_range) {
                         looking_up_verse_range = true;
@@ -1059,6 +1063,9 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             
             ///NOTE: get_verse_at_position is temporary.
             return {
+                bottom_verse: false,
+                top_verse:    false,
+                
                 add_content_if_needed: add_content_if_needed,
                 /**
                  * Prepares the page for new verses.
