@@ -30,11 +30,11 @@ BF.parse_json = window.chrome ? function (str)
     return str === "" ? "" : JSON.parse(str);
 };
 
-BF.create_simple_ajax = function ()
+BF.Create_easy_ajax = function ()
 {
     var ajax = new window.XMLHttpRequest(),
         ajax_timeout;
-    
+   
     return {
         abort: function ()
         {
@@ -59,7 +59,7 @@ BF.create_simple_ajax = function ()
              *
              * @return NULL.
              * @note   This code is a separate function to reduce code duplication.
-             * @note   Called by the BF.create_simple_ajax.query().
+             * @note   Called by the BF.Create_easy_ajax.query().
              */
             function send_query(message, timeout, retry)
             {
@@ -178,7 +178,7 @@ BF.include = (function ()
         
         return function (path, context, timeout, retry)
         {
-            var ajax = BF.create_simple_ajax();
+            var ajax = new BF.Create_easy_ajax();
             
             ajax.query("GET", path, "", function (response)
             {
@@ -1515,8 +1515,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     
                         return (function ()
                         {
-                            var ajax_additional = BF.create_simple_ajax(),
-                                ajax_previous   = BF.create_simple_ajax();
+                            var ajax_additional = new BF.Create_easy_ajax(),
+                                ajax_previous   = new BF.Create_easy_ajax();
                             
                             return function (options)
                             {
