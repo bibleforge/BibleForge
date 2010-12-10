@@ -503,7 +503,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         
                         window.scrollTo(x, y);
                     }
-                }
+                };
                 
                 (function ()
                 {
@@ -608,18 +608,19 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     (function ()
                     {
                         var scroll_check_count = 0;
-                        ///TODO: Perhaps move scroll_pos in here too.
                         
                         /**
-                        * The onscroll event.
-                        *
-                        * When the page scrolls this figures out the direction of the scroll and
-                        * calls specific functions to determine whether content should be added or removed.
-                        *
-                        * @return NULL.  May call other functions via setTimeout().
-                        * @note   Called when the window scrolls.  It may also call itself.
-                        * @note   Set by the onscroll event.
-                        */
+                         * The onscroll event.
+                         *
+                         * When the page scrolls this figures out the direction of the scroll and
+                         * calls specific functions to determine whether content should be added or removed.
+                         *
+                         * @return NULL.  May call other functions via setTimeout().
+                         * @note   Called when the window scrolls.  It may also call itself.
+                         * @note   Called by the onscroll event.
+                         * @note   Could use the wheel event if the scroll bars need to be invisible.
+                         * @todo   Determine how to handle scrolling if there were multiple viewports (i.e., split view).
+                         */
                         function scrolling()
                         {
                             /// Trick IE 8- into understanding pageYOffset.
@@ -677,8 +678,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             }
                         }
                         
-                        ///NOTE: Could use the wheel event if the scroll bars need to be invisible.
-                        ///TODO: Determine how to handle scrolling if there were multiple viewports (i.e., split view).
+                        ///NOTE: The reason why scrolling() not anonymous is because it can be recursive.
                         window.onscroll = scrolling;
                     }());
                 }());
@@ -957,16 +957,17 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     ///TODO: Make a variable that clearly represents the height of the topBar, not topLoader.offsetHeight).
                     ///NOTE: Check a few pixels (8) below what is actually in view so that it finds the verse that is actually readable.
                     verse1 = get_verse_at_position(window.pageYOffset + topLoader.offsetHeight + 8,  true,  page);
-                    if (verse1 === false) {
-                        looking_up_verse_range = false;
-                        ///TODO: Try again?
-                        return;
-                    }
                     
+                    /// If a verse was found, check for the bottom verse.
                     ///NOTE: Check a few pixels (14) above what is actually in view so that it finds the verse that is actually readable.
-                    verse2 = get_verse_at_position(window.pageYOffset + doc_docEl.clientHeight - 14, false, page);
-                    if (verse2 === false) {
+                    ///NOTE: These are combined into one if statement to prevent code duplication.
+                    if (verse1 === false || (verse2 = get_verse_at_position(window.pageYOffset + doc_docEl.clientHeight - 14, false, page)) === false) {
                         looking_up_verse_range = false;
+                        
+                        /// Since the entire verse range could not be found, remove stored verses.
+                        content_manager.top_verse    = false;
+                        content_manager.bottom_verse = false;
+                        
                         ///TODO: Try again?
                         return;
                     }
@@ -1000,7 +1001,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         ref_range = verse1.b + " " + verse1.c + ":" + verse1.v + "\u2013" + verse2.b + " " + verse2.c + ":" + verse2.v;
                     }
                     
-                    /// Store the query type in a variable because it needs to be accessed more than once.
+                    /// Store the query type in a variable because it may need to be accessed more than once.
                     query_type = query_manager.query_type;
                     /// The verse range is displayed differently based on the type of search (i.e., a verse lookup or a search).
                     ///TODO: Set the date of the verse (or when it was written).
@@ -1012,6 +1013,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     
                     /// Is the new verse range the same as the old one?
                     /// If they are the same, updating it would just waste time.
+                    ///TODO: Could use top_verse and bottom_verse to compare too, but since they are objects, there is no good way to do that.
                     if (document.title != new_title) {
                         document.title = new_title;
                         
@@ -1021,6 +1023,10 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             infoBar.innerHTML = "";
                             infoBar.appendChild(document.createTextNode(ref_range));
                         }
+                        
+                        /// Store the verse range for future reference.
+                        content_manager.top_verse    = verse1;
+                        content_manager.bottom_verse = verse2;
                     }
                     
                     looking_up_verse_range = false;
@@ -1063,10 +1069,12 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             
             ///NOTE: get_verse_at_position is temporary.
             return {
+                ///NOTE: It may be better to make these variables accessible only via a get function.
                 bottom_verse: false,
                 top_verse:    false,
                 
                 add_content_if_needed: add_content_if_needed,
+                
                 /**
                  * Prepares the page for new verses.
                  *
@@ -1099,10 +1107,12 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 {
                     has_reached_bottom = true;
                 },
+                
                 reached_top: function ()
                 {
                     has_reached_top = true;
                 },
+                
                 /**
                  * Scrolls that page to make the specified verse at the top of the viewable area.
                  *
@@ -1129,6 +1139,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     ///TODO: Determine if there is any value to returning TRUE and FALSE.
                     return true;
                 },
+                
                 scroll_view_to: scroll_view_to
             };
         }());
