@@ -18,10 +18,18 @@
 ///NOTE: Since the user agent string can be modified by the user, it is not bulletproof.
 BF.is_WebKit = !!window.chrome || window.navigator.userAgent.indexOf("WebKit/") >= 0;
 
-/// NOTE: Usually, eval() and JSON.parse() are similar in speed and the Function Constructor is really slow.
-///       However, in Chrome, eval() is really fast, the Function Constructor is even faster, and JSON.parse() is ridiculously slow.
-///       Therefore, use the Function Constructor for Chrome and JSON.parse() for all others.
+///NOTE: Usually, eval() and JSON.parse() are similar in speed and the Function Constructor is really slow.
+///      However, in Chrome, eval() is really fast, the Function Constructor is even faster, and JSON.parse() is ridiculously slow.
+///      Therefore, use the Function Constructor for Chrome and JSON.parse() for all others.
 ///NOTE: It could also check to make sure that the string starts with a curly bracket ({) straight bracket ([) double quote (") or number (hyphen (-) or digit)to attempt to ensure that it is valid JSON.
+/**
+ * Safely (and quickly) parse JSON.
+ *
+ * A cross browser JSON parsing solution.
+ *
+ * @param  str (string) The string to parse.
+ * @return Returns the value of the JSON or "" if an empty string.
+ */
 BF.parse_json = window.chrome ? function (str)
 {
     return str === "" ? "" : (new Function("return " + str))();
@@ -30,6 +38,12 @@ BF.parse_json = window.chrome ? function (str)
     return str === "" ? "" : JSON.parse(str);
 };
 
+/**
+ * Create an easy to use Ajax object.
+ *
+ * @example var ajax = new BF.Create_easy_ajax();
+ * @return  Returns an object that makes ajax easier.
+ */
 BF.Create_easy_ajax = function ()
 {
     var ajax = new window.XMLHttpRequest(),
@@ -44,8 +58,6 @@ BF.Create_easy_ajax = function ()
                 clearTimeout(ajax_timeout);
                 ajax.abort();
             }
-            
-            return this;
         },
         is_busy: function ()
         {
@@ -90,7 +102,6 @@ BF.Create_easy_ajax = function ()
              *                                          A falsey value (such as 0 or FALSE) disables timing out.         (Default is 10,000 milliseconds.)
              * @param   retry     (boolean)  (optional) Whether or not to retry loading the script if a timeout occurs.  (Default is TRUE.)
              * @return  NULL.
-             * @note    Called by ???.
              * @todo    Determine if it should change a method from GET to POST if it exceeds 2,083 characters (IE's rather small limit).
              */
             return function (method, path, message, onsuccess, onfailure, timeout, retry)
@@ -335,14 +346,12 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         if (!BF.viewPort_count) {
             BF.viewPort_count = 0;
         }
+        
         viewPort_num = BF.viewPort_count;
         ++BF.viewPort_count;
         
-        
         /**
          * Load settings.
-         *
-         * @todo Document
          */
         (function ()
         {
@@ -416,10 +425,9 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
          ******************************/
         
         /**
-         * The functions that handle the scrolling of the page and other related functions.
+         * Create the functions that handle the scrolling of the page and other related functions.
          *
          * @return Returns an object with functions for adding content, updating the verse range, and scrollng the view.
-         * @todo   Restructure this closure more.
          */
         content_manager = (function ()
         {
@@ -438,8 +446,6 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             
             /**
              * The scrolling closure
-             *
-             * @todo Determine if any variables can be placed in here.
              */
             (function ()
             {
@@ -1067,6 +1073,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 update_verse_range();
             };
             
+            /// Return the content_manager object.
             return {
                 ///NOTE: It may be better to make these variables accessible only via a get function.
                 bottom_verse: false,
@@ -1146,8 +1153,12 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         /****************************
          * End of Scrolling Closure *
          ****************************/
-
         
+        /**
+         * Create the functions that handle querying the server and displaying the results.
+         *
+         * @return Returns an object with functions for querying data from the server.
+         */
         query_manager = (function ()
         {   
             var handle_new_verses = (function ()
@@ -1294,7 +1305,19 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     content_manager.update_verse_range();
                 }
                 
-                
+                /**
+                 * Handles new verses from the server.
+                 *
+                 * Passes any verses of to be displayed, asks if more content is needed, determines if more content is available,
+                 * and writes initial information to the infoBar.
+                 *
+                 * @example handle_new_verses({n: [verse_ids, ...], v: [verse_html, ...], p: [paragraphs, ...], i: [word_ids, ...], t: total}, {direction: direction, ...});
+                 * @example handle_new_verses({n: [1001001, 1001002], v: ["<a id=1>In</a> <a id=2>the</a> <a id=3>beginning....</a>", "<a id=12>And</a> <a id=13>the</a> <a id=14>earth....</a>"], t: 2}, options);
+                 * @example handle_new_verses({n: [50004008], v: ["<a id=772635>Finally,</a> <a id=772636>brethren,</a> <a id=772637>whatsoever</a> <a id=772638>things....</a>"], i: [772638], t: 1}, options);
+                 * @param   data    (object) The JSON object returned from the server.
+                 * @param   options (object) The object containing the details of the query.
+                 * @return  NULL.
+                 */
                 return function (data, options)
                 {
                     var b_tag,
@@ -1307,7 +1330,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         /// Data object format:
                         /// i Word IDs      (array)  (optional) An array containing word IDs indicating which words should be highlighted in grammatical searches
                         /// n Verse Numbers (array)             An array containing verse IDs for each verse returned
-                        /// p Paragraphs    (array)             An array of 1's and 0's corresponding to n array indicating which verses are at the beginning of a paragraph
+                        /// p Paragraphs    (array)  (optional) An array of 1's and 0's corresponding to n array indicating which verses are at the beginning of a paragraph
                         /// t Total         (number)            The total number of verses returned
                         /// v Verse HTML    (array)             An array containing the HTML of the verses returned
                         total      = data.t,
@@ -1411,7 +1434,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 };
             }());
             
-            /// Create the query manager object.
+            /// Return the query_manager object.
             return {
                 query_additional: function () {},
                 
