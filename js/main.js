@@ -514,7 +514,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         
                         remove_content_bottom_timeout,
                         remove_content_top_timeout,
-                        remove_speed = 3000;  /// In milliseconds
+                        remove_speed = 3000; /// In milliseconds
                     
                     ///TODO: Determine if remove_excess_content_top and remove_excess_content_bottom can be combined.
                     /**
@@ -813,7 +813,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
              */
             add_content_if_needed = (function ()
             {
-                var buffer_add = 1000;  /// In milliseconds
+                var buffer_add = 1000; /// In milliseconds
                 
                 /**
                  * Add content to bottom of the page (off the screen)
@@ -1253,7 +1253,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             
                         /// Searching
                         } else {
-                            /// Change verse 0 to "title" (e.g., Psalm 3:title instead of Psalm 3:0).
+                            /// Change verse 0 to "title" (e.g., change "Psalm 3:0" to "Psalm 3:title").
                             if (v === 0) {
                                 v = BF.lang.title;
                             }
@@ -1264,7 +1264,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                                 /// We only need to print out the book if it is different from the last verse.
                                 verse_range.bottom_book = b;
                                 
-                                html_str += "<h1 class=short_book id=" + num + "_title>" + BF.lang.books_short[b] + "</h1>"; /// Convert the book number to text.
+                                /// Convert the book number to text.
+                                html_str += "<h1 class=short_book id=" + num + "_title>" + BF.lang.books_short[b] + "</h1>";
                             }
                             
                             html_str += "<div class=search_verse id=" + num + "_search>" + c + ":" + v + " " + verse_html[i] + "</div>";
