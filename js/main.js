@@ -384,7 +384,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             ///TODO: Determine how this should be created.
             settings = {
                 view: {
-                    in_paragraphs: create_get_set(true, function (values)
+                    in_paragraphs: create_get_set(true, function ()
                     {
                         /// Handle changing paragraph mode.
                         
