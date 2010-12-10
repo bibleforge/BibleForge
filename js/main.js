@@ -386,16 +386,16 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 view: {
                     in_paragraphs: create_get_set(true, function (values)
                     {
-                        var cur_verse;
+                        /// Handle changing paragraph mode.
                         
+                        /// If the last query was a search, nothing needs to be done Since only verse lookups are affected by paragraph mode.
                         if (query_manager.query_type !== verse_lookup) {
                             return;
                         }
                         
-                        ///FIXME: There should be a dedicated function for getting the current verse (or better yet, a variable that stores that information).
-                        cur_verse = content_manager.get_verse_at_position(window.pageYOffset + topLoader.offsetHeight + 8, true, page);
-                        
-                        if (cur_verse !== false) {
+                        /// Are there any verses displayed on the scroll?
+                        if (content_manager.top_verse !== false) {
+                            /// Clear the scroll because the view is changing dramatically.
                             ///FIXME: This should reload the verses.
                             ///FIXME: It does not necessarily need to reload the verses if switching from paragraph mode to non-paragraph mode.
                             content_manager.clear_scroll();
@@ -1067,7 +1067,6 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 update_verse_range();
             };
             
-            ///NOTE: get_verse_at_position is temporary.
             return {
                 ///NOTE: It may be better to make these variables accessible only via a get function.
                 bottom_verse: false,
@@ -1100,7 +1099,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     
                     page.innerHTML = "";
                 },
-                get_verse_at_position: get_verse_at_position, /// TEMP
+                
                 update_verse_range:    update_verse_range,
                 
                 reached_bottom: function ()
