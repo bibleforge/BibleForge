@@ -1345,8 +1345,12 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         write_verses(type, direction, verse_ids, verse_html, paragraphs, in_paragraphs, options.verse_range);
                         
                         if (type !== verse_lookup) {
-                            ///NOTE: Only standard and mixed searches need verse_html data to be sent.
-                            options.highlight((type != grammatical_search ? verse_html.join("") : false), word_ids);
+                            window.setTimeout(function ()
+                            {
+                                ///NOTE: Only standard and mixed searches need verse_html data to be sent.
+                                ///NOTE: word_ids is only needed for grammatical and mixed searches.
+                                options.highlight((type != grammatical_search ? verse_html.join("") : false), word_ids);
+                            }, 0);
                         }
                         
                         if (direction === additional) {
