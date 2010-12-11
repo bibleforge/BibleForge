@@ -1345,8 +1345,6 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         write_verses(type, direction, verse_ids, verse_html, paragraphs, in_paragraphs, options.verse_range);
                         
                         if (type !== verse_lookup) {
-                            ///TODO: Implement
-                            ///TODO: Determine if it should send an object?
                             ///NOTE: Only standard and mixed searches need verse_html data to be sent.
                             options.highlight((type != grammatical_search ? verse_html.join("") : false), word_ids);
                         }
@@ -1438,8 +1436,17 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             return {
                 query_additional: function () {},
                 
+                /**
+                 * Create the query function.
+                 */
                 query: (function ()
                 {
+                    /**
+                     * Create the URL query string from the options object.
+                     *
+                     * @return A string representing the URL query.
+                     * @param  options (object) The object containing the various aspects of the query.
+                     */
                     function create_query_message(options)
                     {
                         /// Query Variables:
@@ -1486,12 +1493,24 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     
                     return (function ()
                     {
+                        /**
+                         * Create a function to handle future queries.
+                         *
+                         * @param  ajax      (object) The Ajax object (created via BF.Create_easy_ajax()).
+                         * @param  direction (number) The direction the query should load verses (additional || previous).
+                         * @param  options   (object) The object containing the various aspects of the query.
+                         * @return A function that will handle querying for more verses.
+                         */
                         function next_query_maker(ajax, direction, options)
                         {
+                            /**
+                             * The function that handles querying new for verses.
+                             */
                             return function ()
                             {
                                 var in_paragraphs;
                                 
+                                /// If the initial query has not finished or if the query has already begun, prevent the query.
                                 if (options.initial_query || ajax.is_busy()) {
                                     return;
                                 }
@@ -1535,12 +1554,21 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                                 });
                             };
                         }
-                    
+                        
+                        
                         return (function ()
                         {
                             var ajax_additional = new BF.Create_easy_ajax(),
                                 ajax_previous   = new BF.Create_easy_ajax();
                             
+                            /**
+                             * Initiate a new query and prepare for future queries.
+                             *
+                             * @param  options (object) The object containing the various aspects of the query.
+                             * @return NULL.
+                             * @note   This function is stored in query_manager.query().
+                             * @note   Called by run_new_query().
+                             */
                             return function (options)
                             {
                                 ///TODO: At some point, there needs to be feedback to the user that the query is taking place.  Maybe have something in the infoBar.
@@ -1564,6 +1592,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                                     top_verse:    0
                                 };
                                 
+                                /// Make the initial query with ajax_additional because all initial queries add more verses.
                                 ajax_additional.query("post", "query.php", create_query_message(options), function (data)
                                 {
                                     /// On Success
@@ -1590,6 +1619,9 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
             };
         }());
         
+        /**
+         * Create the run_new_query() function and closure.
+         */
         run_new_query = (function ()
         {
             /**
@@ -1689,6 +1721,15 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 ];
             }
             
+            /**
+             * Process a raw query.
+             *
+             * @example run_new_query("John 3:16"); /// Looks up John 3:6 (and following)
+             * @example run_new_query("love");      /// Searches for the word "love"
+             * @param   raw_query (string) The text from the user to query.
+             * @return  NULL.
+             * @note    Called by searchForm.onsubmit() when a user submits a query.
+             */
             return function (raw_query)
             {
                 /// Step 1: Prepare string and check to see if we need to search (not empty)
@@ -1756,7 +1797,14 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 
                 /// Was the query a search?  Searches need to have the highlight function prepared for the incoming results.
                 if (options.type !== verse_lookup) {
-                    ///TODO: Determine a good way to cache the highlight function/array.
+                    /**
+                     * Create the highlight function and closure and prepare the regular expression used to do the highlighting.
+                     *
+                     * @return A function that will do the highlighting.
+                     * @note   Since this function gets attached to the options object, it is sent by reference to the query_manager and called there.
+                     * @note   Called by handle_new_verses() in the query_manager.
+                     * @todo   Determine a good way to cache the highlight function or regex array.
+                     */
                     options.highlight = (function ()
                     {
                         var highlight_re,
@@ -1769,6 +1817,15 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             highlight_re_length = highlight_re.length;
                         }
                         
+                        /**
+                         * Highlight the search results.
+                         *
+                         * @example	options.highlight("<a id=1>In</a> <a id=2>the</a> <a id=3>beginning</a> <a>...</a>");
+                         * @example	options.highlight("", [1, 4002, ...]);
+                         * @param   html     (string) A string containing the all of the verses in HTML format (only used by standard searches).
+                         * @param   word_ids (array)  An array of word ids to be highlighted (only used by grammatical searches).
+                         * @note    Only one parameter is needed.
+                         */
                         return function (html, word_ids)
                         {
                             var i,
@@ -1833,7 +1890,12 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
      * Set Events *
      **************/
      
-    /// Capture form submit event.
+    /**
+     * Capture form submit events and begin a new query.
+     *
+     * @return FALSE.  It must always return false in order to prevent the form from submitting.
+     * @note Called when a user submits the form.
+     */
     searchForm.onsubmit = function ()
     {
         var raw_query = q_obj.value;
