@@ -1290,7 +1290,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     newEl = document.createElement("div");
                     ///NOTE: If innerHTML disappears in the future (because it is not (yet) in the "standards"),
                     ///      a simple (but slow) alternative is to use the innerDOM script from http://innerdom.sourceforge.net/ or BetterInnerHTML from http://www.optimalworks.net/resources/betterinnerhtml/.
-                    ///      Also using "range = document.createRange(); newEl = range.createContextualFragment(html_str); is also a possibility.
+                    ///      Also using "range = document.createRange(); newEl = range.createContextualFragment(html_str)" is also a possibility.
                     newEl.innerHTML = html_str;
                     
                     if (direction === additional) {
@@ -1508,7 +1508,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         function next_query_maker(ajax, direction, options)
                         {
                             /**
-                             * The function that handles querying new for verses.
+                             * The function that handles querying for new verses.
                              */
                             return function ()
                             {
