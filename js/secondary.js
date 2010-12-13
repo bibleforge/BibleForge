@@ -327,8 +327,8 @@
         ///      when an alert box pops up, but there does not seem to be a simple way to detect
         ///      Safari (or WebKit as a whole) using object detection.
         ///TODO: File a bug report with WebKit and/or Chromium.
-        ///NOTE: Chromium 5.0.342.9 (43360) seems to have fixed this issue for Chromium.
-        if (window.chrome) {
+        ///NOTE: Chromium 5.0.342.9 (43360) seems to have fixed this issue for Chromium, but it still does not work right either.
+        if (BF.is_WebKit) {
             return;
         }
         
@@ -423,13 +423,15 @@
             }
         };
         
+        /// Hide the mouse cursor after switching between tabs or windows.
+        window.onfocus   = hide_cursor_delayed;
+        
         page.onmousemove = hide_cursor_delayed;
     }());
     
     /*******************************
      * End of Mouse Hiding Closure *
      *******************************/
-    
     
     /**
      * Add the rest of the BibleForge user interface (currently, just the wrench menu).
