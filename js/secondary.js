@@ -343,6 +343,7 @@
         {
             clearTimeout(hide_cursor_timeout);
             page.style.cursor = "auto";
+            BF.changeCSS(".verse a, .search_verse a, .first_verse a, .psalm_title a", "cursor: pointer;");
         }
         
         
@@ -363,6 +364,9 @@
                 ///      It would be possible to manually determine if the onmousemove event was legitimate by checking the X and Y coordinates.
                 ///      Opera (at least 10.53) has no alternate cursor support whatsoever.
                 page.style.cursor = "none";
+                /// All words have a hand cursor, so this style must be removed.
+                ///TODO: Determine a way to do this without modifying the CSS.
+                BF.changeCSS(".verse a, .search_verse a, .first_verse a, .psalm_title a", "");
             }, 2000);
         }
         
