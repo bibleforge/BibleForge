@@ -318,7 +318,8 @@
      */
     (function ()
     {
-        var hide_cursor_timeout;
+        var hide_cursor_timeout,
+            is_cursor_visible = true;
         
         ///NOTE: Chromium (at least 4.0) has a strange bug when setting the cursor to "auto" and
         ///      the mouse moves over the HTML element, drop caps letters move downward!
@@ -337,12 +338,18 @@
          * Set the mouse cursor back to its default state.
          *
          * @return NULL.
-         * @note   Called by hide_cursor_delayed(), page.onmousedown, and page.onmouseout.
+         * @note   Called by hide_cursor_delayed(), page.onmousedown(), and page.onmouseout().
          */
         function show_cursor()
         {
+            /// Prevent the cursor from being hidden.
             clearTimeout(hide_cursor_timeout);
-            page.style.cursor = "auto";
+            
+            if (!is_cursor_visible) {
+                page.style.cursor = "auto";
+                
+                is_cursor_visible = true;
+            }
         }
         
         
@@ -350,11 +357,12 @@
          * Hide the cursor after a short delay.
          *
          * @return NULL.
-         * @note   Called by page.onmousedown and page.onmousemove.
+         * @note   Called by page.onmousedown() and page.onmousemove().
          */
         function hide_cursor_delayed()
         {
-            show_cursor();
+            clearTimeout(hide_cursor_timeout);
+            
             hide_cursor_timeout = window.setTimeout(function ()
             {
                 ///NOTE: Works in Mozilla/IE9.
@@ -372,7 +380,7 @@
          *
          * @param  e (object) The event object (normally supplied by the browser).
          * @return NULL.
-         * @note   Called by page.onmousedown.
+         * @note   Called by page.onmousedown().
          */
         page.onmousedown = function (e)
         {
@@ -395,7 +403,7 @@
          *
          * @param  e (object) The event object (normally supplied by the browser).
          * @return NULL.
-         * @note   Called by page.onmouseout.
+         * @note   Called by page.onmouseout().
          */
         page.onmouseout = function (e)
         {
@@ -416,10 +424,17 @@
             }
         };
         
-        /// Hide the mouse cursor after switching between tabs or windows.
-        window.onfocus   = hide_cursor_delayed;
         
-        page.onmousemove = hide_cursor_delayed;
+        page.onmousemove = function ()
+        {
+            if (!is_cursor_visible) {
+                show_cursor();
+            }
+            hide_cursor_delayed();
+        }
+        
+        /// Hide the mouse cursor after switching between tabs or windows.
+        window.onfocus = hide_cursor_delayed;
     }());
     
     /*******************************
