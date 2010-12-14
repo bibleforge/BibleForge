@@ -8,8 +8,8 @@
  * @author  BibleForge <info@bibleforge.com>
  */
 
-/* TODO: Completely document the CSS. */
-/* TODO: Re-order (as well as maybe group) the styles alphabetically. */
+/*TODO: Completely document the CSS. */
+/*TODO: Re-order (as well as maybe group) the styles alphabetically. */
 
 html, body {
     margin:		0;
@@ -26,16 +26,16 @@ html {
     font-size:   15px;
     
     /* Improve the text rendering and enable support for ligatures and kerning in Mozilla. */
-    /* NOTE: This may have a slight speed cost. */
-    /* NOTE: This does not effect Mozilla on Macs. */
+    /*NOTE: This may have a slight speed cost. */
+    /*NOTE: This does not effect Mozilla on Macs. */
     text-rendering: optimizeLegibility;
 }
 
 input {
-    /* NOTE: Input fields do not inherit from the HTML element. */
-    /*       If a font-family is not specified, it will use a system default. */
-    /*       On Windows, that font is "MS Shell Dlg," which is actually "Microsoft Sans Serif." */
-    /* TODO: Make/find a good replacement font for Arial. */
+    /*NOTE: Input fields do not inherit from the HTML element. */
+    /*      If a font-family is not specified, it will use a system default. */
+    /*      On Windows, that font is "MS Shell Dlg," which is actually "Microsoft Sans Serif." */
+    /*TODO: Make/find a good replacement font for Arial. */
     font-family: Arial, 'Bitstream Vera Sans', 'DejaVu Sans', sans-serif;
 }
 
@@ -58,7 +58,7 @@ body {
     background:	#FFF;
     /* Transparent white background for Firefox 3.5-/Opera 10 */
     background:	rgba(255, 255, 255, .9);
-    /* TODO: Determine if gradients increase CPU usage significantly? */
+    /*TODO: Determine if gradients increase CPU usage significantly? */
     /* Transparent white gradient for Firefox 3.6+ */
     background:	-moz-linear-gradient(rgba(255, 255, 255, .98), rgba(255, 255, 255, .93) 25%, rgba(255, 255, 255, .9));
     /* Transparent white gradient for WebKit */
@@ -82,7 +82,7 @@ body {
     height: 18px;
     
     /* Prevent a long search string from overflowing the info bar by cutting it short and adding an ellipsis. (Mozilla has no support for this yet.) */
-    /* FIXME: This does not work yet. */
+    /*FIXME: This does not work yet. */
     text-overflow:    ellipsis;
     /* Opera specific */
     -o-text-overflow: ellipsis;
@@ -91,7 +91,7 @@ body {
     
     font-size: 13px;
     
-    /* NOTE: IE has its own DropShadow filter that could be used. */
+    /*NOTE: IE has its own DropShadow filter that could be used. */
     /* Opera 10.5/Mozilla 4.0 */
     box-shadow:         0px 3px 6px rgba(0, 0, 0, .08);
     /* Mozilla 3.5- */
@@ -111,7 +111,7 @@ body {
     
     max-width: 480px;
     min-width: 30px;
-    /* NOTE: 100% width cannot be used because it extends off the page */
+    /*NOTE: 100% width cannot be used because it extends off the page */
     /*       70% is used because it is a good balance when the page is wide or narrow. */
     width:     70%;
     height:    18px;
@@ -129,13 +129,13 @@ body {
     border-radius:      15px;
     
     /* Add slight gradient shadow to the top of the input box. */
-    /* NOTE: IE has its own DropShadow filter that could be used. */
+    /*NOTE: IE has its own DropShadow filter that could be used. */
     /* Opera 10.5/Mozilla 4.0 */
     box-shadow:         inset 0px 2px 3px rgba(0, 0, 0, .16);
     /* Mozilla 3.5- */
     -moz-box-shadow:    inset 0px 2px 3px rgba(0, 0, 0, .16);
     /* WebKit 522 (Chrome, Safari 3) */
-    /* BUG: The inset shadow does not stay inside of the rounded corners.  (See Chromium issue 29427.) */
+    /*BUG: The inset shadow does not stay inside of the rounded corners.  (See Chromium issue 29427.) */
     /* -webkit-box-shadow: inset 0px 2px 3px rgba(0, 0, 0, .16); */
     
     /* The margin balances moves the input box over a little so as not to cover the wrench icon. */
@@ -284,7 +284,7 @@ body {
     /* Transition for WebKit */
     -webkit-transition: opacity .6s ease, border-color .3s ease;
     /* Transition for Opera 10.5+ */
-    /* BUG: The border-color does not fade out on Opera (tested on 10.63). */ 
+    /*BUG: The border-color does not fade out on Opera (tested on 10.63). */ 
     -o-transition:      opacity .6s ease, border-color .3s ease;
     border-color: #777;
 }
@@ -341,7 +341,7 @@ body {
 }
 
 .contextMenu div a:hover {
-    /* TODO: Determine if it is better to use the color that is similar to the yellow before the transparency is applied (#DDF) or use transparency. */
+    /*TODO: Determine if it is better to use the color that is similar to the yellow before the transparency is applied (#DDF) or use transparency. */
     background: #E1E1FF;
     color:      #3985A8;
     
@@ -370,7 +370,7 @@ body {
     border-radius:      9px;
     
     /* Add both a drop shadow and an inset shadow to give a slightly rounded effect.
-    /* NOTE: IE has its own DropShadow filter that could be used. */
+    /*NOTE: IE has its own DropShadow filter that could be used. */
     /* Opera 10.5/Mozilla 4.0 */
     box-shadow:         3px 3px 3px rgba(0, 0, 0, .3), inset -1px 0 8px rgba(0, 0, 0, .2);
     /* Mozilla 3.5- */
@@ -387,7 +387,7 @@ body {
 }
 
 .panel a:hover {
-    /* TODO: Do something better. */
+    /*TODO: Do something better. */
     text-decoration: underline;
 }
 
@@ -454,7 +454,7 @@ button:hover {
  * @note This does not work in IE.
  */
 button:active {
-    /* TODO: Determine if it would be better just to change the text shadow color.  (Opera already moves the text.) */
+    /*TODO: Determine if it would be better just to change the text shadow color.  (Opera already moves the text.) */
     padding: 6px 13px 4px 15px;
     
     background-color: #E1E1FF;
@@ -517,7 +517,7 @@ label {
 
 /* Drop caps for the first letter of a chapter */
 .first_verse:first-letter, .first_paragraph:first-letter {
-    /* FIXME: Capital J's can cover up part of characters in the third line of the first verse.  (See 2 Kings 22:1 in a narrow window.) */
+    /*FIXME: Capital J's can cover up part of characters in the third line of the first verse.  (See 2 Kings 22:1 in a narrow window.) */
     font-size: 51px;
     float:     left;
     
