@@ -493,10 +493,6 @@ label {
 
 /* Verses created from a search. */
 .search_verse {
-    /* This gives reverse indent, but causes problems with margins (tested in Mozilla).
-    text-indent:	-2em;
-    margin-left:	2em;
-    */
     text-indent:	2em;
     width:			100%;
 }
@@ -515,8 +511,8 @@ label {
 
 /* Verses created from a verse lookup. */
 .psalm_title {
-    margin:			0 2em 0 2em;
-    padding-bottom:	19px;
+    margin: 0 2em 0 2em;
+    padding-bottom: 19px;
 }
 
 /* Drop caps for the first letter of a chapter */
