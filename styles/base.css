@@ -515,6 +515,19 @@ label {
     padding-bottom: 19px;
 }
 
+/* Subscriptions added to the end of Pauline Epistles. */
+.subscription {
+    /* Force this text to a new line and make padding-top work. */
+    /*NOTE: "The .paragraph .verse" rule tries to cancel this out. */
+    display: block!important;
+    
+    /* Insert a single blank line between the text and the subscription. */
+    padding-top: 19px;
+    
+    /* Add indentation on both sides. */
+    margin: 0 2em 0 2em;
+}
+
 /* Drop caps for the first letter of a chapter */
 .first_verse:first-letter, .first_paragraph:first-letter {
     /*FIXME: Capital J's can cover up part of characters in the third line of the first verse.  (See 2 Kings 22:1 in a narrow window.) */

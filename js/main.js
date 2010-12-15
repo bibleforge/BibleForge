@@ -785,13 +785,15 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     /// Check to see if other verses in the paragraph are also visible.
                     ///NOTE: When in paragraph form, multiple verses could share the same Y coordinates; therefore, we need to keep checking for more verses that may also be at the same Y coordinate.
                     ///NOTE: Only verses can be on the same line.  Chapter and book elements may have sibling elements that are not verses (like paragraph elements).
-                    while ((looking_upward ? possible_el = el.previousSibling : possible_el = el.nextSibling) !== null && the_pos >= possible_el.offsetTop && the_pos <= possible_el.offsetTop + possible_el.offsetHeight) {
+                    while ((looking_upward ? (possible_el = el.previousSibling) : (possible_el = el.nextSibling)) !== null && the_pos >= possible_el.offsetTop && the_pos <= possible_el.offsetTop + possible_el.offsetHeight) {
                         el = possible_el;
                     }
-                    ///NOTE: Intentional fall through.
+                    ///NOTE: Intentional fall through
                 case "chapter":
                 case "book":
                 case "short_book":
+                case "psalm_title":
+                case "verse subscription":
                     /// Found the verse, so calculate the verseID and call the success function.
                     ///NOTE: No radix is used because the number should never begin with a leading 0 and suppling the radix slows Mozilla (Firefox 3.6-) down tremendously.
                     verse_id = window.parseInt(el.id);
@@ -979,8 +981,9 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     }
                     
                     /// The titles in the book of Psalms are referenced as verse zero (cf. Psalm 3).
-                    verse1.v = verse1.v === 0 ? BF.lang.title : verse1.v;
-                    verse2.v = verse2.v === 0 ? BF.lang.title : verse2.v;
+                    /// The subscriptions at the end of Paul's epistles are referenced as verse 255 (cf. Romans 16).
+                    verse1.v = verse1.v === 0 ? BF.lang.title : verse1.v == 255 ? BF.lang.subscription : verse1.v;
+                    verse2.v = verse2.v === 0 ? BF.lang.title : verse2.v == 255 ? BF.lang.subscription : verse2.v;
                     
                     ///NOTE: \u2013 is Unicode for the en dash (–) (HTML: &ndash;).
                     ///TODO: Determine if the colons should be language specified.
@@ -1258,8 +1261,13 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                                     html_str += start_paragraph_HTML;
                                 }
                                 
-                                ///NOTE: The trailing space adds a space between verses in a paragraph and does not effect paragraph final verses.
-                                html_str += "<div class=verse id=" + num + "_verse><span class=verse_number>" + v + "&nbsp;</span>" + verse_html[i] + " </div>";
+                                /// Is it a subscription?
+                                if (v == 255) {
+                                    html_str += "<div class=\"verse subscription\" id=" + num + "_verse>" + verse_html[i] + "</div>";
+                                } else {
+                                    ///NOTE: The trailing space adds a space between verses in a paragraph and does not effect paragraph final verses.
+                                    html_str += "<div class=verse id=" + num + "_verse><span class=verse_number>" + v + "&nbsp;</span>" + verse_html[i] + " </div>";
+                                }
                             }
                             
                         /// Searching
