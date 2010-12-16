@@ -1272,9 +1272,12 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             
                         /// Searching
                         } else {
-                            /// Change verse 0 to "title" (e.g., change "Psalm 3:0" to "Psalm 3:title").
                             if (v === 0) {
+                                /// Change verse 0 to indicate a Psalm title (e.g., change "Psalm 3:0" to "Psalm 3:title").
                                 v = BF.lang.title;
+                            } else if (v == 255) {
+                                /// Change verse 255 to indicate a Pauline subscription (e.g., change "Romans 16:255" to "Romans 16:subscription").
+                                v = BF.lang.subscription;
                             }
                             
                             /// Is this verse from a different book than the last verse?
