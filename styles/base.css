@@ -511,8 +511,8 @@ label {
 
 /* Verses created from a verse lookup. */
 .psalm_title {
-    margin: 0 2em 0 2em;
-    padding-bottom: 19px;
+    /* Adding padding to the sides and bottom to distinguish the Psalm title from the rest of the text. */
+    padding: 0 2em 19px 2em;
 }
 
 /* Subscriptions added to the end of Pauline Epistles. */
