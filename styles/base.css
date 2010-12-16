@@ -512,17 +512,15 @@ label {
 /* Verses created from a verse lookup. */
 .psalm_title {
     /* Adding padding to the sides and bottom to distinguish the Psalm title from the rest of the text. */
+    /*NOTE: Padding should always be used for verses instead of margin because it can interfere with determining the verse range. */
     padding: 0 2em 19px 2em;
 }
 
 /* Subscriptions added to the end of Pauline Epistles. */
 .subscription {
-    /* Force this text to a new line and make padding-top work. */
-    /*NOTE: "The .paragraph .verse" rule tries to cancel this out. */
-    display: block!important;
-    
     /* Add indentation on both sides and insert a single blank line between the text and the subscription. */
-    margin: 19px 2em 0 2em;
+    /*NOTE: Padding should always be used for verses instead of margin because it can interfere with determining the verse range. */
+    padding: 19px 2em 0 2em;
 }
 
 /* Drop caps for the first letter of a chapter */
