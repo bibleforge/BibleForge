@@ -521,11 +521,8 @@ label {
     /*NOTE: "The .paragraph .verse" rule tries to cancel this out. */
     display: block!important;
     
-    /* Insert a single blank line between the text and the subscription. */
-    padding-top: 19px;
-    
-    /* Add indentation on both sides. */
-    margin: 0 2em 0 2em;
+    /* Add indentation on both sides and insert a single blank line between the text and the subscription. */
+    margin: 19px 2em 0 2em;
 }
 
 /* Drop caps for the first letter of a chapter */
