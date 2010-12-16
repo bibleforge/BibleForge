@@ -789,11 +789,12 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         el = possible_el;
                     }
                     ///NOTE: Intentional fall through
+                /// These elements will never have another verse on the same line, so we can skip the above checking.
                 case "chapter":
                 case "book":
                 case "short_book":
                 case "psalm_title":
-                case "verse subscription":
+                case "subscription":
                     /// Found the verse, so calculate the verseID and call the success function.
                     ///NOTE: No radix is used because the number should never begin with a leading 0 and suppling the radix slows Mozilla (Firefox 3.6-) down tremendously.
                     verse_id = window.parseInt(el.id);
@@ -1251,20 +1252,25 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                                     html_str += first_paragraph_HTML + "<div class=first_verse id=" + num + "_verse>" + verse_html[i] + " </div>";
                                 }
                             } else {
-                                /// Is there a paragraph break here?
-                                if (in_paragraphs && paragraphs[i]) {
-                                    /// Is this not the first paragraph?  (The first paragraph does not need to be closed.)
-                                    if (i != start_key) {
-                                        html_str += end_paragraph_HTML;
-                                    }
-                                    
-                                    html_str += start_paragraph_HTML;
-                                }
-                                
                                 /// Is it a subscription?
                                 if (v == 255) {
-                                    html_str += "<div class=\"verse subscription\" id=" + num + "_verse>" + verse_html[i] + "</div>";
+                                    /// Is there an open paragraph?
+                                    if (in_paragraphs && i !== start_key) {
+                                        ///NOTE: Since subscriptions are already set off by themselves, they do not need special paragraph HTML, but they may need to close existing paragraphs.
+                                        html_str += end_paragraph_HTML;
+                                    }
+                                    html_str += "<div class=subscription id=" + num + "_verse>" + verse_html[i] + "</div>";
                                 } else {
+                                    /// Is there a paragraph break here?
+                                    if (in_paragraphs && paragraphs[i]) {
+                                        /// Is this not the first paragraph?  (The first paragraph does not need to be closed.)
+                                        if (i !== start_key) {
+                                            html_str += end_paragraph_HTML;
+                                        }
+                                        
+                                        html_str += start_paragraph_HTML;
+                                    }
+                                    
                                     ///NOTE: The trailing space adds a space between verses in a paragraph and does not effect paragraph final verses.
                                     html_str += "<div class=verse id=" + num + "_verse><span class=verse_number>" + v + "&nbsp;</span>" + verse_html[i] + " </div>";
                                 }
