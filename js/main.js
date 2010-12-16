@@ -1397,6 +1397,9 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             }
                         }
                     } else {
+                        /// Since total could be undefined, make sure the total is 0.
+                        total = 0;
+                        
                         ///TODO: Make a separate function for this.
                         if (direction === additional) {
                             /// The user has reached the bottom by scrolling down (either RETURNED_SEARCH or RETURNED_VERSES_PREVIOUS), so we need to hide the loading graphic.
