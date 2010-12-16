@@ -491,7 +491,7 @@ label {
 }
 
 /*NOTE: This style is changed dynamically to hide and show the cursor. */
-.verse a, .search_verse a, .first_verse a, .psalm_title a {
+.verse a, .search_verse a, .first_verse a, .psalm_title a, .subscription a {
     cursor: pointer;
 }
 

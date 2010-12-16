@@ -347,7 +347,8 @@
             
             if (!is_cursor_visible) {
                 page.style.cursor = "auto";
-                BF.changeCSS(".verse a, .search_verse a, .first_verse a, .psalm_title a", "cursor: pointer;");
+                ///FIXME: Determine a way to do this without modifying the CSS.
+                BF.changeCSS(".verse a, .search_verse a, .first_verse a, .psalm_title a, .subscription a", "cursor: pointer;");
                 
                 is_cursor_visible = true;
             }
@@ -373,8 +374,8 @@
                 ///      Opera (at least 10.53) has no alternate cursor support whatsoever.
                 page.style.cursor = "none";
                 /// All words have a hand cursor, so this style must be removed.
-                ///TODO: Determine a way to do this without modifying the CSS.
-                BF.changeCSS(".verse a, .search_verse a, .first_verse a, .psalm_title a", "");
+                ///FIXME: Determine a way to do this without modifying the CSS.
+                BF.changeCSS(".verse a, .search_verse a, .first_verse a, .psalm_title a, .subscription a", "");
                 
                 is_cursor_visible = false;
             }, 2000);
