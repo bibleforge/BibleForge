@@ -376,10 +376,6 @@
          */
         page.onmousedown = function (e)
         {
-            /// Get the global event object for IE compatibility.
-            /*@cc_on
-                e = event;
-            @*/
             /// Was the right mouse button clicked?
             ///TODO: Determine how to detect when the menu comes up on a Mac?
             ///NOTE: In the future, it may be necessary to map the mouse buttons to variables because most are different on IE; however, the right mouse button is always 2.
@@ -402,10 +398,6 @@
          */
         page.onmouseout = function (e)
         {
-            /// Get the global event object for IE compatibility.
-            /*@cc_on
-                e = event;
-            @*/
             ///NOTE: For future IE compatibility, currentTarget is this and relatedTarget is event.toElement.  (Currently, IE cannot handle custom cursors yet.)
             var curTarget = e.currentTarget,
                 relTarget = e.relatedTarget;
