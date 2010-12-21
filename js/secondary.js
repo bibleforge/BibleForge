@@ -384,6 +384,7 @@
                 show_cursor();
             } else {
                 /// Other types of clicks should show the mouse cursor briefly but still hide it again.
+                show_cursor();
                 hide_cursor_delayed();
             }
         };
