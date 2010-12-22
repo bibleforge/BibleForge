@@ -371,6 +371,8 @@
                 ///      It would be possible to manually determine if the onmousemove event was legitimate by checking the X and Y coordinates.
                 ///      Opera (at least 10.53) has no alternate cursor support whatsoever.
                 page.style.cursor = "none";
+                
+                is_cursor_visible = false;
             }, 2000);
         }
         
