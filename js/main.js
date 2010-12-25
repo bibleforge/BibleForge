@@ -270,7 +270,6 @@ BF.format_number = function (num)
  * @param   change_all (boolean) (optional) Whether or not to check every rule.  If falsey, it will stop after finding one rule that matches selector.
  * @return  NULL.  Possibly changes the CSS.
  * @note    Called when the user changes the red_letters setting.
- * @todo    Test in IE.
  */
 BF.changeCSS = function (selector, new_CSS, change_all)
 {
@@ -459,7 +458,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                  * @param  smooth (boolean) (optional) Whether or not to scroll smoothly.  By default, or if falsey, it will scroll instantaneously.
                  * @return NULL.
                  * @note   The y value is first because x value is rarely used.
-                 * @todo   Indicate where used.
+                 * @note   Called by remove_excess_content_top(), add_content_top_if_needed(), scroll_to_verse(), write_verses(), handle_new_verses() and occasionally (IE only) by remove_excess_content_bottom() and add_content_bottom_if_needed().
                  */
                 scroll_view_to = function (y, x, smooth)
                 {
@@ -1131,7 +1130,6 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                  * @return  Returns TRUE on success and FALSE if the verse cannot be found on the scroll.
                  * @note    Called by handle_new_verses() after the first Ajax request of a particular verse lookup.
                  * @bug     Verses at chapter and book beginnings (e.g., Genesis 1:1) are not scrolled to correctly.
-                 * @todo    Move this function somewhere else.
                  */
                 scroll_to_verse: function (verse_id)
                 {
