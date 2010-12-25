@@ -1447,8 +1447,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             infoBar.appendChild(document.createTextNode(BF.format_number(total) + BF.lang["found_" + (total === 1 ? "singular" : "plural")]));
                             /// Create a <b> for the search terms.
                             b_tag = document.createElement("b");
-                            ///NOTE: We use this method instead of straight innerHTML to prevent HTML elements from appearing inside the <b></b>.
-                            ///TODO: Preserve excess whitespace in the raw query.
+                            ///NOTE: We use this method instead of straight innerHTML to prevent HTML elements from appearing inside the <b> tag.
                             b_tag.appendChild(document.createTextNode(options.raw_query));
                             infoBar.appendChild(b_tag);
                         }

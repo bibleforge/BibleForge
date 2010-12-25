@@ -89,6 +89,9 @@ body {
     /* This is what actually hides the text, currently. */
     overflow:         hidden;
     
+    /* Prevent excess whitespace from collapsing when displaying user generated search terms. */
+    white-space: pre-wrap;
+    
     font-size: 13px;
     
     /*NOTE: IE has its own DropShadow filter that could be used. */
