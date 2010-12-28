@@ -570,6 +570,26 @@
                         };
                     }
                     
+                    /**
+                     * Create the function that sends the new value to the settings.
+                     *
+                     * @return A function.
+                     * @note   Called immediately.
+                     */
+                    function make_textbox_onchange(this_apply_change)
+                    {
+                        /**
+                         * Run the specific function to make the change.
+                         *
+                         * @return NULL.
+                         * @note   Called after a user changes a textbox.
+                         * @todo   It should fire immediately, not just onblur.
+                         */
+                        return function ()
+                        {
+                            this_apply_change(this.value);
+                        };
+                    }
                     
                     ///NOTE: document.createTextNode() is akin to innerText.  It does not inject HTML.
                     legend_el.appendChild(document.createTextNode(config.name));
@@ -605,6 +625,17 @@
                             input_el.checked = context.settings[config.settings][config.options[cur_option].settings].get();
                             
                             input_el.onclick = make_checkbox_onclick(apply_change);
+                            break;
+                        ///NOTE: Not yet used.
+                        case "text":
+                            input_el      = document.createElement("input");
+                            input_el.type = "text";
+                            
+                            /// Set the current value.
+                            input_el.value = context.settings[config.settings][config.options[cur_option].settings].get();
+                            
+                            input_el.onchange = make_textbox_onchange(apply_change);
+                            break;
                         }
                         /// Give the input element an id that matches the label so that clicking the label will interact with the input field.
                         input_el.id   = label_el.htmlFor;
