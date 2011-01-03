@@ -1810,6 +1810,10 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 
                 content_manager.clear_scroll();
                 
+                /// Indicate that the lookup is in progress.
+                ///TODO: Determine if this should be done by a function.
+                bottomLoader.style.visibility = "visible";
+                
                 ///TODO: Determine if this should be done by a separate function.
                 document.title = raw_query + " - " + BF.lang.app_name;
                 
