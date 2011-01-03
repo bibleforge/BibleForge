@@ -677,7 +677,7 @@
                 {
                     line: true,
                     text: BF.lang.blog,
-                    link: "http://blog.bibleforge.com"
+                    link: "http://blog.bibleforge.com/"
                 },
                 {
                     text: BF.lang.about,
