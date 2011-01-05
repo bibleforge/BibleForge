@@ -1276,6 +1276,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                                     }
                                     
                                     ///NOTE: The trailing space adds a space between verses in a paragraph and does not effect paragraph final verses.
+                                    ///TODO: Determine if "class=verse_number" is needed.
                                     html_str += "<div class=verse id=" + num + "_verse><span class=verse_number>" + v + "&nbsp;</span>" + verse_html[i] + " </div>";
                                 }
                             }
@@ -1300,7 +1301,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                                 html_str += "<h1 class=short_book id=" + num + "_title>" + BF.lang.books_short[b] + "</h1>";
                             }
                             
-                            html_str += "<div class=search_verse id=" + num + "_search>" + c + ":" + v + " " + verse_html[i] + "</div>";
+                            html_str += "<div class=search_verse id=" + num + "_search><span>" + c + ":" + v + "</span> " + verse_html[i] + "</div>";
                         }
                     }
                     
