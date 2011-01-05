@@ -704,4 +704,57 @@
             e.stopPropagation();
         };
     }());
+    
+    
+    /// Tesint
+    (function ()
+    {
+        page.onclick = function(e)
+        {
+            var clicked_el = e.srcElement ? e.srcElement : e.originalTarget;
+            
+            if (clicked_el) {
+                /// What did the user click on?
+                switch (clicked_el.tagName) {
+                /// A Word
+                case "A":
+                    document.title = clicked_el.tagName + " " + clicked_el.id;
+                    /// Show 
+                    break;
+                /// Verse Number
+                case "SPAN":
+                    document.title = clicked_el.tagName + " " + clicked_el.id;
+                    break;
+                /// Book Title (Big) or Search Book Title
+                case "H1":
+                /// Book Title (Small)
+                case "H2":
+                /// Chapter/Psalm title
+                case "H3":
+                    document.title = clicked_el.tagName + " " + clicked_el.id;
+                    break;
+                }
+            }
+        };
+        
+        page.onmouseup = function(e)
+        {
+            var tmp_el,
+                userSelection;
+            
+            /// Mozilla/WebKit/Opera
+            ///TODO: Try in IE9.
+            if (window.getSelection) {
+                tmp_el = document.createElement("div");
+                ///NOTE: The document fragment (created by cloneContents()) needs to be added to an empty DOM element in order to get access to the raw HTML inside.
+                tmp_el.appendChild(window.getSelection().getRangeAt(0).cloneContents()); 
+                userSelection = tmp_el.innerHTML;
+            /// IE (This should be second because Opera supports both but only the first well).
+            } else if (document.selection) {
+                userSelection = document.selection.createRange().htmlText;
+            }
+            
+            document.title = userSelection;
+        }
+    }());
 });
