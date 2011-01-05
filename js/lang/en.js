@@ -19,7 +19,7 @@
  * @return  Returns an object containing language specific functions and variables.
  */
 BF.lang = (function ()
-{    
+{
     /// Return the language variables and functions.
     return {
         /// Book names

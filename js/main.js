@@ -442,7 +442,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 /// Create functions that need to be declared in a different scope or with functions in their closure.
                 add_content_if_needed,
                 scroll_view_to,
-                update_verse_range;            
+                update_verse_range;
             
             /**
              * The scrolling closure
