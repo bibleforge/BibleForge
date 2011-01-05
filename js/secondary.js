@@ -321,7 +321,13 @@
         (function ()
         {
             var hide_cursor_timeout,
-                is_cursor_visible = true;
+                is_cursor_visible = true,
+                
+                pointer_selector = ".verse a, .verse span, .search_verse a, .search_verse span, .first_verse a, .psalm_title a, .subscription a",
+                pointer_style    = "cursor: pointer;";
+                
+            /// Make the cursor become a hand when hovering over words and verse references.
+            BF.changeCSS(pointer_selector, pointer_style, true);
             
             ///NOTE: Chromium (at least 4.0) has a strange bug when setting the cursor to "auto" and
             ///      the mouse moves over the HTML element, drop caps letters move downward!
@@ -350,7 +356,7 @@
                 if (!is_cursor_visible) {
                     page.style.cursor = "auto";
                     ///FIXME: Determine a way to do this without modifying the CSS.
-                    BF.changeCSS(".verse a, .search_verse a, .first_verse a, .psalm_title a, .subscription a", "cursor: pointer;");
+                    BF.changeCSS(pointer_selector, pointer_style);
                     
                     is_cursor_visible = true;
                 }
@@ -377,7 +383,7 @@
                     page.style.cursor = "none";
                     /// All words have a hand cursor, so this style must be removed.
                     ///FIXME: Determine a way to do this without modifying the CSS.
-                    BF.changeCSS(".verse a, .search_verse a, .first_verse a, .psalm_title a, .subscription a", "");
+                    BF.changeCSS(pointer_selector, "");
                     
                     is_cursor_visible = false;
                 }, 2000);
@@ -740,7 +746,7 @@
         }());
         
         
-        /// Tesint
+        /// Tesing
         (function ()
         {
             page.onclick = function(e)

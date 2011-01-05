@@ -493,10 +493,6 @@ label {
     cursor: pointer;
 }
 
-/*NOTE: This style is changed dynamically to hide and show the cursor. */
-.verse a, .search_verse a, .first_verse a, .psalm_title a, .subscription a {
-    cursor: pointer;
-}
 
 /* Verses created from a search. */
 .search_verse {
