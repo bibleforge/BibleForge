@@ -92,7 +92,7 @@ BF.Create_easy_ajax = function ()
             /**
              * Send an Ajax request to the server.
              *
-             * @example query("POST", "query.php", "q=search", function (data) {/// success}, function (status, data) {/// failure}, 10000, true);
+             * @example query("POST", "query.php", "q=search", function (data) {}, function (status, data) {}, 10000, true);
              * @param   method    (string)              The HTTP method to use (GET || POST).
              * @param   path      (string)              The URL to query.
              * @param   message   (string)   (optional) The variables to send (URI format: "name1=value1&name2=value%202").
