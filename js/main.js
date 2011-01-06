@@ -1390,6 +1390,10 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                                 ///TODO: Make a separate function for this.
                                 bottomLoader.style.visibility = "visible";
                                 content_manager.add_content_if_needed(additional);
+                            } else {
+                                /// Since the last verse is Revelation 22:21, there is no need to look for more.
+                                content_manager.reached_bottom();
+                                bottomLoader.style.visibility = "hidden";
                             }
                         }
                         
@@ -1408,6 +1412,10 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                                 ///TODO: Make a separate function for this.
                                 topLoader.style.visibility = "visible";
                                 content_manager.add_content_if_needed(previous);
+                            } else {
+                                /// Since the first verse is Genesis 1:1, there is no need to look for more.
+                                content_manager.reached_top();
+                                topLoader.style.visibility = "hidden";
                             }
                         }
                     } else {
