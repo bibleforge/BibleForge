@@ -749,6 +749,8 @@
         /// Tesing
         (function ()
         {
+            var ajax = new BF.Create_easy_ajax();
+            
             page.onclick = function(e)
             {
                 var clicked_el = e.srcElement ? e.srcElement : e.originalTarget;
@@ -758,19 +760,14 @@
                     switch (clicked_el.tagName) {
                     /// A Word
                     case "A":
-                        document.title = clicked_el.tagName + " " + clicked_el.id;
                         /// Show 
+                        ajax.query("GET", "info.php?w=" + clicked_el.id, "", function (response)
+                        {
+                            document.title = response;
+                        });
                         break;
                     /// Verse Number
                     case "SPAN":
-                        document.title = clicked_el.tagName + " " + clicked_el.id;
-                        break;
-                    /// Book Title (Big) or Search Book Title
-                    case "H1":
-                    /// Book Title (Small)
-                    case "H2":
-                    /// Chapter/Psalm title
-                    case "H3":
                         document.title = clicked_el.tagName + " " + clicked_el.id;
                         break;
                     }
