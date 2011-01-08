@@ -485,6 +485,7 @@ button::-moz-focus-inner {
     width:      100%;
     background: url("../images/loader.gif") no-repeat center;
     visibility: hidden;
+    opacity:    .5;
 }
 
 
