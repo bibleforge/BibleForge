@@ -22,7 +22,7 @@
  * @param   $limit      (integer)               The maximum number of verses to return.
  * @param   $start_id   (integer) (optional)    The grammatical id whence to start.
  * @return  NULL.  Data is sent to the buffer as a JSON array, and then execution ends.
- * @note    Called in search.php.
+ * @note    Called in query.php.
  */
 function grammatical_search($json, $direction, $limit, $start_id = 0)
 {

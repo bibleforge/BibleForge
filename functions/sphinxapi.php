@@ -393,7 +393,7 @@ function sphFixUint ( $value )
  * The Sphinx searchd client class
  * 
  * @example $sphinx = new SphinxClient();
- * @note Called by standard_search() in functions/standard_search.php and morphology_search() in functions/morphology.php.
+ * @note    Called by standard_search() in functions/standard_search.php and grammatical_search() in functions/grammatical_search.php.
  */
 class SphinxClient
 {
