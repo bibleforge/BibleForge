@@ -35,73 +35,42 @@ if (get_magic_quotes_gpc()) {
 /// Load constants.
 require_once 'config.php';
 
-/// Prepare for search.
+/// Query Variables:
+/// d Direction (number)  The direction of the query (ADDITIONAL, PREVIOUS)      (lookup only)
+/// f Find      (boolean) Whether or not to find a paragraph break to start at   (lookup only)
+/// p Paragraph (boolean) Whether or not verses will be displayed in paragraphs  (lookup only)
+/// q Query     (string)  The verse reference or search string to query
+/// s Start At  (string)  The verse or word id at which to start the query       (search only)
+/// t Type      (number)  The type of query (VERSE_LOOKUP, MIXED_SEARCH, STANDARD_SEARCH, GRAMMATICAL_SEARCH)
 
 ///TODO: Compare POST vs GET vs REQEUST.
-if (isset($_REQUEST['q'])) {
-    $query = $_REQUEST['q'];
-} else {
-    /// $_REQUEST['q'] is required.
-    die;
-}
 
-if (isset($_REQUEST['t'])) {
-    $type = $_REQUEST['t'];
-} else {
+if (!isset($_REQUEST['q']) || !isset($_REQUEST['t'])) {
     die;
-}
-
-/// Which verse should the search start on?
-///NOTE: Not used with VERSE_LOOKUP.
-///TODO: Determine if this can be moved so that it does not always run.
-if (isset($_REQUEST['s'])) {
-    $start_id = (int)$_REQUEST['s'];
-} else {
-    $start_id = 0;
 }
 
 /// In what direction should the verses be retrieved?
-if (isset($_REQUEST['d'])) {
-    $direction = (int)$_REQUEST['d'];
-} else {
-    $direction = ADDITIONAL;
-}
+$_REQUEST['d'] = isset($_REQUEST['d']) ? (int)$_REQUEST['d'] : ADDITIONAL;
 
 /******************
  * Run the query. *
  ******************/
 
-if ($type == VERSE_LOOKUP) {
+if ($_REQUEST['t'] == VERSE_LOOKUP) {
     require_once 'functions/verse_lookup.php';
     
-    /// Should verses be returned in paragraph form?
-    if (isset($_REQUEST['p'])) {
-        $in_paragraphs = (bool)$_REQUEST['p'];
-    } else {
-        $in_paragraphs = true;
-    }
+    /// Example query: 1001001 (Genesis) or 43003016 (John 3:16)
+    retrieve_verses($_REQUEST['q'], $_REQUEST['d'], LIMIT, isset($_REQUEST['p']) ? (bool)$_REQUEST['p'] : true, isset($_REQUEST['f']) ? (bool)$_REQUEST['f'] : false);
     
-    /// Should the server assume that the starting verse is not at a paragraph break
-    /// so it should figure out where the paragraph begins.
-    ///NOTE: Currently, this is only needed when the client preforms the initial verse lookup.
-    if (isset($_REQUEST['f'])) {
-        $find_paragraph_start = (bool)$_REQUEST['f'];
-    } else {
-        $find_paragraph_start = false;
-    }
-    
-    /// $query example: 1001001 or 43003016
-    retrieve_verses($query, $direction, LIMIT, $in_paragraphs, $find_paragraph_start);
-    
-} elseif ($type == STANDARD_SEARCH) {
+} elseif ($_REQUEST['t'] == STANDARD_SEARCH) {
     require_once 'functions/standard_search.php';
     
-    /// $query example: love or God & love or this -that or "in the beginning"
-    standard_search($query, $direction, LIMIT, $start_id);
+    /// Example query: love or God & love or this -that or "in the beginning"
+    standard_search($_REQUEST['q'], $_REQUEST['d'], LIMIT, isset($_REQUEST['s']) ? (int)$_REQUEST['s'] : 0);
     
-} else { /// MORPHOLOGICAL_SEARCH
+} else { /// GRAMMATICAL_SEARCH
     require_once 'functions/morphology.php';
     
-    /// $query example: '["love", [[4,1]], [1]]' (love AS NOUN) or '["love", [[3,1], [7,1]], [1,0]]' (love AS RED, NOT PRESENT)
-    morphology_search($query, $direction, LIMIT, $start_id);
+    /// Example query: '["love", [[4,1]], [1]]' (love AS NOUN) or '["love", [[3,1], [7,1]], [1,0]]' (love AS RED, NOT PRESENT)
+    morphology_search($_REQUEST['q'], $_REQUEST['d'], LIMIT, isset($_REQUEST['s']) ? (int)$_REQUEST['s'] : 0);
 }
