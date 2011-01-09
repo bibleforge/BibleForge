@@ -19,18 +19,17 @@
 /********************
  * MySQL Constants *
  *******************/
-///NOTE: Use the typical MySQL sever format (hostname[:(port|socket)]).
-define('DB_SERVER',		'127.0.0.1');
-define('DB_USERNAME',	'root');
-define('DB_PASSWORD',	'');
-define('DB_NAME',		'bf');
+define('DB_SERVER',   '127.0.0.1'); ///NOTE: Use the typical MySQL sever format (hostname[:(port|socket)]).
+define('DB_USERNAME', 'root');
+define('DB_PASSWORD', '');
+define('DB_NAME',     'bf');
 
 /********************
  * Sphinx Constants *
  ********************/
-define('SPHINX_API',	'sphinxapi');	/// Which API to use (i.e., 'sphinxapi' or 'sphinxapi_cli')?
-define('SPHINX_SERVER',	'127.0.0.1');	/// The Sphinx host address (if using sphinxapi) or the path to search executable (if using sphinxapi_cli)
-define('SPHINX_PORT',	9312);			/// Port number (if using sphinxapi) or path to sphinx configuration file (if using sphinxapi_cli)
+define('SPHINX_API',    'sphinxapi'); /// Which API to use (i.e., 'sphinxapi' or 'sphinxapi_cli')?
+define('SPHINX_SERVER',	'127.0.0.1'); /// The Sphinx host address (if using sphinxapi) or the path to search executable (if using sphinxapi_cli)
+define('SPHINX_PORT',   9312);        /// Port number (if using sphinxapi) or path to sphinx configuration file (if using sphinxapi_cli)
 
 
 /****************************
@@ -45,13 +44,13 @@ define('BIBLE_VERSES', 'bible_english_html');
 /************************
  * BibleForge Constants *
  ************************/
-define('VERSE_LOOKUP',			1);
-define('MIXED_SEARCH',			2);
-define('STANDARD_SEARCH',		3);
-define('MORPHOLOGICAL_SEARCH',	4);
+define('VERSE_LOOKUP',       1);
+define('MIXED_SEARCH',       2);
+define('STANDARD_SEARCH',    3);
+define('GRAMMATICAL_SEARCH', 4);
 
-define('ADDITIONAL',	1);
-define('PREVIOUS',		2);
+define('ADDITIONAL', 1);
+define('PREVIOUS',   2);
 
-define('LIMIT',			40); ///FIXME: Where should this be defined?  Should it be defined?
-define('LIMIT_SUGGEST',	10);
+define('LIMIT',         40); ///FIXME: Where should this be defined?  Should it be defined?
+define('LIMIT_SUGGEST', 10);
