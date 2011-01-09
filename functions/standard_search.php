@@ -10,7 +10,7 @@
  * @author  BibleForge <info@bibleforge.com>
  */
 
-///TODO: Determine the performance cost of creating functions for the code overlap between the two function (standard_search() and morphology_search()).
+///TODO: Determine the performance cost of creating functions for the code overlap between the two function (standard_search() and grammatical_search()).
 /**
  * Perform a standard Sphinx-based search.
  *
@@ -23,7 +23,7 @@
  * @param   $limit      (integer) (optional)    The maximum number of verses to return.
  * @param   $start_id   (integer) (optional)    The verse_id whence to start.
  * @return  NULL.  Data is sent to the buffer as a JSON array, and then execution ends.
- * @note    Called in search.php.
+ * @note    Called in query.php.
  */
 function standard_search($query, $direction, $limit, $start_id = 0, $output_JSON = true)
 {

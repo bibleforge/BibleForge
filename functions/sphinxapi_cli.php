@@ -59,7 +59,7 @@ define('SPH_GROUPBY_ATTRPAIR',	5);
  * The Sphinx search client class
  *
  * @example $sphinx = new SphinxClient();
- * @note Called by standard_search() in functions/standard_search.php and morphology_search() in functions/morphology.php.
+ * @note    Called by standard_search() in functions/standard_search.php and grammatical_search() in functions/grammatical_search.php.
  */
 class SphinxClient
 {
@@ -102,8 +102,8 @@ class SphinxClient
      * Create a new client object and fill defaults.
      *
      * @return NULL.  Default values are set.
-     * @note Called automatically when the class is created.
-     * @note The class is created by standard_search() and morphology_search() in search.php.
+     * @note   Called automatically when the class is created.
+     * @note   The class is created by standard_search() in functions/standard_search.php and grammatical_search() in functions/grammatical_search.php.
      */
     function SphinxClient()
     {
@@ -153,7 +153,7 @@ class SphinxClient
      * @param	$path	(string) The path to the search executable file.  Default is "search."
      * @param	$config	(string) The path to the config file for Sphinx.
      * @return	NULL.
-     * @note	Called by standard_search() and morphology_search() in search.php.
+     * @note	Called by standard_search() in functions/standard_search.php and grammatical_search() in functions/grammatical_search.php.
      */
     function SetServer($path, $config)
     {
@@ -173,7 +173,7 @@ class SphinxClient
      * @param	$min (integer) The lowest id to be returned.
      * @param	$max (integer) The highest id to be returned.  If 0 then there is no upper limit.
      * @return	NULL.
-     * @note	Called by standard_search() and morphology_search() in search.php.
+     * @note	Called by standard_search() in functions/standard_search.php and grammatical_search() in functions/grammatical_search.php.
      */
     function SetIDRange($min, $max)
     {
@@ -191,7 +191,7 @@ class SphinxClient
      * @param	$max	(integer) (optional)	The maximum overall number of results to find internally in Sphinx.
      * @param	$cutoff	(integer) (optional)	The threshold of results to stop searching after.
      * @return	NULL.
-     * @note	Called by standard_search() and morphology_search() in search.php.
+     * @note	Called by standard_search() in functions/standard_search.php and grammatical_search() in functions/grammatical_search.php.
      */
     function SetLimits($offset, $limit, $max = 0, $cutoff = 0)
     {
@@ -212,7 +212,7 @@ class SphinxClient
      * @example	$sphinx->SetMatchMode(SPH_MATCH_EXTENDED);
      * @param	$mode (integer) The mode to search with.  The default is SPH_MATCH_ALL.
      * @return	NULL.
-     * @note	Called by standard_search() and morphology_search() in search.php.
+     * @note	Called by standard_search() in functions/standard_search.php and grammatical_search() in functions/grammatical_search.php.
      */
     function SetMatchMode($mode)
     {
@@ -227,7 +227,7 @@ class SphinxClient
      * @param	$mode	(integer)			The search mode to use.  The default is SPH_SORT_RELEVANCE.
      * @param	$sortby	(string) (optional)	The search expression to use.
      * @return	NULL.
-     * @note	Called by standard_search() in search.php.
+     * @note	Called by standard_search() in functions/standard_search.php.
      */
     function SetSortMode($mode, $sortby = "")
     {
@@ -242,7 +242,7 @@ class SphinxClient
      * @example	$sphinx->SetRankingMode(SPH_RANK_NONE);
      * @param	$ranker (integer) The ranking mode to use.  The default is SPH_RANK_PROXIMITY_BM25.
      * @return	NULL.
-     * @note	Called by standard_search() and morphology_search() in search.php.
+     * @note	Called by standard_search() in functions/standard_search.php and grammatical_search() in functions/grammatical_search.php.
      */
     function SetRankingMode($ranker)
     {
@@ -255,13 +255,13 @@ class SphinxClient
      *
      * Only match records where $attribute value is in given set.
      *
-     * @example	$sphinx->SetFilter($attr, array((int)$morphology_arr[1]), (bool)$include_arr[$key]);
+     * @example	$sphinx->SetFilter($attr, array((int)$grammatical_arr[1]), (bool)$include_arr[$key]);
      * @example	$sphinx->SetFilter('tense', array(1), false); /// This finds words that are in the present tense.
      * @param	$attribute	(string)				The attribute to filter.
      * @param	$values		(array)					An array of values (integers) to filter the attribute with.
      * @param	$exclude	(boolean) (optional)	Whether to find only words that match the values or only words that do not match.
      * @return	NULL.
-     * @note	Called by set_morphology_attributes() in functions/morphology.php.
+     * @note	Called by set_grammatical_attributes() in functions/grammatical_search.php.
      */
     function SetFilter($attribute, $values, $exclude = false)
     {
@@ -282,7 +282,7 @@ class SphinxClient
      * @param	$index		(string) (optional)	The index to use.  The default is "*" which searches through all indices.
      * @param	$comment	(string) (optional)	Comments are recorded in the query log and are placed in square brackets to be used for debugging purposes.
      * @return	NULL.
-     * @note	Called by standard_search() and morphology_search() in search.php.
+     * @note	Called by standard_search() in functions/standard_search.php and grammatical_search() in functions/grammatical_search.php.
      */
     function Query($query, $index = '*', $comment = "")
     {
@@ -339,7 +339,7 @@ class SphinxClient
         }
         
         /// Is the user searching for a specific word?
-        ///NOTE: If the user is looking for all words that match some morphological attributes, then we do not send anything for the query (not even empty double quotes).
+        ///NOTE: If the user is looking for all words that match some grammatical attributes, then we do not send anything for the query (not even empty double quotes).
         if ($query != "") {
             /// Since the data is being sent to the command line, it needs to be wrapped in double quotes and sanitized.
             ///NOTE: A space is needed after the first double quote; otherwise Sphinx throws an error.
