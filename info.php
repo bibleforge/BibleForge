@@ -35,4 +35,8 @@ if (get_magic_quotes_gpc()) {
 /// Load constants.
 require_once 'config.php';
 
-echo 'Testing ' .$_REQUEST['w'];
+//echo 'Testing ' .$_REQUEST['w'];
+
+require_once 'functions/database.php';
+connect_to_database();
+
