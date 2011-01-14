@@ -10,7 +10,7 @@
 
 /// Set JSLint options.
 /*global window, BF */
-/*jslint white: true, browser: true, devel: true, evil: true, onevar: true, undef: true, nomen: true, bitwise: true, newcap: true, immed: true */
+/*jslint white: true, evil: true, onevar: true, undef: true, nomen: true, bitwise: true, newcap: true, plusplus: true */
 
 /**
  * Create the BibleForge language specific object for the English language.
@@ -230,9 +230,9 @@ BF.lang = (function ()
                     
                     last_letter = w.slice(-1);
                     
-                    if (last_letter == "y" || last_letter == "i") {
+                    if (last_letter === "y" || last_letter === "i") {
                         w = w.slice(0, w.length - 1) + "[yi]";
-                    } else if (last_letter == "e") {
+                    } else if (last_letter === "e") {
                         w = w.slice(0, w.length - 1) + "[ei]";
                     }
                     
@@ -270,15 +270,16 @@ BF.lang = (function ()
                 initial_search_arr = search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?|[^\s]*)|[~\/]\d*|["',.:?!;&|\)\(\]\[\/\\`{}<$\^+]|-\B)/g, "").toLowerCase().split(" ");
                 arr_len = initial_search_arr.length;
                 
-first_loop:     for (i = 0; i < arr_len; ++i) {
-                    for (j = 0; j < new_arr_len; ++j) {
-                        if (final_search_arr[j] == initial_search_arr[i]) {
+first_loop:     for (i = 0; i < arr_len; i += 1) {
+                    for (j = 0; j < new_arr_len; j += 1) {
+                        if (final_search_arr[j] === initial_search_arr[i]) {
                             /// This words already exists; jump to the first loop and get the next word.
                             ///NOTE: This would be the same as "continue 2" in PHP.
                             continue first_loop;
                         }
                     }
-                    final_search_arr[new_arr_len++] = initial_search_arr[i];
+                    final_search_arr[new_arr_len] = initial_search_arr[i];
+                    new_arr_len += 1;
                 }
                 
                 return final_search_arr;
@@ -317,7 +318,7 @@ first_loop:     for (i = 0; i < arr_len; ++i) {
 first_loop:     while (i < search_terms_arr_len) {
                     term       = search_terms_arr[i];
                     len_before = term.length;
-                    ++i;
+                    i += 1;
                     
                     /// Fix special/unique words that the stemmer won't stem correctly.
                     switch (term) {
@@ -364,7 +365,7 @@ first_loop:     while (i < search_terms_arr_len) {
                         break;
                     default:
                         /// Does the word contain a wildcard symbol (*)?
-                        if (term.indexOf("*") != -1) {
+                        if (term.indexOf("*") !== -1) {
                             /// Don't stem; change it to a regex compatible form.
                             ///NOTE: Word breaks are found by looking for tag openings (<) or closings (>).
                             stemmed_word = term.replace(/\*/g, "[^<>]*");
@@ -378,8 +379,8 @@ first_loop:     while (i < search_terms_arr_len) {
                     len_after = stemmed_word.length;
                     
                     /// Skip words that are the same after stemming or regex'ing (e.g., "joy joyful" becomes "joy joy").
-                    for (j = 0; j < count; ++j) {
-                        if (stemmed_word == stemmed_arr[j]) {
+                    for (j = 0; j < count; j += 1) {
+                        if (stemmed_word === stemmed_arr[j]) {
                             ///NOTE: This is the same as "continue 2" in PHP.
                             continue first_loop;
                         }
@@ -393,7 +394,7 @@ first_loop:     while (i < search_terms_arr_len) {
                     ///       The current English version (KJV) does not use square brackets ([]).
                     ///FIXME: The punctuation ,.?!;:)( could be considered language specific.
                     ///TODO:  Bench mark different regex (creation and testing).
-                    if (no_morph || (len_after == len_before && len_after < 3)) {
+                    if (no_morph || (len_after === len_before && len_after < 3)) {
                         highlight_regex[count] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")[),.?!;:]*[<-]", "i");
                     } else {
                         /// Find most words based on stem morphology, but also can have false hits.
@@ -401,7 +402,7 @@ first_loop:     while (i < search_terms_arr_len) {
                         //highlight_regex[count++] = new RegExp("id=([0-9]+)>[(]*([^<]+-)?" + stemmed_word + "[a-z']{0,7}[),.?!;:]*[<-]", "i");
                         highlight_regex[count] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")[^<]{0,7}[),.?!;:]*[<-]", "i");
                     }
-                    ++count;
+                    count += 1;
                 }
                 
                 return highlight_regex;
@@ -755,12 +756,15 @@ first_loop:     while (i < search_terms_arr_len) {
                 cv = ref.split(/\s*([0-9]{1,3})(?:[:.;,\s]([0-9]{0,3})[\-0-9]*)?$/);
                 
                 if (cv.length > 1) {
-                    ///TODO: Determine if this should be !==.
-                    if (cv[1] != "") {
+                    /// Is the number a valid chapter?
+                    if (cv[1] > 0) {
+                        /// + "" converts the number to a string so that it can later be concadinated properly.
                         chapter = cv[1] + "";
+                    } else {
+                        chapter = "1";
                     }
-                    ///TODO: Determine if this should be !==.
-                    if (cv[2] != "" && typeof cv[2] != "undefined") {
+                    
+                    if (cv[2] !== "" && typeof cv[2] !== "undefined") {
                         verse = cv[2] + "";
                     } else {
                         /// For books with only 1 chapter, the chapter reference is optional (i.e., Jude 4 == Jude 1:4).
@@ -772,6 +776,7 @@ first_loop:     while (i < search_terms_arr_len) {
                         case "65":
                             verse   = chapter;
                             chapter = "001";
+                            break;
                         }
                     }
                     zeros   = ["", "00", "0", ""];
