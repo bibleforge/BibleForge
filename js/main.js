@@ -10,7 +10,7 @@
 
 /// Set JSLint options.
 /*global window, BF */
-/*jslint white: true, browser: true, devel: true, evil: true, onevar: true, undef: true, nomen: true, bitwise: true, newcap: true, immed: true */
+/*jslint white: true, browser: true, devel: true, evil: true, onevar: true, undef: true, nomen: true, bitwise: true, newcap: true, plusplus: true */
 
 /// Declare helper function(s) attached to the global BibleForge object (BF).
 
@@ -107,13 +107,13 @@ BF.Create_easy_ajax = function ()
             return function (method, path, message, onsuccess, onfailure, timeout, retry)
             {
                 /// Determine if arguments were passed to the last two parameters.  If not, set the defaults.
-                if (typeof timeout == "undefined") {
+                if (typeof timeout === "undefined") {
                     /// Default to 10 seconds.
                     ///TODO: This should be dynamic based on the quality of the connection to the server.
                     timeout = 10000;
                 }
                 
-                if (typeof retry == "undefined") {
+                if (typeof retry === "undefined") {
                     retry = true;
                 }
                 
@@ -123,12 +123,12 @@ BF.Create_easy_ajax = function ()
                 ajax.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
                 ajax.onreadystatechange = function ()
                 {
-                    if (ajax.readyState == 4) {
+                    if (ajax.readyState === 4) {
                         /// Stop the timeout timer that may be running so it does not try again.
                         clearTimeout(ajax_timeout);
                         
                         /// Was the request successful?
-                        if (ajax.status == 200) {
+                        if (ajax.status === 200) {
                             ///NOTE: It is not eval'ed here because it may be needed to be eval'ed in a different (and safer) context or not be parsed at all.
                             if (onsuccess) {
                                 onsuccess(ajax.responseText);
@@ -195,7 +195,7 @@ BF.include = (function ()
             {
                 files[path] = evaler(response);
                 ///TODO: Determine what kind of error handling should be done.
-                if (typeof files[path] == "function") {
+                if (typeof files[path] === "function") {
                     files[path](context);
                 }
             }, null, timeout, retry);
@@ -222,8 +222,10 @@ BF.get_position = function (obj)
         do {
             left_pos += obj.offsetLeft;
             top_pos  += obj.offsetTop;
-        ///NOTE: The condition intentionally assigns obj.offsetParent to obj, which is falsey (null) when no more parents exist.
-        } while ((obj = obj.offsetParent));
+            
+            obj = obj.offsetParent;
+        ///NOTE: The variable obj is falsey (null) when no more parents exist.
+        } while (obj);
     }
     
     return {
@@ -289,13 +291,13 @@ BF.changeCSS = function (selector, new_CSS, insert, change_all)
         CSS_rules     = style_sheet.cssRules ? style_sheet.cssRules : style_sheet.rules;
         CSS_rules_len = CSS_rules.length;
         while (i < CSS_rules_len) {
-            if (CSS_rules[i].selectorText == selector) {
+            if (CSS_rules[i].selectorText === selector) {
                 CSS_rules[i].style.cssText = new_CSS;
                 if (!change_all) {
                     return;
                 }
             }
-            ++i;
+            i += 1;
         }
     }
 };
@@ -304,7 +306,7 @@ BF.changeCSS = function (selector, new_CSS, insert, change_all)
 
 /// Determine if CSS transitions are supported by the browser.
 ///NOTE: All of these variables currently require vendor specific prefixes.
-BF.cssTransitions = typeof document.body.style.webkitTransition != "undefined" || typeof document.body.style.MozTransition != "undefined" || typeof document.body.style.OTransition != "undefined";
+BF.cssTransitions = typeof document.body.style.webkitTransition !== "undefined" || typeof document.body.style.MozTransition !== "undefined" || typeof document.body.style.OTransition !== "undefined";
 
 
 /**
@@ -353,7 +355,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         }
         
         viewPort_num = BF.viewPort_count;
-        ++BF.viewPort_count;
+        BF.viewPort_count += 1;
         
         /**
          * Load settings.
@@ -474,7 +476,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         padding_interval,
                         pixels_needed;
                     
-                    if (typeof x == "undefined") {
+                    if (typeof x === "undefined") {
                         /// IE8- does not set pageXOffset.
                         /*@cc_on
                             @if (@_jscript_version < 9)
@@ -556,7 +558,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         /// Is the object in the remove zone, and is its height less than the remaining space to scroll to prevent jumping?
                         if (child_height + buffer_rem < window.pageYOffset && child_height < doc_docEl.scrollHeight - window.pageYOffset - doc_docEl.clientHeight) {
                             /// Store the content in the cache, and then add 1 to the outer counter variable so that we know how much cache we have.
-                            cached_verses_top[cached_count_top++] = child.innerHTML;
+                            cached_verses_top[cached_count_top] = child.innerHTML;
+                            cached_count_top += 1;
                             ///TODO: Determine if setting the display to "none" actually helps at all.
                             /// Remove quickly from the page.
                             child.style.display = "none";
@@ -595,7 +598,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         /// Is the element is in the remove zone?
                         if (child.offsetTop > window.pageYOffset + doc_docEl.clientHeight + buffer_rem) {
                             /// Store the content in the cache, and then add 1 to the outer counter variable so that we know how much cache we have.
-                            cached_verses_bottom[cached_count_bottom++] = child.innerHTML;
+                            cached_verses_bottom[cached_count_bottom] = child.innerHTML;
+                            cached_count_bottom += 1;
                             
                             page.removeChild(child);
                             
@@ -646,9 +650,10 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             /// Has the scroll position actually not changed?
                             ///NOTE: IE/Opera sometimes don't update scroll position until after this function is run.
                             ///      Mozilla/WebKit can have the same problem.
-                            if (new_scroll_pos == scroll_pos) {
+                            if (new_scroll_pos === scroll_pos) {
                                 /// Should we wait a moment and see if the scroll position changes.
-                                if (++scroll_check_count < 10) {
+                                scroll_check_count += 1;
+                                if (scroll_check_count < 10) {
                                     window.setTimeout(scrolling, 30);
                                 } else {
                                     /// Reset the counter and do not check anymore.
@@ -851,7 +856,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         if (cached_count_bottom > 0) {
                             newEl = document.createElement("div");
                             /// First subtract 1 from the outer counter variable to point to the last cached passage, and then retrieve the cached content.
-                            newEl.innerHTML = cached_verses_bottom[--cached_count_bottom];
+                            cached_count_bottom -= 1;
+                            newEl.innerHTML = cached_verses_bottom[cached_count_bottom];
                             ///NOTE: This is actually works like insertAfter() (if such a function existed).
                             ///      By using "null" as the second parameter, it tells it to add the element to the end.
                             page.insertBefore(newEl, null);
@@ -899,7 +905,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             newEl = document.createElement("div");
                             
                             /// First subtract 1 from the outer counter variable to point to the last cached passage, and then retrieve the cached content.
-                            newEl.innerHTML = cached_verses_top[--cached_count_top];
+                            cached_count_top -= 1;
+                            newEl.innerHTML = cached_verses_top[cached_count_top];
                             
                             page.insertBefore(newEl, child);
                             
@@ -988,19 +995,19 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     
                     /// The titles in the book of Psalms are referenced as verse zero (cf. Psalm 3).
                     /// The subscriptions at the end of Paul's epistles are referenced as verse 255 (cf. Romans 16).
-                    verse1.v = verse1.v === 0 ? BF.lang.title : verse1.v == 255 ? BF.lang.subscription : verse1.v;
-                    verse2.v = verse2.v === 0 ? BF.lang.title : verse2.v == 255 ? BF.lang.subscription : verse2.v;
+                    verse1.v = verse1.v === 0 ? BF.lang.title : verse1.v === 255 ? BF.lang.subscription : verse1.v;
+                    verse2.v = verse2.v === 0 ? BF.lang.title : verse2.v === 255 ? BF.lang.subscription : verse2.v;
                     
                     ///NOTE: \u2013 is Unicode for the en dash (–) (HTML: &ndash;).
                     ///TODO: Determine if the colons should be language specified.
                     /// Are the books the same?
-                    if (verse1.b == verse2.b) {
+                    if (verse1.b === verse2.b) {
                         /// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
-                        verse1.b = verse1.b == 19 ? BF.lang.psalm : BF.lang.books_short[verse1.b];
+                        verse1.b = verse1.b === 19 ? BF.lang.psalm : BF.lang.books_short[verse1.b];
                         /// Are the chapters the same?
-                        if (verse1.c == verse2.c) {
+                        if (verse1.c === verse2.c) {
                             /// Are the verses the same?
-                            if (verse1.v == verse2.v) {
+                            if (verse1.v === verse2.v) {
                                 ref_range = verse1.b + " " + verse1.c + ":" + verse1.v;
                             } else {
                                 ref_range = verse1.b + " " + verse1.c + ":" + verse1.v + "\u2013" + verse2.v;
@@ -1010,8 +1017,8 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         }
                     } else {
                         /// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
-                        verse1.b = verse1.b == 19 ? BF.lang.psalm : BF.lang.books_short[verse1.b];
-                        verse2.b = verse2.b == 19 ? BF.lang.psalm : BF.lang.books_short[verse2.b];
+                        verse1.b = verse1.b === 19 ? BF.lang.psalm : BF.lang.books_short[verse1.b];
+                        verse2.b = verse2.b === 19 ? BF.lang.psalm : BF.lang.books_short[verse2.b];
                         
                         ref_range = verse1.b + " " + verse1.c + ":" + verse1.v + "\u2013" + verse2.b + " " + verse2.c + ":" + verse2.v;
                     }
@@ -1029,7 +1036,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     /// Is the new verse range the same as the old one?
                     /// If they are the same, updating it would just waste time.
                     ///TODO: Could use top_verse and bottom_verse to compare too, but since they are objects, there is no good way to do that.
-                    if (document.title != new_title) {
+                    if (document.title !== new_title) {
                         document.title = new_title;
                         
                         /// Display the verse range on the page if looking up verses.
@@ -1202,17 +1209,17 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         v;
                     
                     ///NOTE: Currently only grammatical_search searches data at the word level, so it is the only type that might stop in the middle of a verse and find more words in the same verse as the user scrolls.
-                    if (type == grammatical_search) {
+                    if (type === grammatical_search) {
                         if (direction === additional) {
                             /// Is the first verse returned the same as the bottom verse on the page?
-                            if (verse_range.bottom_verse == verse_ids[0]) {
+                            if (verse_range.bottom_verse === verse_ids[0]) {
                                 start_key = 1;
                             }
                         /// Is the last verse returned the same as the top verse on the page?
                         ///NOTE: Currently, searches are always additional, so this cannot happen yet.
-                        } else if (verse_range.top_verse == verse_ids[stop_key - 1]) {
+                        } else if (verse_range.top_verse === verse_ids[stop_key - 1]) {
                             /// Stop one verse early because the last verse is already on the page.
-                            --stop_key;
+                            stop_key -= 1;
                         }
                     }
                     
@@ -1222,7 +1229,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         end_paragraph_HTML   = "</div>";
                     }
                     
-                    for (i = start_key; i < stop_key; ++i) {
+                    for (i = start_key; i < stop_key; i += 1) {
                         num = verse_ids[i];
                         v   = num % 1000;                     /// Calculate the verse.
                         c   = ((num - v) % 1000000) / 1000;   /// Calculate the chapter.
@@ -1239,9 +1246,9 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                                 if (c === 1) {
                                     html_str += "<div class=book id=" + num + "_title><h2>" + BF.lang.books_long_pretitle[b] + "</h2><h1>" + BF.lang.books_long_main[b] + "</h1><h2>" + BF.lang.books_long_posttitle[b] + "</h2></div>";
                                 /// Display chapter/psalm number (but not on verse 1 of psalms that have titles).
-                                } else if (b != 19 || v === 0 || (c <= 2 || c == 10 || c == 33 || c == 43 || c == 71 || c == 91 || (c >= 93 && c <= 97) || c == 99 || (c >= 104 && c <= 107) || (c >= 111 && c <= 119) || (c >= 135 && c <= 137) || c >= 146)) {
+                                } else if (b !== 19 || v === 0 || (c <= 2 || c === 10 || c === 33 || c === 43 || c === 71 || c === 91 || (c >= 93 && c <= 97) || c === 99 || (c >= 104 && c <= 107) || (c >= 111 && c <= 119) || (c >= 135 && c <= 137) || c >= 146)) {
                                     /// Is this the book of Psalms?  (Psalms have a special name.)
-                                    if (b == 19) {
+                                    if (b === 19) {
                                         chapter_text = BF.lang.psalm;
                                     } else {
                                         chapter_text = BF.lang.chapter;
@@ -1257,7 +1264,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                                 }
                             } else {
                                 /// Is it a subscription?
-                                if (v == 255) {
+                                if (v === 255) {
                                     /// Is there an open paragraph?
                                     if (in_paragraphs && i !== start_key) {
                                         ///NOTE: Since subscriptions are already set off by themselves, they do not need special paragraph HTML, but they may need to close existing paragraphs.
@@ -1286,7 +1293,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             if (v === 0) {
                                 /// Change verse 0 to indicate a Psalm title (e.g., change "Psalm 3:0" to "Psalm 3:title").
                                 v = BF.lang.title;
-                            } else if (v == 255) {
+                            } else if (v === 255) {
                                 /// Change verse 255 to indicate a Pauline subscription (e.g., change "Romans 16:255" to "Romans 16:subscription").
                                 v = BF.lang.subscription;
                             }
@@ -1371,7 +1378,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             {
                                 ///NOTE: Only standard and mixed searches need verse_html data to be sent.
                                 ///NOTE: word_ids is only needed for grammatical and mixed searches.
-                                options.highlight((type != grammatical_search ? verse_html.join("") : false), word_ids);
+                                options.highlight((type !== grammatical_search ? verse_html.join("") : false), word_ids);
                             }, 0);
                         }
                         
@@ -1397,7 +1404,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             }
                         }
                         
-                        if (direction == previous || initial_query) {
+                        if (direction === previous || initial_query) {
                             /// The first verse ID need to be store so that the server knowns where to start future previous queries.
                             options.verse_range.top_verse = verse_ids[0];
                             
@@ -1430,7 +1437,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             bottomLoader.style.visibility = "hidden";
                         }
                         ///BUG: there can be no results if looking up beyond rev 22.21 (e.g., rev 23). FIX: Prevent looking up past 66022021
-                        if (direction == previous || initial_query) {
+                        if (direction === previous || initial_query) {
                             /// The user has reached the top of the page by scrolling up (either Genesis 1:1 or there were no search results), so we need to hide the loading graphic
                             content_manager.reached_top();
                             topLoader.style.visibility    = "hidden";
@@ -1440,7 +1447,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     /// Is this is the first results of a search or lookup?
                     if (initial_query) {
                         /// Are the results displayed in paragraphs and the verse looked up not at the beginning of a paragraph?
-                        if (type === verse_lookup && in_paragraphs && verse_ids[0] != options.verse) {
+                        if (type === verse_lookup && in_paragraphs && verse_ids[0] !== options.verse) {
                             /// Because the verse the user is looking for is not at the beginning of a paragraph
                             /// the text needs to be scrolled so that the verse is at the top.
                             content_manager.scroll_to_verse(options.verse);
@@ -1504,7 +1511,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             }
                             
                             ///NOTE: Queries are additional by default; therefore, d only needs to be set for previous lookups.
-                            if (options.direction == previous) {
+                            if (options.direction === previous) {
                                 query_str += "&d=" + options.direction;
                                 
                             /// Is it possible that this query does not begin at a paragraph break?
@@ -1553,7 +1560,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                                 
                                 in_paragraphs = settings.view.in_paragraphs.get();
                                 
-                                if (options.type === verse_lookup || options.type == standard_search) {
+                                if (options.type === verse_lookup || options.type === standard_search) {
                                     /// Determine which verse to start from for the next query.
                                     ///NOTE: It does not matter whether or not the verse exists.  The server will simply retrieve the next available verse.
                                     ///      For example, Romans 1:33 will retrieve verses starting at Romans 2:1 (when the direction is additional).
@@ -1685,7 +1692,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     split_pos;
                 
                 /// Did the user use the grammatical keyword in his search?
-                if ((split_pos = search_terms.indexOf(BF.lang.grammar_marker)) != -1) {
+                if ((split_pos = search_terms.indexOf(BF.lang.grammar_marker)) !== -1) {
                     ///TODO: Determine what is better: a JSON array or POST/GET string (i.e., word1=word&grammar_type1=1&value1=3&include1=1&...).
                     ///NOTE: A JSON array is used to contain the information about the search.
                     ///      JSON format: '["WORD",[[GRAMMAR_TYPE1,VALUE1],[...]],[INCLUDE1,...]]'
@@ -1694,7 +1701,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                     grammar_search_term = search_terms.slice(0, split_pos);
                     
                     /// Is the user trying to find all words that match the grammatical attributes?
-                    if (grammar_search_term == "*") {
+                    if (grammar_search_term === "*") {
                         /// Sphinx will find all words if no query is present, so we need to send a blank search request.
                         grammar_search_term = "";
                     }
@@ -1715,12 +1722,12 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                         split_pos = grammar_attributes.indexOf(BF.lang.grammar_separator, split_start);
                         /// Trim leading white space.
                         if (grammar_attributes.slice(split_start, split_start + 1) === " ") {
-                            ++split_start;
+                            split_start += 1;
                         }
                         /// Is this grammatical feature to be excluded?
-                        if (grammar_attributes.slice(split_start, split_start + 1) == "-") {
+                        if (grammar_attributes.slice(split_start, split_start + 1) === "-") {
                             /// Skip the hyphen so that we just get the grammatical word (e.g., "love AS -NOUN" we just want "NOUN").
-                            ++split_start;
+                            split_start += 1;
                             exclude_json += "1,";
                         } else {
                             exclude_json += "0,";
@@ -1786,14 +1793,15 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 
                 /// Determine if the user is preforming a search or looking up a verse.
                 /// If the query is a verse reference, a number is returned, if it is a search, then FALSE is returned.
-                verse_id = BF.lang.determine_reference(query);
+                ///NOTE: The + is to convert the verse reference to a number.
+                verse_id = (+BF.lang.determine_reference(query));
                 
                 /// Is the query a verse lookup?
-                if (verse_id !== false) {
+                if (verse_id > 0) {
                     /// Is the lookup verse possibly the beginning of a Psalm with a title?  If so, we need to start at the title, so go back one verse.
                     ///NOTE: To get the titles of Psalms, select verse 0 instead of verse 1.
                     if (verse_id > 19003000 && verse_id < 19145002 && verse_id % 1000 === 1) {
-                        --verse_id;
+                        verse_id -= 1;
                     }
                     options.verse = verse_id;
                     options.type  = verse_lookup;
@@ -1851,7 +1859,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             highlight_re_length;
                         
                         /// TODO: Handle mixed searches.
-                        if (options.type == standard_search) {
+                        if (options.type === standard_search) {
                             /// standard_terms is a string containing all of the terms in a standard search (i.e., excluding grammatical search terms when preforming a mixed search).
                             highlight_re        = BF.lang.prepare_highlighter(standard_terms);
                             highlight_re_length = highlight_re.length;
@@ -1875,7 +1883,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                             
                             /// Are there standard verses to 
                             /// TODO: Handle mixed searches too.
-                            if (options.type == standard_search) {
+                            if (options.type === standard_search) {
                                 re_id = 0;
                                 while (re_id < highlight_re_length) {
                                     tmp_found_ids = html.split(highlight_re[re_id]);
@@ -1887,12 +1895,12 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                                         ///TODO: Determine if we ever need to replace an existing f* className.
                                         document.getElementById(tmp_found_ids[i]).className += " f" + (re_id + 1);
                                     }
-                                    ++re_id;
+                                    re_id += 1;
                                 }
                             ///NOTE: In order to support mixed searches, this will have to be a separate IF statement.
                             } else {
                                 ids = word_ids.length;
-                                for (i = 0; i < ids; ++i) {
+                                for (i = 0; i < ids; i += 1) {
                                     ///TODO: Determine if there is a downside to having a space at the start of the className.
                                     ///TODO: Determine if we ever need to replace an existing f* className.
                                     document.getElementById(word_ids[i]).className += " f" + 1;
@@ -1905,7 +1913,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
                 /// Is there any chance that there are verses above the starting verse?
                 /// Or, in other words, is the query a search or a verse lookup starting at Genesis 1:1?
                 ///NOTE: In the future, it may be possible for searches to start midway.
-                if (options.type !== verse_lookup || options.verse == "1001001") {
+                if (options.type !== verse_lookup || options.verse === 1001001) {
                     /// There is no reason to look for previous verses when the results start at the beginning.
                     content_manager.reached_top();
                 }
@@ -1941,7 +1949,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
         var raw_query = q_obj.value;
         
         /// Is the query is the same as the explanation?  If so, do not submit the query; just draw attention to the query box.
-        if (raw_query == BF.lang.query_explanation) {
+        if (raw_query === BF.lang.query_explanation) {
             q_obj.focus();
         } else {
             run_new_query(raw_query);
@@ -1974,7 +1982,7 @@ BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLo
      */
     q_obj.onfocus = function ()
     {
-        if (this.value == BF.lang.query_explanation) {
+        if (this.value === BF.lang.query_explanation) {
             this.value = "";
         }
     };
@@ -1996,10 +2004,17 @@ if (!"".trim) {
      */
     String.prototype.trim = function ()
     {
-        var end   = this.length,
-            start = -1;
-        while (this.charCodeAt(--end) < 33) {}
-        while (++start < end && this.charCodeAt(start) < 33) {}
+        var end   = this.length - 1,
+            start = 0;
+        
+        while (this.charCodeAt(end) < 33) {
+            end -= 1;
+        }
+        
+        while (start < end && this.charCodeAt(start) < 33) {
+            start += 1;
+        }
+        
         return this.slice(start, end + 1);
     };
 }
@@ -2019,7 +2034,7 @@ document.onkeydown = function (e)
     
     /// Are there input boxes selected (not including images)?  If so, this function should not be executed.
     ///NOTE: In the future, other elements, such as, TEXTAREA or buttons, may also need to be detected.
-    if (activeEl.tagName == "INPUT" && activeEl.type != "image") {
+    if (activeEl.tagName === "INPUT" && activeEl.type !== "image") {
         return;
     }
     
@@ -2035,7 +2050,7 @@ document.onkeydown = function (e)
     ///NOTE: It may be that the Command key is keyCode 91 and may need to be caught by another keydown event.
     ///NOTE: The meta key does not seem to be detected; this may need me manually checked for, like for the Mac.
     ///NOTE: However, it does want to grab the stroke if the user is pasting.  keyCode 86 == "V," which is the standard shortcut for Paste.
-    if ((e.ctrlKey && keyCode != 86) || e.altKey || e.metaKey) {
+    if ((e.ctrlKey && keyCode !== 86) || e.altKey || e.metaKey) {
         return;
     }
     
@@ -2048,7 +2063,7 @@ document.onkeydown = function (e)
     /// 186-254 = Punctuation
     ///TODO: Determine if capturing Backspace and/Space is confusing because they have alternate functions (the back button and page down, respectively).
     ///      One possible solution is to allow Shift, Ctrl, or Alt + Backspace or Space to be the normal action.
-    if (keyCode == 8 || keyCode == 13 || keyCode == 32 || (keyCode > 47 && keyCode < 91) || (keyCode > 95 && keyCode < 112) || (keyCode > 185 && keyCode < 255)) {
+    if (keyCode === 8 || keyCode === 13 || keyCode === 32 || (keyCode > 47 && keyCode < 91) || (keyCode > 95 && keyCode < 112) || (keyCode > 185 && keyCode < 255)) {
         ///TODO: Determine which input box to select when split screen mode is implemented.
         ///      One option would be to have a value in the global BF object.
         document.getElementById("q0").focus();

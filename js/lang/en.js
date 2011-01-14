@@ -422,7 +422,7 @@ first_loop:     while (i < search_terms_arr_len) {
          * @example	verse_id = determine_reference("Habakkuk 99:1");			/// Returns "35099001" (note the invalid chapter reference).
          * @example	verse_id = determine_reference("love");						/// Returns FALSE
          * @param	ref (string) The text that may or may not be a valid verse reference.
-         * @return	The verse id of a reference or FALSE if invalid.
+         * @return	The verse id of a reference or 0 if invalid.
          * @note	Called by run_search() in js/main.js.
          * @note	Requires books_re and book_arr_re global regex variables.
          */
@@ -443,7 +443,7 @@ first_loop:     while (i < search_terms_arr_len) {
                 
                 /// First determine if it is likely a verse reference.
                 if (!books_re.test(ref)) {
-                    return false;
+                    return 0;
                 }
                 
                 switch (ref.slice(0, 1).toLowerCase()) {
@@ -744,7 +744,7 @@ first_loop:     while (i < search_terms_arr_len) {
                 }
                 
                 if (book === 0) {
-                    return false;
+                    return 0;
                 }
                 
                 chapter	= "001";
