@@ -9,8 +9,8 @@
  */
 
 /// Set JSLint options.
-/*global window, BF */
-/*jslint white: true, browser: true, devel: true, evil: true, onevar: true, undef: true, nomen: true, bitwise: true, newcap: true, plusplus: true */
+/*global document, window, BF */
+/*jslint white: true, evil: true, onevar: true, undef: true, nomen: true, bitwise: true, newcap: true, plusplus: true */
 
 /// Declare helper function(s) attached to the global BibleForge object (BF).
 
@@ -55,7 +55,7 @@ BF.Create_easy_ajax = function ()
             /// Is a query in progress?  If readyState > 0 and < 4, it needs to be aborted.
             if (ajax.readyState % 4) {
                 /// Stop it from retrying first.
-                clearTimeout(ajax_timeout);
+                window.clearTimeout(ajax_timeout);
                 ajax.abort();
             }
         },
@@ -125,7 +125,7 @@ BF.Create_easy_ajax = function ()
                 {
                     if (ajax.readyState === 4) {
                         /// Stop the timeout timer that may be running so it does not try again.
-                        clearTimeout(ajax_timeout);
+                        window.clearTimeout(ajax_timeout);
                         
                         /// Was the request successful?
                         if (ajax.status === 200) {
