@@ -9,8 +9,8 @@
  */
 
 /// Set JSLint options.
-/*global window, BF */
-/*jslint white: true, browser: true, devel: true, evil: true, onevar: true, undef: true, nomen: true, bitwise: true, newcap: true, immed: true */
+/*global document, window, BF */
+/*jslint white: true, evil: true, onevar: true, undef: true, nomen: true, bitwise: true, newcap: true, plusplus: true */
 
 (function ()
 {
@@ -99,11 +99,11 @@
                 
                 is_open = true;
                 
-                for (i = 0; i < menu_count; ++i) {
+                for (i = 0; i < menu_count; i += 1) {
                     menu_item = document.createElement("a");
                     
                     /// If the link is a string, then it is simply a URL; otherwise, it is a function.
-                    if (typeof menu_items[i].link == "string") {
+                    if (typeof menu_items[i].link === "string") {
                         menu_item.href   = menu_items[i].link;
                         /// Force links to open in a new tab.
                         menu_item.target = "_blank";
@@ -351,7 +351,7 @@
             function show_cursor()
             {
                 /// Prevent the cursor from being hidden.
-                clearTimeout(hide_cursor_timeout);
+                window.clearTimeout(hide_cursor_timeout);
                 
                 if (!is_cursor_visible) {
                     page.style.cursor = "auto";
@@ -371,7 +371,7 @@
              */
             function hide_cursor_delayed()
             {
-                clearTimeout(hide_cursor_timeout);
+                window.clearTimeout(hide_cursor_timeout);
                 
                 hide_cursor_timeout = window.setTimeout(function ()
                 {
@@ -402,7 +402,7 @@
                 /// Was the right mouse button clicked?
                 ///TODO: Determine how to detect when the menu comes up on a Mac?
                 ///NOTE: In the future, it may be necessary to map the mouse buttons to variables because most are different on IE; however, the right mouse button is always 2.
-                if (e.button == 2) {
+                if (e.button === 2) {
                     /// Since the right mouse button usually brings up a menu, the user will likely want to see the cursor indefinitely.
                     show_cursor();
                 } else {
@@ -429,12 +429,12 @@
                 ///NOTE: onmouseout does not work as expected.  It fires when the cursor moves over any element, even if it is still over the parent element.
                 ///      Therefore, we must check all of the parent elements to see if it is still over the element in question.
                 ///      IE actually supports the correct behavior with onmouseleave.
-                while (curTarget != relTarget && relTarget !== null && relTarget.nodeName != 'BODY') {
+                while (curTarget !== relTarget && relTarget !== null && relTarget.nodeName !== 'BODY') {
                     relTarget = relTarget.parentNode;
                 }
                 
                 /// Did the mouse cursor leave the parent element?
-                if (curTarget != relTarget) {
+                if (curTarget !== relTarget) {
                     show_cursor();
                 }
             };
@@ -653,7 +653,7 @@
                         
                         table_cell.appendChild(input_el);
                         
-                        ++cur_option;
+                        cur_option += 1;
                     }
                     
                     container_el.appendChild(table_el);
@@ -751,7 +751,7 @@
         {
             var ajax = new BF.Create_easy_ajax();
             
-            page.onclick = function(e)
+            page.onclick = function (e)
             {
                 var clicked_el = e.srcElement ? e.srcElement : e.originalTarget;
                 
@@ -774,7 +774,7 @@
                 }
             };
             
-            page.onmouseup = function(e)
+            page.onmouseup = function (e)
             {
                 var tmp_el,
                     userSelection;
@@ -792,7 +792,7 @@
                 }
                 
                 document.title = userSelection;
-            }
+            };
         }());
     };
 }());
