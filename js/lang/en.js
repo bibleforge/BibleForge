@@ -258,11 +258,11 @@ BF.lang = (function ()
             function filter_terms_for_highlighter(search_terms)
             {
                 var arr_len,
-                    final_search_arr	= [],
+                    final_search_arr    = [],
                     i,
                     initial_search_arr,
                     j,
-                    new_arr_len			= 0;
+                    new_arr_len         = 0;
                 
                 /// Remove punctuation and break up the query string into individual parts to filter out duplicates.
                 ///NOTE: (?:^|\s)- makes sure not to filter out hyphenated words by ensuring that a hyphen must occur at the beginning or before a space to be counted as a NOT operator.
@@ -750,8 +750,8 @@ first_loop:     while (i < search_terms_arr_len) {
                     return 0;
                 }
                 
-                chapter	= "001";
-                verse	= "001";
+                chapter = "001";
+                verse   = "001";
                 
                 /// Finally, we need to determine the chapter and/or verse reference is they are supplied.
                 ///TODO: Explain regex and give examples.
