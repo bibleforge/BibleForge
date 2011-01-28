@@ -15,6 +15,7 @@
 (function ()
 {
     "use strict";
+    
     /// Declare helper function(s) attached to the global BibleForge object (BF).
     
     /// Detect WebKit based browsers.
@@ -27,13 +28,13 @@
     ///      Therefore, use the Function Constructor for Chrome and JSON.parse() for all others.
     ///NOTE: It could also check to make sure that the string starts with a curly bracket ({) straight bracket ([) double quote (") or number (hyphen (-) or digit) to attempt to ensure that it is valid JSON.
     /**
-    * Safely (and quickly) parse JSON.
-    *
-    * A cross browser JSON parsing solution.
-    *
-    * @param  str (string) The string to parse.
-    * @return Returns the value of the JSON or "" if an empty string.
-    */
+     * Safely (and quickly) parse JSON.
+     *
+     * A cross browser JSON parsing solution.
+     *
+     * @param  str (string) The string to parse.
+     * @return Returns the value of the JSON or "" if an empty string.
+     */
     BF.parse_json = window.chrome ? function (str)
     {
         return str === "" ? "" : (new Function("return " + str))();
@@ -43,11 +44,11 @@
     };
     
     /**
-    * Create an easy to use Ajax object.
-    *
-    * @example var ajax = new BF.Create_easy_ajax();
-    * @return  Returns an object that makes ajax easier.
-    */
+     * Create an easy to use Ajax object.
+     *
+     * @example var ajax = new BF.Create_easy_ajax();
+     * @return  Returns an object that makes ajax easier.
+     */
     BF.Create_easy_ajax = function ()
     {
         var ajax = new window.XMLHttpRequest(),
@@ -71,12 +72,12 @@
             query: (function ()
             {
                 /**
-                * Send the Ajax request and start timeout timer.
-                *
-                * @return NULL.
-                * @note   This code is a separate function to reduce code duplication.
-                * @note   Called by the BF.Create_easy_ajax.query().
-                */
+                 * Send the Ajax request and start timeout timer.
+                 *
+                 * @return NULL.
+                 * @note   This code is a separate function to reduce code duplication.
+                 * @note   Called by the BF.Create_easy_ajax.query().
+                 */
                 function send_query(message, timeout, retry)
                 {
                     ajax.send(message);
@@ -94,20 +95,20 @@
                 }
                 
                 /**
-                * Send an Ajax request to the server.
-                *
-                * @example query("POST", "query.php", "q=search", function (data) {}, function (status, data) {}, 10000, true);
-                * @param   method    (string)              The HTTP method to use (GET || POST).
-                * @param   path      (string)              The URL to query.
-                * @param   message   (string)   (optional) The variables to send (URI format: "name1=value1&name2=value%202").
-                * @param   onsuccess (function) (optional) The function to run on a successful query.
-                * @param   onfailure (function) (optional) The function to run if the query fails.
-                * @param   timeout   (number)   (optional) How long to wait before giving up on the script to load (in milliseconds).
-                *                                          A falsey value (such as 0 or FALSE) disables timing out.         (Default is 10,000 milliseconds.)
-                * @param   retry     (boolean)  (optional) Whether or not to retry loading the script if a timeout occurs.  (Default is TRUE.)
-                * @return  NULL.
-                * @todo    Determine if it should change a method from GET to POST if it exceeds 2,083 characters (IE's rather small limit).
-                */
+                 * Send an Ajax request to the server.
+                 *
+                 * @example query("POST", "query.php", "q=search", function (data) {}, function (status, data) {}, 10000, true);
+                 * @param   method    (string)              The HTTP method to use (GET || POST).
+                 * @param   path      (string)              The URL to query.
+                 * @param   message   (string)   (optional) The variables to send (URI format: "name1=value1&name2=value%202").
+                 * @param   onsuccess (function) (optional) The function to run on a successful query.
+                 * @param   onfailure (function) (optional) The function to run if the query fails.
+                 * @param   timeout   (number)   (optional) How long to wait before giving up on the script to load (in milliseconds).
+                 *                                          A falsey value (such as 0 or FALSE) disables timing out.         (Default is 10,000 milliseconds.)
+                 * @param   retry     (boolean)  (optional) Whether or not to retry loading the script if a timeout occurs.  (Default is TRUE.)
+                 * @return  NULL.
+                 * @todo    Determine if it should change a method from GET to POST if it exceeds 2,083 characters (IE's rather small limit).
+                 */
                 return function (method, path, message, onsuccess, onfailure, timeout, retry)
                 {
                     /// Determine if arguments were passed to the last two parameters.  If not, set the defaults.
@@ -157,29 +158,29 @@
     };
     
     /**
-    * Load some Javascript and optionally send it some variables from the closure.
-    *
-    * @example BF.include("path/to/script.js", {needed_var: var_from_the_closure}, 20000, false);
-    * @example BF.include("js/secondary.js",   {topBar: viewPort.firstChild, viewPort_num: viewPort_num});
-    * @param   path    (string)             The location of the JavaScript to load.
-    * @param   context (object)             The variable to send to the included JavaScript.
-    * @param   timeout (number)  (optional) How long to wait before giving up on the script to load (in milliseconds).
-    *                                       A falsey value (such as 0 or FALSE) disables timing out.         (Default is 10,000 milliseconds.)
-    * @param   retry   (boolean) (optional) Whether or not to retry loading the script if a timeout occurs.  (Default is TRUE.)
-    * @return  NULL.   Runs code.
-    * @todo    If the code has already been loaded, simply run the script without re-downloading anything.
-    * @todo    Determine if it would be better to use a callback function rather than passing context.
-    */
+     * Load some Javascript and optionally send it some variables from the closure.
+     *
+     * @example BF.include("path/to/script.js", {needed_var: var_from_the_closure}, 20000, false);
+     * @example BF.include("js/secondary.js",   {topBar: viewPort.firstChild, viewPort_num: viewPort_num});
+     * @param   path    (string)             The location of the JavaScript to load.
+     * @param   context (object)             The variable to send to the included JavaScript.
+     * @param   timeout (number)  (optional) How long to wait before giving up on the script to load (in milliseconds).
+     *                                       A falsey value (such as 0 or FALSE) disables timing out.         (Default is 10,000 milliseconds.)
+     * @param   retry   (boolean) (optional) Whether or not to retry loading the script if a timeout occurs.  (Default is TRUE.)
+     * @return  NULL.   Runs code.
+     * @todo    If the code has already been loaded, simply run the script without re-downloading anything.
+     * @todo    Determine if it would be better to use a callback function rather than passing context.
+     */
     BF.include = (function ()
     {
         /**
-        * Eval code in a neutral scope.
-        *
-        * @param  code (string) The string to eval.
-        * @return The result of the eval'ed code.
-        * @note   Called when the Ajax request returns successfully.
-        * @note   This is used to prevent included code from having access to the variables inside of the function's scope.
-        */
+         * Eval code in a neutral scope.
+         *
+         * @param  code (string) The string to eval.
+         * @return The result of the eval'ed code.
+         * @note   Called when the Ajax request returns successfully.
+         * @note   This is used to prevent included code from having access to the variables inside of the function's scope.
+         */
         function evaler(code)
         {
             return eval(code);
@@ -209,13 +210,13 @@
     
     
     /**
-    * Gets the distance of an object from the top of the scroll.
-    *
-    * @example get_top_position(element);
-    * @param   obj (element) An element on the page.
-    * @return  Returns the distance of obj from the top of the scroll.
-    * @note    Called by content_manager.scroll_to_verse() and wrench button onclick() in secondary.js.
-    */
+     * Gets the distance of an object from the top of the scroll.
+     *
+     * @example get_top_position(element);
+     * @param   obj (element) An element on the page.
+     * @return  Returns the distance of obj from the top of the scroll.
+     * @note    Called by content_manager.scroll_to_verse() and wrench button onclick() in secondary.js.
+     */
     BF.get_position = function (obj)
     {
         var left_pos = 0,
@@ -240,13 +241,13 @@
     
     
     /**
-    * Formats a positive number with appropriate commas.
-    *
-    * @example format_number(1000); /// Returns "1,000"
-    * @param   num (positive number) The number to format.
-    * @return  A formatted number as a string.
-    * @note    To be faster, this will not format a negative number.
-    */
+     * Formats a positive number with appropriate commas.
+     *
+     * @example format_number(1000); /// Returns "1,000"
+     * @param   num (positive number) The number to format.
+     * @return  A formatted number as a string.
+     * @note    To be faster, this will not format a negative number.
+     */
     BF.format_number = function (num)
     {
         var re;
@@ -268,16 +269,16 @@
     
     
     /**
-    * Change an existing CSS rule.
-    *
-    * @example BF.changeCSS(".q", "color: #000;")); /// Changes the ".q" rule (i.e., the "q" class) to have a text color of black.
-    * @param   selector   (string)             The name of the rule to replace.
-    * @param   new_CSS    (string)             The CSS to use for the specified selector.
-    * @param   insert     (boolean) (optional) Whether or not to insert a new css rule or change an existing one.
-    * @param   change_all (boolean) (optional) Whether or not to check every rule.  If falsey, it will stop after finding one rule that matches selector.
-    * @return  NULL.  Possibly changes the CSS.
-    * @note    Called when the user changes the red_letters setting.
-    */
+     * Change an existing CSS rule.
+     *
+     * @example BF.changeCSS(".q", "color: #000;")); /// Changes the ".q" rule (i.e., the "q" class) to have a text color of black.
+     * @param   selector   (string)             The name of the rule to replace.
+     * @param   new_CSS    (string)             The CSS to use for the specified selector.
+     * @param   insert     (boolean) (optional) Whether or not to insert a new css rule or change an existing one.
+     * @param   change_all (boolean) (optional) Whether or not to check every rule.  If falsey, it will stop after finding one rule that matches selector.
+     * @return  NULL.  Possibly changes the CSS.
+     * @note    Called when the user changes the red_letters setting.
+     */
     BF.changeCSS = function (selector, new_CSS, insert, change_all)
     {
         var CSS_rules,
@@ -314,21 +315,21 @@
     
     
     /**
-    * Initialize the BibleForge environment.
-    *
-    * This function is used to house all of the code used by BibleForge,
-    * expect for language specific code, which is stored in js/lang/LOCALE.js.
-    *
-    * @param  viewPort     (object) The HTML element which encapsulates all of the other objects.
-    * @param  searchForm   (object) The <form> element which contains the text box and button.
-    * @param  q_obj        (object) The <input> element the user types into.
-    * @param  page         (object) The HTML element which contains all of the Bible contents.
-    * @param  infoBar      (object) The HTML element that displays information about the lookups and searches.
-    * @param  topLoader    (object) The HTML element which displays the loading image above the text.
-    * @param  bottomLoader (object) The HTML element which displays the loading image below the text.
-    * @param  doc_docEl    (object) The document.documentElement element (the HTML element).
-    * @return NULL.  Some functions are attached to events and the rest accompany them via closure.
-    */
+     * Initialize the BibleForge environment.
+     *
+     * This function is used to house all of the code used by BibleForge,
+     * expect for language specific code, which is stored in js/lang/LOCALE.js.
+     *
+     * @param  viewPort     (object) The HTML element which encapsulates all of the other objects.
+     * @param  searchForm   (object) The <form> element which contains the text box and button.
+     * @param  q_obj        (object) The <input> element the user types into.
+     * @param  page         (object) The HTML element which contains all of the Bible contents.
+     * @param  infoBar      (object) The HTML element that displays information about the lookups and searches.
+     * @param  topLoader    (object) The HTML element which displays the loading image above the text.
+     * @param  bottomLoader (object) The HTML element which displays the loading image below the text.
+     * @param  doc_docEl    (object) The document.documentElement element (the HTML element).
+     * @return NULL.  Some functions are attached to events and the rest accompany them via closure.
+     */
     BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLoader, bottomLoader, doc_docEl)
     {
         var run_new_query;
@@ -362,20 +363,20 @@
             BF.viewPort_count += 1;
             
             /**
-            * Load settings.
-            */
+             * Load settings.
+             */
             (function ()
             {
                 /**
-                * Create an object with getter and setter abilities.
-                *
-                * @param  cur_val  (mixed)    (optional) The default value.
-                * @param  onchange (function) (optional) The function to be called after the set method is called.
-                * @return An object containing get and set methods.
-                * @note   This is used to handle data in the settings object.
-                * @todo   Determine if there should be a validate_change function as a parameter that can accept or reject a change.
-                * @todo   Determine if it is a good idea to delete this and other functions after they are no longer needed.
-                */
+                 * Create an object with getter and setter abilities.
+                 *
+                 * @param  cur_val  (mixed)    (optional) The default value.
+                 * @param  onchange (function) (optional) The function to be called after the set method is called.
+                 * @return An object containing get and set methods.
+                 * @note   This is used to handle data in the settings object.
+                 * @todo   Determine if there should be a validate_change function as a parameter that can accept or reject a change.
+                 * @todo   Determine if it is a good idea to delete this and other functions after they are no longer needed.
+                 */
                 function create_get_set(cur_val, onchange)
                 {
                     return {
@@ -432,14 +433,14 @@
             }());
             
             /******************************
-            * Start of Scrolling Closure *
-            ******************************/
+             * Start of Scrolling Closure *
+             ******************************/
             
             /**
-            * Create the functions that handle the scrolling of the page and other related functions.
-            *
-            * @return Returns an object with functions for adding content, updating the verse range, and scrollng the view.
-            */
+             * Create the functions that handle the scrolling of the page and other related functions.
+             *
+             * @return Returns an object with functions for adding content, updating the verse range, and scrollng the view.
+             */
             content_manager = (function ()
             {
                 var cached_count_bottom  = 0,
@@ -456,22 +457,22 @@
                     update_verse_range;
                 
                 /**
-                * The scrolling closure
-                */
+                 * The scrolling closure
+                 */
                 (function ()
                 {
                     var scroll_pos = 0;
                     
                     /**
-                    * Scroll the page to a specific point.
-                    *
-                    * @param  y      (number)             The Y position to scroll to (i.e, vertical position).
-                    * @param  x      (number)  (optional) The X position to scroll to (i.e, horizontal position).  If left undefined, it will maintain the current Y position.
-                    * @param  smooth (boolean) (optional) Whether or not to scroll smoothly.  By default, or if falsey, it will scroll instantaneously.
-                    * @return NULL.
-                    * @note   The y value is first because x value is rarely used.
-                    * @note   Called by remove_excess_content_top(), add_content_top_if_needed(), scroll_to_verse(), write_verses(), handle_new_verses() and occasionally (IE only) by remove_excess_content_bottom() and add_content_bottom_if_needed().
-                    */
+                     * Scroll the page to a specific point.
+                     *
+                     * @param  y      (number)             The Y position to scroll to (i.e, vertical position).
+                     * @param  x      (number)  (optional) The X position to scroll to (i.e, horizontal position).  If left undefined, it will maintain the current Y position.
+                     * @param  smooth (boolean) (optional) Whether or not to scroll smoothly.  By default, or if falsey, it will scroll instantaneously.
+                     * @return NULL.
+                     * @note   The y value is first because x value is rarely used.
+                     * @note   Called by remove_excess_content_top(), add_content_top_if_needed(), scroll_to_verse(), write_verses(), handle_new_verses() and occasionally (IE only) by remove_excess_content_bottom() and add_content_bottom_if_needed().
+                     */
                     scroll_view_to = function (y, x, smooth)
                     {
                         /// A small amount of extra padding is added just to ensure that the padding element will be large enough.
@@ -535,11 +536,11 @@
                         
                         ///TODO: Determine if remove_excess_content_top and remove_excess_content_bottom can be combined.
                         /**
-                        * Remove content that is past the top of screen and store in cache.
-                        *
-                        * @return NULL.  Removes content from the page if required.
-                        * @note   Called by scrolling() via setTimeout().  May call itself, too.
-                        */
+                         * Remove content that is past the top of screen and store in cache.
+                         *
+                         * @return NULL.  Removes content from the page if required.
+                         * @note   Called by scrolling() via setTimeout().  May call itself, too.
+                         */
                         function remove_excess_content_top()
                         {
                             var child = page.firstChild,
@@ -586,11 +587,11 @@
                         
                         
                         /**
-                        * Remove content from below the screen and store in cache.
-                        *
-                        * @return  NULL.  Removes content from the page if required.
-                        * @note    Called by scrolling() via setTimeout().  May call itself, too.
-                        */
+                         * Remove content from below the screen and store in cache.
+                         *
+                         * @return  NULL.  Removes content from the page if required.
+                         * @note    Called by scrolling() via setTimeout().  May call itself, too.
+                         */
                         function remove_excess_content_bottom()
                         {
                             var child = page.lastChild;
@@ -629,17 +630,17 @@
                             var scroll_check_count = 0;
                             
                             /**
-                            * The onscroll event.
-                            *
-                            * When the page scrolls this figures out the direction of the scroll and
-                            * calls specific functions to determine whether content should be added or removed.
-                            *
-                            * @return NULL.  May call other functions via setTimeout().
-                            * @note   Called when the window scrolls.  It may also call itself.
-                            * @note   Called by the onscroll event.
-                            * @note   Could use the wheel event if the scroll bars need to be invisible.
-                            * @todo   Determine how to handle scrolling if there were multiple viewports (i.e., split view).
-                            */
+                             * The onscroll event.
+                             *
+                             * When the page scrolls this figures out the direction of the scroll and
+                             * calls specific functions to determine whether content should be added or removed.
+                             *
+                             * @return NULL.  May call other functions via setTimeout().
+                             * @note   Called when the window scrolls.  It may also call itself.
+                             * @note   Called by the onscroll event.
+                             * @note   Could use the wheel event if the scroll bars need to be invisible.
+                             * @todo   Determine how to handle scrolling if there were multiple viewports (i.e., split view).
+                             */
                             function scrolling()
                             {
                                 /// Trick IE 8- into understanding pageYOffset.
@@ -705,15 +706,15 @@
                 }());
                 
                 /**
-                * Find a verse element that is within a certain Y coordinate on the screen.
-                *
-                * @example verse = get_verse_at_position(window.pageYOffset + topLoader.offsetHeight + 8,  true,  page); /// Could return {b: 1, c: 1, v: 1} for Genesis 1:1.
-                * @param   the_pos        (number)  The vertical position on the page.
-                * @param   looking_upward (boolean) Whether the verses at the top or bottom of the page.
-                * @param   parent_el      (element) The HTML element that ultimately contains the verse.
-                * @return  Returns an object containing the book, chapter, and verse of the verse element.  Format {b: BB, c: CCC, v: VVV}.
-                * @note    Called by update_verse_range() and itself.
-                */
+                 * Find a verse element that is within a certain Y coordinate on the screen.
+                 *
+                 * @example verse = get_verse_at_position(window.pageYOffset + topLoader.offsetHeight + 8,  true,  page); /// Could return {b: 1, c: 1, v: 1} for Genesis 1:1.
+                 * @param   the_pos        (number)  The vertical position on the page.
+                 * @param   looking_upward (boolean) Whether the verses at the top or bottom of the page.
+                 * @param   parent_el      (element) The HTML element that ultimately contains the verse.
+                 * @return  Returns an object containing the book, chapter, and verse of the verse element.  Format {b: BB, c: CCC, v: VVV}.
+                 * @note    Called by update_verse_range() and itself.
+                 */
                 function get_verse_at_position(the_pos, looking_upward, parent_el)
                 {
                     var b,
@@ -828,23 +829,23 @@
                 
                 
                 /**
-                * Create add_content_if_needed().
-                *
-                * @return A function that checks if more content is needed.
-                * @note   Called immediately.
-                * @todo   This should be done better.
-                */
+                 * Create add_content_if_needed().
+                 *
+                 * @return A function that checks if more content is needed.
+                 * @note   Called immediately.
+                 * @todo   This should be done better.
+                 */
                 add_content_if_needed = (function ()
                 {
                     var buffer_add = 1000; /// In milliseconds
                     
                     /**
-                    * Add content to bottom of the page (off the screen)
-                    *
-                    * @example add_content_bottom_if_needed();
-                    * @return  NULL.  Adds content to the page if needed.
-                    * @note    Called by scrolling() via setTimeout().
-                    */
+                     * Add content to bottom of the page (off the screen)
+                     *
+                     * @example add_content_bottom_if_needed();
+                     * @return  NULL.  Adds content to the page if needed.
+                     * @note    Called by scrolling() via setTimeout().
+                     */
                     function add_content_bottom_if_needed()
                     {
                         var child = page.lastChild,
@@ -887,12 +888,12 @@
                     
                     
                     /**
-                    * Add content to top of the page (off the screen)
-                    *
-                    * @example setTimeout(add_content_top_if_needed, lookup_speed_scrolling);
-                    * @return  NULL.  Adds content to the page if needed.
-                    * @note    Called by add_content_if_needed() via setTimeout().
-                    */
+                     * Add content to top of the page (off the screen)
+                     *
+                     * @example setTimeout(add_content_top_if_needed, lookup_speed_scrolling);
+                     * @return  NULL.  Adds content to the page if needed.
+                     * @note    Called by add_content_if_needed() via setTimeout().
+                     */
                     function add_content_top_if_needed()
                     {
                         var child = page.firstChild,
@@ -933,14 +934,14 @@
                     }
                     
                     /**
-                    * Find a verse element that is within a certain Y coordinate on the screen.
-                    *
-                    * @example add_content_if_needed(additional);
-                    * @param   direction (integer) The direction that verses should be added: additional || previous.
-                    * @return  Null.  A function is run after a delay that may add verses to the page.
-                    * @note    Called by add_content_bottom_if_needed(), add_content_top_if_needed(), handle_new_verses(), window.onresize(), and scrolling().
-                    * @todo    Get rid of this unnecessary function.
-                    */
+                     * Find a verse element that is within a certain Y coordinate on the screen.
+                     *
+                     * @example add_content_if_needed(additional);
+                     * @param   direction (integer) The direction that verses should be added: additional || previous.
+                     * @return  Null.  A function is run after a delay that may add verses to the page.
+                     * @note    Called by add_content_bottom_if_needed(), add_content_top_if_needed(), handle_new_verses(), window.onresize(), and scrolling().
+                     * @todo    Get rid of this unnecessary function.
+                     */
                     return function (direction)
                     {
                         var lookup_delay = 50; /// In milliseconds
@@ -955,22 +956,22 @@
                 
                 
                 /**
-                * Creates update_verse_range().
-                *
-                * @return A function that runs update_verse_range_delayed() after a short delay if needed.
-                * @note   Called by window.onresize(), scrolling(), and write_verses().
-                * @note   The anonymous function runs once and returns a small function with the bigger update_verse_range_delayed() in the closure.
-                */
+                 * Creates update_verse_range().
+                 *
+                 * @return A function that runs update_verse_range_delayed() after a short delay if needed.
+                 * @note   Called by window.onresize(), scrolling(), and write_verses().
+                 * @note   The anonymous function runs once and returns a small function with the bigger update_verse_range_delayed() in the closure.
+                 */
                 update_verse_range = (function ()
                 {
                     var looking_up_verse_range = false;
                     
                     /**
-                    * Determine and set the range of verses currently visible on the screen.
-                    *
-                    * @return Null.  The verse range is updated if need be.
-                    * @note   Called by update_verse_range().
-                    */
+                     * Determine and set the range of verses currently visible on the screen.
+                     *
+                     * @return Null.  The verse range is updated if need be.
+                     * @note   Called by update_verse_range().
+                     */
                     function update_verse_range_delayed()
                     {
                         var new_title,
@@ -1076,15 +1077,15 @@
                 
                 
                 /**
-                * The onresize event.
-                *
-                * When the page is resized, check to see if more content should be loaded.
-                *
-                * @return NULL.  Calls other functions.
-                * @note   Called when the window is resized.
-                * @note   Set by the onresize event.
-                * @todo   Make a function that allows for adding and removing more global events.
-                */
+                 * The onresize event.
+                 *
+                 * When the page is resized, check to see if more content should be loaded.
+                 *
+                 * @return NULL.  Calls other functions.
+                 * @note   Called when the window is resized.
+                 * @note   Set by the onresize event.
+                 * @todo   Make a function that allows for adding and removing more global events.
+                 */
                 window.onresize = function ()
                 {
                     add_content_if_needed(additional);
@@ -1102,12 +1103,12 @@
                     add_content_if_needed: add_content_if_needed,
                     
                     /**
-                    * Prepares the page for new verses.
-                    *
-                    * @return NULL.  The page is prepared for new verses.
-                    * @note   Called by prepare_new_search().
-                    * @todo   Determine if this is a good place for this function.
-                    */
+                     * Prepares the page for new verses.
+                     *
+                     * @return NULL.  The page is prepared for new verses.
+                     * @note   Called by prepare_new_search().
+                     * @todo   Determine if this is a good place for this function.
+                     */
                     clear_scroll: function ()
                     {
                         /// Clear cache.
@@ -1140,14 +1141,14 @@
                     },
                     
                     /**
-                    * Scrolls that page to make the specified verse at the top of the viewable area.
-                    *
-                    * @example content_manager.scroll_to_verse("45001014"); /// Scrolls to Romans 1:14 if that verse element is in the DOM.
-                    * @param   verse_id (number) The id number of the verse in the format [B]BCCCVVV.
-                    * @return  Returns TRUE on success and FALSE if the verse cannot be found on the scroll.
-                    * @note    Called by handle_new_verses() after the first Ajax request of a particular verse lookup.
-                    * @bug     Verses at chapter and book beginnings (e.g., Genesis 1:1) are not scrolled to correctly.
-                    */
+                     * Scrolls that page to make the specified verse at the top of the viewable area.
+                     *
+                     * @example content_manager.scroll_to_verse("45001014"); /// Scrolls to Romans 1:14 if that verse element is in the DOM.
+                     * @param   verse_id (number) The id number of the verse in the format [B]BCCCVVV.
+                     * @return  Returns TRUE on success and FALSE if the verse cannot be found on the scroll.
+                     * @note    Called by handle_new_verses() after the first Ajax request of a particular verse lookup.
+                     * @bug     Verses at chapter and book beginnings (e.g., Genesis 1:1) are not scrolled to correctly.
+                     */
                     scroll_to_verse: function (verse_id)
                     {
                         ///FIXME: This will not get the correct element if the verse is verse 1 (i.e., is at the beginning of a chapter or book).
@@ -1170,32 +1171,32 @@
             }());
             
             /****************************
-            * End of Scrolling Closure *
-            ****************************/
+             * End of Scrolling Closure *
+             ****************************/
             
             /**
-            * Create the functions that handle querying the server and displaying the results.
-            *
-            * @return Returns an object with functions for querying data from the server.
-            */
+             * Create the functions that handle querying the server and displaying the results.
+             *
+             * @return Returns an object with functions for querying data from the server.
+             */
             query_manager = (function ()
             {   
                 var handle_new_verses = (function ()
                 {
                     /**
-                    * Writes new verses to page.
-                    *
-                    * @example write_verses(type, direction, [verse_ids, ...], [verse_html, ...]);
-                    * @example write_verses(verse_lookup, additional, [1001001], ["<a id=1>In</a> <a id=2>the</a> <a id=3>beginning....</a>"]);
-                    * @param   type        (integer) The type of query: verse_lookup || mixed_search || standard_search || grammatical_search.
-                    * @param   direction   (integer) The direction of the verses to be retrieved: additional || previous.
-                    * @param   verse_ids   (array)   An array of integers representing Bible verse references.
-                    * @param   verse_html  (array)   An array of strings containing verses in HTML.
-                    * @param   verse_range (object)  An object containing the top and bottom verses, word IDs, and books.
-                    * @return  NULL.  Writes HTML to the page.
-                    * @note    Called by handle_new_verses().
-                    * @note    verse_ids contains an array of verses in the following format: [B]BCCCVVV (e.g., Genesis 1:1 == 1001001).
-                    */
+                     * Writes new verses to page.
+                     *
+                     * @example write_verses(type, direction, [verse_ids, ...], [verse_html, ...]);
+                     * @example write_verses(verse_lookup, additional, [1001001], ["<a id=1>In</a> <a id=2>the</a> <a id=3>beginning....</a>"]);
+                     * @param   type        (integer) The type of query: verse_lookup || mixed_search || standard_search || grammatical_search.
+                     * @param   direction   (integer) The direction of the verses to be retrieved: additional || previous.
+                     * @param   verse_ids   (array)   An array of integers representing Bible verse references.
+                     * @param   verse_html  (array)   An array of strings containing verses in HTML.
+                     * @param   verse_range (object)  An object containing the top and bottom verses, word IDs, and books.
+                     * @return  NULL.  Writes HTML to the page.
+                     * @note    Called by handle_new_verses().
+                     * @note    verse_ids contains an array of verses in the following format: [B]BCCCVVV (e.g., Genesis 1:1 == 1001001).
+                     */
                     function write_verses(type, direction, verse_ids, verse_html, paragraphs, in_paragraphs, verse_range)
                     {
                         var b,
@@ -1339,18 +1340,18 @@
                     }
                     
                     /**
-                    * Handles new verses from the server.
-                    *
-                    * Passes any verses of to be displayed, asks if more content is needed, determines if more content is available,
-                    * and writes initial information to the infoBar.
-                    *
-                    * @example handle_new_verses({n: [verse_ids, ...], v: [verse_html, ...], p: [paragraphs, ...], i: [word_ids, ...], t: total}, {direction: direction, ...});
-                    * @example handle_new_verses({n: [1001001, 1001002], v: ["<a id=1>In</a> <a id=2>the</a> <a id=3>beginning....</a>", "<a id=12>And</a> <a id=13>the</a> <a id=14>earth....</a>"], t: 2}, options);
-                    * @example handle_new_verses({n: [50004008], v: ["<a id=772635>Finally,</a> <a id=772636>brethren,</a> <a id=772637>whatsoever</a> <a id=772638>things....</a>"], i: [772638], t: 1}, options);
-                    * @param   data    (object) The JSON object returned from the server.
-                    * @param   options (object) The object containing the details of the query.
-                    * @return  NULL.
-                    */
+                     * Handles new verses from the server.
+                     *
+                     * Passes any verses of to be displayed, asks if more content is needed, determines if more content is available,
+                     * and writes initial information to the infoBar.
+                     *
+                     * @example handle_new_verses({n: [verse_ids, ...], v: [verse_html, ...], p: [paragraphs, ...], i: [word_ids, ...], t: total}, {direction: direction, ...});
+                     * @example handle_new_verses({n: [1001001, 1001002], v: ["<a id=1>In</a> <a id=2>the</a> <a id=3>beginning....</a>", "<a id=12>And</a> <a id=13>the</a> <a id=14>earth....</a>"], t: 2}, options);
+                     * @example handle_new_verses({n: [50004008], v: ["<a id=772635>Finally,</a> <a id=772636>brethren,</a> <a id=772637>whatsoever</a> <a id=772638>things....</a>"], i: [772638], t: 1}, options);
+                     * @param   data    (object) The JSON object returned from the server.
+                     * @param   options (object) The object containing the details of the query.
+                     * @return  NULL.
+                     */
                     return function (data, options)
                     {
                         var b_tag,
@@ -1484,16 +1485,16 @@
                     query_additional: function () {},
                     
                     /**
-                    * Create the query function.
-                    */
+                     * Create the query function.
+                     */
                     query: (function ()
                     {
                         /**
-                        * Create the URL query string from the options object.
-                        *
-                        * @return A string representing the URL query.
-                        * @param  options (object) The object containing the various aspects of the query.
-                        */
+                         * Create the URL query string from the options object.
+                         *
+                         * @return A string representing the URL query.
+                         * @param  options (object) The object containing the various aspects of the query.
+                         */
                         function create_query_message(options)
                         {
                             /// Query Variables:
@@ -1541,18 +1542,18 @@
                         return (function ()
                         {
                             /**
-                            * Create a function to handle future queries.
-                            *
-                            * @param  ajax      (object) The Ajax object (created via BF.Create_easy_ajax()).
-                            * @param  direction (number) The direction the query should load verses (additional || previous).
-                            * @param  options   (object) The object containing the various aspects of the query.
-                            * @return A function that will handle querying for more verses.
-                            */
+                             * Create a function to handle future queries.
+                             *
+                             * @param  ajax      (object) The Ajax object (created via BF.Create_easy_ajax()).
+                             * @param  direction (number) The direction the query should load verses (additional || previous).
+                             * @param  options   (object) The object containing the various aspects of the query.
+                             * @return A function that will handle querying for more verses.
+                             */
                             function next_query_maker(ajax, direction, options)
                             {
                                 /**
-                                * The function that handles querying for new verses.
-                                */
+                                 * The function that handles querying for new verses.
+                                 */
                                 return function ()
                                 {
                                     var in_paragraphs;
@@ -1609,13 +1610,13 @@
                                     ajax_previous   = new BF.Create_easy_ajax();
                                 
                                 /**
-                                * Initiate a new query and prepare for future queries.
-                                *
-                                * @param  options (object) The object containing the various aspects of the query.
-                                * @return NULL.
-                                * @note   This function is stored in query_manager.query().
-                                * @note   Called by run_new_query().
-                                */
+                                 * Initiate a new query and prepare for future queries.
+                                 *
+                                 * @param  options (object) The object containing the various aspects of the query.
+                                 * @return NULL.
+                                 * @note   This function is stored in query_manager.query().
+                                 * @note   Called by run_new_query().
+                                 */
                                 return function (options)
                                 {
                                     ///TODO: At some point, there needs to be feedback to the user that the query is taking place.  Maybe have something in the infoBar.
@@ -1667,24 +1668,24 @@
             }());
             
             /**
-            * Create the run_new_query() function and closure.
-            */
+             * Create the run_new_query() function and closure.
+             */
             run_new_query = (function ()
             {
                 /**
-                * Figure out what type of search is being attempted by the user.
-                *
-                * @example determine_search_type("God & love");                          /// Returns [{type: standard_search,    query: '"God & love"'}]
-                * @example determine_search_type("love AS NOUN");                        /// Returns [{type: grammatical_search, query: '["love",[[4,1]],[0]]'}]
-                * @example determine_search_type("go AS IMPERATIVE, -SINGULAR");         /// Returns [{type: grammatical_search, query: '["go",[[9,3],[5,1]],[0,1]]'}]
-                * @example determine_search_type("go* AS PASSIVE, -PERFECT,INDICATIVE"); /// Returns [{type: grammatical_search, query: '["go*",[[8,3],[7,5],[9,1]],[0,1,0]]'}]
-                * @example determine_search_type("* AS RED, IMPERATIVE");                /// Returns [{type: grammatical_search, query: '["",[[3,1],[9,3]],[0,0]]'}]
-                * //@example determine_search_type("love AS NOUN & more | less -good AS ADJECTIVE"); /// Returns [{type: grammatical_search, query: '["love",[[4,1]],[0]]'}, {type: standard_search, query: "& more | less -good"}, {type: grammatical_search, query: '["good",[[4,3]],[1]]'}]
-                * @param   search_terms (string) The prepared terms to be examined.
-                * @return  An array filled with objects describing the type of search.
-                * @note    Called by run_new_query().
-                * @note    Only a partial implementation currently.  Mixed searching is lacking.
-                */
+                 * Figure out what type of search is being attempted by the user.
+                 *
+                 * @example determine_search_type("God & love");                          /// Returns [{type: standard_search,    query: '"God & love"'}]
+                 * @example determine_search_type("love AS NOUN");                        /// Returns [{type: grammatical_search, query: '["love",[[4,1]],[0]]'}]
+                 * @example determine_search_type("go AS IMPERATIVE, -SINGULAR");         /// Returns [{type: grammatical_search, query: '["go",[[9,3],[5,1]],[0,1]]'}]
+                 * @example determine_search_type("go* AS PASSIVE, -PERFECT,INDICATIVE"); /// Returns [{type: grammatical_search, query: '["go*",[[8,3],[7,5],[9,1]],[0,1,0]]'}]
+                 * @example determine_search_type("* AS RED, IMPERATIVE");                /// Returns [{type: grammatical_search, query: '["",[[3,1],[9,3]],[0,0]]'}]
+                 * //@example determine_search_type("love AS NOUN & more | less -good AS ADJECTIVE"); /// Returns [{type: grammatical_search, query: '["love",[[4,1]],[0]]'}, {type: standard_search, query: "& more | less -good"}, {type: grammatical_search, query: '["good",[[4,3]],[1]]'}]
+                 * @param   search_terms (string) The prepared terms to be examined.
+                 * @return  An array filled with objects describing the type of search.
+                 * @note    Called by run_new_query().
+                 * @note    Only a partial implementation currently.  Mixed searching is lacking.
+                 */
                 function determine_search_type(search_terms)
                 {
                     var exclude_json           = "", /// Used to concatenate data. TODO: Make description better.
@@ -1769,14 +1770,14 @@
                 }
                 
                 /**
-                * Process a raw query.
-                *
-                * @example run_new_query("John 3:16"); /// Looks up John 3:6 (and following)
-                * @example run_new_query("love");      /// Searches for the word "love"
-                * @param   raw_query (string) The text from the user to query.
-                * @return  NULL.
-                * @note    Called by searchForm.onsubmit() when a user submits a query.
-                */
+                 * Process a raw query.
+                 *
+                 * @example run_new_query("John 3:16"); /// Looks up John 3:6 (and following)
+                 * @example run_new_query("love");      /// Searches for the word "love"
+                 * @param   raw_query (string) The text from the user to query.
+                 * @return  NULL.
+                 * @note    Called by searchForm.onsubmit() when a user submits a query.
+                 */
                 return function (raw_query)
                 {
                     /// Step 1: Prepare string and check to see if we need to search (not empty)
@@ -1850,13 +1851,13 @@
                     /// Was the query a search?  Searches need to have the highlight function prepared for the incoming results.
                     if (options.type !== verse_lookup) {
                         /**
-                        * Create the highlight function and closure and prepare the regular expression used to do the highlighting.
-                        *
-                        * @return A function that will do the highlighting.
-                        * @note   Since this function gets attached to the options object, it is sent by reference to the query_manager and called there.
-                        * @note   Called by handle_new_verses() in the query_manager.
-                        * @todo   Determine a good way to cache the highlight function or regex array.
-                        */
+                         * Create the highlight function and closure and prepare the regular expression used to do the highlighting.
+                         *
+                         * @return A function that will do the highlighting.
+                         * @note   Since this function gets attached to the options object, it is sent by reference to the query_manager and called there.
+                         * @note   Called by handle_new_verses() in the query_manager.
+                         * @todo   Determine a good way to cache the highlight function or regex array.
+                         */
                         options.highlight = (function ()
                         {
                             var highlight_re,
@@ -1870,14 +1871,14 @@
                             }
                             
                             /**
-                            * Highlight the search results.
-                            *
-                            * @example	options.highlight("<a id=1>In</a> <a id=2>the</a> <a id=3>beginning</a> <a>...</a>");
-                            * @example	options.highlight("", [1, 4002, ...]);
-                            * @param   html     (string) A string containing the all of the verses in HTML format (only used by standard searches).
-                            * @param   word_ids (array)  An array of word ids to be highlighted (only used by grammatical searches).
-                            * @note    Only one parameter is needed.
-                            */
+                             * Highlight the search results.
+                             *
+                             * @example options.highlight("<a id=1>In</a> <a id=2>the</a> <a id=3>beginning</a> <a>...</a>");
+                             * @example options.highlight("", [1, 4002, ...]);
+                             * @param   html     (string) A string containing the all of the verses in HTML format (only used by standard searches).
+                             * @param   word_ids (array)  An array of word ids to be highlighted (only used by grammatical searches).
+                             * @note    Only one parameter is needed.
+                             */
                             return function (html, word_ids)
                             {
                                 var i,
@@ -1939,15 +1940,15 @@
         
         
         /**************
-        * Set Events *
-        **************/
+         * Set Events *
+         **************/
         
         /**
-        * Capture form submit events and begin a new query.
-        *
-        * @return FALSE.  It must always return false in order to prevent the form from submitting.
-        * @note Called when a user submits the form.
-        */
+         * Capture form submit events and begin a new query.
+         *
+         * @return FALSE.  It must always return false in order to prevent the form from submitting.
+         * @note Called when a user submits the form.
+         */
         searchForm.onsubmit = function ()
         {
             var raw_query = q_obj.value;
@@ -1964,12 +1965,12 @@
         };
         
         /**
-        * Set the query input box text with an explanation of what the user can enter in.
-        *
-        * @return NULL.
-        * @note   Called on q_obj blur.
-        * @note   This function is removed after the user submits a search by prepare_new_search() because the user no longer needs the instructions.
-        */
+         * Set the query input box text with an explanation of what the user can enter in.
+         *
+         * @return NULL.
+         * @note   Called on q_obj blur.
+         * @note   This function is removed after the user submits a search by prepare_new_search() because the user no longer needs the instructions.
+         */
         q_obj.onblur = function ()
         {
             if (this.value.trim() === "") {
@@ -1979,11 +1980,11 @@
         
         
         /**
-        * Remove the explanation text so that the user can type.
-        *
-        * @return NULL.
-        * @note   Called on q_obj focus.
-        */
+         * Remove the explanation text so that the user can type.
+         *
+         * @return NULL.
+         * @note   Called on q_obj focus.
+         */
         q_obj.onfocus = function ()
         {
             if (this.value === BF.lang.query_explanation) {
@@ -2000,12 +2001,12 @@
     ///TODO: Remove this as soon as a non-JavaScript version of BibleForge is ready.
     if (!"".trim) {
         /**
-        * Extend the String Prototype to remove leading and trailing spaces.
-        *
-        * @example trimmed = "  God is   good  ".trim(); /// Returns "God is   good"
-        * @return  A string with leading and trailing spaces removed.
-        * @note    This does not remove all types of whitespace.  It actually removes anything under character code 33.
-        */
+         * Extend the String Prototype to remove leading and trailing spaces.
+         *
+         * @example trimmed = "  God is   good  ".trim(); /// Returns "God is   good"
+         * @return  A string with leading and trailing spaces removed.
+         * @note    This does not remove all types of whitespace.  It actually removes anything under character code 33.
+         */
         String.prototype.trim = function ()
         {
             var end   = this.length - 1,
@@ -2025,12 +2026,12 @@
     
     
     /**
-    * Capture certain key events, bringing focus to the query box.
-    *
-    * @param  e (object) The event object (normally supplied by the browser).
-    * @return NULL.
-    * @note   Called on all keydown events.
-    */
+     * Capture certain key events, bringing focus to the query box.
+     *
+     * @param  e (object) The event object (normally supplied by the browser).
+     * @return NULL.
+     * @note   Called on all keydown events.
+     */
     document.onkeydown = function (e)
     {
         var activeEl = document.activeElement,
@@ -2077,8 +2078,8 @@
     ///TODO: Move browser specific code to external files.
     
     /******************************
-    * Start WebKit specific code *
-    ******************************/
+     * Start WebKit specific code *
+     ******************************/
     
     if (BF.is_WebKit) {
         /// Inject CSS to make the drop caps aligned with the second line of text and add an inset shadow to the input box.
@@ -2088,12 +2089,12 @@
     }
     
     /****************************
-    * End WebKit specific code *
-    ****************************/
+     * End WebKit specific code *
+     ****************************/
     
     /*****************************
-    * Start Opera specific code *
-    *****************************/
+     * Start Opera specific code *
+     *****************************/
     
     if (window.opera) {
         /// Inject CSS to make the drop caps take up two lines, so that wrapping text is not placed over it.  (See John 4:1.)
@@ -2104,22 +2105,22 @@
     }
     
     /***************************
-    * End Opera specific code *
-    ***************************/
+     * End Opera specific code *
+     ***************************/
     
     /*****************************
-    * Start of IE Specific Code *
-    *****************************/
+     * Start of IE Specific Code *
+     *****************************/
     
     /**
-    * Fix IE's string.split.
-    *
-    * @param  s     (regexp || string) The regular expression or string with which to break the string.
-    * @param  limit (int) (optional)   The number of times to split the string.
-    * @return Returns an array of the string now broken into pieces.
-    * @see    http://blog.stevenlevithan.com/archives/cross-browser-split
-    * @todo   Determine if IE9 still needs this.
-    */
+     * Fix IE's string.split.
+     *
+     * @param  s     (regexp || string) The regular expression or string with which to break the string.
+     * @param  limit (int) (optional)   The number of times to split the string.
+     * @return Returns an array of the string now broken into pieces.
+     * @see    http://blog.stevenlevithan.com/archives/cross-browser-split
+     * @todo   Determine if IE9 still needs this.
+     */
     ///NOTE: The following conditional compilation code blocks only executes in IE.
     /*@cc_on
         String.prototype._$$split = String.prototype._$$split || String.prototype.split;
@@ -2209,8 +2210,8 @@
     @*/
     
     /***************************
-    * End of IE Specific Code *
-    ***************************/
+     * End of IE Specific Code *
+     ***************************/
     
     /// Initialize BibleForge.
     ///TODO: Require just one element and find the rest dynamically.
