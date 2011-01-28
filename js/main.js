@@ -10,7 +10,7 @@
 
 /// Set JSLint options.
 /*global document, window, BF */
-/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true, plusplus: true, bitwise: true, evil: true */
+/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true, plusplus: true, bitwise: true, evil: true, indent: 0 */
 
 (function ()
 {
