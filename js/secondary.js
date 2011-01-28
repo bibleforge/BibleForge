@@ -14,6 +14,8 @@
 
 (function ()
 {
+    "use strict";
+    
     /**
      * Load secondary, nonessential code, such as the wrench button.
      *

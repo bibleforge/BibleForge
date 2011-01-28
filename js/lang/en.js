@@ -20,6 +20,8 @@
  */
 BF.lang = (function ()
 {
+    "use strict";
+    
     /// Return the language variables and functions.
     return {
         /// Book names
