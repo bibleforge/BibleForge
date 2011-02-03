@@ -272,6 +272,7 @@ BF.lang = (function ()
                 initial_search_arr = search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?|[^\s]*)|[~\/]\d*|["',.:?!;&|\)\(\]\[\/\\`{}<$\^+]|-\B)/g, "").toLowerCase().split(" ");
                 arr_len = initial_search_arr.length;
                 
+                /// Filter out duplicates (i.e., PHP's array_unique()).
 first_loop:     for (i = 0; i < arr_len; i += 1) {
                     for (j = 0; j < new_arr_len; j += 1) {
                         if (final_search_arr[j] === initial_search_arr[i]) {
