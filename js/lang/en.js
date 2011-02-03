@@ -10,7 +10,7 @@
 
 /// Set JSLint options.
 /*global window, BF */
-/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true, plusplus: true, bitwise: true, evil: true, indent: 0 */
+/*jslint newcap: true, undef: true, onevar: true, evil: true, plusplus: true, bitwise: true, nomen: true, strict: true, continue: true, indent: 4, white: false */
 
 /**
  * Create the BibleForge language specific object for the English language.
