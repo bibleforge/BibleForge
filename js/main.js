@@ -1722,7 +1722,7 @@
                         
                         ///TODO: Determine if there is a benefit to using do() over while().
                         ///NOTE: An infinite loop is used because the data is returned when it reaches the end of the string.
-                        do {
+                        for (;;) {
                             /// Find where the attributes separate (e.g., "NOUN, GENITIVE" would separate at character 4).
                             split_pos = grammar_attributes.indexOf(BF.lang.grammar_separator, split_start);
                             /// Trim leading white space.
@@ -1756,7 +1756,7 @@
                                     }
                                 ];
                             }
-                        } while (true);
+                        }
                     }
                     
                     /// The search is just a standard search, so just return the type and the original query.
@@ -2123,7 +2123,7 @@
      */
     ///NOTE: The following conditional compilation code blocks only executes in IE.
     /*@cc_on
-        String.prototype._$$split = String.prototype._$$split || String.prototype.split;
+        String.prototype.split_orig = String.prototype.split_orig || String.prototype.split;
         String.prototype.split    = function (s, limit)
         {
             var flags,
@@ -2138,7 +2138,7 @@
                 s2;
             
             if (!(s instanceof RegExp)) {
-                return String.prototype._$$split.apply(this, arguments);
+                return String.prototype.split_orig.apply(this, arguments);
             }
             
             flags         = (s.global ? "g" : "") + (s.ignoreCase ? "i" : "") + (s.multiline ? "m" : "");
@@ -2148,7 +2148,7 @@
             lastLastIndex = 0;
             i             = 0;
             
-            if (typeof limit == "undefined" || +limit < 0) {
+            if (typeof limit === "undefined" || +limit < 0) {
                 limit = false;
             } else {
                 limit = Math.floor(+limit);
@@ -2164,14 +2164,14 @@
             while ((!limit || i++ <= limit) && (match = s.exec(this))) {
                 emptyMatch = !match[0].length;
                 if (emptyMatch && s.lastIndex > match.index) {
-                    --s.lastIndex;
+                    s.lastIndex -= 1;
                 }
                 if (s.lastIndex > lastLastIndex) {
                     if (match.length > 1) {
                         match[0].replace(s2, function ()
                         {
-                            for (j = 1; j < arguments.length - 2; ++j) {
-                                if (typeof arguments[j] == "undefined") {
+                            for (j = 1; j < arguments.length - 2; j += 1) {
+                                if (typeof arguments[j] === "undefined") {
                                     match[j] = undefined;
                                 }
                             }
@@ -2186,10 +2186,10 @@
                     lastLastIndex = s.lastIndex;
                 }
                 if (emptyMatch) {
-                    ++s.lastIndex;
+                    s.lastIndex += 1;
                 }
             }
-            output = lastLastIndex === this.length ? (s.test("") && !lastLength ? output : output.concat("")) : (limit ? output : output.concat(this.slice(lastLastIndex)));
+            output = (lastLastIndex === this.length ? (s.test("") && !lastLength ? output : output.concat("")) : (limit ? output : output.concat(this.slice(lastLastIndex))));
             /// TODO: Determine if this next line of code is necessary.
             s.lastIndex = origLastIndex;
             return output;
