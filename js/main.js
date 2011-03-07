@@ -2124,17 +2124,18 @@
     ///NOTE: The following conditional compilation code blocks only executes in IE.
     /*@cc_on
         String.prototype.split_orig = String.prototype.split_orig || String.prototype.split;
-        String.prototype.split    = function (s, limit)
+        
+        String.prototype.split = function (s, limit)
         {
             var flags,
                 emptyMatch,
-                i,
+                i             = 0,
                 j,
-                lastLastIndex,
+                lastLastIndex = 0,
                 lastLength,
                 match,
                 origLastIndex,
-                output,
+                output        = [],
                 s2;
             
             if (!(s instanceof RegExp)) {
@@ -2143,10 +2144,7 @@
             
             flags         = (s.global ? "g" : "") + (s.ignoreCase ? "i" : "") + (s.multiline ? "m" : "");
             s2            = new RegExp("^" + s.source + "$", flags);
-            output        = [];
             origLastIndex = s.lastIndex;
-            lastLastIndex = 0;
-            i             = 0;
             
             if (typeof limit === "undefined" || +limit < 0) {
                 limit = false;
