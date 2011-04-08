@@ -2058,6 +2058,8 @@
         ///NOTE:  8 = Backspace
         ///      13 = Enter
         ///      32 = Space
+        ///      38 = Up
+        ///      40 = Down
         ///   48-90 = Alphanumeric
         ///  96-111 = Numpad keys
         /// 186-254 = Punctuation
@@ -2067,8 +2069,14 @@
             ///TODO: Determine which input box to select when split screen mode is implemented.
             ///      One option would be to have a value in the global BF object.
             document.getElementById("q0").focus();
+        } else if (keyCode === 38 || keyCode === 40) {
+            /// Force browsers to scroll one line of text at a time.
+            ///NOTE: Mozilla scrolls the correct amount by default.
+            ///TODO: Make this an option.
+            window.scrollBy(window.pageXOffset, (keyCode === 38 ? -19 : 19));
+            e.preventDefault();
         }
-    });
+    }, false);
     
     ///TODO: Move browser specific code to external files.
     
