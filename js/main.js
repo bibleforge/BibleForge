@@ -2032,7 +2032,7 @@
      * @return NULL.
      * @note   Called on all keydown events.
      */
-    document.onkeydown = function (e)
+    document.addEventListener('keydown', function (e)
     {
         var activeEl = document.activeElement,
             keyCode;
@@ -2042,11 +2042,6 @@
         if (activeEl.tagName === "INPUT" && activeEl.type !== "image") {
             return;
         }
-        
-        /// Get the global event object for IE compatibility.
-        /*@cc_on
-            e = event;
-        @*/
         
         keyCode = e.keyCode;
         
@@ -2073,7 +2068,7 @@
             ///      One option would be to have a value in the global BF object.
             document.getElementById("q0").focus();
         }
-    };
+    });
     
     ///TODO: Move browser specific code to external files.
     
