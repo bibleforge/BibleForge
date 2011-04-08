@@ -761,14 +761,13 @@ first_loop:     while (i < search_terms_arr_len) {
                 if (cv.length > 1) {
                     /// Is the number a valid chapter?
                     if (cv[1] > 0) {
-                        /// + "" converts the number to a string so that it can later be concadinated properly.
-                        chapter = cv[1] + "";
+                        chapter = String(cv[1]);
                     } else {
                         chapter = "1";
                     }
                     
                     if (cv[2] !== "" && typeof cv[2] !== "undefined") {
-                        verse = cv[2] + "";
+                        verse = String(cv[2]);
                     } else {
                         /// For books with only 1 chapter, the chapter reference is optional (i.e., Jude 4 == Jude 1:4).
                         switch (book) {

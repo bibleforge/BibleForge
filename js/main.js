@@ -256,9 +256,8 @@
             return num;
         }
         
-        /// Quickly converts a number to a string quickly.
-        num += "";
-        re   = /^([0-9]+)([0-9][0-9][0-9])/;
+        num = String(num);
+        re  = /^([0-9]+)([0-9][0-9][0-9])/;
         
         while (re.test(num)) {
             num = num.replace(re, "$1,$2");
