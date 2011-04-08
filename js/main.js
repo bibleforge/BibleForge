@@ -498,7 +498,7 @@
                      * @note   The y value is first because x value is rarely used.
                      * @note   Called by remove_excess_content_top(), add_content_top_if_needed(), scroll_to_verse(), write_verses(), handle_new_verses() and occasionally (IE only) by remove_excess_content_bottom() and add_content_bottom_if_needed().
                      */
-                    scroll_view_to = function (y, x, smooth)
+                    scroll_view_to = function (y, x, smooth, allow_scroll_event)
                     {
                         /// A small amount of extra padding is added just to ensure that the padding element will be large enough.
                         var extra_padding = 10,
@@ -506,7 +506,7 @@
                             padding_interval,
                             pixels_needed;
                         
-                        if (typeof x === "undefined") {
+                        if (typeof x === "undefined" || x === null) {
                             /// IE8- does not set pageXOffset.
                             /*@cc_on
                                 @if (@_jscript_version < 9)
@@ -518,7 +518,9 @@
                         }
                         
                         if (!smooth) {
-                            scroll_pos = y;
+                            if (!allow_scroll_event) {
+                                scroll_pos = y;
+                            }
                             
                             /// Is the scroll position not the top of the page.
                             if (scroll_pos > 0) {
@@ -836,14 +838,14 @@
                     case "psalm_title":
                     case "subscription":
                         /// Found the verse, so calculate the verseID and call the success function.
-                        ///NOTE: No radix is used because the number should never begin with a leading 0 and suppling the radix slows Mozilla (Firefox 3.6-) down tremendously.
+                        ///NOTE: No radix is used because the number should never begin with a leading 0 and suppling the radix slows down Mozilla (Firefox 3.6-) tremendously.
                         verse_id = window.parseInt(el.id);
                         
                         v = verse_id % 1000;
                         c = ((verse_id - v) % 1000000) / 1000;
                         b = (verse_id - v - c * 1000) / 1000000;
                         
-                        return {b: b, c: c, v: v};
+                        return {b: b, c: c, v: v, verse_id: verse_id};
                     default:
                         /// The verse has not yet been found.
                         return get_verse_at_position(the_pos, looking_upward, el);
@@ -1025,32 +1027,32 @@
                         
                         /// The titles in the book of Psalms are referenced as verse zero (cf. Psalm 3).
                         /// The subscriptions at the end of Paul's epistles are referenced as verse 255 (cf. Romans 16).
-                        verse1.v = verse1.v === 0 ? BF.lang.title : verse1.v === 255 ? BF.lang.subscription : verse1.v;
-                        verse2.v = verse2.v === 0 ? BF.lang.title : verse2.v === 255 ? BF.lang.subscription : verse2.v;
+                        verse1.full_verse = (verse1.v === 0 ? BF.lang.title : (verse1.v === 255 ? BF.lang.subscription : verse1.v));
+                        verse2.full_verse = (verse2.v === 0 ? BF.lang.title : (verse2.v === 255 ? BF.lang.subscription : verse2.v));
+                        
+                        /// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
+                        ///NOTE: verse2.full_book is set here even though it is not always needed now,
+                        ///      but since these variables are stored as top_verse and bottom_verse it might be used later.
+                        verse1.full_book = (verse1.b === 19 ? BF.lang.psalm : BF.lang.books_short[verse1.b]);
+                        verse2.full_book = (verse2.b === 19 ? BF.lang.psalm : BF.lang.books_short[verse2.b]);
                         
                         ///NOTE: \u2013 is Unicode for the en dash (–) (HTML: &ndash;).
                         ///TODO: Determine if the colons should be language specified.
                         /// Are the books the same?
                         if (verse1.b === verse2.b) {
-                            /// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
-                            verse1.b = verse1.b === 19 ? BF.lang.psalm : BF.lang.books_short[verse1.b];
                             /// Are the chapters the same?
                             if (verse1.c === verse2.c) {
                                 /// Are the verses the same?
                                 if (verse1.v === verse2.v) {
-                                    ref_range = verse1.b + " " + verse1.c + ":" + verse1.v;
+                                    ref_range = verse1.full_book + " " + verse1.c + ":" + verse1.full_verse;
                                 } else {
-                                    ref_range = verse1.b + " " + verse1.c + ":" + verse1.v + "\u2013" + verse2.v;
+                                    ref_range = verse1.full_book + " " + verse1.c + ":" + verse1.full_verse + "\u2013" + verse2.full_verse;
                                 }
                             } else {
-                                ref_range = verse1.b + " " + verse1.c + ":" + verse1.v + "\u2013" + verse2.c + ":" + verse2.v;
+                                ref_range = verse1.full_book + " " + verse1.c + ":" + verse1.full_verse + "\u2013" + verse2.c + ":" + verse2.full_verse;
                             }
                         } else {
-                            /// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
-                            verse1.b = verse1.b === 19 ? BF.lang.psalm : BF.lang.books_short[verse1.b];
-                            verse2.b = verse2.b === 19 ? BF.lang.psalm : BF.lang.books_short[verse2.b];
-                            
-                            ref_range = verse1.b + " " + verse1.c + ":" + verse1.v + "\u2013" + verse2.b + " " + verse2.c + ":" + verse2.v;
+                            ref_range = verse1.full_book + " " + verse1.c + ":" + verse1.full_verse + "\u2013" + verse2.full_book + " " + verse2.c + ":" + verse2.full_verse;
                         }
                         
                         /// Store the query type in a variable because it may need to be accessed more than once.
@@ -1174,7 +1176,7 @@
                      * @note    Called by handle_new_verses() after the first Ajax request of a particular verse lookup.
                      * @bug     Verses at chapter and book beginnings (e.g., Genesis 1:1) are not scrolled to correctly.
                      */
-                    scroll_to_verse: function (verse_id)
+                    scroll_to_verse: function (verse_id, smooth, allow_lookup)
                     {
                         ///FIXME: This will not get the correct element if the verse is verse 1 (i.e., is at the beginning of a chapter or book).
                         var verse_obj = document.getElementById(verse_id + "_verse");
@@ -1185,9 +1187,8 @@
                         
                         /// Calculate the verse's Y coordinate.
                         ///NOTE: "- topLoader.offsetHeight" subtracts off the height of the top bar.
-                        scroll_view_to(BF.get_position(verse_obj).top - topLoader.offsetHeight);
+                        scroll_view_to(BF.get_position(verse_obj).top - topLoader.offsetHeight, null, smooth, allow_lookup);
                         
-                        ///TODO: Determine if there is any value to returning TRUE and FALSE.
                         return true;
                     },
                     
@@ -1276,7 +1277,7 @@
                                     if (c === 1) {
                                         html_str += "<div class=book id=" + num + "_title><h2>" + BF.lang.books_long_pretitle[b] + "</h2><h1>" + BF.lang.books_long_main[b] + "</h1><h2>" + BF.lang.books_long_posttitle[b] + "</h2></div>";
                                     /// Display chapter/psalm number (but not on verse 1 of psalms that have titles).
-                                    } else if (b !== 19 || v === 0 || (c <= 2 || c === 10 || c === 33 || c === 43 || c === 71 || c === 91 || (c >= 93 && c <= 97) || c === 99 || (c >= 104 && c <= 107) || (c >= 111 && c <= 119) || (c >= 135 && c <= 137) || c >= 146)) {
+                                    } else if (b !== 19 || v === 0 || !BF.psalm_has_title(c)) {
                                         /// Is this the book of Psalms?  (Psalms have a special name.)
                                         if (b === 19) {
                                             chapter_text = BF.lang.psalm;
@@ -1950,6 +1951,71 @@
                 };
             }());
             
+            
+            /**
+             * Capture certain key events, bringing focus to the query box.
+             *
+             * @param  e (object) The event object (normally supplied by the browser).
+             * @return NULL.
+             * @note   Called on all keydown events.
+             * @todo   Determine if this viewport is selected (currently, there is only one viewport).
+             * @todo   Determine how to use the keyPress event (since Mozilla only fires this event once when the button is held down).
+             */
+            document.addEventListener('keydown', function (e)
+            {
+                var activeEl = document.activeElement,
+                    keyCode;
+                
+                /// Are there input boxes selected (not including images)?  If so, this function should not be executed.
+                ///NOTE: In the future, other elements, such as, TEXTAREA or buttons, may also need to be detected.
+                if (activeEl.tagName === "INPUT" && activeEl.type !== "image") {
+                    return;
+                }
+                
+                keyCode = e.keyCode;
+                
+                /// If a special key is also pressed, do not capture the stroke.
+                ///TODO: Determine if this works on Mac with the Command key.
+                ///NOTE: It may be that the Command key is keyCode 91 and may need to be caught by another keydown event.
+                ///NOTE: The meta key does not seem to be detected; this may need me manually checked for, like for the Mac.
+                ///NOTE: However, it does want to grab the stroke if the user is pasting.  keyCode 86 == "V," which is the standard shortcut for Paste.
+                if ((e.ctrlKey && keyCode !== 86) || e.altKey || e.metaKey) {
+                    return;
+                }
+                
+                /// Is the user pressing a key that should probably be entered into the input box?  If so, bring focus to the query box so that the keystrokes will be captured.
+                ///NOTE:  8 = Backspace
+                ///      13 = Enter
+                ///      32 = Space
+                ///      33 = Page Up
+                ///      34 = Page Down
+                ///      38 = Up
+                ///      40 = Down
+                ///   48-90 = Alphanumeric
+                ///  96-111 = Numpad keys
+                /// 186-254 = Punctuation
+                ///TODO: Determine if capturing Backspace and/Space is confusing because they have alternate functions (the back button and page down, respectively).
+                ///      One possible solution is to allow Shift, Ctrl, or Alt + Backspace or Space to be the normal action.
+                if (keyCode === 8 || keyCode === 13 || keyCode === 32 || (keyCode > 47 && keyCode < 91) || (keyCode > 95 && keyCode < 112) || (keyCode > 185 && keyCode < 255)) {
+                    q_obj.focus();
+                } else if (keyCode === 38 || keyCode === 40) {
+                    /// Force browsers to scroll one line of text at a time.
+                    ///NOTE: Mozilla scrolls the correct amount by default.
+                    ///TODO: Make this an option.
+                    window.scrollBy(window.pageXOffset, (keyCode === 38 ? -19 : 19));
+                    e.preventDefault();
+                } else if (keyCode === 33 || keyCode === 34) {
+                    /// Scroll to the next/previous chapter on page down/up (respectively).
+                    ///FIXME: Since this just adds or subtracts one chapter, it does not work over book boundaries.
+                    ///FIXME: Use smooth scrolling.
+                    ///FIXME: This should skip a chapter if it is just a verse or two away.
+                    ///TODO:  Determine if it should does something different when the chapter has not been loaded (like preform a lookup).
+                    if (content_manager.top_verse && content_manager.scroll_to_verse(BF.create_verse_id(content_manager.top_verse.b, content_manager.top_verse.c + (keyCode === 33 ? -1 : 1), (content_manager.top_verse.b === 19 && BF.psalm_has_title(content_manager.top_verse.c) ? 0 : 1)), false, true)) {
+                        e.preventDefault();
+                    }
+                }
+            }, false);
+            
             /// After a short delay, lazily load extra, nonessential (or at least not immediately essential) code, like the wrench menu.
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
@@ -2048,60 +2114,6 @@
             return this.slice(start, end + 1);
         };
     }
-    
-    
-    /**
-     * Capture certain key events, bringing focus to the query box.
-     *
-     * @param  e (object) The event object (normally supplied by the browser).
-     * @return NULL.
-     * @note   Called on all keydown events.
-     */
-    document.addEventListener('keydown', function (e)
-    {
-        var activeEl = document.activeElement,
-            keyCode;
-        
-        /// Are there input boxes selected (not including images)?  If so, this function should not be executed.
-        ///NOTE: In the future, other elements, such as, TEXTAREA or buttons, may also need to be detected.
-        if (activeEl.tagName === "INPUT" && activeEl.type !== "image") {
-            return;
-        }
-        
-        keyCode = e.keyCode;
-        
-        /// If a special key is also pressed, do not capture the stroke.
-        ///TODO: Determine if this works on Mac with the Command key.
-        ///NOTE: It may be that the Command key is keyCode 91 and may need to be caught by another keydown event.
-        ///NOTE: The meta key does not seem to be detected; this may need me manually checked for, like for the Mac.
-        ///NOTE: However, it does want to grab the stroke if the user is pasting.  keyCode 86 == "V," which is the standard shortcut for Paste.
-        if ((e.ctrlKey && keyCode !== 86) || e.altKey || e.metaKey) {
-            return;
-        }
-        
-        /// Is the user pressing a key that should probably be entered into the input box?  If so, bring focus to the query box so that the keystrokes will be captured.
-        ///NOTE:  8 = Backspace
-        ///      13 = Enter
-        ///      32 = Space
-        ///      38 = Up
-        ///      40 = Down
-        ///   48-90 = Alphanumeric
-        ///  96-111 = Numpad keys
-        /// 186-254 = Punctuation
-        ///TODO: Determine if capturing Backspace and/Space is confusing because they have alternate functions (the back button and page down, respectively).
-        ///      One possible solution is to allow Shift, Ctrl, or Alt + Backspace or Space to be the normal action.
-        if (keyCode === 8 || keyCode === 13 || keyCode === 32 || (keyCode > 47 && keyCode < 91) || (keyCode > 95 && keyCode < 112) || (keyCode > 185 && keyCode < 255)) {
-            ///TODO: Determine which input box to select when split screen mode is implemented.
-            ///      One option would be to have a value in the global BF object.
-            document.getElementById("q0").focus();
-        } else if (keyCode === 38 || keyCode === 40) {
-            /// Force browsers to scroll one line of text at a time.
-            ///NOTE: Mozilla scrolls the correct amount by default.
-            ///TODO: Make this an option.
-            window.scrollBy(window.pageXOffset, (keyCode === 38 ? -19 : 19));
-            e.preventDefault();
-        }
-    }, false);
     
     ///TODO: Move browser specific code to external files.
     
