@@ -308,6 +308,32 @@
     };
     
     
+    /**
+     * Determine whether or not a psalm has a title.
+     *
+     * @param  c (number) The psalm (i.e., chapter) to check.
+     * @return A boolean indicating if the psalm has a title
+     */
+    BF.psalm_has_title = function (c)
+    {
+        return !(c <= 2 || c === 10 || c === 33 || c === 43 || c === 71 || c === 91 || (c >= 93 && c <= 97) || c === 99 || (c >= 104 && c <= 107) || (c >= 111 && c <= 119) || (c >= 135 && c <= 137) || c >= 146);
+    };
+    
+    
+    /**
+     * Create a verse ID from the book, chapter, and verse reference.
+     *
+     * @param  b (number) The book reference
+     * @param  c (number) The chapter reference
+     * @param  v (number) The verse reference
+     * @return A formatted string representing the verse ID: [B]BCCCVVV
+     */
+    BF.create_verse_id = function (b, c, v)
+    {
+        var zeros = ["", "00", "0", ""];
+        
+        return b + zeros[String(c).length] + c + zeros[String(v).length] + v;
+    };
     
     /// Determine if CSS transitions are supported by the browser.
     ///NOTE: All of these variables currently require vendor specific prefixes.
