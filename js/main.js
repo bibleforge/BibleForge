@@ -1961,7 +1961,7 @@
              * @todo   Determine if this viewport is selected (currently, there is only one viewport).
              * @todo   Determine how to use the keyPress event (since Mozilla only fires this event once when the button is held down).
              */
-            document.addEventListener('keydown', function (e)
+            document.addEventListener("keydown", function (e)
             {
                 var activeEl = document.activeElement,
                     keyCode;
