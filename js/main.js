@@ -2012,6 +2012,7 @@
                     ///FIXME: Use smooth scrolling.
                     ///FIXME: This should skip a chapter if it is just a verse or two away.
                     ///TODO:  Determine if it should does something different when the chapter has not been loaded (like preform a lookup).
+                    ///FIXME: This doesn't work on Opera.
                     if (content_manager.top_verse && content_manager.scroll_to_verse(BF.create_verse_id(content_manager.top_verse.b, content_manager.top_verse.c + (keyCode === 33 ? -1 : 1), (content_manager.top_verse.b === 19 && BF.psalm_has_title(content_manager.top_verse.c) ? 0 : 1)), false, true)) {
                         e.preventDefault();
                     }
