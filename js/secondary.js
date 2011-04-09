@@ -800,5 +800,14 @@
                 document.title = userSelection;
             };
         }());
+        
+        ///NOTE: Mozilla uses the DOMMouseScroll event and event.detail for the delta; however, Mozilla scrolls the 57 pixels too, so it is currently not needed.
+        ///TODO: This should also realign the scroll position if it is not exactly on the verse.
+        window.addEventListener("mousewheel", function (e)
+        {
+            /// Force the browser to scroll three lines of text up or down.
+            window.scrollBy(window.pageXOffset, (e.wheelDelta > 0 ? -57 : 57));
+            e.preventDefault();
+        }, false);
     };
 }());
