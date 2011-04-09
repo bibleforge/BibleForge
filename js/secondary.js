@@ -382,7 +382,11 @@
                     ///      WebKit can use an almost completely transparent PNG, and it will change the mouse cursor, but it calls the onmousemove event when the cursor changes.
                     ///      It would be possible to manually determine if the onmousemove event was legitimate by checking the X and Y coordinates.
                     ///      Opera (at least 10.53) has no alternate cursor support whatsoever.
-                    page.style.cursor = "none";
+                    if (BF.is_WebKit) {
+                            page.style.cursor = "url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAABdJREFUOMtjYBgFo2AUjAIGhv///zMBAA0JAwCYSe1yAAAAAElFTkSuQmCC), auto";
+                    } else {
+                        page.style.cursor = "none";
+                    }
                     /// All words have a hand cursor, so this style must be removed.
                     ///FIXME: Determine a way to do this without modifying the CSS.
                     BF.changeCSS(pointer_selector, "");
