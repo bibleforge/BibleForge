@@ -727,7 +727,7 @@
                             }
                             
                             ///NOTE: The reason why scrolling() not anonymous is because it can be recursive.
-                            window.onscroll = scrolling;
+                            window.addEventListener("scroll", scrolling, false);
                         }());
                     }());
                 }());
