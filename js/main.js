@@ -2001,7 +2001,9 @@
                 } else if (keyCode === 38 || keyCode === 40) {
                     /// Force browsers to scroll one line of text at a time.
                     ///NOTE: Mozilla scrolls the correct amount by default.
-                    ///TODO: Make this an option.
+                    ///TODO: Make this optional.
+                    ///TODO: Calculate the position of the next/previous verse and adjust the amount as necessary (in case user previously scrolled by some other means, like autoscroll and the verses do not line up).
+                    ///      The scroll position should be divisible by 19 after adjusting for the top bar.
                     window.scrollBy(window.pageXOffset, (keyCode === 38 ? -19 : 19));
                     e.preventDefault();
                 } else if (keyCode === 33 || keyCode === 34) {
