@@ -801,15 +801,25 @@
             };
         }());
         
-        ///TODO: Add support for Mozilla, which uses the DOMMouseScroll event and event.detail for the delta.
-        window.addEventListener("mousewheel", function (e)
+        (function ()
         {
-            var line_height = context.settings.system.line_height.get();
+            var mousewheel_scroller = function (e)
+            {
+                /// Mozilla's DOMMouseScroll event supports event.details.
+                ///NOTE: e.details differs from e.wheelDelta in the amount and sign.
+                var delta = (typeof e.wheelDelta !== "undefined" ? e.wheelDelta : -e.detail),
+                    line_height = context.settings.system.line_height.get();
+                
+                /// Force the browser to scroll three lines of text up or down.
+                ///NOTE: window.pageYOffset % line_height calculates the offset from the nearest line to snap the view to a line.
+                window.scrollBy(window.pageXOffset, (line_height * (delta > 0 ? -3 : 3)) - (window.pageYOffset % line_height));
+                e.preventDefault();
+            };
             
-            /// Force the browser to scroll three lines of text up or down.
-            ///NOTE: window.pageYOffset % line_height calculates the offset from the nearest line to snap the view to a line.
-            window.scrollBy(window.pageXOffset, (line_height * (e.wheelDelta > 0 ? -3 : 3)) - (window.pageYOffset % line_height));
-            e.preventDefault();
-        }, false);
+            /// WebKit/Opera/IE9 (?)
+            window.addEventListener("mousewheel",     mousewheel_scroller, false);
+            /// Mozilla
+            window.addEventListener("DOMMouseScroll", mousewheel_scroller, false);
+        }());
     };
 }());
