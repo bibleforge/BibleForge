@@ -373,6 +373,8 @@
                 additional = 1,
                 previous   = 2,
                 
+                topBar_height = topLoader.offsetHeight,
+                
                 /// Objects
                 content_manager,
                 settings,
@@ -735,7 +737,7 @@
                 /**
                  * Find a verse element that is within a certain Y coordinate on the screen.
                  *
-                 * @example verse = get_verse_at_position(window.pageYOffset + topLoader.offsetHeight + 8,  true,  page); /// Could return {b: 1, c: 1, v: 1} for Genesis 1:1.
+                 * @example verse = get_verse_at_position(window.pageYOffset + topBar_height + 8,  true,  page); /// Could return {b: 1, c: 1, v: 1} for Genesis 1:1.
                  * @param   the_pos        (number)  The vertical position on the page.
                  * @param   looking_upward (boolean) Whether the verses at the top or bottom of the page.
                  * @param   parent_el      (element) The HTML element that ultimately contains the verse.
@@ -1007,9 +1009,8 @@
                             verse1,
                             verse2;
                         
-                        ///TODO: Make a variable that clearly represents the height of the topBar, not topLoader.offsetHeight).
                         ///NOTE: Check a few pixels (8) below what is actually in view so that it finds the verse that is actually readable.
-                        verse1 = get_verse_at_position(window.pageYOffset + topLoader.offsetHeight + 8,  true,  page);
+                        verse1 = get_verse_at_position(window.pageYOffset + topBar_height + 8,  true,  page);
                         
                         /// If a verse was found, check for the bottom verse.
                         ///NOTE: Check a few pixels (14) above what is actually in view so that it finds the verse that is actually readable.
@@ -1186,8 +1187,8 @@
                         }
                         
                         /// Calculate the verse's Y coordinate.
-                        ///NOTE: "- topLoader.offsetHeight" subtracts off the height of the top bar.
-                        scroll_view_to(BF.get_position(verse_obj).top - topLoader.offsetHeight, null, smooth, allow_lookup);
+                        ///NOTE: "- topBar_height" subtracts off the height of the top bar.
+                        scroll_view_to(BF.get_position(verse_obj).top - topBar_height, null, smooth, allow_lookup);
                         
                         return true;
                     },
