@@ -455,6 +455,9 @@
                             ///TODO: Add other options, such as custom color, and (in the future) highlighting of other people's words (e.g., highlight the words of Paul in blue).
                             BF.changeCSS(".q", "color: " + (values.new_val ? "#D00;" : "#000;"));
                         })
+                    },
+                    system: {
+                        line_height: create_get_set(19, function () {})
                     }
                 };
             }());
@@ -1965,7 +1968,9 @@
             document.addEventListener("keydown", function (e)
             {
                 var activeEl = document.activeElement,
-                    keyCode;
+                    keyCode,
+                    
+                    line_height = settings.system.line_height.get();
                 
                 /// Are there input boxes selected (not including images)?  If so, this function should not be executed.
                 ///NOTE: In the future, other elements, such as, TEXTAREA or buttons, may also need to be detected.
@@ -2001,11 +2006,9 @@
                     q_obj.focus();
                 } else if (keyCode === 38 || keyCode === 40) {
                     /// Force browsers to scroll one line of text at a time.
-                    ///NOTE: Mozilla scrolls the correct amount by default.
-                    ///TODO: Make this optional.
-                    ///TODO: Calculate the position of the next/previous verse and adjust the amount as necessary (in case user previously scrolled by some other means, like autoscroll and the verses do not line up).
-                    ///      The scroll position should be divisible by 19 after adjusting for the top bar.
-                    window.scrollBy(window.pageXOffset, (keyCode === 38 ? -19 : 19));
+                    ///NOTE: window.pageYOffset % line_height calculates the offset from the nearest line to snap the view to a line.
+                    ///TODO: Make this optional (maybe).
+                    window.scrollBy(window.pageXOffset, (line_height - (window.pageYOffset % line_height)) * (keyCode === 38 ? -1 : 1));
                     e.preventDefault();
                 } else if (keyCode === 33 || keyCode === 34) {
                     /// Scroll to the next/previous chapter on page down/up (respectively).
