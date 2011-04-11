@@ -801,12 +801,14 @@
             };
         }());
         
-        ///NOTE: Mozilla uses the DOMMouseScroll event and event.detail for the delta; however, Mozilla scrolls the 57 pixels too, so it is currently not needed.
-        ///TODO: This should also realign the scroll position if it is not exactly on the verse.
+        ///TODO: Add support for Mozilla, which uses the DOMMouseScroll event and event.detail for the delta.
         window.addEventListener("mousewheel", function (e)
         {
+            var line_height = context.settings.system.line_height.get();
+            
             /// Force the browser to scroll three lines of text up or down.
-            window.scrollBy(window.pageXOffset, (e.wheelDelta > 0 ? -57 : 57));
+            ///NOTE: window.pageYOffset % line_height calculates the offset from the nearest line to snap the view to a line.
+            window.scrollBy(window.pageXOffset, (line_height * (e.wheelDelta > 0 ? -3 : 3)) - (window.pageYOffset % line_height));
             e.preventDefault();
         }, false);
     };
