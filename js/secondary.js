@@ -326,21 +326,64 @@
                 is_cursor_visible = true,
                 
                 pointer_selector = ".verse a, .verse span, .search_verse a, .search_verse span, .first_verse a, .psalm_title a, .subscription a",
-                pointer_style    = "cursor: pointer;";
+                pointer_style    = "cursor: pointer;",
+                
+                /// Special variables needed for an ugly WebKit hack.
+                webkit_cursor_hack,
+                webkit_ignore_event_once;
                 
             /// Make the cursor become a hand when hovering over words and verse references.
             BF.changeCSS(pointer_selector, pointer_style, true);
             
-            ///NOTE: Chromium (at least 4.0) has a strange bug when setting the cursor to "auto" and
-            ///      the mouse moves over the HTML element, drop caps letters move downward!
-            ///      Therefore, prevent Chromium from running the code below.
-            ///      To a lesser extent, Safari (at least 4) has the same bug, but it only happens
-            ///      when an alert box pops up, but there does not seem to be a simple way to detect
-            ///      Safari (or WebKit as a whole) using object detection.
-            ///TODO: File a bug report with WebKit and/or Chromium.
-            ///NOTE: Chromium 5.0.342.9 (43360) seems to have fixed this issue for Chromium, but it still does not work right either.
+            ///NOTE: Webkit only changes the mouse cursor after the mouse cursor moves, making cursor hiding impossible.
+            ///      However, there is a way to trick WebKit into thinking the cursor moved when it did not.  The following
+            ///      function does just that.  Needed for at least Chromium 12/Safari 5.
+            ///      See https://code.google.com/p/chromium/issues/detail?id=26723 for more details.
             if (BF.is_WebKit) {
-                return;
+                /**
+                 * Create the function that tricks WebKit into hiding the cursor.
+                 *
+                 * @return A function used to trick WebKit.
+                 */
+                webkit_cursor_hack = (function ()
+                {
+                    /// Prepare the needed elements.
+                    var div1 = document.createElement("div"),
+                        div2 = document.createElement("div");
+                    
+                    div1.style.cssText = "overflow: hidden; position: fixed; left: 0; top: 0; width: 100%; height: 100%;";
+                    div2.style.cssText = "width: 200%; height: 200%;";
+                    
+                    div1.appendChild(div2);
+                    
+                    /**
+                     * Trick WebKit into updating the cursor.
+                     *
+                     * @param  el     (DOM element) The element which cursor is changing
+                     * @param  cursor (string)      The new cursor style
+                     * @return NULL.
+                     */
+                    return function (el, cursor)
+                    {
+                        ///NOTE: For a yet unknown reason, the code works fine without being called via setTimeout with the exception of being called onmousedown.
+                        window.setTimeout(function ()
+                        {
+                            ///NOTE: So basically, a large div is added with an even larger div inside of it.  Then the first div is scrolled back and forth.
+                            ///      This creates the illusion of mouse movement and the cursor is updated.
+                            document.body.appendChild(div1);
+                            
+                            el.style.cursor = cursor;
+                            
+                            div1.scrollLeft = 1;
+                            div1.scrollLeft = 0;
+                            document.body.removeChild(div1);
+                            
+                            ///NOTE: Because WebKit thinks the cursor moved, it will call the onmousemove event, which will reset the cursor.
+                            ///      So, we need to ignore the next onmousemove event.
+                            webkit_ignore_event_once = true;
+                        },0);
+                    };
+                }());
             }
             
             
@@ -356,7 +399,13 @@
                 window.clearTimeout(hide_cursor_timeout);
                 
                 if (!is_cursor_visible) {
-                    page.style.cursor = "auto";
+                    if (BF.is_WebKit) {
+                        ///NOTE: For a yet unknown reason, when being called onmousedown, this must be called twice.
+                        webkit_cursor_hack(page, "auto");
+                        webkit_cursor_hack(page, "auto");
+                    } else {
+                        page.style.cursor = "auto";
+                    }
                     ///FIXME: Determine a way to do this without modifying the CSS.
                     BF.changeCSS(pointer_selector, pointer_style);
                     
@@ -377,14 +426,12 @@
                 
                 hide_cursor_timeout = window.setTimeout(function ()
                 {
-                    ///NOTE: Works in Mozilla/IE9.
-                    ///      WebKit (at least 532.9 (Safari 4/Chromium 4.0)) does not properly support completely transparent cursors.  It also cannot be set via a timeout (see http://code.google.com/p/chromium/issues/detail?id=26723).
-                    ///      WebKit can use an almost completely transparent PNG, and it will change the mouse cursor, but it calls the onmousemove event when the cursor changes.
-                    ///      It would be possible to manually determine if the onmousemove event was legitimate by checking the X and Y coordinates.
+                    ///NOTE: WebKit can use an almost completely transparent PNG.
                     ///      Opera (at least 10.53) has no alternate cursor support whatsoever.
                     if (BF.is_WebKit) {
-                            page.style.cursor = "url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAABdJREFUOMtjYBgFo2AUjAIGhv///zMBAA0JAwCYSe1yAAAAAElFTkSuQmCC), auto";
+                        webkit_cursor_hack(page, "url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAABdJREFUOMtjYBgFo2AUjAIGhv///zMBAA0JAwCYSe1yAAAAAElFTkSuQmCC), auto");
                     } else {
+                        /// Mozilla/IE9
                         page.style.cursor = "none";
                     }
                     /// All words have a hand cursor, so this style must be removed.
@@ -403,7 +450,7 @@
              * @return NULL.
              * @note   Called by page.onmousedown().
              */
-            page.onmousedown = function (e)
+            page.addEventListener("mousedown", function (e)
             {
                 /// Was the right mouse button clicked?
                 ///TODO: Determine how to detect when the menu comes up on a Mac?
@@ -416,7 +463,7 @@
                     show_cursor();
                     hide_cursor_delayed();
                 }
-            };
+            }, false);
             
             
             /**
@@ -435,7 +482,7 @@
                 ///NOTE: onmouseout does not work as expected.  It fires when the cursor moves over any element, even if it is still over the parent element.
                 ///      Therefore, we must check all of the parent elements to see if it is still over the element in question.
                 ///      IE actually supports the correct behavior with onmouseleave.
-                while (curTarget !== relTarget && relTarget !== null && relTarget.nodeName !== 'BODY') {
+                while (curTarget !== relTarget && relTarget !== null && relTarget.nodeName !== "BODY") {
                     relTarget = relTarget.parentNode;
                 }
                 
@@ -448,6 +495,13 @@
             
             page.onmousemove = function ()
             {
+                ///NOTE: Because WebKit must be tricked into thinking that the mouse cursor moved in order for it to update the cursor, the onmousemove event
+                ///      can be triggered too many times.  Therefore, WebKit needs to ignore the onmousemove event occationally.
+                if (webkit_ignore_event_once) {
+                    webkit_ignore_event_once = false;
+                    return;
+                }
+                
                 if (!is_cursor_visible) {
                     show_cursor();
                 }
