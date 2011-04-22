@@ -1113,18 +1113,26 @@
                         looking_up_verse_range = false;
                     }
                     
-                    /// Return the small function to call update_verse_range_delayed().
-                    return function ()
+                    /**
+                     * Return the small function to call update_verse_range_delayed().
+                     *
+                     * @param  sync (boolean) Whether or not to call update_verse_range_delayed() synchronously.
+                     * @return NULL.
+                     */
+                    return function (sync)
                     {
-                        ///TODO: Determine if this variable is useful since it is only used once.
-                        var lookup_range_speed = 300; /// In milliseconds
-                        
-                        /// Is it not already looking for the verse range?
-                        if (!looking_up_verse_range) {
-                            looking_up_verse_range = true;
-                            
-                            /// Run update_verse_range_delayed() after a brief delay.
-                            window.setTimeout(update_verse_range_delayed, lookup_range_speed);
+                        ///NOTE: sync is used to make sure that the content_manager.top_verse and content_manager.bottom_verse variables are current.
+                        ///TODO: Determine if it is better to clearTimeout() the delayed function.
+                        if (sync) {
+                            update_verse_range_delayed();
+                        } else {
+                            /// Is it not already looking for the verse range?
+                            if (!looking_up_verse_range) {
+                                looking_up_verse_range = true;
+                                
+                                /// Run update_verse_range_delayed() after a brief delay.
+                                window.setTimeout(update_verse_range_delayed, 300);
+                            }
                         }
                     };
                 }());
@@ -1182,7 +1190,7 @@
                         page.innerHTML = "";
                     },
                     
-                    update_verse_range:    update_verse_range,
+                    update_verse_range: update_verse_range,
                     
                     reached_bottom: function ()
                     {
@@ -2059,13 +2067,16 @@
                     window.scrollBy(window.pageXOffset, (line_height - (window.pageYOffset % line_height)) * (keyCode === 38 ? -1 : 1));
                     e.preventDefault();
                 } else if (keyCode === 33 || keyCode === 34) {
-                    /// Scroll to the next/previous chapter on page down/up (respectively).
+                    /// Scroll to the next/previous chapter on page down/up respectively.
+                    
+                    /// The verse range needs to be updated in order to make sure it selects the correct chapter.
+                    content_manager.update_verse_range(true);
+                    
                     ///FIXME: Since this just adds or subtracts one chapter, it does not work over book boundaries.
                     ///TODO:  Determine if it should use smooth scrolling.
                     ///FIXME: This should skip a chapter if it is just a verse or two away.
                     ///TODO:  Determine if it should does something different when the chapter has not been loaded (like preform a lookup).
                     ///FIXME: This doesn't work on Opera.
-                    ///BUG:   Sometimes, nothing happens.  It is probably attempting to scroll to the same chapter.
                     if (content_manager.top_verse && content_manager.scroll_to_verse({b: content_manager.top_verse.b, c: content_manager.top_verse.c + (keyCode === 33 ? -1 : 1), v: 1}, false, true)) {
                         e.preventDefault();
                     }
