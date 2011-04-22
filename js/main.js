@@ -322,17 +322,40 @@
     /**
      * Create a verse ID from the book, chapter, and verse reference.
      *
-     * @param  b (number) The book reference
-     * @param  c (number) The chapter reference
-     * @param  v (number) The verse reference
-     * @return A formatted string representing the verse ID: [B]BCCCVVV
+     * @example BF.create_verse_id({b: 1, c: 2, v: 3}); /// Returns 1002003
+     * @param   verse_obj (object) An object containing the book, chapter, and verse to be converted: {b: book, c: chapter, v: verse}
+     * @return  A formatted string representing the verse ID: [B]BCCCVVV
      */
-    BF.create_verse_id = function (b, c, v)
+    BF.create_verse_id = function (verse_obj)
     {
         var zeros = ["", "00", "0", ""];
         
-        return b + zeros[String(c).length] + c + zeros[String(v).length] + v;
+        return verse_obj.b + zeros[String(verse_obj.c).length] + verse_obj.c + zeros[String(verse_obj.v).length] + verse_obj.v;
     };
+    
+    
+    /**
+     * Get the book, chapter, and verse numbers from a verse ID.
+     *
+     * @example BF.get_b_c_v(1002003); /// Returns {b: 1, c: 2, v: 3}
+     * @param   verseID (number || string) The verse ID to convert.
+     * @return  An object containing the book, chapter, and verse numbers: {b: book, c: chapter, v: verse}
+     */
+    BF.get_b_c_v = function (verseID)
+    {
+        var c,
+            v;
+        
+        v = verseID % 1000;
+        c = ((verseID - v) % 1000000) / 1000;
+        
+        return {
+            b: (verseID - v - c * 1000) / 1000000,
+            c: c,
+            v: v
+        };
+    };
+    
     
     /// Determine if CSS transitions are supported by the browser.
     ///NOTE: All of these variables currently require vendor specific prefixes.
@@ -1174,24 +1197,47 @@
                     /**
                      * Scrolls that page to make the specified verse at the top of the viewable area.
                      *
-                     * @example content_manager.scroll_to_verse("45001014"); /// Scrolls to Romans 1:14 if that verse element is in the DOM.
-                     * @param   verse_id (number) The id number of the verse in the format [B]BCCCVVV.
+                     * @example content_manager.scroll_to_verse({b: 45, c: 1, v: 14}); /// Scrolls to Romans 1:14 if that verse element is in the DOM.
+                     * @param   verse_obj (object) An object containing the book, chapter, and verse references: {b: book, c: chapter, v: verse}
                      * @return  Returns TRUE on success and FALSE if the verse cannot be found on the scroll.
                      * @note    Called by handle_new_verses() after the first Ajax request of a particular verse lookup.
-                     * @bug     Verses at chapter and book beginnings (e.g., Genesis 1:1) are not scrolled to correctly.
+                     * @note    Also called when scrolling via the page up and page down buttons.
+                     * @todo    Determine if there needs to be an option to override looking for Psalm titles and chapter headings.
                      */
-                    scroll_to_verse: function (verse_id, smooth, allow_lookup)
+                    scroll_to_verse: function (verse_obj, smooth, allow_lookup)
                     {
                         ///FIXME: This will not get the correct element if the verse is verse 1 (i.e., is at the beginning of a chapter or book).
-                        var verse_obj = document.getElementById(verse_id + "_verse");
+                        var verse_el,
+                            verse_id;
                         
-                        if (!verse_obj) {
+                        /// Is the verse the first verse in a chapter or a Psalm title (i.e., verse 0)?
+                        if (verse_obj.v <= 1) {
+                            /// Is there a Psalm title?
+                            if (verse_obj.b === 19 && BF.psalm_has_title(verse_obj.c)) {
+                                ///NOTE: The reason why the verse must be set to 0 is because the chapter element's ID uses 0 in the verse reference (e.g., "19003000_chapter" as opposed to "19002001_chapter").
+                                verse_obj.v = 0;
+                            }
+                            
+                            verse_id = BF.create_verse_id(verse_obj);
+                            
+                            if (verse_obj.c === 1) {
+                                verse_el = document.getElementById(verse_id + "_title");
+                            } else {
+                                verse_el = document.getElementById(verse_id + "_chapter");
+                            }
+                            
+                        } else {
+                            verse_id = BF.create_verse_id(verse_obj);
+                            verse_el = document.getElementById(verse_id + "_verse");
+                        }
+                        
+                        if (!verse_el) {
                             return false;
                         }
                         
                         /// Calculate the verse's Y coordinate.
                         ///NOTE: "- topBar_height" subtracts off the height of the top bar.
-                        scroll_view_to(BF.get_position(verse_obj).top - topBar_height, null, smooth, allow_lookup);
+                        scroll_view_to(BF.get_position(verse_el).top - topBar_height, null, smooth, allow_lookup);
                         
                         return true;
                     },
@@ -1372,7 +1418,7 @@
                     /**
                      * Handles new verses from the server.
                      *
-                     * Passes any verses of to be displayed, asks if more content is needed, determines if more content is available,
+                     * Displays new verses, if any; asks if more content is needed; determines if more content is available;
                      * and writes initial information to the infoBar.
                      *
                      * @example handle_new_verses({n: [verse_ids, ...], v: [verse_html, ...], p: [paragraphs, ...], i: [word_ids, ...], t: total}, {direction: direction, ...});
@@ -1403,7 +1449,7 @@
                             verse_html = data.v,
                             word_ids   = data.i;
                         
-                        /// Where there any verses returned?
+                        /// Were there any verses returned?
                         ///FIXME: Lookups always return 1 for success instead of the number of verses.  See functions/verse_lookup.php.
                         if (total) {
                             write_verses(type, direction, verse_ids, verse_html, paragraphs, in_paragraphs, options.verse_range);
@@ -1479,16 +1525,17 @@
                             }
                         }
                         
-                        /// Is this is the first results of a search or lookup?
+                        /// Is this is the first results of a query?
                         if (initial_query) {
-                            /// Are the results displayed in paragraphs and the verse looked up not at the beginning of a paragraph?
+                            /// Are the results displayed in paragraphs, and is the verse looked up not at the beginning of a paragraph?
                             if (type === verse_lookup && in_paragraphs && verse_ids[0] !== options.verse) {
                                 /// Because the verse the user is looking for is not at the beginning of a paragraph
                                 /// the text needs to be scrolled so that the verse is at the top.
-                                content_manager.scroll_to_verse(options.verse);
+                                content_manager.scroll_to_verse(BF.get_b_c_v(options.verse));
                             } else {
                                 /// If the user had scrolled down the page and then pressed the refresh button,
                                 /// the page will keep scrolling down as content is loaded, so to prevent this, force the window to scroll to the top of the page.
+                                ///FIXME: This does not always prevent the issue (especially in Chromium).  Perhaps this should also be called via setTimeout().
                                 content_manager.scroll_view_to(0);
                             }
                             
@@ -1502,7 +1549,7 @@
                                 infoBar.appendChild(document.createTextNode(BF.format_number(total) + BF.lang["found_" + (total === 1 ? "singular" : "plural")]));
                                 /// Create a <b> for the search terms.
                                 b_tag = document.createElement("b");
-                                ///NOTE: We use this method instead of straight innerHTML to prevent HTML elements from appearing inside the <b> tag.
+                                ///NOTE: We use this method instead of straight innerHTML to prevent HTML injection inside the <b> tag.
                                 b_tag.appendChild(document.createTextNode(options.raw_query));
                                 infoBar.appendChild(b_tag);
                             }
@@ -1689,9 +1736,10 @@
                             }());
                         }());
                     }()),
+                    
                     query_previous: function () {},
                     
-                    /// Variables excessable to outer functions.
+                    /// Variables accessible to outer functions.
                     query_type: "",
                     raw_query:  ""
                 };
@@ -2013,11 +2061,12 @@
                 } else if (keyCode === 33 || keyCode === 34) {
                     /// Scroll to the next/previous chapter on page down/up (respectively).
                     ///FIXME: Since this just adds or subtracts one chapter, it does not work over book boundaries.
-                    ///FIXME: Use smooth scrolling.
+                    ///TODO:  Determine if it should use smooth scrolling.
                     ///FIXME: This should skip a chapter if it is just a verse or two away.
                     ///TODO:  Determine if it should does something different when the chapter has not been loaded (like preform a lookup).
                     ///FIXME: This doesn't work on Opera.
-                    if (content_manager.top_verse && content_manager.scroll_to_verse(BF.create_verse_id(content_manager.top_verse.b, content_manager.top_verse.c + (keyCode === 33 ? -1 : 1), (content_manager.top_verse.b === 19 && BF.psalm_has_title(content_manager.top_verse.c) ? 0 : 1)), false, true)) {
+                    ///BUG:   Sometimes, nothing happens.  It is probably attempting to scroll to the same chapter.
+                    if (content_manager.top_verse && content_manager.scroll_to_verse({b: content_manager.top_verse.b, c: content_manager.top_verse.c + (keyCode === 33 ? -1 : 1), v: 1}, false, true)) {
                         e.preventDefault();
                     }
                 }
