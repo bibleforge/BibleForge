@@ -20,8 +20,7 @@
     
     /// Detect WebKit based browsers.
     ///NOTE: Since the user agent string can be modified by the user, it is not bulletproof.
-    ///NOTE: !! converts data to a boolean.
-    BF.is_WebKit = !!window.chrome || window.navigator.userAgent.indexOf("WebKit/") >= 0;
+    BF.is_WebKit = Boolean(window.chrome) || window.navigator.userAgent.indexOf("WebKit/") >= 0;
     
     ///NOTE: Usually, eval() and JSON.parse() are similar in speed and the Function Constructor is really slow.
     ///      However, in Chrome, eval() is really fast, the Function Constructor is even faster, and JSON.parse() is ridiculously slow.
