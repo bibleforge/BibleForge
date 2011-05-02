@@ -834,7 +834,7 @@
                 }
             };
             
-            page.onmouseup = function (e)
+            page.onmouseup = function ()
             {
                 var tmp_el,
                     userSelection;
