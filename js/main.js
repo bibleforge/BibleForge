@@ -343,9 +343,8 @@
     BF.get_b_c_v = function (verseID)
     {
         var c,
-            v;
+            v = verseID % 1000;
         
-        v = verseID % 1000;
         c = ((verseID - v) % 1000000) / 1000;
         
         return {
