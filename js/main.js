@@ -8,9 +8,44 @@
  * @author  BibleForge <info@bibleforge.com>
  */
 
-/// Set JSLint options.
+/// Declare globals for JSLint.
 /*global document, window, BF */
-/*jslint newcap: true, undef: true, onevar: true, evil: true, plusplus: true, bitwise: true, nomen: true, strict: true, continue: true, indent: 4, white: false */
+
+/// Set JSLint options.
+/*jslint newcap: true, undef: true, onevar: true, evil: true, bitwise: true, nomen: true, strict: true, continue: true, indent: 4, white: false */
+
+/// Indicate all object properties used.  JSLint checks this list for misspellings.
+/*properties Create_easy_ajax, MozTransition, OTransition, 
+    XMLHttpRequest, abort, activeElement, addEventListener, 
+    add_content_if_needed, altKey, app_name, appendChild, b, body, 
+    books_long_main, books_long_posttitle, books_long_pretitle, books_short, 
+    bottom_book, bottom_id, bottom_verse, c, changeCSS, chapter, charCodeAt, 
+    childNodes, chrome, className, clearInterval, clearTimeout, 
+    clear_scroll, clientHeight, createElement, createTextNode, 
+    create_verse_id, create_viewport, cssRules, cssText, cssTransitions, 
+    ctrlKey, determine_reference, direction, display, documentElement, 
+    encodeURIComponent, firstChild, focus, format_number, full_book, 
+    full_verse, get, getElementById, get_b_c_v, get_position, 
+    grammar_keywords, grammar_marker, grammar_marker_len, grammar_separator, 
+    height, highlight, i, id, in_paragraphs, include, indexOf, 
+    initial_query, innerHTML, insertBefore, insertRule, is_WebKit, is_busy, 
+    join, keyCode, lang, lastChild, left, length, line_height, metaKey, n, 
+    navigator, new_val, nextSibling, offsetHeight, offsetLeft, offsetParent, 
+    offsetTop, old_val, onblur, onfocus, onreadystatechange, onresize, 
+    onsubmit, open, opera, p, page, pageXOffset, pageYOffset, parentNode, 
+    parse, parseInt, parse_json, prepare_highlighter, prepare_search, 
+    preventDefault, previousSibling, prototype, psalm, psalm_has_title, 
+    query, query_additional, query_explanation, query_previous, query_type, 
+    raw_query, reached_bottom, reached_top, readyState, red_letters, 
+    removeChild, replace, responseText, round, rules, scrollBy, 
+    scrollHeight, scrollTo, scroll_to_verse, scroll_view_to, selectorText, 
+    send, set, setInterval, setRequestHeader, setTimeout, settings, slice, 
+    split, standard_terms, start_at, status, style, styleSheets, 
+    subscription, system, t, tagName, test, title, top, topBar, top_id, 
+    top_verse, trim, type, update_verse_range, userAgent, v, value, verse, 
+    verse_id, verse_range, view, viewPort_count, viewPort_num, visibility, 
+    webkitTransition
+*/
 
 (function ()
 {

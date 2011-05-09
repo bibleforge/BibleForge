@@ -8,9 +8,30 @@
  * @author  BibleForge <info@bibleforge.com>
  */
 
-/// Set JSLint options.
+/// Declare globals for JSLint.
 /*global document, window, BF */
-/*jslint newcap: true, undef: true, onevar: true, evil: true, plusplus: true, bitwise: true, nomen: true, strict: true, continue: true, indent: 4, white: false */
+
+/// Set JSLint options.
+/*jslint newcap: true, undef: true, onevar: true, evil: true, bitwise: true, nomen: true, strict: true, continue: true, indent: 4, white: false */
+
+/// Indicate all object properties used.  JSLint checks this list for misspellings.
+/*properties Create_easy_ajax, about, addEventListener, alt, appendChild, 
+    blog, body, borderTop, button, changeCSS, checked, childNodes, 
+    className, clearTimeout, clientWidth, cloneContents, configure, 
+    createElement, createRange, createTextNode, cssText, cssTransitions, 
+    currentTarget, cursor, detail, display, done, get, getRangeAt, 
+    getSelection, get_position, help, href, htmlFor, htmlText, id, 
+    innerHTML, innerHeight, insertBefore, insertCell, insertRow, is_WebKit, 
+    lang, left, length, line, line_height, link, maxHeight, maxWidth, name, 
+    nodeName, offsetHeight, offsetWidth, onchange, onclick, onfocus, 
+    onmousemove, onmouseout, onmouseup, opacity, options, originalTarget, 
+    page, pageXOffset, pageYOffset, paragraphs, parentNode, preventDefault, 
+    query, red_letters, relatedTarget, removeChild, removeEventListener, 
+    scrollBy, scrollLeft, selection, set, setTimeout, settings, src, 
+    srcElement, stopPropagation, style, system, tagName, target, text, 
+    title, top, topBar, type, value, view, viewPort_num, wheelDelta, 
+    wrench_title
+*/
 
 (function ()
 {

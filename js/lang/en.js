@@ -8,9 +8,41 @@
  * @author  BibleForge <info@bibleforge.com>
  */
 
-/// Set JSLint options.
+/// Declare globals for JSLint.
 /*global window, BF */
-/*jslint newcap: true, undef: true, onevar: true, evil: true, plusplus: true, bitwise: true, nomen: true, strict: true, continue: true, indent: 4, white: false */
+
+/// Set JSLint options.
+/*jslint newcap: true, undef: true, onevar: true, evil: true, bitwise: true, nomen: true, strict: true, continue: true, indent: 4, white: false */
+
+/// Indicate all object properties used.  JSLint checks this list for misspellings.
+/*properties ABBREVIATED, ACCUSATIVE, ACTIVE, ADJECTIVE, ADVERB, AEOLIC, 
+    AMBIGUOUS_CORRELATIVE_INTERROGATIVE_PRONOUN, AMBIGUOUS_MIDDLE_PASSIVE, 
+    AMBIGUOUS_MIDDLE_PASSIVE_DEPONENT, AORIST, APOCOPATED, ARAMAIC, ATTIC, 
+    COMPARATIVE, CONDITIONAL, CONJUNCTION, CONTRACTED, CORRELATIVE_PRONOUN, 
+    DATIVE, DEFINITE_ARTICLE, DEMONSTRATIVE_PRONOUN, DIVINE, FEMININE, 
+    FIRST_FORM, FIRST_PERSON, FUTURE, GENITIVE, HEBREW, IMPERATIVE, 
+    IMPERATIVE_SENSE_PARTICIPLE, IMPERFECT, IMPERSONAL_ACTIVE, IMPLIED, 
+    INDECLINABLE, INDEFINITE_PRONOUN, INDICATIVE, INFINITIVE, INJECTIVE, 
+    INTERROGATIVE, INTERROGATIVE_PRONOUN, IRREGULAR, LETTER, MASCULINE, 
+    MIDDLE, MIDDLE_DEPONENT, MIDDLE_SIGNIFICANCE, NEGATIVE, NEUTER, 
+    NOMINATIVE, NORMAL_NOUN, NOUN, NO_TENSE_STATED, NO_VOICE_STATED, 
+    NUMERICAL, OPTATIVE, OTHER, PARTICIPLE, PARTICLE, PARTICLE_ATTACHED, 
+    PASSIVE, PASSIVE_DEPONENT, PERFECT, PERSONAL_PRONOUN, PLUPERFECT, 
+    PLURAL, POSESSIVE_PRONOUN, PREPOSITION, PRESENT, PRONOUN, PROPER_NOUN, 
+    RECIPROCAL_PRONOUN, RED, REFLEXIVE_PRONOUN, RELATIVE_PRONOUN, 
+    SECOND_FORM, SECOND_PERSON, SINGULAR, SUBJUNCTIVE, SUPERLATIVE, 
+    THIRD_PERSON, TRANSITIVE, VERB, VOCATIVE, about, alism, aliti, alize, 
+    alli, anci, app_name, ation, ational, ative, ator, biliti, bli, blog, 
+    books_long_main, books_long_posttitle, books_long_pretitle, books_short, 
+    chapter, configure, determine_reference, done, eli, enci, entli, exec, 
+    found_plural, found_singular, ful, fulness, grammar_keywords, 
+    grammar_marker, grammar_marker_len, grammar_separator, help, ical, 
+    icate, iciti, indexOf, iveness, iviti, ization, izer, lang, length, 
+    logi, ness, ousli, ousness, paragraphs, prepare_highlighter, 
+    prepare_search, psalm, query_explanation, red_letters, replace, self, 
+    slice, split, subscription, test, tional, title, toLowerCase, view, 
+    wrench_title
+*/
 
 /**
  * Create the BibleForge language specific object for the English language.
