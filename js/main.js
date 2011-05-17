@@ -2073,7 +2073,7 @@
                 ///TODO: Determine if this works on Mac with the Command key.
                 ///NOTE: It may be that the Command key is keyCode 91 and may need to be caught by another keydown event.
                 ///NOTE: The meta key does not seem to be detected; this may need me manually checked for, like for the Mac.
-                ///NOTE: However, it does want to grab the stroke if the user is pasting.  keyCode 86 == "V," which is the standard shortcut for Paste.
+                ///NOTE: However, it should not grab the key stroke if the user is pasting.  keyCode 86 === "V" (which is the standard shortcut for pasting).
                 if ((e.ctrlKey && keyCode !== 86) || e.altKey || e.metaKey) {
                     return;
                 }
@@ -2107,8 +2107,8 @@
                     
                     ///FIXME: Since this just adds or subtracts one chapter, it does not work over book boundaries.
                     ///TODO:  Determine if it should use smooth scrolling.
-                    ///FIXME: This should skip a chapter if it is just a verse or two away.
-                    ///TODO:  Determine if it should does something different when the chapter has not been loaded (like preform a lookup).
+                    ///TODO:  Determine if this should skip a chapter if it is just a verse or two away.
+                    ///TODO:  Determine if it should do something different when the chapter has not been loaded (like preform a lookup).
                     ///FIXME: This doesn't work on Opera.
                     if (content_manager.top_verse && content_manager.scroll_to_verse({b: content_manager.top_verse.b, c: content_manager.top_verse.c + (keyCode === 33 ? -1 : 1), v: 1}, false, true)) {
                         e.preventDefault();
@@ -2138,7 +2138,7 @@
          * Capture form submit events and begin a new query.
          *
          * @return FALSE.  It must always return false in order to prevent the form from submitting.
-         * @note Called when a user submits the form.
+         * @note   Called when a user submits the form.
          */
         searchForm.onsubmit = function ()
         {
