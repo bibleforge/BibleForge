@@ -1917,8 +1917,7 @@
                     
                     /// Determine if the user is preforming a search or looking up a verse.
                     /// If the query is a verse reference, a number is returned, if it is a search, then FALSE is returned.
-                    ///NOTE: The + is to convert the verse reference to a number.
-                    verse_id = (+BF.lang.determine_reference(query));
+                    verse_id = Number(BF.lang.determine_reference(query));
                     
                     /// Is the query a verse lookup?
                     if (verse_id > 0) {
@@ -1976,6 +1975,7 @@
                          * @note   Since this function gets attached to the options object, it is sent by reference to the query_manager and called there.
                          * @note   Called by handle_new_verses() in the query_manager.
                          * @todo   Determine a good way to cache the highlight function or regex array.
+                         * @todo   Rewrite this so that it does not have to recreate the function every time.
                          */
                         options.highlight = (function ()
                         {
