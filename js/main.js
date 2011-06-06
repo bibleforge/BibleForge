@@ -12,7 +12,7 @@
 /*global document, window, BF */
 
 /// Set JSLint options.
-/*jslint newcap: true, undef: true, onevar: true, evil: true, bitwise: true, nomen: true, strict: true, continue: true, indent: 4, white: false */
+/*jslint newcap: true, undef: true, onevar: true, evil: true, bitwise: true, nomen: true, strict: true, continue: true, type: true, indent: 4, white: false */
 
 /// Indicate all object properties used.  JSLint checks this list for misspellings.
 /*properties Create_easy_ajax, MozTransition, OTransition, 
