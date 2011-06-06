@@ -285,7 +285,7 @@ BF.lang = (function ()
              * @param   search_terms (string) The terms to be filtered.
              * @return  An array of filtered words.
              * @note    Called by prepare_highlighter().
-             * @todo    Determine if this should be moved out of the language specific file (and maybe just use some languge specific variables).
+             * @todo    Determine if this should be moved out of the language specific file (and maybe just use some language specific variables).
              */
             function filter_terms_for_highlighter(search_terms)
             {
@@ -837,17 +837,18 @@ first_loop:     while (i < search_terms_arr_len) {
          * @note	Replaces curly quotes with straight.
          * @note	Replaces various hyphens, dashes, and minuses with the standard hyphen (-).
          * @note    This function assumes that whitespace will be trimmed afterward.
-         * @todo    Determine if this should be moved out of the language specific file (and maybe just use some languge specific variables).
+         * @todo    Determine if this should be moved out of the language specific file (and maybe just use some language specific variables).
          */
         prepare_search: function (search_terms)
         {
-            ///NOTE: /\s{2,}/g gets rid of double spaces within the words (e.g., "here    there" becomes "here there").
+            ///NOTE: /\s+/g gets rid of double spaces within the words (e.g., "here    there" becomes "here there")
+            ///      and converts all types of white space to the normal space (e.g., converts non-breaking spaces to normal spaces).
             ///NOTE: /\s+-\s+/g ensures that filter_array() will filter out negative words like "this - that" (i.e., "that" does not need to be highlighted).
             ///NOTE: \u2011-\u2015 replaces various hyphens, dashes, and minuses with the standard hyphen (-).
             ///NOTE: replace(/([0-9]+)[:.;,\s]title/ig, "$1:0") replaces Psalm title references into an acceptable format (e.g., "Psalm 3:title" becomes "Psalm 3:0").
             ///NOTE: replace(/([:.;,\s])subscription/ig, "$1255" replaces the word "subscription" with the verse number (255) used internally by BibleForge for Pauline subscriptions (e.g., "Philemon subscription" becomes "Philemon 255").
             ///NOTE: "$1255" replaces the text with the first placeholder followed by the literal "255" (without quotes).
-            return search_terms.replace(" IN RED", " AS RED").replace(/\s{2,}/g, " ").replace(/\sAND\s/g, " & ").replace(/\sOR\s/g, " | ").replace(/(?:\s-|\s*\bNOT)\s/g, " -").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[\u2011-\u2015]/g, "-").replace(/([0-9]+)[:.;,\s]title/ig, "$1:0").replace(/([:.;,\s])subscript(?:ion)?/ig, "$1255");
+            return search_terms.replace(" IN RED", " AS RED").replace(/\s+/g, " ").replace(/\sAND\s/g, " & ").replace(/\sOR\s/g, " | ").replace(/(?:\s-|\s*\bNOT)\s/g, " -").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[\u2011-\u2015]/g, "-").replace(/([0-9]+)[:.;,\s]title/ig, "$1:0").replace(/([:.;,\s])subscript(?:ion)?/ig, "$1255");
         }
     };
 }());
