@@ -12,7 +12,7 @@
 /*global document, window, BF */
 
 /// Set JSLint options.
-/*jslint newcap: true, undef: true, onevar: true, evil: true, bitwise: true, nomen: true, strict: true, continue: true, type: true, indent: 4, white: false */
+/*jslint evil: true, continue: true, regexp: true, type: true, indent: 4, white: true */
 
 /// Indicate all object properties used.  JSLint checks this list for misspellings.
 /*properties Create_easy_ajax, MozTransition, OTransition, 
@@ -326,7 +326,7 @@
             style_sheet.insertRule(selector + "{" + new_CSS + "}", 0);
         } else {
             /// Get the styles (cssRules) for Mozilla/WebKit/Opera/IE9 and (rules) for IE8-.
-            CSS_rules     = style_sheet.cssRules ? style_sheet.cssRules : style_sheet.rules;
+            CSS_rules     = style_sheet.cssRules || style_sheet.rules;
             CSS_rules_len = CSS_rules.length;
             while (i < CSS_rules_len) {
                 if (CSS_rules[i].selectorText === selector) {

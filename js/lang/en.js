@@ -12,7 +12,7 @@
 /*global window, BF */
 
 /// Set JSLint options.
-/*jslint newcap: true, undef: true, onevar: true, evil: true, bitwise: true, nomen: true, strict: true, continue: true, indent: 4, white: false */
+/*jslint evil: true, continue: true, regexp: true, type: true, indent: 4, white: true */
 
 /// Indicate all object properties used.  JSLint checks this list for misspellings.
 /*properties ABBREVIATED, ACCUSATIVE, ACTIVE, ADJECTIVE, ADVERB, AEOLIC, 

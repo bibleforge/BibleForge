@@ -12,7 +12,7 @@
 /*global document, window, BF */
 
 /// Set JSLint options.
-/*jslint newcap: true, undef: true, onevar: true, evil: true, bitwise: true, nomen: true, strict: true, continue: true, indent: 4, white: false */
+/*jslint evil: true, continue: true, regexp: true, type: true, indent: 4, white: true */
 
 /// Indicate all object properties used.  JSLint checks this list for misspellings.
 /*properties Create_easy_ajax, about, addEventListener, alt, appendChild, 
@@ -118,7 +118,7 @@
                     menu_container        = document.createElement("div"),
                     menu_count            = menu_items.length,
                     menu_item,
-                    prev_document_onclick = document.onclick ? document.onclick : function () {};
+                    prev_document_onclick = document.onclick || function () {};
                 
                 is_open = true;
                 
@@ -834,7 +834,7 @@
             
             page.onclick = function (e)
             {
-                var clicked_el = e.srcElement ? e.srcElement : e.originalTarget;
+                var clicked_el = e.srcElement || e.originalTarget;
                 
                 if (clicked_el) {
                     /// What did the user click on?
