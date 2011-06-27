@@ -8,8 +8,9 @@
 # @author  BibleForge <info@bibleforge.com>
 #
 
-config.php
 .htaccess
+config.php
+favicon.ico #NOTE: This is temporarily ignored until a real favicon is created.
+google*
 robots.txt
 sitemap.xml
-favicon.ico #NOTE: This is temporarily ignored until a real favicon is created.
