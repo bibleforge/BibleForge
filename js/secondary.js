@@ -347,7 +347,7 @@
                 is_cursor_visible = true,
                 
                 pointer_selector = ".verse a, .verse span, .search_verse a, .search_verse span, .first_verse a, .psalm_title a, .subscription a",
-                pointer_style    = "cursor: pointer;",
+                pointer_style    = "cursor: auto;",
                 
                 /// Special variables needed for an ugly WebKit hack.
                 webkit_cursor_hack,
