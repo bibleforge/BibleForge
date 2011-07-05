@@ -2114,6 +2114,15 @@
                 }
             }, false);
             
+            /// If there is no immediate query being preformed, look up Genesis 1:1 so that the page is not so empty.
+            ///NOTE: Currently, there can be no default query.
+            if (query_manager.raw_query === "") {
+                window.setTimeout(function ()
+                {
+                    run_new_query("Gen");
+                }, 200);
+            }
+            
             /// After a short delay, lazily load extra, nonessential (or at least not immediately essential) code, like the wrench menu.
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
