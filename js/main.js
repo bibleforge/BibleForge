@@ -1178,16 +1178,14 @@
                  *
                  * @return NULL.  Calls other functions.
                  * @note   Called when the window is resized.
-                 * @note   Set by the onresize event.
-                 * @todo   Make a function that allows for adding and removing more global events.
                  */
-                window.onresize = function ()
+                window.addEventListener("resize", function ()
                 {
                     add_content_if_needed(additional);
                     add_content_if_needed(previous);
                     
                     update_verse_range();
-                };
+                }, false);
                 
                 /// Return the content_manager object.
                 return {

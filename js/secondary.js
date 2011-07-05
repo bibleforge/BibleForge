@@ -469,7 +469,6 @@
              *
              * @param  e (object) The event object (normally supplied by the browser).
              * @return NULL.
-             * @note   Called by page.onmousedown().
              */
             page.addEventListener("mousedown", function (e)
             {
@@ -528,6 +527,21 @@
                 }
                 hide_cursor_delayed();
             };
+            
+            
+            /**
+             * Possibly hide the cursor on resize.
+             *
+             * If the cursor is not hovering over the text area but it is after a resize (very common when going into full screen mode)
+             * the cursor will not be hidden unless the hide_cursor_delayed() function is triggered on resize.
+             *
+             * @return NULL.
+             */
+            window.addEventListener("resize", function ()
+            {
+                ///NOTE: Does not work on Chromium 12/Firefox 3.6 because the element that the mouse is hovering over does not update on resize.
+                hide_cursor_delayed();
+            }, false);
             
             /// Hide the mouse cursor after switching between tabs or windows.
             window.onfocus = hide_cursor_delayed;
