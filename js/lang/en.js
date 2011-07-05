@@ -398,6 +398,11 @@ first_loop:     while (i < search_terms_arr_len) {
                         stemmed_word = "not";
                         no_morph = true;
                         break;
+                    case "seek":
+                    case "sought":
+                        stemmed_word = "s(?:eek|ought)";
+                        no_morph = false;
+                        break;
                     default:
                         /// Does the word contain a wildcard symbol (*)?
                         if (term.indexOf("*") !== -1) {
