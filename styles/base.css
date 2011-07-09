@@ -508,7 +508,7 @@ label {
 }
 
 /* Make all lines of text the same height. */
-.scrolls .verse, .scrolls .first_verse, .psalm_title, .search_verse, .paragraph {
+.scrolls .verse, .scrolls .first_verse, .psalm_title, .search_verse, .paragraph, .subscription {
     line-height: 19px;
 }
 
