@@ -398,9 +398,24 @@ first_loop:     while (i < search_terms_arr_len) {
                         stemmed_word = "not";
                         no_morph = true;
                         break;
+                    ///TODO: This needs to be selected via a morphology stemmer.  There's just too many options.
                     case "seek":
+                    case "seeks":
+                    case "seekest":
+                    case "seeketh":
+                    case "seeking":
+                    case "seeked":
                     case "sought":
                         stemmed_word = "s(?:eek|ought)";
+                        no_morph = false;
+                        break;
+                    case "brake":
+                    case "braking":
+                    case "brakest":
+                    case "braketh":
+                    case "broke":
+                    case "broken":
+                        stemmed_word = "br[ao]k";
                         no_morph = false;
                         break;
                     default:
