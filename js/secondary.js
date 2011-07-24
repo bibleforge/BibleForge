@@ -390,7 +390,7 @@
                         window.setTimeout(function ()
                         {
                             ///NOTE: So basically, a large div is added with an even larger div inside of it.  Then the first div is scrolled back and forth.
-                            ///      This creates the illusion of mouse movement and the cursor is updated.
+                            ///      This creates the illusion of mouse movement, and the cursor is updated.
                             document.body.appendChild(div1);
                             
                             el.style.cursor = cursor;
