@@ -15,36 +15,34 @@
 /*jslint evil: true, continue: true, regexp: true, type: true, indent: 4, white: true */
 
 /// Indicate all object properties used.  JSLint checks this list for misspellings.
-/*properties Create_easy_ajax, MozTransition, OTransition, 
-    XMLHttpRequest, abort, activeElement, addEventListener, 
-    add_content_if_needed, altKey, app_name, appendChild, b, body, 
-    books_long_main, books_long_posttitle, books_long_pretitle, books_short, 
-    bottom_book, bottom_id, bottom_verse, c, changeCSS, chapter, charCodeAt, 
-    childNodes, chrome, className, clearInterval, clearTimeout, 
-    clear_scroll, clientHeight, createElement, createTextNode, 
-    create_verse_id, create_viewport, cssRules, cssText, cssTransitions, 
-    ctrlKey, determine_reference, direction, display, documentElement, 
-    encodeURIComponent, firstChild, focus, format_number, full_book, 
-    full_verse, get, getElementById, get_b_c_v, get_position, 
+/*properties
+    Create_easy_ajax, MozTransition, OTransition, XMLHttpRequest, abort, 
+    activeElement, addEventListener, add_content_if_needed, altKey, app_name, 
+    appendChild, b, body, books_long_main, books_long_posttitle, 
+    books_long_pretitle, books_short, bottom_book, bottom_id, bottom_verse, c, 
+    changeCSS, chapter, chapter_count, charCodeAt, childNodes, chrome, 
+    className, clearInterval, clearTimeout, clear_scroll, clientHeight, 
+    createElement, createTextNode, create_verse_id, create_viewport, cssRules, 
+    cssText, cssTransitions, ctrlKey, determine_reference, direction, display, 
+    documentElement, encodeURIComponent, firstChild, focus, format_number, 
+    full_book, full_verse, get, getElementById, get_b_c_v, get_position, 
     grammar_keywords, grammar_marker, grammar_marker_len, grammar_separator, 
-    height, highlight, i, id, in_paragraphs, include, indexOf, 
-    initial_query, innerHTML, insertBefore, insertRule, is_WebKit, is_busy, 
-    join, keyCode, lang, lastChild, left, length, line_height, metaKey, n, 
-    navigator, new_val, nextSibling, offsetHeight, offsetLeft, offsetParent, 
-    offsetTop, old_val, onblur, onfocus, onreadystatechange, onresize, 
-    onsubmit, open, opera, p, page, pageXOffset, pageYOffset, parentNode, 
-    parse, parseInt, parse_json, prepare_highlighter, prepare_search, 
-    preventDefault, previousSibling, prototype, psalm, psalm_has_title, 
+    height, highlight, i, id, in_paragraphs, include, initial_query, innerHTML, 
+    insertBefore, insertRule, is_WebKit, is_busy, keyCode, lang, lastChild, 
+    left, line_height, metaKey, n, navigator, new_val, nextSibling, 
+    offsetHeight, offsetLeft, offsetParent, offsetTop, old_val, onblur, 
+    onfocus, onreadystatechange, onsubmit, open, opera, p, page, pageXOffset, 
+    pageYOffset, parentNode, parseInt, parse_json, prepare_highlighter, 
+    prepare_search, preventDefault, previousSibling, psalm, psalm_has_title, 
     query, query_additional, query_explanation, query_previous, query_type, 
     raw_query, reached_bottom, reached_top, readyState, red_letters, 
-    removeChild, replace, responseText, round, rules, scrollBy, 
-    scrollHeight, scrollTo, scroll_to_verse, scroll_view_to, selectorText, 
-    send, set, setInterval, setRequestHeader, setTimeout, settings, slice, 
-    split, standard_terms, start_at, status, style, styleSheets, 
-    subscription, system, t, tagName, test, title, top, topBar, top_id, 
-    top_verse, trim, type, update_verse_range, userAgent, v, value, verse, 
-    verse_id, verse_range, view, viewPort_count, viewPort_num, visibility, 
-    webkitTransition
+    removeChild, replace, responseText, round, rules, scrollBy, scrollHeight, 
+    scrollTo, scroll_to_verse, scroll_view_to, selectorText, send, set, 
+    setInterval, setRequestHeader, setTimeout, settings, split, standard_terms, 
+    start_at, status, style, styleSheets, subscription, system, t, tagName, 
+    title, top, topBar, top_id, top_verse, type, update_verse_range, userAgent, 
+    v, value, verse, verse_id, verse_range, view, viewPort_count, viewPort_num, 
+    visibility, webkitTransition
 */
 
 (function ()
@@ -2056,7 +2054,8 @@
             {
                 var activeEl = document.activeElement,
                     keyCode,
-                    
+                    new_book,
+                    new_chap,
                     line_height = settings.system.line_height.get();
                 
                 /// Are there input boxes selected (not including images)?  If so, this function should not be executed.
@@ -2103,13 +2102,27 @@
                     /// The verse range needs to be updated in order to make sure it selects the correct chapter.
                     content_manager.update_verse_range(true);
                     
-                    ///FIXME: Since this just adds or subtracts one chapter, it does not work over book boundaries.
-                    ///TODO:  Determine if it should use smooth scrolling.
-                    ///TODO:  Determine if this should skip a chapter if it is just a verse or two away.
-                    ///TODO:  Determine if it should do something different when the chapter has not been loaded (like preform a lookup).
-                    ///FIXME: This doesn't work on Opera.
-                    if (content_manager.top_verse && content_manager.scroll_to_verse({b: content_manager.top_verse.b, c: content_manager.top_verse.c + (keyCode === 33 ? -1 : 1), v: 1}, false, true)) {
-                        e.preventDefault();
+                    new_book = content_manager.top_verse.b;
+                    new_chap = content_manager.top_verse.c + (keyCode === 33 ? -1 : 1);
+                    
+                    if (new_chap < 1) {
+                        new_book -= 1;
+                        new_chap  = BF.lang.chapter_count[new_book];
+                    } else if (new_chap > BF.lang.chapter_count[new_book]) {
+                        new_book += 1;
+                        new_chap  = 1;
+                    }
+                    
+                    /// If the new book is within valid range, try to scroll to it.  If not, just let the page scroll like normal.
+                    if (new_book > 0 && new_book < 67) {
+                        ///TODO:  Determine if it should use smooth scrolling.
+                        ///TODO:  Determine if this should skip a chapter if it is just a verse or two away.
+                        ///TODO:  Determine if it should do something different when the chapter has not been loaded (like preform a lookup).
+                        ///FIXME: This doesn't work on Opera.
+                        if (content_manager.top_verse && content_manager.scroll_to_verse({b: new_book, c: new_chap, v: 1}, false, true)) {
+                            /// Since it scrolled to the verses successfully, prevent the key press from scrolling the page like normal.
+                            e.preventDefault();
+                        }
                     }
                 }
             }, false);

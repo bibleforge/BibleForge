@@ -15,7 +15,8 @@
 /*jslint evil: true, continue: true, regexp: true, type: true, indent: 4, white: true */
 
 /// Indicate all object properties used.  JSLint checks this list for misspellings.
-/*properties ABBREVIATED, ACCUSATIVE, ACTIVE, ADJECTIVE, ADVERB, AEOLIC, 
+/*properties
+    ABBREVIATED, ACCUSATIVE, ACTIVE, ADJECTIVE, ADVERB, AEOLIC, 
     AMBIGUOUS_CORRELATIVE_INTERROGATIVE_PRONOUN, AMBIGUOUS_MIDDLE_PASSIVE, 
     AMBIGUOUS_MIDDLE_PASSIVE_DEPONENT, AORIST, APOCOPATED, ARAMAIC, ATTIC, 
     COMPARATIVE, CONDITIONAL, CONJUNCTION, CONTRACTED, CORRELATIVE_PRONOUN, 
@@ -23,25 +24,23 @@
     FIRST_FORM, FIRST_PERSON, FUTURE, GENITIVE, HEBREW, IMPERATIVE, 
     IMPERATIVE_SENSE_PARTICIPLE, IMPERFECT, IMPERSONAL_ACTIVE, IMPLIED, 
     INDECLINABLE, INDEFINITE_PRONOUN, INDICATIVE, INFINITIVE, INJECTIVE, 
-    INTERROGATIVE, INTERROGATIVE_PRONOUN, IRREGULAR, LETTER, MASCULINE, 
-    MIDDLE, MIDDLE_DEPONENT, MIDDLE_SIGNIFICANCE, NEGATIVE, NEUTER, 
-    NOMINATIVE, NORMAL_NOUN, NOUN, NO_TENSE_STATED, NO_VOICE_STATED, 
-    NUMERICAL, OPTATIVE, OTHER, PARTICIPLE, PARTICLE, PARTICLE_ATTACHED, 
-    PASSIVE, PASSIVE_DEPONENT, PERFECT, PERSONAL_PRONOUN, PLUPERFECT, 
-    PLURAL, POSESSIVE_PRONOUN, PREPOSITION, PRESENT, PRONOUN, PROPER_NOUN, 
-    RECIPROCAL_PRONOUN, RED, REFLEXIVE_PRONOUN, RELATIVE_PRONOUN, 
-    SECOND_FORM, SECOND_PERSON, SINGULAR, SUBJUNCTIVE, SUPERLATIVE, 
-    THIRD_PERSON, TRANSITIVE, VERB, VOCATIVE, about, alism, aliti, alize, 
-    alli, anci, app_name, ation, ational, ative, ator, biliti, bli, blog, 
-    books_long_main, books_long_posttitle, books_long_pretitle, books_short, 
-    chapter, configure, determine_reference, done, eli, enci, entli, exec, 
-    found_plural, found_singular, ful, fulness, grammar_keywords, 
-    grammar_marker, grammar_marker_len, grammar_separator, help, ical, 
-    icate, iciti, indexOf, iveness, iviti, ization, izer, lang, length, 
-    logi, ness, ousli, ousness, paragraphs, prepare_highlighter, 
+    INTERROGATIVE, INTERROGATIVE_PRONOUN, IRREGULAR, LETTER, MASCULINE, MIDDLE, 
+    MIDDLE_DEPONENT, MIDDLE_SIGNIFICANCE, NEGATIVE, NEUTER, NOMINATIVE, 
+    NORMAL_NOUN, NOUN, NO_TENSE_STATED, NO_VOICE_STATED, NUMERICAL, OPTATIVE, 
+    OTHER, PARTICIPLE, PARTICLE, PARTICLE_ATTACHED, PASSIVE, PASSIVE_DEPONENT, 
+    PERFECT, PERSONAL_PRONOUN, PLUPERFECT, PLURAL, POSESSIVE_PRONOUN, 
+    PREPOSITION, PRESENT, PRONOUN, PROPER_NOUN, RECIPROCAL_PRONOUN, RED, 
+    REFLEXIVE_PRONOUN, RELATIVE_PRONOUN, SECOND_FORM, SECOND_PERSON, SINGULAR, 
+    SUBJUNCTIVE, SUPERLATIVE, THIRD_PERSON, TRANSITIVE, VERB, VOCATIVE, about, 
+    alism, aliti, alize, alli, anci, app_name, ation, ational, ative, ator, 
+    biliti, bli, blog, books_long_main, books_long_posttitle, 
+    books_long_pretitle, books_short, chapter, chapter_count, configure, 
+    determine_reference, done, eli, enci, entli, found_plural, found_singular, 
+    ful, fulness, grammar_keywords, grammar_marker, grammar_marker_len, 
+    grammar_separator, help, ical, icate, iciti, iveness, iviti, ization, izer, 
+    lang, logi, ness, ousli, ousness, paragraphs, prepare_highlighter, 
     prepare_search, psalm, query_explanation, red_letters, replace, self, 
-    slice, split, subscription, test, tional, title, toLowerCase, view, 
-    wrench_title
+    split, subscription, tional, title, view, wrench_title
 */
 
 /**
@@ -61,6 +60,8 @@ BF.lang = (function ()
         books_long_posttitle: ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "of Jeremiah", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "of the Apostles", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "of Jesus Christ"],
         books_long_pretitle:  ["", "The First Book of Moses, called", "The Second Book of Moses, called", "The Third Book of Moses, called", "The Fourth Book of Moses, called", "The Fifth Book of Moses, called", "The Book of", "The Book of", "The Book of", "The First book of", "The Second book of", "The First book of", "The Second book of", "The First book of", "The Second book of", "The Book of", "The Book of", "The Book of", "The Book of", "The Book of", "The Book of", "The Book of", "The Song of", "The Book of", "The Book of", "The Book of the", "The Book of", "The Book of", "The Book of", "The Book of", "The Book of", "The Book of", "The Book of", "The Book of", "The Book of", "The Book of", "The Book of", "The Book of", "The Book of", "The Book of", "The Gospel According to", "The Gospel According to", "The Gospel According to", "The Gospel According to", "", "The Epistle of Paul to the", "The First Epistle of Paul to the", "The Second Epistle of Paul to the", "The Epistle of Paul to the", "The Epistle of Paul to the", "The Epistle of Paul to the", "The Epistle of Paul to the", "The First Epistle of Paul to the", "The Second Epistle of Paul to the", "The First Epistle of Paul to", "The Second Epistle of Paul to", "The Epistle of Paul to", "The Epistle of Paul to", "The Epistle of Paul to the", "The Epistle of", "The First Epistle of", "The Second Epistle of", "The First Epistle of", "The Second Epistle of", "The Third Epistle of", "The Epistle of", ""],
         books_short:          ["", "Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy", "Joshua", "Judges", "Ruth", "1 Samuel", "2 Samuel", "1 Kings", "2 Kings", "1 Chronicles", "2 Chronicles", "Ezra", "Nehemiah", "Esther", "Job", "Psalms", "Proverbs", "Ecclesiastes", "Song of Songs", "Isaiah", "Jeremiah", "Lamentations", "Ezekiel", "Daniel", "Hosea", "Joel", "Amos", "Obadiah", "Jonah", "Micah", "Nahum", "Habakkuk", "Zephaniah", "Haggai", "Zechariah", "Malachi", "Matthew", "Mark", "Luke", "John", "Acts", "Romans", "1 Corinthians", "2 Corinthians", "Galatians", "Ephesians", "Philippians", "Colossians", "1 Thessalonians", "2 Thessalonians", "1 Timothy", "2 Timothy", "Titus", "Philemon", "Hebrews", "James", "1 Peter", "2 Peter", "1 John", "2 John", "3 John", "Jude", "Revelation"],
+        
+        chapter_count: [0, 50, 40, 27, 36, 34, 24, 21, 4, 31, 24, 22, 25, 29, 36, 10, 13, 10, 42, 150, 31, 12, 8, 66, 52, 5, 48, 12, 14, 3, 9, 1, 4, 7, 3, 3, 3, 2, 14, 4, 28, 16, 24, 21, 28, 16, 16, 13, 6, 6, 4, 4, 5, 3, 6, 4, 3, 1, 13, 5, 5, 3, 5, 1, 1, 1, 22],
         
         ///TODO: Determine if texts should be categorized.
         /// Miscellaneous Text
