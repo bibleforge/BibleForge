@@ -1102,15 +1102,15 @@
                             if (verse1.c === verse2.c) {
                                 /// Are the verses the same?
                                 if (verse1.v === verse2.v) {
-                                    ref_range = verse1.full_book + " " + verse1.c + ":" + verse1.full_verse;
+                                    ref_range = verse1.full_book + " " + (BF.lang.chapter_count[verse1.b] === 1 ? "" : verse1.c + ":") + verse1.full_verse;
                                 } else {
-                                    ref_range = verse1.full_book + " " + verse1.c + ":" + verse1.full_verse + "\u2013" + verse2.full_verse;
+                                    ref_range = verse1.full_book + " " + (BF.lang.chapter_count[verse1.b] === 1 ? "" : verse1.c + ":") + verse1.full_verse + "\u2013" + verse2.full_verse;
                                 }
                             } else {
-                                ref_range = verse1.full_book + " " + verse1.c + ":" + verse1.full_verse + "\u2013" + verse2.c + ":" + verse2.full_verse;
+                                ref_range = verse1.full_book + " " + (BF.lang.chapter_count[verse1.b] === 1 ? "" : verse1.c + ":") + verse1.full_verse + "\u2013" + (BF.lang.chapter_count[verse2.b] === 1 ? "" : verse2.c + ":") + verse2.full_verse;
                             }
                         } else {
-                            ref_range = verse1.full_book + " " + verse1.c + ":" + verse1.full_verse + "\u2013" + verse2.full_book + " " + verse2.c + ":" + verse2.full_verse;
+                            ref_range = verse1.full_book + " " + (BF.lang.chapter_count[verse1.b] === 1 ? "" : verse1.c + ":") + verse1.full_verse + "\u2013" + verse2.full_book + " " + (BF.lang.chapter_count[verse2.b] === 1 ? "" : verse2.c + ":") + verse2.full_verse;
                         }
                         
                         /// Store the query type in a variable because it may need to be accessed more than once.
@@ -1426,7 +1426,7 @@
                                     html_str += "<h1 class=short_book id=" + num + "_title>" + BF.lang.books_short[b] + "</h1>";
                                 }
                                 
-                                html_str += "<div class=search_verse id=" + num + "_search><span>" + c + ":" + v + "</span> " + verse_html[i] + "</div>";
+                                html_str += "<div class=search_verse id=" + num + "_search><span>" + (BF.lang.chapter_count[b] === 1 ? "" : c + ":") + v + "</span> " + verse_html[i] + "</div>";
                             }
                         }
                         
