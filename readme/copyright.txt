@@ -4,6 +4,7 @@ the Reciprocal Public License 1.5 (RPL1.5) which can be found in bf_rpl1.5.txt.
 The Sphinx API (sphinxapi.php) is licensed (with written permission from the author) under
 the GNU Lesser General Public License v2.1 (LGPLv2.1), which can be found in lgpl-2.1.txt.
 
+The wrench graphic is under the Creative Commons by-sa 1.0 copyright.
 
 Font licenses:
 
