@@ -246,24 +246,14 @@ body {
 .wrenchIcon {
     /* Darken the text so that it is more prominent. */
     /* Transition for Mozilla (Firefox 4.0+) */
-    -moz-transition:    opacity .6s ease, border-color .6s ease;
+    -moz-transition:    opacity .6s ease;
     /* Transition for WebKit */
-    -webkit-transition: opacity .6s ease, border-color .6s ease;
+    -webkit-transition: opacity .6s ease;
     /* Transition for Opera 10.5+ */
-    -o-transition:      opacity .6s ease, border-color .6s ease;
-    
-    /* A transparent border is needed because otherwise it would jump when the hover border appears. */
-    border-color: transparent;
-    border-color: rgba(0, 0, 0, 0);
-    border-width: 1px;
-    border-style: solid;
+    -o-transition:      opacity .6s ease;
     
     /* Fade out slightly when the mouse cursor moves off. */
     opacity: .2;
-    
-    -moz-border-radius: 6px;
-    /* Rounded corners for Opera 10.5+, IE 9+, WebKit 532.5+ (Chrome 4, Safari 5), Gecko 2 (Mozilla 4.0) */
-    border-radius:      6px;
     
     padding: 4px;
     
@@ -271,26 +261,6 @@ body {
     outline: 0;
 }
 
-/* Emulate the wrench icon being pressed.  */
-.wrenchIcon:active, .activeWrenchIcon {
-    box-shadow:         inset 2px 2px 3px rgba(0, 0, 0, .2);
-    /* Mozilla 3.5- */
-    -moz-box-shadow:    inset 2px 2px 3px rgba(0, 0, 0, .2);
-    /* WebKit 522 (Chrome, Safari 3) */
-    -webkit-box-shadow: inset 2px 2px 3px rgba(0, 0, 0, .2);
-}
-
-.wrenchIcon:hover, .wrenchPadding:hover .wrenchIcon, .activeWrenchIcon {
-    /* The speed of the border-color change is increased to make it fade in before the opacity is finished so that is looks smooth. */
-    /* Transition for Mozilla (Firefox 4.0+) */
-    -moz-transition:    opacity .6s ease, border-color .3s ease;
-    /* Transition for WebKit */
-    -webkit-transition: opacity .6s ease, border-color .3s ease;
-    /* Transition for Opera 10.5+ */
-    /*BUG: The border-color does not fade out on Opera (tested on 10.63). */ 
-    -o-transition:      opacity .6s ease, border-color .3s ease;
-    border-color: #777;
-}
 
 .contextMenu {
     display:    none;
