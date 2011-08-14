@@ -2094,7 +2094,7 @@
                     /// Force browsers to scroll one line of text at a time.
                     ///NOTE: window.pageYOffset % line_height calculates the offset from the nearest line to snap the view to a line.
                     ///TODO: Make this optional (maybe).
-                    window.scrollBy(window.pageXOffset, (line_height - (window.pageYOffset % line_height)) * (keyCode === 38 ? -1 : 1));
+                    window.scrollBy(window.pageXOffset, (keyCode === 38 ? -(window.pageYOffset % line_height) || -line_height : line_height - (window.pageYOffset % line_height)));
                     e.preventDefault();
                 } else if (keyCode === 33 || keyCode === 34) {
                     /// Scroll to the next/previous chapter on page down/up respectively.
