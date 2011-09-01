@@ -2093,7 +2093,6 @@
                 } else if (keyCode === 38 || keyCode === 40) {
                     /// Force browsers to scroll one line of text at a time.
                     ///NOTE: window.pageYOffset % line_height calculates the offset from the nearest line to snap the view to a line.
-                    ///TODO: Make this optional (maybe).
                     window.scrollBy(window.pageXOffset, (keyCode === 38 ? -(window.pageYOffset % line_height) || -line_height : line_height - (window.pageYOffset % line_height)));
                     e.preventDefault();
                 } else if (keyCode === 33 || keyCode === 34) {
@@ -2115,10 +2114,9 @@
                     
                     /// If the new book is within valid range, try to scroll to it.  If not, just let the page scroll like normal.
                     if (new_book > 0 && new_book < 67) {
-                        ///TODO:  Determine if it should use smooth scrolling.
                         ///TODO:  Determine if this should skip a chapter if it is just a verse or two away.
-                        ///TODO:  Determine if it should do something different when the chapter has not been loaded (like preform a lookup).
-                        ///FIXME: This doesn't work on Opera.
+                        ///TODO:  Determine if it should do something different when the chapter has not been loaded (like preform a lookup and then scroll).
+                        ///FIXME: This does not work in Opera.
                         if (content_manager.top_verse && content_manager.scroll_to_verse({b: new_book, c: new_chap, v: 1}, false, true)) {
                             /// Since it scrolled to the verses successfully, prevent the key press from scrolling the page like normal.
                             e.preventDefault();
@@ -2129,10 +2127,11 @@
             
             /// If there is no immediate query being preformed, look up Genesis 1:1 so that the page is not so empty.
             ///NOTE: Currently, there can be no default query.
+            ///TODO: When additional languages are available, the language will have to be determined as well.
             window.setTimeout(function ()
             {
                 if (query_manager.raw_query === "") {
-                    run_new_query("Gen");
+                    run_new_query("Genesis 1:1");
                 }
             }, 200);
             
@@ -2208,7 +2207,7 @@
     
     
     /// Prototypes
-    ///NOTE: Adds trim() to Strings for IE 8-/Opera 10.1-/Safari 4-/Mozilla 3.0-.
+    /// Adds trim() to Strings for IE 8-/Opera 10.1-/Safari 4-/Mozilla 3.0-.
     ///TODO: Remove this as soon as a non-JavaScript version of BibleForge is ready.
     if (!"".trim) {
         /**
@@ -2274,7 +2273,7 @@
      *****************************/
     
     /**
-     * Fix IE's string.split.
+     * Fix IE's String.split().
      *
      * @param  s     (regexp || string) The regular expression or string with which to break the string.
      * @param  limit (int) (optional)   The number of times to split the string.
