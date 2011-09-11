@@ -2102,11 +2102,15 @@
                     content_manager.update_verse_range(true);
                     
                     new_book = content_manager.top_verse.b;
-                    new_chap = content_manager.top_verse.c + (keyCode === 33 ? -1 : 1);
+                    /// When paging up, go up one chapter if at the top of a chapter; otherwise go to the top of the current chapter.
+                    /// When paging down, always go to the next chapter.
+                    new_chap = content_manager.top_verse.c + (keyCode === 33 ? (content_manager.top_verse.v < 2 ? -1 : 0) : 1);
                     
+                    /// Do we need to go back to the last chapter of the previous book?
                     if (new_chap < 1) {
                         new_book -= 1;
                         new_chap  = BF.lang.chapter_count[new_book];
+                    /// If the chapter does not exist, go to the first chapter of the next book.
                     } else if (new_chap > BF.lang.chapter_count[new_book]) {
                         new_book += 1;
                         new_chap  = 1;
