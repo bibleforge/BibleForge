@@ -3,3 +3,6 @@ This graphic is under the cc-by-sa 1.0 copyright.
 
 The favicon contains an element derived from Alexandre Moore's nuoveXT2 icon set (http://nuovext.pwsp.net/).
 The nuoveXT2 icon set is licensed under the LGPL 2.1 license.
+
+The magnifying glass graphic was derived from Derferman's public domain Magnifying glass icon.svg
+(http://commons.wikimedia.org/wiki/File:Magnifying_glass_icon.svg).
