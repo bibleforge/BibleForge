@@ -56,7 +56,7 @@
     BF.is_WebKit = Boolean(window.chrome) || window.navigator.userAgent.indexOf("WebKit/") >= 0;
     
     ///NOTE: Usually, eval() and JSON.parse() are similar in speed and the Function Constructor is really slow.
-    ///      However, in Chrome, eval() is really fast, the Function Constructor is even faster, and JSON.parse() is ridiculously slow.
+    ///      However, in Chromium (tested up to 15), eval() is really fast, the Function Constructor is even faster, and JSON.parse() is ridiculously slow.
     ///      Therefore, use the Function Constructor for Chrome and JSON.parse() for all others.
     ///NOTE: It could also check to make sure that the string starts with a curly bracket ({) straight bracket ([) double quote (") or number (hyphen (-) or digit) to attempt to ensure that it is valid JSON.
     /**
@@ -2093,7 +2093,7 @@
                 } else if (keyCode === 38 || keyCode === 40) {
                     /// Force browsers to scroll one line of text at a time.
                     ///NOTE: window.pageYOffset % line_height calculates the offset from the nearest line to snap the view to a line.
-                    window.scrollBy(window.pageXOffset, (keyCode === 38 ? -(window.pageYOffset % line_height) || -line_height : line_height - (window.pageYOffset % line_height)));
+                    window.scrollBy(window.pageXOffset, (keyCode === 38 ? -window.pageYOffset % line_height || -line_height : line_height - (window.pageYOffset % line_height)));
                     e.preventDefault();
                 } else if (keyCode === 33 || keyCode === 34) {
                     /// Scroll to the next/previous chapter on page down/up respectively.
