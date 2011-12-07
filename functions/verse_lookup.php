@@ -19,7 +19,7 @@
  * @param   $direction  (integer) The direction of the verses to be retrieved: ADDITIONAL || PREVIOUS.
  * @param   $limit      (integer) The maximum number of verses to return.
  * @return  NULL.       Data is sent to the buffer as a JSON array, and then execution ends.
- * @note    Called by run_search().
+ * @note    Called in query.php.
  */
 function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true, $find_paragraph_start = false)
 {

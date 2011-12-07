@@ -34,6 +34,7 @@ if (get_magic_quotes_gpc()) {
 
 /// Load constants.
 require_once 'config.php';
+require_once 'constants.php';
 
 /// Query Variables:
 /// d Direction (number)  The direction of the query (ADDITIONAL, PREVIOUS)      (lookup only)
