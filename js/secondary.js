@@ -346,14 +346,14 @@
             var hide_cursor_timeout,
                 is_cursor_visible = true,
                 
-                pointer_selector = ".verse a, .verse span, .search_verse a, .search_verse span, .first_verse a, .psalm_title a, .subscription a",
-                pointer_style    = "cursor: auto;",
+                pointer_selector = ".scrolls a",
+                pointer_style    = "cursor: pointer;",
                 
                 /// Special variables needed for an ugly WebKit hack.
                 webkit_cursor_hack,
                 webkit_ignore_event_once;
                 
-            /// Make the cursor become a hand when hovering over words and verse references.
+            /// Make the cursor look like a hand to indicate that the words are clickable.
             BF.changeCSS(pointer_selector, pointer_style, true);
             
             ///NOTE: Webkit only changes the mouse cursor after the mouse cursor moves, making cursor hiding impossible.
