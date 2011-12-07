@@ -608,6 +608,11 @@ h2 {
     color: #D00;
 }
 
+/* Make the cursor look like a hand to indicate that the words are clickable. */
+.scrolls a {
+    cursor: pointer;
+}
+
 
 /* Highlighted found words from searches */
 .f1  {

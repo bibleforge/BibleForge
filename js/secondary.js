@@ -836,6 +836,9 @@
         }());
         
         
+        /**
+         * Snap mouse wheel scrolling.
+         */
         (function ()
         {
             var mousewheel_scroller = function (e)
@@ -857,5 +860,31 @@
             /// Mozilla
             window.addEventListener("DOMMouseScroll", mousewheel_scroller, false);
         }());
+        
+        /**
+         * Look up lexical data.
+         */
+        (function ()
+        {
+            var ajax = new BF.Create_easy_ajax();
+            
+            page.addEventListener("click", function(e)
+            {
+                ///NOTE: IE/Chromium/Safari/Opera use srcElement, Firefox uses originalTarget.
+                var clicked_el = e.srcElement || e.originalTarget;
+                
+                /// All words in the text are in <a> tags.
+                if (clicked_el && clicked_el.tagName === "A") {
+                    ///TODO: Determine if the lexicon query (type 5) should be defined somewhere.
+                    ajax.query("post", "query.php", "t=5&q=" + clicked_el.id, function (data)
+                    {
+                        ///TODO: Do something with the data.
+                    });
+                }
+            }, false);
+
+        }());
+
+        
     };
 }());
