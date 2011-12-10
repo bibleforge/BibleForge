@@ -514,10 +514,10 @@ label {
     background-image:         linear-gradient(left top, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
 }
 .callout .pointer-up {
-    -moz-box-shadow:    -2px -3px 6px rgba(0, 0, 0, .16);
-    -webkit-box-shadow: -2px -3px 6px rgba(0, 0, 0, .16);
-    -ms-box-shadow:     -2px -3px 6px rgba(0, 0, 0, .16);
-    box-shadow:         -2px -3px 6px rgba(0, 0, 0, .16);
+    -moz-box-shadow:    -2px -3px 4px rgba(0, 0, 0, .12);
+    -webkit-box-shadow: -2px -3px 4px rgba(0, 0, 0, .12);
+    -ms-box-shadow:     -2px -3px 4px rgba(0, 0, 0, .12);
+    box-shadow:         -2px -3px 4px rgba(0, 0, 0, .12);
     -moz-transform:    rotate(45deg);
     -webkit-transform: rotate(45deg);
     -o-transform:      rotate(45deg);
