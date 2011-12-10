@@ -464,6 +464,82 @@ label {
     cursor: pointer;
 }
 
+.callout {
+    -moz-border-radius: 9px;
+    border-radius:      9px;
+    -moz-box-shadow:    3px 3px 6px rgba(0, 0, 0, .2), inset -1px 0 2px rgba(0, 0, 0, .2);
+    -webkit-box-shadow: 3px 3px 6px rgba(0, 0, 0, .2), inset -1px 0 2px rgba(0, 0, 0, .2);
+    -ms-box-shadow:     3px 3px 6px rgba(0, 0, 0, .2), inset -1px 0 2px rgba(0, 0, 0, .2);
+    box-shadow:         3px 3px 6px rgba(0, 0, 0, .2), inset -1px 0 2px rgba(0, 0, 0, .2);
+    background: #FFF;
+    background: rgba(255, 255, 255, .95);
+    position: absolute;
+    border: #ccc solid 1px;
+    padding: 4px;
+    font-family: arial;
+    font-size: 16px;
+    min-width: 46px;
+    max-width: 95%;
+    max-height: 90%;
+    width:  300px;
+    height: 125px;
+}
+.callout .inside {
+    overflow: auto;
+    height: 100%;
+}
+.callout .pointer-down {
+    -moz-box-shadow:    5px 3px 6px rgba(0, 0, 0, .16);
+    -webkit-box-shadow: 5px 3px 6px rgba(0, 0, 0, .16);
+    -ms-box-shadow:     5px 3px 6px rgba(0, 0, 0, .16);
+    box-shadow:         5px 3px 6px rgba(0, 0, 0, .16);
+    -moz-transform:    rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    -o-transform:      rotate(45deg);
+    -ms-transform:     rotate(45deg);
+    transform:         rotate(45deg);
+    height: 20px;
+    margin: -6px 0 0 12px;
+    position: absolute;
+    width: 20px;
+    border-bottom: #ccc solid 1px;
+    border-right:  #ccc solid 1px;
+    /* Firefox 3.6+ */
+    background-image:    -moz-linear-gradient(left top, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
+    /* Chrome/Safari 5.1+ */
+    background-image: -webkit-linear-gradient(left top, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
+    background-image:      -o-linear-gradient(left top, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
+    /* IE 10 */
+    background-image:     -ms-linear-gradient(left top, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
+    background-image:         linear-gradient(left top, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
+}
+.callout .pointer-up {
+    -moz-box-shadow:    -2px -3px 6px rgba(0, 0, 0, .16);
+    -webkit-box-shadow: -2px -3px 6px rgba(0, 0, 0, .16);
+    -ms-box-shadow:     -2px -3px 6px rgba(0, 0, 0, .16);
+    box-shadow:         -2px -3px 6px rgba(0, 0, 0, .16);
+    -moz-transform:    rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    -o-transform:      rotate(45deg);
+    -ms-transform:     rotate(45deg);
+    transform:         rotate(45deg);
+    height: 20px;
+    margin: -15px 0 0 12px;
+    position: absolute;
+    width: 20px;
+    border-top: #ccc solid 1px;
+    border-left:  #ccc solid 1px;
+    /* Firefox 3.6+ */
+    background-image:    -moz-linear-gradient(right bottom, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
+    /* Chrome/Safari 5.1+ */
+    background-image: -webkit-linear-gradient(right bottom, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
+    background-image:      -o-linear-gradient(right bottom, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
+    /* IE 10 */
+    background-image:     -ms-linear-gradient(right bottom, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
+    background-image:         linear-gradient(right bottom, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
+}
+
+
 
 /* Verses created from a search. */
 .search_verse {
