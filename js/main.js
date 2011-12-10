@@ -427,12 +427,11 @@
                 additional = 1,
                 previous   = 2,
                 
-                topBar_height = topLoader.offsetHeight,
-                
                 /// Objects
                 content_manager,
-                settings,
-                query_manager;
+                properties = {topBar_height: topLoader.offsetHeight},
+                query_manager,
+                settings;
             
             /// Keep track of which view port this is.
             ///NOTE: In the future, there may be a split view mode.  Currently, this is NOT used.
@@ -1067,7 +1066,7 @@
                             verse2;
                         
                         ///NOTE: Check a few pixels (8) below what is actually in view so that it finds the verse that is actually readable.
-                        verse1 = get_verse_at_position(window.pageYOffset + topBar_height + 8,  true,  page);
+                        verse1 = get_verse_at_position(window.pageYOffset + properties.topBar_height + 8,  true,  page);
                         
                         /// If a verse was found, check for the bottom verse.
                         ///NOTE: Check a few pixels (14) above what is actually in view so that it finds the verse that is actually readable.
@@ -1274,7 +1273,7 @@
                         
                         /// Calculate the verse's Y coordinate.
                         ///NOTE: "- topBar_height" subtracts off the height of the top bar.
-                        scroll_view_to(BF.get_position(verse_el).top - topBar_height, null, smooth, allow_lookup);
+                        scroll_view_to(BF.get_position(verse_el).top - properties.topBar_height, null, smooth, allow_lookup);
                         
                         return true;
                     },
@@ -2144,10 +2143,11 @@
             window.setTimeout(function ()
             {
                 BF.include("js/secondary.js", {
+                    page:         page,
+                    properties:   properties,
                     settings:     settings,
                     topBar:       viewPort.firstChild,
-                    viewPort_num: viewPort_num,
-                    page:         page
+                    viewPort_num: viewPort_num
                 });
             }, 1000);
         }());
