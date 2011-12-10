@@ -866,12 +866,71 @@
          */
         (function ()
         {
-            var ajax = new BF.Create_easy_ajax();
+            var create_callout;
+            
+            create_callout = (function ()
+            {
+                var pointer_height   = 10,
+                    pointer_distance = 28;
+                
+                function adjust_pointer(callout, pointer_before, pointer_after, point_to, users_preference)
+                {
+                    var middle_x = point_to.offsetLeft + (point_to.offsetWidth / 2);
+                    if (!users_preference) {
+                        /// First, try to put the bubble above the word.
+                        if (callout.offsetHeight + pointer_height < point_to.offsetTop - context.properties.topBar_height - window.pageYOffset) {
+                            callout.style.top = (point_to.offsetTop - callout.offsetHeight - pointer_height) + "px";
+                            pointer_after.className = "pointer-down";
+                            pointer_before.style.display = "none";
+                        /// Next try the bottom.
+                        } else if (callout.offsetHeight + pointer_height < window.innerHeight - (window.pageYOffset - point_to.offsetTop - point_to.offsetHeight)) {
+                            callout.style.top = (point_to.offsetTop + point_to.offsetHeight + pointer_height) + "px";
+                            pointer_before.className = "pointer-up";
+                            pointer_after.style.display = "none";
+                        } else {
+                            callout.style.top = "300px";
+                        }
+                        
+                        /// Try to put the pointer on the left.
+                        ///TODO: Include rounded corners in calculation.
+                        if (window.innerWidth - middle_x > callout.offsetWidth) {
+                            callout.style.left = (middle_x - pointer_distance) + "px";
+                        } else {
+                            callout.style.left = "300px";
+                        }
+                        
+                    }
+                }
+                
+                return function (point_to) {
+                    var callout = document.createElement("div"),
+                        inside  = document.createElement("div"),
+                        pointer_before = document.createElement("div"),
+                        pointer_after  = document.createElement("div");
+                    
+                    callout.className = "callout";
+                    inside.className = "inside";
+                    inside.innerHTML = "Loading";
+                    callout.appendChild(pointer_before);
+                    callout.appendChild(inside);
+                    callout.appendChild(pointer_after);
+                    
+                    /// The element must be in the DOM tree in order for it to have a height and width.
+                    document.body.appendChild(callout);
+                    
+                    adjust_pointer(callout, pointer_before, pointer_after, point_to);
+                    
+                    
+                    return inside;
+                }
+            }());
             
             page.addEventListener("click", function(e)
             {
-                ///NOTE: IE/Chromium/Safari/Opera use srcElement, Firefox uses originalTarget.
-                var clicked_el = e.srcElement || e.originalTarget;
+                var ajax = new BF.Create_easy_ajax(),
+                    callout,
+                    ///NOTE: IE/Chromium/Safari/Opera use srcElement, Firefox uses originalTarget.
+                    clicked_el = e.srcElement || e.originalTarget;
                 
                 /// All words in the text are in <a> tags.
                 if (clicked_el && clicked_el.tagName === "A") {
@@ -879,10 +938,13 @@
                     ajax.query("post", "query.php", "t=5&q=" + clicked_el.id, function (data)
                     {
                         ///TODO: Do something with the data.
+                        data = BF.parse_json(data);
+                        callout.innerHTML = data.word;
                     });
+                    
+                    callout = create_callout(clicked_el);
                 }
             }, false);
-
         }());
 
         
