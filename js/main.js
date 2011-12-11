@@ -430,9 +430,9 @@
                 
                 /// Objects
                 content_manager,
-                properties = {topBar_height: topLoader.offsetHeight},
                 query_manager,
-                settings;
+                settings,
+                system;
             
             /// Keep track of which view port this is.
             ///NOTE: In the future, there may be a split view mode.  Currently, this is NOT used.
@@ -509,11 +509,25 @@
                             ///TODO: Add other options, such as custom color, and (in the future) highlighting of other people's words (e.g., highlight the words of Paul in blue).
                             BF.changeCSS(".q", "color: " + (values.new_val ? "#D00;" : "#000;"));
                         })
-                    },
-                    system: {
-                        line_height: create_get_set(19, function () {})
                     }
                 };
+                system = {
+                    attachEvent: (function ()
+                    {
+                        var func_list = [];
+                        
+                        return function (name, func)
+                        {
+                        
+                        };
+                    }()),
+                    properties: {
+                        ///TODO: Determine if these should be read only or a get/set function.
+                        line_height: 19,
+                        topBar_height: topLoader.offsetHeight
+                    }
+                }
+                
             }());
             
             /******************************
@@ -1067,7 +1081,7 @@
                             verse2;
                         
                         ///NOTE: Check a few pixels (8) below what is actually in view so that it finds the verse that is actually readable.
-                        verse1 = get_verse_at_position(window.pageYOffset + properties.topBar_height + 8,  true,  page);
+                        verse1 = get_verse_at_position(window.pageYOffset + system.properties.topBar_height + 8,  true,  page);
                         
                         /// If a verse was found, check for the bottom verse.
                         ///NOTE: Check a few pixels (14) above what is actually in view so that it finds the verse that is actually readable.
@@ -1274,7 +1288,7 @@
                         
                         /// Calculate the verse's Y coordinate.
                         ///NOTE: "- topBar_height" subtracts off the height of the top bar.
-                        scroll_view_to(BF.get_position(verse_el).top - properties.topBar_height, null, smooth, allow_lookup);
+                        scroll_view_to(BF.get_position(verse_el).top - system.properties.topBar_height, null, smooth, allow_lookup);
                         
                         return true;
                     },
@@ -2056,7 +2070,7 @@
                     keyCode,
                     new_book,
                     new_chap,
-                    line_height = settings.system.line_height.get();
+                    line_height = system.properties.line_height;
                 
                 /// Are there input boxes selected (not including images)?  If so, this function should not be executed.
                 ///NOTE: In the future, other elements, such as, TEXTAREA or buttons, may also need to be detected.
@@ -2145,8 +2159,8 @@
             {
                 BF.include("js/secondary.js", {
                     page:         page,
-                    properties:   properties,
                     settings:     settings,
+                    system:       system,
                     topBar:       viewPort.firstChild,
                     viewPort_num: viewPort_num
                 });

@@ -837,7 +837,7 @@
                 /// Mozilla's DOMMouseScroll event supports event.details.
                 ///NOTE: e.details differs from e.wheelDelta in the amount and sign.
                 var delta = (typeof e.wheelDelta !== "undefined" ? e.wheelDelta : -e.detail),
-                    line_height = context.settings.system.line_height.get();
+                    line_height = context.system.properties.line_height;
                 
                 /// Force the browser to scroll three lines of text up or down.
                 ///NOTE: window.pageYOffset % line_height calculates the offset from the nearest line to snap the view to a line.
@@ -872,7 +872,7 @@
                     
                     if (!users_preference) {
                         /// First, try to put the bubble above the word.
-                        if (callout.offsetHeight + pointer_height < point_to.offsetTop - context.properties.topBar_height - window.pageYOffset) {
+                        if (callout.offsetHeight + pointer_height < point_to.offsetTop - context.system.properties.topBar_height - window.pageYOffset) {
                             callout.style.top = (point_to.offsetTop - callout.offsetHeight - pointer_height) + "px";
                             pointer_after.className = "pointer-down";
                             pointer_before.style.display = "none";
