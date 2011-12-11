@@ -12,25 +12,25 @@
 /*global document, window, BF */
 
 /// Set JSLint options.
-/*jslint evil: true, continue: true, regexp: true, type: true, indent: 4, white: true */
+/*jslint evil: true, continue: true, regexp: true, indent: 4, white: true */
 
 /// Indicate all object properties used.  JSLint checks this list for misspellings.
-/*properties Create_easy_ajax, about, addEventListener, alt, appendChild,
-    blog, body, borderTop, button, changeCSS, checked, childNodes,
-    className, clearTimeout, clientWidth, cloneContents, configure,
-    createElement, createRange, createTextNode, cssText, cssTransitions,
-    currentTarget, cursor, detail, display, done, get, getRangeAt,
-    getSelection, get_position, help, href, htmlFor, htmlText, id,
-    innerHTML, innerHeight, insertBefore, insertCell, insertRow, is_WebKit,
-    lang, left, length, line, line_height, link, maxHeight, maxWidth, name,
-    nodeName, offsetHeight, offsetWidth, onchange, onclick, onfocus,
-    onmousemove, onmouseout, onmouseup, opacity, options, originalTarget,
-    page, pageXOffset, pageYOffset, paragraphs, parentNode, preventDefault,
-    query, red_letters, relatedTarget, removeChild, removeEventListener,
-    scrollBy, scrollLeft, selection, set, setTimeout, settings, src,
-    srcElement, stopPropagation, style, system, tagName, target, text,
-    title, top, topBar, type, value, view, viewPort_num, wheelDelta,
-    wrench_title
+/*properties
+    Create_easy_ajax, about, addEventListener, align_callout, alt, appendChild, 
+    blog, body, borderTop, button, changeCSS, checked, childNodes, className, 
+    clearTimeout, clientWidth, configure, createElement, createTextNode, 
+    cssText, cssTransitions, currentTarget, cursor, detail, display, done, get, 
+    get_position, help, href, htmlFor, id, innerHTML, innerHeight, innerWidth, 
+    insertBefore, insertCell, insertRow, is_WebKit, lang, left, length, line, 
+    line_height, link, maxHeight, maxWidth, name, nodeName, offsetHeight, 
+    offsetLeft, offsetTop, offsetWidth, onchange, onclick, onfocus, 
+    onmousemove, onmouseout, opacity, options, originalTarget, page, 
+    pageXOffset, pageYOffset, paragraphs, parentNode, parse_json, 
+    preventDefault, properties, query, red_letters, relatedTarget, removeChild, 
+    removeEventListener, replace_HTML, scrollBy, scrollLeft, set, setTimeout, 
+    settings, src, srcElement, stopPropagation, style, system, tagName, target, 
+    text, title, top, topBar, topBar_height, type, value, view, viewPort_num, 
+    wheelDelta, word, wrench_title
 */
 
 (function ()
