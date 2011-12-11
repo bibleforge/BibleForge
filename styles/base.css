@@ -502,10 +502,10 @@ label {
     height: 100%;
 }
 .callout .pointer-down {
-    -moz-box-shadow:    5px 3px 6px rgba(0, 0, 0, .16);
-    -webkit-box-shadow: 5px 3px 6px rgba(0, 0, 0, .16);
-    -ms-box-shadow:     5px 3px 6px rgba(0, 0, 0, .16);
-    box-shadow:         5px 3px 6px rgba(0, 0, 0, .16);
+    -moz-box-shadow:    5px 3px 6px -2px rgba(0,0,0,.2);
+    -webkit-box-shadow: 5px 3px 6px -2px rgba(0,0,0,.2);
+    -ms-box-shadow:     5px 3px 6px -2px rgba(0,0,0,.2);
+    box-shadow:         5px 3px 6px -2px rgba(0,0,0,.2);
     -moz-transform:    rotate(45deg);
     -webkit-transform: rotate(45deg);
     -o-transform:      rotate(45deg);
@@ -527,10 +527,10 @@ label {
     background-image:         linear-gradient(left top, rgba(255,255,255,0) 45%, rgba(240,240,240,.97) 45%);
 }
 .callout .pointer-up {
-    -moz-box-shadow:    -2px -3px 4px rgba(0, 0, 0, .12);
-    -webkit-box-shadow: -2px -3px 4px rgba(0, 0, 0, .12);
-    -ms-box-shadow:     -2px -3px 4px rgba(0, 0, 0, .12);
-    box-shadow:         -2px -3px 4px rgba(0, 0, 0, .12);
+    -moz-box-shadow:    -1px -3px 6px -3px rgba(0,0,0,.2);
+    -webkit-box-shadow: -1px -3px 6px -3px rgba(0,0,0,.2);
+    -ms-box-shadow:     -1px -3px 6px -3px rgba(0,0,0,.2);
+    box-shadow:         -1px -3px 6px -3px rgba(0,0,0,.2);
     -moz-transform:    rotate(45deg);
     -webkit-transform: rotate(45deg);
     -o-transform:      rotate(45deg);
