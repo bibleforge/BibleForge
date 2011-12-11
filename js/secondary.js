@@ -115,10 +115,9 @@
             function open_menu(x_pos, y_pos, menu_items, open_callback, close_callback)
             {
                 var i,
-                    menu_container        = document.createElement("div"),
-                    menu_count            = menu_items.length,
-                    menu_item,
-                    prev_document_onclick = document.onclick || function () {};
+                    menu_container = document.createElement("div"),
+                    menu_count = menu_items.length,
+                    menu_item;
                 
                 is_open = true;
                 
@@ -162,18 +161,11 @@
                  * @return NULL.
                  * @bug    Firefox 3.6 Does not close the menu when clicking the query box the first time.  However, it does close after submitting the query.
                  */
-                document.onclick = function ()
+                document.addEventListener("click", function ()
                 {
                     /// Close the context menu if the user clicks the page.
                     close_menu(close_callback);
-                    
-                    /// Re-assign the onclick() code back to document.onclick now that this code has finished its purpose.
-                    ///TODO: If multiple functions attempt to reassign a global event function, there could be problems; figure out a better way to do this,
-                    ///      such as creating a function that handles all event re-assignments and attaching it to the BF object.
-                    document.onclick = prev_document_onclick;
-                    /// Run any code that normally would have run when the page is clicked.
-                    prev_document_onclick();
-                };
+                }, false);
                 
                 /// A delay is needed in order for the CSS transition to occur.
                 window.setTimeout(function ()
@@ -830,7 +822,6 @@
                 });
                 
                 /// Stop the even from bubbling so that document.onclick() does not fire and attempt to close the menu immediately.
-                ///TODO: Determine if stopping propagation causes or could cause problems with other events.
                 e.stopPropagation();
             };
         }());
