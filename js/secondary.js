@@ -857,7 +857,8 @@
          */
         (function ()
         {
-            var create_callout;
+            var create_callout,
+                callout_clicked = false;
             
             create_callout = (function ()
             {
@@ -907,6 +908,13 @@
                     callout.appendChild(pointer_before);
                     callout.appendChild(inside);
                     callout.appendChild(pointer_after);
+                    
+                    /// Because non-pinned callouts are closed when the user clicks off,
+                    /// we notify the document.onclick() function that a callout was clicked on so it will ignore the click.
+                    callout.addEventListener("click", function (e)
+                    {
+                        callout_clicked = true;
+                    }, false);
                     
                     /// The element must be in the DOM tree in order for it to have a height and width.
                     document.body.appendChild(callout);
@@ -973,6 +981,12 @@
                     var i,
                         callouts_len = callouts.length,
                         new_arr = [];
+                    
+                    /// Did the user click on a callout?
+                    if (callout_clicked) {
+                        callout_clicked = false;
+                        return;
+                    }
                     
                     for (i = 0; i < callouts_len; i += 1) {
                         if (callouts[i].pinned || callouts[i].just_created) {
