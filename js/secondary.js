@@ -861,7 +861,7 @@
             
             create_callout = (function ()
             {
-                var pointer_height   = 10,
+                var pointer_height   = 12,
                     pointer_distance = 28;
                 
                 function adjust_pointer(callout, pointer_before, pointer_after, point_to, users_preference)
