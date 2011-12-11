@@ -867,7 +867,8 @@
                 
                 function adjust_pointer(callout, pointer_before, pointer_after, point_to, users_preference)
                 {
-                    var middle_x = point_to.offsetLeft + (point_to.offsetWidth / 2);
+                    var middle_x = point_to.offsetLeft + (point_to.offsetWidth / 2),
+                        pointer_used;
                     
                     if (!users_preference) {
                         /// First, try to put the bubble above the word.
@@ -875,21 +876,29 @@
                             callout.style.top = (point_to.offsetTop - callout.offsetHeight - pointer_height) + "px";
                             pointer_after.className = "pointer-down";
                             pointer_before.style.display = "none";
+                            pointer_used = pointer_after;
                         /// Next try the bottom.
                         } else if (callout.offsetHeight + pointer_height < window.innerHeight - (window.pageYOffset - point_to.offsetTop - point_to.offsetHeight)) {
                             callout.style.top = (point_to.offsetTop + point_to.offsetHeight + pointer_height) + "px";
                             pointer_before.className = "pointer-up";
                             pointer_after.style.display = "none";
+                            pointer_used = pointer_before;
                         } else {
+                            ///TODO: Also try to put it on the left and right.
+                            ///TODO: Since it cannot fit, just try to center it on the page.
                             callout.style.top = "300px";
+                            callout.style.left = "300px";
+                            return;
                         }
                         
                         /// Try to put the pointer on the left.
                         ///TODO: Include rounded corners in calculation.
                         if (window.innerWidth - middle_x > callout.offsetWidth) {
                             callout.style.left = (middle_x - pointer_distance) + "px";
+                            pointer_used.style.marginLeft = "12px";
                         } else {
-                            callout.style.left = "300px";
+                            callout.style.left = (window.innerWidth - callout.offsetWidth - pointer_distance) + "px";
+                            pointer_used.style.marginLeft = (middle_x - (window.innerWidth - callout.offsetWidth - (pointer_distance / 2) + 2)) + "px";
                         }
                         
                     }
@@ -944,7 +953,7 @@
                     window.setTimeout(function ()
                     {
                         callout_obj.just_created = false;
-                    }, 400);
+                    }, 200);
                     
                     return callout_obj;
                 };
@@ -976,11 +985,16 @@
                     }
                 }, false);
                 
-                document.addEventListener("click", function ()
+                document.addEventListener("click", function (e)
                 {
                     var i,
                         callouts_len = callouts.length,
                         new_arr = [];
+                    
+                    /// Are there no callouts or is the Ctrl key pressed?
+                    if (i > 0 || e.ctrlKey) {
+                        return;
+                    }
                     
                     /// Did the user click on a callout?
                     if (callout_clicked) {
