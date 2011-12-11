@@ -59,11 +59,14 @@ body {
     background:	#FFF;
     /* Transparent white background for Firefox 3.5-/Opera 10 */
     background:	rgba(255,255,255,.9);
-    /*TODO: Determine if gradients increase CPU usage significantly? */
-    /* Transparent white gradient for Firefox 3.6+ */
-    background:	-moz-linear-gradient(rgba(255,255,255,.98), rgba(255,255,255,.93) 25%, rgba(255,255,255,.9));
-    /* Transparent white gradient for WebKit */
-    background:	-webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(255,255,255,.96)), color-stop(.25, rgba(255,255,255,.92)), color-stop(1, rgba(255,255,255,.9)));
+    /* Firefox 3.6+ */
+    background:	   -moz-linear-gradient(rgba(255,255,255,.98), rgba(255,255,255,.93) 25%, rgba(255,255,255,.9));
+    /* Chrome/Safari 5.1+ */
+    background:	-webkit-linear-gradient(rgba(255,255,255,.98), rgba(255,255,255,.93) 25%, rgba(255,255,255,.9));
+    background:	     -o-linear-gradient(rgba(255,255,255,.98), rgba(255,255,255,.93) 25%, rgba(255,255,255,.9));
+    /* IE 10 */
+    background:	    -ms-linear-gradient(rgba(255,255,255,.98), rgba(255,255,255,.93) 25%, rgba(255,255,255,.9));
+    background:	        linear-gradient(rgba(255,255,255,.98), rgba(255,255,255,.93) 25%, rgba(255,255,255,.9));
     width:		100%;
     height:		100%;
     text-align: center;
