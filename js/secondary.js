@@ -867,6 +867,7 @@
                 function adjust_pointer(callout, pointer_before, pointer_after, point_to, users_preference)
                 {
                     var middle_x = point_to.offsetLeft + (point_to.offsetWidth / 2);
+                    
                     if (!users_preference) {
                         /// First, try to put the bubble above the word.
                         if (callout.offsetHeight + pointer_height < point_to.offsetTop - context.properties.topBar_height - window.pageYOffset) {
@@ -897,7 +898,8 @@
                     var callout = document.createElement("div"),
                         inside  = document.createElement("div"),
                         pointer_before = document.createElement("div"),
-                        pointer_after  = document.createElement("div");
+                        pointer_after  = document.createElement("div"),
+                        callout_obj;
                     
                     callout.className = "callout";
                     inside.className = "inside";
@@ -909,33 +911,51 @@
                     /// The element must be in the DOM tree in order for it to have a height and width.
                     document.body.appendChild(callout);
                     
-                    adjust_pointer(callout, pointer_before, pointer_after, point_to);
+                    callout_obj = {
+                        align_callout: function ()
+                        {
+                            adjust_pointer(callout, pointer_before, pointer_after, point_to);
+                        },
+                        replace_HTML: function (html)
+                        {
+                            inside.innerHTML = html;
+                        }
+                    };
                     
+                    callout_obj.align_callout();
                     
-                    return inside;
-                }
+                    return callout_obj;
+                };
             }());
             
-            page.addEventListener("click", function(e)
+            (function ()
             {
-                var ajax = new BF.Create_easy_ajax(),
-                    callout,
-                    ///NOTE: IE/Chromium/Safari/Opera use srcElement, Firefox uses originalTarget.
-                    clicked_el = e.srcElement || e.originalTarget;
+                var callouts = [];
                 
-                /// All words in the text are in <a> tags.
-                if (clicked_el && clicked_el.tagName === "A") {
-                    ///TODO: Determine if the lexicon query (type 5) should be defined somewhere.
-                    ajax.query("post", "query.php", "t=5&q=" + clicked_el.id, function (data)
-                    {
-                        ///TODO: Do something with the data.
-                        data = BF.parse_json(data);
-                        callout.innerHTML = data.word;
-                    });
+                page.addEventListener("click", function(e)
+                {
+                    var ajax = new BF.Create_easy_ajax(),
+                        callout,
+                        ///NOTE: IE/Chromium/Safari/Opera use srcElement, Firefox uses originalTarget.
+                        clicked_el = e.srcElement || e.originalTarget;
                     
-                    callout = create_callout(clicked_el);
-                }
-            }, false);
+                    /// All words in the text are in <a> tags.
+                    if (clicked_el && clicked_el.tagName === "A") {
+                        ///TODO: Determine if the lexicon query (type 5) should be defined somewhere.
+                        ajax.query("post", "query.php", "t=5&q=" + clicked_el.id, function (data)
+                        {
+                            ///TODO: Do something with the data.
+                            data = BF.parse_json(data);
+                            callout.replace_HTML(data.word);
+                        });
+                        
+                        callout = create_callout(clicked_el);
+                        callouts[callouts.length - 1] = callout;
+                    }
+                }, false);
+                
+                
+            }());
         }());
 
         
