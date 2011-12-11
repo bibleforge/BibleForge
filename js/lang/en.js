@@ -12,7 +12,7 @@
 /*global window, BF */
 
 /// Set JSLint options.
-/*jslint evil: true, continue: true, regexp: true, indent: 4, white: true */
+/*jslint continue: true, regexp: true, indent: 4, white: true */
 
 /// Indicate all object properties used.  JSLint checks this list for misspellings.
 /*properties
