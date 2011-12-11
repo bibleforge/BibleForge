@@ -912,17 +912,31 @@
                     document.body.appendChild(callout);
                     
                     callout_obj = {
+                        /// Methods
                         align_callout: function ()
                         {
                             adjust_pointer(callout, pointer_before, pointer_after, point_to);
                         },
+                        destroy: function ()
+                        {
+                            document.body.removeChild(callout);
+                        },
                         replace_HTML: function (html)
                         {
                             inside.innerHTML = html;
-                        }
+                        },
+                        
+                        /// Properties
+                        just_created: true
                     };
                     
                     callout_obj.align_callout();
+                    
+                    /// Prevent the callout from being destroyed by the document.onclick function that will fire momentarily.
+                    window.setTimeout(function ()
+                    {
+                        callout_obj.just_created = false;
+                    }, 400);
                     
                     return callout_obj;
                 };
@@ -950,11 +964,25 @@
                         });
                         
                         callout = create_callout(clicked_el);
-                        callouts[callouts.length - 1] = callout;
+                        callouts[callouts.length] = callout;
                     }
                 }, false);
                 
-                
+                document.addEventListener("click", function ()
+                {
+                    var i,
+                        callouts_len = callouts.length,
+                        new_arr = [];
+                    
+                    for (i = 0; i < callouts_len; i += 1) {
+                        if (callouts[i].pinned || callouts[i].just_created) {
+                            new_arr[new_arr.length] = callouts[i];
+                        } else {
+                            callouts[i].destroy();
+                        }
+                    }
+                    callouts = new_arr;
+                }, false);
             }());
         }());
 
