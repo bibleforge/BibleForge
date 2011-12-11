@@ -478,6 +478,14 @@ label {
     box-shadow:         3px 3px 6px rgba(0, 0, 0, .2), inset -1px 0 2px rgba(0, 0, 0, .2);
     background: #FFF;
     background: rgba(255, 255, 255, .95);
+    /* Firefox 3.6+ */
+    background:    -moz-linear-gradient(bottom, rgba(240,240,240,.97), rgba(255,255,255,.97) 47%);
+    /* Chrome/Safari 5.1+ */
+    background: -webkit-linear-gradient(bottom, rgba(240,240,240,.97), rgba(255,255,255,.97) 47%);
+    background:      -o-linear-gradient(bottom, rgba(240,240,240,.97), rgba(255,255,255,.97) 47%);
+    /* IE 10 */
+    background:     -ms-linear-gradient(bottom, rgba(240,240,240,.97), rgba(255,255,255,.97) 47%);
+    background:         linear-gradient(bottom, rgba(240,240,240,.97), rgba(255,255,255,.97) 47%);
     position: absolute;
     border: #ccc solid 1px;
     padding: 4px;
@@ -510,13 +518,13 @@ label {
     border-bottom: #ccc solid 1px;
     border-right:  #ccc solid 1px;
     /* Firefox 3.6+ */
-    background-image:    -moz-linear-gradient(left top, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
+    background-image:    -moz-linear-gradient(left top, rgba(255,255,255,0) 45%, rgba(240,240,240,.97) 45%);
     /* Chrome/Safari 5.1+ */
-    background-image: -webkit-linear-gradient(left top, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
-    background-image:      -o-linear-gradient(left top, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
+    background-image: -webkit-linear-gradient(left top, rgba(255,255,255,0) 45%, rgba(240,240,240,.97) 45%);
+    background-image:      -o-linear-gradient(left top, rgba(255,255,255,0) 45%, rgba(240,240,240,.97) 45%);
     /* IE 10 */
-    background-image:     -ms-linear-gradient(left top, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
-    background-image:         linear-gradient(left top, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
+    background-image:     -ms-linear-gradient(left top, rgba(255,255,255,0) 45%, rgba(240,240,240,.97) 45%);
+    background-image:         linear-gradient(left top, rgba(255,255,255,0) 45%, rgba(240,240,240,.97) 45%);
 }
 .callout .pointer-up {
     -moz-box-shadow:    -2px -3px 4px rgba(0, 0, 0, .12);
