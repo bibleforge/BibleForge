@@ -512,13 +512,23 @@
                     }
                 };
                 system = {
-                    attachEvent: (function ()
+                    event: (function ()
                     {
-                        var func_list = [];
+                        var func_list = {};
                         
-                        return function (name, func)
-                        {
-                        
+                        return {
+                            attach: function (name, func)
+                            {
+                            
+                            },
+                            detach: function (name, func)
+                            {
+                            
+                            },
+                            trigger: function (name)
+                            {
+                            
+                            }
                         };
                     }()),
                     properties: {
