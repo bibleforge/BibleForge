@@ -50,6 +50,55 @@
 {
     "use strict";
     
+    /// Prototypes
+    
+    /// Adds trim() to Strings for IE 8-/Opera 10.1-/Safari 4-/Mozilla 3.0-.
+    ///TODO: Remove this as soon as a non-JavaScript version of BibleForge is ready.
+    if (!"".trim) {
+        /**
+         * Extend the String Prototype to remove leading and trailing spaces.
+         *
+         * @example trimmed = "  God is   good  ".trim(); /// Returns "God is   good"
+         * @return  A string with leading and trailing spaces removed.
+         * @note    This does not remove all types of whitespace.  It actually removes anything under character code 33.
+         */
+        String.prototype.trim = function ()
+        {
+            var end   = this.length - 1,
+                start = 0;
+            
+            while (this.charCodeAt(end) < 33) {
+                end -= 1;
+            }
+            
+            while (start < end && this.charCodeAt(start) < 33) {
+                start += 1;
+            }
+            
+            return this.slice(start, end + 1);
+        };
+    }
+    
+    /**
+     * Remove an element or a range of elements from an array.
+     *
+     * @example [0,1,2,3].remove( 1);     /// Converts array to [0,2,3]
+     * @example [0,1,2,3].remove(-2);     /// Converts array to [0,1,3]
+     * @example [0,1,2,3].remove( 1,  2); /// Converts array to [0,3]
+     * @example [0,1,2,3].remove(-2, -1); /// Converts array to [0,1]
+     * @param   from (integer)            The index to remove, or, if two parameters are given, the index to begin removing from.
+     * @param   to   (integer) (optional) The index to remove to.
+     * @return  A number representing the length of the new array.
+     * @note    This mutates the array; it does not return an array.
+     * @see     http://ejohn.org/blog/javascript-array-remove/
+     */
+    Array.prototype.remove = function(from, to)
+    {
+        var rest = this.slice((to || from) + 1 || this.length);
+        this.length = from < 0 ? this.length + from : from;
+        return this.push.apply(this, rest);
+    };
+    
     /// Declare helper function(s) attached to the global BibleForge object (BF).
     
     /// Detect WebKit based browsers.
@@ -2235,55 +2284,6 @@
         };
         
         q_obj.onblur();
-    };
-    
-    
-    /// Prototypes
-    /// Adds trim() to Strings for IE 8-/Opera 10.1-/Safari 4-/Mozilla 3.0-.
-    ///TODO: Remove this as soon as a non-JavaScript version of BibleForge is ready.
-    if (!"".trim) {
-        /**
-         * Extend the String Prototype to remove leading and trailing spaces.
-         *
-         * @example trimmed = "  God is   good  ".trim(); /// Returns "God is   good"
-         * @return  A string with leading and trailing spaces removed.
-         * @note    This does not remove all types of whitespace.  It actually removes anything under character code 33.
-         */
-        String.prototype.trim = function ()
-        {
-            var end   = this.length - 1,
-                start = 0;
-            
-            while (this.charCodeAt(end) < 33) {
-                end -= 1;
-            }
-            
-            while (start < end && this.charCodeAt(start) < 33) {
-                start += 1;
-            }
-            
-            return this.slice(start, end + 1);
-        };
-    }
-    
-    /**
-     * Remove an element or a range from an array.
-     *
-     * @example [0,1,2,3].remove( 1);     /// Converts array to [0,2,3]
-     * @example [0,1,2,3].remove(-2);     /// Converts array to [0,1,3]
-     * @example [0,1,2,3].remove( 1,  2); /// Converts array to [0,3]
-     * @example [0,1,2,3].remove(-2, -1); /// Converts array to [0,1]
-     * @param   from (integer)            The index to remove, or, if two parameters are given, the index to begin removing from.
-     * @param   to   (integer) (optional) The index to remove to.
-     * @return  A number representing the length of the new array.
-     * @note    This mutates the array; it does not return an array.
-     * @see     http://ejohn.org/blog/javascript-array-remove/
-     */
-    Array.prototype.remove = function(from, to)
-    {
-        var rest = this.slice((to || from) + 1 || this.length);
-        this.length = from < 0 ? this.length + from : from;
-        return this.push.apply(this, rest);
     };
     
     
