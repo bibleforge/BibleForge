@@ -442,6 +442,19 @@
     ///NOTE: All of these variables currently require vendor specific prefixes.
     BF.cssTransitions = typeof document.body.style.webkitTransition !== "undefined" || typeof document.body.style.MozTransition !== "undefined" || typeof document.body.style.OTransition !== "undefined";
     
+    /**
+     * Determine if a variable is really an object or not.
+     *
+     * @param  mixed_var (variable) The variable to analyze.
+     * @return TRUE if the variable is a real object (not including arrays), FALSE for all other types.
+     * @note   Arrays inherit from Object, so they are a type of an object.
+     * @note   Due to an old JavaScript bug, NULL is wrongly identified as an object when using typeof.
+     */
+    BF.is_object = function (mixed_var)
+    {
+        return !(mixed_var instanceof Array) && mixed_var instanceof Object;
+    };
+    
     
     /**
      * Initialize the BibleForge environment.
