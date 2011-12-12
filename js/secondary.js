@@ -938,6 +938,10 @@
                         {
                             document.body.removeChild(callout);
                         },
+                        move: function (x)
+                        {
+                            callout.style.top = (window.parseInt(callout.style.top) + x) + "px";
+                        },
                         replace_HTML: function (html)
                         {
                             inside.innerHTML = html;
@@ -1011,9 +1015,18 @@
                     }
                     callouts = new_arr;
                 }, false);
+                
+                ///TODO: Trigger the contentRemovedAbove event and perhaps check to see if the word was removed.
+                context.system.event.attach(["contentAddedAbove", "contentRemovedAbove"], function (e)
+                {
+                    var i,
+                        callouts_len = callouts.length;
+                    
+                    for (i = 0; i < callouts_len; i += 1) {
+                        callouts[i].move(e.amount);
+                    }
+                });
             }());
         }());
-
-        
     };
 }());
