@@ -2266,6 +2266,27 @@
         };
     }
     
+    /**
+     * Remove an element or a range from an array.
+     *
+     * @example [0,1,2,3].remove( 1);     /// Converts array to [0,2,3]
+     * @example [0,1,2,3].remove(-2);     /// Converts array to [0,1,3]
+     * @example [0,1,2,3].remove( 1,  2); /// Converts array to [0,3]
+     * @example [0,1,2,3].remove(-2, -1); /// Converts array to [0,1]
+     * @param   from (integer)            The index to remove, or, if two parameters are given, the index to begin removing from.
+     * @param   to   (integer) (optional) The index to remove to.
+     * @return  A number representing the length of the new array.
+     * @note    This mutates the array; it does not return an array.
+     * @see     http://ejohn.org/blog/javascript-array-remove/
+     */
+    Array.prototype.remove = function(from, to)
+    {
+        var rest = this.slice((to || from) + 1 || this.length);
+        this.length = from < 0 ? this.length + from : from;
+        return this.push.apply(this, rest);
+    };
+    
+    
     ///TODO: Move browser specific code to external files.
     
     /******************************
