@@ -519,7 +519,10 @@
                         return {
                             attach: function (name, func)
                             {
-                            
+                                if (!func_list[name]) {
+                                    func_list[name] = [];
+                                }
+                                func_list[name][func_list[name].length] = func;
                             },
                             detach: function (name, func)
                             {
