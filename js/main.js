@@ -581,18 +581,49 @@
                         return {
                             attach: function (name, func)
                             {
-                                if (!func_list[name]) {
-                                    func_list[name] = [];
+                                if (typeof func === "function") {
+                                    if (!func_list[name]) {
+                                        func_list[name] = [];
+                                    }
+                                    
+                                    func_list[name][func_list[name].length] = func;
                                 }
-                                func_list[name][func_list[name].length] = func;
                             },
                             detach: function (name, func)
                             {
-                            
+                                var func_arr_len,
+                                    i;
+                                
+                                if (func_list[name]) {
+                                    func_arr_len = func_list[name].length;
+                                    
+                                    for (i = 0; i < func_arr_len; i += 1) {
+                                        if (func_list[name][i] === func) {
+                                            func_list[name][i].remove(i);
+                                            break;
+                                        }
+                                    }
+                                }
                             },
-                            trigger: function (name)
+                            trigger: function (name, e)
                             {
-                            
+                                var func_arr_len,
+                                    i;
+                                
+                                if (func_list[name]) {
+                                    func_arr_len = func_list[name].length;                                    
+                                    
+                                    if (!BF.is_object(e)) {
+                                        e = {};
+                                    }
+                                    
+                                    for (i = 0; i < func_arr_len; i += 1) {
+                                        /// If the function returns FALSE, stop the event propagation.
+                                        if (func_list[name][i](e) === false) {
+                                            break;
+                                        }
+                                    }
+                                }
                             }
                         };
                     }()),
@@ -601,7 +632,7 @@
                         line_height: 19,
                         topBar_height: topLoader.offsetHeight
                     }
-                }
+                };
                 
             }());
             
