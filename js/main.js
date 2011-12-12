@@ -579,16 +579,43 @@
                         var func_list = {};
                         
                         return {
+                            /**
+                             * Add one or more events to the event cue.
+                             *
+                             * @example system.event.attach("contentAddedAbove", function (e) {});
+                             * @example system.event.attach(["contentAddedAbove", "contentRemovedAbove"], function (e) {});
+                             * @param   name (string || array) The name of the event or an array of names of events.
+                             * @param   func (function)        The function to call when the event it triggered.
+                             * @return  NULL
+                             */
                             attach: function (name, func)
                             {
-                                if (typeof func === "function") {
-                                    if (!func_list[name]) {
-                                        func_list[name] = [];
+                                var arr_len,
+                                    i;
+                                
+                                if (name instanceof Array) {
+                                    arr_len = name.length;
+                                    for (i = 0; i < arr_len; i += 1) {
+                                        this.attach(name[i], func);
                                     }
-                                    
-                                    func_list[name][func_list[name].length] = func;
+                                } else {
+                                    if (typeof func === "function") {
+                                        if (!func_list[name]) {
+                                            func_list[name] = [];
+                                        }
+                                        func_list[name][func_list[name].length] = func;
+                                    }
                                 }
                             },
+                            /**
+                             * Remove an event from the event cue.
+                             *
+                             * @example system.event.detach("contentAddedAbove", function (e) {});
+                             * @param   name (string)   The name of the event.
+                             * @param   func (function) The function that was attached to the specified event.
+                             * @return  NULL
+                             * @note    Not currently used.
+                             */
                             detach: function (name, func)
                             {
                                 var func_arr_len,
@@ -605,6 +632,13 @@
                                     }
                                 }
                             },
+                            /**
+                             * Trigger the functions attached to an event.
+                             *
+                             * @param  name (string) The name of the event to trigger.
+                             * @param  e    (object) The event object sent to the called functions.
+                             * @return NULL
+                             */
                             trigger: function (name, e)
                             {
                                 var func_arr_len,
