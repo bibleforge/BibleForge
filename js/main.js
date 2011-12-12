@@ -1125,6 +1125,8 @@
                                 /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was added.
                                 scroll_view_to(window.pageYOffset + newEl.clientHeight);
                                 
+                                system.event.trigger("contentAddedAbove", {amount: newEl.clientHeight});
+                                
                                 /// Check to see if we need to add more content.
                                 add_content_if_needed(previous);
                             } else {
@@ -1568,6 +1570,8 @@
                             /// The new content that was just added to the top of the page will push the other contents downward.
                             /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was added.
                             content_manager.scroll_view_to(window.pageYOffset + newEl.clientHeight);
+                            
+                            system.event.trigger("contentAddedAbove", {amount: newEl.clientHeight});
                         }
                         content_manager.update_verse_range();
                     }
