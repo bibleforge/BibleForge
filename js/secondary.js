@@ -1039,9 +1039,9 @@
                         } else {
                             callouts[i].destroy();
                         }
-                        
-                        callouts = new_arr;
                     }
+                    
+                    callouts = new_arr;
                 });
                 
                 context.system.event.attach("scrollCleared", function ()
