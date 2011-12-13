@@ -1027,7 +1027,7 @@
                     }
                 });
                 
-                context.system.event.attach(["scrollCleared"], function ()
+                context.system.event.attach("scrollCleared", function ()
                 {
                     var i,
                         callouts_len = callouts.length,
