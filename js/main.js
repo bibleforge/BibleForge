@@ -587,6 +587,7 @@
                              * @param   name (string || array) The name of the event or an array of names of events.
                              * @param   func (function)        The function to call when the event it triggered.
                              * @return  NULL
+                             * @note    If func() returns FALSE when triggered, it will stop further event propagation.
                              */
                             attach: function (name, func)
                             {
@@ -652,7 +653,7 @@
                                     }
                                     
                                     for (i = 0; i < func_arr_len; i += 1) {
-                                        /// If the function returns FALSE, stop the event propagation.
+                                        /// If the function returns FALSE, stop further event propagation.
                                         if (func_list[name][i](e) === false) {
                                             break;
                                         }
