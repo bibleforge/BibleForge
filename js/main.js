@@ -88,7 +88,7 @@
      * @example [0,1,2,3].remove(-2, -1); /// Converts array to [0,1]
      * @param   from (integer)            The index to remove, or, if two parameters are given, the index to begin removing from.
      * @param   to   (integer) (optional) The index to remove to.
-     * @return  A number representing the length of the new array.
+     * @return  An integer representing the length of the new array.
      * @note    This mutates the array; it does not return an array.
      * @see     http://ejohn.org/blog/javascript-array-remove/
      */
@@ -854,7 +854,7 @@
                                     scroll_view_to(window.pageYOffset);
                                 @*/
                                 
-                                /// End execution to keep the checking_content_top_interval running because there might be even more content that should be removed.
+                                /// Indicates to the user that content will load if they scroll to the bottom of the screen.
                                 bottomLoader.style.visibility = "visible";
                                 
                                 /// Check again soon for more content to be removed.
