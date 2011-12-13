@@ -1016,14 +1016,26 @@
                     callouts = new_arr;
                 }, false);
                 
-                ///TODO: Trigger the contentRemovedAbove event and perhaps check to see if the word was removed.
                 context.system.event.attach(["contentAddedAbove", "contentRemovedAbove"], function (e)
                 {
                     var i,
                         callouts_len = callouts.length;
                     
                     for (i = 0; i < callouts_len; i += 1) {
+                        ///TODO: Use point_to_el_exists(). 
                         callouts[i].move(e.amount);
+                    }
+                });
+                
+                context.system.event.attach(["scrollCleared"], function ()
+                {
+                    var i,
+                        callouts_len = callouts.length;
+                    
+                    for (i = 0; i < callouts_len; i += 1) {
+                        if (!callouts[i].pinned) {
+                            callouts[i].destroy();
+                        }
                     }
                 });
             }());
