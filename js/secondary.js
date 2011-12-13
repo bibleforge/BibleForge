@@ -865,7 +865,7 @@
                 var pointer_height   = 12,
                     pointer_distance = 28;
                 
-                function adjust_pointer(callout, pointer_before, pointer_after, point_to, users_preference)
+                function align_callout(callout, pointer_before, pointer_after, point_to, users_preference)
                 {
                     var middle_x = point_to.offsetLeft + (point_to.offsetWidth / 2),
                         pointer_used;
@@ -932,7 +932,7 @@
                         /// Methods
                         align_callout: function ()
                         {
-                            adjust_pointer(callout, pointer_before, pointer_after, point_to);
+                            align_callout(callout, pointer_before, pointer_after, point_to);
                         },
                         destroy: function ()
                         {
