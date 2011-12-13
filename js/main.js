@@ -627,7 +627,7 @@
                                     
                                     for (i = 0; i < func_arr_len; i += 1) {
                                         if (func_list[name][i] === func) {
-                                            func_list[name][i].remove(i);
+                                            func_list[name].remove(i);
                                             break;
                                         }
                                     }
