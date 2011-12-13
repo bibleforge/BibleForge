@@ -1022,7 +1022,6 @@
                     callouts = new_arr;
                 }, false);
                 
-                ///TODO: A similar function is needed to possibly remove callouts on contentRemovedBelow.
                 context.system.event.attach(["contentAddedAbove", "contentRemovedAbove"], function (e)
                 {
                     var i,
