@@ -805,15 +805,15 @@
                                 /// Store the content in the cache, and then add 1 to the outer counter variable so that we know how much cache we have.
                                 cached_verses_top[cached_count_top] = child.innerHTML;
                                 cached_count_top += 1;
-                                ///TODO: Determine if setting the display to "none" actually helps at all.
-                                /// Remove quickly from the page.
-                                child.style.display = "none";
+                                
+                                page.removeChild(child);
+                                
                                 /// Calculate and set the new scroll position.
                                 /// Because content is being removed from the top of the page, the rest of the content will be shifted upward.
                                 /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was removed.
                                 scroll_view_to(window.pageYOffset - child_height);
                                 
-                                page.removeChild(child);
+                                system.event.trigger("contentRemovedAbove", {amount: -child_height});
                                 
                                 /// Indicates to the user that content will load if they scroll to the top of the screen.
                                 topLoader.style.visibility = "visible";
