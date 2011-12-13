@@ -855,6 +855,9 @@
                                     scroll_view_to(window.pageYOffset);
                                 @*/
                                 
+                                ///NOTE: The height of the element removed is not sent because it is not currently needed.
+                                system.event.trigger("contentRemovedBelow");
+                                
                                 /// Indicates to the user that content will load if they scroll to the bottom of the screen.
                                 bottomLoader.style.visibility = "visible";
                                 
