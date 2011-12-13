@@ -1030,13 +1030,18 @@
                 context.system.event.attach(["scrollCleared"], function ()
                 {
                     var i,
-                        callouts_len = callouts.length;
+                        callouts_len = callouts.length,
+                        new_arr = [];
                     
                     for (i = 0; i < callouts_len; i += 1) {
-                        if (!callouts[i].pinned) {
+                        if (callouts[i].pinned) {
+                            new_arr[new_arr.length] = callouts[i];
+                        } else {
                             callouts[i].destroy();
                         }
                     }
+                    
+                    callouts = new_arr;
                 });
             }());
         }());
