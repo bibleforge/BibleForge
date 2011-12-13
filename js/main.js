@@ -156,7 +156,7 @@
                 /**
                  * Send the Ajax request and start timeout timer.
                  *
-                 * @return NULL.
+                 * @return NULL
                  * @note   This code is a separate function to reduce code duplication.
                  * @note   Called by the BF.Create_easy_ajax.query().
                  */
@@ -188,7 +188,7 @@
                  * @param   timeout   (number)   (optional) How long to wait before giving up on the script to load (in milliseconds).
                  *                                          A falsey value (such as 0 or FALSE) disables timing out.         (Default is 10,000 milliseconds.)
                  * @param   retry     (boolean)  (optional) Whether or not to retry loading the script if a timeout occurs.  (Default is TRUE.)
-                 * @return  NULL.
+                 * @return  NULL
                  * @todo    Determine if it should change a method from GET to POST if it exceeds 2,083 characters (IE's rather small limit).
                  */
                 return function (method, path, message, onsuccess, onfailure, timeout, retry)
@@ -707,7 +707,7 @@
                      * @param  y      (number)             The Y position to scroll to (i.e, vertical position).
                      * @param  x      (number)  (optional) The X position to scroll to (i.e, horizontal position).  If left undefined, it will maintain the current Y position.
                      * @param  smooth (boolean) (optional) Whether or not to scroll smoothly.  By default, or if falsey, it will scroll instantaneously.
-                     * @return NULL.
+                     * @return NULL
                      * @note   The y value is first because x value is rarely used.
                      * @note   Called by remove_excess_content_top(), add_content_top_if_needed(), scroll_to_verse(), write_verses(), handle_new_verses() and occasionally (IE only) by remove_excess_content_bottom() and add_content_bottom_if_needed().
                      */
@@ -1304,7 +1304,7 @@
                      * Return the small function to call update_verse_range_delayed().
                      *
                      * @param  sync (boolean) Whether or not to call update_verse_range_delayed() synchronously.
-                     * @return NULL.
+                     * @return NULL
                      */
                     return function (sync)
                     {
@@ -1621,7 +1621,7 @@
                      * @example handle_new_verses({n: [50004008], v: ["<a id=772635>Finally,</a> <a id=772636>brethren,</a> <a id=772637>whatsoever</a> <a id=772638>things....</a>"], i: [772638], t: 1}, options);
                      * @param   data    (object) The JSON object returned from the server.
                      * @param   options (object) The object containing the details of the query.
-                     * @return  NULL.
+                     * @return  NULL
                      */
                     return function (data, options)
                     {
@@ -1885,7 +1885,7 @@
                                  * Initiate a new query and prepare for future queries.
                                  *
                                  * @param  options (object) The object containing the various aspects of the query.
-                                 * @return NULL.
+                                 * @return NULL
                                  * @note   This function is stored in query_manager.query().
                                  * @note   Called by run_new_query().
                                  */
@@ -2048,7 +2048,7 @@
                  * @example run_new_query("John 3:16"); /// Looks up John 3:6 (and following)
                  * @example run_new_query("love");      /// Searches for the word "love"
                  * @param   raw_query (string) The text from the user to query.
-                 * @return  NULL.
+                 * @return  NULL
                  * @note    Called by searchForm.onsubmit() when a user submits a query.
                  */
                 return function (raw_query)
@@ -2203,7 +2203,7 @@
              * Capture certain key events, bringing focus to the query box.
              *
              * @param  e (object) The event object (normally supplied by the browser).
-             * @return NULL.
+             * @return NULL
              * @note   Called on all keydown events.
              * @todo   Determine if this viewport is selected (currently, there is only one viewport).
              * @todo   Determine how to use the keyPress event (since Mozilla only fires this event once when the button is held down).
@@ -2340,7 +2340,7 @@
         /**
          * Set the query input box text with an explanation of what the user can enter in.
          *
-         * @return NULL.
+         * @return NULL
          * @note   Called on q_obj blur.
          * @note   This function is removed after the user submits a search by prepare_new_search() because the user no longer needs the instructions.
          */
@@ -2355,7 +2355,7 @@
         /**
          * Remove the explanation text so that the user can type.
          *
-         * @return NULL.
+         * @return NULL
          * @note   Called on q_obj focus.
          */
         q_obj.onfocus = function ()

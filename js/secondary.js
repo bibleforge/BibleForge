@@ -43,7 +43,7 @@
      * @param  context (object) An object containing necessary variables from the parent closure.
      * @note   This code is eval'ed inside of main.js.  The anonymous function is then called and data from the BibleForge closure is passed though the context object.
      * @note   Even though this function is not called immediately, it needs to be wrapped in parentheses to make it a function expression.
-     * @return Null.
+     * @return NULL
      */
     return function (context)
     {
@@ -77,7 +77,7 @@
              * @param   callback (function) (optional) The function to run after the menu is closed.
              * @note    Called by show_context_menu() and document.onclick().
              * @todo    It would be nice to make the menu item that was clicked fade out slowly.
-             * @return  NULL.
+             * @return  NULL
              */
             function close_menu(callback)
             {
@@ -110,7 +110,7 @@
              * @param   open_callback  (function) (optional) The function to run when the menu opens.
              * @param   close_callback (function) (optional) The function to send to close_menu() as a callback when the menu closes.
              * @note    Called by show_context_menu() and close_menu() (as the callback function).
-             * @return  NULL.
+             * @return  NULL
              */
             function open_menu(x_pos, y_pos, menu_items, open_callback, close_callback)
             {
@@ -158,7 +158,7 @@
                  * Catch mouse clicks in order to close the menu.
                  *
                  * @note   Called on the mouse click event anywhere on the page (unless the event is canceled).
-                 * @return NULL.
+                 * @return NULL
                  * @bug    Firefox 3.6 Does not close the menu when clicking the query box the first time.  However, it does close after submitting the query.
                  */
                 document.addEventListener("click", function ()
@@ -191,7 +191,7 @@
              * @param   close_callback (function) (optional) The function to send to close_menu() as a callback when the menu closes.
              * @note    This is the function stored in the show_context_menu variable.
              * @note    Called by the wrench menu onclick event.
-             * @return  NULL.
+             * @return  NULL
              */
             return function (x_pos, y_pos, menu_items, open_callback, close_callback)
             {
@@ -215,7 +215,7 @@
         /**
          * Display the panel window.
          *
-         * @return NULL.
+         * @return NULL
          */
         show_panel = (function ()
         {
@@ -330,7 +330,7 @@
         /**
          * Register events to manage the cursor for better readability.
          *
-         * @return NULL.
+         * @return NULL
          * @note   Called immediately.
          */
         (function ()
@@ -374,7 +374,7 @@
                      *
                      * @param  el     (DOM element) The element which cursor is changing
                      * @param  cursor (string)      The new cursor style
-                     * @return NULL.
+                     * @return NULL
                      */
                     return function (el, cursor)
                     {
@@ -403,7 +403,7 @@
             /**
              * Set the mouse cursor back to its default state.
              *
-             * @return NULL.
+             * @return NULL
              * @note   Called by hide_cursor_delayed(), page.onmousedown(), and page.onmouseout().
              */
             function show_cursor()
@@ -430,7 +430,7 @@
             /**
              * Hide the cursor after a short delay.
              *
-             * @return NULL.
+             * @return NULL
              * @note   Called by page.onmousedown() and page.onmousemove().
              */
             function hide_cursor_delayed()
@@ -460,7 +460,7 @@
              * Handle cursor hiding when a mouse button is clicked.
              *
              * @param  e (object) The event object (normally supplied by the browser).
-             * @return NULL.
+             * @return NULL
              */
             page.addEventListener("mousedown", function (e)
             {
@@ -482,7 +482,7 @@
              * Prevent hiding the cursor when cursor moves off the scroll.
              *
              * @param  e (object) The event object (normally supplied by the browser).
-             * @return NULL.
+             * @return NULL
              * @note   Called by page.onmouseout().
              */
             page.onmouseout = function (e)
@@ -527,7 +527,7 @@
              * If the cursor is not hovering over the text area but it is after a resize (very common when going into full screen mode)
              * the cursor will not be hidden unless the hide_cursor_delayed() function is triggered on resize.
              *
-             * @return NULL.
+             * @return NULL
              */
             window.addEventListener("resize", function ()
             {
@@ -547,7 +547,7 @@
          * Add the rest of the BibleForge user interface (currently, just the wrench menu).
          *
          * @note   This function is called immediately.
-         * @return NULL.
+         * @return NULL
          */
         (function ()
         {
@@ -637,7 +637,7 @@
                         /**
                          * Implement the change in setting.
                          *
-                         * @return NULL.
+                         * @return NULL
                          * @note   Called when the user changes a setting.
                          */
                         return function (new_value)
@@ -658,7 +658,7 @@
                         /**
                          * Run the specific function to make the change.
                          *
-                         * @return NULL.
+                         * @return NULL
                          * @note   Called when the user clicks a checkbox.
                          * @note   Keyboard actions (such as pressing Space Bar) counts as a click.
                          */
@@ -679,7 +679,7 @@
                         /**
                          * Run the specific function to make the change.
                          *
-                         * @return NULL.
+                         * @return NULL
                          * @note   Called after a user changes a textbox.
                          * @todo   It should fire immediately, not just onblur.
                          */
@@ -783,7 +783,7 @@
              *
              * @param  e (object) (optional) The event object optionally sent by the browser.
              * @note   Called when the user clicks on the wrench button.
-             * @return NULL.
+             * @return NULL
              * @todo   Make the wrench icon look pressed.
              * @bug    Opera does not send the onclick event from the label to the button.
              */
