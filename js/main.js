@@ -1373,6 +1373,8 @@
                         has_reached_top    = false;
                         
                         page.innerHTML = "";
+                        
+                        system.event.trigger("scrollCleared");
                     },
                     
                     update_verse_range: update_verse_range,
@@ -2106,8 +2108,7 @@
                     /// Prepare the initial query, create functions to handle additional and previous queries.
                     query_manager.query(options);
                     
-                    /// Step 4: Prepare for new results (clear page(?), prepare highlighter if applicable)
-                    
+                    /// Step 4: Prepare for new results (clear page, prepare highlighter if applicable)
                     content_manager.clear_scroll();
                     
                     /// Indicate that the lookup is in progress.
