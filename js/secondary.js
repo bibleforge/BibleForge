@@ -868,17 +868,22 @@
                 function align_callout(callout, pointer_before, pointer_after, point_to, users_preference)
                 {
                     var middle_x = point_to.offsetLeft + (point_to.offsetWidth / 2),
-                        pointer_used;
+                        pointer_used,
+                        pointer_fits_horizontally;
+                    
+                    ///NOTE: The pointer needs 30 pixels of buffer room on the left side and 50 pixels of buffer room on the right side.
+                    pointer_fits_horizontally = (window.innerWidth - middle_x > 49) && middle_x > 29;
                     
                     if (!users_preference) {
-                        /// First, try to put the bubble above the word.
-                        if (callout.offsetHeight + pointer_height < point_to.offsetTop - context.system.properties.topBar_height - window.pageYOffset) {
+                        document.title = middle_x;
+                        /// First, try to put the callout above the word.
+                        if (pointer_fits_horizontally && callout.offsetHeight + pointer_height < point_to.offsetTop - context.system.properties.topBar_height - window.pageYOffset) {
                             callout.style.top = (point_to.offsetTop - callout.offsetHeight - pointer_height) + "px";
                             pointer_after.className = "pointer-down";
                             pointer_before.style.display = "none";
                             pointer_used = pointer_after;
-                        /// Next try the bottom.
-                        } else if (callout.offsetHeight + pointer_height < window.innerHeight - (window.pageYOffset - point_to.offsetTop - point_to.offsetHeight)) {
+                        /// Next try to put the callout below the word.
+                        } else if (pointer_fits_horizontally && callout.offsetHeight + pointer_height < window.innerHeight - (window.pageYOffset - point_to.offsetTop - point_to.offsetHeight)) {
                             callout.style.top = (point_to.offsetTop + point_to.offsetHeight + pointer_height) + "px";
                             pointer_before.className = "pointer-up";
                             pointer_after.style.display = "none";
