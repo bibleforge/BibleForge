@@ -912,8 +912,8 @@
                         callout_obj;
                     
                     callout.className = "callout";
-                    inside.className = "inside";
-                    inside.innerHTML = "Loading";
+                    inside.className  = "inside";
+                    inside.innerHTML  = "Loading"; /// TEMP
                     callout.appendChild(pointer_before);
                     callout.appendChild(inside);
                     callout.appendChild(pointer_after);
@@ -941,6 +941,12 @@
                         move: function (x)
                         {
                             callout.style.top = (window.parseInt(callout.style.top) + x) + "px";
+                        },
+                        point_to_el_exists: function ()
+                        {
+                            ///NOTE: Right now, all words have unique id. If this is not true in the future,
+                            ///      we could loop through .parentNode until reaching document or NULL.
+                            return Boolean(document.getElementById(point_to.id));
                         },
                         replace_HTML: function (html)
                         {
@@ -1016,14 +1022,25 @@
                     callouts = new_arr;
                 }, false);
                 
+                ///TODO: A similar function is needed to possibly remove callouts on contentRemovedBelow.
                 context.system.event.attach(["contentAddedAbove", "contentRemovedAbove"], function (e)
                 {
                     var i,
-                        callouts_len = callouts.length;
+                        callouts_len = callouts.length,
+                        new_arr = [];
                     
                     for (i = 0; i < callouts_len; i += 1) {
-                        ///TODO: Use point_to_el_exists(). 
-                        callouts[i].move(e.amount);
+                        /// When contentRemovedAbove is triggered, the element that the callout is pointing to may have been removed.
+                        /// If so, remove the callout.
+                        ///NOTE: contentRemovedAbove has a negative e.amount.
+                        if (e.amount >= 0 || callouts[i].point_to_el_exists()) {
+                            callouts[i].move(e.amount);
+                            new_arr[new_arr.length] = callouts[i];
+                        } else {
+                            callouts[i].destroy();
+                        }
+                        
+                        callouts = new_arr;
                     }
                 });
                 
