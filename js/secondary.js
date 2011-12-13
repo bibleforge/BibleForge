@@ -1060,6 +1060,23 @@
                     
                     callouts = new_arr;
                 });
+                
+                context.system.event.attach("contentRemovedBelow", function ()
+                {
+                    var i,
+                        callouts_len = callouts.length,
+                        new_arr = [];
+                    
+                    for (i = 0; i < callouts_len; i += 1) {
+                        if (callouts[i].point_to_el_exists()) {
+                            new_arr[new_arr.length] = callouts[i];
+                        } else {
+                            callouts[i].destroy();
+                        }
+                    }
+                    
+                    callouts = new_arr;
+                });
             }());
         }());
     };
