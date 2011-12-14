@@ -862,49 +862,47 @@
             
             create_callout = (function ()
             {
+                ///TODO: Rename to something more exact.
                 var pointer_height   = 12,
                     pointer_distance = 28;
                 
                 function align_callout(callout, pointer_before, pointer_after, point_to, users_preference)
                 {
                     var middle_x = point_to.offsetLeft + (point_to.offsetWidth / 2),
-                        pointer_used,
-                        pointer_fits_horizontally;
-                    
-                    ///NOTE: The pointer needs 30 pixels of buffer room on the left side and 50 pixels of buffer room on the right side.
-                    pointer_fits_horizontally = window.innerWidth - middle_x > 49 && middle_x > 29;
+                        middle_y = point_to.offsetTop + (point_to.offsetHeight / 2),
+                        pointer_used;
                     
                     if (!users_preference) {
-                        /// First, try to put the callout above the word.
-                        if (pointer_fits_horizontally && callout.offsetHeight + pointer_height < point_to.offsetTop - context.system.properties.topBar_height - window.pageYOffset) {
+                        /// Try to put the callout above the word.
+                        if (callout.offsetHeight + pointer_height < point_to.offsetTop - context.system.properties.topBar_height - window.pageYOffset) {
                             callout.style.top = (point_to.offsetTop - callout.offsetHeight - pointer_height) + "px";
                             pointer_after.className = "pointer-down";
                             pointer_before.style.display = "none";
                             pointer_used = pointer_after;
-                        /// Next try to put the callout below the word.
-                        } else if (pointer_fits_horizontally && callout.offsetHeight + pointer_height < window.innerHeight - (window.pageYOffset - point_to.offsetTop - point_to.offsetHeight)) {
+                        /// Else, put the callout below the word.
+                        } else {
                             callout.style.top = (point_to.offsetTop + point_to.offsetHeight + pointer_height) + "px";
                             pointer_before.className = "pointer-up";
                             pointer_after.style.display = "none";
                             pointer_used = pointer_before;
-                        } else {
-                            ///TODO: Also try to put it on the left and right.
-                            ///TODO: Since it cannot fit, just try to center it on the page.
-                            callout.style.top = "300px";
-                            callout.style.left = "300px";
-                            return;
                         }
                         
-                        /// Try to put the pointer on the left.
-                        ///TODO: Include rounded corners in calculation.
+                        /// Can the pointer fit on the far left?
                         if (window.innerWidth - middle_x > callout.offsetWidth) {
                             callout.style.left = (middle_x - pointer_distance) + "px";
                             pointer_used.style.marginLeft = "12px";
                         } else {
-                            callout.style.left = (window.innerWidth - callout.offsetWidth - pointer_distance) + "px";
-                            pointer_used.style.marginLeft = (middle_x - (window.innerWidth - callout.offsetWidth - (pointer_distance / 2) + 2)) + "px";
+                            /// Will the pointer move off of the callout?
+                            ///TODO: Clean up and try to combine.
+                            ///TODO: See if using style.left and style.right would be better.
+                            if (window.innerWidth - middle_x < 49) {
+                                callout.style.left = (window.innerWidth - callout.offsetWidth - pointer_distance + (49 - (window.innerWidth - middle_x))) + "px";
+                                pointer_used.style.marginLeft = (callout.offsetWidth - (pointer_distance) - 10) + "px";
+                            } else {
+                                callout.style.left = (window.innerWidth - callout.offsetWidth - pointer_distance) + "px";
+                                pointer_used.style.marginLeft = (middle_x - (window.innerWidth - callout.offsetWidth - (pointer_distance / 2) + 2)) + "px";
+                            }
                         }
-                        
                     }
                 }
                 
