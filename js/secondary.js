@@ -911,14 +911,27 @@
                         inside  = document.createElement("div"),
                         pointer_before = document.createElement("div"),
                         pointer_after  = document.createElement("div"),
-                        callout_obj;
+                        callout_obj,
+                        loading_timer;
                     
                     callout.className = "callout";
                     inside.className  = "inside";
-                    inside.innerHTML  = "Loading"; /// TEMP
+                    
                     callout.appendChild(pointer_before);
                     callout.appendChild(inside);
                     callout.appendChild(pointer_after);
+                    
+                    /// Delay the creation of the loading graphic because the data could load quickly enough as to make it unnecessary.
+                    loading_timer = window.setTimeout(function ()
+                    {
+                        var loader = document.createElement("div");
+                        loader.className = "loaders";
+                        /// By default, loaders are invisible.
+                        loader.style.visibility = "visible";
+                        /// Center the graphic vertically.
+                        loader.style.height = "100%";
+                        inside.appendChild(loader);
+                    }, 500);
                     
                     /// Because non-pinned callouts are closed when the user clicks off,
                     /// we notify the document.onclick() function that a callout was clicked on so it will ignore the click.
@@ -952,6 +965,8 @@
                         },
                         replace_HTML: function (html)
                         {
+                            /// Prevent the loading graphic from loading if it has not loaded yet.
+                            clearTimeout(loading_timer);
                             inside.innerHTML = html;
                         },
                         
