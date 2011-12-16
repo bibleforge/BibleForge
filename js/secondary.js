@@ -925,12 +925,17 @@
                     loading_timer = window.setTimeout(function ()
                     {
                         var loader = document.createElement("div");
-                        loader.className = "loaders";
+                        loader.style.opacity = "0";
+                        loader.className = "loaders fade";
                         /// By default, loaders are invisible.
                         loader.style.visibility = "visible";
                         /// Center the graphic vertically.
                         loader.style.height = "100%";
                         inside.appendChild(loader);
+                        /// Change the opacity after a delay to make it fade in (if the browser supports CSS transitions; otherwise the change is instant).
+                        loading_timer = window.setTimeout(function () {
+                            loader.style.opacity = ".99";
+                        }, 0);
                     }, 500);
                     
                     /// Because non-pinned callouts are closed when the user clicks off,
