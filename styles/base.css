@@ -859,3 +859,13 @@ h2 {
     font-weight:	bold;
     font-style:		italic;
 }
+
+@font-face {
+    font-family: 'BFHebrew';
+    src: url('../fonts/BFHebrew.eot');
+    src: url('../fonts/BFHebrew.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/BFHebrew.ttf')        format('truetype'),
+         url('../fonts/BFHebrew.woff')       format('woff');
+    font-weight: normal;
+    font-style:  normal;
+}
