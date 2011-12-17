@@ -720,6 +720,7 @@ h2 {
 
 /* The divine name of God */
 .d {
+    /* Firefox 4.0+ also supports -moz-font-feature-settings:'smcp=1' which turns on small caps as well */
     font-variant: small-caps;
     font-size: 16px;
     /* Different fonts have different line-heights.  This eliminates the inconsistency. */
