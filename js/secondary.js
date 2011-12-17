@@ -877,12 +877,14 @@
                         if (callout.offsetHeight + pointer_height < point_to.offsetTop - context.system.properties.topBar_height - window.pageYOffset) {
                             callout.style.top = (point_to.offsetTop - callout.offsetHeight - pointer_height) + "px";
                             pointer_after.className = "pointer-down";
+                            pointer_after.style.display = "block";
                             pointer_before.style.display = "none";
                             pointer_used = pointer_after;
                         /// Else, put the callout below the word.
                         } else {
                             callout.style.top = (point_to.offsetTop + point_to.offsetHeight + pointer_height) + "px";
                             pointer_before.className = "pointer-up";
+                            pointer_before.style.display = "block";
                             pointer_after.style.display = "none";
                             pointer_used = pointer_before;
                         }
@@ -1115,6 +1117,19 @@
                     
                     callouts = new_arr;
                 });
+                
+                window.addEventListener("resize", function ()
+                {
+                    var i,
+                        callouts_len = callouts.length;
+                    
+                    ///TODO: If there are a lot of callouts that are not visible, it might be a good idea to make them invisible and not re-align them.
+                    for (i = 0; i < callouts_len; i += 1) {
+                        if (callouts[i].point_to_el_exists()) {
+                            callouts[i].align_callout();
+                        }
+                    }
+                }, false);
             }());
         }());
     };
