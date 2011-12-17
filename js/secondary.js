@@ -1016,17 +1016,20 @@
                             if (data.word) {
                                 ///FIXME: Currently, .pronunciation is the base word, not the actual word.
                                 /// Thin spaces are added to separate the word from the vertical bars so that they do not appear to be part of the word.
-                                html  = "<div><span class=lex-title>" + data.word + "</span> <span class=lex-pronun>|&thinsp;" + data.pronunciation + "&thinsp;|</span></div>";
+                                html  = "<div class=lex-title><span class=lex-orig_word>" + data.word + "</span> <span class=lex-pronun>|&thinsp;" + data.pronunciation + "&thinsp;|</span></div>";
+                                /// Wrap the rest of the text in a separate tag so that it can all be moved slightly to the left to line up (more or less) with the title.
+                                html += "<div class=lex-body>";
                                 ///FIXME: data.long_def.lit should be somewhere else.
                                 if (data.long_def && data.long_def.lit) {
                                     html += "<div>&#8220;" + data.long_def.lit + "&#8221;</div>";
                                 }
                                 html += "<div>" + data.short_def + "</div>";
+                                html += "</div>";
                                 ///TODO: Add a way to get more details.
                             } else {
                                 ///TODO: In the future, there could be other information, like notes.
                                 ///FIXME: Not all italic words are implied, some are questionable.
-                                html = "<em>This word is implied by context or required in order to translate properly; it was not translated directly from a word in the original languages.</em>"
+                                html = "<div class=lex-body><em>This word is implied by context or required in order to translate properly; it was not translated directly from a word in the original languages.</em></div>"
                             }
                             callout.replace_HTML(html);
                         });

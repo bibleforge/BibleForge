@@ -31,7 +31,7 @@ html {
     text-rendering: optimizeLegibility;
 }
 
-input {
+input, .callout {
     /*NOTE: Input fields do not inherit from the HTML element. */
     /*      If a font-family is not specified, it will use a system default. */
     /*      On Windows, that font is "MS Shell Dlg," which is actually "Microsoft Sans Serif." */
@@ -503,8 +503,8 @@ label {
     background:         linear-gradient(bottom, rgba(240,240,240,.97), rgba(255,255,255,.97) 60px);
     position: absolute;
     border: #ccc solid 1px;
-    padding: 4px;
-    font-family: arial;
+    /* There is no padding on the left so that the lexicon title's diacritics have enough room to be displayed. */
+    padding: 4px 4px 4px 0;
     font-size: 16px;
     min-width: 46px;
     max-width: 95%;
@@ -513,10 +513,8 @@ label {
     height: 125px;
 }
 .callout .inside {
-    overflow: auto;
+    overflow-x: hidden;
     height: 100%;
-    /* Push the text over a little so diacritics are not cut off. */
-    padding-left: 3px;
 }
 .callout .pointer-down {
     -moz-box-shadow:    5px 3px 6px -2px rgba(0,0,0,.2);
@@ -572,6 +570,11 @@ label {
 }
 
 .lex-title {
+    /* Push the text over a little so that diacritics are not cut off. */
+    margin-left: 7px;
+}
+
+.lex-orig_word {
     font-family: 'BFHebrew', 'Palatino Linotype', Palatino, TexGyrePagella, 'TeX Gyre Pagella', 'URWPalladioL', 'Book Antiqua', 'Times new Roman', Times, serif;;
     font-size: 30px;
 }
@@ -579,6 +582,11 @@ label {
 .lex-pronun {
     font-size: 14px;
     white-space: nowrap;
+}
+
+.lex-body {
+    /* Push the text over a little to make it line up (more or less) with the title. */
+    margin-left: 4px;
 }
 
 /* The class allows for simple fade ins and outs with JavaScript. */
