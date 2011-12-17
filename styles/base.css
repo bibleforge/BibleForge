@@ -515,6 +515,8 @@ label {
 .callout .inside {
     overflow: auto;
     height: 100%;
+    /* Push the text over a little so diacritics are not cut off. */
+    padding-left: 3px;
 }
 .callout .pointer-down {
     -moz-box-shadow:    5px 3px 6px -2px rgba(0,0,0,.2);
@@ -569,6 +571,15 @@ label {
     background-image:         linear-gradient(right bottom, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
 }
 
+.lex-title {
+    font-family: 'BFHebrew', 'Palatino Linotype', Palatino, TexGyrePagella, 'TeX Gyre Pagella', 'URWPalladioL', 'Book Antiqua', 'Times new Roman', Times, serif;;
+    font-size: 30px;
+}
+
+.lex-pronun {
+    font-size: 14px;
+    white-space: nowrap;
+}
 
 /* The class allows for simple fade ins and outs with JavaScript. */
 .fade {

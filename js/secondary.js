@@ -1007,9 +1007,26 @@
                         ///TODO: Determine if the lexicon query (type 5) should be defined somewhere.
                         ajax.query("post", "query.php", "t=5&q=" + clicked_el.id, function (data)
                         {
-                            ///TODO: Do something with the data.
+                            var html;
+                            
                             data = BF.parse_json(data);
-                            callout.replace_HTML(data.word);
+                            
+                            if (data.word) {
+                                ///FIXME: Currently, .pronunciation is the base word, not the actual word.
+                                /// Thin spaces are added to separate the word from the vertical bars so that they do not appear to be part of the word.
+                                html  = "<div><span class=lex-title>" + data.word + "</span> <span class=lex-pronun>|&thinsp;" + data.pronunciation + "&thinsp;|</span></div>";
+                                ///FIXME: data.long_def.lit should be somewhere else.
+                                if (data.long_def && data.long_def.lit) {
+                                    html += "<div>&#8220;" + data.long_def.lit + "&#8221;</div>";
+                                }
+                                html += "<div>" + data.short_def + "</div>";
+                                ///TODO: Add a way to get more details.
+                            } else {
+                                ///TODO: In the future, there could be other information, like notes.
+                                ///FIXME: Not all italic words are implied, some are questionable.
+                                html = "<em>This word is implied by context or required in order to translate properly; it was not translated directly from a word in the original languages.</em>"
+                            }
+                            callout.replace_HTML(html);
                         });
                         
                         callout = create_callout(clicked_el);
