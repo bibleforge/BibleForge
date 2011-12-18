@@ -869,7 +869,6 @@
                 function align_callout(callout, pointer_before, pointer_after, point_to, users_preference)
                 {
                     var middle_x = point_to.offsetLeft + (point_to.offsetWidth / 2),
-                        middle_y = point_to.offsetTop + (point_to.offsetHeight / 2),
                         pointer_used;
                     
                     if (!users_preference) {
@@ -954,7 +953,7 @@
                     
                     /// Because non-pinned callouts are closed when the user clicks off,
                     /// we notify the document.onclick() function that a callout was clicked on so it will ignore the click.
-                    callout.addEventListener("click", function (e)
+                    callout.addEventListener("click", function ()
                     {
                         callout_clicked = true;
                     }, false);
@@ -985,7 +984,7 @@
                         replace_HTML: function (html)
                         {
                             /// Prevent the loading graphic from loading if it has not loaded yet.
-                            clearTimeout(loading_timer);
+                            window.clearTimeout(loading_timer);
                             inside.innerHTML = html;
                         },
                         
@@ -1041,7 +1040,7 @@
                             } else {
                                 ///TODO: In the future, there could be other information, like notes.
                                 ///FIXME: Not all italic words are implied, some are questionable.
-                                html = "<div class=lex-body><em>This word is implied by context or required in order to translate properly; it was not translated directly from a word in the original languages.</em></div>"
+                                html = "<div class=lex-body><em>This word is implied by context or required in order to translate properly; it was not translated directly from a word in the original languages.</em></div>";
                             }
                             callout.replace_HTML(html);
                         });
