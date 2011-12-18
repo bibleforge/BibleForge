@@ -846,7 +846,7 @@
                 e.preventDefault();
             };
             
-            /// WebKit/Opera/IE9 (?)
+            /// WebKit/Opera/IE9(?)
             window.addEventListener("mousewheel",     mousewheel_scroller, false);
             /// Mozilla
             window.addEventListener("DOMMouseScroll", mousewheel_scroller, false);
@@ -918,6 +918,18 @@
                     
                     callout.className = "callout";
                     inside.className  = "inside";
+                    
+                    /// Prevent the page from scrolling when scrolling the content in the callout.
+                    /// WebKit/Opera/IE9(?)
+                    inside.addEventListener("mousewheel", function (e)
+                    {
+                        e.stopPropagation();
+                    }, false);
+                    /// Mozilla
+                    inside.addEventListener("DOMMouseScroll", function (e)
+                    {
+                        e.stopPropagation();
+                    }, false);
                     
                     callout.appendChild(pointer_before);
                     callout.appendChild(inside);
