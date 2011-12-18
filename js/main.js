@@ -643,7 +643,8 @@
                             trigger: function (name, e)
                             {
                                 var func_arr_len,
-                                    i;
+                                    i,
+                                    stop_propagation;
                                 
                                 if (func_list[name]) {
                                     func_arr_len = func_list[name].length;                                    
@@ -652,9 +653,15 @@
                                         e = {};
                                     }
                                     
+                                    e.stopPropagation = function ()
+                                    {
+                                        stop_propagation = true;
+                                    };
+                                    
                                     for (i = 0; i < func_arr_len; i += 1) {
-                                        /// If the function returns FALSE, stop further event propagation.
-                                        if (func_list[name][i](e) === false) {
+                                        func_list[name][i](e);
+                                        /// Was e.stopPropagation() called?
+                                        if (stop_propagation) {
                                             break;
                                         }
                                     }
