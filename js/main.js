@@ -364,7 +364,7 @@
     {
         var CSS_rules,
             CSS_rules_len,
-            i = 0,
+            i,
             ///TODO: Determine if it should loop through all styles sheets.
             style_sheet = document.styleSheets[0];
         
@@ -376,14 +376,13 @@
             /// Get the styles (cssRules) for Mozilla/WebKit/Opera/IE9 and (rules) for IE8-.
             CSS_rules     = style_sheet.cssRules || style_sheet.rules;
             CSS_rules_len = CSS_rules.length;
-            while (i < CSS_rules_len) {
+            for (i = 0; i < CSS_rules_len; i += 1) {
                 if (CSS_rules[i].selectorText === selector) {
                     CSS_rules[i].style.cssText = new_CSS;
                     if (!change_all) {
                         return;
                     }
                 }
-                i += 1;
             }
         }
     };
@@ -392,8 +391,8 @@
     /**
      * Determine whether or not a psalm has a title.
      *
-     * @param  c (number) The psalm (i.e., chapter) to check.
-     * @return A boolean indicating if the psalm has a title
+     * @param  c (integer) The psalm (i.e., chapter) to check.
+     * @return A boolean indicating whether or not the psalm has a title
      */
     BF.psalm_has_title = function (c)
     {
