@@ -16,21 +16,24 @@
 
 /// Indicate all object properties used.  JSLint checks this list for misspellings.
 /*properties
-    Create_easy_ajax, about, addEventListener, align_callout, alt, appendChild, 
-    blog, body, borderTop, button, changeCSS, checked, childNodes, className, 
-    clearTimeout, clientWidth, configure, createElement, createTextNode, 
-    cssText, cssTransitions, currentTarget, cursor, destroy, detail, display, 
-    done, get, get_position, help, href, htmlFor, id, innerHTML, innerHeight, 
-    innerWidth, insertBefore, insertCell, insertRow, is_WebKit, just_created, 
-    lang, left, length, line, line_height, link, maxHeight, maxWidth, name, 
-    nodeName, offsetHeight, offsetLeft, offsetTop, offsetWidth, onchange, 
-    onclick, onfocus, onmousemove, onmouseout, opacity, options, 
-    originalTarget, page, pageXOffset, pageYOffset, paragraphs, parentNode, 
-    parse_json, pinned, preventDefault, properties, query, red_letters, 
+    Create_easy_ajax, about, addEventListener, align_callout, alt, amount, 
+    appendChild, attach, blog, body, borderTop, button, changeCSS, checked, 
+    childNodes, className, clearTimeout, clientWidth, configure, createElement, 
+    createTextNode, cssText, cssTransitions, ctrlKey, currentTarget, cursor, 
+    destroy, detail, display, done, event, get, getElementById, get_position, 
+    height, help, href, htmlFor, id, innerHTML, innerHeight, innerWidth, 
+    insertBefore, insertCell, insertRow, is_WebKit, just_created, lang, left, 
+    length, line, line_height, link, lit, long_def, marginLeft, maxHeight, 
+    maxWidth, move, name, nodeName, offsetHeight, offsetLeft, offsetTop, 
+    offsetWidth, onchange, onclick, onfocus, onmousemove, onmouseout, opacity, 
+    options, originalTarget, page, pageXOffset, pageYOffset, paragraphs, 
+    parentNode, parseInt, parse_json, pinned, point_to_el_exists, 
+    preventDefault, pronunciation, properties, query, red_letters, 
     relatedTarget, removeChild, removeEventListener, replace_HTML, scrollBy, 
-    scrollLeft, set, setTimeout, settings, src, srcElement, stopPropagation, 
-    style, system, tagName, target, text, title, top, topBar, topBar_height, 
-    type, value, view, viewPort_num, wheelDelta, word, wrench_title
+    scrollLeft, set, setTimeout, settings, short_def, src, srcElement, 
+    stopPropagation, style, system, tagName, target, text, title, top, topBar, 
+    topBar_height, type, value, view, viewPort_num, visibility, wheelDelta, 
+    word, wrench_title
 */
 
 (function ()
