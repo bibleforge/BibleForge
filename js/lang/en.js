@@ -76,6 +76,8 @@ BF.lang = (function ()
         found_plural:      " verses found for ",                                  /// On the info bar when searching (multiple results)
         found_singular:    " verse found for ",                                   /// On the info bar when searching (one result)
         help:              "Help",                                                /// Context menu item
+        ///FIXME: Not all italic words are implied; some are questionable.
+        italics_explanation: "This word is implied by context or required in order to translate properly; it was not translated directly from a word in the original languages.", /// When clicking on an italic word
         paragraphs:        "Paragraphs",                                          /// In the View configuration panel
         psalm:             "Psalm",                                               /// The title of chapters in the book of Psalms
         query_explanation: 'Keyword or Reference: "God so loved" or Romans 3:23', /// In a blank query input box before a search has been preformed

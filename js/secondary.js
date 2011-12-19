@@ -1042,8 +1042,7 @@
                                 ///TODO: Add a way to get more details.
                             } else {
                                 ///TODO: In the future, there could be other information, like notes.
-                                ///FIXME: Not all italic words are implied, some are questionable.
-                                html = "<div class=lex-body><em>This word is implied by context or required in order to translate properly; it was not translated directly from a word in the original languages.</em></div>";
+                                html = "<div class=lex-body><em>" + BF.lang.italics_explanation + "</em></div>";
                             }
                             callout.replace_HTML(html);
                         });
