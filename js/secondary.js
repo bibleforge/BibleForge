@@ -351,6 +351,11 @@
             /// Make the cursor look like a hand to indicate that the words are clickable.
             BF.changeCSS(pointer_selector, pointer_style, true);
             
+            ///NOTE: Temporarily disabling cursor hiding because changing the CSS causes all webfonts to blink Chrome!
+            if (BF.is_WebKit) {
+                return;
+            }
+            
             ///NOTE: Webkit only changes the mouse cursor after the mouse cursor moves, making cursor hiding impossible.
             ///      However, there is a way to trick WebKit into thinking the cursor moved when it did not.  The following
             ///      function does just that.  Needed for at least Chromium 12/Safari 5.
