@@ -1139,6 +1139,7 @@
                         callouts_len = callouts.length;
                     
                     ///TODO: If there are a lot of callouts that are not visible, it might be a good idea to make them invisible and not re-align them.
+                    ///      To do this, we could expose the callout's pos variable (perhaps via a get() function).
                     for (i = 0; i < callouts_len; i += 1) {
                         if (callouts[i].point_to_el_exists()) {
                             callouts[i].align_callout();
