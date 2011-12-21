@@ -876,7 +876,8 @@
                 function align_callout(callout, pointer, point_to, users_preference)
                 {
                     ///TODO: Store the callout offset info in the object.
-                    var callout_offsetHeight = callout.offsetHeight,
+                    var callout_left,
+                        callout_offsetHeight = callout.offsetHeight,
                         callout_offsetWidth  = callout.offsetWidth,
                         middle_x             = point_to.offsetLeft + (point_to.offsetWidth / 2),
                         point_to_offsetTop   = point_to.offsetTop,
@@ -896,13 +897,14 @@
                         distance_from_right = window.innerWidth - middle_x;
                         /// Can the pointer fit on the far left?
                         if (distance_from_right > callout_offsetWidth) {
-                            callout.style.left = (middle_x - pointer_distance) + "px";
+                            callout_left = middle_x - pointer_distance;
                         } else {
                             /// If the pointer will move off of callout on the right side (distance_from_right < 50),
                             /// the callout needs to be moved to the left a little further (pushing the callout off the page a little).
-                            callout.style.left = ((window.innerWidth - callout_offsetWidth - pointer_distance + 8) + (distance_from_right < 50 ? 50 - (distance_from_right) : 0)) + "px";
+                            callout_left = (window.innerWidth - callout_offsetWidth - pointer_distance + 8) + (distance_from_right < 50 ? 50 - (distance_from_right) : 0);
                         }
-                        pointer.style.left = (middle_x - parseInt(callout.style.left) - pointer_length) + "px";
+                        callout.style.left = callout_left + "px";
+                        pointer.style.left = (middle_x - callout_left - pointer_length) + "px";
                     }
                 }
                 
