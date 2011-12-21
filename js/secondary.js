@@ -22,18 +22,18 @@
     createTextNode, cssText, cssTransitions, ctrlKey, currentTarget, cursor, 
     destroy, detail, display, done, event, get, getElementById, get_position, 
     height, help, href, htmlFor, id, innerHTML, innerHeight, innerWidth, 
-    insertBefore, insertCell, insertRow, is_WebKit, just_created, lang, left, 
-    length, line, line_height, link, lit, long_def, marginLeft, maxHeight, 
-    maxWidth, move, name, nodeName, offsetHeight, offsetLeft, offsetTop, 
-    offsetWidth, onchange, onclick, onfocus, onmousemove, onmouseout, opacity, 
-    options, originalTarget, page, pageXOffset, pageYOffset, paragraphs, 
-    parentNode, parseInt, parse_json, pinned, point_to_el_exists, 
-    preventDefault, pronunciation, properties, query, red_letters, 
-    relatedTarget, removeChild, removeEventListener, replace_HTML, scrollBy, 
-    scrollLeft, set, setTimeout, settings, short_def, src, srcElement, 
-    stopPropagation, style, system, tagName, target, text, title, top, topBar, 
-    topBar_height, type, value, view, viewPort_num, visibility, wheelDelta, 
-    word, wrench_title
+    insertBefore, insertCell, insertRow, is_WebKit, italics_explanation, 
+    just_created, lang, left, length, line, line_height, link, lit, long_def, 
+    maxHeight, maxWidth, move, name, nodeName, offsetHeight, offsetLeft, 
+    offsetTop, offsetWidth, onchange, onclick, onfocus, onmousemove, 
+    onmouseout, opacity, options, originalTarget, page, pageXOffset, 
+    pageYOffset, paragraphs, parentNode, parse_json, pinned, 
+    point_to_el_exists, preventDefault, pronunciation, properties, query, 
+    red_letters, relatedTarget, removeChild, removeEventListener, replace_HTML, 
+    scrollBy, scrollLeft, set, setTimeout, settings, short_def, src, 
+    srcElement, stopPropagation, style, system, tagName, target, text, title, 
+    top, topBar, topBar_height, type, value, view, viewPort_num, visibility, 
+    wheelDelta, word, wrench_title
 */
 
 (function ()
