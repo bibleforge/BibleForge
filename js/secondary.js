@@ -870,56 +870,44 @@
             
             create_callout = (function ()
             {
-                ///TODO: Rename to something more exact.
-                var pointer_height   = 12,
-                    pointer_distance = 28;
+                var pointer_length   = 12, /// Essentially from the tip of the pointer to the callout
+                    pointer_distance = 28; /// 
                 
-                function align_callout(callout, pointer_before, pointer_after, point_to, users_preference)
+                function align_callout(callout, pointer, point_to, users_preference)
                 {
-                    var middle_x = point_to.offsetLeft + (point_to.offsetWidth / 2),
-                        pointer_used;
+                    var middle_x = point_to.offsetLeft + (point_to.offsetWidth / 2);
                     
                     if (!users_preference) {
                         /// Try to put the callout above the word.
-                        if (callout.offsetHeight + pointer_height < point_to.offsetTop - context.system.properties.topBar_height - window.pageYOffset) {
-                            callout.style.top = (point_to.offsetTop - callout.offsetHeight - pointer_height) + "px";
-                            pointer_after.className = "pointer-down";
-                            pointer_after.style.display = "block";
-                            pointer_before.style.display = "none";
-                            pointer_used = pointer_after;
+                        if (callout.offsetHeight + pointer_length < point_to.offsetTop - context.system.properties.topBar_height - window.pageYOffset) {
+                            callout.style.top = (point_to.offsetTop - callout.offsetHeight - pointer_length) + "px";
+                            pointer.className = "pointer-down";
                         /// Else, put the callout below the word.
                         } else {
-                            callout.style.top = (point_to.offsetTop + point_to.offsetHeight + pointer_height) + "px";
-                            pointer_before.className = "pointer-up";
-                            pointer_before.style.display = "block";
-                            pointer_after.style.display = "none";
-                            pointer_used = pointer_before;
+                            callout.style.top = (point_to.offsetTop + point_to.offsetHeight + pointer_length) + "px";
+                            pointer.className = "pointer-up";
                         }
                         
                         /// Can the pointer fit on the far left?
                         if (window.innerWidth - middle_x > callout.offsetWidth) {
                             callout.style.left = (middle_x - pointer_distance) + "px";
-                            pointer_used.style.marginLeft = "12px";
                         } else {
                             /// Will the pointer move off of the callout?
                             ///TODO: Clean up and try to combine.
-                            ///TODO: See if using style.left and style.right would be better.
-                            if (window.innerWidth - middle_x < 49) {
-                                callout.style.left = (window.innerWidth - callout.offsetWidth - pointer_distance + (49 - (window.innerWidth - middle_x))) + "px";
-                                pointer_used.style.marginLeft = (callout.offsetWidth - (pointer_distance) - 10) + "px";
+                            if (window.innerWidth - middle_x < 50) {
+                                callout.style.left = (window.innerWidth - callout.offsetWidth - pointer_distance + (50 - (window.innerWidth - middle_x))) + "px";
                             } else {
                                 callout.style.left = (window.innerWidth - callout.offsetWidth - pointer_distance) + "px";
-                                pointer_used.style.marginLeft = (middle_x - (window.innerWidth - callout.offsetWidth - (pointer_distance / 2) + 2)) + "px";
                             }
                         }
+                        pointer.style.left = (middle_x - parseInt(callout.style.left) - pointer_length) + "px";
                     }
                 }
                 
                 return function (point_to) {
                     var callout = document.createElement("div"),
                         inside  = document.createElement("div"),
-                        pointer_before = document.createElement("div"),
-                        pointer_after  = document.createElement("div"),
+                        pointer = document.createElement("div"),
                         callout_obj,
                         loading_timer;
                     
@@ -938,9 +926,8 @@
                         e.stopPropagation();
                     }, false);
                     
-                    callout.appendChild(pointer_before);
                     callout.appendChild(inside);
-                    callout.appendChild(pointer_after);
+                    callout.appendChild(pointer);
                     
                     /// Delay the creation of the loading graphic because the data could load quickly enough as to make it unnecessary.
                     loading_timer = window.setTimeout(function ()
@@ -973,7 +960,7 @@
                         /// Methods
                         align_callout: function ()
                         {
-                            align_callout(callout, pointer_before, pointer_after, point_to);
+                            align_callout(callout, pointer, point_to);
                         },
                         destroy: function ()
                         {
