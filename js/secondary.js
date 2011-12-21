@@ -1053,8 +1053,8 @@
                 
                 document.addEventListener("click", function (e)
                 {
-                    var i,
-                        callouts_len = callouts.length,
+                    var callouts_len = callouts.length,
+                        i,
                         new_arr = [];
                     
                     /// Are there no callouts or is the Ctrl key pressed?
@@ -1080,8 +1080,8 @@
                 
                 context.system.event.attach(["contentAddedAbove", "contentRemovedAbove"], function (e)
                 {
-                    var i,
-                        callouts_len = callouts.length,
+                    var callouts_len = callouts.length,
+                        i,
                         new_arr = [];
                     
                     for (i = 0; i < callouts_len; i += 1) {
@@ -1101,8 +1101,8 @@
                 
                 context.system.event.attach("scrollCleared", function ()
                 {
-                    var i,
-                        callouts_len = callouts.length,
+                    var callouts_len = callouts.length,
+                        i,
                         new_arr = [];
                     
                     for (i = 0; i < callouts_len; i += 1) {
@@ -1118,8 +1118,8 @@
                 
                 context.system.event.attach("contentRemovedBelow", function ()
                 {
-                    var i,
-                        callouts_len = callouts.length,
+                    var callouts_len = callouts.length,
+                        i,
                         new_arr = [];
                     
                     for (i = 0; i < callouts_len; i += 1) {
@@ -1135,8 +1135,8 @@
                 
                 window.addEventListener("resize", function ()
                 {
-                    var i,
-                        callouts_len = callouts.length;
+                    var callouts_len = callouts.length,
+                        i;
                     
                     ///TODO: If there are a lot of callouts that are not visible, it might be a good idea to make them invisible and not re-align them.
                     ///      To do this, we could expose the callout's pos variable (perhaps via a get() function).
