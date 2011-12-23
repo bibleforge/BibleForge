@@ -406,6 +406,31 @@
         }
     };
     
+    BF.toggleCSS = function (el, className, force)
+    {
+        var class_arr = el.className.split(" "),
+            found = false,
+            new_class = "";
+        
+        class_arr.forEach(function (cur_class)
+        {
+            if (cur_class === className) {
+                found = true;
+                if (force === 1) {
+                    new_class += " " + cur_class;
+                }
+            } else {
+                new_class += " " + cur_class;
+            }
+        });
+        
+        if (!found && force !== 0) {
+            new_class += " " + className;
+        }
+        
+        el.className = new_class.trim();
+    };
+    
     
     /**
      * Determine whether or not a psalm has a title.
