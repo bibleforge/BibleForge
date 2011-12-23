@@ -347,18 +347,10 @@
                 /// Special variables needed for an ugly WebKit hack.
                 webkit_cursor_hack,
                 webkit_ignore_event_once;
-                
-            /// Make the cursor look like a hand to indicate that the words are clickable.
-            BF.changeCSS(pointer_selector, pointer_style, true);
-            
-            ///NOTE: Temporarily disabling cursor hiding because changing the CSS causes all webfonts to blink in Chrome! (tested in Chrome 17; still need to test Safari)
-            if (BF.is_WebKit) {
-                return;
-            }
             
             ///NOTE: Webkit only changes the mouse cursor after the mouse cursor moves, making cursor hiding impossible.
             ///      However, there is a way to trick WebKit into thinking the cursor moved when it did not.  The following
-            ///      function does just that.  Needed for at least Chromium 12/Safari 5.
+            ///      function does just that.  Needed for at least Chromium 15/Safari 5.
             ///      See https://code.google.com/p/chromium/issues/detail?id=26723 for more details.
             if (BF.is_WebKit) {
                 /**
@@ -368,36 +360,20 @@
                  */
                 webkit_cursor_hack = (function ()
                 {
-                    /// Prepare the needed elements.
-                    var div1 = document.createElement("div"),
-                        div2 = document.createElement("div");
-                    
-                    div1.style.cssText = "overflow: hidden; position: fixed; left: 0; top: 0; width: 100%; height: 100%;";
-                    div2.style.cssText = "width: 200%; height: 200%;";
-                    
-                    div1.appendChild(div2);
-                    
                     /**
                      * Trick WebKit into updating the cursor.
                      *
-                     * @param  el     (DOM element) The element which cursor is changing
-                     * @param  cursor (string)      The new cursor style
+                     * @param  el        (DOM element) The element which cursor is changing
+                     * @param  className (string)      The class name to toggle
+                     * @param  force     (integer)     Whether or not to force the toggle on (1) or off (0).
                      * @return NULL
+                     * @bug    This does not work with at least Chromium 15 on mousedown.
                      */
-                    return function (el, cursor)
+                    return function (el, className, force)
                     {
-                        ///NOTE: For a yet unknown reason, the code works fine without being called via setTimeout with the exception of being called onmousedown.
                         window.setTimeout(function ()
                         {
-                            ///NOTE: So basically, a large div is added with an even larger div inside of it.  Then the first div is scrolled back and forth.
-                            ///      This creates the illusion of mouse movement, and the cursor is updated.
-                            document.body.appendChild(div1);
-                            
-                            el.style.cursor = cursor;
-                            
-                            div1.scrollLeft = 1;
-                            div1.scrollLeft = 0;
-                            document.body.removeChild(div1);
+                            BF.toggleCSS(el, className, force);
                             
                             ///NOTE: Because WebKit thinks the cursor moved, it will call the onmousemove event, which will reset the cursor.
                             ///      So, we need to ignore the next onmousemove event.
@@ -422,13 +398,12 @@
                 if (!is_cursor_visible) {
                     if (BF.is_WebKit) {
                         ///NOTE: For a yet unknown reason, when being called onmousedown, this must be called twice.
-                        webkit_cursor_hack(page, "auto");
-                        webkit_cursor_hack(page, "auto");
+                        ///      Actually, this used to work, but in Chrome 15 it does not seem to.
+                        webkit_cursor_hack(page, "hidden_cursor", 0);
+                        webkit_cursor_hack(page, "hidden_cursor", 0);
                     } else {
-                        page.style.cursor = "auto";
+                        BF.toggleCSS(page, "hidden_cursor", 0);
                     }
-                    ///FIXME: Determine a way to do this without modifying the CSS.
-                    BF.changeCSS(pointer_selector, pointer_style);
                     
                     is_cursor_visible = true;
                 }
@@ -450,14 +425,12 @@
                     ///NOTE: WebKit can use an almost completely transparent PNG.
                     ///      Opera (at least 10.53) has no alternate cursor support whatsoever.
                     if (BF.is_WebKit) {
-                        webkit_cursor_hack(page, "url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAABdJREFUOMtjYBgFo2AUjAIGhv///zMBAA0JAwCYSe1yAAAAAElFTkSuQmCC), auto");
+                        webkit_cursor_hack(page, "hidden_cursor", 1);
                     } else {
                         /// Mozilla/IE9
-                        page.style.cursor = "none";
+                        //page.style.cursor = "none";
+                        BF.toggleCSS(page, "hidden_cursor", 1);
                     }
-                    /// All words have a hand cursor, so this style must be removed.
-                    ///FIXME: Determine a way to do this without modifying the CSS.
-                    BF.changeCSS(pointer_selector, "");
                     
                     is_cursor_visible = false;
                 }, 2000);

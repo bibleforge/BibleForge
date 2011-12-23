@@ -466,6 +466,19 @@ button::-moz-focus-inner {
     padding: 0 4px 0 4px;
 }
 
+.scrolls a {
+    cursor: pointer;
+}
+
+.scrolls {
+    cursor: auto;
+}
+
+.hidden_cursor, .hidden_cursor a {
+    cursor: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAABdJREFUOMtjYBgFo2AUjAIGhv///zMBAA0JAwCYSe1yAAAAAElFTkSuQmCC), auto!important;
+    cursor: none!important;
+}
+
 
 .loaders {
     height:     50px;
