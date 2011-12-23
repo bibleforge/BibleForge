@@ -406,6 +406,17 @@
         }
     };
     
+    /**
+     * Add or remove a CSS class name.
+     *
+     * @example BF.toggleCSS(page, "hidden_cursor", 1); /// Add "hidden_cursor" to page's list of classes (if not already present).
+     * @example BF.toggleCSS(page, "hidden_cursor", 0); /// Remove "hidden_cursor" from page's list of classes (if already present).
+     * @example BF.toggleCSS(page, "hidden_cursor"); /// Add/remove (depending on if it is already present) "hidden_cursor" to/from page's list of classes.
+     * @param   el        (DOM element)        The element to modify.
+     * @param   className (string)             The class to add/remove.
+     * @param   force     (integer) (optional) Whether or not to force the toggle on (1) or off (0).
+     * @return  NULL
+     */
     BF.toggleCSS = function (el, className, force)
     {
         var class_arr = el.className.split(" "),
