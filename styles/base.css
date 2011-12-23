@@ -165,7 +165,6 @@ body {
  * Highlight the input box partially on hover.
  */
 .queryInput:hover {
-    /* Darken the text so that it is more prominent. */
     border-color: #96968E;
 }
 
@@ -238,7 +237,7 @@ body {
     /* Use the hand cursor for the padded area, just like the button. */
     cursor: pointer;
     
-    /* TODO: Determine if there should be a separate class for CSS transition fade ins. */
+    /* TODO: Use fade class. */
     /* Transition for Mozilla (Firefox 4.0+) */
     -moz-transition:    opacity 1s ease-in;
     /* Transition for WebKit */
