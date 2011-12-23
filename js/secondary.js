@@ -428,7 +428,6 @@
                         webkit_cursor_hack(page, "hidden_cursor", 1);
                     } else {
                         /// Mozilla/IE9
-                        //page.style.cursor = "none";
                         BF.toggleCSS(page, "hidden_cursor", 1);
                     }
                     
