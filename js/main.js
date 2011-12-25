@@ -101,23 +101,6 @@
     };
     
     
-    /// Add the Array.forEach function if not present.
-    ///TODO: Remove this as soon as a non-JavaScript version of BibleForge is ready.
-    if (![].forEach) {
-        Array.prototype.forEach = function(callback, thisArg)
-        {
-            var len = this.length,
-                i;
-            
-            if (typeof callback === "function") {
-                for (i = 0; i < len; i += 1) {
-                    ///NOTE: Since JavaScript allows this function to set the "this" variable, we must use .call().
-                    callback.call(thisArg, this[i], i, this);
-                }
-            }
-        };
-    }
-    
     /// Declare helper function(s) attached to the global BibleForge object (BF).
     
     /// Detect WebKit based browsers.
