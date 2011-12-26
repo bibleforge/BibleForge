@@ -880,7 +880,7 @@
                     }
                 }
                 
-                return function (point_to) {
+                return function (point_to, ajax) {
                     var callout = document.createElement("div"),
                         inside  = document.createElement("div"),
                         pointer = document.createElement("div"),
@@ -943,6 +943,8 @@
                         destroy: function ()
                         {
                             document.body.removeChild(callout);
+                            /// In case the data is still loading, try to abort the request.
+                            ajax.abort();
                         },
                         move: function (x)
                         {
@@ -1018,7 +1020,7 @@
                             callout.replace_HTML(html);
                         });
                         
-                        callout = create_callout(clicked_el);
+                        callout = create_callout(clicked_el, ajax);
                         callouts[callouts.length] = callout;
                     }
                 }, false);
