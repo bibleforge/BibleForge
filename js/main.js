@@ -135,9 +135,10 @@
      */
     BF.Create_easy_ajax = function ()
     {
-        var ajax = new window.XMLHttpRequest(),
+        var aborted,
+            ajax = new window.XMLHttpRequest(),
             ajax_timeout;
-    
+        
         return {
             abort: function ()
             {
@@ -146,6 +147,7 @@
                     /// Stop it from retrying first.
                     window.clearTimeout(ajax_timeout);
                     ajax.abort();
+                    aborted = true;
                 }
             },
             is_busy: function ()
@@ -195,6 +197,9 @@
                  */
                 return function (method, path, message, onsuccess, onfailure, timeout, retry)
                 {
+                    /// Reset the aborted variable (needed if the query was previously aborted).
+                    aborted = false;
+                    
                     /// Determine if arguments were passed to the last two parameters.  If not, set the defaults.
                     if (typeof timeout === "undefined") {
                         /// Default to 10 seconds.
@@ -212,6 +217,12 @@
                     ajax.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
                     ajax.onreadystatechange = function ()
                     {
+                        /// readyState status codes:
+                        /// 0 = uninitialized    (.open() has not been called)
+                        /// 1 = opened           (.open() called but .send() has not been called)
+                        /// 2 = headers_recieved (.send() called and the headers and status are ready)
+                        /// 3 = loading          (downloading content; .responseText should have some data)
+                        /// 4 = completed        (finished downloading all data)
                         if (ajax.readyState === 4) {
                             /// Stop the timeout timer that may be running so it does not try again.
                             window.clearTimeout(ajax_timeout);
@@ -228,8 +239,7 @@
                                 }
                                 
                                 /// Should it retry?
-                                ///NOTE: ajax.status !== 0 prevents it from retrying when it was aborted intentionally.
-                                if (retry && ajax.status !== 0) {
+                                if (retry && !aborted) {
                                     send_query(message, timeout, retry);
                                 }
                             }
