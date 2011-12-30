@@ -484,8 +484,6 @@ first_loop:     while (i < search_terms_arr_len) {
          * @example	verse_id = determine_reference("love");						/// Returns FALSE
          * @param	ref (string) The text that may or may not be a valid verse reference.
          * @return	The verse id of a reference or 0 if invalid.
-         * @note	Called by run_search() in js/main.js.
-         * @note	Requires books_re and book_arr_re global regex variables.
          */
         determine_reference: (function ()
         {
