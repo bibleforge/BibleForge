@@ -49,7 +49,7 @@
  * @note    The object that is created is used by main.js to preform language specific operations.
  * @return  Returns an object containing language specific functions and variables.
  */
-BF.lang = (function ()
+BF.langs.en = (function ()
 {
     "use strict";
     

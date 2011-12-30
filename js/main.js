@@ -51,6 +51,10 @@
 {
     "use strict";
     
+    /// Set the default language.
+    ///TODO: This should be based on browser language settings and IP address.
+    BF.lang = BF.langs.en;
+    
     /// Prototypes
     
     /// Adds trim() to Strings for IE 8-/Opera 10.1-/Safari 4-/Mozilla 3.0-.
