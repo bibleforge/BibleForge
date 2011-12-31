@@ -290,7 +290,7 @@
             ///TODO: Use the data in this variable and maybe make a way to ignore the cache is needed.
             var files = {};
             
-            return function (path, context, timeout, retry)
+            return function (path, context, callback, timeout, retry)
             {
                 var ajax = new BF.Create_easy_ajax();
                 
@@ -300,6 +300,9 @@
                     ///TODO: Determine what kind of error handling should be done.
                     if (typeof files[path] === "function") {
                         files[path](context);
+                    }
+                    if (typeof callback === "function") {
+                        callback();
                     }
                 }, null, timeout, retry);
             };
