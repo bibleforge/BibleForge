@@ -787,6 +787,22 @@ h2 {
 }
 
 
+.lang_en_em, .lang_en_em .verse_number, .lang_en_em .book, .lang_en_em .chapter, .lang_en_em .short_book, .lang_en_em .first_verse:first-letter, .lang_en_em .first_paragraph:first-letter, .lang_en_em .d {
+    /* Enable advanced OpenType typographic features in Mozilla. */
+    /* dlig = Discretionary Ligatures (combine certain characters, e.g., "ct") */
+    /* ss01 = Stylistic Set 1 (e.g., long s (ſ)) */
+    /*BUG Automatic conversion of short s's to long s's is not always correct. */
+    /*    For example, Colossians is sometimes spelled "Coloſsians" and other times "Coloſſians." */
+    /*    One true error is 2 Samuel 19:16 where "wass" is rendered "waß"; whereas the KJV 1611 has "wass," surprisingly. */
+    -moz-font-feature-settings: "dlig=1,ss01=1";
+    font-family: 'IM Fell DW Pica', 'Palatino Linotype', Palatino, TexGyrePagella, 'TeX Gyre Pagella', 'URWPalladioL', 'Book Antiqua', 'Times new Roman', Times, serif!important;
+}
+
+.lang_en_em {
+    font-size: 19px;
+}
+
+
 /* The divine name of God */
 .d {
     /* Firefox 4.0+ also supports -moz-font-feature-settings:'smcp=1' which turns on small caps as well */
@@ -949,4 +965,27 @@ h2 {
          url('../fonts/BFHebrew.woff')       format('woff');
     font-weight: normal;
     font-style:  normal;
+}
+
+@font-face {
+    font-family: 'IM Fell DW Pica';
+    src: local('IM Fell DW Pica');
+    src: url('../fonts/imfepirm28p.eot');
+    src: url('../fonts/imfepirm28p.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/imfepirm28p.woff') format('woff'),
+         url('../fonts/imfepirm28p.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'IM Fell DW Pica';
+    src: local('IM Fell DW Pica');
+    src: url('../fonts/imfepiit28p.eot');
+    src: url('../fonts/imfepiit28p.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/imfepiit28p.woff') format('woff'),
+         url('../fonts/imfepiit28p.ttf') format('truetype');
+    font-weight: normal;
+    font-style: italic;
 }

@@ -1146,8 +1146,8 @@
                 /// Does the language exist?
                 if (BF.langs[identifier]) {
                     /// Is the new language different from the current language?
-                    if (BF.lang.indentifier !== identifier) {
-                        prev_lang = BF.lang.indentifier;
+                    if (BF.lang.identifier !== identifier) {
+                        prev_lang = BF.lang.identifier;
                         
                         activate_new_lang = function ()
                         {
@@ -1156,8 +1156,10 @@
                             
                             ///TODO: Also, reload the current page in the new language.
                             context.content_manager.clear_scroll();
-                            /// Make the cursor turn into a hand when hovering over words if there is lexical data avaiable.
-                            BF.toggleCSS(page, "linked", BF.lang.linked_to_orig);
+                            /// Make the cursor turn into a hand when hovering over words if there is lexical data available.
+                            BF.toggleCSS(page, "linked", BF.lang.linked_to_orig ? 1 : 0);
+                            BF.toggleCSS(page, "lang_" + prev_lang,  0);
+                            BF.toggleCSS(page, "lang_" + identifier, 1);
                             
                             context.system.event.trigger("languageChange", {
                                 ///NOTE: Currently, not used, but migth be useful in the future.
@@ -1174,7 +1176,8 @@
                 }
             }
             
-            change_langEl_text(BF.lang.short_name)
+            change_langEl_text(BF.lang.short_name);
+            BF.toggleCSS(page, "lang_" + BF.lang.identifier, 1);
             
             /// The language button is hidden until the current language name is displayed.
             ///TODO: Also, change the padding of the qEl.
