@@ -524,6 +524,7 @@
             /// DOM Elements
             bottomLoader,
             infoBar,
+            langEl,
             page,
             qEl,
             searchForm,
@@ -538,6 +539,7 @@
         ///     │  │  └─►searchForm
         ///     │  │     └─►label
         ///     │  │        └─►nobr
+        ///     │  │           ├─►lang
         ///     │  │           ├─►q
         ///     │  │           └─►button
         ///     │  └─>infoBar
@@ -547,11 +549,30 @@
         
         topBar       = viewPort.firstChild;
         searchForm   = topBar.firstChild.firstChild;
-        qEl          = searchForm.firstChild.firstChild.firstChild;
+        langEl       = searchForm.firstChild.firstChild.firstChild;
+        qEl          = langEl.nextSibling;
         topLoader    = topBar.nextSibling;
         page         = topLoader.nextSibling;
         bottomLoader = page.nextSibling;
         infoBar      = topBar.lastChild;
+        
+        /// The language button is hidden until the current language name is displayed.
+        ///TODO: Also, change the padding of the qEl.
+        langEl.style.visibility = "visible";
+        
+        if (BF.is_WebKit) {
+            ///HACK: A tremendously ugly hack to make WebKit not center align langEl.
+            (function ()
+            {
+                /// If there is an input element before langEl, it will align correctly.
+                var dummy = document.createElement("input");
+                dummy.type = "image";
+                dummy.style.cssText = "width: 0; height: 0;";
+                langEl.parentNode.insertBefore(dummy, langEl);
+            }());
+        }
+        
+        langEl.value = BF.lang.short_name;
         
         (function ()
         {

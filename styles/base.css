@@ -11,6 +11,14 @@
 /*TODO: Completely document the CSS. */
 /*TODO: Re-order (as well as maybe group) the styles alphabetically. */
 
+/* Normalize Mozilla button styles. */
+/* Also, remove the ugly dashed border on the text of buttons in Mozilla when clicked. */
+button::-moz-focus-inner, input::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+}
+
+
 html, body {
     margin: 0;
     padding: 0;
@@ -184,6 +192,31 @@ body {
     padding: 8px;
 }
 
+.lang {
+    background: rgba(0,0,200,.05);
+    color: rgba(0, 0, 0, 0.2);
+    font-size: 13px;
+    
+    cursor: pointer;
+    
+    /* Rounded corners for Mozilla 3.6- */
+    -moz-border-radius: 15px 0 0 15px;
+    border-radius:      15px 0 0 15px;
+    
+    border: none transparent;
+    border-right: 1px solid rgba(0,0,0,.1);
+    
+    /* Align the element inside of queryInput */
+    position: absolute;
+    margin: 0 0 0 31px;
+    top: 3px;
+    height: 22px;
+    
+    padding-right: 4px;
+    
+    /* Hide by default so that the default language name can be added first. */
+    visibility: hidden;
+}
 
 .inputIcon {
     /* Move the icon over the right end of the input box. */
@@ -449,12 +482,6 @@ button:active {
     
     background-color: #E1E1FF;
 }
-
-/* Remove the ugly dashed border on the text of buttons in Mozilla when clicked. */
-button::-moz-focus-inner {
-    border: 0;
-}
-
 
 .scrolls {
     overflow: hidden;
