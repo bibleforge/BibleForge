@@ -2151,11 +2151,12 @@
                  *
                  * @example run_new_query("John 3:16"); /// Looks up John 3:6 (and following)
                  * @example run_new_query("love");      /// Searches for the word "love"
-                 * @param   raw_query (string) The text from the user to query.
+                 * @param   raw_query (string)  The text from the user to query.
+                 * @param   automated (boolean) Whether or not this query was made by the program without user interaction.
                  * @return  NULL
                  * @note    Called by searchForm.onsubmit() when a user submits a query.
                  */
-                return function (raw_query)
+                return function (raw_query, automated)
                 {
                     /// Step 1: Prepare string and check to see if we need to search (not empty)
                     
@@ -2222,8 +2223,10 @@
                     ///TODO: Determine if this should be done by a separate function.
                     document.title = raw_query + " - " + BF.lang.app_name;
                     
-                    /// Stop filling in the explanation text so that the user can make the query box blank.  (Text in the query box can be distracting while reading.)
-                    qEl.onblur = function () {};
+                    if (!automated) {
+                        /// Stop filling in the explanation text so that the user can make the query box blank.  (Text in the query box can be distracting while reading.)
+                        qEl.onblur = function () {};
+                    }
                     
                     /// Was the query a search?  Searches need to have the highlight function prepared for the incoming results.
                     if (options.type !== verse_lookup) {
@@ -2398,7 +2401,7 @@
             window.setTimeout(function ()
             {
                 if (query_manager.raw_query === "") {
-                    run_new_query("Genesis 1:1");
+                    run_new_query("Genesis 1:1", true);
                 }
             }, 200);
             
