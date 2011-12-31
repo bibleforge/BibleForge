@@ -81,7 +81,7 @@ BF.langs.en_em = (function ()
         blog:              "Weblog",                                              /// Context menu item
         chapter:           "Chapter",                                             /// Chapter headings
         configure:         "Configure",                                           /// Context menu item
-        done:              "Finiſh"                                               /// The button that closes panels
+        done:              "Finiſh",                                               /// The button that closes panels
         found_plural:      " verſes found for ",                                  /// On the info bar when searching (multiple results)
         found_singular:    " verſe found for ",                                   /// On the info bar when searching (one result)
         help:              "Succor",                                              /// Context menu item
