@@ -277,7 +277,7 @@ class SphinxClient
      * Only match records where $attribute value is in given set.
      *
      * @example	$sphinx_res = $sphinx->Query($query, 'index');
-     * @example	$sphinx_res = $sphinx->Query('love', 'verse_text'); /// Do a simple search for the word "love."
+     * @example	$sphinx_res = $sphinx->Query('love', 'verse_text_english'); /// Do a simple search for the word "love."
      * @param	$query		(string)			The string to search for.
      * @param	$index		(string) (optional)	The index to use.  The default is "*" which searches through all indices.
      * @param	$comment	(string) (optional)	Comments are recorded in the query log and are placed in square brackets to be used for debugging purposes.
