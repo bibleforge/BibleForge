@@ -121,7 +121,8 @@ body {
     background: rgba(255,255,255,.5);
     
     /* Padding is used to push the text away from the rounded corners. */
-    padding: 3px 25px 1px 7px;
+    /*TODO: The left padding should be calculated dynamically based on the length of the language name. (And then change it back to 7px.) */
+    padding: 3px 25px 1px 28px;
     
     font-size: 15px;
     
@@ -194,19 +195,21 @@ body {
 
 .lang {
     background: rgba(0,0,200,.05);
-    color: rgba(0, 0, 0, 0.2);
+    color: rgba(0,0,0,.2);
     font-size: 13px;
     
     cursor: pointer;
     
+    /* Round just the left side to match queryInput. */
     /* Rounded corners for Mozilla 3.6- */
     -moz-border-radius: 15px 0 0 15px;
     border-radius:      15px 0 0 15px;
     
+    /* Just have a single border on the right to separate it from queryInput. */
     border: none transparent;
     border-right: 1px solid rgba(0,0,0,.1);
     
-    /* Align the element inside of queryInput */
+    /* Align the element inside of queryInput. */
     position: absolute;
     margin: 0 0 0 31px;
     top: 3px;
@@ -270,7 +273,7 @@ body {
     /* Use the hand cursor for the padded area, just like the button. */
     cursor: pointer;
     
-    /* TODO: Use fade class. */
+    /*TODO: Use fade class. */
     /* Transition for Mozilla (Firefox 4.0+) */
     -moz-transition:    opacity 1s ease-in;
     /* Transition for WebKit */
@@ -317,14 +320,14 @@ body {
     /* Transition for Opera 10.5+ */
     -o-transition:      opacity .2s ease-in;
     
-    /* Rounded corners for Mozilla */
+    /* Rounded corners for Mozilla 3.6- */
     -moz-border-radius: 3px;
     /* Rounded corners for Opera 10.5+, IE 9+, WebKit 532.5+ (Chrome 4, Safari 5), Gecko 2 (Mozilla 4.0) */
     border-radius:      3px;
     
     /* This shadow is slightly dimmer than the panel because it is supposed to look higher up. */
-    /* TODO: The direction of the shadow could be set dynamically based on where it is on the page. */
-    /* NOTE: IE has its own DropShadow filter that could be used. */
+    /*TODO: The direction of the shadow could be set dynamically based on where it is on the page. */
+    /*NOTE: IE has its own DropShadow filter that could be used. */
     /* Mozilla 3.5- */
     -moz-box-shadow:    2px 2px 3px rgba(0,0,0,.2);
     /* WebKit 522 (Chrome, Safari 3) */
@@ -440,24 +443,25 @@ legend {
 }
 
 button {
-   border: 1px solid #8EC1DA;
-   
-   border-radius:      4px;
-   -moz-border-radius: 4px;
-   
-   background-color: rgba(221,238,246,.3);
-   
-   /* Opera 10.5/Mozilla 4.0 */
-   box-shadow:         inset 0 1px 3px rgba(255,255,255,.5), inset 0 -15px 1px rgba(203,230,242,.3), 0 0 3px rgba(142,193,218,.3);
-   -webkit-box-shadow: inset 0 1px 3px rgba(255,255,255,.5), inset 0 -15px 1px rgba(203,230,242,.3), 0 0 3px rgba(142,193,218,.3);
-   -moz-box-shadow:    inset 0 1px 3px rgba(255,255,255,.5), inset 0 -15px 1px rgba(203,230,242,.3), 0 0 3px rgba(142,193,218,.3);
-   
-   color:       #3985A8;
-   text-shadow: 0 1px #FFF;
-   
-   padding: 5px 14px;
-   outline: 0;
-   
+    border: 1px solid #8EC1DA;
+    
+    border-radius:      4px;
+    /* Rounded corners for Mozilla 3.6- */
+    -moz-border-radius: 4px;
+    
+    background-color: rgba(221,238,246,.3);
+    
+    /* Opera 10.5/Mozilla 4.0 */
+    box-shadow:         inset 0 1px 3px rgba(255,255,255,.5), inset 0 -15px 1px rgba(203,230,242,.3), 0 0 3px rgba(142,193,218,.3);
+    -webkit-box-shadow: inset 0 1px 3px rgba(255,255,255,.5), inset 0 -15px 1px rgba(203,230,242,.3), 0 0 3px rgba(142,193,218,.3);
+    -moz-box-shadow:    inset 0 1px 3px rgba(255,255,255,.5), inset 0 -15px 1px rgba(203,230,242,.3), 0 0 3px rgba(142,193,218,.3);
+    
+    color:       #3985A8;
+    text-shadow: 0 1px #FFF;
+    
+    padding: 5px 14px;
+    outline: 0;
+
     /* Fade the background color on mouse down. */
     /* Transition for Mozilla (Firefox 4.0+) */
     -moz-transition:    background-color .1s;
@@ -522,6 +526,7 @@ label {
 }
 
 .callout {
+    /* Rounded corners for Mozilla 3.6- */
     -moz-border-radius: 9px;
     border-radius:      9px;
     -moz-box-shadow:    3px 3px 6px rgba(0,0,0,.2), inset -1px 0 2px rgba(0,0,0,.2);
