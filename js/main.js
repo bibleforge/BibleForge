@@ -2163,7 +2163,7 @@
                     var options = {
                             raw_query: raw_query
                         },
-                        query   = BF.lang.prepare_search(raw_query).trim(),
+                        query = BF.lang.prepare_search(raw_query).trim(),
                         /// Search terms that are not grammatical.
                         standard_terms,
                         verse_id;
