@@ -803,7 +803,7 @@ h2 {
     font-size: 19px;
 }
 
-/* Increase the size of book post- and pre-titles. */
+/* Increase the size of book post- and pre-titles because they look a little small in this font (IM Fell DW Pica). */
 .lang_en_em h2 {
     font-size: 30px;
 }
