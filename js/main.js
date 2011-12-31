@@ -2405,6 +2405,13 @@
                 }
             }, 200);
             
+            system.event.attach("languageChange", function (e)
+            {
+                if (qEl.value.trim() === BF.langs[e.prev_lang].query_explanation) {
+                    qEl.value = BF.lang.query_explanation;
+                }
+            });
+            
             /// After a short delay, lazily load extra, nonessential (or at least not immediately essential) code, like the wrench menu.
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
@@ -2476,6 +2483,7 @@
             }
         };
         
+        /// Besides setting the text, is there a reason to call this function?
         qEl.onblur();
     };
     

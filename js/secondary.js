@@ -543,6 +543,12 @@
             ///TODO: Determine if the alt tag should be shorter, like "Configure."
             wrench_button.alt   = BF.lang.wrench_title;
             
+            context.system.event.attach("languageChange", function (e)
+            {
+                wrench_button.title = BF.lang.wrench_title;
+                wrench_button.alt   = BF.lang.wrench_title;
+            });
+            
             wrench_label.htmlFor = wrench_button.id;
             
             /// A label is used to allow the cursor to be all the way in the corner and still be able to click on the button.
@@ -571,6 +577,7 @@
              */
             show_configure_panel = (function ()
             {
+                ///FIXME: Make it so that this text can be updated onLanguageChange.
                 var panel_element   = document.createElement("div"),
                     settings_config = [
                         {
@@ -1160,7 +1167,6 @@
                             BF.toggleCSS(page, "lang_" + identifier, 1);
                             
                             context.system.event.trigger("languageChange", {
-                                ///NOTE: Currently, not used, but migth be useful in the future.
                                 prev_lang: prev_lang
                             });
                         };
