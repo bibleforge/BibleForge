@@ -2468,7 +2468,7 @@
         /// Inject CSS to make the drop caps aligned with the second line of text and add an inset shadow to the input box.
         ///NOTE: Needed for at least Chromium 9.
         ///TODO: Determine if this would be better as a function.
-        document.body.appendChild(document.createElement("style").appendChild(document.createTextNode(".first_verse:first-letter, .first_paragraph:first-letter { margin-bottom: 0; margin-top: 5px; padding: 1px;  } .queryInput { background: url('data:image/gif;base64,R0lGODlhAQADAKEDAN3d3eTk5PLy8v///yH5BAEKAAMALAAAAAABAAMAAAICRFQAOw==') top repeat-x rgba(255, 255, 255, .5); }")).parentNode);
+        document.body.appendChild(document.createElement("style").appendChild(document.createTextNode(".first_verse:first-letter, .first_paragraph:first-letter {margin-bottom: 0; margin-top: 5px; padding: 1px;}")).parentNode);
     }
     
     /****************************
