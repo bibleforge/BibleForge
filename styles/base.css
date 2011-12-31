@@ -803,6 +803,11 @@ h2 {
     font-size: 19px;
 }
 
+/* Increase the size of book post- and pre-titles. */
+.lang_en_em h2 {
+    font-size: 30px;
+}
+
 
 /* The divine name of God */
 .d {
