@@ -510,22 +510,48 @@
     /**
      * Initialize the BibleForge environment.
      *
-     * This function is used to house all of the code used by BibleForge,
-     * expect for language specific code, which is stored in js/lang/LOCALE.js.
+     * Load all of the JavaScript necessary to start BibleForge running,
+     * and then load the remainder lazily.
      *
      * @param  viewPort     (object) The HTML element which encapsulates all of the other objects.
-     * @param  searchForm   (object) The <form> element which contains the text box and button.
-     * @param  q_obj        (object) The <input> element the user types into.
-     * @param  page         (object) The HTML element which contains all of the Bible contents.
-     * @param  infoBar      (object) The HTML element that displays information about the lookups and searches.
-     * @param  topLoader    (object) The HTML element which displays the loading image above the text.
-     * @param  bottomLoader (object) The HTML element which displays the loading image below the text.
      * @param  doc_docEl    (object) The document.documentElement element (the HTML element).
      * @return NULL.  Some functions are attached to events and the rest accompany them via closure.
      */
-    BF.create_viewport = function (viewPort, searchForm, q_obj, page, infoBar, topLoader, bottomLoader, doc_docEl)
+    BF.create_viewport = function (viewPort, doc_docEl)
     {
-        var run_new_query;
+        var run_new_query,
+            
+            /// DOM Elements
+            bottomLoader,
+            infoBar,
+            page,
+            qEl,
+            searchForm,
+            topBar,
+            topLoader;
+        
+        /// Find the DOM elements relative to viewPort.
+        /// Expected HTML Structure:
+        ///     viewPort
+        ///     ├─►topBar
+        ///     │  ├─►searchBar
+        ///     │  │  └─►searchForm
+        ///     │  │     └─►label
+        ///     │  │        └─►nobr
+        ///     │  │           ├─►q
+        ///     │  │           └─►button
+        ///     │  └─>infoBar
+        ///     ├─►topLoader
+        ///     ├─►scroll
+        ///     └─►bottomLoader
+        
+        topBar       = viewPort.firstChild;
+        searchForm   = topBar.firstChild.firstChild;
+        qEl          = searchForm.firstChild.firstChild.firstChild;
+        topLoader    = topBar.nextSibling;
+        page         = topLoader.nextSibling;
+        bottomLoader = page.nextSibling;
+        infoBar      = topBar.lastChild;
         
         (function ()
         {
@@ -2181,7 +2207,7 @@
                     document.title = raw_query + " - " + BF.lang.app_name;
                     
                     /// Stop filling in the explanation text so that the user can make the query box blank.  (Text in the query box can be distracting while reading.)
-                    q_obj.onblur = function () {};
+                    qEl.onblur = function () {};
                     
                     /// Was the query a search?  Searches need to have the highlight function prepared for the incoming results.
                     if (options.type !== verse_lookup) {
@@ -2310,7 +2336,7 @@
                 ///TODO: Determine if capturing Backspace and/Space is confusing because they have alternate functions (the back button and page down, respectively).
                 ///      One possible solution is to allow Shift, Ctrl, or Alt + Backspace or Space to be the normal action.
                 if (keyCode === 8 || keyCode === 13 || keyCode === 32 || (keyCode > 47 && keyCode < 91) || (keyCode > 95 && keyCode < 112) || (keyCode > 185 && keyCode < 255)) {
-                    q_obj.focus();
+                    qEl.focus();
                 } else if (keyCode === 38 || keyCode === 40) {
                     /// Force browsers to scroll one line of text at a time.
                     ///NOTE: window.pageYOffset % line_height calculates the offset from the nearest line to snap the view to a line.
@@ -2368,7 +2394,7 @@
                     page:         page,
                     settings:     settings,
                     system:       system,
-                    topBar:       viewPort.firstChild,
+                    topBar:       topBar,
                     viewPort_num: viewPort_num
                 });
             }, 1000);
@@ -2387,11 +2413,11 @@
          */
         searchForm.onsubmit = function ()
         {
-            var raw_query = q_obj.value;
+            var raw_query = qEl.value;
             
             /// Is the query is the same as the explanation?  If so, do not submit the query; just draw attention to the query box.
             if (raw_query === BF.lang.query_explanation) {
-                q_obj.focus();
+                qEl.focus();
             } else {
                 run_new_query(raw_query);
             }
@@ -2404,10 +2430,10 @@
          * Set the query input box text with an explanation of what the user can enter in.
          *
          * @return NULL
-         * @note   Called on q_obj blur.
+         * @note   Called on qEl blur.
          * @note   This function is removed after the user submits a search by prepare_new_search() because the user no longer needs the instructions.
          */
-        q_obj.onblur = function ()
+        qEl.onblur = function ()
         {
             if (this.value.trim() === "") {
                 this.value = BF.lang.query_explanation;
@@ -2419,16 +2445,16 @@
          * Remove the explanation text so that the user can type.
          *
          * @return NULL
-         * @note   Called on q_obj focus.
+         * @note   Called on qEl focus.
          */
-        q_obj.onfocus = function ()
+        qEl.onfocus = function ()
         {
             if (this.value === BF.lang.query_explanation) {
                 this.value = "";
             }
         };
         
-        q_obj.onblur();
+        qEl.onblur();
     };
     
     
@@ -2570,6 +2596,5 @@
      ***************************/
     
     /// Initialize BibleForge.
-    ///TODO: Require just one element and find the rest dynamically.
-    BF.create_viewport(document.getElementById("viewPort0"), document.getElementById("searchForm0"), document.getElementById("q0"), document.getElementById("scroll0"), document.getElementById("infoBar0"), document.getElementById("topLoader0"), document.getElementById("bottomLoader0"), document.documentElement);
+    BF.create_viewport(document.getElementById("viewPort0"), document.documentElement);
 }());
