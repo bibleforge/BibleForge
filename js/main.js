@@ -1872,6 +1872,7 @@
                             /// q Query     (string)  The verse reference or search string to query
                             /// s Start At  (string)  The verse or word id at which to start the query       (search only)
                             /// t Type      (number)  The type of query (verse_lookup, mixed_search, standard_search, grammatical_search)
+                            /// l Language  (number)  The language to use.
                             
                             var query_str = "t=" + options.type;
                             
@@ -1902,6 +1903,10 @@
                                 } else if (options.verse) {
                                     query_str += "&s=" + options.verse;
                                 }
+                            }
+                            
+                            if (options.lang_id) {
+                                query_str += "&l=" + options.lang_id;
                             }
                             
                             return query_str;
@@ -1953,8 +1958,9 @@
                                     }
                                     
                                     options.direction     = direction;
-                                    /// Since this settings can be changed by the user at run time, it must be retrieved before each query.
+                                    /// Since these settings can be changed by the user at run time, it must be retrieved before each query.
                                     options.in_paragraphs = in_paragraphs;
+                                    options.lang_id = BF.lang.lang_id;
                                     
                                     ajax.query("post", "query.php", create_query_message(options), function (data)
                                     {
@@ -2007,6 +2013,7 @@
                                         top_id:       0,
                                         top_verse:    0
                                     };
+                                    options.lang_id = BF.lang.lang_id;
                                     
                                     /// Make the initial query with ajax_additional because all initial queries add more verses.
                                     ajax_additional.query("post", "query.php", create_query_message(options), function (data)
@@ -2152,7 +2159,9 @@
                     /// Step 1: Prepare string and check to see if we need to search (not empty)
                     
                     ///NOTE: Whitespace must be trimmed after this function because it may create excess whitespace.
-                    var options = {raw_query: raw_query},
+                    var options = {
+                            raw_query: raw_query
+                        },
                         query   = BF.lang.prepare_search(raw_query).trim(),
                         /// Search terms that are not grammatical.
                         standard_terms,

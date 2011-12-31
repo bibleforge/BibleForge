@@ -43,6 +43,7 @@ require_once 'constants.php';
 /// q Query     (string)  The verse reference or search string to query
 /// s Start At  (string)  The verse or word id at which to start the query       (search only)
 /// t Type      (number)  The type of query (VERSE_LOOKUP, MIXED_SEARCH, STANDARD_SEARCH, GRAMMATICAL_SEARCH)
+/// l Language  (number)  The language to use.
 
 ///TODO: Compare POST vs GET vs REQEUST.
 
