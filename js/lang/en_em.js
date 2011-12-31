@@ -63,6 +63,7 @@ BF.langs.en_em = (function ()
         full_name:  "Early Modern English (1611)",
         short_name: "1611",
         identifier: "en_em",
+        lang_id:    1,
         
         /// Book names
         books_long_main:      ["", "Genesis", "Exodus", "Leuiticus", "Numbers", "Deuteronomie", "Ioshua", "Iudges", "Ruth", "Samuel", "Samuel", "The Kings", "The Kings", "Chronicles", "Chronicles", "Ezra", "Nehemiah", "Esther", "Iob", "Psalmes", "The Prouerbes", "Ecclesiastes", "Solomon", "Prophet Isaiah", "Prophet Ieremiah", "The Lamentations", "Prophet Ezekiel", "Daniel", "Hosea", "Ioel", "Amos", "Obadiah", "Ionah", "Micah", "Nahum", "Habakkuk", "Zephaniah", "Haggai", "Zechariah", "Malachi", "Matthew", "Marke", "Luke", "Iohn", "The Actes of", "Epistle of Paul the", "of Paul the Apostle to the", "of Paul the Apostle to the", "Paul to the Galatians", "the Apostle to the Ephesians", "the Apostle to the Philippians", "the Apostle to the Colossians", "Paul the Apostle to the Thessalonians", "of Paul the Apostle to the", "of Paul the Apostle to Timothie", "of Paul the Apostle to Timothie", "Paul to Titus", "Paul to Philemon", "the Apostle to the Hebrewes", "Epistle of Iames", "generall of Peter", "generall of Peter", "generall of Iohn", "The second Epistle of Iohn", "The third Epistle of Iohn", "Epistle of Iude", "The Reuelation"],
