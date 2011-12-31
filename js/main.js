@@ -2484,7 +2484,7 @@
         /// Also removes extra padding on buttons (this emulates button clicks on other browsers).
         ///NOTE: Needed for at least Opera 10.63.
         ///TODO: Determine if this would be better as a function.
-        document.body.appendChild(document.createElement("style").appendChild(document.createTextNode(".first_verse:first-letter, .first_paragraph:first-letter { margin-bottom: 0; margin-top: 13px; padding: 1px; } button:active { padding: 5px 14px; }")).parentNode);
+        document.body.appendChild(document.createElement("style").appendChild(document.createTextNode(".first_verse:first-letter, .first_paragraph:first-letter {margin-bottom: 0; margin-top: 13px; padding: 1px;} button:active {padding: 5px 14px;}")).parentNode);
     }
     
 
@@ -2587,7 +2587,7 @@
         /// IE9+ CSS: Make the inputIcon appear next to the queryInput.
         ///NOTE: The query box is slightly off centered in IE9 with this CSS.
         @if (@_jscript_version >= 9)
-            document.body.appendChild(document.createElement("style").appendChild(document.createTextNode(".inputIcon { position: relative; } .first_verse:first-letter, .first_paragraph:first-letter { margin-top: 5px; }")).parentNode);
+            document.body.appendChild(document.createElement("style").appendChild(document.createTextNode(".inputIcon {position: relative;} .first_verse:first-letter, .first_paragraph:first-letter {margin-top: 5px;}")).parentNode);
         @end
     @*/
     
