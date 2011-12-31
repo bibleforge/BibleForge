@@ -513,7 +513,8 @@ button:active {
     padding: 0 4px 0 4px;
 }
 
-.scrolls a {
+/* Display a hand cursor for words that can be looked up. */
+.linked a {
     cursor: pointer;
 }
 

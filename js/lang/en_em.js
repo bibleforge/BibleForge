@@ -65,6 +65,8 @@ BF.langs.en_em = (function ()
         identifier: "en_em",
         lang_id:    1,
         
+        linked_to_orig: false,
+        
         /// Book names
         books_long_main:      ["", "Genesis", "Exodus", "Leuiticus", "Numbers", "Deuteronomie", "Ioshua", "Iudges", "Ruth", "Samuel", "Samuel", "The Kings", "The Kings", "Chronicles", "Chronicles", "Ezra", "Nehemiah", "Esther", "Iob", "Psalmes", "The Prouerbes", "Ecclesiastes", "Solomon", "Prophet Isaiah", "Prophet Ieremiah", "The Lamentations", "Prophet Ezekiel", "Daniel", "Hosea", "Ioel", "Amos", "Obadiah", "Ionah", "Micah", "Nahum", "Habakkuk", "Zephaniah", "Haggai", "Zechariah", "Malachi", "Matthew", "Marke", "Luke", "Iohn", "The Actes of", "Epistle of Paul the", "of Paul the Apostle to the", "of Paul the Apostle to the", "Paul to the Galatians", "the Apostle to the Ephesians", "the Apostle to the Philippians", "the Apostle to the Colossians", "Paul the Apostle to the Thessalonians", "of Paul the Apostle to the", "of Paul the Apostle to Timothie", "of Paul the Apostle to Timothie", "Paul to Titus", "Paul to Philemon", "the Apostle to the Hebrewes", "Epistle of Iames", "generall of Peter", "generall of Peter", "generall of Iohn", "The second Epistle of Iohn", "The third Epistle of Iohn", "Epistle of Iude", "The Reuelation"],
         books_long_posttitle: ["", "", "", "", "", "", "", "", "", "otherwise called, The first Booke of the Kings", "otherwise called, The second Booke of the Kings", "commonly called, The third Booke of the Kings", "commonly called, The fourth Booke of the Kings", "", "", "", "", "", "", "", "", "or the Preacher", "", "", "", "of Ieremiah", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "the Apostles", "Apostle to the Romanes", "Corinthians", "Corinthians", "", "", "", "", "", "Thessalonians", "", "", "", "", "", "", "", "", "", "", "", "", "of Jesus Christ"],
@@ -82,7 +84,7 @@ BF.langs.en_em = (function ()
         blog:              "Weblog",                                              /// Context menu item
         chapter:           "Chapter",                                             /// Chapter headings
         configure:         "Configure",                                           /// Context menu item
-        done:              "Finiſh",                                               /// The button that closes panels
+        done:              "Finiſh",                                              /// The button that closes panels
         found_plural:      " verſes found for ",                                  /// On the info bar when searching (multiple results)
         found_singular:    " verſe found for ",                                   /// On the info bar when searching (one result)
         help:              "Succor",                                              /// Context menu item

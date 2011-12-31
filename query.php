@@ -89,7 +89,7 @@ if ($_REQUEST['t'] == VERSE_LOOKUP) {
     standard_search($_REQUEST['q'], $_REQUEST['d'], LIMIT, $lang[$_REQUEST['l']], isset($_REQUEST['s']) ? (int)$_REQUEST['s'] : 0);
 } elseif ($_REQUEST['t'] == LEXICON_LOOKUP) {
     require_once 'functions/lexicon_lookup.php';
-    retrieve_lexical_data($_REQUEST['q']);
+    retrieve_lexical_data($_REQUEST['q'], $lang[$_REQUEST['l']]);
 } else { /// GRAMMATICAL_SEARCH
     require_once 'functions/grammatical_search.php';
     /// Example query: '["love", [[4,1]], [1]]' (love AS NOUN) or '["love", [[3,1], [7,1]], [1,0]]' (love AS RED, NOT PRESENT)

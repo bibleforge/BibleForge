@@ -982,6 +982,11 @@
             {
                 var callouts = [];
                 
+                /// Since this is not styled by initially, it needs to be set now.
+                if (BF.lang.linked_to_orig) {
+                    BF.toggleCSS(page, "linked", 1);
+                }
+                
                 page.addEventListener("click", function(e)
                 {
                     var ajax = new BF.Create_easy_ajax(),
@@ -989,8 +994,9 @@
                         ///NOTE: IE/Chromium/Safari/Opera use srcElement, Firefox uses originalTarget.
                         clicked_el = e.srcElement || e.originalTarget;
                     
-                    /// All words in the text are in <a> tags.
-                    if (clicked_el && clicked_el.tagName === "A") {
+                    /// Does this language support lexical lookups, and did the user click on a word?
+                    ///NOTE: All words in the text are in <a> tags.
+                    if (BF.lang.linked_to_orig && clicked_el && clicked_el.tagName === "A") {
                         ///TODO: Determine if the lexicon query (type 5) should be defined somewhere.
                         ajax.query("post", "query.php", "t=5&q=" + clicked_el.id, function (data)
                         {
@@ -1140,11 +1146,13 @@
                     if (BF.langs[identifier].loaded) {
                         BF.lang = BF.langs[identifier];
                         change_langEl_text(BF.lang.short_name);
+                        BF.toggleCSS(page, "linked", BF.lang.linked_to_orig);
                     } else {
                         BF.include("js/lang/" + identifier + ".js", {}, function ()
                         {
                             BF.lang = BF.langs[identifier];
                             change_langEl_text(BF.lang.short_name);
+                            BF.toggleCSS(page, "linked", BF.lang.linked_to_orig);
                         });
                     }
                 }
