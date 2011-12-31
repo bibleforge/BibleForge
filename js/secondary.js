@@ -791,12 +791,12 @@
                 function ()
                 {
                     /// Because the context menu is open, keep the icon dark.
-                    wrench_button.className += " activeWrenchIcon";
+                    BF.toggleCSS(wrench_button, "activeWrenchIcon", 1);
                 },
                 function ()
                 {
                     /// When the menu closes, the wrench button should be lighter.
-                    wrench_button.className = "wrenchIcon";
+                    BF.toggleCSS(wrench_button, "activeWrenchIcon", 0);
                 });
                 
                 /// Stop the even from bubbling so that document.onclick() does not fire and attempt to close the menu immediately.
