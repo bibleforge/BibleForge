@@ -1140,20 +1140,36 @@
             
             function change_language(identifier)
             {
+                var activate_new_lang,
+                    prev_lang; 
+                
                 /// Does the language exist?
                 if (BF.langs[identifier]) {
-                    /// Has the language code already been downloaded?
-                    if (BF.langs[identifier].loaded) {
-                        BF.lang = BF.langs[identifier];
-                        change_langEl_text(BF.lang.short_name);
-                        BF.toggleCSS(page, "linked", BF.lang.linked_to_orig);
-                    } else {
-                        BF.include("js/lang/" + identifier + ".js", {}, function ()
+                    /// Is the new language different from the current language?
+                    if (BF.lang.indentifier !== identifier) {
+                        prev_lang = BF.lang.indentifier;
+                        
+                        activate_new_lang = function ()
                         {
                             BF.lang = BF.langs[identifier];
                             change_langEl_text(BF.lang.short_name);
+                            
+                            ///TODO: Also, reload the current page in the new language.
+                            context.content_manager.clear_scroll();
+                            /// Make the cursor turn into a hand when hovering over words if there is lexical data avaiable.
                             BF.toggleCSS(page, "linked", BF.lang.linked_to_orig);
-                        });
+                            
+                            context.system.event.trigger("languageChange", {
+                                ///NOTE: Currently, not used, but migth be useful in the future.
+                                prev_lang: prev_lang
+                            });
+                        }
+                        /// Has the language code already been downloaded?
+                        if (BF.langs[identifier].loaded) {
+                            activate_new_lang();
+                        } else {
+                            BF.include("js/lang/" + identifier + ".js", {}, activate_new_lang);
+                        }
                     }
                 }
             }
