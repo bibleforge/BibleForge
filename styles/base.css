@@ -791,6 +791,7 @@ h2 {
     /* Enable advanced OpenType typographic features in Mozilla. */
     /* dlig = Discretionary Ligatures (combine certain characters, e.g., "ct") */
     /* ss01 = Stylistic Set 1 (e.g., long s (ſ)) */
+    /*NOTE: It would be nice to use lnum (Lining Figures), but it does not appear to work. */
     /*BUG Automatic conversion of short s's to long s's is not always correct. */
     /*    For example, Colossians is sometimes spelled "Coloſsians" and other times "Coloſſians." */
     /*    One true error is 2 Samuel 19:16 where "wass" is rendered "waß"; whereas the KJV 1611 has "wass," surprisingly. */
