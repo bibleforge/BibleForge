@@ -341,9 +341,6 @@
             var hide_cursor_timeout,
                 is_cursor_visible = true,
                 
-                pointer_selector = ".scrolls a",
-                pointer_style    = "cursor: pointer;",
-                
                 /// Special variables needed for an ugly WebKit hack.
                 webkit_cursor_hack,
                 webkit_ignore_event_once;
@@ -1165,7 +1162,7 @@
                                 ///NOTE: Currently, not used, but migth be useful in the future.
                                 prev_lang: prev_lang
                             });
-                        }
+                        };
                         /// Has the language code already been downloaded?
                         if (BF.langs[identifier].loaded) {
                             activate_new_lang();
@@ -1206,10 +1203,13 @@
                 }
                 
                 for (lang in BF.langs) {
-                    lang_menu[lang_menu.length] = {
-                        text: BF.langs[lang].full_name,
-                        link: create_lang_selection(lang)
-                    };
+                    ///NOTE: According to Crockford (http://yuiblog.com/blog/2006/09/26/for-in-intrigue/) for in loops should be filtered.
+                    if (BF.langs.hasOwnProperty(lang)) {
+                        lang_menu[lang_menu.length] = {
+                            text: BF.langs[lang].full_name,
+                            link: create_lang_selection(lang)
+                        };
+                    }
                 }
                 
                 return function (e)
