@@ -529,6 +529,7 @@
             bottomLoader,
             infoBar,
             langEl,
+            queryButton,
             page,
             qEl,
             searchForm,
@@ -555,6 +556,7 @@
         searchForm   = topBar.firstChild.firstChild;
         langEl       = searchForm.firstChild.firstChild.firstChild;
         qEl          = langEl.nextSibling;
+        queryButton  = qEl.nextSibling;
         topLoader    = topBar.nextSibling;
         page         = topLoader.nextSibling;
         bottomLoader = page.nextSibling;
@@ -2405,8 +2407,15 @@
                 }
             }, 200);
             
+            /// Set some default language specific text.
+            queryButton.title = BF.lang.query_button_title;
+            queryButton.alt   = BF.lang.query_button_alt;
+            
             system.event.attach("languageChange", function (e)
             {
+                queryButton.title = BF.lang.query_button_title;
+                queryButton.alt   = BF.lang.query_button_alt;
+                
                 if (qEl.value.trim() === BF.langs[e.prev_lang].query_explanation) {
                     qEl.value = BF.lang.query_explanation;
                 }

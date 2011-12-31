@@ -94,6 +94,8 @@ BF.langs.en = (function ()
         paragraphs:        "Paragraphs",                                          /// In the View configuration panel
         psalm:             "Psalm",                                               /// The title of chapters in the book of Psalms
         query_explanation: 'Keyword or Reference: "God so loved" or Romans 3:23', /// In a blank query input box before a search has been preformed
+        query_button_title:"Click here (or press Enter)",                         /// The text displayed when hovering over the magnifying glass (query button).
+        query_button_alt:  "Go",                                                  /// The text to display for the magnifying glass (query button) if images are disabled.
         red_letters:       "Red Letters",                                         /// In the View configuration panel
         subscription:      "subscription",                                        /// Used instead of 255 for subscripts to Paul's epistles
         title:             "title",                                               /// Used instead of 0 for Psalm title verse references
