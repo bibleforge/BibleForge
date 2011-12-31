@@ -36,6 +36,19 @@ if (get_magic_quotes_gpc()) {
 require_once 'config.php';
 require_once 'constants.php';
 
+$lang = array(
+    array(
+        'identifier' => 'english',
+        'paragraph_limit'        => 90,
+        'minimum_desired_verses' => 40
+    ),
+    array(
+        'identifier' => 'en_em',
+        'paragraph_limit'        => 90,
+        'minimum_desired_verses' => 40
+    )
+);
+
 /// Query Variables:
 /// d Direction (number)  The direction of the query (ADDITIONAL, PREVIOUS)      (lookup only)
 /// f Find      (boolean) Whether or not to find a paragraph break to start at   (lookup only)
@@ -43,13 +56,21 @@ require_once 'constants.php';
 /// q Query     (string)  The verse reference or search string to query
 /// s Start At  (string)  The verse or word id at which to start the query       (search only)
 /// t Type      (number)  The type of query (VERSE_LOOKUP, MIXED_SEARCH, STANDARD_SEARCH, GRAMMATICAL_SEARCH)
-/// l Language  (number)  The language to use.
+/// l Language  (number)  The language to use.  If not present, use 0 (English).
 
 ///TODO: Compare POST vs GET vs REQEUST.
 
 if (!isset($_REQUEST['q']) || !isset($_REQUEST['t'])) {
     die;
 }
+
+/// What is the language to use?  Default to English.
+$_REQUEST['l'] = isset($_REQUEST['l']) ? (int)$_REQUEST['l'] : 0;
+
+if (!isset($lang[$_REQUEST['l']])) {
+    die;
+}
+
 
 /// In what direction should the verses be retrieved?
 $_REQUEST['d'] = isset($_REQUEST['d']) ? (int)$_REQUEST['d'] : ADDITIONAL;
@@ -61,7 +82,7 @@ $_REQUEST['d'] = isset($_REQUEST['d']) ? (int)$_REQUEST['d'] : ADDITIONAL;
 if ($_REQUEST['t'] == VERSE_LOOKUP) {
     require_once 'functions/verse_lookup.php';
     /// Example query: 1001001 (Genesis) or 43003016 (John 3:16)
-    retrieve_verses($_REQUEST['q'], $_REQUEST['d'], LIMIT, isset($_REQUEST['p']) ? (bool)$_REQUEST['p'] : true, isset($_REQUEST['f']) ? (bool)$_REQUEST['f'] : false);
+    retrieve_verses($_REQUEST['q'], $_REQUEST['d'], LIMIT, $lang[$_REQUEST['l']], isset($_REQUEST['p']) ? (bool)$_REQUEST['p'] : true, isset($_REQUEST['f']) ? (bool)$_REQUEST['f'] : false);
 } elseif ($_REQUEST['t'] == STANDARD_SEARCH) {
     require_once 'functions/standard_search.php';
     /// Example query: love or God & love or this -that or "in the beginning"

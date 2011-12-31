@@ -1872,7 +1872,7 @@
                             /// q Query     (string)  The verse reference or search string to query
                             /// s Start At  (string)  The verse or word id at which to start the query       (search only)
                             /// t Type      (number)  The type of query (verse_lookup, mixed_search, standard_search, grammatical_search)
-                            /// l Language  (number)  The language to use.
+                            /// l Language  (number)  The language to use.  If not present, use 0 (English).
                             
                             var query_str = "t=" + options.type;
                             

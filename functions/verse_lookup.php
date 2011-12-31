@@ -21,7 +21,7 @@
  * @return  NULL.       Data is sent to the buffer as a JSON array, and then execution ends.
  * @note    Called in query.php.
  */
-function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true, $find_paragraph_start = false)
+function retrieve_verses($verse_id, $direction, $limit, $language, $in_paragraphs = true, $find_paragraph_start = false)
 {
     /// Quickly check to see if the verse_id is outside of the valid range.
     ///TODO: Determine if $verse_id < 1001001 should default to 1001001 and $verse_id > 66022021 to 66022021.
@@ -46,13 +46,15 @@ function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true, $
     require_once 'functions/database.php';
     connect_to_database();
     
+    /// This is necessary for any database with non-basic Latin symboles.
+    ///TODO: Determine if this should be optional since it might slow the request down a little.
+    mysql_query("SET NAMES 'utf8'");
+    
     if ($in_paragraphs) {
         /// The longest paragraph in the English version is 57 verses.  By selecting 90, it ensures that plenty of verses should be found.
         /// The limit must be at least that long because paragraphs cannot be split.
-        ///TODO: Determine if $limit should be stored in a config file or variable somewhere (maybe in a builder).
-        $limit                  = 90;
-        $minimum_desired_verses = 40;
-        $extra_fields           = ', paragraph';
+        $limit = $language['paragraph_limit'];
+        $extra_fields = ', paragraph';
     } else {
         $extra_fields = "";
     }
@@ -62,13 +64,13 @@ function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true, $
         ///NOTE: Currently, $find_paragraph_start is never true when $direction == PREVIOUS because previous lookups always start at a paragraph break.
         ///      In order to find the correct starting verse when looking up in reverse, the comparison operator (<=) would need to be greater than or equal to (>=),
         ///      and 1 would need to be subtracted from the found starting id.
-        $starting_verse = '(SELECT id FROM `' . BIBLE_VERSES . '` WHERE id <= ' . (int)$verse_id . ' AND paragraph = 1 ORDER BY id DESC LIMIT 1)';
+        $starting_verse = '(SELECT id FROM `bible_' . $language['identifier'] . '_html` WHERE id <= ' . (int)$verse_id . ' AND paragraph = 1 ORDER BY id DESC LIMIT 1)';
     } else {
         $starting_verse = (int)$verse_id;
     }
     
     /// Create the query.
-    $SQL_query = 'SELECT id, words' . $extra_fields . ' FROM `' . BIBLE_VERSES . '` WHERE id ' . $operator . $starting_verse . $order_by . ' LIMIT ' . $limit;
+    $SQL_query = 'SELECT id, words' . $extra_fields . ' FROM `bible_' . $language['identifier'] . '_html` WHERE id ' . $operator . $starting_verse . $order_by . ' LIMIT ' . $limit;
     
     ///NOTE: Unbuffered queries start returning data as soon as the first row is available;
     ///      however, when the PHP script ends, if all of the data has not been fetched,
@@ -91,7 +93,7 @@ function retrieve_verses($verse_id, $direction, $limit, $in_paragraphs = true, $
         while ($row = mysql_fetch_assoc($SQL_res)) {
             if ($row['paragraph']) {
                 /// Did it find enough verses to send to the browser.
-                if ($verse_count > $minimum_desired_verses) {
+                if ($verse_count > $language['minimum_desired_verses']) {
                     /// The first verse should be at a paragraph beginning, and the last verse
                     /// should be just before one. Therefore, when looking up previous verses,
                     /// we must get this verse (because previous lookups are in reverse).
