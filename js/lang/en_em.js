@@ -78,21 +78,21 @@ BF.langs.en_em = (function ()
         blog:              "Weblog",                                              /// Context menu item
         chapter:           "Chapter",                                             /// Chapter headings
         configure:         "Configure",                                           /// Context menu item
-        done:              "Done",                                                /// The button that closes panels
-        found_plural:      " verses found for ",                                  /// On the info bar when searching (multiple results)
-        found_singular:    " verse found for ",                                   /// On the info bar when searching (one result)
+        done:              "Finiſh"                                               /// The button that closes panels
+        found_plural:      " verſes found for ",                                  /// On the info bar when searching (multiple results)
+        found_singular:    " verſe found for ",                                   /// On the info bar when searching (one result)
         help:              "Succor",                                              /// Context menu item
         ///FIXME: Not all italic words are implied; some are questionable.
         italics_explanation: "This word is implied by context or required in order to translate properly; it was not translated directly from a word in the original languages.", /// When clicking on an italic word
         paragraphs:        "Paragraphs",                                          /// In the View configuration panel
         psalm:             "Psalme",                                              /// The title of chapters in the book of Psalms
-        query_explanation: 'Keyword or Reference: "God so loued" or Romans 3:23', /// In a blank query input box before a search has been preformed
+        query_explanation: 'Keyword or Reference: "God ſo loued" or Romans 3:23', /// In a blank query input box before a search has been preformed
         red_letters:       "Red Letters",                                         /// In the View configuration panel
         subscription:      "subscription",                                        /// Used instead of 255 for subscripts to Paul's epistles
         title:             "title",                                               /// Used instead of 0 for Psalm title verse references
-        view:              "View",                                                /// The title of a configuration panel
+        view:              "Uiew",                                                /// The title of a configuration panel
         ///TODO: Determine if the app_name should be dynamically appended to the string below or if it should be done in the build system
-        wrench_title:      "Customize and Configure BibleForge",                  /// The text displayed when hovering over the wrench menu
+        wrench_title:      "Cuſtomiſe and Configure BibleForge",                  /// The text displayed when hovering over the wrench menu
         
         /// Grammatical Variables
         /// Grammatical search format:  WORD grammar_marker ATTRIBUTE_1 grammar_separator ATTRIBUTE_2 grammar_separator ... ATTRIBUTE_N
