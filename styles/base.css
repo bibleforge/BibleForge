@@ -121,8 +121,7 @@ body {
     background: rgba(255,255,255,.5);
     
     /* Padding is used to push the text away from the rounded corners. */
-    /*TODO: The left padding should be calculated dynamically based on the length of the language name. (And then change it back to 7px.) */
-    padding: 3px 25px 1px 28px;
+    padding: 3px 25px 1px 7px;
     
     font-size: 15px;
     

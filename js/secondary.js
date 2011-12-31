@@ -1126,7 +1126,31 @@
         {
             var langEl = context.langEl;
             
-            langEl.value = BF.lang.short_name;
+            function change_langEl_text(identifier)
+            {
+                langEl.value = identifier;
+                context.qEl.style.paddingLeft = (langEl.offsetWidth + 3) + "px";
+            }
+            
+            function change_language(identifier)
+            {
+                /// Does the language exist?
+                if (BF.langs[identifier]) {
+                    /// Has the language code already been downloaded?
+                    if (BF.langs[identifier].loaded) {
+                        BF.lang = BF.langs[identifier];
+                        change_langEl_text(BF.lang.short_name);
+                    } else {
+                        BF.include("js/lang/" + identifier + ".js", {}, function ()
+                        {
+                            BF.lang = BF.langs[identifier];
+                            change_langEl_text(BF.lang.short_name);
+                        });
+                    }
+                }
+            }
+            
+            change_langEl_text(BF.lang.short_name)
             
             /// The language button is hidden until the current language name is displayed.
             ///TODO: Also, change the padding of the qEl.
@@ -1140,37 +1164,49 @@
             * @note   Called when the user clicks on the language button.
             * @return NULL
             */
-            langEl.onclick = function (e)
+            langEl.onclick = (function ()
             {
                 var lang,
-                    lang_menu = [],
-                    langEl_pos = BF.get_position(langEl);
+                    lang_menu = [];
+                
+                function create_lang_selection(identifier)
+                {
+                    return function ()
+                    {
+                        /// Do something with identifier.
+                        change_language(identifier);
+                    };
+                }
                 
                 for (lang in BF.langs) {
                     lang_menu[lang_menu.length] = {
                         text: BF.langs[lang].full_name,
-                        link: function (lang) {}
+                        link: create_lang_selection(lang)
                     };
                 }
                 
-                ///TODO: Make show_context_menu() take a position object, not two variables.
-                show_context_menu(langEl_pos.left, langEl_pos.top + langEl.offsetHeight, lang_menu,
-                function ()
+                return function (e)
                 {
-                    /// Because the menu is open, keep the button dark.
-                    BF.toggleCSS(langEl, "activeLang", 1);
-                },
-                function ()
-                {
-                    /// When the menu closes, the button should be lighter.
-                    BF.toggleCSS(langEl, "activeLang", 0);
-                });
-                
-                /// Stop the even from bubbling so that document.onclick() does not fire and attempt to close the menu immediately.
-                e.stopPropagation();
-                /// Prevent the default action.
-                return false;
-            };
+                    var langEl_pos = BF.get_position(langEl);
+                    ///TODO: Make show_context_menu() take a position object, not two variables.
+                    show_context_menu(langEl_pos.left, langEl_pos.top + langEl.offsetHeight, lang_menu,
+                    function ()
+                    {
+                        /// Because the menu is open, keep the button dark.
+                        BF.toggleCSS(langEl, "activeLang", 1);
+                    },
+                    function ()
+                    {
+                        /// When the menu closes, the button should be lighter.
+                        BF.toggleCSS(langEl, "activeLang", 0);
+                    });
+                    
+                    /// Stop the even from bubbling so that document.onclick() does not fire and attempt to close the menu immediately.
+                    e.stopPropagation();
+                    /// Prevent the default action.
+                    return false;
+                };
+            }());
             
             if (BF.is_WebKit) {
                 ///HACK: A tremendously ugly hack to make WebKit not center align langEl.

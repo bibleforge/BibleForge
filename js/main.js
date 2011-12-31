@@ -2399,6 +2399,7 @@
                 BF.include("js/secondary.js", {
                     langEl:       langEl,
                     page:         page,
+                    qEl:          qEl,
                     settings:     settings,
                     system:       system,
                     topBar:       topBar,
