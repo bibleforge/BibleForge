@@ -46,10 +46,6 @@ function retrieve_verses($verse_id, $direction, $limit, $language, $in_paragraph
     require_once 'functions/database.php';
     connect_to_database();
     
-    /// This is necessary for any database with non-basic Latin symboles.
-    ///TODO: Determine if this should be optional since it might slow the request down a little.
-    mysql_query("SET NAMES 'utf8'");
-    
     if ($in_paragraphs) {
         /// The longest paragraph in the English version is 57 verses.  By selecting 90, it ensures that plenty of verses should be found.
         /// The limit must be at least that long because paragraphs cannot be split.
