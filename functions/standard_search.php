@@ -25,7 +25,7 @@
  * @return  NULL.  Data is sent to the buffer as a JSON array, and then execution ends.
  * @note    Called in query.php.
  */
-function standard_search($query, $direction, $limit, $start_id = 0, $output_JSON = true)
+function standard_search($query, $direction, $limit, $language, $start_id = 0, $output_JSON = true)
 {
     require_once 'functions/' . SPHINX_API . '.php';
     
@@ -69,7 +69,7 @@ function standard_search($query, $direction, $limit, $start_id = 0, $output_JSON
     $sphinx->SetRankingMode(SPH_RANK_NONE); /// No ranking, fastest
     
     /// Run Sphinx search.
-    $sphinx_res = $sphinx->Query($query, 'verse_text');
+    $sphinx_res = $sphinx->Query($query, 'verse_text_' . $language['identifier']);
     
     /// If no results found were found, send an empty JSON result.
     ///FIXME: Sending an empty JSON is actually unnecessary if post_to_server() in main.js keeps track of the query.
@@ -88,7 +88,7 @@ function standard_search($query, $direction, $limit, $start_id = 0, $output_JSON
     require_once 'functions/database.php';
     connect_to_database();
     
-    $SQL_query = 'SELECT words FROM ' . BIBLE_VERSES . ' WHERE id IN (' . $simple_matches . ')';
+    $SQL_query = 'SELECT words FROM `bible_' . $language['identifier'] . '_html` WHERE id IN (' . $simple_matches . ')';
     $SQL_res   = mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
     
     /// Convert SQL results into one comma delineated string.

@@ -86,12 +86,12 @@ if ($_REQUEST['t'] == VERSE_LOOKUP) {
 } elseif ($_REQUEST['t'] == STANDARD_SEARCH) {
     require_once 'functions/standard_search.php';
     /// Example query: love or God & love or this -that or "in the beginning"
-    standard_search($_REQUEST['q'], $_REQUEST['d'], LIMIT, isset($_REQUEST['s']) ? (int)$_REQUEST['s'] : 0);
+    standard_search($_REQUEST['q'], $_REQUEST['d'], LIMIT, $lang[$_REQUEST['l']], isset($_REQUEST['s']) ? (int)$_REQUEST['s'] : 0);
 } elseif ($_REQUEST['t'] == LEXICON_LOOKUP) {
     require_once 'functions/lexicon_lookup.php';
     retrieve_lexical_data($_REQUEST['q']);
 } else { /// GRAMMATICAL_SEARCH
     require_once 'functions/grammatical_search.php';
     /// Example query: '["love", [[4,1]], [1]]' (love AS NOUN) or '["love", [[3,1], [7,1]], [1,0]]' (love AS RED, NOT PRESENT)
-    grammatical_search($_REQUEST['q'], $_REQUEST['d'], LIMIT, isset($_REQUEST['s']) ? (int)$_REQUEST['s'] : 0);
+    grammatical_search($_REQUEST['q'], $_REQUEST['d'], LIMIT, $lang[$_REQUEST['l']], isset($_REQUEST['s']) ? (int)$_REQUEST['s'] : 0);
 }

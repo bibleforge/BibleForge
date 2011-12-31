@@ -24,7 +24,7 @@
  * @return  NULL.  Data is sent to the buffer as a JSON array, and then execution ends.
  * @note    Called in query.php.
  */
-function grammatical_search($json, $direction, $limit, $start_id = 0)
+function grammatical_search($json, $direction, $limit, $language, $start_id = 0)
 {
     /// Prepare Sphinx.
     require_once 'functions/' . SPHINX_API . '.php';
@@ -46,7 +46,7 @@ function grammatical_search($json, $direction, $limit, $start_id = 0)
     
     /// Run Sphinx search.
     ///TODO: Change "morphological" to "grammatical."
-    $sphinx_res = $sphinx->Query($query_array[0], 'morphological');
+    $sphinx_res = $sphinx->Query($query_array[0], 'morphological_' . $language['identifier']);
     
     /// If no results found were found, send an empty JSON result.
     ///FIXME: Sending an empty JSON is actually unnecessary if post_to_server() in main.js keeps track of the query.
@@ -68,7 +68,7 @@ function grammatical_search($json, $direction, $limit, $start_id = 0)
     require_once 'functions/database.php';
     connect_to_database();
     
-    $SQL_query = 'SELECT words FROM ' . BIBLE_VERSES . ' WHERE id IN (' . $simple_matches . ')';
+    $SQL_query = 'SELECT words FROM `bible_' . $language['identifier'] . '_html` WHERE id IN (' . $simple_matches . ')';
     $SQL_res   = mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
     
     /// Convert SQL results into one comma delineated string.
