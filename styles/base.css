@@ -161,7 +161,7 @@ body {
     /* This removes the awful, non-rounded selection rectangle that WebKit imposes. */
     outline: 0;
     
-    /* Apply transitions to all changes (in particular, background-color, border-color, and color) */
+    /* Apply transitions to all changes (in particular, background-color, border-color, and color). */
     /* Transition for Mozilla (Firefox 4.0+) */
     -moz-transition:    all .3s;
     /* Transition for WebKit */
@@ -219,6 +219,18 @@ body {
     
     /* Hide by default so that the default language name can be added first. */
     visibility: hidden;
+    
+    /* Apply transitions to all changes. */
+    /* Transition for Mozilla (Firefox 4.0+) */
+    -moz-transition:    all .3s;
+    /* Transition for WebKit */
+    -webkit-transition: all .3s;
+    /* Transition for Opera 10.5+ */
+    -o-transition:      all .3s;
+}
+
+.lang:hover {
+    color: rgba(0,0,0,.6);
 }
 
 .inputIcon {
