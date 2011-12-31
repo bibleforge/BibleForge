@@ -233,6 +233,11 @@ body {
     color: rgba(0,0,0,.6);
 }
 
+.lang:active, .activeLang {
+    background: rgba(0,0,255,.12);
+    color: rgba(0,0,0,.6);
+}
+
 .inputIcon {
     /* Move the icon over the right end of the input box. */
     margin-left: -55px;

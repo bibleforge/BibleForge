@@ -1158,10 +1158,12 @@
                 function ()
                 {
                     /// Because the menu is open, keep the button dark.
+                    BF.toggleCSS(langEl, "activeLang", 1);
                 },
                 function ()
                 {
                     /// When the menu closes, the button should be lighter.
+                    BF.toggleCSS(langEl, "activeLang", 0);
                 });
                 
                 /// Stop the even from bubbling so that document.onclick() does not fire and attempt to close the menu immediately.
