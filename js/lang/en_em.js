@@ -96,7 +96,7 @@ BF.langs.en_em = (function ()
         red_letters:       "Red Letters",                                         /// In the View configuration panel
         subscription:      "subscription",                                        /// Used instead of 255 for subscripts to Paul's epistles
         title:             "title",                                               /// Used instead of 0 for Psalm title verse references
-        view:              "Uiew",                                                /// The title of a configuration panel
+        view:              "View",                                                /// The title of a configuration panel
         ///TODO: Determine if the app_name should be dynamically appended to the string below or if it should be done in the build system
         wrench_title:      "Cuſtomiſe and Configure BibleForge",                  /// The text displayed when hovering over the wrench menu
         
