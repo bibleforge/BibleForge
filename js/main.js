@@ -421,7 +421,7 @@
             i,
             new_class = "";
         
-        for (i = class_arr.length; i >= 0; i -= 1) {
+        for (i = class_arr.length - 1; i >= 0; i -= 1) {
             if (class_arr[i] === className) {
                 found = true;
                 if (force === 1) {
