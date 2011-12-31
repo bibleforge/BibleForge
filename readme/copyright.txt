@@ -10,5 +10,5 @@ Font licenses:
 
 The Bitstream Vera Fonts fonts are copyrighted under an open source license as found
 in bitstream_font_license.txt.  The Tex Gyre Pagella fonts are also copyrighted under an
-open source copyright as found in gust_font_license.txt.  The BF Hebrew font is licensed
-under the SIL Open Font License as found in ofl_1.1.txt.
+open source copyright as found in gust_font_license.txt.  The BF Hebrew and IM Fell DW Pica
+fonts are licensed under the SIL Open Font License as found in ofl_1.1.txt.
