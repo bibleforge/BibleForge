@@ -626,7 +626,6 @@
                         };
                     }
                     
-                    
                     /**
                      * Create the function that sends the new value to the settings.
                      *
@@ -728,7 +727,7 @@
                     return container_el;
                 }
                 
-                ///TODO: Determine which settings pane to create first (based on the last one the user used).
+                ///TODO: Determine which settings pane to create first (based on the last one the user used). (But currently, there is only one pane.)
                 panel_element = create_element_from_config(settings_config[0]);
                 
                 return function ()
@@ -764,7 +763,6 @@
              * @param  e (object) (optional) The event object optionally sent by the browser.
              * @note   Called when the user clicks on the wrench button.
              * @return NULL
-             * @todo   Make the wrench icon look pressed.
              * @bug    Opera does not send the onclick event from the label to the button.
              */
             wrench_button.onclick = function (e)
@@ -1124,23 +1122,65 @@
         }());
         
         /// Display the language selector button.
-        
-        context.langEl.value = BF.lang.short_name;
-        
-        /// The language button is hidden until the current language name is displayed.
-        ///TODO: Also, change the padding of the qEl.
-        context.langEl.style.visibility = "visible";
-        
-        if (BF.is_WebKit) {
-            ///HACK: A tremendously ugly hack to make WebKit not center align langEl.
-            (function ()
+        (function ()
+        {
+            var langEl = context.langEl;
+            
+            langEl.value = BF.lang.short_name;
+            
+            /// The language button is hidden until the current language name is displayed.
+            ///TODO: Also, change the padding of the qEl.
+            ///TODO: Make langEl and the wrench icon to fade in.
+            langEl.style.visibility = "visible";
+            
+            /**
+            * Prepare to display the language selection menu.
+            *
+            * @param  e (object) (optional) The event object optionally sent by the browser.
+            * @note   Called when the user clicks on the language button.
+            * @return NULL
+            */
+            langEl.onclick = function (e)
             {
-                /// If there is an input element before langEl, it will align correctly.
-                var dummy = document.createElement("input");
-                dummy.type = "image";
-                dummy.style.cssText = "width: 0; height: 0;";
-                context.langEl.parentNode.insertBefore(dummy, context.langEl);
-            }());
-        }
+                var lang,
+                    lang_menu = [],
+                    langEl_pos = BF.get_position(langEl);
+                
+                for (lang in BF.langs) {
+                    lang_menu[lang_menu.length] = {
+                        text: BF.langs[lang].full_name,
+                        link: function (lang) {}
+                    };
+                }
+                
+                ///TODO: Make show_context_menu() take a position object, not two variables.
+                show_context_menu(langEl_pos.left, langEl_pos.top + langEl.offsetHeight, lang_menu,
+                function ()
+                {
+                    /// Because the menu is open, keep the button dark.
+                },
+                function ()
+                {
+                    /// When the menu closes, the button should be lighter.
+                });
+                
+                /// Stop the even from bubbling so that document.onclick() does not fire and attempt to close the menu immediately.
+                e.stopPropagation();
+                /// Prevent the default action.
+                return false;
+            };
+            
+            if (BF.is_WebKit) {
+                ///HACK: A tremendously ugly hack to make WebKit not center align langEl.
+                (function ()
+                {
+                    /// If there is an input element before langEl, it will align correctly.
+                    var dummy = document.createElement("input");
+                    dummy.type = "image";
+                    dummy.style.cssText = "width: 0; height: 0;";
+                    langEl.parentNode.insertBefore(dummy, langEl);
+                }());
+            }
+        }());
     };
 }());

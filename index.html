@@ -72,8 +72,18 @@ no other style sheets are used.  It is planned to allow users to add their own c
     
     /// Create the global BibleForge variable to which everything else attaches.
     var BF = {};
+    
     /// Create the basis for the language object.
-    BF.langs = {};
+    ///NOTE: The elements in this object are overwritten if/when the code is actually downloaded.
+    BF.langs = {
+        /// Although this code is currently loaded by default (and so full_name will rewritten soon), in the future, the default language might be dynamically chosen.
+        en: {
+            full_name: "English"
+        },
+        en_em: {
+            full_name: "Early Modern English (1611)"
+        }
+    };
 </script
 ><script src="js/lang/en.js"></script
 ><script src="js/main.js"></script

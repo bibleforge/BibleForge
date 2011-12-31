@@ -55,6 +55,9 @@ BF.langs.en = (function ()
     
     /// Return the language variables and functions.
     return {
+        /// Incidate that the code has been downloaded and parsed.
+        loaded: true,
+        
         /// Indicate the language name so it can be distinguished later.
         full_name:  "English",
         short_name: "en",

@@ -56,6 +56,9 @@ BF.langs.en_em = (function ()
     
     /// Return the language variables and functions.
     return {
+        /// Incidate that the code has been downloaded and parsed.
+        loaded: true,
+        
         /// Indicate the language name so it can be distinguished later.
         full_name:  "Early Modern English (1611)",
         short_name: "1611",
