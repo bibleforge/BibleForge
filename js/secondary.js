@@ -1122,5 +1122,25 @@
                 }, false);
             }());
         }());
+        
+        /// Display the language selector button.
+        
+        context.langEl.value = BF.lang.short_name;
+        
+        /// The language button is hidden until the current language name is displayed.
+        ///TODO: Also, change the padding of the qEl.
+        context.langEl.style.visibility = "visible";
+        
+        if (BF.is_WebKit) {
+            ///HACK: A tremendously ugly hack to make WebKit not center align langEl.
+            (function ()
+            {
+                /// If there is an input element before langEl, it will align correctly.
+                var dummy = document.createElement("input");
+                dummy.type = "image";
+                dummy.style.cssText = "width: 0; height: 0;";
+                context.langEl.parentNode.insertBefore(dummy, context.langEl);
+            }());
+        }
     };
 }());

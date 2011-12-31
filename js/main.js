@@ -556,24 +556,6 @@
         bottomLoader = page.nextSibling;
         infoBar      = topBar.lastChild;
         
-        /// The language button is hidden until the current language name is displayed.
-        ///TODO: Also, change the padding of the qEl.
-        langEl.style.visibility = "visible";
-        
-        if (BF.is_WebKit) {
-            ///HACK: A tremendously ugly hack to make WebKit not center align langEl.
-            (function ()
-            {
-                /// If there is an input element before langEl, it will align correctly.
-                var dummy = document.createElement("input");
-                dummy.type = "image";
-                dummy.style.cssText = "width: 0; height: 0;";
-                langEl.parentNode.insertBefore(dummy, langEl);
-            }());
-        }
-        
-        langEl.value = BF.lang.short_name;
-        
         (function ()
         {
             var viewPort_num,
@@ -2412,6 +2394,7 @@
             window.setTimeout(function ()
             {
                 BF.include("js/secondary.js", {
+                    langEl:       langEl,
                     page:         page,
                     settings:     settings,
                     system:       system,
