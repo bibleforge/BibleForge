@@ -101,7 +101,7 @@ BF.langs.en_em = (function ()
         title:             "title",                                               /// Used instead of 0 for Psalm title verse references
         view:              "View",                                                /// The title of a configuration panel
         ///TODO: Determine if the app_name should be dynamically appended to the string below or if it should be done in the build system
-        wrench_title:      "Cuſtomiſe & Configure BibleForge",                  /// The text displayed when hovering over the wrench menu
+        wrench_title:      "Cuſtomiſe & Configure BibleForge",                    /// The text displayed when hovering over the wrench menu
         
         /// Grammatical Variables
         /// Grammatical search format:  WORD grammar_marker ATTRIBUTE_1 grammar_separator ATTRIBUTE_2 grammar_separator ... ATTRIBUTE_N
