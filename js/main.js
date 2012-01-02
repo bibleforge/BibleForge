@@ -2397,15 +2397,21 @@
                 }
             }, false);
             
-            /// If there is no immediate query being preformed, look up Genesis 1:1 so that the page is not so empty.
-            ///NOTE: Currently, there can be no default query.
-            ///TODO: When additional languages are available, the language will have to be determined as well.
-            window.setTimeout(function ()
+            (function ()
             {
-                if (query_manager.raw_query === "") {
-                    run_new_query("Genesis 1:1", true);
-                }
-            }, 200);
+                ///TODO: Determine the last spot they left off (maybe using local storage).
+                var pre_entered_text = qEl.value;
+                /// If there is no immediate query being preformed, look up whatever is in the query box (or Genesis 1:1 if there is nothing in it),
+                /// so that the scroll is not so empty after it loads.
+                ///TODO: When additional languages are available, the language will have to be determined as well.
+                window.setTimeout(function ()
+                {
+                    if (query_manager.raw_query === "") {
+                        ///BUG: The pre_entered_text could be from a different language.
+                        run_new_query((pre_entered_text && pre_entered_text !== BF.lang.query_explanation) ? pre_entered_text : "Genesis 1:1", true);
+                    }
+                }, 200);
+            }());
             
             /// Set some default language specific text.
             queryButton.title = BF.lang.query_button_title;
