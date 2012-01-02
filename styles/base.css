@@ -592,15 +592,19 @@ label {
     height: 20px;
     border-bottom: #ccc solid 1px;
     border-right:  #ccc solid 1px;
+    
+    /* IE9- */
+    /* This isn't perfect, but it's something. */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00ffffff', endColorstr='#ffffff', GradientType=1);
     /* Firefox 3.6+ */
-    background-image:    -moz-linear-gradient(left top, rgba(255,255,255,0) 45%, rgba(240,240,240,.97) 45%);
+    background:    -moz-linear-gradient(left top, rgba(255,255,255,0) 45%, rgba(240,240,240,.97) 45%);
     /* Chrome/Safari 5.1+ */
-    background-image: -webkit-linear-gradient(left top, rgba(255,255,255,0) 45%, rgba(240,240,240,.97) 45%);
+    background: -webkit-linear-gradient(left top, rgba(255,255,255,0) 45%, rgba(240,240,240,.97) 45%);
     /* Opera 11.10 */
     background-image:      -o-linear-gradient(left top, rgba(255,255,255,0) 45%, rgba(240,240,240,.97) 45%);
     /* IE 10 */
-    background-image:     -ms-linear-gradient(left top, rgba(255,255,255,0) 45%, rgba(240,240,240,.97) 45%);
-    background-image:         linear-gradient(left top, rgba(255,255,255,0) 45%, rgba(240,240,240,.97) 45%);
+    background:     -ms-linear-gradient(left top, rgba(255,255,255,0) 45%, rgba(240,240,240,.97) 45%);
+    background:         linear-gradient(left top, rgba(255,255,255,0) 45%, rgba(240,240,240,.97) 45%);
     bottom: -11px;
 }
 .callout .pointer-up {
@@ -618,15 +622,19 @@ label {
     height: 20px;
     border-top:  #ccc solid 1px;
     border-left: #ccc solid 1px;
+    
+    /* IE6-9 */
+    /* This isn't perfect, but it's something. */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#00ffffff', GradientType=1);
     /* Firefox 3.6+ */
-    background-image:    -moz-linear-gradient(right bottom, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
+    background:    -moz-linear-gradient(right bottom, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
     /* Chrome/Safari 5.1+ */
-    background-image: -webkit-linear-gradient(right bottom, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
+    background: -webkit-linear-gradient(right bottom, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
     /* Opera 11.10 */
-    background-image:      -o-linear-gradient(right bottom, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
+    background:      -o-linear-gradient(right bottom, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
     /* IE 10 */
-    background-image:     -ms-linear-gradient(right bottom, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
-    background-image:         linear-gradient(right bottom, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
+    background:     -ms-linear-gradient(right bottom, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
+    background:         linear-gradient(right bottom, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
     top: -11px;
 }
 
