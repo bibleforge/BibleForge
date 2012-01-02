@@ -40,9 +40,9 @@
     grammar_marker_len, grammar_separator, help, ical, icate, iciti, 
     identifier, italics_explanation, iveness, iviti, ization, izer, lang_id, 
     langs, linked_to_orig, loaded, logi, ness, ousli, ousness, paragraphs, 
-    prepare_highlighter, prepare_search, psalm, query_explanation, red_letters, 
-    replace, self, short_name, split, subscription, tional, title, view, 
-    wrench_title
+    prepare_highlighter, prepare_search, psalm, query_button_alt, 
+    query_button_title, query_explanation, red_letters, replace, self, 
+    short_name, split, subscription, tional, title, view, wrench_title
 */
 
 /**
