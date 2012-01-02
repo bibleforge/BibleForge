@@ -1,7 +1,9 @@
 The wrench graphic was derived from Justin Force's Wrench.svg (http://wiki.education.ucsb.edu/File:Wrench.svg).
 This graphic is under the cc-by-sa 1.0 copyright.
 
-The favicon contains an element derived from Alexandre Moore's nuoveXT2 icon set (http://nuovext.pwsp.net/).
+The favicon and/or touch icon contains one or more elements derived from Alexandre Moore's nuoveXT2 icon set
+(http://nuovext.pwsp.net/) and Lawrie Cate's picture Torah
+(https://secure.flickr.com/photos/lawriecate/3370859327/sizes/o/in/photostream/).
 The nuoveXT2 icon set is licensed under the LGPL 2.1 license.
 
 The magnifying glass graphic was derived from Derferman's public domain Magnifying glass icon.svg
