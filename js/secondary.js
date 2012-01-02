@@ -1159,8 +1159,9 @@
                             BF.lang = BF.langs[identifier];
                             change_langEl_text(BF.lang.short_name);
                             
-                            ///TODO: Also, reload the current page in the new language.
+                            /// Since the language has changed, any currently loaded text must be removed and reloaded (after a moment).
                             context.content_manager.clear_scroll();
+                            
                             /// Make the cursor turn into a hand when hovering over words if there is lexical data available.
                             BF.toggleCSS(page, "linked", BF.lang.linked_to_orig ? 1 : 0);
                             BF.toggleCSS(page, "lang_" + prev_lang,  0);
@@ -1169,6 +1170,13 @@
                             context.system.event.trigger("languageChange", {
                                 prev_lang: prev_lang
                             });
+                            
+                            /// Reload the text in the new language.
+                            window.setTimeout(function ()
+                            {
+                                ///TODO: Determine the last spot they left off (maybe using local storage).
+                                context.run_new_query(context.qEl.value && context.qEl.value !== BF.lang.query_explanation ? context.qEl.value : BF.lang.books_short[1] + " 1:1");
+                            }, 0);
                         };
                         /// Has the language code already been downloaded?
                         if (BF.langs[identifier].loaded) {
