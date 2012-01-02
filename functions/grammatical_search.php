@@ -4,9 +4,9 @@
  * BibleForge
  *
  * @date    11-08-09
- * @version 0.2 alpha
+ * @version alpha (α)
  * @link    http://BibleForge.com
- * @license Reciprocal Public License 1.5 (RPL1.5)
+ * @license Affero General Public License Version 3 (AGPL-3.0)
  * @author  BibleForge <info@bibleforge.com>
  */
 
