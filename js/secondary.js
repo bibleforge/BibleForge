@@ -543,7 +543,7 @@
             ///TODO: Determine if the alt tag should be shorter, like "Configure."
             wrench_button.alt   = BF.lang.wrench_title;
             
-            context.system.event.attach("languageChange", function (e)
+            context.system.event.attach("languageChange", function ()
             {
                 wrench_button.title = BF.lang.wrench_title;
                 wrench_button.alt   = BF.lang.wrench_title;
