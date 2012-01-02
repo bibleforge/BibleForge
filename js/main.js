@@ -2408,7 +2408,7 @@
                 {
                     if (query_manager.raw_query === "") {
                         ///BUG: The pre_entered_text could be from a different language.
-                        run_new_query((pre_entered_text && pre_entered_text !== BF.lang.query_explanation) ? pre_entered_text : "Genesis 1:1", true);
+                        run_new_query((pre_entered_text && pre_entered_text !== BF.lang.query_explanation) ? pre_entered_text : BF.lang.books_short[1] + " 1:1", true);
                     }
                 }, 200);
             }());
