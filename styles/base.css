@@ -578,10 +578,10 @@ label {
     height: 100%;
 }
 .callout .pointer-down {
-    -moz-box-shadow:    5px 3px 6px -2px rgba(0,0,0,.2);
-    -webkit-box-shadow: 5px 3px 6px -2px rgba(0,0,0,.2);
-    -ms-box-shadow:     5px 3px 6px -2px rgba(0,0,0,.2);
-    box-shadow:         5px 3px 6px -2px rgba(0,0,0,.2);
+    -moz-box-shadow:    6px 4px 6px -3px rgba(0,0,0,.2);
+    -webkit-box-shadow: 6px 4px 6px -3px rgba(0,0,0,.2);
+    -ms-box-shadow:     6px 4px 6px -3px rgba(0,0,0,.2);
+    box-shadow:         6px 4px 6px -3px rgba(0,0,0,.2);
     -moz-transform:    rotate(45deg);
     -webkit-transform: rotate(45deg);
     -o-transform:      rotate(45deg);
@@ -597,14 +597,14 @@ label {
     /* This isn't perfect, but it's something. */
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00ffffff', endColorstr='#ffffff', GradientType=1);
     /* Firefox 3.6+ */
-    background:    -moz-linear-gradient(left top, rgba(255,255,255,0) 45%, rgba(240,240,240,.97) 45%);
+    background:    -moz-linear-gradient(left top, rgba(255,255,255,0) 41%, rgba(240,240,240,.97) 41%);
     /* Chrome/Safari 5.1+ */
-    background: -webkit-linear-gradient(left top, rgba(255,255,255,0) 45%, rgba(240,240,240,.97) 45%);
+    background: -webkit-linear-gradient(left top, rgba(255,255,255,0) 41%, rgba(240,240,240,.97) 41%);
     /* Opera 11.10 */
-    background-image:      -o-linear-gradient(left top, rgba(255,255,255,0) 45%, rgba(240,240,240,.97) 45%);
+    background:      -o-linear-gradient(left top, rgba(255,255,255,0) 41%, rgba(240,240,240,.97) 41%);
     /* IE 10 */
-    background:     -ms-linear-gradient(left top, rgba(255,255,255,0) 45%, rgba(240,240,240,.97) 45%);
-    background:         linear-gradient(left top, rgba(255,255,255,0) 45%, rgba(240,240,240,.97) 45%);
+    background:     -ms-linear-gradient(left top, rgba(255,255,255,0) 41%, rgba(240,240,240,.97) 41%);
+    background:         linear-gradient(left top, rgba(255,255,255,0) 41%, rgba(240,240,240,.97) 41%);
     bottom: -11px;
 }
 .callout .pointer-up {
@@ -627,14 +627,14 @@ label {
     /* This isn't perfect, but it's something. */
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#00ffffff', GradientType=1);
     /* Firefox 3.6+ */
-    background:    -moz-linear-gradient(right bottom, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
+    background:    -moz-linear-gradient(right bottom, rgba(255,255,255,0) 45%, rgba(255,255,255,.95) 45%);
     /* Chrome/Safari 5.1+ */
-    background: -webkit-linear-gradient(right bottom, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
+    background: -webkit-linear-gradient(right bottom, rgba(255,255,255,0) 45%, rgba(255,255,255,.95) 45%);
     /* Opera 11.10 */
-    background:      -o-linear-gradient(right bottom, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
+    background:      -o-linear-gradient(right bottom, rgba(255,255,255,0) 45%, rgba(255,255,255,.95) 45%);
     /* IE 10 */
-    background:     -ms-linear-gradient(right bottom, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
-    background:         linear-gradient(right bottom, rgba(255,255,255,0) 47%, rgba(255,255,255,.95) 47%);
+    background:     -ms-linear-gradient(right bottom, rgba(255,255,255,0) 45%, rgba(255,255,255,.95) 45%);
+    background:         linear-gradient(right bottom, rgba(255,255,255,0) 45%, rgba(255,255,255,.95) 45%);
     top: -11px;
 }
 
