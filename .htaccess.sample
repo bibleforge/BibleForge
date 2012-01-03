@@ -26,6 +26,12 @@
         # This eliminates If-Modified-Since and If-None-Match requests for speed improvements.
         Header unset Last-Modified
     </FilesMatch>
+    # Use ChromeFrame if available
+    Header set X-UA-Compatible "IE=Edge,chrome=1"
+    # Remove header for certain file types since it is unncessary.
+    <FilesMatch "\.(js|css|gif|png|jpe?g|pdf|eot|ttf|otf|woff|ico)$">
+        Header unset X-UA-Compatible
+    </FilesMatch>
 </IfModule>
 
 
