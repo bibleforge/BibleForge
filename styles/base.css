@@ -595,7 +595,7 @@ label {
     
     /* IE9- */
     /* This isn't perfect, but it's something. */
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00ffffff', endColorstr='#ffffff', GradientType=1);
+    background: #FFF;
     /* Firefox 3.6+ */
     background:    -moz-linear-gradient(left top, rgba(255,255,255,0) 41%, rgba(240,240,240,.97) 41%);
     /* Chrome/Safari 5.1+ */
@@ -625,7 +625,7 @@ label {
     
     /* IE6-9 */
     /* This isn't perfect, but it's something. */
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#00ffffff', GradientType=1);
+    background: #FFF;
     /* Firefox 3.6+ */
     background:    -moz-linear-gradient(right bottom, rgba(255,255,255,0) 45%, rgba(255,255,255,.95) 45%);
     /* Chrome/Safari 5.1+ */
