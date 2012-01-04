@@ -4,7 +4,7 @@
  * @date    09-28-10
  * @version alpha (α)
  * @link    http://BibleForge.com
- * @license Affero General Public License Version 3 (AGPL-3.0)
+ * @license GNU Affero General Public License 3.0 (AGPL-3.0)
  * @author  BibleForge <info@bibleforge.com>
  */
 
