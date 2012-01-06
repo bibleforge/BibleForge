@@ -53,3 +53,6 @@ AddOutputFilterByType DEFLATE text/html text/plain text/xml text/javascript text
 #
 # Hide the .git directory and .gitignore from the client.
 #RedirectMatch 404 /\\.git
+
+# Redirect pages to be created on the fly (primarily for browsers without JavaScript).
+ErrorDocument 404 /page_creator.php

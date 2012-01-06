@@ -1004,7 +1004,7 @@
                     ///NOTE: All words in the text are in <a> tags.
                     if (BF.lang.linked_to_orig && clicked_el && clicked_el.tagName === "A") {
                         ///TODO: Determine if the lexicon query (type 5) should be defined somewhere.
-                        ajax.query("post", "query.php", "t=5&q=" + clicked_el.id, function (data)
+                        ajax.query("post", "/query.php", "t=5&q=" + clicked_el.id, function (data)
                         {
                             var html;
                             

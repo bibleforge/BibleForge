@@ -1966,7 +1966,7 @@
                                     options.in_paragraphs = in_paragraphs;
                                     options.lang_id = BF.lang.lang_id;
                                     
-                                    ajax.query("post", "query.php", create_query_message(options), function (data)
+                                    ajax.query("post", "/query.php", create_query_message(options), function (data)
                                     {
                                         /// On Success
                                         ///NOTE: direction and in_paragraphs need to be set again because they could have been changed by another query in the mean time.
@@ -2020,7 +2020,7 @@
                                     options.lang_id = BF.lang.lang_id;
                                     
                                     /// Make the initial query with ajax_additional because all initial queries add more verses.
-                                    ajax_additional.query("post", "query.php", create_query_message(options), function (data)
+                                    ajax_additional.query("post", "/query.php", create_query_message(options), function (data)
                                     {
                                         /// On Success
                                         handle_new_verses(BF.parse_json(data), options);
@@ -2400,8 +2400,17 @@
             
             (function ()
             {
-                ///TODO: Determine the last spot they left off (maybe using local storage).
-                var pre_entered_text = qEl.value;
+                /// Determine the last spot they left off.
+                ///TODO: Determine exactly where the user left off, not just what was last queried.
+                
+                /// TODO: Check for a hash bang (#!) and redirect the page to the hash bang's address, ignoring the pathname (unless the hash bang is empty).
+                var url = window.decodeURIComponent(window.location.pathname);
+                
+                if (url.charAt(0) === "/") {
+                    url = url.substr(1);
+                }
+                var pre_entered_text = url;
+                
                 /// If there is no immediate query being preformed, look up whatever is in the query box (or Genesis 1:1 if there is nothing in it),
                 /// so that the scroll is not so empty after it loads.
                 ///TODO: When additional languages are available, the language will have to be determined as well.
@@ -2432,7 +2441,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("js/secondary.js", {
+                BF.include("/js/secondary.js", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
