@@ -97,7 +97,7 @@
                     /// Set the menu's is_open status to false after the delay to prevent the menu from being re-opened in the meantime.
                     is_open = false;
                     
-                    if (callback) {
+                    if (typeof callback === "function") {
                         callback();
                     }
                 }, 0);
@@ -177,7 +177,7 @@
                 {
                     context_menu.style.opacity = 1;
                     
-                    if (open_callback) {
+                    if (typeof open_callback === "function") {
                         open_callback();
                     }
                 }, 0);
@@ -205,7 +205,7 @@
                 if (is_open) {
                     close_menu(function ()
                     {
-                        if (close_callback) {
+                        if (typeof close_callback === "function") {
                             close_callback();
                         }
                         open_menu(x_pos, y_pos, menu_items, open_callback, close_callback);
@@ -250,7 +250,7 @@
                     /// Ensure that the display is set to none (even though it might already be if this is the first time or if no CSS transitions were used).
                     panel.style.display = "none";
                     
-                    if (callback) {
+                    if (typeof callback === "function") {
                         callback();
                     }
                 }
