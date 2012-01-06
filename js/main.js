@@ -311,7 +311,6 @@
         }());
     }());
     
-    
     /**
      * Gets the distance of an object from the top of the scroll.
      *
@@ -2400,27 +2399,63 @@
             
             (function ()
             {
-                /// Determine the last spot they left off.
-                ///TODO: Determine exactly where the user left off, not just what was last queried.
+                ///TODO: Check for a hash bang (#!) and possibly redirect the page to the hash bang's address, ignoring the pathname.
+                ///TODO: Check if IE 10 has the leading slash (see http://trac.osgeo.org/openlayers/ticket/3478).
+                var change_input = true,
+                    default_query,
+                    lang,
+                    /// URL structure: /[lang/][query]
+                    /// window.location.pathname should always start with a slash (/); substr(1) removes it.
+                    /// Since there should only be two parameters, anything after the second slash is ignored by limiting split() to two results.
+                    split_query = window.decodeURIComponent(window.location.pathname).substr(1).split("/", 2);
                 
-                /// TODO: Check for a hash bang (#!) and redirect the page to the hash bang's address, ignoring the pathname (unless the hash bang is empty).
-                var url = window.decodeURIComponent(window.location.pathname);
-                
-                if (url.charAt(0) === "/") {
-                    url = url.substr(1);
+                if (split_query.length === 2) {
+                    /// If the language has already been loaded, there is no need to change the language.
+                    lang = split_query[0] === BF.lang.identifier ? "" : split_query[0];
+                    default_query = split_query[1];
+                } else {
+                    default_query = split_query[0];
                 }
-                var pre_entered_text = url;
                 
-                /// If there is no immediate query being preformed, look up whatever is in the query box (or Genesis 1:1 if there is nothing in it),
-                /// so that the scroll is not so empty after it loads.
-                ///TODO: When additional languages are available, the language will have to be determined as well.
-                window.setTimeout(function ()
-                {
-                    if (query_manager.raw_query === "") {
-                        ///BUG: The pre_entered_text could be from a different language.
-                        run_new_query((pre_entered_text && pre_entered_text !== BF.lang.query_explanation) ? pre_entered_text : BF.lang.books_short[1] + " 1:1", true);
-                    }
-                }, 200);
+                /// If the default query is empty, lookup Genesis 1:1.
+                if (!default_query || default_query === BF.lang.query_explanation) {
+                    default_query = BF.lang.books_short[1] + " 1:1";
+                    change_input = false;
+                }
+                
+                /// Is the query in a different language?  If there is no language specified, just use the default language.
+                if (lang) {
+                    /// Since BF.change_language() is created in secondary.js, we must wait until that code has loaded.
+                    system.event.attach("secondaryLoaded", function ()
+                    {
+                        BF.change_language(lang, true, function ()
+                        {
+                            run_new_query(default_query, true);
+                            
+                            /// Only change the text in the query input if the user has not started typing.
+                            if (change_input && qEl.value === BF.lang.query_explanation) {
+                                qEl.value = default_query;
+                            }
+                        });
+                    });
+                } else {
+                    /// If there is no immediate query being preformed, look up whatever is in the query box (or Genesis 1:1 if there is nothing in it),
+                    /// so that the scroll is not so empty after it loads.
+                    ///TODO: When additional languages are available, the language will have to be determined as well.
+                    window.setTimeout(function ()
+                    {
+                        ///NOTE: Do not preform the default query if the user has already preformed another query.
+                        if (query_manager.raw_query === "") {
+                            
+                            run_new_query(default_query, true);
+                            
+                            /// Only change the text in the query input if the user has not started typing.
+                            if (change_input && qEl.value === BF.lang.query_explanation) {
+                                qEl.value = default_query;
+                            }
+                        }
+                    }, 200);
+                }
             }());
             
             /// Set some default language specific text.

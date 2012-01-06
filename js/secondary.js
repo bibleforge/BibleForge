@@ -1144,50 +1144,59 @@
                 context.qEl.style.paddingLeft = (langEl.offsetWidth + 3) + "px";
             }
             
-            function change_language(identifier)
+            BF.change_language = function (identifier, prevent_reload, callback)
             {
                 var activate_new_lang,
                     prev_lang; 
                 
-                /// Does the language exist?
-                if (BF.langs[identifier]) {
-                    /// Is the new language different from the current language?
-                    if (BF.lang.identifier !== identifier) {
-                        prev_lang = BF.lang.identifier;
+                /// Does the language exist and is the new language different from the current language?
+                if (BF.langs[identifier] && BF.lang.identifier !== identifier) {
+                    prev_lang = BF.lang.identifier;
+                    
+                    activate_new_lang = function ()
+                    {
+                        BF.lang = BF.langs[identifier];
+                        change_langEl_text(BF.lang.short_name);
                         
-                        activate_new_lang = function ()
-                        {
-                            BF.lang = BF.langs[identifier];
-                            change_langEl_text(BF.lang.short_name);
-                            
-                            /// Since the language has changed, any currently loaded text must be removed and reloaded (after a moment).
-                            context.content_manager.clear_scroll();
-                            
-                            /// Make the cursor turn into a hand when hovering over words if there is lexical data available.
-                            BF.toggleCSS(page, "linked", BF.lang.linked_to_orig ? 1 : 0);
-                            BF.toggleCSS(page, "lang_" + prev_lang,  0);
-                            BF.toggleCSS(page, "lang_" + identifier, 1);
-                            
-                            context.system.event.trigger("languageChange", {
-                                prev_lang: prev_lang
-                            });
-                            
+                        /// Since the language has changed, any currently loaded text must be removed and reloaded (after a moment).
+                        context.content_manager.clear_scroll();
+                        
+                        /// Make the cursor turn into a hand when hovering over words if there is lexical data available.
+                        BF.toggleCSS(page, "linked", BF.lang.linked_to_orig ? 1 : 0);
+                        BF.toggleCSS(page, "lang_" + prev_lang,  0);
+                        BF.toggleCSS(page, "lang_" + identifier, 1);
+                        
+                        context.system.event.trigger("languageChange", {
+                            prev_lang: prev_lang
+                        });
+                        
+                        if (!prevent_reload) {
                             /// Reload the text in the new language.
                             window.setTimeout(function ()
                             {
                                 ///TODO: Determine the last spot they left off (maybe using local storage).
                                 context.run_new_query(context.qEl.value && context.qEl.value !== BF.lang.query_explanation ? context.qEl.value : BF.lang.books_short[1] + " 1:1");
                             }, 0);
-                        };
-                        /// Has the language code already been downloaded?
-                        if (BF.langs[identifier].loaded) {
-                            activate_new_lang();
-                        } else {
-                            BF.include("js/lang/" + identifier + ".js", {}, activate_new_lang);
                         }
+                        
+                        if (typeof callback === "function") {
+                            callback();
+                        }
+                    };
+                    /// Has the language code already been downloaded?
+                    if (BF.langs[identifier].loaded) {
+                        activate_new_lang();
+                    } else {
+                        BF.include("/js/lang/" + identifier + ".js", {}, activate_new_lang);
+                    }
+                } else {
+                    if (typeof callback === "function") {
+                        callback();
                     }
                 }
-            }
+            };
+            
+            
             
             change_langEl_text(BF.lang.short_name);
             BF.toggleCSS(page, "lang_" + BF.lang.identifier, 1);
@@ -1214,7 +1223,7 @@
                     return function ()
                     {
                         /// Do something with identifier.
-                        change_language(identifier);
+                        BF.change_language(identifier);
                     };
                 }
                 
@@ -1263,5 +1272,10 @@
                 }());
             }
         }());
+        
+        window.setTimeout(function ()
+        {
+            context.system.event.trigger("secondaryLoaded");
+        }, 0);
     };
 }());
