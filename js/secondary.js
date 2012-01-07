@@ -1171,15 +1171,18 @@
                             /// Reload the text in the new language.
                             window.setTimeout(function ()
                             {
-                                var query_str = context.get_last_query();
+                                var query_info = context.get_query_info(),
+                                    query_str;
+                                
+                                query_str = query_info.automated ? "" : query_info.raw_query;
                                 
                                 BF.history.pushState("/" + identifier + "/" + query_str);
                                 
-                                if (query_str === "") {
+                                if (query_info.automated) {
                                     query_str = BF.lang.books_short[1] + " 1:1";
                                 }
                                 
-                                context.run_new_query(query_str, true);
+                                context.run_new_query(query_str, query_info.automated, true);
                             }, 0);
                         }
                         

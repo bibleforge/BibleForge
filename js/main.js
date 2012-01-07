@@ -162,7 +162,7 @@
                 {
                     window.history.pushState(state, "", url);
                 },
-                replaceState: function ()
+                replaceState: function (url, state)
                 {
                     window.history.pushState(state, "", url);
                 }
@@ -2105,9 +2105,7 @@
                                     /// Store the current query so that outer functions can access this information.
                                     this.raw_query  = options.raw_query;
                                     
-                                    if (!options.automated) {
-                                        this.last_user_generated_query = options.raw_query;
-                                    }
+                                    this.automated  = options.automated;
                                     
                                     /// Create the additional and previous functions for the content_manager to call when needed.
                                     this.query_additional = next_query_maker(ajax_additional, additional, options);
@@ -2120,7 +2118,7 @@
                     query_previous: function () {},
                     
                     /// Variables accessible to outer functions.
-                    last_user_generated_query: "",
+                    automated:  "",
                     query_type: "",
                     raw_query:  ""
                 };
@@ -2238,7 +2236,7 @@
                  * @return  NULL
                  * @note    Called by searchForm.onsubmit() when a user submits a query.
                  */
-                return function (raw_query, automated)
+                return function (raw_query, automated, ignore_state)
                 {
                     /// Step 1: Prepare string and check to see if we need to send a query (i.e., the query string is not empty).
                     
@@ -2306,8 +2304,11 @@
                     ///TODO: Determine if this should be done by a separate function.
                     document.title = raw_query + " - " + BF.lang.app_name;
                     
-                    if (!automated) {
+                    if (!ignore_state) {
                         BF.history.pushState("/" + BF.lang.identifier + "/" + raw_query);
+                    }
+                    
+                    if (!automated) {
                         /// Stop filling in the explanation text so that the user can make the query box blank.  (Text in the query box can be distracting while reading.)
                         qEl.onblur = function () {};
                     }
@@ -2485,7 +2486,7 @@
                 {
                     ///TODO: Check for a hash bang (#!) and possibly redirect the page to the hash bang's address, ignoring the pathname.
                     ///TODO: Check if IE 10 has the leading slash (see http://trac.osgeo.org/openlayers/ticket/3478).
-                    var change_input = true,
+                    var automated = false,
                         default_query,
                         lang,
                         /// URL structure: /[lang/][query]
@@ -2495,10 +2496,11 @@
                     
                     function do_query()
                     {
-                        run_new_query(default_query, true);
+                        run_new_query(default_query, automated, true);
                         
                         /// Only change the text in the query input if the user has not started typing.
-                        if (!e.initial_page_load || change_input && qEl.value === BF.lang.query_explanation) {
+                        if (!automated && (!e.initial_page_load || qEl.value === BF.lang.query_explanation)) {
+                        //if (!e.initial_page_load || (!automated && qEl.value === BF.lang.query_explanation)) {
                             qEl.value = default_query;
                         }                
                     }
@@ -2514,7 +2516,7 @@
                     /// If the default query is empty, lookup Genesis 1:1.
                     if (!default_query || default_query === BF.lang.query_explanation) {
                         default_query = BF.lang.books_short[1] + " 1:1";
-                        change_input = false;
+                        automated = true;
                     }
                     
                     /// Is the query in a different language?  If there is no language specified, just use the default language.
@@ -2574,9 +2576,12 @@
             {
                 BF.include("/js/secondary.js", {
                     content_manager: content_manager,
-                    get_last_query:  function ()
+                    get_query_info:  function ()
                     {
-                        return query_manager.last_user_generated_query;
+                        return {
+                            automated: query_manager.automated,
+                            raw_query: query_manager.raw_query
+                        };
                     },
                     langEl:          langEl,
                     page:            page,
