@@ -108,6 +108,81 @@
     };
     
     
+    /**
+     * Create the history object for handling browser history changes.
+     *
+     * @return An object that handles history events.
+     */
+    BF.history = (function ()
+    {
+        var hasHistory = Boolean(window.history),
+            func_arr = [];
+        
+        /**
+         * Add an event to the window.onpopstate event cue.
+         *
+         * @param  func (function) The function to call when the window.onpopstate event is triggered.
+         * @return NULL
+         * @note   Currently, there is no detach() function because it is not needed.
+         */
+        function attach(func)
+        {
+            if (typeof func === "function") {
+                func_arr[func_arr.length] = func;
+            }
+        }
+        
+        /// If the browser supports the History API, use that; if it does not, use the URL hash.
+        if (hasHistory) {
+            window.addEventListener("popstate", function (e)
+            {
+                var event = {state: e.state ? JSON.stringify(e.state) : ""},
+                    func_arr_len = func_arr.length,
+                    i,
+                    stop_propagation = false;
+                
+                event.stopPropagation = function ()
+                {
+                    stop_propagation = true;
+                };
+                
+                for (i = 0; i < func_arr_len; i += 1) {
+                    func_arr[i](event);
+                    if (stop_propagation) {
+                        break;
+                    }
+                }
+            }, false);
+            
+            
+            return {
+                attach: attach,
+                needsHash: false,
+                pushState: function (url, state)
+                {
+                    window.history.pushState(state, "", url);
+                },
+                replaceState: function ()
+                {
+                    window.history.pushState(state, "", url);
+                }
+            };
+        } else {
+            return {
+                attach: attach,
+                needsHash: true,
+                pushState: function (url, state)
+                {
+                    ///TODO: Use hash.
+                },
+                replaceState: function ()
+                {
+                    ///TODO: Use hash.
+                }
+            };
+        }
+    }());
+    
     /// Declare helper function(s) attached to the global BibleForge object (BF).
     
     /// Detect WebKit based browsers.
@@ -2231,8 +2306,10 @@
                     document.title = raw_query + " - " + BF.lang.app_name;
                     
                     if (!automated) {
+                        BF.history.pushState("/" + BF.lang.identifier + "/" + raw_query);
                         /// Stop filling in the explanation text so that the user can make the query box blank.  (Text in the query box can be distracting while reading.)
                         qEl.onblur = function () {};
+                        
                     }
                     
                     /// Was the query a search?  Searches need to have the highlight function prepared for the incoming results.
@@ -2404,63 +2481,73 @@
             
             (function ()
             {
-                ///TODO: Check for a hash bang (#!) and possibly redirect the page to the hash bang's address, ignoring the pathname.
-                ///TODO: Check if IE 10 has the leading slash (see http://trac.osgeo.org/openlayers/ticket/3478).
-                var change_input = true,
-                    default_query,
-                    lang,
-                    /// URL structure: /[lang/][query]
-                    /// window.location.pathname should always start with a slash (/); substr(1) removes it.
-                    /// Since there should only be two parameters, anything after the second slash is ignored by limiting split() to two results.
-                    split_query = window.decodeURIComponent(window.location.pathname).substr(1).split("/", 2);
-                
-                if (split_query.length === 2) {
-                    /// If the language has already been loaded, there is no need to change the language.
-                    lang = split_query[0] === BF.lang.identifier ? "" : split_query[0];
-                    default_query = split_query[1];
-                } else {
-                    default_query = split_query[0];
-                }
-                
-                /// If the default query is empty, lookup Genesis 1:1.
-                if (!default_query || default_query === BF.lang.query_explanation) {
-                    default_query = BF.lang.books_short[1] + " 1:1";
-                    change_input = false;
-                }
-                
-                /// Is the query in a different language?  If there is no language specified, just use the default language.
-                if (lang) {
-                    /// Since BF.change_language() is created in secondary.js, we must wait until that code has loaded.
-                    system.event.attach("secondaryLoaded", function ()
+                function on_state_change(e)
+                {
+                    ///TODO: Check for a hash bang (#!) and possibly redirect the page to the hash bang's address, ignoring the pathname.
+                    ///TODO: Check if IE 10 has the leading slash (see http://trac.osgeo.org/openlayers/ticket/3478).
+                    var change_input = true,
+                        default_query,
+                        lang,
+                        /// URL structure: /[lang/][query]
+                        /// window.location.pathname should always start with a slash (/); substr(1) removes it.
+                        /// Since there should only be two parameters, anything after the second slash is ignored by limiting split() to two results.
+                        split_query = window.decodeURIComponent(window.location.pathname).substr(1).split("/", 2);
+                    
+                    function do_query()
                     {
-                        BF.change_language(lang, true, function ()
-                        {
-                            run_new_query(default_query, true);
-                            
-                            /// Only change the text in the query input if the user has not started typing.
-                            if (change_input && qEl.value === BF.lang.query_explanation) {
-                                qEl.value = default_query;
-                            }
-                        });
-                    });
-                } else {
-                    /// If there is no immediate query being preformed, look up whatever is in the query box (or Genesis 1:1 if there is nothing in it),
-                    /// so that the scroll is not so empty after it loads.
-                    ///TODO: When additional languages are available, the language will have to be determined as well.
-                    window.setTimeout(function ()
-                    {
-                        ///NOTE: Do not preform the default query if the user has already preformed another query.
-                        if (query_manager.raw_query === "") {
-                            
-                            run_new_query(default_query, true);
-                            
-                            /// Only change the text in the query input if the user has not started typing.
-                            if (change_input && qEl.value === BF.lang.query_explanation) {
-                                qEl.value = default_query;
-                            }
+                        run_new_query(default_query, true);
+                        
+                        /// Only change the text in the query input if the user has not started typing.
+                        if (!e.initial_page_load || change_input && qEl.value === BF.lang.query_explanation) {
+                            qEl.value = default_query;
+                        }                
+                    }
+                    
+                    if (split_query.length === 2) {
+                        /// If the language has already been loaded, there is no need to change the language.
+                        lang = split_query[0] === BF.lang.identifier ? "" : split_query[0];
+                        default_query = split_query[1];
+                    } else {
+                        default_query = split_query[0];
+                    }
+                    
+                    /// If the default query is empty, lookup Genesis 1:1.
+                    if (!default_query || default_query === BF.lang.query_explanation) {
+                        default_query = BF.lang.books_short[1] + " 1:1";
+                        change_input = false;
+                    }
+                    
+                    /// Is the query in a different language?  If there is no language specified, just use the default language.
+                    if (lang) {
+                        /// If BF.change_language() has not been created by secondary.js, we must wait until that code has loaded.
+                        if (BF.change_language) {
+                            BF.change_language(lang, true, do_query);
+                        } else {
+                            system.event.attach("secondaryLoaded", function ()
+                            {
+                                BF.change_language(lang, true, do_query);
+                            });
                         }
-                    }, 200);
+                    } else if (!e.initial_page_load) {
+                        do_query();
+                    } else {
+                        /// If there is no immediate query being preformed, look up whatever is in the query box (or Genesis 1:1 if there is nothing in it),
+                        /// so that the scroll is not so empty after it loads.
+                        ///TODO: When additional languages are available, the language will have to be determined as well.
+                        window.setTimeout(function ()
+                        {
+                            ///NOTE: Do not preform the default query if the user has already preformed another query.
+                            if (query_manager.raw_query === "") {
+                                do_query();
+                            }
+                        }, 200);
+                    }
                 }
+                
+                
+                on_state_change({initial_page_load: true});
+                
+                BF.history.attach(on_state_change);
             }());
             
             /// Set some default language specific text.
