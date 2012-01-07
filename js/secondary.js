@@ -124,6 +124,25 @@
                     menu_count = menu_items.length,
                     menu_item;
                 
+                /**
+                 * Wraps a function with the code to prevent the default action.
+                 *
+                 * @param  func (function) The function to call.
+                 * @return NULL
+                 * @note   This function is needed because functions cannot be created properly in loops.
+                 */
+                function make_onclick(func)
+                {
+                    return function (e)
+                    {
+                        func(e);
+                        
+                        e.preventDefault();
+                        ///TODO: Determine if returning FALSE is necessary.
+                        return false;
+                    }
+                }
+                
                 is_open = true;
                 
                 for (i = 0; i < menu_count; i += 1) {
@@ -135,9 +154,9 @@
                         /// Force links to open in a new tab.
                         menu_item.target = "_blank";
                     } else {
-                        ///TODO: Create a useful hash value.
-                        menu_item.href    = "#contextmenu";
-                        menu_item.onclick = menu_items[i].link;
+                        ///NOTE: Possibly could add something here to make the link open in a new window.
+                        menu_item.href    = "";
+                        menu_item.onclick = make_onclick(menu_items[i].link);
                     }
                     /// Should there be a line break before this item?
                     if (menu_items[i].line) {
