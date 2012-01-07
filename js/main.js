@@ -2100,13 +2100,13 @@
                                         handle_new_verses(BF.parse_json(data), options);
                                     });
                                     
-                                    /// If the query was automated, this information should not be stored. 
+                                    /// Store the current query type so that outer functions can access this information.
+                                    this.query_type = options.type;
+                                    /// Store the current query so that outer functions can access this information.
+                                    this.raw_query  = options.raw_query;
                                     
                                     if (!options.automated) {
-                                        /// Store the current query type so that outer functions can access this information.
-                                        this.query_type = options.type;
-                                        /// Store the current query so that outer functions can access this information.
-                                        this.raw_query  = options.raw_query;
+                                        this.last_user_generated_query = options.raw_query;
                                     }
                                     
                                     /// Create the additional and previous functions for the content_manager to call when needed.
@@ -2120,6 +2120,7 @@
                     query_previous: function () {},
                     
                     /// Variables accessible to outer functions.
+                    last_user_generated_query: "",
                     query_type: "",
                     raw_query:  ""
                 };
@@ -2546,7 +2547,11 @@
                 
                 on_state_change({initial_page_load: true});
                 
-                BF.history.attach(on_state_change);
+                /// Because WebKit (unlike Gecko) fires the window.onpopstate event on page load, we must wait to attach the function.
+                window.setTimeout(function ()
+                {
+                    BF.history.attach(on_state_change);
+                }, 0);
             }());
             
             /// Set some default language specific text.
@@ -2571,7 +2576,7 @@
                     content_manager: content_manager,
                     get_last_query:  function ()
                     {
-                        return query_manager.raw_query;
+                        return query_manager.last_user_generated_query;
                     },
                     langEl:          langEl,
                     page:            page,
