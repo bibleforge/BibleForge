@@ -674,13 +674,14 @@
                              * @param   name (string || array) The name of the event or an array of names of events.
                              * @param   func (function)        The function to call when the event it triggered.
                              * @return  NULL
-                             * @note    If func() returns FALSE when triggered, it will stop further event propagation.
+                             * @note    If func(e) calls e.stopPropagation(), it will stop further event propagation.
                              */
                             attach: function (name, func)
                             {
                                 var arr_len,
                                     i;
                                 
+                                /// Should the function be attached to multiple events?
                                 if (name instanceof Array) {
                                     arr_len = name.length;
                                     for (i = 0; i < arr_len; i += 1) {
@@ -703,6 +704,7 @@
                              * @param   func (function) The function that was attached to the specified event.
                              * @return  NULL
                              * @note    Not currently used.
+                             * @note    The name parameter cannot be an array (unlike attach()).
                              */
                             detach: function (name, func)
                             {
@@ -715,7 +717,8 @@
                                     for (i = 0; i < func_arr_len; i += 1) {
                                         if (func_list[name][i] === func) {
                                             func_list[name].remove(i);
-                                            break;
+                                            /// Since only one event can be removed, we can end now.
+                                            return;
                                         }
                                     }
                                 }
@@ -734,12 +737,13 @@
                                     stop_propagation;
                                 
                                 if (func_list[name]) {
-                                    func_arr_len = func_list[name].length;                                    
+                                    func_arr_len = func_list[name].length;
                                     
                                     if (!BF.is_object(e)) {
                                         e = {};
                                     }
                                     
+                                    /// If an attached function runs this function, it will stop calling other functions.
                                     e.stopPropagation = function ()
                                     {
                                         stop_propagation = true;
