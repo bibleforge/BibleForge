@@ -2235,7 +2235,7 @@
                  */
                 return function (raw_query, automated)
                 {
-                    /// Step 1: Prepare string and check to see if we need to search (not empty)
+                    /// Step 1: Prepare string and check to see if we need to send a query (i.e., the query string is not empty).
                     
                     ///NOTE: Whitespace must be trimmed after this function because it may create excess whitespace.
                     var options = {
@@ -2251,7 +2251,7 @@
                         return;
                     }
                     
-                    /// Step 2: Determine type of query
+                    /// Step 2: Determine the type of query.
                     
                     /// Determine if the user is preforming a search or looking up a verse.
                     /// If the query is a verse reference, a number is returned, if it is a search, then FALSE is returned.
@@ -2285,12 +2285,12 @@
                         }
                     }
                     
-                    /// Step 3: Request results
+                    /// Step 3: Request results.
                     
                     /// Prepare the initial query, create functions to handle additional and previous queries.
                     query_manager.query(options);
                     
-                    /// Step 4: Prepare for new results (clear page, prepare highlighter if applicable)
+                    /// Step 4: Prepare for new results (clear page, prepare highlighter if applicable).
                     content_manager.clear_scroll();
                     
                     /// Indicate that the lookup is in progress.
@@ -2304,7 +2304,6 @@
                         BF.history.pushState("/" + BF.lang.identifier + "/" + raw_query);
                         /// Stop filling in the explanation text so that the user can make the query box blank.  (Text in the query box can be distracting while reading.)
                         qEl.onblur = function () {};
-                        
                     }
                     
                     /// Was the query a search?  Searches need to have the highlight function prepared for the incoming results.

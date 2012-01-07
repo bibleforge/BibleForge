@@ -1165,9 +1165,7 @@
                         BF.toggleCSS(page, "lang_" + prev_lang,  0);
                         BF.toggleCSS(page, "lang_" + identifier, 1);
                         
-                        context.system.event.trigger("languageChange", {
-                            prev_lang: prev_lang
-                        });
+                        context.system.event.trigger("languageChange", {prev_lang: prev_lang});
                         
                         if (!prevent_reload) {
                             /// Reload the text in the new language.
@@ -1182,6 +1180,7 @@
                             callback();
                         }
                     };
+                    
                     /// Has the language code already been downloaded?
                     if (BF.langs[identifier].loaded) {
                         activate_new_lang();
