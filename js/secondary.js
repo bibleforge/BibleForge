@@ -1055,9 +1055,7 @@
                 
                 document.addEventListener("click", function (e)
                 {
-                    var callouts_len = callouts.length,
-                        i,
-                        new_arr = [];
+                    var i;
                     
                     /// Are there no callouts or is the Ctrl key pressed?
                     if (i > 0 || e.ctrlKey) {
@@ -1070,79 +1068,62 @@
                         return;
                     }
                     
-                    for (i = 0; i < callouts_len; i += 1) {
-                        if (callouts[i].pinned || callouts[i].just_created) {
-                            new_arr[new_arr.length] = callouts[i];
-                        } else {
+                    for (i = callouts.length - 1; i >= 0; i -= 1) {
+                        if (!callouts[i].just_created && !callouts[i].pinned) {
                             callouts[i].destroy();
+                            callouts.remove(i);
                         }
                     }
-                    callouts = new_arr;
                 }, false);
                 
                 context.system.event.attach(["contentAddedAbove", "contentRemovedAbove"], function (e)
                 {
-                    var callouts_len = callouts.length,
-                        i,
-                        new_arr = [];
+                    var i;
                     
-                    for (i = 0; i < callouts_len; i += 1) {
+                    for (i = callouts.length - 1; i >= 0; i -= 1) {
                         /// When contentRemovedAbove is triggered, the element that the callout is pointing to may have been removed.
                         /// If so, remove the callout.
-                        ///NOTE: contentRemovedAbove has a negative e.amount.
+                        ///NOTE: contentAddedAbove has a positive e.amount; whereas, contentRemovedAbove has a negative e.amount.
                         if (e.amount >= 0 || callouts[i].point_to_el_exists()) {
                             callouts[i].move(e.amount);
-                            new_arr[new_arr.length] = callouts[i];
                         } else {
                             callouts[i].destroy();
+                            callouts.remove(i);
                         }
                     }
-                    
-                    callouts = new_arr;
                 });
                 
                 context.system.event.attach("scrollCleared", function ()
                 {
-                    var callouts_len = callouts.length,
-                        i,
-                        new_arr = [];
+                    var i;
                     
-                    for (i = 0; i < callouts_len; i += 1) {
-                        if (callouts[i].pinned) {
-                            new_arr[new_arr.length] = callouts[i];
-                        } else {
+                    for (i = callouts.length - 1; i >= 0; i -= 1) {
+                        if (!callouts[i].pinned) {
                             callouts[i].destroy();
+                            callouts.remove(i);
                         }
                     }
-                    
-                    callouts = new_arr;
                 });
                 
                 context.system.event.attach("contentRemovedBelow", function ()
                 {
-                    var callouts_len = callouts.length,
-                        i,
-                        new_arr = [];
+                    var i;
                     
-                    for (i = 0; i < callouts_len; i += 1) {
-                        if (callouts[i].point_to_el_exists()) {
-                            new_arr[new_arr.length] = callouts[i];
-                        } else {
+                    for (i = callouts.length - 1; i >= 0; i -= 1) {
+                        if (!callouts[i].point_to_el_exists()) {
                             callouts[i].destroy();
+                            callouts.remove(i);
                         }
                     }
-                    
-                    callouts = new_arr;
                 });
                 
                 window.addEventListener("resize", function ()
                 {
-                    var callouts_len = callouts.length,
-                        i;
+                    var i;
                     
                     ///TODO: If there are a lot of callouts that are not visible, it might be a good idea to make them invisible and not re-align them.
                     ///      To do this, we could expose the callout's pos variable (perhaps via a get() function).
-                    for (i = 0; i < callouts_len; i += 1) {
+                    for (i = callouts.length - 1; i >= 0; i -= 1) {
                         if (callouts[i].point_to_el_exists()) {
                             callouts[i].align_callout();
                         }
