@@ -154,8 +154,7 @@
                         /// Force links to open in a new tab.
                         menu_item.target = "_blank";
                     } else {
-                        ///NOTE: Possibly could add something here to make the link open in a new window.
-                        menu_item.href    = "";
+                        ///NOTE: Possibly could add something to the href to make the link open in a new window.
                         menu_item.onclick = make_onclick(menu_items[i].link);
                     }
                     /// Should there be a line break before this item?
