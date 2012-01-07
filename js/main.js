@@ -459,7 +459,6 @@
     BF.changeCSS = function (selector, new_CSS, insert, change_all)
     {
         var CSS_rules,
-            CSS_rules_len,
             i,
             ///TODO: Determine if it should loop through all styles sheets.
             style_sheet = document.styleSheets[0];
@@ -471,8 +470,7 @@
         } else {
             /// Get the styles (cssRules) for Mozilla/WebKit/Opera/IE9 and (rules) for IE8-.
             CSS_rules     = style_sheet.cssRules || style_sheet.rules;
-            CSS_rules_len = CSS_rules.length;
-            for (i = 0; i < CSS_rules_len; i += 1) {
+            for (i = CSS_rules.length - 1; i >= 0; i -= 1) {
                 if (CSS_rules[i].selectorText === selector) {
                     CSS_rules[i].style.cssText = new_CSS;
                     if (!change_all) {
