@@ -2100,10 +2100,14 @@
                                         handle_new_verses(BF.parse_json(data), options);
                                     });
                                     
-                                    /// Store the current query type so that outer functions can access this information.
-                                    this.query_type = options.type;
-                                    /// Store the current query so that outer functions can access this information.
-                                    this.raw_query  = options.raw_query;
+                                    /// If the query was automated, this information should not be stored. 
+                                    
+                                    if (!options.automated) {
+                                        /// Store the current query type so that outer functions can access this information.
+                                        this.query_type = options.type;
+                                        /// Store the current query so that outer functions can access this information.
+                                        this.raw_query  = options.raw_query;
+                                    }
                                     
                                     /// Create the additional and previous functions for the content_manager to call when needed.
                                     this.query_additional = next_query_maker(ajax_additional, additional, options);
@@ -2239,6 +2243,7 @@
                     
                     ///NOTE: Whitespace must be trimmed after this function because it may create excess whitespace.
                     var options = {
+                            automated: automated,
                             raw_query: raw_query
                         },
                         query = BF.lang.prepare_search(raw_query).trim(),
@@ -2564,6 +2569,10 @@
             {
                 BF.include("/js/secondary.js", {
                     content_manager: content_manager,
+                    get_last_query:  function ()
+                    {
+                        return query_manager.raw_query;
+                    },
                     langEl:          langEl,
                     page:            page,
                     qEl:             qEl,

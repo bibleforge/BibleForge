@@ -1171,8 +1171,15 @@
                             /// Reload the text in the new language.
                             window.setTimeout(function ()
                             {
-                                ///TODO: Determine the last spot they left off (maybe using local storage).
-                                context.run_new_query(context.qEl.value && context.qEl.value !== BF.lang.query_explanation ? context.qEl.value : BF.lang.books_short[1] + " 1:1");
+                                var query_str = context.get_last_query();
+                                
+                                BF.history.pushState("/" + identifier + "/" + query_str);
+                                
+                                if (query_str === "") {
+                                    query_str = BF.lang.books_short[1] + " 1:1";
+                                }
+                                
+                                context.run_new_query(query_str, true);
                             }, 0);
                         }
                         
