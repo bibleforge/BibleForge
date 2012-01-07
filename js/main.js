@@ -783,16 +783,13 @@
                              */
                             detach: function (name, func)
                             {
-                                var func_arr_len,
-                                    i;
+                                var i;
                                 
                                 if (func_list[name]) {
-                                    func_arr_len = func_list[name].length;
-                                    
-                                    for (i = 0; i < func_arr_len; i += 1) {
+                                    for (i = func_list[name].length - 1; i >= 0; i -= 1) {
                                         if (func_list[name][i] === func) {
                                             func_list[name].remove(i);
-                                            /// Since only one event can be removed, we can end now.
+                                            /// Since only one event should be removed at a time, we can end now.
                                             return;
                                         }
                                     }
