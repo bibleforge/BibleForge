@@ -2507,10 +2507,18 @@
                     
                     if (split_query.length === 2) {
                         /// If the language has already been loaded, there is no need to change the language.
-                        lang = split_query[0] === BF.lang.identifier ? "" : split_query[0];
+                        lang = split_query[0];
                         default_query = split_query[1];
                     } else {
+                        /// If no language was specified, default to English.
+                        ///TODO: Consider changing the default language based on the user's location and settings.
+                        lang = "en";
                         default_query = split_query[0];
+                    }
+                    
+                    /// If the requested language is the same as the current one, there is no need to change it.
+                    if (lang === BF.lang.identifier) {
+                        lang = "";
                     }
                     
                     /// If the default query is empty, lookup Genesis 1:1.
