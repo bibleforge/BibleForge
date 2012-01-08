@@ -1195,7 +1195,8 @@
                     if (BF.langs[identifier].loaded) {
                         activate_new_lang();
                     } else {
-                        BF.include("/js/lang/" + identifier + ".js", {}, activate_new_lang);
+                        ///NOTE: The last modified time is added (if available) to prevent browsers from caching an outdated file.
+                        BF.include("/js/lang/" + identifier + ".js?" + (BF.langs[identifier].modified || ""), {}, activate_new_lang);
                     }
                 } else {
                     if (typeof callback === "function") {
