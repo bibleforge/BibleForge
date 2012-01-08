@@ -18,7 +18,7 @@
 /*properties
     Create_easy_ajax, MozTransition, OTransition, XMLHttpRequest, abort, 
     activeElement, addEventListener, add_content_if_needed, alt, altKey, 
-    amount, app_name, appendChild, attach, b, body, books_long_main, 
+    amount, app_name, appendChild, attach, automated, b, body, books_long_main, 
     books_long_posttitle, books_long_pretitle, books_short, bottom_book, 
     bottom_id, bottom_verse, c, changeCSS, change_language, chapter, 
     chapter_count, charCodeAt, childNodes, chrome, className, clearInterval, 
@@ -27,26 +27,27 @@
     cssTransitions, ctrlKey, decodeURIComponent, detach, determine_reference, 
     direction, documentElement, en, encodeURIComponent, event, firstChild, 
     focus, format_number, full_book, full_verse, get, getElementById, 
-    get_b_c_v, get_position, grammar_keywords, grammar_marker, 
-    grammar_marker_len, grammar_separator, height, highlight, i, id, 
-    identifier, in_paragraphs, include, initial_query, innerHTML, insertBefore, 
-    insertRule, is_WebKit, is_busy, is_object, keyCode, lang, langEl, lang_id, 
-    langs, lastChild, left, line_height, location, metaKey, n, navigator, 
-    new_val, nextSibling, offsetHeight, offsetLeft, offsetParent, offsetTop, 
-    old_val, onblur, onfocus, onreadystatechange, onsubmit, open, opera, p, 
-    page, pageXOffset, pageYOffset, parentNode, parseInt, parse_json, pathname, 
+    get_b_c_v, get_position, get_query_info, grammar_keywords, grammar_marker, 
+    grammar_marker_len, grammar_separator, height, highlight, history, i, id, 
+    identifier, in_paragraphs, include, initial_page_load, initial_query, 
+    innerHTML, insertBefore, insertRule, is_WebKit, is_busy, is_object, 
+    keyCode, lang, langEl, lang_id, langs, lastChild, left, line_height, 
+    location, metaKey, n, navigator, needsHash, new_val, nextSibling, 
+    offsetHeight, offsetLeft, offsetParent, offsetTop, old_val, onblur, 
+    onfocus, onreadystatechange, onsubmit, open, opera, p, page, pageXOffset, 
+    pageYOffset, parentNode, parseInt, parse_json, pathname, 
     prepare_highlighter, prepare_search, prev_lang, preventDefault, 
-    previousSibling, properties, psalm, psalm_has_title, qEl, query, 
+    previousSibling, properties, psalm, psalm_has_title, pushState, qEl, query, 
     query_additional, query_button_alt, query_button_title, query_explanation, 
     query_previous, query_type, raw_query, reached_bottom, reached_top, 
-    readyState, red_letters, remove, removeChild, replace, responseText, round, 
-    rules, run_new_query, scrollBy, scrollHeight, scrollTo, scroll_to_verse, 
-    scroll_view_to, selectorText, send, set, setInterval, setRequestHeader, 
-    setTimeout, settings, split, standard_terms, start_at, status, 
-    stopPropagation, style, styleSheets, subscription, system, t, tagName, 
-    title, toggleCSS, top, topBar, topBar_height, top_id, top_verse, trigger, 
-    type, update_verse_range, userAgent, v, value, verse, verse_id, 
-    verse_range, view, viewPort_count, viewPort_num, visibility, 
+    readyState, red_letters, remove, removeChild, replace, replaceState, 
+    responseText, round, rules, run_new_query, scrollBy, scrollHeight, 
+    scrollTo, scroll_to_verse, scroll_view_to, selectorText, send, set, 
+    setInterval, setRequestHeader, setTimeout, settings, split, standard_terms, 
+    start_at, state, status, stopPropagation, style, styleSheets, subscription, 
+    system, t, tagName, title, toggleCSS, top, topBar, topBar_height, top_id, 
+    top_verse, trigger, type, update_verse_range, userAgent, v, value, verse, 
+    verse_id, verse_range, view, viewPort_count, viewPort_num, visibility, 
     webkitTransition
 */
 
@@ -175,7 +176,7 @@
                 {
                     ///TODO: Use hash.
                 },
-                replaceState: function ()
+                replaceState: function (url, state)
                 {
                     ///TODO: Use hash.
                 }
@@ -2581,7 +2582,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?1325954226", {
+                BF.include("/js/secondary.js?1326011040", {
                     content_manager: content_manager,
                     get_query_info:  function ()
                     {
