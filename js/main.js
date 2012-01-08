@@ -336,8 +336,7 @@
     /**
      * Load some Javascript and optionally send it some variables from the closure.
      *
-     * @example BF.include("path/to/script.js", {needed_var: var_from_the_closure}, 20000, false);
-     * @example BF.include("js/secondary.js",   {topBar: viewPort.firstChild, viewPort_num: viewPort_num});
+     * @example BF.include("/path/to/script.js", {needed_var: var_from_the_closure}, 20000, false);
      * @param   path    (string)             The location of the JavaScript to load.
      * @param   context (object)             The variable to send to the included JavaScript.
      * @param   timeout (number)  (optional) How long to wait before giving up on the script to load (in milliseconds).
