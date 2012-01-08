@@ -140,7 +140,7 @@
                         e.preventDefault();
                         ///TODO: Determine if returning FALSE is necessary.
                         return false;
-                    }
+                    };
                 }
                 
                 is_open = true;
