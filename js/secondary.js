@@ -1177,7 +1177,8 @@
                                 
                                 query_str = query_info.automated ? "" : query_info.raw_query;
                                 
-                                BF.history.pushState("/" + identifier + "/" + query_str);
+                                ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
+                                BF.history.pushState("/" + identifier + "/" + query_str + "/");
                                 
                                 if (query_info.automated) {
                                     query_str = BF.lang.books_short[1] + " 1:1";

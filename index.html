@@ -49,6 +49,16 @@ no other style sheets are used.  It is planned to allow users to add their own c
     <!-- The Froyo browser on Android 2.2 needs scaling disabled in order for fixed positioning to work. -->
     <!-- TODO: The correct header should probably be sent dynamically from the server. -->
     <meta name=viewport content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <!-- Redirect unsupported browsers and those with JavaScript turned off to a non-JS version. -->
+    <noscript>
+        <meta http-equiv=refresh content="0; URL=!">
+    </noscript>
+    <!--[if lte IE 9]>
+        <meta http-equiv=refresh content="0; URL=!">
+    <![endif]-->
+    <!-- Tell Googlebot (and maybe other bots) to retry the same address with "?_escaped_fragment_=" at the end. -->
+    <!-- Then the server can create a page for Googlebot to index. -->
+    <meta name="fragment" content="!">
 </head>
 <body
 ><div class=viewPorts id=viewPort0
@@ -90,6 +100,6 @@ no other style sheets are used.  It is planned to allow users to add their own c
     };
 </script
 ><script src="/js/lang/en.js?1325641394"></script
-><script src="/js/main.js?1326011256"></script
+><script src="/js/main.js?1326115720"></script
 ></body
 ></html>
