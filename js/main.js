@@ -2489,18 +2489,22 @@
                     var automated = false,
                         default_query,
                         lang,
-                        /// URL structure: /[lang/][query]
+                        /// URL structure: /[lang/][query/]
                         /// window.location.pathname should always start with a slash (/); substr(1) removes it.
                         /// Since there should only be two parameters, anything after the second slash is ignored by limiting split() to two results.
                         split_query = window.decodeURIComponent(window.location.pathname).substr(1).split("/", 2);
                     
+                    /**
+                     * Execute the query and possibly change the query box text.
+                     *
+                     * @return NULL
+                     */
                     function do_query()
                     {
                         run_new_query(default_query, automated, true);
                         
                         /// Only change the text in the query input if the user has not started typing.
                         if (!automated && (!e.initial_page_load || qEl.value === BF.lang.query_explanation)) {
-                        //if (!e.initial_page_load || (!automated && qEl.value === BF.lang.query_explanation)) {
                             qEl.value = default_query;
                         }                
                     }
@@ -2541,12 +2545,10 @@
                     } else if (!e.initial_page_load) {
                         do_query();
                     } else {
-                        /// If there is no immediate query being preformed, look up whatever is in the query box (or Genesis 1:1 if there is nothing in it),
-                        /// so that the scroll is not so empty after it loads.
-                        ///TODO: When additional languages are available, the language will have to be determined as well.
+                        /// Since the page just loaded, wait for a moment before executing the query (to give the client a server a moment's rest).
                         window.setTimeout(function ()
                         {
-                            ///NOTE: Do not preform the default query if the user has already preformed another query.
+                            /// If the user has not sent a query, execute the default query.
                             if (query_manager.raw_query === "") {
                                 do_query();
                             }
