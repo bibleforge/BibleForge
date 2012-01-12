@@ -1013,6 +1013,12 @@ h2 {
     padding: 1px;
 }
 
+/* When using @font-face, "font-variant: small-caps" does not work in WebKit, so make the text all uppercase instead. */
+/* See https://code.google.com/p/chromium/issues/detail?id=46931 */
+.webkit .d {
+    text-transform: uppercase;
+}
+
 
 /* Opera specific CSS */
 
