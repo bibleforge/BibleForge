@@ -2585,7 +2585,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?1326113327", {
+                BF.include("/js/secondary.js?1255", {
                     content_manager: content_manager,
                     get_query_info:  function ()
                     {
@@ -2664,40 +2664,15 @@
         qEl.onblur();
     };
     
-    
-    ///TODO: Move browser specific code to external files.
-    
-    /******************************
-     * Start WebKit specific code *
-     ******************************/
-    
     if (BF.is_WebKit) {
-        /// Inject CSS to make the drop caps aligned with the second line of text and add an inset shadow to the input box.
-        ///NOTE: Needed for at least Chromium 9.
-        ///TODO: Determine if this would be better as a function.
-        document.body.appendChild(document.createElement("style").appendChild(document.createTextNode(".first_verse:first-letter, .first_paragraph:first-letter {margin-bottom: 0; margin-top: 5px; padding: 1px;}")).parentNode);
+        /// Add "webkit" to the <html> element's class to allow for WebKit specific CSS.
+        BF.toggleCSS(document.getElementsByTagName("html")[0], "webkit", true);
     }
-    
-    /****************************
-     * End WebKit specific code *
-     ****************************/
-    
-    /*****************************
-     * Start Opera specific code *
-     *****************************/
     
     if (window.opera) {
-        /// Inject CSS to make the drop caps take up two lines, so that wrapping text is not placed over it.  (See John 4:1.)
-        /// Also removes extra padding on buttons (this emulates button clicks on other browsers).
-        ///NOTE: Needed for at least Opera 10.63.
-        ///TODO: Determine if this would be better as a function.
-        document.body.appendChild(document.createElement("style").appendChild(document.createTextNode(".first_verse:first-letter, .first_paragraph:first-letter {margin-bottom: 0; margin-top: 13px; padding: 1px;} button:active {padding: 5px 14px;}")).parentNode);
+        /// Add "opera" to the <html> element's class to allow for Opera specific CSS.
+        BF.toggleCSS(document.getElementsByTagName("html")[0], "opera", true);
     }
-    
-
-    /***************************
-     * End Opera specific code *
-     ***************************/
     
     /*****************************
      * Start of IE Specific Code *
@@ -2791,10 +2766,9 @@
             var pageYOffset = document.documentElement.scrollTop;
         @end
         
-        /// IE9+ CSS: Make the inputIcon appear next to the queryInput.
-        ///NOTE: The query box is slightly off centered in IE9 with this CSS.
         @if (@_jscript_version >= 9)
-            document.body.appendChild(document.createElement("style").appendChild(document.createTextNode(".inputIcon {position: relative;} .first_verse:first-letter, .first_paragraph:first-letter {margin-top: 5px;}")).parentNode);
+            /// Add "ie" to the <html> element's class to allow for IE specific CSS.
+            BF.toggleCSS(document.getElementsByTagName("html")[0], "ie", true);
         @end
     @*/
     
