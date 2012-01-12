@@ -45,7 +45,7 @@ function create_page_html($title = '', $query = '', $info = '')
     <meta http-equiv=content-type content="text/html;charset=UTF-8">
     <!-- TODO: Set the page title (and inputIcon title) with language specific JavaScript. -->
     <title><?php echo $title ?> - BibleForge</title>
-    <link rel=stylesheet href="/styles/base.css?1325641394">
+    <link rel=stylesheet href="/styles/base.css">
     <link rel="icon" type="image/png" href="/favicon.png">
     <!-- This graphic is used by handhelds and tablets for a bookmark icon. -->
     <!-- NOTE: Ideally, this should be at least 114 pixels. -->
@@ -135,7 +135,7 @@ header('HTTP/1.1 200 OK');
         window.location.replace("<?php echo $full_featured_uri; ?>");
     </script>
 <!-- <![endif]-->
-<!--[if gt IE 9]>
+<!--[if gte IE 7]>
     <script>
         window.location.replace("<?php echo $full_featured_uri; ?>");
     </script>
@@ -226,7 +226,9 @@ if ($ref['verseID'] !== 0) {
     
     create_back_next($b, $c);
 } else {
-    ///TODO: Do search queries.
+    create_page_html($query, $query);
+    
+    echo 'Sorry, but this feature is not yet available in basic version of BibleForge. Please <a href="http://getfirefox.com" target=_blank>upgrade your browser</a>.';
 }
 ?>
     </div
