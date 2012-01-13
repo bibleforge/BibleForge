@@ -10,8 +10,14 @@
  * @author  BibleForge <info@bibleforge.com>
  */
 
-///NOTE: REDIRECT_URL does not have the query string, so use that if it is avaiable.
-$uri = isset($_SERVER['REDIRECT_URL']) ? $_SERVER['REDIRECT_URL'] : $_SERVER['REQUEST_URI'];
+/// Create REDIRECT_URL and REDIRECT_QUERY_STRING if it is not available.  Apache creates them, but nginx does not.
+if (!isset($_SERVER['REDIRECT_URL'])) {
+    $_SERVER['REDIRECT_QUERY_STRING'] = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY);
+    ///NOTE: Since REDIRECT_QUERY_STRING does not include the question mark (?), trim it off.
+    $_SERVER['REDIRECT_URL'] = rtrim(substr($_SERVER['REQUEST_URI'], 0, strlen($_SERVER['REQUEST_URI']) - strlen($_SERVER['REDIRECT_QUERY_STRING'])), '?');
+}
+
+$uri = $_SERVER['REDIRECT_URL'];
 
 /// Is this a request for the normal full featured version?
 if (substr($uri, -1) !== '!' && strpos($_SERVER['REQUEST_URI'], '_escaped_fragment_') === false) {
