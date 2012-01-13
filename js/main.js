@@ -2306,7 +2306,7 @@
                     
                     if (!ignore_state) {
                         ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
-                        BF.history.pushState("/" + BF.lang.identifier + "/" + raw_query + "/");
+                        BF.history.pushState("/" + BF.lang.identifier + "/" + window.encodeURIComponent(raw_query) + "/");
                     }
                     
                     if (!automated) {
@@ -2585,7 +2585,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?1255", {
+                BF.include("/js/secondary.js?109254", {
                     content_manager: content_manager,
                     get_query_info:  function ()
                     {
