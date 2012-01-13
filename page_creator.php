@@ -119,7 +119,9 @@ if (trim($query) === '') {
     $query = isset($_GET['q']) ? $_GET['q'] : $language['default_query'];
 }
 
-$full_featured_uri = '/' . $language['identifier'] . '/' . $query . '/';
+$query = rawurldecode($query);
+
+$full_featured_uri = '/' . $language['identifier'] . '/' . rawurlencode($query) . '/';
 
 /// If a query string is present, we want to redirect it to the correct URL.
 ///TODO: Check for the presence of both the exclamation point (!) and _escaped_fragment_ and redirect to a page without the exclamation point .
