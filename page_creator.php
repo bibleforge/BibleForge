@@ -211,28 +211,32 @@ if ($ref['verseID'] !== 0) {
     
     $SQL_res = mysql_query($SQL_query) or die('SQL Error: ' . mysql_error() . '<br>' . $SQL_query);
     
-    $cur_verse = 1;
-    
-    create_back_next($b, $c);
-    
-    /// Print book and chapter headings.
-    if ($c === 1) {
-        echo '<div class=book><h2>' . $ref['books_long_pretitle'][$b] . '</h2><h1>' . $ref['books_long_main'][$b] . '</h1><h2>' . $ref['books_long_posttitle'][$b] . '</h2></div>';
+    if (mysql_num_rows($SQL_res) === 0) {
+        echo 'Sorry, but this verse does not exist.';
     } else {
-        echo '<h3 class="chapter">' . $ref[$b === 19 ? 'psalm' : 'chapter'] . ' ' . $c . '</h3>';
-    }
-    
-    while ($row = mysql_fetch_assoc($SQL_res)) {
-        echo '<div class="verse">';
-        echo '<span class="verse_number">' . $c . ':' . $cur_verse . '&nbsp;</span>';
-        echo $row['words'];
+        $cur_verse = 1;
         
-        ++$cur_verse;
+        create_back_next($b, $c);
         
-        echo '</div>';
+        /// Print book and chapter headings.
+        if ($c === 1) {
+            echo '<div class=book><h2>' . $ref['books_long_pretitle'][$b] . '</h2><h1>' . $ref['books_long_main'][$b] . '</h1><h2>' . $ref['books_long_posttitle'][$b] . '</h2></div>';
+        } else {
+            echo '<h3 class="chapter">' . $ref[$b === 19 ? 'psalm' : 'chapter'] . ' ' . $c . '</h3>';
+        }
+        
+        while ($row = mysql_fetch_assoc($SQL_res)) {
+            echo '<div class="verse">';
+            echo '<span class="verse_number">' . $c . ':' . $cur_verse . '&nbsp;</span>';
+            echo $row['words'];
+            
+            ++$cur_verse;
+            
+            echo '</div>';
+        }
+        
+        create_back_next($b, $c);
     }
-    
-    create_back_next($b, $c);
 } else {
     create_page_html($query, $query);
     
