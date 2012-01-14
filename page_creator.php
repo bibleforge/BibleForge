@@ -20,6 +20,7 @@ if (!isset($_SERVER['REDIRECT_URL'])) {
 $uri = $_SERVER['REDIRECT_URL'];
 
 /// Is this a request for the normal full featured version?
+/// Googlebot converts hash bangs (#!) into "?_escaped_fragment_=", so URIs with this in it should also be sent to the basic version.
 if (substr($uri, -1) !== '!' && strpos($_SERVER['REQUEST_URI'], '_escaped_fragment_') === false) {
     /// Override the default 404 response.
     header('HTTP/1.1 200 OK');
@@ -33,6 +34,16 @@ if (substr($uri, -1) !== '!' && strpos($_SERVER['REQUEST_URI'], '_escaped_fragme
 if (isset($_SERVER['REDIRECT_QUERY_STRING'])) {
     parse_str($_SERVER['REDIRECT_QUERY_STRING'], $_GET);
 }
+
+if (isset($_GET['_escaped_fragment_'])) {
+    $_GET['_escaped_fragment_'] = trim($_GET['_escaped_fragment_']);
+    /// If a value is present, use that as the uri.
+    if ($_GET['_escaped_fragment_'] !== "") {
+        $uri = $_GET['_escaped_fragment_'];
+    }
+    unset($_GET['_escaped_fragment_']);
+}
+
 
 /**
  * Create the HTML for the non-JS version.
@@ -88,7 +99,8 @@ function create_page_html($title = '', $query = '', $info = '')
 }
 
 /// Break apart the URL string.
-$query_arr = explode('/', substr($uri, 1, -2), 2);
+///NOTE: trim($uri, "/!") removes leading and trailing slashes (/) and exclamation points (!).
+$query_arr = explode('/', trim($uri, "/!"), 2);
 
 $langs = array(
     'en' => array(
@@ -155,6 +167,7 @@ flush();
 require_once 'config.php';
 
 /// Use node.js to determine if it is a verse reference.
+///NOTE: Use "shell_exec('node js/.ref_info.js ' . $language['identifier'] . ' ' . escapeshellarg($query) . ' 2>&1')" for debugging.
 $ref = json_decode(shell_exec('node js/.ref_info.js ' . $language['identifier'] . ' ' . escapeshellarg($query)), true);
 
 /// Is it a verse lookup?
