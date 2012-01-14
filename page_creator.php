@@ -128,7 +128,7 @@ $full_featured_uri = '/' . $language['identifier'] . '/' . rawurlencode($query) 
 ///TODO: Retrieve any query in the _escaped_fragment_ variable.
 if (isset($_GET['q'])) {
     Header('HTTP/1.1 301 Moved Permanently');
-    Header('Location: //' . $_SERVER['HTTP_HOST'] . $full_featured_uri . '!');
+    Header('Location: http' . (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . $full_featured_uri . '!');
     die;
 }
 
