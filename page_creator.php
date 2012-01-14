@@ -143,7 +143,7 @@ header('HTTP/1.1 200 OK');
         window.location.replace("<?php echo $full_featured_uri; ?>");
     </script>
 <!-- <![endif]-->
-<!--[if gte IE 7]>
+<!--[if gte IE 9]>
     <script>
         window.location.replace("<?php echo $full_featured_uri; ?>");
     </script>
