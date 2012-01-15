@@ -601,8 +601,8 @@
             
             /// DOM Elements
             bottomLoader,
-            infoBar,
             langEl,
+            leftInfo,
             queryButton,
             page,
             qEl,
@@ -622,6 +622,7 @@
         ///     │  │           ├─►q
         ///     │  │           └─►button
         ///     │  └─>infoBar
+        ///     │     └─>leftInfo
         ///     ├─►topLoader
         ///     ├─►scroll
         ///     └─►bottomLoader
@@ -634,7 +635,7 @@
         topLoader    = topBar.nextSibling;
         page         = topLoader.nextSibling;
         bottomLoader = page.nextSibling;
-        infoBar      = topBar.lastChild;
+        leftInfo     = topBar.lastChild.firstChild;
         
         (function ()
         {
@@ -1459,9 +1460,9 @@
                             
                             /// Display the verse range on the page if looking up verses.
                             if (query_type === verse_lookup) {
-                                ///TODO: Find a better way to clear infoBar than using innerHTML.
-                                infoBar.innerHTML = "";
-                                infoBar.appendChild(document.createTextNode(ref_range));
+                                ///TODO: Find a better way to clear leftInfo than using innerHTML.
+                                leftInfo.innerHTML = "";
+                                leftInfo.appendChild(document.createTextNode(ref_range));
                             }
                             
                             /// Store the verse range for future reference.
@@ -1788,7 +1789,7 @@
                      * Handles new verses from the server.
                      *
                      * Displays new verses, if any; asks if more content is needed; determines if more content is available;
-                     * and writes initial information to the infoBar.
+                     * and writes initial information into the infoBar.
                      *
                      * @example handle_new_verses({n: [verse_ids, ...], v: [verse_html, ...], p: [paragraphs, ...], i: [word_ids, ...], t: total}, {direction: direction, ...});
                      * @example handle_new_verses({n: [1001001, 1001002], v: ["<a id=1>In</a> <a id=2>the</a> <a id=3>beginning....</a>", "<a id=12>And</a> <a id=13>the</a> <a id=14>earth....</a>"], t: 2}, options);
@@ -1911,16 +1912,16 @@
                             /// Since the first query is done, set the initial_query property to FALSE.
                             options.initial_query = false;
                             
-                            infoBar.innerHTML = "";
+                            leftInfo.innerHTML = "";
                             
                             if (type !== verse_lookup) {
                                 /// Create the inital text.
-                                infoBar.appendChild(document.createTextNode(BF.format_number(total) + BF.lang["found_" + (total === 1 ? "singular" : "plural")]));
+                                leftInfo.appendChild(document.createTextNode(BF.format_number(total) + BF.lang["found_" + (total === 1 ? "singular" : "plural")]));
                                 /// Create a <b> for the search terms.
                                 b_tag = document.createElement("b");
                                 ///NOTE: We use this method instead of straight innerHTML to prevent HTML injection inside the <b> tag.
                                 b_tag.appendChild(document.createTextNode(options.raw_query));
-                                infoBar.appendChild(b_tag);
+                                leftInfo.appendChild(b_tag);
                             }
                         }
                     };

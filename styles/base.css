@@ -116,6 +116,21 @@ body {
     box-shadow:         0px 3px 6px rgba(0,0,0,.08);
 }
 
+.infoLeft {
+    /* Make the <div> not take up the entire width of the infoBar. */
+    float: left;
+    
+    /* Add a slight radial blur to make sure the text is always readable.*/
+    /* Firefox 3.6+ */
+    background:    -moz-radial-gradient(center center , ellipse farthest-corner, #FFFFE2 70%, rgba(255,255,226,0) 100%);
+    /* Chrome/Safari 5.1+ */
+    background: -webkit-radial-gradient(center center , ellipse farthest-corner, #FFFFE2 70%, rgba(255,255,226,0) 100%);
+    /* Opera 11.10 */
+    background:      -o-radial-gradient(center center , ellipse farthest-corner, #FFFFE2 70%, rgba(255,255,226,0) 100%);
+    /* IE 10 */
+    background:     -ms-radial-gradient(center center , ellipse farthest-corner, #FFFFE2 70%, rgba(255,255,226,0) 100%);
+    background:         radial-gradient(center center , ellipse farthest-corner, #FFFFE2 70%, rgba(255,255,226,0) 100%);
+}
 
 .queryInput {
     background: rgba(255,255,255,.5);
