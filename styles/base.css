@@ -365,6 +365,11 @@ body {
     -webkit-box-shadow: 2px 2px 3px rgba(0,0,0,.2);
     /* Opera 10.5/Mozilla 4.0/WebKit */
     box-shadow:         2px 2px 3px rgba(0,0,0,.2);
+    
+    /* Ensure that the cursor will look like a hand even if not hovering over the text. */
+    /*NOTE: Since Chromium fires the onmousemove event when the mouse cursor changes, we must set the cursor for the entire <div>, not just on hover */
+    /*      because if the user uses the keyboard arrows while the mouse is over an element, the onmousemove event will keep firing. */
+    cursor: pointer;
 }
 
 
@@ -385,13 +390,10 @@ body {
     -o-transition:      background .2s, color .2s;
 }
 
-.contextMenu div a:hover {
+.menu_item_selected {
     /*TODO: Determine if it is better to use the color that is similar to the yellow before the transparency is applied (#DDF) or use transparency. */
     background: #E1E1FF;
     color:      #3985A8;
-    
-    /* Ensure that the cursor will look like a hand even if not hovering over the text. */
-    cursor: pointer;
 }
 
 

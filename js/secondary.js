@@ -67,7 +67,8 @@
         show_context_menu = (function ()
         {
             var context_menu = document.createElement("div"),
-                is_open      = false;
+                is_open = false,
+                key_handler;
             
             ///NOTE: The default style does has "display" set to "none" and "position" set to "fixed."
             context_menu.className = "contextMenu";
@@ -91,6 +92,10 @@
                 context_menu.style.display = "none";
                 /// Then reset the opacity so that it will fade in when the menu is re-displayed later.
                 context_menu.style.opacity = 0;
+                
+                /// Release control of the keyboard.
+                context.system.keyboard_busy = false;
+                document.removeEventListener("keydown", key_handler, false);
                 
                 /// A delay is needed so that if there is a callback, it will run after the menu has been visually removed from the page.
                 window.setTimeout(function ()
@@ -120,10 +125,21 @@
              */
             function open_menu(x_pos, y_pos, menu_items, open_callback, close_callback)
             {
-                var i,
+                var cur_item = -1,
+                    i,
                     menu_container = document.createElement("div"),
                     menu_count = menu_items.length,
                     menu_item;
+                
+                function highlight_item(old_item)
+                {
+                    if (old_item !== cur_item) {
+                        if (old_item > -1) {
+                            BF.toggleCSS(menu_container.childNodes[old_item], "menu_item_selected", 0);
+                        }
+                        BF.toggleCSS(menu_container.childNodes[cur_item], "menu_item_selected", 1);
+                    }
+                }
                 
                 /**
                  * Wraps a function with the code to prevent the default action.
@@ -141,6 +157,16 @@
                         e.preventDefault();
                         ///TODO: Determine if returning FALSE is necessary.
                         return false;
+                    };
+                }
+                
+                function make_onmousemove(id)
+                {
+                    return function ()
+                    {
+                        var old_item = cur_item;
+                        cur_item = id;
+                        highlight_item(old_item);
                     };
                 }
                 
@@ -163,6 +189,9 @@
                         menu_item.style.borderTop = "1px solid #A3A3A3";
                     }
                     
+                    /// In order to allow for both mouse and keyboard interaction, a menu item must be selected when the mouse moves over it.
+                    menu_item.onmousemove = make_onmousemove(i);
+                    
                     ///NOTE: document.createTextNode() is akin to innerText.  It does not inject HTML.
                     menu_item.appendChild(document.createTextNode(menu_items[i].text));
                     menu_container.appendChild(menu_item);
@@ -183,13 +212,64 @@
                  *
                  * @note   Called on the mouse click event anywhere on the page (unless the event is canceled).
                  * @return NULL
-                 * @bug    Firefox 3.6 Does not close the menu when clicking the query box the first time.  However, it does close after submitting the query.
                  */
                 document.addEventListener("click", function ()
                 {
                     /// Close the context menu if the user clicks the page.
                     close_menu(close_callback);
                 }, false);
+                
+                /// Take control of the keyboard (primarily, prevent the view from scrolling when the arrow keys are used).
+                context.system.keyboard_busy = true;
+                
+                key_handler = function (e)
+                {
+                    var fake_event,
+                        old_item = cur_item;
+                    
+                    if (e.keyCode === 38) { /// Up
+                        if (cur_item < 1) {
+                            cur_item = menu_count - 1;
+                        } else {
+                            cur_item -= 1;
+                        }
+                        highlight_item(old_item);
+                    } else if (e.keyCode === 40) { /// Down
+                        if (cur_item === menu_count - 1) {
+                            cur_item = 0;
+                        } else {
+                            cur_item += 1;
+                        }
+                        highlight_item(old_item);
+                    } else if (e.keyCode === 13) { /// Enter
+                        if (cur_item > -1) {
+                            if (typeof menu_container.childNodes[cur_item].click === "function") {
+                                /// Firefox
+                                ///NOTE: Sadly, opening new tabs this way (or with the simulated event) trigger's the pop-up blocker.
+                                menu_container.childNodes[cur_item].click();
+                            } else {
+                                /// Simulate a mouse click.
+                                fake_event = document.createEvent("MouseEvents"); 
+                                fake_event.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null); 
+                                menu_container.childNodes[cur_item].dispatchEvent(fake_event);
+                            }
+                        }
+                    } else if (e.keyCode === 27) { /// Escape
+                        close_menu(close_callback);
+                    } else {
+                        /// Allow all other keys to pass to the rest of the page like normal.
+                        return;
+                    }
+                    
+                    e.stopPropagation();
+                    /// Chromium somtimes does not have preventDefault().
+                    if (typeof e.preventDefault === "function") {
+                        e.preventDefault();
+                    }
+                    return false;
+                };
+                
+                document.addEventListener("keydown", key_handler, false);
                 
                 /// A delay is needed in order for the CSS transition to occur.
                 window.setTimeout(function ()
@@ -217,7 +297,7 @@
              * @note    Called by the wrench menu onclick event.
              * @return  NULL
              */
-            return function (x_pos, y_pos, menu_items, open_callback, close_callback)
+            return function show_context_menu(x_pos, y_pos, menu_items, open_callback, close_callback)
             {
                 /// If it is already open, close it and then re-open it with the new menu.
                 ///TODO: Determine if this can (or should) ever happen.

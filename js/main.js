@@ -2411,13 +2411,13 @@
                     new_chap,
                     line_height = system.properties.line_height;
                 
-                /// Are there input boxes selected (not including images)?  If so, this function should not be executed.
-                ///NOTE: In the future, other elements, such as, TEXTAREA or buttons, may also need to be detected.
-                if (activeEl.tagName === "INPUT" && activeEl.type !== "image") {
+                keyCode = e.keyCode;
+                
+                /// Is there an input box selected?  If so, this function should not be executed.
+                ///NOTE: If an <input> image is selected, the enter and space bar keys still works like normal, but other key strokes are caught.
+                if ((activeEl.tagName === "INPUT" && (activeEl.type !== "image" || keyCode === 13 || keyCode === 32)) || activeEl.tagName === "BUTTON" || activeEl.tagName === "TEXTAREA" || system.keyboard_busy) {
                     return;
                 }
-                
-                keyCode = e.keyCode;
                 
                 /// If a special key is also pressed, do not capture the stroke.
                 ///TODO: Determine if this works on Mac with the Command key.
@@ -2597,7 +2597,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?109254", {
+                BF.include("/js/secondary.js?288721", {
                     content_manager: content_manager,
                     get_query_info:  function ()
                     {
