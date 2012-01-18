@@ -713,13 +713,16 @@
                     }
                     
                     for (prop in new_settings) {
-                        if (BF.is_object(new_settings[prop])) {
-                            if (!settings_obj[prop]) {
-                                settings_obj[prop] = {};
+                        ///NOTE: According to Crockford (http://yuiblog.com/blog/2006/09/26/for-in-intrigue/), for in loops should be filtered.
+                        if (new_settings.hasOwnProperty(prop)) {
+                            if (BF.is_object(new_settings[prop])) {
+                                if (!settings_obj[prop]) {
+                                    settings_obj[prop] = {};
+                                }
+                                load_settings(new_settings[prop], settings_obj[prop]);
+                            } else {
+                                settings_obj[prop] = new_settings[prop];
                             }
-                            load_settings(new_settings[prop], settings_obj[prop]);
-                        } else {
-                            settings_obj[prop] = new_settings[prop];
                         }
                     }
                 }
@@ -2628,7 +2631,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?520708", {
+                BF.include("/js/secondary.js?521285", {
                     content_manager: content_manager,
                     get_query_info:  function ()
                     {

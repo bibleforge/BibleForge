@@ -1321,7 +1321,7 @@
                 }
                 
                 for (lang in BF.langs) {
-                    ///NOTE: According to Crockford (http://yuiblog.com/blog/2006/09/26/for-in-intrigue/) for in loops should be filtered.
+                    ///NOTE: According to Crockford (http://yuiblog.com/blog/2006/09/26/for-in-intrigue/), for in loops should be filtered.
                     if (BF.langs.hasOwnProperty(lang)) {
                         lang_menu[lang_menu.length] = {
                             text: BF.langs[lang].full_name,
