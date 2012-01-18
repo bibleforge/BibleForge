@@ -191,22 +191,16 @@
     ///NOTE: Since the user agent string can be modified by the user, it is not bulletproof.
     BF.is_WebKit = Boolean(window.chrome) || window.navigator.userAgent.indexOf("WebKit/") >= 0;
     
-    ///NOTE: Usually, eval() and JSON.parse() are similar in speed and the Function Constructor is really slow.
-    ///      However, in Chromium (tested up to 15), eval() is really fast, the Function Constructor is even faster, and JSON.parse() is ridiculously slow.
-    ///      Therefore, use the Function Constructor for Chrome and JSON.parse() for all others.
-    ///NOTE: It could also check to make sure that the string starts with a curly bracket ({) straight bracket ([) double quote (") or number (hyphen (-) or digit) to attempt to ensure that it is valid JSON.
     /**
-     * Safely (and quickly) parse JSON.
+     * Safely parse JSON.
      *
      * A cross browser JSON parsing solution.
      *
      * @param  str (string) The string to parse.
      * @return Returns the value of the JSON or "" if an empty string.
+     * @note   It could also check to make sure that the string starts with a curly bracket ({) straight bracket ([) double quote (") or number (hyphen (-) or digit) to attempt to ensure that it is valid JSON.
      */
-    BF.parse_json = window.chrome ? function (str)
-    {
-        return str === "" ? "" : (new Function("return " + str))();
-    } : function (str)
+    BF.parse_json = function (str)
     {
         return str === "" ? "" : JSON.parse(str);
     };
