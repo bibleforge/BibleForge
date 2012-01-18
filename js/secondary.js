@@ -729,7 +729,7 @@
                          */
                         return function (new_value)
                         {
-                            settings_obj[option_name].set(new_value);
+                            settings_obj[option_name] = new_value;
                         };
                     }
                     
@@ -806,7 +806,7 @@
                             input_el.type = "checkbox";
                             
                             /// Set the current value.
-                            input_el.checked = context.settings[config.settings][config.options[cur_option].settings].get();
+                            input_el.checked = context.settings[config.settings][config.options[cur_option].settings];
                             
                             input_el.onclick = make_checkbox_onclick(apply_change);
                             break;
@@ -816,7 +816,7 @@
                             input_el.type = "text";
                             
                             /// Set the current value.
-                            input_el.value = context.settings[config.settings][config.options[cur_option].settings].get();
+                            input_el.value = context.settings[config.settings][config.options[cur_option].settings];
                             
                             input_el.onchange = make_textbox_onchange(apply_change);
                             break;

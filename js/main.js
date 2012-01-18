@@ -690,150 +690,186 @@
                             
                             cur_val = new_val;
                             
+                            window.localStorage.setItem("settings", JSON.stringify(settings));
+                            
                             /// Optionally, run a function after the value is changed.
-                            if (onchange) {
-                                window.setTimeout(function ()
-                                {
-                                    onchange({old_val: old_val, new_val: new_val});
-                                }, 0);
+                            if (typeof onchange === "function") {
+                                onchange({old_val: old_val, new_val: new_val});
                             }
-                        }
+                        },
+                        
+                        /// Default property settings.
+                        configurable: true,
+                        enumerable:   true
                     };
                 }
                 
-                ///TODO: Determine how this should be created.
+                function load_settings(new_settings, settings_obj)
+                {
+                    var prop;
+                    
+                    if (!BF.is_object(new_settings)) {
+                        return;
+                    }
+                    
+                    for (prop in new_settings) {
+                        if (BF.is_object(new_settings[prop])) {
+                            if (!settings_obj[prop]) {
+                                settings_obj[prop] = {};
+                            }
+                            load_settings(new_settings[prop], settings_obj[prop]);
+                        } else {
+                            settings_obj[prop] = new_settings[prop];
+                        }
+                    }
+                }
+                
+                
+                /// Create settings object.
                 settings = {
-                    view: {
-                        in_paragraphs: create_get_set(true, function ()
-                        {
-                            /// Handle changing paragraph mode.
-                            
-                            /// If the last query was a search, nothing needs to be done Since only verse lookups are affected by paragraph mode.
-                            if (query_manager.query_type !== verse_lookup) {
-                                return;
-                            }
-                            
-                            /// Are there any verses displayed on the scroll?
-                            if (content_manager.top_verse !== false) {
-                                /// Clear the scroll because the view is changing dramatically.
-                                ///FIXME: This should reload the verses.
-                                ///FIXME: It does not necessarily need to reload the verses if switching from paragraph mode to non-paragraph mode.
-                                content_manager.clear_scroll();
-                            }
-                        }),
-                        red_letters: create_get_set(true, function (values)
-                        {
-                            /// Alternate between red and black letters.
-                            ///TODO: Add other options, such as custom color, and (in the future) highlighting of other people's words (e.g., highlight the words of Paul in blue).
-                            BF.changeCSS(".q", "color: " + (values.new_val ? "#D00;" : "#000;"));
-                        })
-                    }
-                };
-                system = {
-                    event: (function ()
-                    {
-                        var func_list = {};
-                        
-                        return {
-                            /**
-                             * Add one or more events to the event cue.
-                             *
-                             * @example system.event.attach("contentAddedAbove", function (e) {});
-                             * @example system.event.attach(["contentAddedAbove", "contentRemovedAbove"], function (e) {});
-                             * @param   name (string || array) The name of the event or an array of names of events.
-                             * @param   func (function)        The function to call when the event it triggered.
-                             * @return  NULL
-                             * @note    If func(e) calls e.stopPropagation(), it will stop further event propagation.
-                             */
-                            attach: function (name, func)
-                            {
-                                var arr_len,
-                                    i;
-                                
-                                /// Should the function be attached to multiple events?
-                                if (name instanceof Array) {
-                                    arr_len = name.length;
-                                    for (i = 0; i < arr_len; i += 1) {
-                                        this.attach(name[i], func);
-                                    }
-                                } else {
-                                    if (typeof func === "function") {
-                                        if (!func_list[name]) {
-                                            func_list[name] = [];
-                                        }
-                                        func_list[name][func_list[name].length] = func;
-                                    }
-                                }
-                            },
-                            /**
-                             * Remove an event from the event cue.
-                             *
-                             * @example system.event.detach("contentAddedAbove", function (e) {});
-                             * @param   name (string)   The name of the event.
-                             * @param   func (function) The function that was attached to the specified event.
-                             * @return  NULL
-                             * @note    Not currently used.
-                             * @note    The name parameter cannot be an array (unlike attach()).
-                             */
-                            detach: function (name, func)
-                            {
-                                var i;
-                                
-                                if (func_list[name]) {
-                                    for (i = func_list[name].length - 1; i >= 0; i -= 1) {
-                                        if (func_list[name][i] === func) {
-                                            func_list[name].remove(i);
-                                            /// Since only one event should be removed at a time, we can end now.
-                                            return;
-                                        }
-                                    }
-                                }
-                            },
-                            /**
-                             * Trigger the functions attached to an event.
-                             *
-                             * @param  name (string) The name of the event to trigger.
-                             * @param  e    (object) The event object sent to the called functions.
-                             * @return NULL
-                             */
-                            trigger: function (name, e)
-                            {
-                                var func_arr_len,
-                                    i,
-                                    stop_propagation;
-                                
-                                if (func_list[name]) {
-                                    func_arr_len = func_list[name].length;
-                                    
-                                    if (!BF.is_object(e)) {
-                                        e = {};
-                                    }
-                                    
-                                    /// If an attached function runs this function, it will stop calling other functions.
-                                    e.stopPropagation = function ()
-                                    {
-                                        stop_propagation = true;
-                                    };
-                                    
-                                    for (i = 0; i < func_arr_len; i += 1) {
-                                        func_list[name][i](e);
-                                        /// Was e.stopPropagation() called?
-                                        if (stop_propagation) {
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        };
-                    }()),
-                    properties: {
-                        ///TODO: Determine if these should be read only or a get/set function.
-                        line_height: 19,
-                        topBar_height: topLoader.offsetHeight
-                    }
+                    view: {}
                 };
                 
+                /// Create getter/setter pairs and load default settings.
+                
+                Object.defineProperty(settings.view, "in_paragraphs", create_get_set(true, function ()
+                    {
+                        /// Handle changing paragraph mode.
+                        
+                        /// If the last query was a search, nothing needs to be done Since only verse lookups are affected by paragraph mode.
+                        /// Since this function will be called before query_manager is created when loading saved settings, check to make sure it exists.
+                        if (typeof query_manager === "undefined" || query_manager.query_type !== verse_lookup) {
+                            return;
+                        }
+                        
+                        /// Are there any verses displayed on the scroll?
+                        if (content_manager.top_verse !== false) {
+                            /// Clear the scroll because the view is changing dramatically.
+                            ///FIXME: This should reload the verses.
+                            ///FIXME: It does not necessarily need to reload the verses if switching from paragraph mode to non-paragraph mode.
+                            content_manager.clear_scroll();
+                        }
+                    }));
+                Object.defineProperty(settings.view, "red_letters", create_get_set(true, function (values)
+                    {
+                        /// Alternate between red and black letters.
+                        ///TODO: Add other options, such as custom color, and (in the future) highlighting of other people's words (e.g., highlight the words of Paul in blue).
+                        BF.changeCSS(".q", "color: " + (values.new_val ? "#D00;" : "#000;"));
+                    }));
+                
+                /// Load user settings (if any).
+                /// Does the browser support localStorage? (All modern browsers should.)
+                ///NOTE: If more settings can be added in later (e.g., by extentions), this function may need to be able to be called externally.
+                ///NOTE: BibleForge does not prune unused settings from the localStorage.
+                if (window.localStorage) {
+                    load_settings(BF.parse_json(window.localStorage.getItem("settings")), settings);
+                }
             }());
+            
+            
+            system = {
+                event: (function ()
+                {
+                    var func_list = {};
+                    
+                    return {
+                        /**
+                            * Add one or more events to the event cue.
+                            *
+                            * @example system.event.attach("contentAddedAbove", function (e) {});
+                            * @example system.event.attach(["contentAddedAbove", "contentRemovedAbove"], function (e) {});
+                            * @param   name (string || array) The name of the event or an array of names of events.
+                            * @param   func (function)        The function to call when the event it triggered.
+                            * @return  NULL
+                            * @note    If func(e) calls e.stopPropagation(), it will stop further event propagation.
+                            */
+                        attach: function (name, func)
+                        {
+                            var arr_len,
+                                i;
+                            
+                            /// Should the function be attached to multiple events?
+                            if (name instanceof Array) {
+                                arr_len = name.length;
+                                for (i = 0; i < arr_len; i += 1) {
+                                    this.attach(name[i], func);
+                                }
+                            } else {
+                                if (typeof func === "function") {
+                                    if (!func_list[name]) {
+                                        func_list[name] = [];
+                                    }
+                                    func_list[name][func_list[name].length] = func;
+                                }
+                            }
+                        },
+                        /**
+                            * Remove an event from the event cue.
+                            *
+                            * @example system.event.detach("contentAddedAbove", function (e) {});
+                            * @param   name (string)   The name of the event.
+                            * @param   func (function) The function that was attached to the specified event.
+                            * @return  NULL
+                            * @note    Not currently used.
+                            * @note    The name parameter cannot be an array (unlike attach()).
+                            */
+                        detach: function (name, func)
+                        {
+                            var i;
+                            
+                            if (func_list[name]) {
+                                for (i = func_list[name].length - 1; i >= 0; i -= 1) {
+                                    if (func_list[name][i] === func) {
+                                        func_list[name].remove(i);
+                                        /// Since only one event should be removed at a time, we can end now.
+                                        return;
+                                    }
+                                }
+                            }
+                        },
+                        /**
+                            * Trigger the functions attached to an event.
+                            *
+                            * @param  name (string) The name of the event to trigger.
+                            * @param  e    (object) The event object sent to the called functions.
+                            * @return NULL
+                            */
+                        trigger: function (name, e)
+                        {
+                            var func_arr_len,
+                                i,
+                                stop_propagation;
+                            
+                            if (func_list[name]) {
+                                func_arr_len = func_list[name].length;
+                                
+                                if (!BF.is_object(e)) {
+                                    e = {};
+                                }
+                                
+                                /// If an attached function runs this function, it will stop calling other functions.
+                                e.stopPropagation = function ()
+                                {
+                                    stop_propagation = true;
+                                };
+                                
+                                for (i = 0; i < func_arr_len; i += 1) {
+                                    func_list[name][i](e);
+                                    /// Was e.stopPropagation() called?
+                                    if (stop_propagation) {
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    };
+                }()),
+                properties: {
+                    ///TODO: Determine if these should be read only or a get/set function.
+                    line_height: 19,
+                    topBar_height: topLoader.offsetHeight
+                }
+            };
             
             /******************************
              * Start of Scrolling Closure *
@@ -2010,7 +2046,7 @@
                                         return;
                                     }
                                     
-                                    in_paragraphs = settings.view.in_paragraphs.get();
+                                    in_paragraphs = settings.view.in_paragraphs;
                                     
                                     if (options.type === verse_lookup || options.type === standard_search) {
                                         /// Determine which verse to start from for the next query.
@@ -2079,7 +2115,7 @@
                                     ///TODO: Determine if it should not store direction in the options because it changes between previous and additional searches.
                                     options.direction     = additional;
                                     /// Since this settings can be changed by the user at run time, it must be retrieved before each query.
-                                    options.in_paragraphs = settings.view.in_paragraphs.get();
+                                    options.in_paragraphs = settings.view.in_paragraphs;
                                     /// Create an empty verse_range object, which will be filled in as verses are retrieved.
                                     options.verse_range   = {
                                         bottom_id:    0,
@@ -2592,7 +2628,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?500685", {
+                BF.include("/js/secondary.js?517097", {
                     content_manager: content_manager,
                     get_query_info:  function ()
                     {
