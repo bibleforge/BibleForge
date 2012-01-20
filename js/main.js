@@ -545,7 +545,7 @@
      * @param  mixed_var (variable) The variable to analyze.
      * @return TRUE if the variable is a real object (not including arrays), FALSE for all other types.
      * @note   Arrays inherit from Object, so they are a type of an object.
-     * @note   Due to an old JavaScript bug, NULL is wrongly identified as an object when using typeof.
+     * @note   Due to an old JavaScript bug (now a part of the standard), NULL is wrongly identified as an object when using typeof.
      */
     BF.is_object = function (mixed_var)
     {
@@ -661,6 +661,7 @@
                             /// Temporarily store the original value to be sent to the onchange function.
                             var old_val = cur_val;
                             
+                            /// Set the new value.
                             cur_val = new_val;
                             
                             window.localStorage.setItem("settings", JSON.stringify(settings));
@@ -677,6 +678,16 @@
                     };
                 }
                 
+                /**
+                 * Recersively step through an object and load saved settings.
+                 *
+                 * @example load_settings({view:{in_paragraphs: false}}, settings);
+                 * @example load_settings({in_paragraphs: false}, settings.view);
+                 * @param   new_setting  (object) The new settings to load.
+                 * @param   settings_obj (object) The part of the settings variable to change.
+                 * @return  NULL
+                 * @note    This function is desifned to call itself.
+                 */
                 function load_settings(new_settings, settings_obj)
                 {
                     var prop;
@@ -689,9 +700,16 @@
                         ///NOTE: According to Crockford (http://yuiblog.com/blog/2006/09/26/for-in-intrigue/), for in loops should be filtered.
                         if (new_settings.hasOwnProperty(prop)) {
                             if (BF.is_object(new_settings[prop])) {
+                                /// If the new_settings object is trying to load a setting that does not yet exist in the settings variable,
+                                /// create a new object and attach it to the settings variable.
+                                ///NOTE: The thought is that, in the future, extensions that are be loaded later could have their own settings,
+                                ///      so we need to load the saved settings, and when the extension later loads, it can check to see if
+                                ///      the settings have been already set.  If they are set, it would then grab the data and then create
+                                ///      get/set properties to handle changing the settings later on.
                                 if (!settings_obj[prop]) {
                                     settings_obj[prop] = {};
                                 }
+                                /// Recursively call itself to step through the objects' objects.
                                 load_settings(new_settings[prop], settings_obj[prop]);
                             } else {
                                 settings_obj[prop] = new_settings[prop];
@@ -706,14 +724,14 @@
                     view: {}
                 };
                 
-                /// Create getter/setter pairs and load default settings.
+                /// Create get/set pairs with Object.defineProperty, and load default settings.
                 
                 Object.defineProperty(settings.view, "in_paragraphs", create_get_set(true, function ()
                     {
                         /// Handle changing paragraph mode.
                         
-                        /// If the last query was a search, nothing needs to be done Since only verse lookups are affected by paragraph mode.
-                        /// Since this function will be called before query_manager is created when loading saved settings, check to make sure it exists.
+                        /// If the last query was a search, nothing needs to be done since only verse lookups are affected by paragraph mode.
+                        ///NOTE: Since this function will be called before query_manager is created when loading saved settings, check to make sure it exists.
                         if (typeof query_manager === "undefined" || query_manager.query_type !== verse_lookup) {
                             return;
                         }
@@ -735,8 +753,7 @@
                 
                 /// Load user settings (if any).
                 /// Does the browser support localStorage? (All modern browsers should.)
-                ///NOTE: If more settings can be added in later (e.g., by extentions), this function may need to be able to be called externally.
-                ///NOTE: BibleForge does not prune unused settings from the localStorage.
+                ///NOTE: BibleForge does not prune unused settings from the localStorage (extension loaded later might use seemingly unused settings).
                 if (window.localStorage) {
                     load_settings(BF.parse_json(window.localStorage.getItem("settings")), settings);
                 }
@@ -758,6 +775,7 @@
                             * @param   func (function)        The function to call when the event it triggered.
                             * @return  NULL
                             * @note    If func(e) calls e.stopPropagation(), it will stop further event propagation.
+                            * @todo    Determine the value of adding a run_once property that removes function after the first run.
                             */
                         attach: function (name, func)
                         {
