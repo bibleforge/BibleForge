@@ -62,33 +62,6 @@
     
     /// Prototypes
     
-    /// Adds trim() to Strings for IE 8-/Opera 10.1-/Safari 4-/Mozilla 3.0-.
-    ///TODO: Remove this as soon as a non-JavaScript version of BibleForge is ready.
-    if (!"".trim) {
-        /**
-         * Extend the String Prototype to remove leading and trailing spaces.
-         *
-         * @example trimmed = "  God is   good  ".trim(); /// Returns "God is   good"
-         * @return  A string with leading and trailing spaces removed.
-         * @note    This does not remove all types of whitespace.  It actually removes anything under character code 33.
-         */
-        String.prototype.trim = function ()
-        {
-            var end   = this.length - 1,
-                start = 0;
-            
-            while (this.charCodeAt(end) < 33) {
-                end -= 1;
-            }
-            
-            while (start < end && this.charCodeAt(start) < 33) {
-                start += 1;
-            }
-            
-            return this.slice(start, end + 1);
-        };
-    }
-    
     /**
      * Remove an element or a range of elements from an array.
      *
