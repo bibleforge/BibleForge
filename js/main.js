@@ -664,7 +664,10 @@
                             /// Set the new value.
                             cur_val = new_val;
                             
-                            window.localStorage.setItem("settings", JSON.stringify(settings));
+                            if (window.localStorage) {
+                                /// Save the settings object so that the user's settings can be loaded the next time the page is accessed.
+                                window.localStorage.setItem("settings", JSON.stringify(settings));
+                            }
                             
                             /// Optionally, run a function after the value is changed.
                             if (typeof onchange === "function") {
