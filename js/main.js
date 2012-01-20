@@ -672,8 +672,13 @@
                             }
                         },
                         
-                        /// Default property settings.
-                        configurable: true,
+                        /// Default property settings:
+                        ///NOTE: The "writable" property is not used when using a get function.
+                        
+                        /// With configurable set to FALSE, these properties cannot be changed later.
+                        ///NOTE: Since we use a get function, the value can be set to a different type of variable.
+                        configurable: false,
+                        /// Make sure that the property is retrieved when using JSON.stringify().
                         enumerable:   true
                     };
                 }
