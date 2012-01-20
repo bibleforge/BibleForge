@@ -720,7 +720,10 @@
                                 /// Recursively call itself to step through the objects' objects.
                                 load_settings(new_settings[prop], settings_obj[prop]);
                             } else {
-                                settings_obj[prop] = new_settings[prop];
+                                /// Only set the property if it is different (i.e., not default).
+                                if (settings_obj[prop] !== new_settings[prop]) {
+                                    settings_obj[prop] = new_settings[prop];
+                                }
                             }
                         }
                     }
