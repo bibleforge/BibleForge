@@ -433,11 +433,9 @@
         
         if (insert) {
             /// Mozilla/WebKit/Opera/IE9
-            ///NOTE: IE8- uses addRule(selector, declaration, [index]).
             style_sheet.insertRule(selector + "{" + new_CSS + "}", 0);
         } else {
-            /// Get the styles (cssRules) for Mozilla/WebKit/Opera/IE9 and (rules) for IE8-.
-            CSS_rules     = style_sheet.cssRules || style_sheet.rules;
+            CSS_rules = style_sheet.cssRules;
             for (i = CSS_rules.length - 1; i >= 0; i -= 1) {
                 if (CSS_rules[i].selectorText === selector) {
                     CSS_rules[i].style.cssText = new_CSS;
@@ -926,12 +924,6 @@
                             pixels_needed;
                         
                         if (typeof x === "undefined" || x === null) {
-                            /// IE8- does not set pageXOffset.
-                            /*@cc_on
-                                @if (@_jscript_version < 9)
-                                    window.pageXOffset = document.documentElement.scrollLeft;
-                                @end
-                            @*/
                             /// Preserve the current x position by default.
                             x = window.pageXOffset;
                         }
@@ -1092,12 +1084,6 @@
                              */
                             function scrolling()
                             {
-                                /// Trick IE 8- into understanding pageYOffset.
-                                /*@cc_on
-                                    @if (@_jscript_version < 9)
-                                        window.pageYOffset = doc_docEl.scrollTop;
-                                    @end
-                                @*/
                                 var new_scroll_pos = window.pageYOffset,
                                     scrolling_down;
                                 
@@ -2806,13 +2792,6 @@
             s.lastIndex = origLastIndex;
             return output;
         };
-        
-        /// Trick IE 8- into understanding pageYOffset.
-        /// Set the initial value, so that it is not undefined.
-        /// See scrolling().
-        @if (@_jscript_version < 9)
-            var pageYOffset = document.documentElement.scrollTop;
-        @end
         
         @if (@_jscript_version >= 9)
             /// Add "ie" to the <html> element's class to allow for IE specific CSS.
