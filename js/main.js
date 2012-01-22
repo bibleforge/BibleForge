@@ -82,6 +82,116 @@
         return this.push.apply(this, rest);
     };
     
+    /// Detect WebKit based browsers.
+    ///NOTE: Since the user agent string can be modified by the user, it is not bulletproof.
+    BF.is_WebKit = Boolean(window.chrome) || window.navigator.userAgent.indexOf("WebKit/") >= 0;
+    
+    /// Create the object in which the following functions store key presses into.
+    BF.keys_pressed = {};
+    
+    ///NOTE: There is no good way to detect other key strokes, and even this may return false negatives.
+    
+    window.addEventListener("keydown", function (e)
+    {
+        /// 16 Shift (left or right)
+        /// 17 Ctrl  (left or right)
+        /// 18 Alt   (left or right)
+        if (e.keyCode >= 16 && e.keyCode <= 18) {
+            if (!BF.keys_pressed[e.keyCode]) {
+                BF.keys_pressed[e.keyCode] = 1;
+            } else {
+                /// This allows us to key track of how many of the same keys were pressed (for example, whether one or two shift keys were pressed).
+                BF.keys_pressed[e.keyCode] += 1;
+            }
+        }
+        
+        ///NOTE: WebKit does not set shiftKey, ctrlKey, or altKey to true when they are first pressed, so keyCode must also be used.
+        if (e.keyCode === 16 || e.shiftKey) {
+            BF.keys_pressed.shift = true;
+            if (!BF.keys_pressed[16]) {
+                BF.keys_pressed[16] = 1;
+            }
+        } else if (BF.keys_pressed.shift) {
+            delete BF.keys_pressed.shift;
+        }
+        if (e.keyCode === 17 || e.ctrlKey) {
+            BF.keys_pressed.ctrl = true;
+            if (!BF.keys_pressed[17]) {
+                BF.keys_pressed[17] = 1;
+            }
+        } else if (BF.keys_pressed.ctrl) {
+            delete BF.keys_pressed.ctrl;
+        }
+        
+        if (e.keyCode === 18 || e.altKey) {
+            BF.keys_pressed.alt = true;
+            if (!BF.keys_pressed[18]) {
+                BF.keys_pressed[18] = 1;
+            }
+        } else if (BF.keys_pressed.alt) {
+            delete BF.keys_pressed.alt;
+        }
+        
+        ///NOTE: If both Shift and Ctrl are pressed, the Alt key often is wrongly interpreted as the Meta key.
+        ///      So to eliminate false positive Alt key presses, we just delete any reference to the Alt key.
+        if (BF.keys_pressed.shift && BF.keys_pressed.ctrl) {
+            delete BF.keys_pressed[18];
+            delete BF.keys_pressed.alt;
+        }
+    }, false);
+    
+    window.addEventListener("keyup", function (e)
+    {
+        /// 16 Shift (left or right)
+        /// 17 Ctrl  (left or right)
+        /// 18 Alt   (left or right)
+        if (BF.keys_pressed[e.keyCode]) {
+            ///NOTE: WebKit only fires one onkeyup event if more than one of the same keys are pressed.
+            ///      For example, if both shift keys are pressed, the onkeyup event will only fire when the first shift key is released, not the second.
+            ///      So, to avoid false positives, on WeKit, we must delete the key code regardless of the value.
+            if (BF.keys_pressed[e.keyCode] < 2 || BF.is_WebKit) {
+                delete BF.keys_pressed[e.keyCode];
+            } else {
+                BF.keys_pressed[e.keyCode] -= 1;
+            }
+        }
+        
+        if (!BF.keys_pressed[16]) {
+            delete BF.keys_pressed.shift;
+        }
+        if (!BF.keys_pressed[17]) {
+            delete BF.keys_pressed.ctrl;
+        }
+        if (!BF.keys_pressed[18]) {
+            delete BF.keys_pressed.alt;
+        }
+    }, false);
+    
+    window.addEventListener("blur", function ()
+    {
+        BF.keys_pressed = {};
+    }, false);
+    
+    window.addEventListener("contextmenu", function ()
+    {
+        BF.keys_pressed = {};
+    }, false);
+    
+    /// Declare helper function(s) attached to the global BibleForge object (BF).
+    
+    /**
+     * Safely parse JSON.
+     *
+     * A cross browser JSON parsing solution.
+     *
+     * @param  str (string) The string to parse.
+     * @return Returns the value of the JSON or "" if an empty string.
+     * @note   It could also check to make sure that the string starts with a curly bracket ({) straight bracket ([) double quote (") or number (hyphen (-) or digit) to attempt to ensure that it is valid JSON.
+     */
+    BF.parse_json = function (str)
+    {
+        return str === "" ? "" : JSON.parse(str);
+    };
     
     /**
      * Create the history object for handling browser history changes.
@@ -157,26 +267,6 @@
             };
         }
     }());
-    
-    /// Declare helper function(s) attached to the global BibleForge object (BF).
-    
-    /// Detect WebKit based browsers.
-    ///NOTE: Since the user agent string can be modified by the user, it is not bulletproof.
-    BF.is_WebKit = Boolean(window.chrome) || window.navigator.userAgent.indexOf("WebKit/") >= 0;
-    
-    /**
-     * Safely parse JSON.
-     *
-     * A cross browser JSON parsing solution.
-     *
-     * @param  str (string) The string to parse.
-     * @return Returns the value of the JSON or "" if an empty string.
-     * @note   It could also check to make sure that the string starts with a curly bracket ({) straight bracket ([) double quote (") or number (hyphen (-) or digit) to attempt to ensure that it is valid JSON.
-     */
-    BF.parse_json = function (str)
-    {
-        return str === "" ? "" : JSON.parse(str);
-    };
     
     /**
      * Create an easy to use Ajax object.
@@ -2659,7 +2749,15 @@
             if (raw_query === BF.lang.query_explanation) {
                 qEl.focus();
             } else {
-                run_new_query(raw_query);
+                /// If the Alt and/or Ctrl key is pressed, open in a new tab.
+                ///TODO: Determine if it would be good to indicate to the user somehow that it will open in a new tab (maybe change the magnifying glass icon).
+                if (BF.keys_pressed.alt || BF.keys_pressed.ctrl) {
+                    ///BUG: Chromium only opens a new tab when clicking on the magnifying glass (not when pressing enter).
+                    ///NOTE: In Chromium, holding Alt brings the new tab to the forefront but Ctrl opens it in the background.
+                    window.open("/" + BF.lang.identifier + "/" + window.encodeURIComponent(raw_query) + "/", "_blank");
+                } else {
+                    run_new_query(raw_query);
+                }
             }
             
             ///NOTE: Must return false in order to stop the form submission.
