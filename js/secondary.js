@@ -224,12 +224,18 @@
                 /// Take control of the keyboard (primarily, prevent the view from scrolling when the arrow keys are used).
                 context.system.keyboard_busy = true;
                 
+                /**
+                 * Intercept keystrokes to manipulate the menu.
+                 *
+                 * @param e (event object) The keyboard event object.
+                 */
                 key_handler = function (e)
                 {
                     var fake_event,
                         old_item = cur_item;
                     
                     if (e.keyCode === 38) { /// Up
+                        /// If at the top, loop to the bottom.
                         if (cur_item < 1) {
                             cur_item = menu_count - 1;
                         } else {
@@ -237,6 +243,7 @@
                         }
                         highlight_item(old_item);
                     } else if (e.keyCode === 40) { /// Down
+                        /// If at the bottom, loop to the top.
                         if (cur_item === menu_count - 1) {
                             cur_item = 0;
                         } else {
@@ -1136,21 +1143,32 @@
                     }
                 }, false);
                 
+                /**
+                 * Possibly remove callouts when a user clicks the page.
+                 *
+                 * Remove callouts if Ctrl is not held and not clicking on a callout.
+                 *
+                 * @param e (event object) The mouse event object.
+                 */
                 document.addEventListener("click", function (e)
                 {
                     var i;
                     
                     /// Are there no callouts or is the Ctrl key pressed?
+                    ///NOTE: The Ctrl key is used as a way to open multiple callouts (like selecting multiple files in a file browser).
                     if (i > 0 || e.ctrlKey) {
                         return;
                     }
                     
-                    /// Did the user click on a callout?
+                    /// Did the user click on a callout? If so, do not close any.
                     if (callout_clicked) {
                         callout_clicked = false;
                         return;
                     }
                     
+                    /// Remove unpinned callous and non-new callouts.
+                    ///NOTE: When a callout is created, this function (i.e., the onclick event) will fire, thus potentially removing the callout immedately;
+                    ///      therefore, use just_created to see if the callout was recently created and should be left alone.
                     for (i = callouts.length - 1; i >= 0; i -= 1) {
                         if (!callouts[i].just_created && !callouts[i].pinned) {
                             callouts[i].destroy();
@@ -1159,6 +1177,13 @@
                     }
                 }, false);
                 
+                /**
+                 * Move callouts to compensate for additional or the abcense of text.
+                 *
+                 * Also, remove callouts if the word they were attached to was removed.
+                 *
+                 * @param e (event object) An object containing the height dimension (in pixels) of the text that was removed (negative value) or added (positive value).
+                 */
                 context.system.event.attach(["contentAddedAbove", "contentRemovedAbove"], function (e)
                 {
                     var i;
@@ -1176,6 +1201,9 @@
                     }
                 });
                 
+                /**
+                 * When the text is removed, remove the callous too.
+                 */
                 context.system.event.attach("scrollCleared", function ()
                 {
                     var i;
@@ -1188,6 +1216,9 @@
                     }
                 });
                 
+                /**
+                 * Check to see if a word that a callout was connected to was removed.
+                 */
                 context.system.event.attach("contentRemovedBelow", function ()
                 {
                     var i;
@@ -1200,6 +1231,9 @@
                     }
                 });
                 
+                /**
+                 * Realign callouts.
+                 */
                 window.addEventListener("resize", function ()
                 {
                     var i;
@@ -1295,17 +1329,9 @@
             BF.toggleCSS(page, "lang_" + BF.lang.identifier, 1);
             
             /// The language button is hidden until the current language name is displayed.
-            ///TODO: Also, change the padding of the qEl.
-            ///TODO: Make langEl and the wrench icon to fade in.
             langEl.style.visibility = "visible";
             
-            /**
-            * Prepare to display the language selection menu.
-            *
-            * @param  e (object) (optional) The event object optionally sent by the browser.
-            * @note   Called when the user clicks on the language button.
-            * @return NULL
-            */
+            
             langEl.onclick = (function ()
             {
                 var lang,
@@ -1315,11 +1341,12 @@
                 {
                     return function ()
                     {
-                        /// Do something with identifier.
+                        /// Set identifier as the new language.
                         BF.change_language(identifier);
                     };
                 }
                 
+                /// Create the language menu drop down menu.
                 for (lang in BF.langs) {
                     ///NOTE: According to Crockford (http://yuiblog.com/blog/2006/09/26/for-in-intrigue/), for in loops should be filtered.
                     if (BF.langs.hasOwnProperty(lang)) {
@@ -1330,6 +1357,13 @@
                     }
                 }
                 
+                /**
+                 * Prepare to display the language selection menu.
+                 *
+                 * @param  e (object) (optional) The event object optionally sent by the browser.
+                 * @note   Called when the user clicks on the language button.
+                 * @return NULL
+                 */
                 return function (e)
                 {
                     var langEl_pos = BF.get_position(langEl);
