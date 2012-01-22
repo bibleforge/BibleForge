@@ -2606,7 +2606,7 @@
                         /// URL structure: /[lang/][query/]
                         /// window.location.pathname should always start with a slash (/); substr(1) removes it.
                         /// Since there should only be two parameters, anything after the second slash is ignored by limiting split() to two results.
-                        split_query = window.decodeURIComponent(window.location.pathname).substr(1).split("/", 2);
+                        split_query = window.location.pathname.substr(1).split("/", 2).map(window.decodeURIComponent);
                     
                     /**
                      * Execute the query and possibly change the query box text.
@@ -2620,7 +2620,7 @@
                         /// Only change the text in the query input if the user has not started typing.
                         if (!automated && (!e.initial_page_load || qEl.value === BF.lang.query_explanation)) {
                             qEl.value = default_query;
-                        }                
+                        }
                     }
                     
                     /// If the second parameter is empty, remove it.
