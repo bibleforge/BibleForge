@@ -21,10 +21,10 @@
     amount, app_name, appendChild, attach, automated, b, body, books_long_main, 
     books_long_posttitle, books_long_pretitle, books_short, bottom_book, 
     bottom_id, bottom_verse, c, changeCSS, change_language, chapter, 
-    chapter_count, charCodeAt, childNodes, chrome, className, clearInterval, 
-    clearTimeout, clear_scroll, clientHeight, configurable, content_manager, 
-    createElement, createTextNode, create_verse_id, create_viewport, cssRules, 
-    cssText, cssTransitions, ctrlKey, decodeURIComponent, detach, 
+    chapter_count, childNodes, chrome, className, clearInterval, clearTimeout, 
+    clear_scroll, clientHeight, configurable, content_manager, createElement, 
+    createTextNode, create_verse_id, create_viewport, cssRules, cssText, 
+    cssTransitions, ctrl, ctrlKey, decodeURIComponent, detach, 
     determine_reference, direction, documentElement, en, encodeURIComponent, 
     enumerable, event, firstChild, focus, format_number, full_book, full_verse, 
     get, getElementById, getElementsByTagName, getItem, get_b_c_v, 
@@ -32,23 +32,24 @@
     grammar_marker_len, grammar_separator, height, highlight, history, i, id, 
     identifier, in_paragraphs, include, initial_page_load, initial_query, 
     innerHTML, insertBefore, insertRule, is_WebKit, is_busy, is_object, 
-    keyCode, keyboard_busy, lang, langEl, lang_id, langs, lastChild, left, 
-    line_height, localStorage, location, metaKey, n, navigator, needsHash, 
-    new_val, nextSibling, offsetHeight, offsetLeft, offsetParent, offsetTop, 
-    old_val, onblur, onfocus, onreadystatechange, onsubmit, open, opera, p, 
-    page, pageXOffset, pageYOffset, parseInt, parse_json, pathname, 
-    prepare_highlighter, prepare_search, prev_lang, preventDefault, 
-    previousSibling, properties, psalm, psalm_has_title, pushState, qEl, query, 
-    query_additional, query_button_alt, query_button_title, query_explanation, 
-    query_previous, query_type, raw_query, reached_bottom, reached_top, 
-    readyState, remove, removeChild, replace, replaceState, responseText, 
-    round, rules, run_new_query, scrollBy, scrollHeight, scrollTo, 
-    scroll_to_verse, scroll_view_to, selectorText, send, set, setInterval, 
-    setItem, setRequestHeader, setTimeout, settings, split, standard_terms, 
-    start_at, state, status, stopPropagation, style, styleSheets, subscription, 
-    system, t, tagName, title, toggleCSS, top, topBar, topBar_height, top_id, 
-    top_verse, trigger, type, update_verse_range, userAgent, v, value, verse, 
-    verse_id, verse_range, view, viewPort_count, viewPort_num, visibility, 
+    keyCode, keyboard_busy, keys_pressed, lang, langEl, lang_id, langs, 
+    lastChild, left, line_height, localStorage, location, metaKey, n, 
+    navigator, needsHash, new_val, nextSibling, offsetHeight, offsetLeft, 
+    offsetParent, offsetTop, old_val, onblur, onfocus, onreadystatechange, 
+    onsubmit, open, opera, p, page, pageXOffset, pageYOffset, parseInt, 
+    parse_json, pathname, prepare_highlighter, prepare_search, prev_lang, 
+    preventDefault, previousSibling, properties, psalm, psalm_has_title, 
+    pushState, qEl, query, query_additional, query_button_alt, 
+    query_button_title, query_explanation, query_previous, query_type, 
+    raw_query, reached_bottom, reached_top, readyState, real_query, remove, 
+    removeChild, replace, replaceState, responseText, round, run_new_query, 
+    scrollBy, scrollHeight, scrollTo, scroll_to_verse, scroll_view_to, 
+    selectorText, send, set, setInterval, setItem, setRequestHeader, 
+    setTimeout, settings, shiftKey, split, standard_terms, start_at, state, 
+    status, stopPropagation, style, styleSheets, subscription, system, t, 
+    tagName, title, toggleCSS, top, topBar, topBar_height, top_id, top_verse, 
+    trigger, type, update_verse_range, userAgent, v, value, verse, verse_id, 
+    verse_range, view, viewPort_count, viewPort_num, visibility, 
     webkitTransition
 */
 
@@ -2709,7 +2710,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?886276", {
+                BF.include("/js/secondary.js?886629", {
                     content_manager: content_manager,
                     get_query_info:  function ()
                     {
