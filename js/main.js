@@ -2709,13 +2709,14 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?521285", {
+                BF.include("/js/secondary.js?886276", {
                     content_manager: content_manager,
                     get_query_info:  function ()
                     {
                         return {
-                            automated: query_manager.automated,
-                            raw_query: query_manager.raw_query
+                            automated:  query_manager.automated,
+                            raw_query:  query_manager.raw_query,
+                            real_query: query_manager.automated ? "" : query_manager.raw_query
                         };
                     },
                     langEl:          langEl,

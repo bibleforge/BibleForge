@@ -1263,66 +1263,71 @@
             BF.change_language = function (identifier, prevent_reload, callback)
             {
                 var activate_new_lang,
-                    prev_lang; 
+                    prev_lang;
                 
-                /// Does the language exist and is the new language different from the current language?
-                if (BF.langs[identifier] && BF.lang.identifier !== identifier) {
-                    prev_lang = BF.lang.identifier;
-                    
-                    activate_new_lang = function ()
-                    {
-                        BF.lang = BF.langs[identifier];
-                        change_langEl_text(BF.lang.short_name);
+                if (BF.keys_pressed.alt || BF.keys_pressed.ctrl) {
+                    window.open("/" + identifier + "/" + window.encodeURIComponent(context.get_query_info().real_query) + "/", "_blank");
+                } else {
+                    /// Does the language exist and is the new language different from the current language?
+                    if (BF.langs[identifier] && BF.lang.identifier !== identifier) {
+                        prev_lang = BF.lang.identifier;
                         
-                        /// Since the language has changed, any currently loaded text must be removed and reloaded (after a moment).
-                        context.content_manager.clear_scroll();
+                        activate_new_lang = function ()
+                        {
+                            BF.lang = BF.langs[identifier];
+                            change_langEl_text(BF.lang.short_name);
+                            
+                            /// Since the language has changed, any currently loaded text must be removed and reloaded (after a moment).
+                            context.content_manager.clear_scroll();
+                            
+                            /// Make the cursor turn into a hand when hovering over words if there is lexical data available.
+                            BF.toggleCSS(page, "linked", BF.lang.linked_to_orig ? 1 : 0);
+                            BF.toggleCSS(page, "lang_" + prev_lang,  0);
+                            BF.toggleCSS(page, "lang_" + identifier, 1);
+                            
+                            context.system.event.trigger("languageChange", {prev_lang: prev_lang});
+                            
+                            /// prevent_reload is used when the page first loads since a query will be sent shortly after changing the language.
+                            if (!prevent_reload) {
+                                /// Reload the text in the new language.
+                                window.setTimeout(function ()
+                                {
+                                    var query_info = context.get_query_info(),
+                                        query_str;
+                                    
+                                    /// If the last query was automated (e.g., when the page first loads), we do not want to record the query in the URL.
+                                    query_str = query_info.real_query;
+                                    
+                                    ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
+                                    BF.history.pushState("/" + BF.lang.identifier + "/" + window.encodeURIComponent(query_str) + "/");
+                                    
+                                    if (query_info.automated) {
+                                        query_str = BF.lang.books_short[1] + " 1:1";
+                                    }
+                                    
+                                    context.run_new_query(query_str, query_info.automated, true);
+                                }, 0);
+                            }
+                            
+                            if (typeof callback === "function") {
+                                callback();
+                            }
+                        };
                         
-                        /// Make the cursor turn into a hand when hovering over words if there is lexical data available.
-                        BF.toggleCSS(page, "linked", BF.lang.linked_to_orig ? 1 : 0);
-                        BF.toggleCSS(page, "lang_" + prev_lang,  0);
-                        BF.toggleCSS(page, "lang_" + identifier, 1);
-                        
-                        context.system.event.trigger("languageChange", {prev_lang: prev_lang});
-                        
-                        if (!prevent_reload) {
-                            /// Reload the text in the new language.
-                            window.setTimeout(function ()
-                            {
-                                var query_info = context.get_query_info(),
-                                    query_str;
-                                
-                                query_str = query_info.automated ? "" : query_info.raw_query;
-                                
-                                ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
-                                BF.history.pushState("/" + identifier + "/" + window.encodeURIComponent(query_str) + "/");
-                                
-                                if (query_info.automated) {
-                                    query_str = BF.lang.books_short[1] + " 1:1";
-                                }
-                                
-                                context.run_new_query(query_str, query_info.automated, true);
-                            }, 0);
+                        /// Has the language code already been downloaded?
+                        if (BF.langs[identifier].loaded) {
+                            activate_new_lang();
+                        } else {
+                            ///NOTE: The last modified time is added (if available) to prevent browsers from caching an outdated file.
+                            BF.include("/js/lang/" + identifier + ".js?" + (BF.langs[identifier].modified || ""), {}, activate_new_lang);
                         }
-                        
+                    } else {
                         if (typeof callback === "function") {
                             callback();
                         }
-                    };
-                    
-                    /// Has the language code already been downloaded?
-                    if (BF.langs[identifier].loaded) {
-                        activate_new_lang();
-                    } else {
-                        ///NOTE: The last modified time is added (if available) to prevent browsers from caching an outdated file.
-                        BF.include("/js/lang/" + identifier + ".js?" + (BF.langs[identifier].modified || ""), {}, activate_new_lang);
-                    }
-                } else {
-                    if (typeof callback === "function") {
-                        callback();
                     }
                 }
             };
-            
             
             
             change_langEl_text(BF.lang.short_name);
