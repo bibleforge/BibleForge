@@ -1356,8 +1356,7 @@
                     case "psalm_title":
                     case "subscription":
                         /// Found the verse, so calculate the verseID and call the success function.
-                        ///NOTE: No radix is used because the number should never begin with a leading 0 and suppling the radix slows down Mozilla (Firefox 3.6-) tremendously.
-                        verse_id = window.parseInt(el.id);
+                        verse_id = window.parseInt(el.id, 10);
                         
                         v = verse_id % 1000;
                         c = ((verse_id - v) % 1000000) / 1000;
@@ -2784,6 +2783,41 @@
             ///NOTE: Must return false in order to stop the form submission.
             return false;
         };
+        
+        /**
+         * Detect when a search verse reference was clicked and look up that verse.
+         *
+         * @param e (event object) The mouse event object.
+         */
+        page.addEventListener("click", function(e)
+        {
+            ///NOTE: IE/Chromium/Safari/Opera use srcElement, Firefox uses originalTarget.
+            var bcv,
+                clicked_el = e.srcElement || e.originalTarget,
+                clicked_parent,
+                query;
+            
+            ///TODO: Determine a faster way of determining if a search verse reference was clicked.
+            ///      One option would be to try to attach an event to each element, but that might take up too many resources.
+            if (clicked_el.tagName === "SPAN") {
+                clicked_parent = clicked_el.parentNode;
+                if (clicked_parent && clicked_parent.className === "search_verse") {
+                    bcv = BF.get_b_c_v(window.parseInt(clicked_parent.id, 10));
+                    query = BF.lang.books_short[bcv.b] + " " + bcv.c + ":" + bcv.v;
+                    /// If the Alt and/or Ctrl key is pressed, open in a new tab.
+                    ///TODO: Determine if middle click should open in a new tab too.
+                    if (BF.keys_pressed.alt || BF.keys_pressed.ctrl) {
+                        ///BUG: Chromium only opens a new tab when clicking on the magnifying glass (not when pressing enter).
+                        ///NOTE: In Chromium, holding Alt brings the new tab to the forefront but Ctrl opens it in the background.
+                        window.open("/" + BF.lang.identifier + "/" + window.encodeURIComponent(query) + "/", "_blank");
+                    } else {
+                        /// Look up the clicked verse.
+                        ///TODO: Keep the highlighting.
+                        run_new_query(query);
+                    }
+                }
+            }
+        }, false);
         
         /**
          * Set the query input box text with an explanation of what the user can enter in.

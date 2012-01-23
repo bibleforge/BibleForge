@@ -539,8 +539,13 @@ button:active {
     cursor: auto;
 }
 
-.hidden_cursor, .hidden_cursor a {
+/* Hide the cursor when hovering between words on the page (.hidden_cursor), hovering over words on the page (.hidden_cursor a), and hovering over a search verse (.hidden_cursor .search_verse span). */
+/* These all must be specified specifically because they may have a hand cursor style that needs to be directly overwitten. */
+.hidden_cursor, .hidden_cursor a, .hidden_cursor .search_verse span {
+    /*NOTE: The data URI cursor is a hack to hide the cursor on WebKit. It is an almost completely transparent pixel. */
+    /*      Completely transparent cursors show up as a black square. */
     cursor: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAABdJREFUOMtjYBgFo2AUjAIGhv///zMBAA0JAwCYSe1yAAAAAElFTkSuQmCC), auto!important;
+    /* Firefox */
     cursor: none!important;
 }
 
@@ -691,6 +696,10 @@ label {
 .search_verse {
     text-indent: 2em;
     width: 100%;
+}
+
+.search_verse span {
+    cursor: pointer;
 }
 
 /* Verses created from a verse lookup. */
