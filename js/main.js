@@ -61,6 +61,7 @@
     ///TODO: This should be based on browser language settings and IP address.
     BF.lang = BF.langs.en;
     
+    
     /// Prototypes
     
     /**
@@ -90,13 +91,19 @@
     /// Create the object in which the following functions store key presses into.
     BF.keys_pressed = {};
     
-    ///NOTE: There is no good way to detect other key strokes, and even this may return false negatives.
-    
+    /**
+     * Detect when the Shift, Ctrl, and/or Alt are pressed down so that that information can be used by functions not called by a keyboard event.
+     *
+     * @param e (event object) The keyboard event object.
+     * @note  There is no good way to detect other key strokes, and even this may return false negatives, but it should not return false positives.
+     */
     window.addEventListener("keydown", function (e)
     {
         /// 16 Shift (left or right)
         /// 17 Ctrl  (left or right)
         /// 18 Alt   (left or right)
+        
+        /// First, record how many times the keys have been pressed.
         if (e.keyCode >= 16 && e.keyCode <= 18) {
             if (!BF.keys_pressed[e.keyCode]) {
                 BF.keys_pressed[e.keyCode] = 1;
@@ -106,6 +113,8 @@
             }
         }
         
+        /// Second, set the alt, ctrl, and shift properties accordingly.
+        /// If the user held down a key when the page was not in focus, we can use shiftKey, ctrlKey, and altKey to detect those keys presses.
         ///NOTE: WebKit does not set shiftKey, ctrlKey, or altKey to true when they are first pressed, so keyCode must also be used.
         if (e.keyCode === 16 || e.shiftKey) {
             BF.keys_pressed.shift = true;
@@ -133,23 +142,30 @@
             delete BF.keys_pressed.alt;
         }
         
-        ///NOTE: If both Shift and Ctrl are pressed, the Alt key often is wrongly interpreted as the Meta key.
-        ///      So to eliminate false positive Alt key presses, we just delete any reference to the Alt key.
+        ///NOTE: If both Shift and Ctrl are pressed, the Alt key often is wrongly interpreted as the Meta key;
+        ///      therefore, if the Alt key was pressed before Shift or Ctrl, no Alt key onkeyup event will fire,
+        ///      So, to eliminate false positive Alt key presses, we just delete any reference to the Alt key.
         if (BF.keys_pressed.shift && BF.keys_pressed.ctrl) {
             delete BF.keys_pressed[18];
             delete BF.keys_pressed.alt;
         }
     }, false);
     
+    /**
+     * Detect when Alt, Ctrl, and Shift are no longer being pressed down.
+     *
+     * @param e (event object) The keyboard event object.
+     */
     window.addEventListener("keyup", function (e)
     {
         /// 16 Shift (left or right)
         /// 17 Ctrl  (left or right)
         /// 18 Alt   (left or right)
+        
         if (BF.keys_pressed[e.keyCode]) {
             ///NOTE: WebKit only fires one onkeyup event if more than one of the same keys are pressed.
             ///      For example, if both shift keys are pressed, the onkeyup event will only fire when the first shift key is released, not the second.
-            ///      So, to avoid false positives, on WeKit, we must delete the key code regardless of the value.
+            ///      So, to avoid false positives, on WebKit, we must delete the key code regardless of the value.
             if (BF.keys_pressed[e.keyCode] < 2 || BF.is_WebKit) {
                 delete BF.keys_pressed[e.keyCode];
             } else {
@@ -168,15 +184,18 @@
         }
     }, false);
     
+    /// Since onkeyup is not fired if the page is not in focus, clear all keys to avoid false positives.
     window.addEventListener("blur", function ()
     {
         BF.keys_pressed = {};
     }, false);
     
+    /// Since onblur is not called when oncontextmenu (and onkeyup is not called as long as the menu is opened), we must clear the keys to avoid false positives.
     window.addEventListener("contextmenu", function ()
     {
         BF.keys_pressed = {};
     }, false);
+    
     
     /// Declare helper function(s) attached to the global BibleForge object (BF).
     
