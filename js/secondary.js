@@ -448,7 +448,8 @@
          */
         (function ()
         {
-            var hide_cursor_timeout,
+            var hidden_css = "hidden_cursor",
+                hide_cursor_timeout,
                 is_cursor_visible = true,
                 
                 /// Special variables needed for an ugly WebKit hack.
@@ -506,10 +507,10 @@
                     if (BF.is_WebKit) {
                         ///NOTE: For a yet unknown reason, when being called onmousedown, this must be called twice.
                         ///      Actually, this used to work, but in Chrome 15 it does not seem to.
-                        webkit_cursor_hack(page, "hidden_cursor", 0);
-                        webkit_cursor_hack(page, "hidden_cursor", 0);
+                        webkit_cursor_hack(page, hidden_css, 0);
+                        webkit_cursor_hack(page, hidden_css, 0);
                     } else {
-                        BF.toggleCSS(page, "hidden_cursor", 0);
+                        BF.toggleCSS(page, hidden_css, 0);
                     }
                     
                     is_cursor_visible = true;
@@ -532,10 +533,10 @@
                     ///NOTE: WebKit can use an almost completely transparent PNG.
                     ///      Opera (at least 10.53) has no alternate cursor support whatsoever.
                     if (BF.is_WebKit) {
-                        webkit_cursor_hack(page, "hidden_cursor", 1);
+                        webkit_cursor_hack(page, hidden_css, 1);
                     } else {
                         /// Mozilla/IE9
-                        BF.toggleCSS(page, "hidden_cursor", 1);
+                        BF.toggleCSS(page, hidden_css, 1);
                     }
                     
                     is_cursor_visible = false;
