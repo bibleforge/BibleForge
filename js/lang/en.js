@@ -498,7 +498,7 @@ first_loop:     while (i < search_terms_arr_len) {
          * @example	verse_id = determine_reference("Habakkuk 99:1");			/// Returns "35099001" (note the invalid chapter reference).
          * @example	verse_id = determine_reference("love");						/// Returns FALSE
          * @param	ref (string) The text that may or may not be a valid verse reference.
-         * @return	The verse id of a reference or 0 if invalid.
+         * @return  The verse id of a reference (as a string) or the integer 0 if invalid.
          */
         determine_reference: (function ()
         {
