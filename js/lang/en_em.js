@@ -347,12 +347,12 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
              *
              * Create regex array to search through the verses that will soon be returned by the server.
              *
-             * @example	BF.lang.prepare_highlighter(q_obj.value);
-             * @example	BF.lang.prepare_highlighter("search terms");
-             * @param	search_terms (string) The terms to look for.
-             * @return	An array of regular expressions.
-             * @note	Called by run_new_query().
-             * @todo   Adapt for Early Modern English.
+             * @example BF.lang.prepare_highlighter(q_obj.value);
+             * @example BF.lang.prepare_highlighter("search terms");
+             * @param   search_terms (string) The terms to look for.
+             * @return  An array of regular expressions.
+             * @note    Called by run_new_query().
+             * @todo    Adapt for Early Modern English.
              */
             return function (search_terms)
             {
@@ -496,11 +496,11 @@ first_loop:     while (i < search_terms_arr_len) {
          * Only a book is required or checked for validity.
          * The verse id format is [B]BCCCVVV (e.g., Genesis 1:1 == 1001001).
          *
-         * @example	verse_id = determine_reference("Gen");						/// Returns "10001001"
-         * @example	verse_id = determine_reference("first thesalonions 3:10");	/// Returns "52003010" (note the misspelling).
-         * @example	verse_id = determine_reference("Habakkuk 99:1");			/// Returns "35099001" (note the invalid chapter reference).
-         * @example	verse_id = determine_reference("love");						/// Returns FALSE
-         * @param	ref (string) The text that may or may not be a valid verse reference.
+         * @example verse_id = determine_reference("Gen");                      /// Returns "10001001"
+         * @example verse_id = determine_reference("first thesalonions 3:10");  /// Returns "52003010" (note the misspelling).
+         * @example verse_id = determine_reference("Habakkuk 99:1");            /// Returns "35099001" (note the invalid chapter reference).
+         * @example verse_id = determine_reference("love");                     /// Returns FALSE
+         * @param   ref (string) The text that may or may not be a valid verse reference.
          * @return  The verse id of a reference (as a string) or the integer 0 if invalid.
          * @todo    Adapt further for Early Modern English.
          */
@@ -526,163 +526,163 @@ first_loop:     while (i < search_terms_arr_len) {
                 
                 switch (ref.slice(0, 1).toLowerCase()) {
                 case "j":
-                    if (book_arr_re[43].test(ref)) {		/// John
+                    if (book_arr_re[43].test(ref)) {        /// John
                         book = "43";
                         break;
-                    } else if (book_arr_re[32].test(ref)) {	/// Jonah
+                    } else if (book_arr_re[32].test(ref)) { /// Jonah
                         book = "32";
                         break;
-                    } else if (book_arr_re[59].test(ref)) {	/// James
+                    } else if (book_arr_re[59].test(ref)) { /// James
                         book = "59";
                         break;
-                    } else if (book_arr_re[6].test(ref)) {	/// Joshua
+                    } else if (book_arr_re[6].test(ref)) {  /// Joshua
                         book = "6";
                         break;
-                    } else if (book_arr_re[7].test(ref)) {	/// Judges
+                    } else if (book_arr_re[7].test(ref)) {  /// Judges
                         book = "7";
                         break;
-                    } else if (book_arr_re[18].test(ref)) {	/// Job
+                    } else if (book_arr_re[18].test(ref)) { /// Job
                         book = "18";
                         break;
-                    } else if (book_arr_re[65].test(ref)) {	/// Jude
+                    } else if (book_arr_re[65].test(ref)) { /// Jude
                         book = "65";
                         break;
-                    } else if (book_arr_re[24].test(ref)) {	/// Jeremiah
+                    } else if (book_arr_re[24].test(ref)) { /// Jeremiah
                         book = "24";
                         break;
-                    } else if (book_arr_re[29].test(ref)) {	/// Joel
+                    } else if (book_arr_re[29].test(ref)) { /// Joel
                         book = "29";
                         break;
                     }
                     break;
                 case "r":
-                    if (book_arr_re[45].test(ref)) {		/// Romans
+                    if (book_arr_re[45].test(ref)) {        /// Romans
                         book = "45";
                         break;
-                    } else if (book_arr_re[66].test(ref)) {	/// Revelation
+                    } else if (book_arr_re[66].test(ref)) { /// Revelation
                         book = "66";
                         break;
-                    } else if (book_arr_re[8].test(ref)) {	/// Ruth
+                    } else if (book_arr_re[8].test(ref)) {  /// Ruth
                         book = "8";
                         break;
                     }
                     break;
                 case "g":
-                    if (book_arr_re[1].test(ref)) {			/// Genesis
+                    if (book_arr_re[1].test(ref)) {         /// Genesis
                         book = "1";
                         break;
-                    } else if (book_arr_re[48].test(ref)) {	/// Galatians
+                    } else if (book_arr_re[48].test(ref)) { /// Galatians
                         book = "48";
                         break;
-                    } else if (book_arr_re[59].test(ref)) {	/// James (Generall Epistle of James)
+                    } else if (book_arr_re[59].test(ref)) { /// James (Generall Epistle of James)
                         book = "59";
                         break;
-                    } else if (book_arr_re[65].test(ref)) {	/// Jude (Generall Epistle of Jude)
+                    } else if (book_arr_re[65].test(ref)) { /// Jude (Generall Epistle of Jude)
                         book = "65";
                         break;
                     }
                     break;
                 case "e":
-                    if (book_arr_re[2].test(ref)) {			/// Exodus
+                    if (book_arr_re[2].test(ref)) {         /// Exodus
                         book = "2";
                         break;
-                    } else if (book_arr_re[49].test(ref)) {	/// Ephesians
+                    } else if (book_arr_re[49].test(ref)) { /// Ephesians
                         book = "49";
                         break;
-                    } else if (book_arr_re[26].test(ref)) {	/// Ezekiel
+                    } else if (book_arr_re[26].test(ref)) { /// Ezekiel
                         book = "26";
                         break;
-                    } else if (book_arr_re[21].test(ref)) {	/// Ecclesiastes
+                    } else if (book_arr_re[21].test(ref)) { /// Ecclesiastes
                         book = "21";
                         break;
-                    } else if (book_arr_re[17].test(ref)) {	/// Esther
+                    } else if (book_arr_re[17].test(ref)) { /// Esther
                         book = "17";
                         break;
-                    } else if (book_arr_re[15].test(ref)) {	/// Ezra
+                    } else if (book_arr_re[15].test(ref)) { /// Ezra
                         book = "15";
                         break;
                     }
                     break;
                 case "m":
-                    if (book_arr_re[40].test(ref)) {		/// Matthew
+                    if (book_arr_re[40].test(ref)) {        /// Matthew
                         book = "40";
                         break;
-                    } else if (book_arr_re[41].test(ref)) {	/// Mark
+                    } else if (book_arr_re[41].test(ref)) { /// Mark
                         book = "41";
                         break;
-                    } else if (book_arr_re[39].test(ref)) {	/// Malachi
+                    } else if (book_arr_re[39].test(ref)) { /// Malachi
                         book = "39";
                         break;
-                    } else if (book_arr_re[33].test(ref)) {	/// Micah
+                    } else if (book_arr_re[33].test(ref)) { /// Micah
                         book = "33";
                         break;
                     }
                     break;
                 case "l":
-                    if (book_arr_re[42].test(ref)) {		/// Luke
+                    if (book_arr_re[42].test(ref)) {        /// Luke
                         book = "42";
                         break;
-                    } else if (book_arr_re[3].test(ref)) {	/// Leviticus
+                    } else if (book_arr_re[3].test(ref)) {  /// Leviticus
                         book = "3";
                         break;
-                    } else if (book_arr_re[25].test(ref)) {	/// Lamentations
+                    } else if (book_arr_re[25].test(ref)) { /// Lamentations
                         book = "25";
                         break;
                     }
                     break;
                 case "p":
-                    if (book_arr_re[19].test(ref)) {		/// Psalms
+                    if (book_arr_re[19].test(ref)) {        /// Psalms
                         book = "19";
                         break;
-                    } else if (book_arr_re[20].test(ref)) {	/// Proverbs
+                    } else if (book_arr_re[20].test(ref)) { /// Proverbs
                         book = "20";
                         break;
-                    } else if (book_arr_re[50].test(ref)) {	/// Philippians
+                    } else if (book_arr_re[50].test(ref)) { /// Philippians
                         book = "50";
                         break;
-                    } else if (book_arr_re[57].test(ref)) {	/// Philemon
+                    } else if (book_arr_re[57].test(ref)) { /// Philemon
                         book = "57";
                         break;
-                    } else if (book_arr_re[60].test(ref)) {	/// 1 Peter (Peter)
+                    } else if (book_arr_re[60].test(ref)) { /// 1 Peter (Peter)
                         book = "60";
                         break;
                     }
                     break;
                 case "d":
-                    if (book_arr_re[5].test(ref)) {			/// Deuteronomy
+                    if (book_arr_re[5].test(ref)) {         /// Deuteronomy
                         book = "5";
                         break;
-                    } else if (book_arr_re[27].test(ref)) {	/// Daniel
+                    } else if (book_arr_re[27].test(ref)) { /// Daniel
                         book = "27";
                         break;
                     }
                     break;
                 case "i":
-                    if (book_arr_re[43].test(ref)) {		/// John (Iohn)
+                    if (book_arr_re[43].test(ref)) {        /// John (Iohn)
                         book = "43";
                         break;
-                    } else if (book_arr_re[32].test(ref)) {	/// Jonah (Ionah)
+                    } else if (book_arr_re[32].test(ref)) { /// Jonah (Ionah)
                         book = "32";
                         break;
-                    } else if (book_arr_re[59].test(ref)) {	/// James (Iames)
+                    } else if (book_arr_re[59].test(ref)) { /// James (Iames)
                         book = "59";
                         break;
-                    } else if (book_arr_re[6].test(ref)) {	/// Joshua (Ioshua)
+                    } else if (book_arr_re[6].test(ref)) {  /// Joshua (Ioshua)
                         book = "6";
                         break;
-                    } else if (book_arr_re[7].test(ref)) {	/// Judges (Iudges)
+                    } else if (book_arr_re[7].test(ref)) {  /// Judges (Iudges)
                         book = "7";
                         break;
-                    } else if (book_arr_re[18].test(ref)) {	/// Job (Iob)
+                    } else if (book_arr_re[18].test(ref)) { /// Job (Iob)
                         book = "18";
                         break;
-                    } else if (book_arr_re[65].test(ref)) {	/// Jude (Iude)
+                    } else if (book_arr_re[65].test(ref)) { /// Jude (Iude)
                         book = "65";
                         break;
-                    } else if (book_arr_re[24].test(ref)) {	/// Jeremiah (Ieremiah)
+                    } else if (book_arr_re[24].test(ref)) { /// Jeremiah (Ieremiah)
                         book = "24";
                         break;
-                    } else if (book_arr_re[29].test(ref)) {	/// Joel (Ioel)
+                    } else if (book_arr_re[29].test(ref)) { /// Joel (Ioel)
                         book = "29";
                         break;
                     } else if (book_arr_re[23].test(ref)) { /// Isaiah
@@ -692,174 +692,174 @@ first_loop:     while (i < search_terms_arr_len) {
                     ///NOTE: Don't break so that references like "I Kings" will be checked.
                 case "1":
                 case "f":
-                    if (book_arr_re[46].test(ref)) {		/// 1 Corinthians | First Corinthians| I Corinthians
+                    if (book_arr_re[46].test(ref)) {        /// 1 Corinthians | First Corinthians| I Corinthians
                         book = "46";
                         break;
-                    } else if (book_arr_re[62].test(ref)) {	/// 1 John | First John | I John
+                    } else if (book_arr_re[62].test(ref)) { /// 1 John | First John | I John
                         book = "62";
                         break;
-                    } else if (book_arr_re[54].test(ref)) {	/// 1 Timothy | First Timothy | I Timothy
+                    } else if (book_arr_re[54].test(ref)) { /// 1 Timothy | First Timothy | I Timothy
                         book = "54";
                         break;
-                    } else if (book_arr_re[52].test(ref)) {	/// 1 Thessalonians | First Thessalonians | I Thessalonians
+                    } else if (book_arr_re[52].test(ref)) { /// 1 Thessalonians | First Thessalonians | I Thessalonians
                         book = "52";
                         break;
-                    } else if (book_arr_re[60].test(ref)) {	/// 1 Peter | First Peter | I Peter
+                    } else if (book_arr_re[60].test(ref)) { /// 1 Peter | First Peter | I Peter
                         book = "60";
                         break;
-                    } else if (book_arr_re[9].test(ref)) {	/// 1 Samuel | First Samuel | I Samuel
+                    } else if (book_arr_re[9].test(ref)) {  /// 1 Samuel | First Samuel | I Samuel
                         book = "9";
                         break;
-                    } else if (book_arr_re[11].test(ref)) {	/// 1 Kings | First Kings | I Kings
+                    } else if (book_arr_re[11].test(ref)) { /// 1 Kings | First Kings | I Kings
                         book = "11";
                         break;
-                    } else if (book_arr_re[13].test(ref)) {	/// 1 Chronicles | First Chronicles | I Chronicles
+                    } else if (book_arr_re[13].test(ref)) { /// 1 Chronicles | First Chronicles | I Chronicles
                         book = "13";
                         break;
                     }
                     ///NOTE: Don't break so that references like "II Kings" will be checked.
                 case "2":
                 case "s":
-                    if (book_arr_re[47].test(ref)) {		/// 2 Corinthians | Second Corinthians| II Corinthians
+                    if (book_arr_re[47].test(ref)) {        /// 2 Corinthians | Second Corinthians| II Corinthians
                         book = "47";
                         break;
-                    } else if (book_arr_re[63].test(ref)) {	/// 2 John | Second John | II John
+                    } else if (book_arr_re[63].test(ref)) { /// 2 John | Second John | II John
                         book = "63";
                         break;
-                    } else if (book_arr_re[55].test(ref)) {	/// 2 Timothy | Second Timothy | II Timothy
+                    } else if (book_arr_re[55].test(ref)) { /// 2 Timothy | Second Timothy | II Timothy
                         book = "55";
                         break;
-                    } else if (book_arr_re[53].test(ref)) {	/// 2 Thessalonians | Second Thessalonians | II Thessalonians
+                    } else if (book_arr_re[53].test(ref)) { /// 2 Thessalonians | Second Thessalonians | II Thessalonians
                         book = "53";
                         break;
-                    } else if (book_arr_re[61].test(ref)) {	/// 2 Peter | Second Peter | II Peter
+                    } else if (book_arr_re[61].test(ref)) { /// 2 Peter | Second Peter | II Peter
                         book = "61";
                         break;
-                    } else if (book_arr_re[22].test(ref)) {	/// Song of Songs
+                    } else if (book_arr_re[22].test(ref)) { /// Song of Songs
                         book = "22";
                         break;
-                    } else if (book_arr_re[10].test(ref)) {	/// 2 Samuel | Second Samuel | II Samuel
+                    } else if (book_arr_re[10].test(ref)) { /// 2 Samuel | Second Samuel | II Samuel
                         book = "10";
                         break;
-                    } else if (book_arr_re[12].test(ref)) {	/// 2 Kings | Second Kings | II Kings
+                    } else if (book_arr_re[12].test(ref)) { /// 2 Kings | Second Kings | II Kings
                         book = "12";
                         break;
-                    } else if (book_arr_re[14].test(ref)) {	/// 2 Chronicles | Second Chronicles | II Chronicles
+                    } else if (book_arr_re[14].test(ref)) { /// 2 Chronicles | Second Chronicles | II Chronicles
                         book = "14";
                         break;
-                    } else if (book_arr_re[9].test(ref)) {	/// 1 Samuel (Samuel)
+                    } else if (book_arr_re[9].test(ref)) {  /// 1 Samuel (Samuel)
                         book = "9";
                         break;
-                    } else if (book_arr_re[19].test(ref)) {	/// Psalms (Salms)
+                    } else if (book_arr_re[19].test(ref)) { /// Psalms (Salms)
                         book = "19";
                         break;
                     }
                     ///NOTE: Don't break so that references like "III John" will be checked.
                 case "3":
                 case "t":
-                    if (book_arr_re[64].test(ref)) {		/// 3 John | Third John | III John
+                    if (book_arr_re[64].test(ref)) {        /// 3 John | Third John | III John
                         book = "64";
                         break;
-                    } else if (book_arr_re[56].test(ref)) {	/// Titus
+                    } else if (book_arr_re[56].test(ref)) { /// Titus
                         book = "56";
                         break;
-                    } else if (book_arr_re[54].test(ref)) {	/// 1 Timothy (Timothy)
+                    } else if (book_arr_re[54].test(ref)) { /// 1 Timothy (Timothy)
                         book = "54";
                         break;
-                    } else if (book_arr_re[52].test(ref)) {	/// 1 Thessalonians (Thessalonians)
+                    } else if (book_arr_re[52].test(ref)) { /// 1 Thessalonians (Thessalonians)
                         book = "52";
                         break;
-                    } else if (book_arr_re[44].test(ref)) {	/// The Acts of the Apostles
+                    } else if (book_arr_re[44].test(ref)) { /// The Acts of the Apostles
                         book = "44";
                         break;
-                    } else if (book_arr_re[22].test(ref)) {	/// The Song of Songs
+                    } else if (book_arr_re[22].test(ref)) { /// The Song of Songs
                         book = "22";
                         break;
-                    } else if (book_arr_re[60].test(ref)) {	/// 1 Peter (The First Epistle generall of Peter)
+                    } else if (book_arr_re[60].test(ref)) { /// 1 Peter (The First Epistle generall of Peter)
                         book = "60";
                         break;
-                    } else if (book_arr_re[61].test(ref)) {	/// 2 Peter (The Second Epistle generall of Peter)
+                    } else if (book_arr_re[61].test(ref)) { /// 2 Peter (The Second Epistle generall of Peter)
                         book = "61";
                         break;
-                    } else if (book_arr_re[59].test(ref)) {	/// James (The generall Epistle of James)
+                    } else if (book_arr_re[59].test(ref)) { /// James (The generall Epistle of James)
                         book = "59";
                         break;
-                    } else if (book_arr_re[65].test(ref)) {	/// Jude (The generall Epistle of Jude)
+                    } else if (book_arr_re[65].test(ref)) { /// Jude (The generall Epistle of Jude)
                         book = "65";
                         break;
                     }
                     break;
                 case "a":
-                    if (book_arr_re[44].test(ref)) {		/// Acts
+                    if (book_arr_re[44].test(ref)) {        /// Acts
                         book = "44";
                         break;
-                    } else if (book_arr_re[30].test(ref)) {	/// Amos
+                    } else if (book_arr_re[30].test(ref)) { /// Amos
                         book = "30";
                         break;
-                    } else if (book_arr_re[66].test(ref)) {	/// Revelation (Apocalypse)
+                    } else if (book_arr_re[66].test(ref)) { /// Revelation (Apocalypse)
                         book = "66";
                         break;
                     }
                     break;
                 case "c":
-                    if (book_arr_re[51].test(ref)) {		/// Colossians
+                    if (book_arr_re[51].test(ref)) {        /// Colossians
                         book = "51";
                         break;
-                    } else if (book_arr_re[46].test(ref)) {	/// 1 Corinthians (Corinthians)
+                    } else if (book_arr_re[46].test(ref)) { /// 1 Corinthians (Corinthians)
                         book = "46";
                         break;
-                    } else if (book_arr_re[22].test(ref)) {	/// Song of Songs (Canticles)
+                    } else if (book_arr_re[22].test(ref)) { /// Song of Songs (Canticles)
                         book = "22";
                         break;
-                    } else if (book_arr_re[13].test(ref)) {	/// 1 Chronicles (Chronicles)
+                    } else if (book_arr_re[13].test(ref)) { /// 1 Chronicles (Chronicles)
                         book = "13";
                         break;
                     }
                     break;
                 case "h":
-                    if (book_arr_re[58].test(ref)) {		/// Hebrews
+                    if (book_arr_re[58].test(ref)) {        /// Hebrews
                         book = "58";
                         break;
-                    } else if (book_arr_re[28].test(ref)) {	/// Hosea
+                    } else if (book_arr_re[28].test(ref)) { /// Hosea
                         book = "28";
                         break;
-                    } else if (book_arr_re[35].test(ref)) {	/// Habakkuk
+                    } else if (book_arr_re[35].test(ref)) { /// Habakkuk
                         book = "35";
                         break;
-                    } else if (book_arr_re[37].test(ref)) {	/// Haggai
+                    } else if (book_arr_re[37].test(ref)) { /// Haggai
                         book = "37";
                         break;
                     }
                     break;
                 case "n":
-                    if (book_arr_re[4].test(ref)) {			/// Numbers
+                    if (book_arr_re[4].test(ref)) {         /// Numbers
                         book = "4";
                         break;
-                    } else if (book_arr_re[16].test(ref)) {	/// Nehemiah
+                    } else if (book_arr_re[16].test(ref)) { /// Nehemiah
                         book = "16";
                         break;
-                    } else if (book_arr_re[34].test(ref)) {	/// Nahum
+                    } else if (book_arr_re[34].test(ref)) { /// Nahum
                         book = "34";
                         break;
                     }
                     break;
                 case "z":
-                    if (book_arr_re[38].test(ref)) {		/// Zechariah
+                    if (book_arr_re[38].test(ref)) {        /// Zechariah
                         book = "38";
                         break;
-                    } else if (book_arr_re[36].test(ref)) {	/// Zephaniah
+                    } else if (book_arr_re[36].test(ref)) { /// Zephaniah
                         book = "36";
                         break;
                     }
                     break;
                 case "k":
-                    if (book_arr_re[11].test(ref)) {		/// 1 Kings (Kings)
+                    if (book_arr_re[11].test(ref)) {        /// 1 Kings (Kings)
                         book = "11";
                         break;
                     }
                     break;
                 case "o":
-                    if (book_arr_re[31].test(ref)) {		/// Obadiah
+                    if (book_arr_re[31].test(ref)) {        /// Obadiah
                         book = "31";
                         break;
                     }
@@ -908,15 +908,15 @@ first_loop:     while (i < search_terms_arr_len) {
          *
          * Converts special words to symbols, and converts certain characters to a format adhere to Sphinx syntax.
          *
-         * @example	search_terms = prepare_search("NOT in  the  AND good OR  beginning  ");	/// Returns "-in the & good | beginning  "
-         * @example	search_terms = prepare_search("ps 16:title");							/// Returns "ps 16:0"
-         * @example	search_terms = prepare_search("“God is good”");							/// Returns '"God is good"' (Note the curly quotes.)
-         * @param	search_terms (string) The terms to be examined.
-         * @return	A string that conforms to Sphinx syntax.
-         * @note	Called by preform_query() in js/main.js.
-         * @note	Replaces AND, OR, and NOT with &, |, and - respectively.
-         * @note	Replaces curly quotes with straight.
-         * @note	Replaces various hyphens, dashes, and minuses with the standard hyphen (-).
+         * @example search_terms = prepare_search("NOT in  the  AND good OR  beginning  "); /// Returns "-in the & good | beginning  "
+         * @example search_terms = prepare_search("ps 16:title");                           /// Returns "ps 16:0"
+         * @example search_terms = prepare_search("“God is good”");                         /// Returns '"God is good"' (Note the curly quotes.)
+         * @param   search_terms (string) The terms to be examined.
+         * @return  A string that conforms to Sphinx syntax.
+         * @note    Called by preform_query() in js/main.js.
+         * @note    Replaces AND, OR, and NOT with &, |, and - respectively.
+         * @note    Replaces curly quotes with straight.
+         * @note    Replaces various hyphens, dashes, and minuses with the standard hyphen (-).
          * @note    This function assumes that whitespace will be trimmed afterward.
          * @todo    Determine if this should be moved out of the language specific file (and maybe just use some language specific variables).
          */
