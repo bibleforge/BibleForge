@@ -2368,7 +2368,7 @@
                  * @return  NULL
                  * @note    Called by searchForm.onsubmit() when a user submits a query.
                  */
-                return function (raw_query, automated, ignore_state)
+                return function run_new_query(raw_query, automated, ignore_state)
                 {
                     /// Step 1: Prepare string and check to see if we need to send a query (i.e., the query string is not empty).
                     
@@ -2791,8 +2791,8 @@
          */
         page.addEventListener("click", function(e)
         {
-            ///NOTE: IE/Chromium/Safari/Opera use srcElement, Firefox uses originalTarget.
             var bcv,
+                ///NOTE: IE/Chromium/Safari/Opera use srcElement, Firefox uses originalTarget.
                 clicked_el = e.srcElement || e.originalTarget,
                 clicked_parent,
                 query;
