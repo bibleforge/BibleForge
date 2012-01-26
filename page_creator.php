@@ -53,7 +53,7 @@ if (isset($_GET['_escaped_fragment_'])) {
  * @param  $info  (string) (optional) The text to go in the info bar.
  * @return NULL.  HTML is printed to the buffer and then flushed.
  */
-function create_page_html($title = '', $query = '', $info = '')
+function create_page_html($title = '', $query = '', $info = '', $description = '')
 {
 
 ?>
@@ -67,7 +67,7 @@ function create_page_html($title = '', $query = '', $info = '')
     <!-- This graphic is used by handhelds and tablets for a bookmark icon. -->
     <!-- NOTE: Ideally, this should be at least 114 pixels. -->
     <link rel="apple-touch-icon" href="/images/scroll_64.png">
-    <meta name=description content="BibleForge: The free, open source Bible Study web app.">
+    <meta name=description content="<?php echo addslashes(substr(trim("BibleForge: The free, open source Bible Study web app. " . $description), 0, 155)); ?>">
     <!-- Safari on the iPhone or iPad requires that the viewport width be set. -->
     <!-- The Froyo browser on Android 2.2 needs scaling disabled in order for fixed positioning to work. -->
     <!-- TODO: The correct header should probably be sent dynamically from the server. -->
@@ -106,12 +106,14 @@ $langs = array(
     'en' => array(
         'default_query' => 'Genesis 1',
         'db_identifier' => 'english',
-        'identifier'    => 'en'
+        'identifier'    => 'en',
+        'name'          => 'English'
     ),
     'en_em' => array(
         'default_query' => 'Genesis 1',
         'db_identifier' => 'en_em',
-        'identifier'    => 'en_em'
+        'identifier'    => 'en_em',
+        'name'          => 'Early Modern English'
     )
 );
 
@@ -218,7 +220,7 @@ if ($ref['verseID'] !== 0) {
     $c = (($ref['verseID'] - $v) % 1000000) / 1000;
     $b = ($ref['verseID'] - $v - $c * 1000) / 1000000;
     
-    create_page_html($ref['books_short'][$b] . ' ' . $c, $query, $ref['books_short'][$b] . ' ' . $c);
+    create_page_html($ref['books_short'][$b] . ' ' . $c, $query, $ref['books_short'][$b] . ' ' . $c, $query . ' in ' . $language['name'] . '.');
     
     $SQL_query = 'SELECT id, words FROM `bible_' . $language['db_identifier'] . '_html` WHERE book = ' . $b . ' AND chapter = ' . $c;
     
