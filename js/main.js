@@ -2367,7 +2367,7 @@
                 /**
                  * Process a raw query.
                  *
-                 * @example run_new_query("John 3:16"); /// Looks up John 3:6 (and following)
+                 * @example run_new_query("John 3:16"); /// Looks up John 3:16 (and following)
                  * @example run_new_query("love");      /// Searches for the word "love"
                  * @param   raw_query (string)  The text from the user to query.
                  * @param   automated (boolean) Whether or not this query was made by the program without user interaction.
@@ -2484,7 +2484,7 @@
                              * @param   word_ids (array)  An array of word ids to be highlighted (only used by grammatical searches).
                              * @note    Only one parameter is needed.
                              */
-                            return function (html, word_ids)
+                            return function highlight(html, word_ids)
                             {
                                 var i,
                                     ids,
