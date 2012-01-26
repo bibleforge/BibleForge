@@ -908,10 +908,10 @@ first_loop:     while (i < search_terms_arr_len) {
          *
          * Converts special words to symbols, and converts certain characters to a format adhere to Sphinx syntax.
          *
-         * @example search_terms = prepare_search("NOT in  the  AND good OR  beginning  "); /// Returns "-in the & good | beginning  "
-         * @example search_terms = prepare_search("ps 16:title");                           /// Returns "ps 16:0"
-         * @example search_terms = prepare_search("“God is good”");                         /// Returns '"God is good"' (Note the curly quotes.)
-         * @param   search_terms (string) The terms to be examined.
+         * @example query = prepare_search("NOT in  the  AND good OR  beginning  "); /// Returns "-in the & good | beginning  "
+         * @example query = prepare_search("ps 16:title");                           /// Returns "ps 16:0"
+         * @example query = prepare_search("“God is good”");                         /// Returns '"God is good"' (Note the curly quotes.)
+         * @param   query (string) The terms to be examined.
          * @return  A string that conforms to Sphinx syntax.
          * @note    Called by preform_query() in js/main.js.
          * @note    Replaces AND, OR, and NOT with &, |, and - respectively.
@@ -920,7 +920,7 @@ first_loop:     while (i < search_terms_arr_len) {
          * @note    This function assumes that whitespace will be trimmed afterward.
          * @todo    Determine if this should be moved out of the language specific file (and maybe just use some language specific variables).
          */
-        prepare_search: function (search_terms)
+        prepare_search: function (query)
         {
             ///NOTE: /\s+/g gets rid of double spaces within the words (e.g., "here    there" becomes "here there")
             ///      and converts all types of white space to the normal space (e.g., converts non-breaking spaces to normal spaces).
@@ -929,7 +929,7 @@ first_loop:     while (i < search_terms_arr_len) {
             ///NOTE: replace(/([0-9]+)[:.;,\s]title/ig, "$1:0") replaces Psalm title references into an acceptable format (e.g., "Psalm 3:title" becomes "Psalm 3:0").
             ///NOTE: replace(/([:.;,\s])subscript(?:ion)?/ig, "$1255" replaces the word "subscription" with the verse number (255) used internally by BibleForge for Pauline subscriptions (e.g., "Philemon subscription" becomes "Philemon 255").
             ///NOTE: "$1255" replaces the text with the first placeholder followed by the literal "255" (without quotes).
-            return search_terms.replace(" IN RED", " AS RED").replace(/\s+/g, " ").replace(/\sAND\s/g, " & ").replace(/\sOR\s/g, " | ").replace(/(?:\s-|\s*\bNOT)\s/g, " -").replace(/ſ/g, "s").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[\u2011-\u2015]/g, "-").replace(/([0-9]+)[:.;,\s]title/ig, "$1:0").replace(/([:.;,\s])subscript(?:ion)?/ig, "$1255");
+            return query.replace(" IN RED", " AS RED").replace(/\s+/g, " ").replace(/\sAND\s/g, " & ").replace(/\sOR\s/g, " | ").replace(/(?:\s-|\s*\bNOT)\s/g, " -").replace(/ſ/g, "s").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[\u2011-\u2015]/g, "-").replace(/([0-9]+)[:.;,\s]title/ig, "$1:0").replace(/([:.;,\s])subscript(?:ion)?/ig, "$1255");
         }
     };
 }());
