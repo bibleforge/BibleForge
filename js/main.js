@@ -2274,22 +2274,22 @@
                  * @return  An array filled with objects describing the type of search.
                  * @note    Called by run_new_query().
                  * @note    Only a partial implementation currently.  Mixed searching is lacking.
+                 * @todo    Review this function.  It seems overly complicated and cryptic.
                  */
                 function determine_search_type(search_terms)
                 {
-                    var exclude_json           = "", /// Used to concatenate data. TODO: Make description better.
-                        grammar_attribute_json = "", /// Used to concatenate data. TODO: Make description better.
-                        grammar_attributes,
-                        grammar_json           = "", /// Used to concatenate data. TODO: Make description better.
-                        grammar_search_term,
+                    var exclude_json           = "", /// A comma separated binary list indicating if an attribute is to be present or not present
+                        grammar_attribute_json = "", /// This holds the date until it is ready to be concatenated with the other parts into valid JSON.
+                        grammar_attributes,          /// This temporarily holds the grammatical attributes.
+                        grammar_json           = "", /// This holds the search term.
+                        grammar_search_term,         /// This temporarily holds the search term.
                         split_start,
-                        split_pos;
+                        split_pos = search_terms.indexOf(BF.lang.grammar_marker);
                     
                     /// Did the user use the grammatical keyword in his search?
-                    if ((split_pos = search_terms.indexOf(BF.lang.grammar_marker)) !== -1) {
-                        ///TODO: Determine what is better: a JSON array or POST/GET string (i.e., word1=word&grammar_type1=1&value1=3&include1=1&...).
+                    if (split_pos !== -1) {
                         ///NOTE: A JSON array is used to contain the information about the search.
-                        ///      JSON format: '["WORD",[[GRAMMAR_TYPE1,VALUE1],[...]],[INCLUDE1,...]]'
+                        ///      JSON format: '["WORD",[[GRAMMAR_TYPE1,VALUE1],...],[EXCLUDE1,...]]'
                         
                         /// Get the search term (e.g., in "go AS IMPERATIVE, -SINGULAR", grammar_search_term = "go").
                         grammar_search_term = search_terms.slice(0, split_pos);
@@ -2300,34 +2300,40 @@
                             grammar_search_term = "";
                         }
                         
+                        /// Prepare the first part of the JSON string.
+                        /// If grammar_search_term is "go", grammar_json will equal '["go",['.
                         ///NOTE: .replace(/(["'])/g, "\\$1") adds slashes to sanitize the data.  (It is essentially the same as addslashes() in PHP.)
                         ///TODO: Determine if the entire query should be passed through encodeURIComponent().  It would make the text much longer.
                         grammar_json = '["' + window.encodeURIComponent(grammar_search_term.replace(/(["'])/g, "\\$1")) + '",[';
                         
-                        /// Get the grammatical attributes (e.g., in "go AS IMPERATIVE, -SINGULAR", grammar_attributes = IMPERATIVE, -SINGULAR").
+                        /// Isolate the grammatical attributes (e.g., in "go AS IMPERATIVE, -SINGULAR", grammar_attributes = "IMPERATIVE, -SINGULAR").
                         grammar_attributes = search_terms.slice(split_pos + BF.lang.grammar_marker_len);
                         
                         split_start = 0;
                         
-                        ///TODO: Determine if there is a benefit to using do() over while().
                         ///NOTE: An infinite loop is used because the data is returned when it reaches the end of the string.
                         for (;;) {
-                            /// Find where the attributes separate (e.g., "NOUN, GENITIVE" would separate at character 4).
+                            /// Find where the attributes separate (e.g., "NOUN, GENITIVE" would separate at the comma, so split_pos would equal 4).
                             split_pos = grammar_attributes.indexOf(BF.lang.grammar_separator, split_start);
-                            /// Trim leading white space.
+                            /// Trim any leading white space.
+                            ///NOTE: Because the string was already prepared by BF.lang.prepare_search(), there should not be two spaces together.
                             if (grammar_attributes.slice(split_start, split_start + 1) === " ") {
                                 split_start += 1;
                             }
+                            
                             /// Is this grammatical feature to be excluded?
                             if (grammar_attributes.slice(split_start, split_start + 1) === "-") {
-                                /// Skip the hyphen so that we just get the grammatical word (e.g., "love AS -NOUN" we just want "NOUN").
+                                /// Skip the hyphen so that we just get the grammatical word (e.g., in "love AS -NOUN" we just want "NOUN").
                                 split_start += 1;
                                 exclude_json += "1,";
                             } else {
                                 exclude_json += "0,";
                             }
                             
+                            /// Are there more words to find? If so, concatenate the strings into grammar_attribute_json and loop again.
+                            ///TODO: Remove the duplicated code.
                             if (split_pos > -1) {
+                                /// Get the pre-constructed grammar keyword JSON string (e.g., if grammar_attributes equals "NOUN", grammar_attribute_json will become "[4,1],").
                                 ///TODO: Determine if there should be error handling when a grammar keyword does not exist.
                                 ///NOTE: The slice() function separates the various grammatical attributes and then that word is
                                 ///      looked up in the grammar_keywords object in order to find the JSON code to send to the server.
@@ -2336,10 +2342,10 @@
                                 split_start = split_pos + 1;
                             } else {
                                 ///TODO: Determine if trim() is necessary or if there is a better implementation.
-                                ///NOTE: exclude_json.slice(0, -1) is used to remove the trailing comma.  This could be unnecessary.
+                                ///NOTE: exclude_json.slice(0, -1) is used to remove the trailing comma.
                                 return [
                                     {
-                                        ///TODO: Document what is going on here.
+                                        /// Concatenate the last attribute found (like above) along with the exlude array.
                                         query: grammar_json + grammar_attribute_json + BF.lang.grammar_keywords[grammar_attributes.slice(split_start).trim()] + "],[" + exclude_json.slice(0, -1) + "]]",
                                         type:  grammatical_search
                                     }
