@@ -2378,12 +2378,12 @@
                 {
                     /// Step 1: Prepare string and check to see if we need to send a query (i.e., the query string is not empty).
                     
-                    ///NOTE: Whitespace must be trimmed after this function because it may create excess whitespace.
                     var options = {
                             automated: automated,
                             raw_query: raw_query
                         },
-                        query = BF.lang.prepare_search(raw_query).trim(),
+                        ///NOTE: Whitespace must be trimmed after this function because it may create excess whitespace.
+                        query = BF.lang.prepare_query(raw_query).trim(),
                         /// Search terms that are not grammatical.
                         standard_terms,
                         verse_id;

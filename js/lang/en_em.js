@@ -920,7 +920,7 @@ first_loop:     while (i < search_terms_arr_len) {
          * @note    This function assumes that whitespace will be trimmed afterward.
          * @todo    Determine if this should be moved out of the language specific file (and maybe just use some language specific variables).
          */
-        prepare_search: function (query)
+        prepare_query: function (query)
         {
             ///NOTE: /\s+/g gets rid of double spaces within the words (e.g., "here    there" becomes "here there")
             ///      and converts all types of white space to the normal space (e.g., converts non-breaking spaces to normal spaces).
