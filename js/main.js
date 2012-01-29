@@ -2255,6 +2255,9 @@
                     raw_query:  ""
                 };
             }());
+            /// ************************
+            /// * End of query_manager *
+            /// ************************
             
             /**
              * Create the run_new_query() function and closure.
@@ -2529,6 +2532,9 @@
                     }
                 };
             }());
+            /// ************************
+            /// * End of run_new_query *
+            /// ************************
             
             
             /**
@@ -2755,6 +2761,9 @@
                 });
             }, 1000);
         }());
+        /// ***********************************************
+        /// * End of main BibleForge initializing function *
+        /// ***********************************************
         
         
         /**************
@@ -2857,6 +2866,14 @@
         /// Besides setting the text, is there a reason to call this function?
         qEl.onblur();
     };
+    /// *******************************
+    /// * End of Bf.create_viewport() *
+    /// *******************************
+    
+    
+    /// **********************************
+    /// * Start of browser specific code *
+    /// **********************************
     
     if (BF.is_WebKit) {
         /// Add "webkit" to the <html> element's class to allow for WebKit specific CSS.
@@ -2867,10 +2884,6 @@
         /// Add "opera" to the <html> element's class to allow for Opera specific CSS.
         BF.toggleCSS(document.getElementsByTagName("html")[0], "opera", true);
     }
-    
-    /*****************************
-     * Start of IE Specific Code *
-     *****************************/
     
     /**
      * Fix IE's String.split().
@@ -2959,9 +2972,9 @@
         @end
     @*/
     
-    /***************************
-     * End of IE Specific Code *
-     ***************************/
+    /// ********************************
+    /// * End of browser specific code *
+    /// ********************************
     
     /// Initialize BibleForge.
     BF.create_viewport(document.getElementById("viewPort0"), document.documentElement);
