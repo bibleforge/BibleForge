@@ -354,7 +354,7 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
              * @note    Called by run_new_query().
              * @todo    Adapt for Early Modern English.
              */
-            return function (search_terms)
+            return function prepare_highlighter(search_terms)
             {
                 var count           = 0,
                     highlight_regex = [],

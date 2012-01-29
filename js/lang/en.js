@@ -351,7 +351,7 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
              * @return  An array of regular expressions.
              * @note    Called by run_new_query().
              */
-            return function (search_terms)
+            return function prepare_highlighter(search_terms)
             {
                 var count           = 0,
                     highlight_regex = [],

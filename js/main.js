@@ -1929,7 +1929,7 @@
                      * @param   options (object) The object containing the details of the query.
                      * @return  NULL
                      */
-                    return function (data, options)
+                    return function handle_new_verses(data, options)
                     {
                         var b_tag,
                             
@@ -2172,9 +2172,8 @@
                                     options.in_paragraphs = in_paragraphs;
                                     options.lang_id = BF.lang.lang_id;
                                     
-                                    ajax.query("post", "/query.php", create_query_message(options), function (data)
+                                    ajax.query("post", "/query.php", create_query_message(options), function success(data)
                                     {
-                                        /// On Success
                                         ///NOTE: direction and in_paragraphs need to be set again because they could have been changed by another query in the mean time.
                                         ///      options.verse and options.start_at could also be changed but they are not needed in handle_new_verses().
                                         ///      options.verse is used in handle_new_verses() for initial queries, but it will not be changed until after the initial query loads.
@@ -2226,9 +2225,8 @@
                                     options.lang_id = BF.lang.lang_id;
                                     
                                     /// Make the initial query with ajax_additional because all initial queries add more verses.
-                                    ajax_additional.query("post", "/query.php", create_query_message(options), function (data)
+                                    ajax_additional.query("post", "/query.php", create_query_message(options), function success(data)
                                     {
-                                        /// On Success
                                         handle_new_verses(BF.parse_json(data), options);
                                     });
                                     
