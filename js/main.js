@@ -2397,7 +2397,7 @@
                         verse_id;
                     
                     ///NOTE: Since the highlight string could be at the beginning or end, trim() is used to remove any extra space.
-                    query = raw_query.replace(/\s*{{(?!}})(.*?)}}\s*/, function ()
+                    query = raw_query.replace(/\s*\{\{(?!\}\})(.*?)\}\}\s*/, function ()
                     {
                         options.extra_highlighting = arguments[1];
                         ///TODO: Auto highlighting.
