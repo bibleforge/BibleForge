@@ -1580,7 +1580,7 @@
                         if (query_type === verse_lookup) {
                             new_title = ref_range + " - " + BF.lang.app_name;
                         } else {
-                            new_title = query_manager.raw_query + " (" + ref_range + ") - " + BF.lang.app_name;
+                            new_title = query_manager.base_query + " (" + ref_range + ") - " + BF.lang.app_name;
                         }
                         
                         /// Is the new verse range the same as the old one?
@@ -1955,12 +1955,12 @@
                         if (total) {
                             write_verses(type, direction, verse_ids, verse_html, paragraphs, in_paragraphs, options.verse_range);
                             
-                            if (type !== verse_lookup) {
+                            if (options.highlight) {
                                 window.setTimeout(function ()
                                 {
                                     ///NOTE: Only standard and mixed searches need verse_html data to be sent.
                                     ///NOTE: word_ids is only needed for grammatical and mixed searches.
-                                    options.highlight((type !== grammatical_search ? verse_html.join("") : false), word_ids);
+                                    options.highlight((options.extra_highlighting || type !== grammatical_search ? verse_html.join("") : false), word_ids);
                                 }, 0);
                             }
                             
@@ -2051,7 +2051,7 @@
                                 /// Create a <b> for the search terms.
                                 b_tag = document.createElement("b");
                                 ///NOTE: We use this method instead of straight innerHTML to prevent HTML injection inside the <b> tag.
-                                b_tag.appendChild(document.createTextNode(options.raw_query));
+                                b_tag.appendChild(document.createTextNode(options.base_query));
                                 leftInfo.appendChild(b_tag);
                             }
                         }
@@ -2167,7 +2167,7 @@
                                         }
                                     }
                                     
-                                    options.direction     = direction;
+                                    options.direction = direction;
                                     /// Since these settings can be changed by the user at run time, it must be retrieved before each query.
                                     options.in_paragraphs = in_paragraphs;
                                     options.lang_id = BF.lang.lang_id;
@@ -2230,12 +2230,15 @@
                                         handle_new_verses(BF.parse_json(data), options);
                                     });
                                     
-                                    /// Store the current query type so that outer functions can access this information.
+                                    /// Store information about the current query to make it accessible to outer functions.
+                                    ///NOTE: raw_query is exactly what the user typed in.
+                                    ///      base_query is the query without the extra highlighting info (which is stored in extra_highlighting).
+                                    ///      E.g., with the query "For AND  God {{world}}", raw_query is "For AND  God {{world}}" and base_query is "For AND  God".
                                     this.query_type = options.type;
-                                    /// Store the current query so that outer functions can access this information.
                                     this.raw_query  = options.raw_query;
-                                    
+                                    this.base_query = options.base_query;
                                     this.automated  = options.automated;
+                                    this.extra_highlighting = options.extra_highlighting;
                                     
                                     /// Create the additional and previous functions for the content_manager to call when needed.
                                     this.query_additional = next_query_maker(ajax_additional, additional, options);
@@ -2365,6 +2368,7 @@
                     ];
                 }
                 
+                
                 /**
                  * Process a raw query.
                  *
@@ -2383,11 +2387,25 @@
                             automated: automated,
                             raw_query: raw_query
                         },
-                        ///NOTE: Whitespace must be trimmed after this function because it may create excess whitespace.
-                        query = BF.lang.prepare_query(raw_query).trim(),
+                        query,
                         /// Search terms that are not grammatical.
-                        standard_terms,
+                        ///NOTE: This is set to an empty string so that it can be concadinated with extra highlighting terms on lookups.
+                        standard_terms = "",
                         verse_id;
+                    
+                    ///NOTE: Since the highlight string could be at the beginning or end, trim() is used to remove any extra space.
+                    query = raw_query.replace(/\s*{{(?!}})(.*?)}}\s*/, function ()
+                    {
+                        options.extra_highlighting = arguments[1];
+                        ///TODO: Auto highlighting.
+                        ///NOTE: If we use the g flag, there could be more than one.
+                        return " ";
+                    }).trim();
+                    
+                    options.base_query = query;
+                    
+                    ///NOTE: Whitespace must be trimmed after this function because it may create excess whitespace.
+                    query = BF.lang.prepare_query(query).trim();
                     
                     if (query === "") {
                         /// TODO: Determine what else should be done to notifiy the user that no query will be preformed.
@@ -2454,7 +2472,7 @@
                     }
                     
                     /// Was the query a search?  Searches need to have the highlight function prepared for the incoming results.
-                    if (options.type !== verse_lookup) {
+                    if (options.type !== verse_lookup || options.extra_highlighting) {
                         /**
                          * Create the highlight function and closure and prepare the regular expression used to do the highlighting.
                          *
@@ -2466,14 +2484,12 @@
                          */
                         options.highlight = (function ()
                         {
-                            var highlight_re,
-                                highlight_re_length;
+                            var highlight_re;
                             
                             /// TODO: Handle mixed searches.
-                            if (options.type === standard_search) {
+                            if (options.type === standard_search || options.extra_highlighting) {
                                 /// standard_terms is a string containing all of the terms in a standard search (i.e., excluding grammatical search terms when preforming a mixed search).
-                                highlight_re        = BF.lang.prepare_highlighter(standard_terms);
-                                highlight_re_length = highlight_re.length;
+                                highlight_re = BF.lang.prepare_highlighter((standard_terms + (options.extra_highlighting ? " " + options.extra_highlighting : "")).trim());
                             }
                             
                             /**
@@ -2492,11 +2508,11 @@
                                     re_id,
                                     tmp_found_ids = [];
                                 
-                                /// Are there standard verses to 
+                                /// Are there standard verses to highlight?
                                 /// TODO: Handle mixed searches too.
-                                if (options.type === standard_search) {
-                                    re_id = 0;
-                                    while (re_id < highlight_re_length) {
+                                if (html) {
+                                    re_id = highlight_re.length;
+                                    while (re_id >= 0) {
                                         tmp_found_ids = html.split(highlight_re[re_id]);
                                         
                                         ids = tmp_found_ids.length;
@@ -2506,10 +2522,13 @@
                                             ///TODO: Determine if we ever need to replace an existing f* className.
                                             document.getElementById(tmp_found_ids[i]).className += " f" + (re_id + 1);
                                         }
-                                        re_id += 1;
+                                        re_id -= 1;
                                     }
                                 ///NOTE: In order to support mixed searches, this will have to be a separate IF statement.
-                                } else {
+                                }
+                                
+                                /// Are there grammatical words to highlight?
+                                if (word_ids) {
                                     ids = word_ids.length;
                                     for (i = 0; i < ids; i += 1) {
                                         ///TODO: Determine if there is a downside to having a space at the start of the className.
@@ -2734,6 +2753,55 @@
                 }
             });
             
+            
+            /**
+             * Detect when a search verse reference was clicked and look up that verse.
+             *
+             * @param e (event object) The mouse event object.
+             */
+            page.addEventListener("click", function(e)
+            {
+                var bcv,
+                    ///NOTE: IE/Chromium/Safari/Opera use srcElement, Firefox uses originalTarget.
+                    clicked_el = e.srcElement || e.originalTarget,
+                    clicked_parent,
+                    highlighting,
+                    query;
+                
+                ///TODO: Determine a faster way of determining if a search verse reference was clicked.
+                ///      One option would be to try to attach an event to each element, but that might take up too many resources.
+                if (clicked_el.tagName === "SPAN") {
+                    clicked_parent = clicked_el.parentNode;
+                    if (clicked_parent && clicked_parent.className === "search_verse") {
+                        bcv = BF.get_b_c_v(window.parseInt(clicked_parent.id, 10));
+                        query = BF.lang.books_short[bcv.b] + " " + bcv.c + ":" + bcv.v;
+                        
+                        /// Prepare to highlight the search terms on the verse lookup.
+                        ///TODO: Figure out how to highlight grammatical (as well as mixed) searches.
+                        if (query_manager.query_type !== grammatical_search) {
+                            ///TODO: Instead of using base_query, it should figure out how to use the actual highlighted words.
+                            highlighting = (query_manager.base_query + (query_manager.extra_highlighting ? " " + query_manager.extra_highlighting : ""));
+                            if (highlighting) {
+                                query = query + " {{" + highlighting + "}}";
+                            }
+                        }
+                        
+                        /// If the Alt and/or Ctrl key is pressed, open in a new tab.
+                        ///TODO: Determine if middle click should open in a new tab too.
+                        if (BF.keys_pressed.alt || BF.keys_pressed.ctrl) {
+                            ///BUG: Chromium only opens a new tab when clicking on the magnifying glass (not when pressing enter).
+                            ///NOTE: In Chromium, holding Alt brings the new tab to the forefront but Ctrl opens it in the background.
+                            window.open("/" + BF.lang.identifier + "/" + window.encodeURIComponent(query) + "/", "_blank");
+                        } else {
+                            /// Look up the clicked verse.  
+                            ///TODO: Keep the highlighting.
+                            qEl.value = query;
+                            run_new_query(query);
+                        }
+                    }
+                }
+            }, false);
+            
             /// After a short delay, lazily load extra, nonessential (or at least not immediately essential) code, like the wrench menu.
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
@@ -2797,41 +2865,6 @@
             return false;
         };
         
-        /**
-         * Detect when a search verse reference was clicked and look up that verse.
-         *
-         * @param e (event object) The mouse event object.
-         */
-        page.addEventListener("click", function(e)
-        {
-            var bcv,
-                ///NOTE: IE/Chromium/Safari/Opera use srcElement, Firefox uses originalTarget.
-                clicked_el = e.srcElement || e.originalTarget,
-                clicked_parent,
-                query;
-            
-            ///TODO: Determine a faster way of determining if a search verse reference was clicked.
-            ///      One option would be to try to attach an event to each element, but that might take up too many resources.
-            if (clicked_el.tagName === "SPAN") {
-                clicked_parent = clicked_el.parentNode;
-                if (clicked_parent && clicked_parent.className === "search_verse") {
-                    bcv = BF.get_b_c_v(window.parseInt(clicked_parent.id, 10));
-                    query = BF.lang.books_short[bcv.b] + " " + bcv.c + ":" + bcv.v;
-                    /// If the Alt and/or Ctrl key is pressed, open in a new tab.
-                    ///TODO: Determine if middle click should open in a new tab too.
-                    if (BF.keys_pressed.alt || BF.keys_pressed.ctrl) {
-                        ///BUG: Chromium only opens a new tab when clicking on the magnifying glass (not when pressing enter).
-                        ///NOTE: In Chromium, holding Alt brings the new tab to the forefront but Ctrl opens it in the background.
-                        window.open("/" + BF.lang.identifier + "/" + window.encodeURIComponent(query) + "/", "_blank");
-                    } else {
-                        /// Look up the clicked verse.
-                        ///TODO: Keep the highlighting.
-                        qEl.value = query;
-                        run_new_query(query);
-                    }
-                }
-            }
-        }, false);
         
         /**
          * Set the query input box text with an explanation of what the user can enter in.
