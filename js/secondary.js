@@ -1374,18 +1374,20 @@
                 return function (e)
                 {
                     var langEl_pos = BF.get_position(langEl);
+                    
                     ///TODO: Make show_context_menu() take a position object, not two variables.
                     show_context_menu(langEl_pos.left, langEl_pos.top + langEl.offsetHeight, lang_menu,
-                    function ()
-                    {
-                        /// Because the menu is open, keep the button dark.
-                        BF.toggleCSS(langEl, "activeLang", 1);
-                    },
-                    function ()
-                    {
-                        /// When the menu closes, the button should be lighter.
-                        BF.toggleCSS(langEl, "activeLang", 0);
-                    });
+                        function open()
+                        {
+                            /// Because the menu is open, keep the button dark.
+                            BF.toggleCSS(langEl, "activeLang", 1);
+                        },
+                        function close()
+                        {
+                            /// When the menu closes, the button should be lighter.
+                            BF.toggleCSS(langEl, "activeLang", 0);
+                        }
+                    );
                     
                     /// Stop the even from bubbling so that document.onclick() does not fire and attempt to close the menu immediately.
                     e.stopPropagation();
