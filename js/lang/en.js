@@ -35,14 +35,15 @@
     alism, aliti, alize, alli, anci, app_name, ation, ational, ative, ator, 
     biliti, bli, blog, books_long_main, books_long_posttitle, 
     books_long_pretitle, books_short, chapter, chapter_count, configure, 
-    determine_reference, done, eli, en, enci, entli, found_plural, 
+    determine_reference, done, eli, en, enci, entli, exec, found_plural, 
     found_singular, ful, full_name, fulness, grammar_keywords, grammar_marker, 
     grammar_marker_len, grammar_separator, help, ical, icate, iciti, 
-    identifier, italics_explanation, iveness, iviti, ization, izer, lang_id, 
-    langs, linked_to_orig, loaded, logi, ness, ousli, ousness, paragraphs, 
-    prepare_highlighter, prepare_search, psalm, query_button_alt, 
-    query_button_title, query_explanation, red_letters, replace, self, 
-    short_name, split, subscription, tional, title, view, wrench_title
+    identifier, indexOf, italics_explanation, iveness, iviti, ization, izer, 
+    lang_id, langs, length, linked_to_orig, loaded, logi, ness, ousli, ousness, 
+    paragraphs, prepare_highlighter, prepare_query, prepare_search, psalm, 
+    query_button_alt, query_button_title, query_explanation, red_letters, 
+    replace, self, short_name, slice, split, subscription, test, tional, title, 
+    toLowerCase, view, wrench_title
 */
 
 /**
