@@ -373,7 +373,7 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                 search_terms_arr     = filter_terms_for_highlighter(search_terms);
                 search_terms_arr_len = search_terms_arr.length;
                 
-                ///TODO: Determine if a normal for loop would be better.
+                ///TODO: Determine if a normal FOR loop would be better.
 first_loop:     while (i < search_terms_arr_len) {
                     term       = search_terms_arr[i];
                     len_before = term.length;

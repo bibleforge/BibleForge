@@ -2237,11 +2237,13 @@
                                     /// Store information about the current query to make it accessible to outer functions.
                                     ///NOTE: raw_query is exactly what the user typed in.
                                     ///      base_query is the query without the extra highlighting info (which is stored in extra_highlighting).
-                                    ///      E.g., with the query "For AND  God {{world}}", raw_query is "For AND  God {{world}}" and base_query is "For AND  God".
-                                    this.query_type = options.type;
-                                    this.raw_query  = options.raw_query;
-                                    this.base_query = options.base_query;
-                                    this.automated  = options.automated;
+                                    ///      prepared_query is the query terms after being prepared by the language specific code to conform to Sphinx syntax.
+                                    ///      E.g., with the query "For AND  God {{world}}", raw_query is "For AND  God {{world}}", base_query is "For AND  God", and prepared_query is "For & God".
+                                    this.query_type         = options.type;
+                                    this.raw_query          = options.raw_query;
+                                    this.base_query         = options.base_query;
+                                    this.prepared_query     = options.prepared_query;
+                                    this.automated          = options.automated;
                                     this.extra_highlighting = options.extra_highlighting;
                                     
                                     /// Create the additional and previous functions for the content_manager to call when needed.
@@ -2415,6 +2417,8 @@
                         /// TODO: Determine what else should be done to notifiy the user that no query will be preformed.
                         return;
                     }
+                    
+                    options.prepared_query = query;
                     
                     /// Step 2: Determine the type of query.
                     
@@ -2783,8 +2787,8 @@
                         /// Prepare to highlight the search terms on the verse lookup.
                         ///TODO: Figure out how to highlight grammatical (as well as mixed) searches.
                         if (query_manager.query_type !== grammatical_search) {
-                            ///TODO: Instead of using base_query, it should figure out how to use the actual highlighted words.
-                            highlighting = (query_manager.base_query + (query_manager.extra_highlighting ? " " + query_manager.extra_highlighting : ""));
+                            ///TODO: Instead of using prepared_query, it might be good to just use a simple list terms.
+                            highlighting = (query_manager.prepared_query + (query_manager.extra_highlighting ? " " + query_manager.extra_highlighting : ""));
                             if (highlighting) {
                                 query = query + " {{" + highlighting + "}}";
                             }
