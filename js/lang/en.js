@@ -322,19 +322,23 @@ BF.langs.en = (function ()
                 ///NOTE: [~\/]\d* removes characters used for Sphinx query syntax.  I.e., proximity searches ("this that"~10) and quorum matching ("at least three of these"/3).
                 ///NOTE: -\B removes trailing hyphens.  (This might be unnecessary.)
                 initial_search_arr = search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?|[^\s]*)|[~\/]\d*|["',.:?!;&|\)\(\]\[\/\\`{}<$\^+]|-\B)/g, "").toLowerCase().split(" ");
+                
                 arr_len = initial_search_arr.length;
                 
                 /// Filter out duplicates (i.e., PHP's array_unique()).
 first_loop:     for (i = 0; i < arr_len; i += 1) {
-                    for (j = 0; j < new_arr_len; j += 1) {
-                        if (final_search_arr[j] === initial_search_arr[i]) {
-                            /// This words already exists; jump to the first loop and get the next word.
-                            ///NOTE: This would be the same as "continue 2" in PHP.
-                            continue first_loop;
+                    /// Skip empty strings.
+                    if (initial_search_arr[i] !== "") {
+                        for (j = 0; j < new_arr_len; j += 1) {
+                            if (final_search_arr[j] === initial_search_arr[i]) {
+                                /// This words already exists; jump to the first loop and get the next word.
+                                ///NOTE: This would be the same as "continue 2" in PHP.
+                                continue first_loop;
+                            }
                         }
+                        final_search_arr[new_arr_len] = initial_search_arr[i];
+                        new_arr_len += 1;
                     }
-                    final_search_arr[new_arr_len] = initial_search_arr[i];
-                    new_arr_len += 1;
                 }
                 
                 return final_search_arr;
