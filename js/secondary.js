@@ -33,12 +33,13 @@
     onfocus, onmousemove, onmouseout, opacity, open, options, originalTarget, 
     paddingLeft, page, pageXOffset, pageYOffset, paragraphs, parentNode, 
     parse_json, pinned, point_to_el_exists, prev_lang, preventDefault, 
-    pronunciation, properties, pushState, qEl, query, real_query, red_letters, 
-    relatedTarget, remove, removeChild, removeEventListener, replace_HTML, 
-    run_new_query, scrollBy, setTimeout, settings, short_def, short_name, src, 
-    srcElement, stopPropagation, style, system, tagName, target, text, title, 
-    toggleCSS, top, topBar, topBar_height, trigger, type, value, view, 
-    viewPort_num, visibility, wheelDelta, word, wrench_title
+    pronunciation, properties, pushState, qEl, query, query_explanation, 
+    real_query, red_letters, relatedTarget, remove, removeChild, 
+    removeEventListener, replace_HTML, run_new_query, scrollBy, setTimeout, 
+    settings, short_def, short_name, src, srcElement, stopPropagation, style, 
+    system, tagName, target, text, title, toggleCSS, top, topBar, 
+    topBar_height, trigger, trim, type, value, view, viewPort_num, visibility, 
+    wheelDelta, word, wrench_title
 */
 
 (function ()
