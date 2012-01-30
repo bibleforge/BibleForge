@@ -472,24 +472,24 @@
      * Gets the distance of an object from the top of the scroll.
      *
      * @example get_top_position(element);
-     * @param   obj (element) An element on the page.
+     * @param   el (element) An element on the page.
      * @return  Returns the distance of obj from the top of the scroll.
      * @note    Called by content_manager.scroll_to_verse() and wrench button onclick() in secondary.js.
      */
-    BF.get_position = function (obj)
+    BF.get_position = function (el)
     {
         var left_pos = 0,
             top_pos  = 0;
         
-        /// Does the object have an element above it (i.e., offsetParent)?
-        if (obj.offsetParent) {
+        /// Does the element have another element above it (i.e., offsetParent) (it should atleast have an HTMl element as a parent)?
+        if (el.offsetParent) {
             do {
-                left_pos += obj.offsetLeft;
-                top_pos  += obj.offsetTop;
+                left_pos += el.offsetLeft;
+                top_pos  += el.offsetTop;
                 
-                obj = obj.offsetParent;
-            ///NOTE: The variable obj is falsey (null) when no more parents exist.
-            } while (obj);
+                el = el.offsetParent;
+            ///NOTE: The variable el is falsey (null) when no more parents exist.
+            } while (el);
         }
         
         return {
