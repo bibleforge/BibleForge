@@ -1271,7 +1271,7 @@
                 if (BF.keys_pressed.alt || BF.keys_pressed.ctrl) {
                     /// If the user has typed something into the query box, use that; otherwise, use the last query.
                     ///NOTE: Because the placeholder is currently in the element's value, we must check for that.
-                    window.open("/" + identifier + "/" + window.encodeURIComponent(context.qEl.value !== BF.lang.query_explanation ? context.qEl.value.trim() || context.get_query_info().real_query : context.get_query_info().real_query) + "/", "_blank");
+                    window.open("/" + identifier + "/" + window.encodeURIComponent(context.qEl.value !== BF.lang.query_explanation && context.qEl.value.trim() ? context.qEl.value : context.get_query_info().real_query) + "/", "_blank");
                 } else {
                     /// Does the language exist and is the new language different from the current language?
                     if (BF.langs[identifier] && BF.lang.identifier !== identifier) {
@@ -1302,7 +1302,7 @@
                                     
                                     /// If the last query was automated (e.g., when the page first loads), we do not want to record the query in the URL.
                                     ///NOTE: Because the placeholder is currently in the element's value, we must check for that.
-                                    query_str = context.qEl.value !== BF.lang.query_explanation ? context.qEl.value.trim() || context.get_query_info().real_query : context.get_query_info().real_query;
+                                    query_str = context.qEl.value !== BF.lang.query_explanation && context.qEl.value.trim() ? context.qEl.value : context.get_query_info().real_query;
                                     
                                     ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
                                     BF.history.pushState("/" + BF.lang.identifier + "/" + window.encodeURIComponent(query_str) + "/");
