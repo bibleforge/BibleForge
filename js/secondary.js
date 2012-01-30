@@ -1268,7 +1268,9 @@
                     prev_lang;
                 
                 if (BF.keys_pressed.alt || BF.keys_pressed.ctrl) {
-                    window.open("/" + identifier + "/" + window.encodeURIComponent(context.get_query_info().real_query) + "/", "_blank");
+                    /// If the user has typed something into the query box, use that; otherwise, use the last query.
+                    ///NOTE: Because the placeholder is currently in the element's value, we must check for that.
+                    window.open("/" + identifier + "/" + window.encodeURIComponent(context.qEl.value !== BF.lang.query_explanation ? context.qEl.value.trim() || context.get_query_info().real_query : context.get_query_info().real_query) + "/", "_blank");
                 } else {
                     /// Does the language exist and is the new language different from the current language?
                     if (BF.langs[identifier] && BF.lang.identifier !== identifier) {
@@ -1298,12 +1300,14 @@
                                         query_str;
                                     
                                     /// If the last query was automated (e.g., when the page first loads), we do not want to record the query in the URL.
-                                    query_str = query_info.real_query;
+                                    ///NOTE: Because the placeholder is currently in the element's value, we must check for that.
+                                    query_str = context.qEl.value !== BF.lang.query_explanation ? context.qEl.value.trim() || context.get_query_info().real_query : context.get_query_info().real_query;
                                     
                                     ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
                                     BF.history.pushState("/" + BF.lang.identifier + "/" + window.encodeURIComponent(query_str) + "/");
                                     
-                                    if (query_info.automated) {
+                                    /// If the last query was automated (query_info.automated) and the user has not typed anything into the query box (query_str === query_info.real_query), use the default query (i.e., Genesis 1:1).
+                                    if (query_info.automated && query_str === query_info.real_query) {
                                         query_str = BF.lang.books_short[1] + " 1:1";
                                     }
                                     
