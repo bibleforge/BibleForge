@@ -1310,6 +1310,9 @@
                                     /// If the last query was automated (query_info.automated) and the user has not typed anything into the query box (query_str === query_info.real_query), use the default query (i.e., Genesis 1:1).
                                     if (query_info.automated && query_str === query_info.real_query) {
                                         query_str = BF.lang.books_short[1] + " 1:1";
+                                    } else {
+                                        /// If the user typed something into the query box, the query is not automated.
+                                        query_info.automated = false;
                                     }
                                     
                                     context.run_new_query(query_str, query_info.automated, true);
