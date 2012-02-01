@@ -1936,6 +1936,7 @@
                     return function handle_new_verses(data, options)
                     {
                         var b_tag,
+                            no_results,
                             
                             direction     = options.direction,
                             in_paragraphs = options.in_paragraphs,
@@ -2057,6 +2058,19 @@
                                 ///NOTE: We use this method instead of straight innerHTML to prevent HTML injection inside the <b> tag.
                                 b_tag.appendChild(document.createTextNode(options.base_query));
                                 leftInfo.appendChild(b_tag);
+                            }
+                            
+                            if (!total) {
+                                ///TODO: It should try to spell check (using the right language) and make suggestions (like did you mean "Godhead" if they enter "Trinity").
+                                no_results = document.createElement("div");
+                                no_results.className = "no_results";
+                                no_results.appendChild(document.createTextNode("Your search "));
+                                b_tag = document.createElement("b");
+                                b_tag.appendChild(document.createTextNode(options.base_query));
+                                no_results.appendChild(b_tag);
+                                no_results.appendChild(document.createTextNode(" did not return any results."));
+                                page.appendChild(no_results);
+                                ///TODO: Add suggestions.
                             }
                         }
                     };
@@ -2814,7 +2828,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?1574257", {
+                BF.include("/js/secondary.js?1724349", {
                     content_manager: content_manager,
                     get_query_info:  function ()
                     {

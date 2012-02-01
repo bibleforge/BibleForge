@@ -841,6 +841,11 @@ h2 {
 }
 
 
+.no_results {
+    margin-top: 10px;
+}
+
+
 .lang_en_em, .lang_en_em .verse_number, .lang_en_em .book, .lang_en_em .chapter, .lang_en_em .short_book, .lang_en_em .first_verse:first-letter, .lang_en_em .first_paragraph:first-letter, .lang_en_em .d {
     /* Enable advanced OpenType typographic features in Mozilla. */
     /* dlig = Discretionary Ligatures (combine certain characters, e.g., "ct") */
