@@ -92,6 +92,8 @@ BF.langs.en = (function ()
         help:              "Help",                                                /// Context menu item
         ///FIXME: Not all italic words are implied; some are questionable.
         italics_explanation: "This word is implied by context or required in order to translate properly; it was not translated directly from a word in the original languages.", /// When clicking on an italic word
+        no_results1:       "Your search\u200A\u2014\u200A",                       /// Displayed when preforming a search that returns no results (before the search terms).
+        no_results2:       "\u200A\u2014\u200Adid not return any results.",       /// Displayed when preforming a search that returns no results (after the search terms).
         paragraphs:        "Paragraphs",                                          /// In the View configuration panel
         psalm:             "Psalm",                                               /// The title of chapters in the book of Psalms
         query_explanation: 'Keyword or Reference: "God so loved" or Romans 3:23', /// In a blank query input box before a search has been preformed

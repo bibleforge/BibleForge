@@ -2064,11 +2064,11 @@
                                 ///TODO: It should try to spell check (using the right language) and make suggestions (like did you mean "Godhead" if they enter "Trinity").
                                 no_results = document.createElement("div");
                                 no_results.className = "no_results";
-                                no_results.appendChild(document.createTextNode("Your search "));
+                                no_results.appendChild(document.createTextNode(BF.lang.no_results1));
                                 b_tag = document.createElement("b");
                                 b_tag.appendChild(document.createTextNode(options.base_query));
                                 no_results.appendChild(b_tag);
-                                no_results.appendChild(document.createTextNode(" did not return any results."));
+                                no_results.appendChild(document.createTextNode(BF.lang.no_results2));
                                 page.appendChild(no_results);
                                 ///TODO: Add suggestions.
                             }
