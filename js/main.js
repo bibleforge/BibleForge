@@ -2408,16 +2408,23 @@
                             raw_query: raw_query
                         },
                         query,
-                        /// Search terms that are not grammatical.
-                        ///NOTE: This is set to an empty string so that it can be concadinated with extra highlighting terms on lookups.
-                        standard_terms = "",
+                        ///NOTE: This is set to an empty string so that it can be concatenated with extra highlighting terms on lookups.
+                        standard_terms = "", /// Search terms that are not grammatical.
                         verse_id;
+                    
+                    ///TODO: If the query is a verse lookup and the verse is visible, it should scroll to it.
+                    
+                    /// Prevent querying the exact same query twice.
+                    ///NOTE: Although this is probably the most desirable behavior, if the user scrolls down away from the original query, they will want to be brought back to it.
+                    if (raw_query === query_manager.raw_query) {
+                        return;
+                    }
                     
                     ///NOTE: Since the highlight string could be at the beginning or end, trim() is used to remove any extra space.
                     query = raw_query.replace(/\s*\{\{(?!\}\})(.*?)\}\}\s*/, function ()
                     {
                         options.extra_highlighting = arguments[1];
-                        ///TODO: Auto highlighting.
+                        ///TODO: Auto highlighting while typing.  This should be done somewhere else.
                         ///NOTE: If we use the g flag, there could be more than one.
                         return " ";
                     }).trim();
