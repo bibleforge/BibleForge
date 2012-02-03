@@ -690,6 +690,16 @@
             {
                 ///FIXME: Make it so that this text can be updated onLanguageChange.
                 var panel_element   = document.createElement("div"),
+                    settings_config;
+                
+                /**
+                 * Create an array to represent the settings.
+                 *
+                 * @todo The settings_config variable should be created automatically from the context.settings object.
+                 * @todo This function should probably be a part of create_element_from_config (and not be a separate function).
+                 */
+                function create_settings_panel()
+                {
                     settings_config = [
                         {
                             name:     BF.lang.view,
@@ -708,15 +718,23 @@
                             ]
                         }
                     ];
+                }
                 
+                
+                /**
+                 * Create a DOM element to display the configuration menu.
+                 *
+                 * @param config (object) An object representing a pane on the configuration menu.
+                 * @todo  This code needs to be rewritten for two reasons: 1) To make changes in the language more straightforward, and 2) it should (probably) create all of the panes and let the user switch between them instantly by clicking on tabs.
+                 */
                 function create_element_from_config(config)
                 {
-                    var container_el = document.createElement("fieldset"),
+                    var apply_change,
+                        container_el = document.createElement("fieldset"),
                         cur_option   = 0,
                         input_el,
                         label_el,
                         legend_el    = document.createElement("legend"),
-                        apply_change,
                         option_count = config.options.length,
                         table_el     = document.createElement("table"),
                         table_row,
@@ -842,6 +860,17 @@
                     
                     return container_el;
                 }
+                
+                /// Create the settings_config variable now.
+                create_settings_panel();
+                /**
+                 * Create the settings_config variable when the language changes and re-create the element.
+                 */
+                context.system.event.attach("languageChange", function ()
+                {
+                    create_settings_panel()
+                    panel_element = create_element_from_config(settings_config[0]);
+                });
                 
                 ///TODO: Determine which settings pane to create first (based on the last one the user used). (But currently, there is only one pane.)
                 panel_element = create_element_from_config(settings_config[0]);
