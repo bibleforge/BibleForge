@@ -868,7 +868,7 @@
                  */
                 context.system.event.attach("languageChange", function ()
                 {
-                    create_settings_panel()
+                    create_settings_panel();
                     panel_element = create_element_from_config(settings_config[0]);
                 });
                 
