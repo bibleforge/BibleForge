@@ -1514,7 +1514,7 @@
                  * Create a function to run when a user clicks on an item on the language selection menu.
                  *
                  * @param  identifier (string) The ID of the language to change to.
-                 * @return function A function that calls the language changing function.
+                 * @return A function that calls the language changing function.
                  * @note   This function is outside of the loop below because creating a function in a loop is error prone.
                  */
                 function create_lang_selection(identifier)
@@ -1542,7 +1542,7 @@
                  *
                  * @param  e (object) (optional) The event object optionally sent by the browser.
                  * @note   Called when the user clicks on the language button.
-                 * @return FALSE to prevent the default action.
+                 * @return FALSE.  It must return FALSE to prevent the click event from being picked up by the label.
                  */
                 return function onclick(e)
                 {
