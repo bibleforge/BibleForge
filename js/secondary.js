@@ -960,24 +960,38 @@
                 var pointer_length   = 12, /// Essentially from the tip of the pointer to the callout
                     pointer_distance = 28; /// The optimal distance from the left of the callout to the middle of the pointer.
                 
-                function align_callout(callout, pointer, point_to, pos, users_preference)
+                function align_callout(callout, pointer, point_to, pos, split_info, users_preference)
                 {
                     ///TODO: Store the callout offset info in the object.
                     var callout_offsetHeight = callout.offsetHeight,
                         callout_offsetWidth  = callout.offsetWidth,
                         distance_from_right,
+                        i,
                         middle_x,
                         point_to_offsetTop,
                         /// Get the rectangles that represent the object.
                         ///NOTE: If a word is wrapped (specifically a hyphenated word), there will be multiple rectangles.
-                        point_to_rects       = point_to.getClientRects();
+                        point_to_rects = point_to.getClientRects(),
+                        which_rect = 0;
                     
+                    /// Does the word wrap?
                     if (point_to_rects.length > 1) {
-                        ///TODO: Figure out which rectangle was clicked on.
+                        if (split_info.which_rect) {
+                            which_rect = split_info.which_rect;
+                        } else {
+                            for (i = point_to_rects.length - 1; i >= 0; i -= 1) {
+                                if (split_info.mouse_x >= point_to_rects[i].left && split_info.mouse_x <= point_to_rects[i].right && split_info.mouse_y >= point_to_rects[i].top && split_info.mouse_y <= point_to_rects[i].bottom) {
+                                    which_rect = i;
+                                    split_info.which_rect = i;
+                                    break;   
+                                }
+                            }
+                            /// If, for some reason, it cannot find the part of the word that it should point to, it will default to the first rectangle because which_rect defaults to 0.
+                        }
                     }
                     
-                    middle_x             = point_to_rects[0].left + window.pageXOffset + (point_to_rects[0].width / 2);
-                    point_to_offsetTop   = point_to_rects[0].top + window.pageYOffset;
+                    middle_x           = point_to_rects[which_rect].left + window.pageXOffset + (point_to_rects[which_rect].width / 2);
+                    point_to_offsetTop = point_to_rects[which_rect].top  + window.pageYOffset;
                     
                     ///NOTE: Currently, the user cannot drag the callouts, so there are no user preferences when it comes to indidual callouts.
                     if (!users_preference) {
@@ -987,7 +1001,7 @@
                             pointer.className = "pointer-down";
                         /// Else, put the callout below the word.
                         } else {
-                            pos.top = point_to_offsetTop + point_to_rects[0].height + pointer_length;
+                            pos.top = point_to_offsetTop + point_to_rects[which_rect].height + pointer_length;
                             pointer.className = "pointer-up";
                         }
                         callout.style.top = pos.top + "px";
@@ -1006,7 +1020,7 @@
                     }
                 }
                 
-                return function create_callout(point_to, ajax) {
+                return function create_callout(point_to, ajax, split_info) {
                     var callout = document.createElement("div"),
                         inside  = document.createElement("div"),
                         pointer = document.createElement("div"),
@@ -1064,7 +1078,7 @@
                         /// Methods
                         align_callout: function ()
                         {
-                            align_callout(callout, pointer, point_to, pos);
+                            align_callout(callout, pointer, point_to, pos, split_info);
                         },
                         destroy: function ()
                         {
@@ -1152,7 +1166,7 @@
                             callout.replace_HTML(html);
                         });
                         
-                        callout = create_callout(clicked_el, ajax);
+                        callout = create_callout(clicked_el, ajax, {mouse_x: e.clientX, mouse_y: e.clientY});
                         callouts[callouts.length] = callout;
                     }
                 }, false);
