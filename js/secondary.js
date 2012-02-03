@@ -1341,7 +1341,9 @@
                 var activate_new_lang,
                     prev_lang;
                 
-                if (BF.keys_pressed.alt || BF.keys_pressed.ctrl) {
+                /// If the user is holding down Alt or Ctrl, open a new tab.
+                /// But make sure to prevent loading in a new tab as well.
+                if (!prevent_reload && (BF.keys_pressed.alt || BF.keys_pressed.ctrl)) {
                     /// If the user has typed something into the query box, use that; otherwise, use the last query.
                     ///NOTE: Because the placeholder is currently in the element's value, we must check for that.
                     window.open("/" + identifier + "/" + window.encodeURIComponent(context.qEl.value !== BF.lang.query_explanation && context.qEl.value.trim() ? context.qEl.value : context.get_query_info().real_query) + "/", "_blank");
