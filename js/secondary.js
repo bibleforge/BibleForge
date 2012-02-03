@@ -927,6 +927,11 @@
          */
         (function ()
         {
+            /**
+             * Control the amount of scrolling when the mouse wheel turns.
+             *
+             * @param e (event object) The wheel event object.
+             */
             var mousewheel_scroller = function (e)
             {
                 /// Mozilla's DOMMouseScroll event supports event.details.
@@ -948,13 +953,16 @@
         }());
         
         /**
-         * Look up lexical data.
+         * Create the lexical data lookup functions.
          */
         (function ()
         {
             var create_callout,
                 callout_clicked = false;
             
+            /**
+             * The closure for creating callouts.
+             */
             create_callout = (function ()
             {
                 var pointer_length   = 12, /// Essentially from the tip of the pointer to the callout
