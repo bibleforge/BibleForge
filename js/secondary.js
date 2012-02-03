@@ -967,29 +967,36 @@
                         callout_offsetWidth  = callout.offsetWidth,
                         distance_from_right,
                         i,
-                        middle_x,
+                        middle_x, /// The middle (horizontally) of the word being pointed to.
                         point_to_offsetTop,
                         /// Get the rectangles that represent the object.
                         ///NOTE: If a word is wrapped (specifically a hyphenated word), there will be multiple rectangles.
                         point_to_rects = point_to.getClientRects(),
                         which_rect = 0;
                     
-                    /// Does the word wrap?
+                    /// Does the word wrap? (See Judges 1:11 "Kirjath-sepher").
                     if (point_to_rects.length > 1) {
+                        /// Did it already figure out which part of the word was clicked on?
                         if (split_info.which_rect) {
                             which_rect = split_info.which_rect;
                         } else {
+                            /// Loop through each rectangle, and try to find which part the use clicked on.
                             for (i = point_to_rects.length - 1; i >= 0; i -= 1) {
+                                /// Did the user click on this rectangle?
                                 if (split_info.mouse_x >= point_to_rects[i].left && split_info.mouse_x <= point_to_rects[i].right && split_info.mouse_y >= point_to_rects[i].top && split_info.mouse_y <= point_to_rects[i].bottom) {
                                     which_rect = i;
                                     split_info.which_rect = i;
                                     break;   
                                 }
                             }
-                            /// If, for some reason, it cannot find the part of the word that it should point to, it will default to the first rectangle because which_rect defaults to 0.
+                            /// If the user clicked on the word before it wrapped and then the view was resized so that it now wraps, it will not find a matching rectangle.
+                            /// If it cannot find the part of the word that it should point to, it will default to the first rectangle because which_rect defaults to 0.
+                            /// Store which_rect so that it does not try to find it again in vain.
+                            split_info.which_rect = which_rect;
                         }
                     }
                     
+                    ///NOTE: Since getClientRects() does not take into account the page offset, we need to add it in.
                     middle_x           = point_to_rects[which_rect].left + window.pageXOffset + (point_to_rects[which_rect].width / 2);
                     point_to_offsetTop = point_to_rects[which_rect].top  + window.pageYOffset;
                     
