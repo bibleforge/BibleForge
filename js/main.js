@@ -2777,6 +2777,7 @@
                 queryButton.title = BF.lang.query_button_title;
                 queryButton.alt   = BF.lang.query_button_alt;
                 
+                /// If the query text is the same as the previous query explaination, change it to the current language's.
                 if (qEl.value.trim() === BF.langs[e.prev_lang].query_explanation) {
                     qEl.value = BF.lang.query_explanation;
                 }
@@ -2835,7 +2836,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?1905124", {
+                BF.include("/js/secondary.js?1907598", {
                     content_manager: content_manager,
                     get_query_info:  function ()
                     {

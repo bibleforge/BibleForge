@@ -976,7 +976,7 @@
                  * @param point_to   (element) The element the callout should point to.
                  * @param pos        (object)  An object containing position of the callout so that this information can be retreaved quickly without accessing the DOM.
                  *                             Object structure: {left: number, top: number}
-                 * @param split_info (object)  An object containing information about where the user originally clicked and possibily which part of the word the user clicked.
+                 * @param split_info (object)  An object containing information about where the user originally clicked and possibly which part of the word the user clicked.
                  *                             Object structure: {mouse_x: number, mouse_y: number, which_rect: number}
                  * @param preference (object)  An object containing information about where the user would prefer the callout to be (e.g., above or below the word).  Not currently used.
                  */
@@ -1050,10 +1050,11 @@
                 /**
                  * Create the callout element and attach it to a word.
                  *
-                 * @param point_to   (element) The element the callout should point to.
-                 * @param ajax       (object)  The ajax object created by BF.Create_easy_ajax().
-                 * @param split_info (object)  An object containing information about where the user originally clicked and possibily which part of the word the user clicked.
-                 *                             Object structure: {mouse_x: number, mouse_y: number, which_rect: number}
+                 * @param  point_to   (element) The element the callout should point to.
+                 * @param  ajax       (object)  The ajax object created by BF.Create_easy_ajax().
+                 * @param  split_info (object)  An object containing information about where the user originally clicked and possibly which part of the word the user clicked.
+                 *                              Object structure: {mouse_x: number, mouse_y: number, which_rect: number}
+                 * @return A object that manages the callout.
                  */
                 return function create_callout(point_to, ajax, split_info) {
                     var callout = document.createElement("div"),
@@ -1117,7 +1118,7 @@
                     callout_obj = {
                         /// Methods
                         /**
-                         * Using outer variables, call the aligining function.
+                         * Using outer variables, call the aligning function.
                          */
                         align_callout: function ()
                         {
@@ -1246,7 +1247,8 @@
                  *
                  * Remove callouts if Ctrl is not held and not clicking on a callout.
                  *
-                 * @param e (event object) The mouse event object.
+                 * @param  e (event object) The mouse event object.
+                 * @return NULL
                  */
                 document.addEventListener("click", function (e)
                 {
@@ -1347,17 +1349,32 @@
             }());
         }());
         
-        /// Display the language selector button.
+        /**
+         * Display and manage the language selector button.
+         */
         (function ()
         {
             var langEl = context.langEl;
             
+            /**
+             * Change the text in the button and adjust the padding.
+             *
+             * @param identifier (string) The text to put into the button.
+             */
             function change_langEl_text(identifier)
             {
                 langEl.value = identifier;
                 context.qEl.style.paddingLeft = (langEl.offsetWidth + 3) + "px";
             }
             
+            /**
+             * Handle changes to the language.
+             *
+             * @param identifier     (string)   The ID of the language to change to.
+             * @param prevent_reload (boolean)  Whether or not to load the last query after changing the language.
+             * @param callback       (function) The function to run after the language loading has completed.
+             * @note  This function attaches to the global BF object because it can be executed in different places.
+             */
             BF.change_language = function (identifier, prevent_reload, callback)
             {
                 var activate_new_lang,
@@ -1374,6 +1391,11 @@
                     if (BF.langs[identifier] && BF.lang.identifier !== identifier) {
                         prev_lang = BF.lang.identifier;
                         
+                        /**
+                         * Make the new language the active language.
+                         *
+                         * @note It is a separate function because it is called in two different places below.
+                         */
                         activate_new_lang = function ()
                         {
                             BF.lang = BF.langs[identifier];
@@ -1391,7 +1413,11 @@
                             
                             /// prevent_reload is used when the page first loads since a query will be sent shortly after changing the language.
                             if (!prevent_reload) {
-                                /// Reload the text in the new language.
+                                /**
+                                 * Reload the text in the new language.
+                                 *
+                                 * @note The is called via setTimeout to let the effects of switching the language to take place and to isolate some of the variables used for convenience.
+                                 */ 
                                 window.setTimeout(function ()
                                 {
                                     var query_info = context.get_query_info(),
@@ -1425,6 +1451,7 @@
                         if (BF.langs[identifier].loaded) {
                             activate_new_lang();
                         } else {
+                            /// If the language code has not been downloaded yet, download it now and activate the language after the code has loaded.
                             ///NOTE: The last modified time is added (if available) to prevent browsers from caching an outdated file.
                             BF.include("/js/lang/" + identifier + ".js?" + (BF.langs[identifier].modified || ""), {}, activate_new_lang);
                         }
@@ -1437,18 +1464,30 @@
             };
             
             
+            /// Make the necessary changes to load the default language when the page first loads.
             change_langEl_text(BF.lang.short_name);
             BF.toggleCSS(page, "lang_" + BF.lang.identifier, 1);
             
             /// The language button is hidden until the current language name is displayed.
             langEl.style.visibility = "visible";
             
-            
+            /**
+             * Create the language selection menu.
+             *
+             * @return A function that displays the language selection menu.
+             */
             langEl.onclick = (function ()
             {
                 var lang,
                     lang_menu = [];
                 
+                /**
+                 * Create a function to run when a user clicks on an item on the language selection menu.
+                 *
+                 * @param  identifier (string) The ID of the language to change to.
+                 * @return function A function that calls the language changing function.
+                 * @note   This function is outside of the loop below because creating a function in a loop is error prone.
+                 */
                 function create_lang_selection(identifier)
                 {
                     return function ()
@@ -1474,9 +1513,9 @@
                  *
                  * @param  e (object) (optional) The event object optionally sent by the browser.
                  * @note   Called when the user clicks on the language button.
-                 * @return NULL
+                 * @return FALSE to prevent the default action.
                  */
-                return function (e)
+                return function onclick(e)
                 {
                     var langEl_pos = BF.get_position(langEl);
                     
@@ -1496,7 +1535,7 @@
                     
                     /// Stop the even from bubbling so that document.onclick() does not fire and attempt to close the menu immediately.
                     e.stopPropagation();
-                    /// Prevent the default action.
+                    /// Prevent the default action which highlights the query box and closes the menu.
                     return false;
                 };
             }());
