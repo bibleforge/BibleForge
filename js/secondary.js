@@ -965,10 +965,21 @@
                     ///TODO: Store the callout offset info in the object.
                     var callout_offsetHeight = callout.offsetHeight,
                         callout_offsetWidth  = callout.offsetWidth,
-                        middle_x             = point_to.offsetLeft + (point_to.offsetWidth / 2),
-                        point_to_offsetTop   = point_to.offsetTop,
-                        distance_from_right;
+                        distance_from_right,
+                        middle_x,
+                        point_to_offsetTop,
+                        /// Get the rectangles that represent the object.
+                        ///NOTE: If a word is wrapped (specifically a hyphenated word), there will be multiple rectangles.
+                        point_to_rects       = point_to.getClientRects();
                     
+                    if (point_to_rects.length > 1) {
+                        ///TODO: Figure out which rectangle was clicked on.
+                    }
+                    
+                    middle_x             = point_to_rects[0].left + window.pageXOffset + (point_to_rects[0].width / 2);
+                    point_to_offsetTop   = point_to_rects[0].top + window.pageYOffset;
+                    
+                    ///NOTE: Currently, the user cannot drag the callouts, so there are no user preferences when it comes to indidual callouts.
                     if (!users_preference) {
                         /// Try to put the callout above the word.
                         if (callout_offsetHeight + pointer_length < point_to_offsetTop - context.system.properties.topBar_height - window.pageYOffset) {
@@ -976,7 +987,7 @@
                             pointer.className = "pointer-down";
                         /// Else, put the callout below the word.
                         } else {
-                            pos.top = point_to_offsetTop + point_to.offsetHeight + pointer_length;
+                            pos.top = point_to_offsetTop + point_to_rects[0].height + pointer_length;
                             pointer.className = "pointer-up";
                         }
                         callout.style.top = pos.top + "px";
@@ -995,7 +1006,7 @@
                     }
                 }
                 
-                return function (point_to, ajax) {
+                return function create_callout(point_to, ajax) {
                     var callout = document.createElement("div"),
                         inside  = document.createElement("div"),
                         pointer = document.createElement("div"),
