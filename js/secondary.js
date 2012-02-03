@@ -972,7 +972,7 @@
                  * Align the callout with the word it is pointing to.
                  *
                  * @param callout    (element) The DOM element representing the callout.
-                 * @param pointer    (element) The triangluar pointer element.
+                 * @param pointer    (element) The triangular pointer element.
                  * @param point_to   (element) The element the callout should point to.
                  * @param pos        (object)  An object containing position of the callout so that this information can be retreaved quickly without accessing the DOM.
                  *                             Object structure: {left: number, top: number}
@@ -1116,27 +1116,49 @@
                     
                     callout_obj = {
                         /// Methods
+                        /**
+                         * Using outer variables, call the aligining function.
+                         */
                         align_callout: function ()
                         {
                             align_callout(callout, pointer, point_to, pos, split_info);
                         },
+                        /**
+                         * Delete the callout and stop the query, if it has not already.
+                         */
                         destroy: function ()
                         {
                             document.body.removeChild(callout);
                             /// In case the data is still loading, try to abort the request.
                             ajax.abort();
                         },
-                        move: function (x)
+                        /**
+                         * Move the callout up or down.
+                         *
+                         * @param y (number) The amount to move vertically.
+                         */
+                        move: function (y)
                         {
-                            pos.top += x;
+                            pos.top += y;
                             callout.style.top = pos.top + "px";
                         },
+                        /**
+                         * Determine if the element that the callout is pointing to still exists.
+                         *
+                         * @return boolean
+                         * @note   The element the callout is pointing to could be removed when verses are cached.
+                         */
                         point_to_el_exists: function ()
                         {
                             ///NOTE: Right now, all words have unique id. If this is not true in the future,
                             ///      we could loop through .parentNode until reaching document or NULL.
                             return Boolean(document.getElementById(point_to.id));
                         },
+                        /**
+                         * Write HTML to the callout and prevent the loading notifier from loading, if it has not already appeared.
+                         *
+                         * @param html (string) The HTML display in the callout.
+                         */
                         replace_HTML: function (html)
                         {
                             /// Prevent the loading graphic from loading if it has not loaded yet.
