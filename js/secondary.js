@@ -968,12 +968,24 @@
                 var pointer_length   = 12, /// Essentially from the tip of the pointer to the callout
                     pointer_distance = 28; /// The optimal distance from the left of the callout to the middle of the pointer.
                 
-                function align_callout(callout, pointer, point_to, pos, split_info, users_preference)
+                /**
+                 * Align the callout with the word it is pointing to.
+                 *
+                 * @param callout    (element) The DOM element representing the callout.
+                 * @param pointer    (element) The triangluar pointer element.
+                 * @param point_to   (element) The element the callout should point to.
+                 * @param pos        (object)  An object containing position of the callout so that this information can be retreaved quickly without accessing the DOM.
+                 *                             Object structure: {left: number, top: number}
+                 * @param split_info (object)  An object containing information about where the user originally clicked and possibily which part of the word the user clicked.
+                 *                             Object structure: {mouse_x: number, mouse_y: number, which_rect: number}
+                 * @param preference (object)  An object containing information about where the user would prefer the callout to be (e.g., above or below the word).  Not currently used.
+                 */
+                function align_callout(callout, pointer, point_to, pos, split_info, preference)
                 {
                     ///TODO: Store the callout offset info in the object.
                     var callout_offsetHeight = callout.offsetHeight,
                         callout_offsetWidth  = callout.offsetWidth,
-                        distance_from_right,
+                        distance_from_right, /// The distance (in pixels) from the right edge of the viewport to middle_x
                         i,
                         middle_x, /// The middle (horizontally) of the word being pointed to.
                         point_to_offsetTop,
@@ -1009,7 +1021,7 @@
                     point_to_offsetTop = point_to_rects[which_rect].top  + window.pageYOffset;
                     
                     ///NOTE: Currently, the user cannot drag the callouts, so there are no user preferences when it comes to indidual callouts.
-                    if (!users_preference) {
+                    if (!preference) {
                         /// Try to put the callout above the word.
                         if (callout_offsetHeight + pointer_length < point_to_offsetTop - context.system.properties.topBar_height - window.pageYOffset) {
                             pos.top = point_to_offsetTop - callout_offsetHeight - pointer_length;
@@ -1035,6 +1047,14 @@
                     }
                 }
                 
+                /**
+                 * Create the callout element and attach it to a word.
+                 *
+                 * @param point_to   (element) The element the callout should point to.
+                 * @param ajax       (object)  The ajax object created by BF.Create_easy_ajax().
+                 * @param split_info (object)  An object containing information about where the user originally clicked and possibily which part of the word the user clicked.
+                 *                             Object structure: {mouse_x: number, mouse_y: number, which_rect: number}
+                 */
                 return function create_callout(point_to, ajax, split_info) {
                     var callout = document.createElement("div"),
                         inside  = document.createElement("div"),
@@ -1062,10 +1082,15 @@
                     callout.appendChild(inside);
                     callout.appendChild(pointer);
                     
-                    /// Delay the creation of the loading graphic because the data could load quickly enough as to make it unnecessary.
+                    /**
+                     * Add a loading indicator if the content does not load very quickly.
+                     *
+                     * @note Delay the creation of the loading graphic because the data could load quickly enough as to make it unnecessary.
+                     */
                     loading_timer = window.setTimeout(function ()
                     {
                         var loader = document.createElement("div");
+                        
                         loader.style.opacity = "0";
                         loader.className = "loaders fade";
                         /// By default, loaders are invisible.
@@ -1135,6 +1160,9 @@
                 };
             }());
             
+            /**
+             * Create the callouts array and attach the event functions.
+             */
             (function ()
             {
                 var callouts = [];
@@ -1144,6 +1172,11 @@
                     BF.toggleCSS(page, "linked", 1);
                 }
                 
+                /**
+                 * Create a callout if a word with lexical information was clicked on.
+                 *
+                 * @param e (event object) The mouse event object.
+                 */
                 page.addEventListener("click", function(e)
                 {
                     var ajax = new BF.Create_easy_ajax(),
