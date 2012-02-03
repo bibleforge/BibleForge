@@ -2259,6 +2259,7 @@
                                     this.prepared_query     = options.prepared_query;
                                     this.automated          = options.automated;
                                     this.extra_highlighting = options.extra_highlighting;
+                                    this.lang_ID            = BF.lang.identifier;
                                     
                                     /// Create the additional and previous functions for the content_manager to call when needed.
                                     this.query_additional = next_query_maker(ajax_additional, additional, options);
@@ -2416,7 +2417,8 @@
                     
                     /// Prevent querying the exact same query twice.
                     ///NOTE: Although this is probably the most desirable behavior, if the user scrolls down away from the original query, they will want to be brought back to it.
-                    if (raw_query === query_manager.raw_query) {
+                    ///TODO: Determine if there are any cases where we definitely want to allow the exact same query to go through.
+                    if (raw_query === query_manager.raw_query && query_manager.lang_ID === BF.lang.identifier) {
                         return;
                     }
                     
@@ -2836,7 +2838,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?1910591", {
+                BF.include("/js/secondary.js?1917228", {
                     content_manager: content_manager,
                     get_query_info:  function ()
                     {
