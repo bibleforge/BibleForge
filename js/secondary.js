@@ -187,14 +187,14 @@
                         cur_item = i;
                     }
                     
-                    /// If the link is a string, then it is simply a URL; otherwise, it is a function.
-                    if (typeof menu_items[i].link === "string") {
+                    /// If the link is a function, then execute that function when clicked; otherwise, it should be a string, which is simply a URL.
+                    if (typeof menu_items[i].link === "function") {
+                        ///NOTE: Possibly could add something to the href to make the link open in a new window.
+                        menu_item.onclick = make_onclick(menu_items[i].link);
+                    } else {
                         menu_item.href   = menu_items[i].link;
                         /// Force links to open in a new tab.
                         menu_item.target = "_blank";
-                    } else {
-                        ///NOTE: Possibly could add something to the href to make the link open in a new window.
-                        menu_item.onclick = make_onclick(menu_items[i].link);
                     }
                     /// Should there be a line break before this item?
                     if (menu_items[i].line) {
@@ -1583,6 +1583,14 @@
                     return false;
                 };
             }());
+            
+            window.setTimeout(function ()
+            {
+                var tmp_el = document.createElement("div");
+                
+                tmp_el.className = "lex-orig_word";
+                tmp_el.innerHTML = "α";
+            }, 250);
             
             if (BF.is_WebKit) {
                 ///HACK: A tremendously ugly hack to make WebKit not center align langEl.
