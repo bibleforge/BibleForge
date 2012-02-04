@@ -570,6 +570,7 @@
      * @param   className (string)             The class to add/remove.
      * @param   force     (integer) (optional) Whether or not to force the toggle on (1) or off (0).
      * @return  NULL
+     * @todo    Consider using HTML5's classList DOMTokenList, which is in all of the major browsers except IE.
      */
     BF.toggleCSS = function (el, className, force)
     {
