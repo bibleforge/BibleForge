@@ -122,7 +122,7 @@
              * @param   y_pos          (number)              The Y position of the menu.
              * @param   menu_items     (array)               An array containing object(s) specifying the text of the menu items, the corresponding links, whether or not to add a line break, and an optional ID.
              *                                               Array format: [{text: (string), link: (string or function), line: (truthy or falsey (optional)), id: (variable (optional))}, ...]
-             * @param   selected       (variable)            The ID of the menu item that should be selected by default.
+             * @param   selected       (variable)            The ID of the menu item that should be selected by default.  Sending FALSE will ignore all IDs.
              * @param   open_callback  (function) (optional) The function to run when the menu opens.
              * @param   close_callback (function) (optional) The function to send to close_menu() as a callback when the menu closes.
              * @note    Called by show_context_menu() and close_menu() (as the callback function).
@@ -180,7 +180,8 @@
                 for (i = 0; i < menu_count; i += 1) {
                     menu_item = document.createElement("a");
                     
-                    if (menu_items[i].id === selected) {
+                    /// Select the default menu item, if any.
+                    if (selected !== false && menu_items[i].id === selected) {
                         BF.toggleCSS(menu_item, "menu_item_selected", 1);
                         cur_item = i;
                     }
@@ -308,7 +309,7 @@
              * @param   y_pos          (number)              The Y position of the menu.
              * @param   menu_items     (array)               An array containing object(s) specifying the text of the menu items, the corresponding links, whether or not to add a line break, and an optional ID.
              *                                               Array format: [{text: (string), link: (string or function), line: (truthy or falsey (optional)), id: (variable (optional))}, ...]
-             * @param   selected       (variable)            The ID of the menu item that should be selected by default.
+             * @param   selected       (variable)            The ID of the menu item that should be selected by default.  Sending FALSE will ignore all IDs.
              * @param   open_callback  (function) (optional) The function to send to open_menu() as a callback when the menu opens.
              * @param   close_callback (function) (optional) The function to send to close_menu() as a callback when the menu closes.
              * @note    This is the function stored in the show_context_menu variable.
@@ -942,8 +943,8 @@
                             link: show_help_panel
                         }
                     ],
-                    /// Since no item needs to be selected by default, just sent an empty string.
-                    "",
+                    /// Make sure no items are selected by default.
+                    false,
                     function open()
                     {
                         /// Because the context menu is open, keep the icon dark.
