@@ -2402,7 +2402,12 @@
                  */
                 return function run_new_query(raw_query, automated, ignore_state)
                 {
-                    /// Step 1: Prepare string and check to see if we need to send a query (i.e., the query string is not empty).
+                    /// **********
+                    /// * Step 1 *
+                    /// **********
+                    ///
+                    /// Prepare query string, and check to see if we need to send a query.
+                    ///
                     
                     var options = {
                             automated: automated,
@@ -2422,28 +2427,57 @@
                         return;
                     }
                     
+                    /// ***********
+                    /// * Step 1a *
+                    /// ***********
+                    ///
+                    /// First, find and remove text to be highlighted.
+                    ///
+                    
+                    ///TODO: Auto highlighting while typing.  This should be done somewhere else.
+                    
+                    /// Text inside two curly brackets is to be highlighted, not searched for or looked up.
+                    /// E.g., with the string "For God {{so loved}}", it will store "so loved" into options.extra_highlighting via the callback function,
+                    /// and return "so loved ", which gets trimmed and turned into "so loved";
+                    /// therefore, it will search for the terms "For" and "God," but highlight any occurrence of "so" and "loved."
+                    ///NOTE: But search queries and verse lookups can have extra highlighted terms.
                     ///NOTE: Since the highlight string could be at the beginning or end, trim() is used to remove any extra space.
+                    ///NOTE: Only one set of highlighted text is allowed, so only one set of curly brackets will be found.
                     query = raw_query.replace(/\s*\{\{(?!\}\})(.*?)\}\}\s*/, function ()
                     {
+                        /// Store the text inside the curly brackets.
+                        ///NOTE: If we use the g flag, there could be more than one, but currently this is not allowed.
                         options.extra_highlighting = arguments[1];
-                        ///TODO: Auto highlighting while typing.  This should be done somewhere else.
-                        ///NOTE: If we use the g flag, there could be more than one.
+                        
+                        /// Replace the matching string with a space because it could appear between two words (i.e., "for {{God}} so" would turn into "for so").
                         return " ";
                     }).trim();
                     
                     options.base_query = query;
                     
+                    /// ***********
+                    /// * Step 1b *
+                    /// ***********
+                    ///
+                    /// Prepare the string by normalizing special terms and symbols.
+                    ///
+                    
                     ///NOTE: Whitespace must be trimmed after this function because it may create excess whitespace.
                     query = BF.lang.prepare_query(query).trim();
                     
                     if (query === "") {
-                        /// TODO: Determine what else should be done to notifiy the user that no query will be preformed.
+                        /// TODO: Determine what else should be done to notify the user that no query will be preformed.
                         return;
                     }
                     
                     options.prepared_query = query;
                     
-                    /// Step 2: Determine the type of query.
+                    /// ***********
+                    /// * Step 2 *
+                    /// ***********
+                    ///
+                    /// Determine the type of query.
+                    ///
                     
                     /// Determine if the user is preforming a search or looking up a verse.
                     /// If the query is a verse reference, a number is returned, if it is a search, then FALSE is returned.
@@ -2477,12 +2511,23 @@
                         }
                     }
                     
-                    /// Step 3: Request results.
+                    /// ***********
+                    /// * Step 3 *
+                    /// ***********
+                    ///
+                    /// Request results.
+                    ///
                     
                     /// Prepare the initial query, create functions to handle additional and previous queries.
                     query_manager.query(options);
                     
-                    /// Step 4: Prepare for new results (clear page, prepare highlighter if applicable).
+                    /// ***********
+                    /// * Step 4 *
+                    /// ***********
+                    ///
+                    /// Prepare for new results (clear page, prepare highlighter if applicable).
+                    ///
+                    
                     content_manager.clear_scroll();
                     
                     /// Indicate that the lookup is in progress.
