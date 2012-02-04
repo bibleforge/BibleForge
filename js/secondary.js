@@ -120,14 +120,15 @@
              * @example open_menu(leftOffset, topOffset, [{text: "Menu Item 1", link: "http://link.com"}, [text: "Menu Item 2", link: some_function, line: true}]); /// Creates a menu with one external link and one link that runs a function with a line break separating the two.
              * @param   x_pos          (number)              The X position of the menu.
              * @param   y_pos          (number)              The Y position of the menu.
-             * @param   menu_items     (array)               An array containing object(s) specifying the text of the menu items, the corresponding links, and whether or not to add a line break.
-             *                                               Array format: [{text: (string), link: (string or function), line: (truthy or falsey (optional))}, {...}]
+             * @param   menu_items     (array)               An array containing object(s) specifying the text of the menu items, the corresponding links, whether or not to add a line break, and an optional ID.
+             *                                               Array format: [{text: (string), link: (string or function), line: (truthy or falsey (optional)), id: (variable (optional))}, ...]
+             * @param   selected       (variable)            The ID of the menu item that should be selected by default.
              * @param   open_callback  (function) (optional) The function to run when the menu opens.
              * @param   close_callback (function) (optional) The function to send to close_menu() as a callback when the menu closes.
              * @note    Called by show_context_menu() and close_menu() (as the callback function).
              * @return  NULL
              */
-            function open_menu(x_pos, y_pos, menu_items, open_callback, close_callback)
+            function open_menu(x_pos, y_pos, menu_items, selected, open_callback, close_callback)
             {
                 var cur_item = -1,
                     i,
@@ -178,6 +179,11 @@
                 
                 for (i = 0; i < menu_count; i += 1) {
                     menu_item = document.createElement("a");
+                    
+                    if (menu_items[i].id === selected) {
+                        BF.toggleCSS(menu_item, "menu_item_selected", 1);
+                        cur_item = i;
+                    }
                     
                     /// If the link is a string, then it is simply a URL; otherwise, it is a function.
                     if (typeof menu_items[i].link === "string") {
@@ -300,15 +306,16 @@
              * @example show_context_menu(leftOffset, topOffset, [{text: "Menu Item 1", link: "http://link.com"}, [text: "Menu Item 2", link: some_function, line: true}]); /// Creates a menu with one external link and one link that runs a function with a line break separating the two.
              * @param   x_pos          (number)              The X position of the menu.
              * @param   y_pos          (number)              The Y position of the menu.
-             * @param   menu_items     (array)               An array containing object(s) specifying the text of the menu items, the corresponding links, and whether or not to add a line break.
-             *                                               Array format: [{text: (string), link: (string or function), line: (truthy or falsey (optional))}, {...}]
+             * @param   menu_items     (array)               An array containing object(s) specifying the text of the menu items, the corresponding links, whether or not to add a line break, and an optional ID.
+             *                                               Array format: [{text: (string), link: (string or function), line: (truthy or falsey (optional)), id: (variable (optional))}, ...]
+             * @param   selected       (variable)            The ID of the menu item that should be selected by default.
              * @param   open_callback  (function) (optional) The function to send to open_menu() as a callback when the menu opens.
              * @param   close_callback (function) (optional) The function to send to close_menu() as a callback when the menu closes.
              * @note    This is the function stored in the show_context_menu variable.
              * @note    Called by the wrench menu onclick event.
              * @return  NULL
              */
-            return function show_context_menu(x_pos, y_pos, menu_items, open_callback, close_callback)
+            return function show_context_menu(x_pos, y_pos, menu_items, selected, open_callback, close_callback)
             {
                 /// If it is already open, close it and then re-open it with the new menu.
                 ///TODO: Determine if this can (or should) ever happen.
@@ -318,10 +325,10 @@
                         if (typeof close_callback === "function") {
                             close_callback();
                         }
-                        open_menu(x_pos, y_pos, menu_items, open_callback, close_callback);
+                        open_menu(x_pos, y_pos, menu_items, selected, open_callback, close_callback);
                     });
                 } else {
-                    open_menu(x_pos, y_pos, menu_items, open_callback, close_callback);
+                    open_menu(x_pos, y_pos, menu_items, selected, open_callback, close_callback);
                 }
             };
         }());
@@ -917,34 +924,37 @@
                 var wrench_pos = BF.get_position(wrench_button);
                 
                 show_context_menu(wrench_pos.left, wrench_pos.top + wrench_button.offsetHeight, [
+                        {
+                            text: BF.lang.configure,
+                            link: show_configure_panel
+                        },
+                        {
+                            line: true,
+                            text: BF.lang.blog,
+                            link: "http://blog.bibleforge.com/"
+                        },
+                        {
+                            text: BF.lang.about,
+                            link: "http://bibleforge.wordpress.com/about/"
+                        },
+                        {
+                            text: BF.lang.help,
+                            link: show_help_panel
+                        }
+                    ],
+                    /// Since no item needs to be selected by default, just sent an empty string.
+                    "",
+                    function open()
                     {
-                        text: BF.lang.configure,
-                        link: show_configure_panel
+                        /// Because the context menu is open, keep the icon dark.
+                        BF.toggleCSS(wrench_button, "activeWrenchIcon", 1);
                     },
+                    function close()
                     {
-                        line: true,
-                        text: BF.lang.blog,
-                        link: "http://blog.bibleforge.com/"
-                    },
-                    {
-                        text: BF.lang.about,
-                        link: "http://bibleforge.wordpress.com/about/"
-                    },
-                    {
-                        text: BF.lang.help,
-                        link: show_help_panel
+                        /// When the menu closes, the wrench button should be lighter.
+                        BF.toggleCSS(wrench_button, "activeWrenchIcon", 0);
                     }
-                ],
-                function ()
-                {
-                    /// Because the context menu is open, keep the icon dark.
-                    BF.toggleCSS(wrench_button, "activeWrenchIcon", 1);
-                },
-                function ()
-                {
-                    /// When the menu closes, the wrench button should be lighter.
-                    BF.toggleCSS(wrench_button, "activeWrenchIcon", 0);
-                });
+                );
                 
                 /// Stop the even from bubbling so that document.onclick() does not fire and attempt to close the menu immediately.
                 e.stopPropagation();
@@ -1528,10 +1538,12 @@
                 }
                 
                 /// Create the language menu drop down menu.
+                
                 for (lang in BF.langs) {
                     ///NOTE: According to Crockford (http://yuiblog.com/blog/2006/09/26/for-in-intrigue/), for in loops should be filtered.
                     if (BF.langs.hasOwnProperty(lang)) {
                         lang_menu[lang_menu.length] = {
+                            id:   lang,
                             text: BF.langs[lang].full_name,
                             link: create_lang_selection(lang)
                         };
@@ -1550,7 +1562,7 @@
                     var langEl_pos = BF.get_position(langEl);
                     
                     ///TODO: Make show_context_menu() take a position object, not two variables.
-                    show_context_menu(langEl_pos.left, langEl_pos.top + langEl.offsetHeight, lang_menu,
+                    show_context_menu(langEl_pos.left, langEl_pos.top + langEl.offsetHeight, lang_menu, BF.lang.identifier,
                         function open()
                         {
                             /// Because the menu is open, keep the button dark.
