@@ -181,8 +181,9 @@
                     menu_item = document.createElement("a");
                     
                     /// Select the default menu item, if any.
-                    if (selected !== false && menu_items[i].id === selected) {
                         BF.toggleCSS(menu_item, "menu_item_selected", 1);
+                    ///NOTE: cur_item === -1 is used to make sure that at most one item is selected.
+                    if (selected !== false && cur_item === -1 && menu_items[i].id === selected) {
                         cur_item = i;
                     }
                     
