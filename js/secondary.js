@@ -1584,12 +1584,12 @@
                 };
             }());
             
+            /// Load the fonts for the lexicon, after a short delay, so that they don't blink when the text first loads.
             window.setTimeout(function ()
             {
-                var tmp_el = document.createElement("div");
-                
-                tmp_el.className = "lex-orig_word";
-                tmp_el.innerHTML = "α";
+                /// To load both fonts, we need to use both a Hebrew and a Greek letter.
+                ///NOTE: \u05d0 is the Hebrew letter Aleph, and \u03b1 is the Greek letter Alpha.
+                BF.preload_font("lex-orig_word", "\u05d0\u03b1");
             }, 250);
             
             if (BF.is_WebKit) {
