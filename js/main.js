@@ -666,6 +666,49 @@
     
     
     /**
+     * Create a function that preloads fonts.
+     *
+     * @return A function that attempts to preload web fonts.
+     */
+    BF.preload_font = (function ()
+    {
+        /// Create an outer variable once that can be reused each time the function is called.
+        var text_el;
+        
+        /**
+         * Load web fonts by using a hidden element.
+         *
+         * @param className (string)            The CSS class to apply that contains the web font to load.
+         * @param str       (string) (optional) An optional string to put into the element.
+         * @note  The actual function is delayed to make sure that multiple calls to the function will all have time to let the browser start to download the font before the function is called again.
+         * @note  The reason for the str parameter is that some fonts will only load if certain a character set is used (e.g., Hebrew or Greek letters).
+         */
+        return function preload_font(className, str)
+        {   
+            /// Delay the function to make sure that there is a pause between each call to make sure that multiple calls will all take place.
+            window.setTimeout(function ()
+            {
+                /// Has the element already been created?
+                if (!text_el) {
+                    text_el = document.createElement("div");
+                    /// Make sure that it will not show up on the page anywhere by both moving it off the viewport and clipping it.
+                    text_el.style.cssText = "position: absolute!important; top: -1000px!important; left: -1000px!important; clip: rect(0,0,0,0)!important";
+                    ///NOTE: Because attaching elements to the DOM causes a reflow (which is slow) the element is left in the DOM.
+                    ///      If there is a problem with doing this, it could be removed or hidden later via setTimeout(),
+                    ///      but it needs to be in the DOM long enough for the font to begin downloading.
+                    document.body.appendChild(text_el);
+                }
+                
+                text_el.className = className;
+                /// Set the string or default to "a" if none given.
+                ///NOTE: textContent is esentially the same as innerText.
+                text_el.textContent = str || "a";
+            }, 0);
+        };
+    }());
+    
+    
+    /**
      * Initialize the BibleForge environment.
      *
      * Load all of the JavaScript necessary to start BibleForge running,
