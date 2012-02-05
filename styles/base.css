@@ -365,13 +365,14 @@ body {
     -webkit-box-shadow: 2px 2px 3px rgba(0,0,0,.2);
     /* Opera 10.5/Mozilla 4.0/WebKit */
     box-shadow:         2px 2px 3px rgba(0,0,0,.2);
-    
+}
+
+.contextMenu div {
     /* Ensure that the cursor will look like a hand even if not hovering over the text. */
     /*NOTE: Since Chromium fires the onmousemove event when the mouse cursor changes, we must set the cursor for the entire <div>, not just on hover */
     /*      because if the user uses the keyboard arrows while the mouse is over an element, the onmousemove event will keep firing. */
     cursor: pointer;
 }
-
 
 /* Menu items */
 .contextMenu div a {
