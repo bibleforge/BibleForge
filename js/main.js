@@ -1031,14 +1031,11 @@
                 }
             };
             
-            /******************************
-             * Start of Scrolling Closure *
-             ******************************/
             
             /**
              * Create the functions that handle the scrolling of the page and other related functions.
              *
-             * @return Returns an object with functions for adding content, updating the verse range, and scrollng the view.
+             * @return Returns an object with functions for adding content, updating the verse range, and scrolling the view.
              */
             content_manager = (function ()
             {
@@ -1789,13 +1786,27 @@
                         return true;
                     },
                     
-                    scroll_view_to: scroll_view_to
+                    scroll_view_to: scroll_view_to,
+                    /**
+                     * Indicate to the user that BibleForge is working.
+                     *
+                     * @param bottom (boolean) Whether or not to show the bottom loader.
+                     * @param top    (boolean) Whether or not to show the top loader.
+                     */
+                    indicate_loading: function (bottom, top)
+                    {
+                        if (bottom) {
+                            bottomLoader.style.visibility = "visible";
+                        }
+                        if (top) {
+                            topLoader.style.visibility    = "visible";
+                        }
+                    }
                 };
             }());
-            
-            /****************************
-             * End of Scrolling Closure *
-             ****************************/
+            /// **************************
+            /// * End of content_manager *
+            /// **************************
             
             /**
              * Create the functions that handle querying the server and displaying the results.
@@ -2927,7 +2938,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?2054715", {
+                BF.include("/js/secondary.js?2059749", {
                     content_manager: content_manager,
                     get_query_info:  function ()
                     {

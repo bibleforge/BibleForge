@@ -1443,9 +1443,6 @@
                             BF.lang = BF.langs[identifier];
                             change_langEl_text(BF.lang.short_name);
                             
-                            /// Since the language has changed, any currently loaded text must be removed and reloaded (after a moment).
-                            context.content_manager.clear_scroll();
-                            
                             /// Make the cursor turn into a hand when hovering over words if there is lexical data available.
                             BF.toggleCSS(page, "linked", BF.lang.linked_to_orig ? 1 : 0);
                             BF.toggleCSS(page, "lang_" + prev_lang,  0);
@@ -1489,6 +1486,11 @@
                             }
                         };
                         
+                        /// Since the language has changed, any currently loaded text must be removed and reloaded (after a moment).
+                        context.content_manager.clear_scroll();
+                        /// Indicate that more content is coming by showing the bottom loader.
+                        context.content_manager.indicate_loading(true);
+                            
                         /// Has the language code already been downloaded?
                         if (BF.langs[identifier].loaded) {
                             activate_new_lang();
