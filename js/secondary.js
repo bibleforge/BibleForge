@@ -1230,7 +1230,8 @@
              */
             (function ()
             {
-                var callouts = [];
+                var callouts = [],
+                    remove;
                 
                 /// Since this is not styled by initially, it needs to be set now.
                 if (BF.lang.linked_to_orig) {
@@ -1284,6 +1285,8 @@
                     }
                 }, false);
                 
+                ///TODO: Instead of attaching functions here and looping through an array of callouts, it probably should attach a separate function inside the callout closure.
+                
                 /**
                  * Possibly remove callouts when a user clicks the page.
                  *
@@ -1292,7 +1295,7 @@
                  * @param  e (event object) The mouse event object.
                  * @return NULL
                  */
-                document.addEventListener("click", function (e)
+                remove = function (e)
                 {
                     var i;
                     
@@ -1317,10 +1320,27 @@
                             callouts.remove(i);
                         }
                     }
+                };
+                
+                
+                document.addEventListener("click", remove, false);
+                
+                /**
+                 * Possibly remove callouts when a user presses escape.
+                 *
+                 * @param e (event object) The keyboard event object.
+                 * @note  This does not fire when closing menus in Chromium (which is the desired effect), but it does in Firefox (but Firefox seems to work probably when this function is attached once per callout.
+                 */
+                document.addEventListener("keydown", function (e)
+                {
+                    /// keyCode 27 is the escape key.
+                    if (e.keyCode === 27) {
+                        remove(e);
+                    }
                 }, false);
                 
                 /**
-                 * Move callouts to compensate for additional or the abcense of text.
+                 * Move callouts to compensate for additional or the absence of text.
                  *
                  * Also, remove callouts if the word they were attached to was removed.
                  *
