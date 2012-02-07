@@ -2144,6 +2144,11 @@
                 
                 /// Return the query_manager object.
                 return {
+                    /**
+                     * Execute a query to retrieve additional verses.
+                     *
+                     * @note This is created by this.query() each time.
+                     */
                     query_additional: function () {},
                     
                     /**
@@ -2335,9 +2340,14 @@
                         }());
                     }()),
                     
+                    /**
+                     * Execute a query to retrieve previous verses.
+                     *
+                     * @note This is created by this.query() each time.
+                     */
                     query_previous: function () {},
                     
-                    /// Variables accessible to outer functions.
+                    /// Properties accessible to outer functions.
                     automated:  "",
                     query_type: "",
                     raw_query:  ""
@@ -2807,7 +2817,7 @@
                     {
                         run_new_query(default_query, automated, true);
                         
-                        /// Only change the text in the query input if the user has not started typing.
+                        /// Only change the text in the query input if the user has not started typing and the user actually typed in the query.
                         if (!automated && (!e.initial_page_load || qEl.value === BF.lang.query_explanation)) {
                             qEl.value = default_query;
                         }
