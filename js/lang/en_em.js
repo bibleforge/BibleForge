@@ -65,7 +65,7 @@ BF.langs.en_em = (function ()
         /// Indicate the language name so it can be distinguished later.
         full_name:  "Early Modern English (1611)",
         short_name: "1611",
-        identifier: "en_em",
+        id:         "en_em",
         lang_id:    1,
         
         linked_to_orig: false,

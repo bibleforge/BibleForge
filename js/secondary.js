@@ -1424,23 +1424,23 @@
             /**
              * Change the text in the button and adjust the padding.
              *
-             * @param identifier (string) The text to put into the button.
+             * @param lang_ID (string) The text to put into the button.
              */
-            function change_langEl_text(identifier)
+            function change_langEl_text(lang_ID)
             {
-                langEl.value = identifier;
+                langEl.value = lang_ID;
                 context.qEl.style.paddingLeft = (langEl.offsetWidth + 3) + "px";
             }
             
             /**
              * Handle changes to the language.
              *
-             * @param identifier     (string)   The ID of the language to change to.
+             * @param lang_ID        (string)   The ID of the language to change to.
              * @param prevent_reload (boolean)  Whether or not to load the last query after changing the language.
              * @param callback       (function) The function to run after the language loading has completed.
              * @note  This function attaches to the global BF object because it can be executed in different places.
              */
-            BF.change_language = function (identifier, prevent_reload, callback)
+            BF.change_language = function (lang_ID, prevent_reload, callback)
             {
                 var activate_new_lang,
                     prev_lang;
@@ -1450,11 +1450,11 @@
                 if (!prevent_reload && (BF.keys_pressed.alt || BF.keys_pressed.ctrl)) {
                     /// If the user has typed something into the query box, use that; otherwise, use the last query.
                     ///NOTE: Because the placeholder is currently in the element's value, we must check for that.
-                    window.open("/" + identifier + "/" + window.encodeURIComponent(context.qEl.value !== BF.lang.query_explanation && context.qEl.value.trim() ? context.qEl.value : context.get_query_info().real_query) + "/", "_blank");
+                    window.open("/" + lang_ID + "/" + window.encodeURIComponent(context.qEl.value !== BF.lang.query_explanation && context.qEl.value.trim() ? context.qEl.value : context.get_query_info().real_query) + "/", "_blank");
                 } else {
                     /// Does the language exist and is the new language different from the current language?
-                    if (BF.langs[identifier] && BF.lang.identifier !== identifier) {
-                        prev_lang = BF.lang.identifier;
+                    if (BF.langs[lang_ID] && BF.lang.id !== lang_ID) {
+                        prev_lang = BF.lang.id;
                         
                         /**
                          * Make the new language the active language.
@@ -1463,13 +1463,13 @@
                          */
                         activate_new_lang = function ()
                         {
-                            BF.lang = BF.langs[identifier];
+                            BF.lang = BF.langs[lang_ID];
                             change_langEl_text(BF.lang.short_name);
                             
                             /// Make the cursor turn into a hand when hovering over words if there is lexical data available.
                             BF.toggleCSS(page, "linked", BF.lang.linked_to_orig ? 1 : 0);
                             BF.toggleCSS(page, "lang_" + prev_lang,  0);
-                            BF.toggleCSS(page, "lang_" + identifier, 1);
+                            BF.toggleCSS(page, "lang_" + lang_ID,    1);
                             
                             context.system.event.trigger("languageChange", {prev_lang: prev_lang});
                             
@@ -1490,7 +1490,7 @@
                                     query_str = context.qEl.value !== BF.lang.query_explanation && context.qEl.value.trim() ? context.qEl.value : context.get_query_info().real_query;
                                     
                                     ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
-                                    BF.history.pushState("/" + BF.lang.identifier + "/" + window.encodeURIComponent(query_str) + "/");
+                                    BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(query_str) + "/");
                                     
                                     /// If the last query was automated (query_info.automated) and the user has not typed anything into the query box (query_str === query_info.real_query), use the default query (i.e., Genesis 1:1).
                                     if (query_info.automated && query_str === query_info.real_query) {
@@ -1515,12 +1515,12 @@
                         context.content_manager.indicate_loading(true);
                             
                         /// Has the language code already been downloaded?
-                        if (BF.langs[identifier].loaded) {
+                        if (BF.langs[lang_ID].loaded) {
                             activate_new_lang();
                         } else {
                             /// If the language code has not been downloaded yet, download it now and activate the language after the code has loaded.
                             ///NOTE: The last modified time is added (if available) to prevent browsers from caching an outdated file.
-                            BF.include("/js/lang/" + identifier + ".js?" + (BF.langs[identifier].modified || ""), {}, activate_new_lang);
+                            BF.include("/js/lang/" + lang_ID + ".js?" + (BF.langs[lang_ID].modified || ""), {}, activate_new_lang);
                         }
                     } else {
                         if (typeof callback === "function") {
@@ -1533,7 +1533,7 @@
             
             /// Make the necessary changes to load the default language when the page first loads.
             change_langEl_text(BF.lang.short_name);
-            BF.toggleCSS(page, "lang_" + BF.lang.identifier, 1);
+            BF.toggleCSS(page, "lang_" + BF.lang.id, 1);
             
             /// The language button is hidden until the current language name is displayed.
             langEl.style.visibility = "visible";
@@ -1551,16 +1551,16 @@
                 /**
                  * Create a function to run when a user clicks on an item on the language selection menu.
                  *
-                 * @param  identifier (string) The ID of the language to change to.
+                 * @param  lang_ID (string) The ID of the language to change to.
                  * @return A function that calls the language changing function.
                  * @note   This function is outside of the loop below because creating a function in a loop is error prone.
                  */
-                function create_lang_selection(identifier)
+                function create_lang_selection(lang_ID)
                 {
                     return function ()
                     {
-                        /// Set identifier as the new language.
-                        BF.change_language(identifier);
+                        /// Set lang_ID as the new language.
+                        BF.change_language(lang_ID);
                     };
                 }
                 
@@ -1589,7 +1589,7 @@
                     var langEl_pos = BF.get_position(langEl);
                     
                     ///TODO: Make show_context_menu() take a position object, not two variables.
-                    show_context_menu(langEl_pos.left, langEl_pos.top + langEl.offsetHeight, lang_menu, BF.lang.identifier,
+                    show_context_menu(langEl_pos.left, langEl_pos.top + langEl.offsetHeight, lang_menu, BF.lang.id,
                         function open()
                         {
                             /// Because the menu is open, keep the button dark.

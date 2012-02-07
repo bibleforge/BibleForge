@@ -64,7 +64,7 @@ BF.langs.en = (function ()
         /// Indicate the language name so it can be distinguished later.
         full_name:  "English",
         short_name: "en",
-        identifier: "en",
+        id:         "en",
         lang_id:    0,
         
         linked_to_orig: true,

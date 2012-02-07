@@ -2351,13 +2351,13 @@
                                     this.prepared_query     = options.prepared_query;
                                     this.automated          = options.automated;
                                     this.extra_highlighting = options.extra_highlighting;
-                                    this.lang_ID            = BF.lang.identifier;
+                                    this.lang_ID            = BF.lang.id;
                                     
                                     /// Store the user's position so that it can be retrieved when the user comes back later.
                                     ///FIXME: Also, store the exact location of the user and take the user to that point. 
                                     ///NOTE:  Simply modifying the object (i.e., settings.user.state.lang_ID = "...") does not trigger the setter callback.
                                     settings.user.state = {
-                                        lang_ID:    BF.lang.identifier,
+                                        lang_ID:    BF.lang.id,
                                         query_info: query_manager.get_query_info()
                                     };
                                     
@@ -2528,7 +2528,7 @@
                     /// Prevent querying the exact same query twice.
                     ///NOTE: Although this is probably the most desirable behavior, if the user scrolls down away from the original query, they will want to be brought back to it.
                     ///TODO: Determine if there are any cases where we definitely want to allow the exact same query to go through.
-                    if (raw_query === query_manager.raw_query && query_manager.lang_ID === BF.lang.identifier) {
+                    if (raw_query === query_manager.raw_query && query_manager.lang_ID === BF.lang.id) {
                         return;
                     }
                     
@@ -2644,7 +2644,7 @@
                     
                     if (!ignore_state) {
                         ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
-                        BF.history.pushState("/" + BF.lang.identifier + "/" + window.encodeURIComponent(raw_query) + "/");
+                        BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(raw_query) + "/");
                     }
                     
                     if (!automated) {
@@ -2873,7 +2873,7 @@
                         lang = split_query[0];
                         default_query = split_query[1];
                     } else {
-                        /// Is the parameter a valid language identifier?
+                        /// Is the parameter a valid language ID?
                         if (BF.langs[split_query[0]]) {
                             lang = split_query[0];    
                         } else {
@@ -2885,7 +2885,7 @@
                     }
                     
                     /// If the requested language is the same as the current one, there is no need to change it.
-                    if (lang === BF.lang.identifier) {
+                    if (lang === BF.lang.id) {
                         lang = "";
                     }
                     
@@ -2982,7 +2982,7 @@
                         if (BF.keys_pressed.alt || BF.keys_pressed.ctrl) {
                             ///BUG: Chromium only opens a new tab when clicking on the magnifying glass (not when pressing enter).
                             ///NOTE: In Chromium, holding Alt brings the new tab to the forefront but Ctrl opens it in the background.
-                            window.open("/" + BF.lang.identifier + "/" + window.encodeURIComponent(query) + "/", "_blank");
+                            window.open("/" + BF.lang.id + "/" + window.encodeURIComponent(query) + "/", "_blank");
                         } else {
                             /// Look up the clicked verse.  
                             ///TODO: Keep the highlighting.
@@ -2997,7 +2997,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?2276047", {
+                BF.include("/js/secondary.js?2277155", {
                     content_manager: content_manager,
                     get_query_info:  query_manager.get_query_info,
                     langEl:          langEl,
@@ -3039,7 +3039,7 @@
                 if (BF.keys_pressed.alt || BF.keys_pressed.ctrl) {
                     ///BUG: Chromium only opens a new tab when clicking on the magnifying glass (not when pressing enter).
                     ///NOTE: In Chromium, holding Alt brings the new tab to the forefront but Ctrl opens it in the background.
-                    window.open("/" + BF.lang.identifier + "/" + window.encodeURIComponent(raw_query) + "/", "_blank");
+                    window.open("/" + BF.lang.id + "/" + window.encodeURIComponent(raw_query) + "/", "_blank");
                 } else {
                     run_new_query(raw_query);
                 }
