@@ -32,28 +32,30 @@
     get_position, get_query_info, grammar_keywords, grammar_marker, 
     grammar_marker_len, grammar_separator, hasOwnProperty, height, highlight, 
     history, i, id, identifier, in_paragraphs, include, indexOf, 
-    initial_page_load, initial_query, innerHTML, insertBefore, insertRule, 
-    is_WebKit, is_busy, is_object, join, keyCode, keyboard_busy, keys_pressed, 
-    lang, langEl, lang_id, langs, lastChild, left, length, line_height, 
-    localStorage, location, map, metaKey, n, navigator, needsHash, new_val, 
-    nextSibling, offsetHeight, offsetLeft, offsetParent, offsetTop, old_val, 
-    onblur, onfocus, onreadystatechange, onsubmit, open, opera, originalTarget, 
-    p, page, pageXOffset, pageYOffset, parentNode, parse, parseInt, parse_json, 
-    pathname, prepare_highlighter, prepare_query, prepare_search, 
+    indicate_loading, initial_page_load, initial_query, innerHTML, 
+    insertBefore, insertRule, is_WebKit, is_busy, is_object, join, keyCode, 
+    keyboard_busy, keys_pressed, lang, langEl, lang_ID, lang_id, langs, 
+    lastChild, left, length, line_height, localStorage, location, map, metaKey, 
+    n, navigator, needsHash, new_val, nextSibling, no_results1, no_results2, 
+    offsetHeight, offsetLeft, offsetParent, offsetTop, old_val, onblur, 
+    onfocus, onreadystatechange, onsubmit, open, opera, originalTarget, p, 
+    page, pageXOffset, pageYOffset, parentNode, parse, parseInt, parse_json, 
+    pathname, preload_font, prepare_highlighter, prepare_query, prepare_search, 
     prepared_query, prev_lang, preventDefault, previousSibling, properties, 
     prototype, psalm, psalm_has_title, push, pushState, qEl, query, 
     query_additional, query_button_alt, query_button_title, query_explanation, 
-    query_previous, query_type, raw_query, reached_bottom, reached_top, 
-    readyState, real_query, remove, removeChild, replace, replaceState, 
-    responseText, round, run_new_query, scrollBy, scrollHeight, scrollTo, 
-    scroll_to_verse, scroll_view_to, selectorText, send, set, setInterval, 
-    setItem, setRequestHeader, setTimeout, settings, shift, shiftKey, slice, 
-    split, srcElement, standard_terms, start_at, state, status, 
-    stopPropagation, stringify, style, styleSheets, subscription, substr, 
-    system, t, tagName, test, title, toggleCSS, top, topBar, topBar_height, 
-    top_id, top_verse, trigger, trim, type, update_verse_range, userAgent, v, 
-    value, verse, verse_id, verse_range, view, viewPort_count, viewPort_num, 
-    visibility, webkitTransition
+    query_info, query_previous, query_type, raw_query, reached_bottom, 
+    reached_top, readyState, real_query, remove, removeChild, replace, 
+    replaceState, responseText, round, run_new_query, scrollBy, scrollHeight, 
+    scrollTo, scroll_to_verse, scroll_view_to, selectorText, send, set, 
+    setInterval, setItem, setRequestHeader, setTimeout, settings, shift, 
+    shiftKey, slice, split, srcElement, standard_terms, start_at, state, 
+    status, stopPropagation, stringify, style, styleSheets, subscription, 
+    substr, system, t, tagName, test, textContent, title, toggleCSS, top, 
+    topBar, topBar_height, top_id, top_verse, trigger, trim, type, 
+    update_verse_range, user, userAgent, v, value, verse, verse_id, 
+    verse_range, view, viewPort_count, viewPort_num, visibility, 
+    webkitTransition
 */
 
 (function ()
@@ -2995,7 +2997,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?2261613", {
+                BF.include("/js/secondary.js?2276047", {
                     content_manager: content_manager,
                     get_query_info:  query_manager.get_query_info,
                     langEl:          langEl,
