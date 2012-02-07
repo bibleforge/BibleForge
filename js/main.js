@@ -1655,7 +1655,7 @@
                      * @param  sync (boolean) Whether or not to call update_verse_range_delayed() synchronously.
                      * @return NULL
                      */
-                    return function (sync)
+                    return function update_verse_range(sync)
                     {
                         ///NOTE: sync is used to make sure that the content_manager.top_verse and content_manager.bottom_verse variables are current.
                         ///TODO: Determine if it is better to clearTimeout() the delayed function.
@@ -2145,6 +2145,22 @@
                 /// Return the query_manager object.
                 return {
                     /**
+                     * Return useful information about the last query.
+                     *
+                     * @return An object containing whether or not the last query was automated, the last raw query, and the last query the user actually typed in (or blank if the user did not type it in).
+                     * @note   This function is sent to secondary.js.
+                     * @note   Consider making all information about the query visible only through this function or exposing all of query_manager to secondary.js.
+                     */
+                    get_query_info: function ()
+                    {
+                        return {
+                            automated:  query_manager.automated,
+                            raw_query:  query_manager.raw_query,
+                            real_query: query_manager.automated ? "" : query_manager.raw_query
+                        };
+                    },
+                    
+                    /**
                      * Execute a query to retrieve additional verses.
                      *
                      * @note This is created by this.query() each time.
@@ -2289,7 +2305,7 @@
                                  * @note   This function is stored in query_manager.query().
                                  * @note   Called by run_new_query().
                                  */
-                                return function (options)
+                                return function query(options)
                                 {
                                     ///TODO: At some point, there needs to be feedback to the user that the query is taking place.  Maybe have something in the infoBar.
                                     
@@ -2959,16 +2975,9 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?2127919", {
+                BF.include("/js/secondary.js?2261613", {
                     content_manager: content_manager,
-                    get_query_info:  function ()
-                    {
-                        return {
-                            automated:  query_manager.automated,
-                            raw_query:  query_manager.raw_query,
-                            real_query: query_manager.automated ? "" : query_manager.raw_query
-                        };
-                    },
+                    get_query_info:  query_manager.get_query_info,
                     langEl:          langEl,
                     page:            page,
                     qEl:             qEl,
