@@ -1728,11 +1728,22 @@
                     
                     update_verse_range: update_verse_range,
                     
+                    /**
+                     * Indicate that the user has scrolled to the very end of the results.
+                     *
+                     * @todo Use a get/set pair instead.
+                     */
                     reached_bottom: function ()
                     {
                         has_reached_bottom = true;
                     },
                     
+                    /**
+                     * Indicate that the user has scrolled to the very beginning of the results.
+                     *
+                     * @note Search queries currently always begins at the beginning, but verse lookups can start anywhere.
+                     * @todo Use a get/set pair instead.
+                     */
                     reached_top: function ()
                     {
                         has_reached_top = true;
