@@ -893,29 +893,29 @@
                 /// Create get/set pairs with Object.defineProperty, and load default settings.
                 
                 Object.defineProperty(settings.view, "in_paragraphs", create_get_set(true, function ()
-                    {
-                        /// Handle changing paragraph mode.
-                        
-                        /// If the last query was a search, nothing needs to be done since only verse lookups are affected by paragraph mode.
-                        ///NOTE: Since this function will be called before query_manager is created when loading saved settings, check to make sure it exists.
-                        if (typeof query_manager === "undefined" || query_manager.query_type !== verse_lookup) {
-                            return;
-                        }
-                        
-                        /// Are there any verses displayed on the scroll?
-                        if (content_manager.top_verse !== false) {
-                            /// Clear the scroll because the view is changing dramatically.
-                            ///FIXME: This should reload the verses.
-                            ///FIXME: It does not necessarily need to reload the verses if switching from paragraph mode to non-paragraph mode.
-                            content_manager.clear_scroll();
-                        }
-                    }));
+                {
+                    /// Handle changing paragraph mode.
+                    
+                    /// If the last query was a search, nothing needs to be done since only verse lookups are affected by paragraph mode.
+                    ///NOTE: Since this function will be called before query_manager is created when loading saved settings, check to make sure it exists.
+                    if (typeof query_manager === "undefined" || query_manager.query_type !== verse_lookup) {
+                        return;
+                    }
+                    
+                    /// Are there any verses displayed on the scroll?
+                    if (content_manager.top_verse !== false) {
+                        /// Clear the scroll because the view is changing dramatically.
+                        ///FIXME: This should reload the verses.
+                        ///FIXME: It does not necessarily need to reload the verses if switching from paragraph mode to non-paragraph mode.
+                        content_manager.clear_scroll();
+                    }
+                }));
                 Object.defineProperty(settings.view, "red_letters", create_get_set(true, function (values)
-                    {
-                        /// Alternate between red and black letters.
-                        ///TODO: Add other options, such as custom color, and (in the future) highlighting of other people's words (e.g., highlight the words of Paul in blue).
-                        BF.changeCSS(".q", "color: " + (values.new_val ? "#D00;" : "#000;"));
-                    }));
+                {
+                    /// Alternate between red and black letters.
+                    ///TODO: Add other options, such as custom color, and (in the future) highlighting of other people's words (e.g., highlight the words of Paul in blue).
+                    BF.changeCSS(".q", "color: " + (values.new_val ? "#D00;" : "#000;"));
+                }));
                 
                 /// Load user settings (if any).
                 /// Does the browser support localStorage? (All modern browsers should.)
