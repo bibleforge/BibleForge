@@ -887,6 +887,7 @@
                 
                 /// Create settings object.
                 settings = {
+                    user: {},
                     view: {}
                 };
                 
@@ -916,6 +917,8 @@
                     ///TODO: Add other options, such as custom color, and (in the future) highlighting of other people's words (e.g., highlight the words of Paul in blue).
                     BF.changeCSS(".q", "color: " + (values.new_val ? "#D00;" : "#000;"));
                 }));
+                Object.defineProperty(settings.user, "state", create_get_set({}));
+                
                 
                 /// Load user settings (if any).
                 /// Does the browser support localStorage? (All modern browsers should.)
@@ -2348,6 +2351,14 @@
                                     this.extra_highlighting = options.extra_highlighting;
                                     this.lang_ID            = BF.lang.identifier;
                                     
+                                    /// Store the user's position so that it can be retrieved when the user comes back later.
+                                    ///FIXME: Also, store the exact location of the user and take the user to that point. 
+                                    ///NOTE:  Simply modifying the object (i.e., settings.user.state.lang_ID = "...") does not trigger the setter callback.
+                                    settings.user.state = {
+                                        lang_ID:    BF.lang.identifier,
+                                        query_info: query_manager.get_query_info()
+                                    };
+                                    
                                     /// Create the additional and previous functions for the content_manager to call when needed.
                                     this.query_additional = next_query_maker(ajax_additional, additional, options);
                                     this.query_previous   = next_query_maker(ajax_previous,   previous,   options);
@@ -2819,10 +2830,7 @@
                     var automated = false,
                         default_query,
                         lang,
-                        /// URL structure: /[lang/][query/]
-                        /// window.location.pathname should always start with a slash (/); substr(1) removes it.
-                        /// Since there should only be two parameters, anything after the second slash is ignored by limiting split() to two results.
-                        split_query = window.location.pathname.substr(1).split("/", 2).map(window.decodeURIComponent);
+                        split_query;
                     
                     /**
                      * Execute the query and possibly change the query box text.
@@ -2839,8 +2847,21 @@
                         }
                     }
                     
+                    /// Is the page loading for the first time and the user did not specify a query in the URL?  If so, use the last query the user made.
+                    if (e.initial_page_load && window.location.pathname === "/" && BF.is_object(settings.user.state) && settings.user.state.lang_ID && BF.is_object(settings.user.state.query_info)) {
+                        ///TODO: It should also determine the last position the user was at and scroll to that point.
+                        split_query = [settings.user.state.lang_ID, settings.user.state.query_info.real_query];
+                    } else {
+                        /// Try to load a query from the URL.
+                        /// URL structure: /[lang/][query/]
+                        /// window.location.pathname should always start with a slash (/); substr(1) removes it.
+                        /// Since there should only be two parameters, anything after the second slash is ignored by limiting split() to two results.
+                        split_query = window.location.pathname.substr(1).split("/", 2).map(window.decodeURIComponent);
+                    }
+                    
                     /// If the second parameter is empty, remove it.
                     /// E.g., "/en/" turns into ["en", ""], so make it just ["en"].
+                    ///NOTE: split_query[1] could be undefined (e.g., "/en" becomes ["en"]).
                     if (typeof split_query[1] === "string" && split_query[1].trim() === "") {
                         split_query.remove(1);
                     }
@@ -2896,7 +2917,6 @@
                         }, 200);
                     }
                 }
-                
                 
                 on_state_change({initial_page_load: true});
                 
