@@ -29,18 +29,18 @@
     insertBefore, insertCell, insertRow, is_WebKit, italics_explanation, 
     just_created, keyCode, keyboard_busy, keys_pressed, lang, langEl, langs, 
     left, length, line, line_height, link, linked_to_orig, lit, loaded, 
-    long_def, maxHeight, maxWidth, modified, mouse_x, mouse_y, move, name, 
-    nodeName, offsetHeight, offsetLeft, offsetTop, offsetWidth, onchange, 
-    onclick, onfocus, onmousemove, onmouseout, opacity, open, options, 
-    originalTarget, paddingLeft, page, pageXOffset, pageYOffset, paragraphs, 
-    parentNode, parse_json, pinned, point_to_el_exists, preload_font, 
-    prev_lang, preventDefault, pronunciation, properties, pushState, qEl, 
-    query, query_explanation, real_query, red_letters, relatedTarget, remove, 
-    removeChild, removeEventListener, replace_HTML, right, run_new_query, 
-    scrollBy, setTimeout, settings, short_def, short_name, src, srcElement, 
-    stopPropagation, style, system, tagName, target, text, title, toggleCSS, 
-    top, topBar, topBar_height, trigger, trim, type, value, view, viewPort_num, 
-    visibility, wheelDelta, which_rect, width, word, wrench_title
+    long_def, maxHeight, maxWidth, modified, mouse_x, mouse_y, move, nodeName, 
+    offsetHeight, offsetWidth, onchange, onclick, onfocus, onmousemove, 
+    onmouseout, opacity, open, options, originalTarget, paddingLeft, page, 
+    pageXOffset, pageYOffset, parentNode, parse_json, pinned, 
+    point_to_el_exists, preload_font, prev_lang, preventDefault, pronunciation, 
+    properties, pushState, qEl, query, query_explanation, real_query, 
+    relatedTarget, remove, removeChild, removeEventListener, replace_HTML, 
+    right, run_new_query, scrollBy, setTimeout, settings, short_def, 
+    short_name, src, srcElement, stopPropagation, style, system, tagName, 
+    target, text, textContent, title, toggleCSS, top, topBar, topBar_height, 
+    trigger, trim, type, value, viewPort_num, visibility, wheelDelta, 
+    which_rect, width, word, wrench_title
 */
 
 (function ()

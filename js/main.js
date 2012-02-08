@@ -38,9 +38,9 @@
     line_height, localStorage, location, map, metaKey, n, navigator, needsHash, 
     new_val, nextSibling, no_results1, no_results2, offsetHeight, offsetLeft, 
     offsetParent, offsetTop, old_val, onblur, onfocus, onreadystatechange, 
-    onsubmit, open, opera, originalTarget, p, page, pageXOffset, pageYOffset, 
-    parentNode, parse, parseInt, parse_json, pathname, preload_font, 
-    prepare_highlighter, prepare_query, prepare_search, prepared_query, 
+    onsubmit, open, opera, options, originalTarget, p, page, pageXOffset, 
+    pageYOffset, parentNode, parse, parseInt, parse_json, pathname, 
+    preload_font, prepare_highlighter, prepare_query, prepared_query, 
     prev_lang, preventDefault, previousSibling, properties, prototype, psalm, 
     psalm_has_title, push, pushState, qEl, query, query_additional, 
     query_button_alt, query_button_title, query_explanation, query_info, 
@@ -3008,7 +3008,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?2344629", {
+                BF.include("/js/secondary.js?2344784", {
                     content_manager: content_manager,
                     get_query_info:  query_manager.get_query_info,
                     langEl:          langEl,

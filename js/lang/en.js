@@ -38,12 +38,12 @@
     determine_reference, done, eli, en, enci, entli, exec, found_plural, 
     found_singular, ful, full_name, fulness, grammar_keywords, grammar_marker, 
     grammar_marker_len, grammar_separator, help, ical, icate, iciti, id, 
-    indexOf, italics_explanation, iveness, iviti, ization, izer, lang_id, 
-    langs, length, linked_to_orig, loaded, logi, ness, no_results1, 
-    no_results2, ousli, ousness, paragraphs, prepare_highlighter, 
-    prepare_query, prepare_search, psalm, query_button_alt, query_button_title, 
-    query_explanation, red_letters, replace, self, short_name, slice, split, 
-    subscription, test, tional, title, toLowerCase, view, wrench_title
+    in_paragraphs, indexOf, italics_explanation, iveness, iviti, ization, izer, 
+    lang_id, langs, length, linked_to_orig, loaded, logi, ness, no_results1, 
+    no_results2, ousli, ousness, prepare_highlighter, prepare_query, psalm, 
+    query_button_alt, query_button_title, query_explanation, red_letters, 
+    replace, self, short_name, slice, split, subscription, test, tional, title, 
+    toLowerCase, view, wrench_title
 */
 
 /**
