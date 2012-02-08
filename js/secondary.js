@@ -699,53 +699,25 @@
             show_configure_panel = (function ()
             {
                 ///FIXME: Make it so that this text can be updated onLanguageChange.
-                var panel_element   = document.createElement("div"),
-                    settings_config;
-                
-                /**
-                 * Create an array to represent the settings.
-                 *
-                 * @todo The settings_config variable should be created automatically from the context.settings object.
-                 * @todo This function should probably be a part of create_element_from_config (and not be a separate function).
-                 */
-                function create_settings_panel()
-                {
-                    settings_config = [
-                        {
-                            name:     BF.lang.view,
-                            settings: "view",
-                            options:  [
-                                {
-                                    name:     BF.lang.red_letters,
-                                    type:     "checkbox",
-                                    settings: "red_letters"
-                                },
-                                {
-                                    name:     BF.lang.paragraphs,
-                                    type:     "checkbox",
-                                    settings: "in_paragraphs"
-                                }
-                            ]
-                        }
-                    ];
-                }
-                
+                var panel_element   = document.createElement("div");
                 
                 /**
                  * Create a DOM element to display the configuration menu.
                  *
-                 * @param config (object) An object representing a pane on the configuration menu.
-                 * @todo  This code needs to be rewritten for two reasons: 1) To make changes in the language more straightforward, and 2) it should (probably) create all of the panes and let the user switch between them instantly by clicking on tabs.
+                 * @param pane (string) The name of the settings pane to display initially.
+                 * @note  Currently, only one pane is used.
+                 * @todo  Create tabs for each section of the settings and dynamically display the sections when clicked.
                  */
-                function create_element_from_config(config)
+                function create_element_from_config(pane)
                 {
                     var apply_change,
+                        config       = context.settings[pane],
                         container_el = document.createElement("fieldset"),
                         cur_option   = 0,
                         input_el,
                         label_el,
                         legend_el    = document.createElement("legend"),
-                        option_count = config.options.length,
+                        option_count,
                         table_el     = document.createElement("table"),
                         table_row,
                         table_cell;
@@ -812,11 +784,14 @@
                         };
                     }
                     
-                    ///NOTE: document.createTextNode() is akin to innerText.  It does not inject HTML.
-                    legend_el.appendChild(document.createTextNode(config.name));
+                    
+                    ///NOTE: textContent is esentially the same as innerText.
+                    legend_el.textContent = BF.lang[pane];
                     container_el.appendChild(legend_el);
+                    option_count = context.settings[pane].options.length;
                     
                     /// Create the input items in the table.
+                    ///FIXME: Only create the selected pane and create the other panes when they are clicked on.
                     while (cur_option < option_count) {
                         ///NOTE: Passing -1 to insertRow() and insertCell() adds a row/cell to the end of the table.
                         table_row  = table_el.insertRow(-1);
@@ -826,16 +801,16 @@
                         label_el   = document.createElement("label");
                         
                         /// The label identifies with the input element via a unique id.
-                        label_el.htmlFor = context.settings[config.settings] + "_" + config.options[cur_option].settings;
+                        label_el.htmlFor = pane + "_" + config.options[cur_option].settings;
                         ///NOTE: document.createTextNode() is akin to innerText.  It does not inject HTML.
-                        label_el.appendChild(document.createTextNode(config.options[cur_option].name));
+                        label_el.appendChild(document.createTextNode(BF.lang[config.options[cur_option].settings]));
                         table_cell.appendChild(label_el);
                         
                         /// Insert a <td> for the input element.
                         table_cell = table_row.insertCell(-1);
                         
                         /// Create the function that changes the proper settings before the switch statement so that it can be used multiple times inside of it.
-                        apply_change = make_apply_change(context.settings[config.settings], config.options[cur_option].settings);
+                        apply_change = make_apply_change(context.settings[pane], config.options[cur_option].settings);
                         
                         switch (config.options[cur_option].type) {
                         case "checkbox":
@@ -843,7 +818,7 @@
                             input_el.type = "checkbox";
                             
                             /// Set the current value.
-                            input_el.checked = context.settings[config.settings][config.options[cur_option].settings];
+                            input_el.checked = context.settings[pane][config.options[cur_option].settings];
                             
                             input_el.onclick = make_checkbox_onclick(apply_change);
                             break;
@@ -853,7 +828,7 @@
                             input_el.type = "text";
                             
                             /// Set the current value.
-                            input_el.value = context.settings[config.settings][config.options[cur_option].settings];
+                            input_el.value = context.settings[pane][config.options[cur_option].settings];
                             
                             input_el.onchange = make_textbox_onchange(apply_change);
                             break;
@@ -867,23 +842,22 @@
                     }
                     
                     container_el.appendChild(table_el);
-                    
+            
                     return container_el;
                 }
                 
-                /// Create the settings_config variable now.
-                create_settings_panel();
                 /**
                  * Create the settings_config variable when the language changes and re-create the element.
                  */
                 context.system.event.attach("languageChange", function ()
                 {
-                    create_settings_panel();
-                    panel_element = create_element_from_config(settings_config[0]);
+                    ///TODO: Display the last pane the user selected, not just View.
+                    panel_element = create_element_from_config("view");
                 });
                 
                 ///TODO: Determine which settings pane to create first (based on the last one the user used). (But currently, there is only one pane.)
-                panel_element = create_element_from_config(settings_config[0]);
+                ///TODO: Display the last pane the user selected, not just View.
+                panel_element = create_element_from_config("view");
                 
                 return function ()
                 {

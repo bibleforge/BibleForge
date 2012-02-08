@@ -889,7 +889,19 @@
                 /// Create settings object.
                 settings = {
                     user: {},
-                    view: {}
+                    view: {
+                        ///NOTE: This array is used by secondary.js to create the configuration pane.
+                        options:  [
+                            {
+                                type:     "checkbox",
+                                settings: "red_letters"
+                            },
+                            {
+                                type:     "checkbox",
+                                settings: "in_paragraphs"
+                            }
+                        ]
+                    }
                 };
                 
                 /// Create get/set pairs with Object.defineProperty, and load default settings.
@@ -2996,7 +3008,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?2277406", {
+                BF.include("/js/secondary.js?2344629", {
                     content_manager: content_manager,
                     get_query_info:  query_manager.get_query_info,
                     langEl:          langEl,

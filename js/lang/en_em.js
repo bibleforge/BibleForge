@@ -91,15 +91,17 @@ BF.langs.en_em = (function ()
         found_plural:      " verſes found for ",                                  /// On the info bar when searching (multiple results)
         found_singular:    " verſe found for ",                                   /// On the info bar when searching (one result)
         help:              "Succor",                                              /// Context menu item
+        ///NOTE: This key must be the same as the value in the settings.
+        in_paragraphs:     "Paragraphs",                                          /// In the View configuration panel
         ///FIXME: Not all italic words are implied; some are questionable.
         italics_explanation: "This word is implied by context or required in order to translate properly; it was not translated directly from a word in the original languages.", /// When clicking on an italic word
         no_results1:       "Your search\u200A\u2014\u200A",                       /// Displayed when preforming a search that returns no results (before the search terms).
         no_results2:       "\u200A\u2014\u200Adid not return any results.",       /// Displayed when preforming a search that returns no results (after the search terms).
-        paragraphs:        "Paragraphs",                                          /// In the View configuration panel
         psalm:             "Psalme",                                              /// The title of chapters in the book of Psalms
         query_explanation: 'Keyword or Reference: "God ſo loued" or Romans 3:23', /// In a blank query input box before a search has been preformed
         query_button_title:"Click here (or preſſe Enter)",                        /// The text displayed when hovering over the magnifying glass (query button).
         query_button_alt:  "Goe",                                                 /// The text to display for the magnifying glass (query button) if images are disabled.
+        ///NOTE: This key must be the same as the value in the settings.
         red_letters:       "Red Letters",                                         /// In the View configuration panel
         subscription:      "subscription",                                        /// Used instead of 255 for subscripts to Paul's epistles
         title:             "title",                                               /// Used instead of 0 for Psalm title verse references
