@@ -2600,7 +2600,8 @@
                         
                         /// If the query is a verse lookup and the verse is visible, just scroll to it.
                         ///TODO: The second parameter (smooth) should (probably) be TRUE, but it is not implemented yet.
-                        ///TODO: If the user is already at that verese, nothing happens, so there may need to be some visual confirmation.
+                        ///TODO: If the user is already at that verse, nothing happens, so there may need to be some visual confirmation.
+                        ///TODO: If the user changes the highlighting (i.e., words between "{{" and "}}"), update the highlighting accordingly.
                         if (query_manager.lang_ID === BF.lang.id && content_manager.scroll_to_verse(BF.get_b_c_v(verse_id), false, false)) {
                             return;
                         }
