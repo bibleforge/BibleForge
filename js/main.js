@@ -1078,14 +1078,15 @@
                     /**
                      * Scroll the page to a specific point.
                      *
-                     * @param  y      (number)             The Y position to scroll to (i.e, vertical position).
-                     * @param  x      (number)  (optional) The X position to scroll to (i.e, horizontal position).  If left undefined, it will maintain the current Y position.
-                     * @param  smooth (boolean) (optional) Whether or not to scroll smoothly.  By default, or if falsey, it will scroll instantaneously.
+                     * @param  y            (number)             The Y position to scroll to (i.e, vertical position).
+                     * @param  x            (number)  (optional) The X position to scroll to (i.e, horizontal position).  If left undefined, it will maintain the current Y position.
+                     * @param  smooth       (boolean) (optional) Whether or not to scroll smoothly.  By default, or if falsey, it will scroll instantaneously.
+                     * @param  allow_lookup (boolean) (optional) Whether or not to allow BibleForge to trigger the onscroll event and possibly look up additional verses.
                      * @return NULL
                      * @note   The y value is first because x value is rarely used.
                      * @note   Called by remove_excess_content_top(), add_content_top_if_needed(), scroll_to_verse(), write_verses(), handle_new_verses() and occasionally (IE only) by remove_excess_content_bottom() and add_content_bottom_if_needed().
                      */
-                    scroll_view_to = function (y, x, smooth, allow_scroll_event)
+                    scroll_view_to = function (y, x, smooth, allow_lookup)
                     {
                         /// A small amount of extra padding is added just to ensure that the padding element will be large enough.
                         var extra_padding = 10,
@@ -1099,7 +1100,7 @@
                         }
                         
                         if (!smooth) {
-                            if (!allow_scroll_event) {
+                            if (!allow_lookup) {
                                 scroll_pos = y;
                             }
                             
@@ -1769,7 +1770,9 @@
                      * Scrolls that page to make the specified verse at the top of the viewable area.
                      *
                      * @example content_manager.scroll_to_verse({b: 45, c: 1, v: 14}); /// Scrolls to Romans 1:14 if that verse element is in the DOM.
-                     * @param   verse_obj (object) An object containing the book, chapter, and verse references: {b: book, c: chapter, v: verse}
+                     * @param   verse_obj    (object)             An object containing the book, chapter, and verse references: {b: book, c: chapter, v: verse}
+                     * @param   smooth       (boolean) (optional) Whether to transition to the verse or instantly jump to it
+                     * @param   allow_lookup (boolean) (optional) Whether or not to allow BibleForge to trigger the onscroll event and possibly look up additional verses.
                      * @return  Returns TRUE on success and FALSE if the verse cannot be found on the scroll.
                      * @note    Called by handle_new_verses() after the first Ajax request of a particular verse lookup.
                      * @note    Also called when scrolling via the page up and page down buttons.
