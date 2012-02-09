@@ -2534,15 +2534,6 @@
                         standard_terms = "", /// Search terms that are not grammatical.
                         verse_id;
                     
-                    ///TODO: If the query is a verse lookup and the verse is visible, it should scroll to it.
-                    
-                    /// Prevent querying the exact same query twice.
-                    ///NOTE: Although this is probably the most desirable behavior, if the user scrolls down away from the original query, they will want to be brought back to it.
-                    ///TODO: Determine if there are any cases where we definitely want to allow the exact same query to go through.
-                    if (raw_query === query_manager.raw_query && query_manager.lang_ID === BF.lang.id) {
-                        return;
-                    }
-                    
                     /// ***********
                     /// * Step 1a *
                     /// ***********
@@ -2606,6 +2597,14 @@
                         if (verse_id > 19003000 && verse_id < 19145002 && verse_id % 1000 === 1) {
                             verse_id -= 1;
                         }
+                        
+                        /// If the query is a verse lookup and the verse is visible, just scroll to it.
+                        ///TODO: The second parameter (smooth) should (probably) be TRUE, but it is not implemented yet.
+                        ///TODO: If the user is already at that verese, nothing happens, so there may need to be some visual confirmation.
+                        if (query_manager.lang_ID === BF.lang.id && content_manager.scroll_to_verse(BF.get_b_c_v(verse_id), false, false)) {
+                            return;
+                        }
+                        
                         options.verse = verse_id;
                         options.type  = verse_lookup;
                     } else {
