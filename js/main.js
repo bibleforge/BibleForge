@@ -2520,13 +2520,14 @@
                  *
                  * @example run_new_query("John 3:16"); /// Looks up John 3:16 (and following)
                  * @example run_new_query("love");      /// Searches for the word "love"
-                 * @param   raw_query    (string)  The text from the user to query.
-                 * @param   automated    (boolean) Whether or not this query was made by the program without user interaction.
-                 * @param   ignore_state (boolean) Whether or not to push this query into the history as a new state.
+                 * @param   raw_query    (string)             The text from the user to query.
+                 * @param   automated    (boolean) (optional) Whether or not this query was made by the program without user interaction.
+                 * @param   ignore_state (boolean) (optional) Whether or not to push this query into the history as a new state.
+                 * @param   position     (object)  (optional) The actual position the user was at.
                  * @return  NULL
                  * @note    Called by searchForm.onsubmit() when a user submits a query.
                  */
-                return function run_new_query(raw_query, automated, ignore_state)
+                return function run_new_query(raw_query, automated, ignore_state, position)
                 {
                     /// **********
                     /// * Step 1 *
@@ -2600,8 +2601,23 @@
                     /// If the query is a verse reference, a number is returned, if it is a search, then FALSE is returned.
                     verse_id = Number(BF.lang.determine_reference(query));
                     
+                    if (!ignore_state) {
+                        ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
+                        ///NOTE: This needs to be called before the function returns if instead of querying it just scrolls to the verse.
+                        BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(raw_query) + "/", {position: position});
+                    }
+                    
                     /// Is the query a verse lookup?
                     if (verse_id > 0) {
+                        /// Do we know what position the user should be brought to?
+                        ///TODO: Make this work with searches as well.
+                        if (position) {
+                            /// If the user is intended to be brought back to a particular passage, use that instead.
+                            ///NOTE: This is used when the page first loads and the user is brought back to where they were last.
+                            ///TODO: Make this work when moving back/forth through the history.
+                            verse_id = position.verse_id;
+                        }
+                        
                         /// Is the lookup verse possibly the beginning of a Psalm with a title?  If so, we need to start at the title, so go back one verse.
                         ///NOTE: To get the titles of Psalms, select verse 0 instead of verse 1.
                         if (verse_id > 19003000 && verse_id < 19145002 && verse_id % 1000 === 1) {
@@ -2662,11 +2678,6 @@
                     
                     ///TODO: Determine if this should be done by a separate function.
                     document.title = raw_query + " - " + BF.lang.app_name;
-                    
-                    if (!ignore_state) {
-                        ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
-                        BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(raw_query) + "/");
-                    }
                     
                     if (!automated) {
                         /// Stop filling in the explanation text so that the user can make the query box blank.  (Text in the query box can be distracting while reading.)
@@ -2853,6 +2864,7 @@
                     var automated = false,
                         default_query,
                         lang,
+                        position,
                         split_query;
                     
                     /**
@@ -2862,7 +2874,7 @@
                      */
                     function do_query()
                     {
-                        run_new_query(default_query, automated, true);
+                        run_new_query(default_query, automated, true, position);
                         
                         /// Only change the text in the query input if the user has not started typing and the user actually typed in the query.
                         if (!automated && (!e.initial_page_load || qEl.value === BF.lang.query_explanation)) {
@@ -2870,16 +2882,22 @@
                         }
                     }
                     
-                    /// Is the page loading for the first time and the user did not specify a query in the URL?  If so, use the last query the user made.
+                    /// Is the page loading for the first time and the user did not specify a query in the URL?
                     if (e.initial_page_load && window.location.pathname === "/" && BF.is_object(settings.user.last_query) && settings.user.last_query.lang_ID && BF.is_object(settings.user.last_query.query_info)) {
-                        ///TODO: It should also determine the last position the user was at and scroll to that point.
+                        /// Uuse the last query the user made instead of the default query.
                         split_query = [settings.user.last_query.lang_ID, settings.user.last_query.query_info.real_query];
+                        /// Get the last position the user was at.
+                        position = settings.user.position;
+                        /// Change the current state to match the last query so that if the user presses the back button later, they will get to the right query.
+                        BF.history.replaceState("/" + split_query[0] + "/" + window.encodeURIComponent(split_query[1]) + "/", {position: position});
                     } else {
                         /// Try to load a query from the URL.
                         /// URL structure: /[lang/][query/]
                         /// window.location.pathname should always start with a slash (/); substr(1) removes it.
                         /// Since there should only be two parameters, anything after the second slash is ignored by limiting split() to two results.
                         split_query = window.location.pathname.substr(1).split("/", 2).map(window.decodeURIComponent);
+                        /// Get the last position the user was at (if available).
+                        position = e.state.position;
                     }
                     
                     /// If the second parameter is empty, remove it.
