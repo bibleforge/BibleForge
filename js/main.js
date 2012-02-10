@@ -245,7 +245,8 @@
         if (hasHistory) {
             window.addEventListener("popstate", function (e)
             {
-                var func_arr_len = func_arr.length,
+                var event = {state: e.state},
+                    func_arr_len = func_arr.length,
                     i,
                     stop_propagation = false;
                 
@@ -255,7 +256,7 @@
                 };
                 
                 for (i = 0; i < func_arr_len; i += 1) {
-                    func_arr[i](e);
+                    func_arr[i](event);
                     if (stop_propagation) {
                         break;
                     }
