@@ -2516,8 +2516,9 @@
                  *
                  * @example run_new_query("John 3:16"); /// Looks up John 3:16 (and following)
                  * @example run_new_query("love");      /// Searches for the word "love"
-                 * @param   raw_query (string)  The text from the user to query.
-                 * @param   automated (boolean) Whether or not this query was made by the program without user interaction.
+                 * @param   raw_query    (string)  The text from the user to query.
+                 * @param   automated    (boolean) Whether or not this query was made by the program without user interaction.
+                 * @param   ignore_state (boolean) Whether or not to push this query into the history as a new state.
                  * @return  NULL
                  * @note    Called by searchForm.onsubmit() when a user submits a query.
                  */
