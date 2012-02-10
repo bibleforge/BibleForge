@@ -245,8 +245,7 @@
         if (hasHistory) {
             window.addEventListener("popstate", function (e)
             {
-                var event = {state: e.state ? JSON.stringify(e.state) : ""},
-                    func_arr_len = func_arr.length,
+                var func_arr_len = func_arr.length,
                     i,
                     stop_propagation = false;
                 
@@ -256,7 +255,7 @@
                 };
                 
                 for (i = 0; i < func_arr_len; i += 1) {
-                    func_arr[i](event);
+                    func_arr[i](e);
                     if (stop_propagation) {
                         break;
                     }
@@ -273,7 +272,7 @@
                 },
                 replaceState: function (url, state)
                 {
-                    window.history.pushState(state, "", url);
+                    window.history.replaceState(state, "", url);
                 }
             };
         } else {
