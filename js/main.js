@@ -280,11 +280,11 @@
             return {
                 attach: attach,
                 needsHash: true,
-                pushState: function (url, state)
+                pushState: function ()
                 {
                     ///TODO: Use hash.
                 },
-                replaceState: function (url, state)
+                replaceState: function ()
                 {
                     ///TODO: Use hash.
                 }
