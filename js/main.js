@@ -933,6 +933,8 @@
                 
                 Object.defineProperty(settings.user, "last_query", create_get_set({}));
                 
+                Object.defineProperty(settings.user, "position", create_get_set({}));
+                
                 
                 /// Load user settings (if any).
                 /// Does the browser support localStorage? (All modern browsers should.)
@@ -1665,6 +1667,8 @@
                         }
                         
                         looking_up_verse_range = false;
+                        
+                        settings.user.position = verse1;
                     }
                     
                     /**
@@ -2373,6 +2377,7 @@
                                     ///NOTE:  Simply modifying the object (i.e., settings.user.last_query.lang_ID = "...") does not trigger the setter callback.
                                     settings.user.last_query = {
                                         lang_ID:    BF.lang.id,
+                                        ///TODO: Remove get_query_info() (which secondary.js currently uses) because the same info is stored in the settings object.
                                         query_info: query_manager.get_query_info()
                                     };
                                     
