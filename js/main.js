@@ -907,6 +907,8 @@
                 
                 Object.defineProperty(settings.view, "in_paragraphs", create_get_set(true, function ()
                 {
+                    var cur_query,
+                        cur_pos;
                     /// Handle changing paragraph mode.
                     
                     /// If the last query was a search, nothing needs to be done since only verse lookups are affected by paragraph mode.
@@ -917,10 +919,16 @@
                     
                     /// Are there any verses displayed on the scroll?
                     if (content_manager.top_verse !== false) {
+                        /// Get the current query and position now because the scroll will be cleared.
+                        cur_query = settings.user.last_query.query_info.real_query;
+                        cur_pos   = settings.user.position;
+                        
                         /// Clear the scroll because the view is changing dramatically.
-                        ///FIXME: This should reload the verses.
-                        ///FIXME: It does not necessarily need to reload the verses if switching from paragraph mode to non-paragraph mode.
+                        ///NOTE: It does not necessarily need to reload the verses if switching from paragraph mode to non-paragraph mode.
                         content_manager.clear_scroll();
+                        
+                        /// Reload verses to where the user left off.
+                        run_new_query(cur_query, false, true, cur_pos);
                     }
                 }));
                 
@@ -2897,7 +2905,7 @@
                         /// Since there should only be two parameters, anything after the second slash is ignored by limiting split() to two results.
                         split_query = window.location.pathname.substr(1).split("/", 2).map(window.decodeURIComponent);
                         /// Get the last position the user was at (if available).
-                        position = e.state.position;
+                        position = e.state ? e.state.position : undefined;
                     }
                     
                     /// If the second parameter is empty, remove it.
