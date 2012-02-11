@@ -2872,7 +2872,7 @@
                     ///TODO: Check if IE 10 has the leading slash (see http://trac.osgeo.org/openlayers/ticket/3478).
                     var is_default = false,
                         default_query,
-                        lang,
+                        lang_id,
                         position,
                         split_query;
                     
@@ -2894,7 +2894,7 @@
                     /// Is the page loading for the first time and the user did not specify a query in the URL?
                     if (e.initial_page_load && window.location.pathname === "/" && BF.is_object(settings.user.last_query) && settings.user.last_query.lang_ID && BF.is_object(settings.user.last_query.query_info)) {
                         /// Use the last query the user made instead of the default query.
-                        lang          = settings.user.last_query.lang_ID;
+                        lang_id       = settings.user.last_query.lang_ID;
                         default_query = settings.user.last_query.query_info.real_query;
                         /// Get the last position the user was at.
                         position = settings.user.position;
@@ -2902,7 +2902,7 @@
                         ///NOTE: The query and language is stored in the state object so as not to cause the URL to change.
                         ///      This way, if the user clicks refresh, it will load back to the same position.
                         BF.history.replaceState("/", {
-                            lang_id:  lang,
+                            lang_id:  lang_id,
                             query:    default_query,
                             position: position
                         });
@@ -2910,7 +2910,7 @@
                         /// Was the query and langauge stored in the history state?
                         if (e.state && e.state.lang_id && e.state.query) {
                             /// Load the query from the history state.
-                            lang          = e.state.lang_id;
+                            lang_id       = e.state.lang_id;
                             default_query = e.state.query;
                         } else {
                             /// Try to load a query from the URL.
@@ -2928,16 +2928,16 @@
                             
                             if (split_query.length === 2) {
                                 /// If the language has already been loaded, there is no need to change the language.
-                                lang = split_query[0];
+                                lang_id = split_query[0];
                                 default_query = split_query[1];
                             } else {
                                 /// Is the parameter a valid language ID?
                                 if (BF.langs[split_query[0]]) {
-                                    lang = split_query[0];    
+                                    lang_id = split_query[0];    
                                 } else {
                                     /// If no language was specified, default to English.
                                     ///TODO: Consider changing the default language based on the user's location and settings.
-                                    lang = "en";
+                                    lang_id = "en";
                                     default_query = split_query[0];
                                 }
                             }
@@ -2948,8 +2948,8 @@
                     }
                     
                     /// If the requested language is the same as the current one, there is no need to change it.
-                    if (lang === BF.lang.id) {
-                        lang = "";
+                    if (lang_id === BF.lang.id) {
+                        lang_id = "";
                     }
                     
                     /// If the default query is empty, lookup Genesis 1:1.
@@ -2959,14 +2959,14 @@
                     }
                     
                     /// Is the query in a different language?  If there is no language specified, just use the default language.
-                    if (lang) {
+                    if (lang_id) {
                         /// If BF.change_language() has not been created by secondary.js, we must wait until that code has loaded.
                         if (BF.change_language) {
-                            BF.change_language(lang, true, do_query);
+                            BF.change_language(lang_id, true, do_query);
                         } else {
                             system.event.attach("secondaryLoaded", function ()
                             {
-                                BF.change_language(lang, true, do_query);
+                                BF.change_language(lang_id, true, do_query);
                             });
                         }
                     } else if (!e.initial_page_load) {
