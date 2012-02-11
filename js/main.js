@@ -28,7 +28,7 @@
     detach, determine_reference, direction, documentElement, en, 
     encodeURIComponent, enumerable, event, extra_highlighting, firstChild, 
     focus, format_number, full_book, full_verse, get, getElementById, 
-    getElementsByTagName, getItem, get_b_c_v, get_position, get_query_info, 
+    getElementsByTagName, getItem, get_b_c_v, get_position,  
     grammar_keywords, grammar_marker, grammar_marker_len, grammar_separator, 
     hasOwnProperty, height, highlight, history, i, id, in_paragraphs, include, 
     indexOf, indicate_loading, initial_page_load, initial_query, innerHTML, 
@@ -43,7 +43,7 @@
     prepare_highlighter, prepare_query, prepared_query, prev_lang, 
     preventDefault, previousSibling, properties, prototype, psalm, 
     psalm_has_title, push, pushState, qEl, query, query_additional, 
-    query_button_alt, query_button_title, query_explanation, query_info, 
+    query_button_alt, query_button_title, query_explanation,
     query_previous, query_type, raw_query, reached_bottom, reached_top, 
     readyState, real_query, remove, removeChild, replace, replaceState, 
     responseText, round, run_new_query, scrollBy, scrollHeight, scrollTo, 
@@ -924,7 +924,7 @@
                     /// Are there any verses displayed on the scroll?
                     if (content_manager.top_verse !== false) {
                         /// Get the current query and position now because the scroll will be cleared.
-                        cur_query = settings.user.last_query.query_info.real_query;
+                        cur_query = settings.user.last_query.real_query;
                         cur_pos   = settings.user.position;
                         
                         /// Clear the scroll because the view is changing dramatically.
@@ -2181,22 +2181,6 @@
                 /// Return the query_manager object.
                 return {
                     /**
-                     * Return useful information about the last query.
-                     *
-                     * @return An object containing whether or not the last query was the default query, the last raw query, and the last query the user actually typed in (or blank if the user did not type it in).
-                     * @note   This function is sent to secondary.js.
-                     * @note   Consider making all information about the query visible only through this function or exposing all of query_manager to secondary.js.
-                     */
-                    get_query_info: function ()
-                    {
-                        return {
-                            is_default: query_manager.is_default,
-                            raw_query:  query_manager.raw_query,
-                            real_query: query_manager.is_default ? "" : query_manager.raw_query
-                        };
-                    },
-                    
-                    /**
                      * Execute a query to retrieve additional verses.
                      *
                      * @note This is created by this.query() each time.
@@ -2389,8 +2373,9 @@
                                     ///NOTE:  Simply modifying the object (i.e., settings.user.last_query.lang_id = "...") does not trigger the setter callback.
                                     settings.user.last_query = {
                                         lang_id:    BF.lang.id,
-                                        ///TODO: Remove get_query_info() (which secondary.js currently uses) because the same info is stored in the settings object.
-                                        query_info: query_manager.get_query_info()
+                                        is_default: options.is_default,
+                                        raw_query:  options.raw_query,
+                                        real_query: options.is_default ? "" : options.raw_query
                                     };
                                     
                                     /// Create the additional and previous functions for the content_manager to call when needed.
@@ -2894,10 +2879,10 @@
                     }
                     
                     /// Is the page loading for the first time and the user did not specify a query in the URL? (E.g., the user loaded "bibleforge.com" and not something like "bibleforge.com/en/gen".)
-                    if (e.initial_page_load && window.location.pathname === "/" && BF.is_object(settings.user.last_query) && settings.user.last_query.lang_id && BF.is_object(settings.user.last_query.query_info)) {
+                    if (e.initial_page_load && window.location.pathname === "/" && BF.is_object(settings.user.last_query) && settings.user.last_query.lang_id && BF.is_object(settings.user.last_query.real_query)) {
                         /// Use the last query the user made instead of the default query.
                         lang_id   = settings.user.last_query.lang_id;
-                        raw_query = settings.user.last_query.query_info.real_query;
+                        raw_query = settings.user.last_query.real_query;
                         /// Get the last position the user was at.
                         position = settings.user.position;
                         /// Change the current state to match the last query so that if the user presses the back button later, they will get to the right query.
@@ -3063,9 +3048,8 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?2599520", {
+                BF.include("/js/secondary.js?2599916", {
                     content_manager: content_manager,
-                    get_query_info:  query_manager.get_query_info,
                     langEl:          langEl,
                     page:            page,
                     qEl:             qEl,

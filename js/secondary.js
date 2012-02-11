@@ -23,7 +23,7 @@
     content_manager, createElement, createEvent, createTextNode, cssText, 
     cssTransitions, ctrl, ctrlKey, currentTarget, destroy, detail, 
     dispatchEvent, display, done, encodeURIComponent, event, full_name, 
-    getClientRects, getElementById, get_position, get_query_info, 
+    getClientRects, getElementById, get_position,
     hasOwnProperty, height, help, history, href, htmlFor, id, include, 
     indicate_loading, initMouseEvent, innerHTML, innerHeight, innerWidth, 
     insertBefore, insertCell, insertRow, is_WebKit, is_default, 
@@ -1423,7 +1423,7 @@
                 if (!prevent_reload && (BF.keys_pressed.alt || BF.keys_pressed.ctrl)) {
                     /// If the user has typed something into the query box, use that; otherwise, use the last query.
                     ///NOTE: Because the placeholder is currently in the element's value, we must check for that.
-                    window.open("/" + lang_id + "/" + window.encodeURIComponent(context.qEl.value !== BF.lang.query_explanation && context.qEl.value.trim() ? context.qEl.value : context.get_query_info().real_query) + "/", "_blank");
+                    window.open("/" + lang_id + "/" + window.encodeURIComponent(context.qEl.value !== BF.lang.query_explanation && context.qEl.value.trim() ? context.qEl.value : context.settings.user.last_query.real_query) + "/", "_blank");
                 } else {
                     /// Does the language exist and is the new language different from the current language?
                     if (BF.langs[lang_id] && BF.lang.id !== lang_id) {
@@ -1456,13 +1456,13 @@
                                 window.setTimeout(function ()
                                 {
                                     var qEl_str = context.qEl.value,
-                                        query_info = context.get_query_info(),
+                                        query_info = context.settings.user.last_query,
                                         query_str;
                                     
                                     /// Unless the query box is empty or contains the default text, use that text.  If it is empty, try getting the last query.
                                     ///NOTE: If the last query was the default query (when the page first loads), we do not want to record the query in the URL.
                                     ///NOTE: Because the placeholder is currently in the element's value, we must check for that.
-                                    query_str = qEl_str !== BF.lang.query_explanation && qEl_str.trim() ? qEl_str : context.get_query_info().real_query;
+                                    query_str = qEl_str !== BF.lang.query_explanation && qEl_str.trim() ? qEl_str : query_info.real_query;
                                     
                                     ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
                                     BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(query_str) + "/");
@@ -1476,7 +1476,7 @@
                                     }
                                     
                                     ///NOTE: If the user has not typed in a new query, keep the current position.
-                                    context.run_new_query(query_str, query_info.is_default, true, qEl_str === context.settings.user.last_query.query_info.raw_query ? context.settings.user.position : undefined);
+                                    context.run_new_query(query_str, query_info.is_default, true, qEl_str === query_info.raw_query ? context.settings.user.position : undefined);
                                 }, 0);
                             }
                             
