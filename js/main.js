@@ -120,6 +120,8 @@
         /// Second, set the alt, ctrl, and shift properties accordingly.
         /// If the user held down a key when the page was not in focus, we can use shiftKey, ctrlKey, and altKey to detect those keys presses.
         ///NOTE: WebKit does not set shiftKey, ctrlKey, or altKey to true when they are first pressed, so keyCode must also be used.
+        
+        /// Is Shift pressed?
         if (e.keyCode === 16 || e.shiftKey) {
             BF.keys_pressed.shift = true;
             if (!BF.keys_pressed[16]) {
@@ -128,6 +130,7 @@
         } else if (BF.keys_pressed.shift) {
             delete BF.keys_pressed.shift;
         }
+        /// Is Ctrl pressed?
         if (e.keyCode === 17 || e.ctrlKey) {
             BF.keys_pressed.ctrl = true;
             if (!BF.keys_pressed[17]) {
@@ -136,7 +139,7 @@
         } else if (BF.keys_pressed.ctrl) {
             delete BF.keys_pressed.ctrl;
         }
-        
+        /// Is Alt pressed?
         if (e.keyCode === 18 || e.altKey) {
             BF.keys_pressed.alt = true;
             if (!BF.keys_pressed[18]) {
