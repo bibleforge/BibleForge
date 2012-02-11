@@ -2893,19 +2893,32 @@
                     
                     /// Is the page loading for the first time and the user did not specify a query in the URL?
                     if (e.initial_page_load && window.location.pathname === "/" && BF.is_object(settings.user.last_query) && settings.user.last_query.lang_ID && BF.is_object(settings.user.last_query.query_info)) {
-                        /// Uuse the last query the user made instead of the default query.
+                        /// Use the last query the user made instead of the default query.
                         split_query = [settings.user.last_query.lang_ID, settings.user.last_query.query_info.real_query];
                         /// Get the last position the user was at.
                         position = settings.user.position;
                         /// Change the current state to match the last query so that if the user presses the back button later, they will get to the right query.
-                        BF.history.replaceState("/" + split_query[0] + "/" + window.encodeURIComponent(split_query[1]) + "/", {position: position});
+                        ///NOTE: The query and language is stored in the state object so as not to cause the URL to change.
+                        ///      This way, if the user clicks refresh, it will load back to the same position.
+                        BF.history.replaceState("/", {
+                            lang_id:  split_query[0],
+                            query:    split_query[1],
+                            position: position
+                        });
                     } else {
-                        /// Try to load a query from the URL.
-                        /// URL structure: /[lang/][query/]
-                        /// window.location.pathname should always start with a slash (/); substr(1) removes it.
-                        /// Since there should only be two parameters, anything after the second slash is ignored by limiting split() to two results.
-                        split_query = window.location.pathname.substr(1).split("/", 2).map(window.decodeURIComponent);
-                        /// Get the last position the user was at (if available).
+                        /// Was the query and langauge stored in the history state?
+                        if (e.state && e.state.lang_id && e.state.query) {
+                            /// Load the query from the history state.
+                            split_query = [e.state.lang_id, e.state.query];
+                        } else {
+                            /// Try to load a query from the URL.
+                            /// URL structure: /[lang/][query/]
+                            /// window.location.pathname should always start with a slash (/); substr(1) removes it.
+                            /// Since there should only be two parameters, anything after the second slash is ignored by limiting split() to two results.
+                            split_query = window.location.pathname.substr(1).split("/", 2).map(window.decodeURIComponent);
+                        }
+                        
+                        /// Get the last position the user was at (if available).    
                         position = e.state ? e.state.position : undefined;
                     }
                     
