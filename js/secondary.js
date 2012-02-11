@@ -1475,8 +1475,8 @@
                                         query_info.is_default = false;
                                     }
                                     
-                                    ///NOTE: If the user has not typed in a new query, keep the current position.
-                                    context.run_new_query(query_str, query_info.is_default, true, qEl_str === query_info.raw_query ? context.settings.user.position : undefined);
+                                    ///NOTE: If the user has not typed in a new query or the query was automated (i.e., query_info.is_default), keep the current position.
+                                    context.run_new_query(query_str, query_info.is_default, true, qEl_str === query_info.raw_query || query_info.is_default ? context.settings.user.position : undefined);
                                 }, 0);
                             }
                             

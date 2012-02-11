@@ -911,8 +911,6 @@
                 
                 Object.defineProperty(settings.view, "in_paragraphs", create_get_set(true, function ()
                 {
-                    var cur_query,
-                        cur_pos;
                     /// Handle changing paragraph mode.
                     
                     /// If the last query was a search, nothing needs to be done since only verse lookups are affected by paragraph mode.
@@ -923,16 +921,12 @@
                     
                     /// Are there any verses displayed on the scroll?
                     if (content_manager.top_verse !== false) {
-                        /// Get the current query and position now because the scroll will be cleared.
-                        cur_query = settings.user.last_query.real_query;
-                        cur_pos   = settings.user.position;
-                        
                         /// Clear the scroll because the view is changing dramatically.
                         ///NOTE: It does not necessarily need to reload the verses if switching from paragraph mode to non-paragraph mode.
                         content_manager.clear_scroll();
                         
                         /// Reload verses to where the user left off.
-                        run_new_query(cur_query, false, true, cur_pos);
+                        run_new_query(settings.user.last_query.real_query, false, true, settings.user.position);
                     }
                 }));
                 
@@ -2608,7 +2602,7 @@
                     if (verse_id > 0) {
                         /// Do we know what position the user should be brought to?
                         ///TODO: Make this work with searches as well.
-                        if (position) {
+                        if (position && position.verse_id) {
                             /// If the user is intended to be brought back to a particular passage, use that instead.
                             ///NOTE: This is used when the page first loads and the user is brought back to where they were last.
                             ///TODO: Make this work when moving back/forth through the history.
@@ -2879,7 +2873,7 @@
                     }
                     
                     /// Is the page loading for the first time and the user did not specify a query in the URL? (E.g., the user loaded "bibleforge.com" and not something like "bibleforge.com/en/gen".)
-                    if (e.initial_page_load && window.location.pathname === "/" && BF.is_object(settings.user.last_query) && settings.user.last_query.lang_id && BF.is_object(settings.user.last_query.real_query)) {
+                    if (e.initial_page_load && window.location.pathname === "/" && BF.is_object(settings.user.last_query) && settings.user.last_query.lang_id) {
                         /// Use the last query the user made instead of the default query.
                         lang_id   = settings.user.last_query.lang_id;
                         raw_query = settings.user.last_query.real_query;
@@ -2931,8 +2925,10 @@
                             }
                         }
                         
-                        /// Get the last position the user was at (if available).    
-                        position = e.state ? e.state.position : undefined;
+                        /// Get the last position the user was at (if available).
+                        /// If a language is specified but no query, try to load the last position as well on initial page loads.
+                        ///FIXME: Prevent search queries from influencing the position.
+                        position = e.state ? e.state.position : e.initial_page_load && !raw_query ? settings.user.position : undefined;
                     }
                     
                     /// If the requested language is the same as the current one, there is no need to change it.
@@ -3048,7 +3044,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?2599916", {
+                BF.include("/js/secondary.js?2605294", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
