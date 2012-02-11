@@ -17,7 +17,7 @@
 /// Indicate all object properties used.  JSLint checks this list for misspellings.
 /*properties
     Create_easy_ajax, abort, about, addEventListener, align_callout, alt, 
-    amount, appendChild, attach, automated, blog, body, books_short, borderTop, 
+    amount, appendChild, attach, blog, body, books_short, borderTop, 
     bottom, button, change_language, checked, childNodes, className, 
     clearTimeout, clear_scroll, click, clientWidth, clientX, clientY, 
     configure, content_manager, createElement, createEvent, createTextNode, 
@@ -1458,22 +1458,22 @@
                                     var query_info = context.get_query_info(),
                                         query_str;
                                     
-                                    /// If the last query was automated (e.g., when the page first loads), we do not want to record the query in the URL.
+                                    /// If the last query was the default query (when the page first loads), we do not want to record the query in the URL.
                                     ///NOTE: Because the placeholder is currently in the element's value, we must check for that.
                                     query_str = context.qEl.value !== BF.lang.query_explanation && context.qEl.value.trim() ? context.qEl.value : context.get_query_info().real_query;
                                     
                                     ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
                                     BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(query_str) + "/");
                                     
-                                    /// If the last query was automated (query_info.automated) and the user has not typed anything into the query box (query_str === query_info.real_query), use the default query (i.e., Genesis 1:1).
-                                    if (query_info.automated && query_str === query_info.real_query) {
+                                    /// If the last query was the default query (query_info.is_default) and the user has not typed anything into the query box (query_str === query_info.real_query), use the default query (i.e., Genesis 1:1).
+                                    if (query_info.is_default && query_str === query_info.real_query) {
                                         query_str = BF.lang.books_short[1] + " 1:1";
                                     } else {
-                                        /// If the user typed something into the query box, the query is not automated.
-                                        query_info.automated = false;
+                                        /// If the user typed something into the query box, the query is not the default query.
+                                        query_info.is_default = false;
                                     }
                                     
-                                    context.run_new_query(query_str, query_info.automated, true);
+                                    context.run_new_query(query_str, query_info.is_default, true);
                                 }, 0);
                             }
                             
