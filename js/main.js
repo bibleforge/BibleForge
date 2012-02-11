@@ -2874,9 +2874,9 @@
                     ///TODO: Check for a hash bang (#!) and possibly redirect the page to the hash bang's address, ignoring the pathname.
                     ///TODO: Check if IE 10 has the leading slash (see http://trac.osgeo.org/openlayers/ticket/3478).
                     var is_default = false,
-                        default_query,
                         lang_id,
                         position,
+                        raw_query,
                         split_query;
                     
                     /**
@@ -2886,19 +2886,19 @@
                      */
                     function do_query()
                     {
-                        run_new_query(default_query, is_default, true, position);
+                        run_new_query(raw_query, is_default, true, position);
                         
                         /// Only change the text in the query input if the user has not started typing and the user actually typed in the query.
                         if (!is_default && (!e.initial_page_load || qEl.value === BF.lang.query_explanation)) {
-                            qEl.value = default_query;
+                            qEl.value = raw_query;
                         }
                     }
                     
                     /// Is the page loading for the first time and the user did not specify a query in the URL?
                     if (e.initial_page_load && window.location.pathname === "/" && BF.is_object(settings.user.last_query) && settings.user.last_query.lang_id && BF.is_object(settings.user.last_query.query_info)) {
                         /// Use the last query the user made instead of the default query.
-                        lang_id       = settings.user.last_query.lang_id;
-                        default_query = settings.user.last_query.query_info.real_query;
+                        lang_id   = settings.user.last_query.lang_id;
+                        raw_query = settings.user.last_query.query_info.real_query;
                         /// Get the last position the user was at.
                         position = settings.user.position;
                         /// Change the current state to match the last query so that if the user presses the back button later, they will get to the right query.
@@ -2906,15 +2906,15 @@
                         ///      This way, if the user clicks refresh, it will load back to the same position.
                         BF.history.replaceState("/", {
                             lang_id:  lang_id,
-                            query:    default_query,
+                            query:    raw_query,
                             position: position
                         });
                     } else {
                         /// Was the query and langauge stored in the history state?
                         if (e.state && e.state.lang_id && e.state.query) {
                             /// Load the query from the history state.
-                            lang_id       = e.state.lang_id;
-                            default_query = e.state.query;
+                            lang_id   = e.state.lang_id;
+                            raw_query = e.state.query;
                         } else {
                             /// Try to load a query from the URL.
                             /// URL structure: /[lang/][query/]
@@ -2931,8 +2931,8 @@
                             
                             if (split_query.length === 2) {
                                 /// If the language has already been loaded, there is no need to change the language.
-                                lang_id = split_query[0];
-                                default_query = split_query[1];
+                                lang_id   = split_query[0];
+                                raw_query = split_query[1];
                             } else {
                                 /// Is the parameter a valid language ID?
                                 if (BF.langs[split_query[0]]) {
@@ -2940,8 +2940,8 @@
                                 } else {
                                     /// If no language was specified, default to English.
                                     ///TODO: Consider changing the default language based on the user's location and settings.
-                                    lang_id = "en";
-                                    default_query = split_query[0];
+                                    lang_id   = "en";
+                                    raw_query = split_query[0];
                                 }
                             }
                         }
@@ -2956,8 +2956,8 @@
                     }
                     
                     /// If the default query is empty, lookup Genesis 1:1.
-                    if (!default_query || default_query === BF.lang.query_explanation) {
-                        default_query = BF.lang.books_short[1] + " 1:1";
+                    if (!raw_query || raw_query === BF.lang.query_explanation) {
+                        raw_query = BF.lang.books_short[1] + " 1:1";
                         is_default = true;
                     }
                     
