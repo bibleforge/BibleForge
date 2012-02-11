@@ -34,7 +34,7 @@
     history, i, id, in_paragraphs, include, indexOf, indicate_loading, 
     initial_page_load, initial_query, innerHTML, insertBefore, insertRule, 
     is_WebKit, is_busy, is_object, join, keyCode, keyboard_busy, keys_pressed, 
-    lang, langEl, lang_ID, lang_id, langs, lastChild, last_query, left, length, 
+    lang, langEl, lang_id, langs, lastChild, last_query, left, length, 
     line_height, localStorage, location, map, metaKey, n, navigator, needsHash, 
     new_val, nextSibling, no_results1, no_results2, offsetHeight, offsetLeft, 
     offsetParent, offsetTop, old_val, onblur, onfocus, onreadystatechange, 
@@ -2379,13 +2379,13 @@
                                     this.prepared_query     = options.prepared_query;
                                     this.is_default         = options.is_default;
                                     this.extra_highlighting = options.extra_highlighting;
-                                    this.lang_ID            = BF.lang.id;
+                                    this.lang_id            = BF.lang.id;
                                     
                                     /// Store the user's position so that it can be retrieved when the user comes back later.
                                     ///FIXME: Also, store the exact location of the user and take the user to that point. 
-                                    ///NOTE:  Simply modifying the object (i.e., settings.user.last_query.lang_ID = "...") does not trigger the setter callback.
+                                    ///NOTE:  Simply modifying the object (i.e., settings.user.last_query.lang_id = "...") does not trigger the setter callback.
                                     settings.user.last_query = {
-                                        lang_ID:    BF.lang.id,
+                                        lang_id:    BF.lang.id,
                                         ///TODO: Remove get_query_info() (which secondary.js currently uses) because the same info is stored in the settings object.
                                         query_info: query_manager.get_query_info()
                                     };
@@ -2637,7 +2637,7 @@
                         ///TODO: The second parameter (smooth) should (probably) be TRUE, but it is not implemented yet.
                         ///TODO: If the user is already at that verse, nothing happens, so there may need to be some visual confirmation.
                         ///TODO: If the user changes the highlighting (i.e., words between "{{" and "}}"), update the highlighting accordingly.
-                        if (query_manager.lang_ID === BF.lang.id && content_manager.scroll_to_verse(BF.get_b_c_v(verse_id), false, true)) {
+                        if (query_manager.lang_id === BF.lang.id && content_manager.scroll_to_verse(BF.get_b_c_v(verse_id), false, true)) {
                             return;
                         }
                         
@@ -2892,9 +2892,9 @@
                     }
                     
                     /// Is the page loading for the first time and the user did not specify a query in the URL?
-                    if (e.initial_page_load && window.location.pathname === "/" && BF.is_object(settings.user.last_query) && settings.user.last_query.lang_ID && BF.is_object(settings.user.last_query.query_info)) {
+                    if (e.initial_page_load && window.location.pathname === "/" && BF.is_object(settings.user.last_query) && settings.user.last_query.lang_id && BF.is_object(settings.user.last_query.query_info)) {
                         /// Use the last query the user made instead of the default query.
-                        lang_id       = settings.user.last_query.lang_ID;
+                        lang_id       = settings.user.last_query.lang_id;
                         default_query = settings.user.last_query.query_info.real_query;
                         /// Get the last position the user was at.
                         position = settings.user.position;
@@ -3060,7 +3060,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?2587289", {
+                BF.include("/js/secondary.js?2592433", {
                     content_manager: content_manager,
                     get_query_info:  query_manager.get_query_info,
                     langEl:          langEl,

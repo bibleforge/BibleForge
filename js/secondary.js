@@ -1397,23 +1397,23 @@
             /**
              * Change the text in the button and adjust the padding.
              *
-             * @param lang_ID (string) The text to put into the button.
+             * @param lang_id (string) The text to put into the button.
              */
-            function change_langEl_text(lang_ID)
+            function change_langEl_text(lang_id)
             {
-                langEl.value = lang_ID;
+                langEl.value = lang_id;
                 context.qEl.style.paddingLeft = (langEl.offsetWidth + 3) + "px";
             }
             
             /**
              * Handle changes to the language.
              *
-             * @param lang_ID        (string)   The ID of the language to change to.
+             * @param lang_id        (string)   The ID of the language to change to.
              * @param prevent_reload (boolean)  Whether or not to load the last query after changing the language.
              * @param callback       (function) The function to run after the language loading has completed.
              * @note  This function attaches to the global BF object because it can be executed in different places.
              */
-            BF.change_language = function (lang_ID, prevent_reload, callback)
+            BF.change_language = function (lang_id, prevent_reload, callback)
             {
                 var activate_new_lang,
                     prev_lang;
@@ -1423,10 +1423,10 @@
                 if (!prevent_reload && (BF.keys_pressed.alt || BF.keys_pressed.ctrl)) {
                     /// If the user has typed something into the query box, use that; otherwise, use the last query.
                     ///NOTE: Because the placeholder is currently in the element's value, we must check for that.
-                    window.open("/" + lang_ID + "/" + window.encodeURIComponent(context.qEl.value !== BF.lang.query_explanation && context.qEl.value.trim() ? context.qEl.value : context.get_query_info().real_query) + "/", "_blank");
+                    window.open("/" + lang_id + "/" + window.encodeURIComponent(context.qEl.value !== BF.lang.query_explanation && context.qEl.value.trim() ? context.qEl.value : context.get_query_info().real_query) + "/", "_blank");
                 } else {
                     /// Does the language exist and is the new language different from the current language?
-                    if (BF.langs[lang_ID] && BF.lang.id !== lang_ID) {
+                    if (BF.langs[lang_id] && BF.lang.id !== lang_id) {
                         prev_lang = BF.lang.id;
                         
                         /**
@@ -1436,13 +1436,13 @@
                          */
                         activate_new_lang = function ()
                         {
-                            BF.lang = BF.langs[lang_ID];
+                            BF.lang = BF.langs[lang_id];
                             change_langEl_text(BF.lang.short_name);
                             
                             /// Make the cursor turn into a hand when hovering over words if there is lexical data available.
                             BF.toggleCSS(page, "linked", BF.lang.linked_to_orig ? 1 : 0);
                             BF.toggleCSS(page, "lang_" + prev_lang,  0);
-                            BF.toggleCSS(page, "lang_" + lang_ID,    1);
+                            BF.toggleCSS(page, "lang_" + lang_id,    1);
                             
                             context.system.event.trigger("languageChange", {prev_lang: prev_lang});
                             
@@ -1488,12 +1488,12 @@
                         context.content_manager.indicate_loading(true);
                             
                         /// Has the language code already been downloaded?
-                        if (BF.langs[lang_ID].loaded) {
+                        if (BF.langs[lang_id].loaded) {
                             activate_new_lang();
                         } else {
                             /// If the language code has not been downloaded yet, download it now and activate the language after the code has loaded.
                             ///NOTE: The last modified time is added (if available) to prevent browsers from caching an outdated file.
-                            BF.include("/js/lang/" + lang_ID + ".js?" + (BF.langs[lang_ID].modified || ""), {}, activate_new_lang);
+                            BF.include("/js/lang/" + lang_id + ".js?" + (BF.langs[lang_id].modified || ""), {}, activate_new_lang);
                         }
                     } else {
                         if (typeof callback === "function") {
@@ -1524,16 +1524,16 @@
                 /**
                  * Create a function to run when a user clicks on an item on the language selection menu.
                  *
-                 * @param  lang_ID (string) The ID of the language to change to.
+                 * @param  lang_id (string) The ID of the language to change to.
                  * @return A function that calls the language changing function.
                  * @note   This function is outside of the loop below because creating a function in a loop is error prone.
                  */
-                function create_lang_selection(lang_ID)
+                function create_lang_selection(lang_id)
                 {
                     return function ()
                     {
-                        /// Set lang_ID as the new language.
-                        BF.change_language(lang_ID);
+                        /// Set lang_id as the new language.
+                        BF.change_language(lang_id);
                     };
                 }
                 
