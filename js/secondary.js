@@ -1455,12 +1455,14 @@
                                  */ 
                                 window.setTimeout(function ()
                                 {
-                                    var query_info = context.get_query_info(),
+                                    var qEl_str = context.qEl.value,
+                                        query_info = context.get_query_info(),
                                         query_str;
                                     
-                                    /// If the last query was the default query (when the page first loads), we do not want to record the query in the URL.
+                                    /// Unless the query box is empty or contains the default text, use that text.  If it is empty, try getting the last query.
+                                    ///NOTE: If the last query was the default query (when the page first loads), we do not want to record the query in the URL.
                                     ///NOTE: Because the placeholder is currently in the element's value, we must check for that.
-                                    query_str = context.qEl.value !== BF.lang.query_explanation && context.qEl.value.trim() ? context.qEl.value : context.get_query_info().real_query;
+                                    query_str = qEl_str !== BF.lang.query_explanation && qEl_str.trim() ? qEl_str : context.get_query_info().real_query;
                                     
                                     ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
                                     BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(query_str) + "/");
@@ -1473,7 +1475,8 @@
                                         query_info.is_default = false;
                                     }
                                     
-                                    context.run_new_query(query_str, query_info.is_default, true, context.settings.user.position);
+                                    ///NOTE: If the user has not typed in a new query, keep the current position.
+                                    context.run_new_query(query_str, query_info.is_default, true, qEl_str === context.settings.user.last_query.query_info.raw_query ? context.settings.user.position : undefined);
                                 }, 0);
                             }
                             
