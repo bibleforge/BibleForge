@@ -2872,7 +2872,6 @@
                 function on_state_change(e)
                 {
                     ///TODO: Check for a hash bang (#!) and possibly redirect the page to the hash bang's address, ignoring the pathname.
-                    ///TODO: Check if IE 10 has the leading slash (see http://trac.osgeo.org/openlayers/ticket/3478).
                     var is_default = false,
                         lang_id,
                         position,
@@ -2894,7 +2893,7 @@
                         }
                     }
                     
-                    /// Is the page loading for the first time and the user did not specify a query in the URL?
+                    /// Is the page loading for the first time and the user did not specify a query in the URL? (E.g., the user loaded "bibleforge.com" and not something like "bibleforge.com/en/gen".)
                     if (e.initial_page_load && window.location.pathname === "/" && BF.is_object(settings.user.last_query) && settings.user.last_query.lang_id && BF.is_object(settings.user.last_query.query_info)) {
                         /// Use the last query the user made instead of the default query.
                         lang_id   = settings.user.last_query.lang_id;
@@ -2920,6 +2919,7 @@
                             /// URL structure: /[lang/][query/]
                             /// window.location.pathname should always start with a slash (/); substr(1) removes it.
                             /// Since there should only be two parameters, anything after the second slash is ignored by limiting split() to two results.
+                            ///TODO: Check if IE 10 has the leading slash (see http://trac.osgeo.org/openlayers/ticket/3478).
                             split_query = window.location.pathname.substr(1).split("/", 2).map(window.decodeURIComponent);
                             
                             /// If the second parameter is empty, remove it.
@@ -3063,7 +3063,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?2592850", {
+                BF.include("/js/secondary.js?2596967", {
                     content_manager: content_manager,
                     get_query_info:  query_manager.get_query_info,
                     langEl:          langEl,

@@ -1473,7 +1473,7 @@
                                         query_info.is_default = false;
                                     }
                                     
-                                    context.run_new_query(query_str, query_info.is_default, true);
+                                    context.run_new_query(query_str, query_info.is_default, true, context.settings.user.position);
                                 }, 0);
                             }
                             
