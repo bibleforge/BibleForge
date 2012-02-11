@@ -2894,55 +2894,57 @@
                     /// Is the page loading for the first time and the user did not specify a query in the URL?
                     if (e.initial_page_load && window.location.pathname === "/" && BF.is_object(settings.user.last_query) && settings.user.last_query.lang_ID && BF.is_object(settings.user.last_query.query_info)) {
                         /// Use the last query the user made instead of the default query.
-                        split_query = [settings.user.last_query.lang_ID, settings.user.last_query.query_info.real_query];
+                        lang          = settings.user.last_query.lang_ID;
+                        default_query = settings.user.last_query.query_info.real_query;
                         /// Get the last position the user was at.
                         position = settings.user.position;
                         /// Change the current state to match the last query so that if the user presses the back button later, they will get to the right query.
                         ///NOTE: The query and language is stored in the state object so as not to cause the URL to change.
                         ///      This way, if the user clicks refresh, it will load back to the same position.
                         BF.history.replaceState("/", {
-                            lang_id:  split_query[0],
-                            query:    split_query[1],
+                            lang_id:  lang,
+                            query:    default_query,
                             position: position
                         });
                     } else {
                         /// Was the query and langauge stored in the history state?
                         if (e.state && e.state.lang_id && e.state.query) {
                             /// Load the query from the history state.
-                            split_query = [e.state.lang_id, e.state.query];
+                            lang          = e.state.lang_id;
+                            default_query = e.state.query;
                         } else {
                             /// Try to load a query from the URL.
                             /// URL structure: /[lang/][query/]
                             /// window.location.pathname should always start with a slash (/); substr(1) removes it.
                             /// Since there should only be two parameters, anything after the second slash is ignored by limiting split() to two results.
                             split_query = window.location.pathname.substr(1).split("/", 2).map(window.decodeURIComponent);
+                            
+                            /// If the second parameter is empty, remove it.
+                            /// E.g., "/en/" turns into ["en", ""], so make it just ["en"].
+                            ///NOTE: split_query[1] could be undefined (e.g., "/en" becomes ["en"]).
+                            if (typeof split_query[1] === "string" && split_query[1].trim() === "") {
+                                split_query.remove(1);
+                            }
+                            
+                            if (split_query.length === 2) {
+                                /// If the language has already been loaded, there is no need to change the language.
+                                lang = split_query[0];
+                                default_query = split_query[1];
+                            } else {
+                                /// Is the parameter a valid language ID?
+                                if (BF.langs[split_query[0]]) {
+                                    lang = split_query[0];    
+                                } else {
+                                    /// If no language was specified, default to English.
+                                    ///TODO: Consider changing the default language based on the user's location and settings.
+                                    lang = "en";
+                                    default_query = split_query[0];
+                                }
+                            }
                         }
                         
                         /// Get the last position the user was at (if available).    
                         position = e.state ? e.state.position : undefined;
-                    }
-                    
-                    /// If the second parameter is empty, remove it.
-                    /// E.g., "/en/" turns into ["en", ""], so make it just ["en"].
-                    ///NOTE: split_query[1] could be undefined (e.g., "/en" becomes ["en"]).
-                    if (typeof split_query[1] === "string" && split_query[1].trim() === "") {
-                        split_query.remove(1);
-                    }
-                    
-                    if (split_query.length === 2) {
-                        /// If the language has already been loaded, there is no need to change the language.
-                        lang = split_query[0];
-                        default_query = split_query[1];
-                    } else {
-                        /// Is the parameter a valid language ID?
-                        if (BF.langs[split_query[0]]) {
-                            lang = split_query[0];    
-                        } else {
-                            /// If no language was specified, default to English.
-                            ///TODO: Consider changing the default language based on the user's location and settings.
-                            lang = "en";
-                            default_query = split_query[0];
-                        }
                     }
                     
                     /// If the requested language is the same as the current one, there is no need to change it.
