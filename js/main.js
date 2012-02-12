@@ -259,6 +259,9 @@
                     stop_propagation = true;
                 };
                 
+                cur_state = e.state;
+                cur_url   = window.location.pathname;
+                
                 for (i = 0; i < func_arr_len; i += 1) {
                     func_arr[i](event);
                     if (stop_propagation) {
@@ -270,13 +273,26 @@
             
             return {
                 attach: attach,
+                getState: function ()
+                {
+                    ///NOTE: Make sure that the session is an object.
+                    return cur_state || {};
+                },
                 pushState: function (url, state)
                 {
+                    cur_state = state;
+                    cur_url   = url;
                     window.history.pushState(state, "", url);
                 },
                 replaceState: function (url, state)
                 {
+                    cur_state = state;
+                    cur_url   = url;
                     window.history.replaceState(state, "", url);
+                },
+                updateState: function (state)
+                {
+                    this.replaceState(cur_url, state);
                 }
             };
         } else {
@@ -1591,6 +1607,7 @@
                         var new_title,
                             query_type,
                             ref_range,
+                            state,
                             verse1,
                             verse2;
                         
@@ -1671,7 +1688,17 @@
                         
                         looking_up_verse_range = false;
                         
+                        /// Next, store the state in the settings so that if the user comes back later, we can take them back to where they left off. 
                         settings.user.position = verse1;
+                        
+                        /// Finally, update the history state so that using the back/forward buttons will take the user back to where they left off.
+                        state = BF.history.getState();
+                        if (state.verse_id !== verse1.verse_id) {
+                            state.position = verse1;
+                            ///NOTE: This causes Chromium's stop button to breifly change into the refresh button.  (Tested in Chromium 16.)
+                            ///      See https://code.google.com/p/chromium/issues/detail?id=50298.
+                            BF.history.updateState(state);
+                        }
                     }
                     
                     /**
