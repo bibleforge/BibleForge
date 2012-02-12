@@ -227,8 +227,9 @@
      */
     BF.history = (function ()
     {
-        var hasHistory = Boolean(window.history),
-            func_arr = [];
+        var cur_state = {},
+            cur_url   = window.location.pathname,
+            func_arr  = [];
         
         /**
          * Add an event to the window.onpopstate event cue.
@@ -244,8 +245,8 @@
             }
         }
         
-        /// If the browser supports the History API, use that; if it does not, use the URL hash.
-        if (hasHistory) {
+        /// If the browser supports the History API, use that; if it does not, create dummy functions so that no errors are thrown (and ignore session state).
+        if (window.history) {
             window.addEventListener("popstate", function (e)
             {
                 var event = {state: e.state},
@@ -269,7 +270,6 @@
             
             return {
                 attach: attach,
-                needsHash: false,
                 pushState: function (url, state)
                 {
                     window.history.pushState(state, "", url);
@@ -282,15 +282,12 @@
         } else {
             return {
                 attach: attach,
-                needsHash: true,
-                pushState: function ()
+                getState: function ()
                 {
-                    ///TODO: Use hash.
+                    return {};
                 },
-                replaceState: function ()
-                {
-                    ///TODO: Use hash.
-                }
+                pushState: function () {},
+                replaceState: function () {}
             };
         }
     }());
@@ -2850,7 +2847,6 @@
             {
                 function on_state_change(e)
                 {
-                    ///TODO: Check for a hash bang (#!) and possibly redirect the page to the hash bang's address, ignoring the pathname.
                     var is_default = false,
                         lang_id,
                         position,
