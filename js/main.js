@@ -1640,6 +1640,9 @@
                         verse1.full_book = (verse1.b === 19 ? BF.lang.psalm : BF.lang.books_short[verse1.b]);
                         verse2.full_book = (verse2.b === 19 ? BF.lang.psalm : BF.lang.books_short[verse2.b]);
                         
+                        /// Beging creating the verse range text.  (The first book, chapter, and verse is always present).
+                        ref_range = verse1.full_book + " " + (BF.lang.chapter_count[verse1.b] === 1 ? "" : verse1.c + ":") + verse1.full_verse;
+                        
                         ///NOTE: \u2013 is Unicode for the en dash (–) (HTML: &ndash;).
                         ///TODO: Determine if the colons should be language specified.
                         /// Are the books the same?
@@ -1647,16 +1650,14 @@
                             /// Are the chapters the same?
                             if (verse1.c === verse2.c) {
                                 /// Are the verses the same?
-                                if (verse1.v === verse2.v) {
-                                    ref_range = verse1.full_book + " " + (BF.lang.chapter_count[verse1.b] === 1 ? "" : verse1.c + ":") + verse1.full_verse;
-                                } else {
-                                    ref_range = verse1.full_book + " " + (BF.lang.chapter_count[verse1.b] === 1 ? "" : verse1.c + ":") + verse1.full_verse + "\u2013" + verse2.full_verse;
+                                if (verse1.v !== verse2.v) {
+                                    ref_range += "\u2013" + verse2.full_verse;
                                 }
                             } else {
-                                ref_range = verse1.full_book + " " + (BF.lang.chapter_count[verse1.b] === 1 ? "" : verse1.c + ":") + verse1.full_verse + "\u2013" + (BF.lang.chapter_count[verse2.b] === 1 ? "" : verse2.c + ":") + verse2.full_verse;
+                                ref_range += "\u2013" + (BF.lang.chapter_count[verse2.b] === 1 ? "" : verse2.c + ":") + verse2.full_verse;
                             }
                         } else {
-                            ref_range = verse1.full_book + " " + (BF.lang.chapter_count[verse1.b] === 1 ? "" : verse1.c + ":") + verse1.full_verse + "\u2013" + verse2.full_book + " " + (BF.lang.chapter_count[verse2.b] === 1 ? "" : verse2.c + ":") + verse2.full_verse;
+                            ref_range += "\u2013" + verse2.full_book + " " + (BF.lang.chapter_count[verse2.b] === 1 ? "" : verse2.c + ":") + verse2.full_verse;
                         }
                         
                         /// Store the query type in a variable because it may need to be accessed more than once.
