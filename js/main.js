@@ -1595,7 +1595,8 @@
                  */
                 update_verse_range = (function ()
                 {
-                    var looking_up_verse_range = false;
+                    var looking_up_verse_range = false,
+                        updating_state_timeout = false;
                     
                     /**
                      * Determine and set the range of verses currently visible on the screen.
@@ -1608,7 +1609,6 @@
                         var new_title,
                             query_type,
                             ref_range,
-                            state,
                             verse1,
                             verse2;
                         
@@ -1689,18 +1689,42 @@
                         
                         looking_up_verse_range = false;
                         
-                        /// Next, store the state in the settings so that if the user comes back later, we can take them back to where they left off. 
+                        /// Store the state in the settings so that if the user comes back later, we can take them back to where they left off. 
                         settings.user.position = verse1;
                         
-                        /// Finally, update the history state so that using the back/forward buttons will take the user back to where they left off.
-                        state = BF.history.getState();
-                        if (state.verse_id !== verse1.verse_id) {
-                            state.position = verse1;
-                            ///NOTE: This causes Chromium's stop button to breifly change into the refresh button.  (Tested in Chromium 16.)
-                            ///      See https://code.google.com/p/chromium/issues/detail?id=50298.
-                            BF.history.updateState(state);
+                        if (updating_state_timeout === false) {
+                            /**
+                             * Update the state with the current position.
+                             *
+                             * @note Since the verse range may be called very frequently and updating the state is costly, this function needs to be delayed to prevent overwhelming the browser.
+                             */
+                            updating_state_timeout = window.setTimeout(function ()
+                            {
+                                var state = BF.history.getState();
+                                
+                                /// Update the history state so that using the back/forward buttons will take the user back to where they left off.
+                                ///NOTE: verse1 is from the function that initiated the timeout, so it is not necessarily up to date; therefore, use settings.user.position.
+                                if (state.verse_id !== settings.user.position.verse_id) {
+                                    state.position = settings.user.position;
+                                    ///NOTE: This causes Chromium's stop button to briefly change into the refresh button.  (Tested in Chromium 16.)
+                                    ///      See https://code.google.com/p/chromium/issues/detail?id=50298.
+                                    BF.history.updateState(state);
+                                }
+                                /// Set updating_state_timeout to FALSE to make sure that a new timeout can be created later.
+                                updating_state_timeout = false;
+                            }, 1000);
                         }
                     }
+                    
+                    /**
+                     * Prevent updating the state if the state changes.
+                     */
+                    BF.history.attach(function ()
+                    {
+                        window.clearTimeout(updating_state_timeout);
+                        /// Set updating_state_timeout to FALSE to make sure that a new timeout can be created later.
+                        updating_state_timeout = false;
+                    });
                     
                     /**
                      * Return the small function to call update_verse_range_delayed().
@@ -3068,7 +3092,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?2605294", {
+                BF.include("/js/secondary.js?2759061", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
