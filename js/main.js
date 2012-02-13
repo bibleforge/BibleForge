@@ -248,6 +248,11 @@
         
         /// If the browser supports the History API, use that; if it does not, create dummy functions so that no errors are thrown (and ignore session state).
         if (window.history) {
+            /**
+             * Run attached functions onpopstate.
+             *
+             * @param e (event object) The onpopstate event object.
+             */
             window.addEventListener("popstate", function (e)
             {
                 var event = {state: e.state},
@@ -255,14 +260,19 @@
                     i,
                     stop_propagation = false;
                 
+                /**
+                 * Prevent propogation to other attached functions.
+                 */
                 event.stopPropagation = function ()
                 {
                     stop_propagation = true;
                 };
                 
+                /// Update the current state and URL.
                 cur_state = e.state;
                 cur_url   = window.location.pathname;
                 
+                /// Run the attached functions.
                 for (i = 0; i < func_arr_len; i += 1) {
                     func_arr[i](event);
                     if (stop_propagation) {
@@ -274,29 +284,54 @@
             
             return {
                 attach: attach,
+                /**
+                 * Get the current history state.
+                 *
+                 * @note If the current state is NULL (or falsey) an empty object will be returned.
+                 */
                 getState: function ()
                 {
                     ///NOTE: Make sure that the session is an object.
                     return cur_state || {};
                 },
+                /**
+                 * Push a new state to the history.
+                 *
+                 * @param url   (string) The new URL to put into the history.
+                 * @param state (object) The state object to attach to the history.
+                 */
                 pushState: function (url, state)
                 {
                     cur_state = state;
                     cur_url   = url;
                     window.history.pushState(state, "", url);
                 },
+                /**
+                 * Replace the current state with a new one.
+                 *
+                 * @param url   (string) The new URL which will replace the current URL in the history.
+                 * @param state (object) A new state object to attach to the history, which overrides the current one.
+                 */
                 replaceState: function (url, state)
                 {
                     cur_state = state;
                     cur_url   = url;
                     window.history.replaceState(state, "", url);
                 },
+                /**
+                 * Replace the current state object with a new one.
+                 *
+                 * @param state (object) A new state object to attach to the history, which overrides the current one.
+                 * @note  This is essentially a shorthand for replaceState(), with the advantage of not needing to determine the current URL.
+                 */
                 updateState: function (state)
                 {
                     this.replaceState(cur_url, state);
                 }
             };
         } else {
+            /// If the browser does not support the history API, just create dummy functions to prevent errors from being thrown.
+            ///NOTE: The site will still work; just the back and forward buttons won't.
             return {
                 attach: attach,
                 getState: function ()
@@ -719,7 +754,7 @@
                 
                 text_el.className = className;
                 /// Set the string or default to "a" if none given.
-                ///NOTE: textContent is esentially the same as innerText.
+                ///NOTE: textContent is essentially the same as innerText.
                 text_el.textContent = str || "a";
             }, 0);
         };
