@@ -236,6 +236,7 @@
          *
          * @param  func (function) The function to call when the window.onpopstate event is triggered.
          * @return NULL
+         * @note   If func(e) calls e.stopPropagation(), it will stop further event propagation.
          * @note   Currently, there is no detach() function because it is not needed.
          */
         function attach(func)
@@ -2219,11 +2220,11 @@
                         function create_query_message(options)
                         {
                             /// Query Variables:
-                            /// d Direction (number)  The direction of the query (additional, previous)      (lookup only)
-                            /// f Find      (boolean) Whether or not to find a paragraph break to start at   (lookup only)
-                            /// p Paragraph (boolean) Whether or not verses will be displayed in paragraphs  (lookup only)
+                            /// d Direction (number)  The direction of the query (1 = additional, 2 = previous) (lookup only)
+                            /// f Find      (boolean) Whether or not to find a paragraph break to start at    (lookup only)
+                            /// p Paragraph (boolean) Whether or not verses will be displayed in paragraphs   (lookup only)
                             /// q Query     (string)  The verse reference or search string to query
-                            /// s Start At  (string)  The verse or word id at which to start the query       (search only)
+                            /// s Start At  (string)  The verse or word id at which to start the query        (search only)
                             /// t Type      (number)  The type of query (verse_lookup, mixed_search, standard_search, grammatical_search)
                             /// l Language  (number)  The language to use.  If not present, use 0 (English).
                             
