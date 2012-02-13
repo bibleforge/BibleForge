@@ -2259,31 +2259,6 @@
                 
                 /// Return the query_manager object.
                 return {
-                    store_query_options: function (options)
-                    {
-                        /// Store information about the current query to make it accessible to outer functions.
-                        ///NOTE: raw_query is exactly what the user typed in.
-                        ///      base_query is the query without the extra highlighting info (which is stored in extra_highlighting).
-                        ///      prepared_query is the query terms after being prepared by the language specific code to conform to Sphinx syntax.
-                        ///      E.g., with the query "For AND  God {{world}}", raw_query is "For AND  God {{world}}", base_query is "For AND  God", and prepared_query is "For & God".
-                        this.query_type         = options.type;
-                        this.raw_query          = options.raw_query;
-                        this.base_query         = options.base_query;
-                        this.prepared_query     = options.prepared_query;
-                        this.is_default         = options.is_default;
-                        this.extra_highlighting = options.extra_highlighting;
-                        this.lang_id            = BF.lang.id;
-                        
-                        /// Store the user's position so that it can be retrieved when the user comes back later.
-                        ///FIXME: Also, store the exact location of the user and take the user to that point. 
-                        ///NOTE:  Simply modifying the object (i.e., settings.user.last_query.lang_id = "...") does not trigger the setter callback.
-                        settings.user.last_query = {
-                            lang_id:    BF.lang.id,
-                            is_default: options.is_default,
-                            raw_query:  options.raw_query,
-                            real_query: options.is_default ? "" : options.raw_query
-                        };
-                    },
                     /**
                      * Execute a query to retrieve additional verses.
                      *
@@ -2475,6 +2450,37 @@
                      * @note This is created by this.query() each time.
                      */
                     query_previous: function () {},
+                    
+                    /**
+                     * Store the information from the query options for later use.
+                     *
+                     * @param options (object) The object containing the various aspects of the query.
+                     */
+                    store_query_options: function (options)
+                    {
+                        /// Store information about the current query to make it accessible to outer functions.
+                        ///NOTE: raw_query is exactly what the user typed in.
+                        ///      base_query is the query without the extra highlighting info (which is stored in extra_highlighting).
+                        ///      prepared_query is the query terms after being prepared by the language specific code to conform to Sphinx syntax.
+                        ///      E.g., with the query "For AND  God {{world}}", raw_query is "For AND  God {{world}}", base_query is "For AND  God", and prepared_query is "For & God".
+                        this.query_type         = options.type;
+                        this.raw_query          = options.raw_query;
+                        this.base_query         = options.base_query;
+                        this.prepared_query     = options.prepared_query;
+                        this.is_default         = options.is_default;
+                        this.extra_highlighting = options.extra_highlighting;
+                        this.lang_id            = BF.lang.id;
+                        
+                        /// Store the user's position so that it can be retrieved when the user comes back later.
+                        ///FIXME: Also, store the exact location of the user and take the user to that point. 
+                        ///NOTE:  Simply modifying the object (i.e., settings.user.last_query.lang_id = "...") does not trigger the setter callback.
+                        settings.user.last_query = {
+                            lang_id:    BF.lang.id,
+                            is_default: options.is_default,
+                            raw_query:  options.raw_query,
+                            real_query: options.is_default ? "" : options.raw_query
+                        };
+                    },
                     
                     /// Properties accessible to outer functions.
                     is_default: "",
@@ -2712,6 +2718,7 @@
                         ///TODO: If the user is already at that verse, nothing happens, so there may need to be some visual confirmation.
                         ///NOTE: If just the highlighting changes, the page does not need to reload.
                         if (options.extra_highlighting === query_manager.extra_highlighting && query_manager.lang_id === BF.lang.id && content_manager.scroll_to_verse(BF.get_b_c_v(verse_id), false, true)) {
+                            ///NOTE: Since the verse had already been loaded, and therefore no query needs to be made, store the query info now.
                             query_manager.store_query_options(options);
                             return;
                         }
