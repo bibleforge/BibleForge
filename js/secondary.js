@@ -635,6 +635,7 @@
             }, false);
             
             /// Hide the mouse cursor after switching between tabs or windows.
+            ///NOTE: Could use the new Page Visibility API, such as onvisibilitychange.
             window.onfocus = hide_cursor_delayed;
         }());
         
