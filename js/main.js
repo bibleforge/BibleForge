@@ -2951,7 +2951,6 @@
                         
                         /// Get the last position the user was at (if available).
                         /// On initial page loads, if a language is specified but no query or the query and language is the same as the last query made, try to load the last position as well.
-                        ///FIXME: Prevent search queries from influencing the position.
                         position = e.state ? e.state.position : e.initial_page_load && (!raw_query || (raw_query === settings.user.last_query.real_query && lang_id === settings.user.last_query.lang_id)) ? settings.user.position : undefined;
                     }
                     
