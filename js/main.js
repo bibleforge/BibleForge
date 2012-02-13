@@ -2911,7 +2911,8 @@
                             position: position
                         });
                     } else {
-                        /// Was the query and langauge stored in the history state?
+                        /// Was the query and language stored in the history state?
+                        ///NOTE: This occurs when the page first loads in order to take the user back to where they left off without changing the URL.
                         if (e.state && e.state.lang_id && e.state.query) {
                             /// Load the query from the history state.
                             lang_id   = e.state.lang_id;
@@ -2949,9 +2950,9 @@
                         }
                         
                         /// Get the last position the user was at (if available).
-                        /// If a language is specified but no query, try to load the last position as well on initial page loads.
+                        /// On initial page loads, if a language is specified but no query or the query and language is the same as the last query made, try to load the last position as well.
                         ///FIXME: Prevent search queries from influencing the position.
-                        position = e.state ? e.state.position : e.initial_page_load && !raw_query ? settings.user.position : undefined;
+                        position = e.state ? e.state.position : e.initial_page_load && (!raw_query || (raw_query === settings.user.last_query.real_query && lang_id === settings.user.last_query.lang_id)) ? settings.user.position : undefined;
                     }
                     
                     /// If the requested language is the same as the current one, there is no need to change it.
