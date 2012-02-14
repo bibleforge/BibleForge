@@ -1422,9 +1422,14 @@
                 /// If the user is holding down Alt or Ctrl, open a new tab.
                 /// But make sure to prevent loading in a new tab as well.
                 if (!prevent_reload && (BF.keys_pressed.alt || BF.keys_pressed.ctrl)) {
-                    /// If the user has typed something into the query box, use that; otherwise, use the last query.
-                    ///NOTE: Because the placeholder is currently in the element's value, we must check for that.
-                    window.open("/" + lang_id + "/" + window.encodeURIComponent(context.qEl.value !== BF.lang.query_explanation && context.qEl.value.trim() ? context.qEl.value : context.settings.user.last_query.real_query) + "/", "_blank");
+                    if (BF.langs[lang_id]) {
+                        /// If the user has typed something into the query box, use that; otherwise, use the last query.
+                        ///NOTE: Because the placeholder is currently in the element's value, we must check for that.
+                        window.open("/" + lang_id + "/" + window.encodeURIComponent(context.qEl.value !== BF.lang.query_explanation && context.qEl.value.trim() ? context.qEl.value : context.qEl.value.trim() === "" ? BF.langs[lang_id].books_short[context.settings.user.position.b] + " " + context.settings.user.position.c + ":" + context.settings.user.position.v : context.settings.user.last_query.real_query) + "/", "_blank");
+                    }
+                    if (typeof callback === "function") {
+                        callback();
+                    }
                 } else {
                     /// Does the language exist and is the new language different from the current language?
                     if (BF.langs[lang_id] && BF.lang.id !== lang_id) {
@@ -1477,7 +1482,7 @@
                                     }
                                     
                                     ///NOTE: If the user has not typed in a new query or the query was automated (i.e., query_info.is_default), keep the current position.
-                                    context.run_new_query(query_str, query_info.is_default, true, qEl_str === query_info.raw_query || query_info.is_default ? context.settings.user.position : undefined);
+                                    context.run_new_query(query_str, query_info.is_default, true, qEl_str === query_info.raw_query || query_info.is_default || qEl_str.trim() === "" ? context.settings.user.position : undefined);
                                 }, 0);
                             }
                             
