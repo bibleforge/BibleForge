@@ -2760,6 +2760,10 @@
                     
                     content_manager.clear_scroll();
                     
+                    /// Clear the old position since the page is now cleared.
+                    ///NOTE: If no results are found, the position variable is not updated; therefor, it needs to be cleared now.
+                    settings.user.position = {};
+                    
                     /// Indicate that the lookup is in progress.
                     ///TODO: Determine if this should be done by a function.
                     bottomLoader.style.visibility = "visible";
@@ -3140,7 +3144,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?2826961", {
+                BF.include("/js/secondary.js?3221164", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,

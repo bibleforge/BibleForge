@@ -1417,15 +1417,42 @@
             BF.change_language = function (lang_id, prevent_reload, callback)
             {
                 var activate_new_lang,
-                    prev_lang;
+                    prev_lang,
+                    qEl_str = context.qEl.value,
+                    qEl_str_trim;
+                
+                qEl_str_trim = qEl_str.trim();
                 
                 /// If the user is holding down Alt or Ctrl, open a new tab.
                 /// But make sure to prevent loading in a new tab as well.
                 if (!prevent_reload && (BF.keys_pressed.alt || BF.keys_pressed.ctrl)) {
                     if (BF.langs[lang_id]) {
-                        /// If the user has typed something into the query box, use that; otherwise, use the last query.
-                        ///NOTE: Because the placeholder is currently in the element's value, we must check for that.
-                        window.open("/" + lang_id + "/" + window.encodeURIComponent(context.qEl.value !== BF.lang.query_explanation && context.qEl.value.trim() ? context.qEl.value : context.qEl.value.trim() === "" ? BF.langs[lang_id].books_short[context.settings.user.position.b] + " " + context.settings.user.position.c + ":" + context.settings.user.position.v : context.settings.user.last_query.real_query) + "/", "_blank");
+                        activate_new_lang = function ()
+                        {
+                            /// If the user has typed something into the query box, use that; otherwise, use the last query.
+                            ///NOTE: Because the placeholder explanation is currently in the element's value, we must check for that.
+                            var query_str;
+                            
+                            if (context.settings.user.position.b && (qEl_str === "" || qEl_str === BF.lang.query_explanation || qEl_str === context.settings.user.last_query.real_query)) {
+                                query_str = BF.langs[lang_id].books_short[context.settings.user.position.b] + " " + context.settings.user.position.c + ":" + context.settings.user.position.v;
+                            } else if (context.qEl.value !== BF.lang.query_explanation && qEl_str_trim !== "") {
+                                query_str = qEl_str;
+                            } else {
+                                query_str = context.settings.user.last_query.real_query;
+                            }
+                            
+                            window.open("/" + lang_id + "/" + window.encodeURIComponent(query_str) + "/", "_blank");
+                        };
+                        
+                        /// Has the language code already been downloaded?
+                        if (!BF.langs[lang_id].loaded && (context.settings.user.position.b && (qEl_str === "" || qEl_str === BF.lang.query_explanation || qEl_str === context.settings.user.last_query.real_query))) {
+                            /// Because we needs to know the name of the book, it must first download the selected language and then open a new tab.
+                            ///TODO: Notify the user if downloading takes too long.
+                            ///NOTE: The last modified time is added (if available) to prevent browsers from caching an outdated file.
+                            BF.include("/js/lang/" + lang_id + ".js?" + (BF.langs[lang_id].modified || ""), {}, activate_new_lang);
+                        } else {
+                            activate_new_lang();
+                        }
                     }
                     if (typeof callback === "function") {
                         callback();
@@ -1461,14 +1488,13 @@
                                  */ 
                                 window.setTimeout(function ()
                                 {
-                                    var qEl_str = context.qEl.value,
-                                        query_info = context.settings.user.last_query,
+                                    var query_info = context.settings.user.last_query,
                                         query_str;
                                     
                                     /// Unless the query box is empty or contains the default text, use that text.  If it is empty, try getting the last query.
                                     ///NOTE: If the last query was the default query (when the page first loads), we do not want to record the query in the URL.
                                     ///NOTE: Because the placeholder is currently in the element's value, we must check for that.
-                                    query_str = qEl_str !== BF.lang.query_explanation && qEl_str.trim() ? qEl_str : query_info.real_query;
+                                    query_str = qEl_str !== BF.lang.query_explanation && qEl_str_trim ? qEl_str : query_info.real_query;
                                     
                                     ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
                                     BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(query_str) + "/");
@@ -1482,7 +1508,7 @@
                                     }
                                     
                                     ///NOTE: If the user has not typed in a new query or the query was automated (i.e., query_info.is_default), keep the current position.
-                                    context.run_new_query(query_str, query_info.is_default, true, qEl_str === query_info.raw_query || query_info.is_default || qEl_str.trim() === "" ? context.settings.user.position : undefined);
+                                    context.run_new_query(query_str, query_info.is_default, true, qEl_str === query_info.raw_query || query_info.is_default || qEl_str_trim === "" ? context.settings.user.position : undefined);
                                 }, 0);
                             }
                             
