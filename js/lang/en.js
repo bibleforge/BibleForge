@@ -132,7 +132,7 @@ BF.langs.en = (function ()
                 var step2list = {ational: "ate", tional: "tion", enci: "ence", anci: "ance", izer: "ize", bli: "ble", alli: "al", entli: "ent", eli: "e", ousli: "ous", ization: "ize", ation: "ate", ator: "ate", alism: "al", iveness: "ive", fulness: "ful", ousness: "ous", aliti: "al", iviti: "ive", biliti: "ble", logi: "log"},
                     step3list = {icate: "ic", ative: "", alize: "al", iciti: "ic", ical: "ic", ful: "", ness: "", self: ""},
                     
-                    ///TODO: Determine if there is a faster way to do this.  E.g., using a in_array() or isset() function.
+                    ///TODO: Determine if there is a faster way to do this.  E.g., using an in_array() or isset() function.
                     /// Words to ignore that are already the root word but don't look like it.
                     stop_words_re = /^th[iu]s|h[ai]s|was|yes|succeed|proceed|e(?:arly|xceed)|only|news$/i;
                 
@@ -462,7 +462,7 @@ first_loop:     while (i < search_terms_arr_len) {
                     }
                     len_after = stemmed_word.length;
                     
-                    /// Skip words that are the same after stemming or regex'ing (e.g., "joy joyful" becomes "joy joy").
+                    /// Skip words that are the same after stemming or regex'ing (e.g., "joyful joy" becomes "joy joy").
                     for (j = 0; j < count; j += 1) {
                         if (stemmed_word === stemmed_arr[j]) {
                             ///NOTE: This is the same as "continue 2" in PHP.
@@ -481,7 +481,8 @@ first_loop:     while (i < search_terms_arr_len) {
                     if (no_morph || (len_after === len_before && len_after < 3)) {
                         highlight_regex[count] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")[),.?!;:]*[<-]", "i");
                     } else {
-                        /// Find most words based on stem morphology, but also can have false hits.
+                        /// Find most words based on stem morphology.
+                        /// Because it just uses the stem plus up to 7 additional characters, this can have false hits.
                         ///TODO: Compare different regexes.
                         //highlight_regex[count++] = new RegExp("id=([0-9]+)>[(]*([^<]+-)?" + stemmed_word + "[a-z']{0,7}[),.?!;:]*[<-]", "i");
                         highlight_regex[count] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")[^<]{0,7}[),.?!;:]*[<-]", "i");
