@@ -2475,7 +2475,8 @@
                             lang_id:    BF.lang.id,
                             is_default: options.is_default,
                             raw_query:  options.raw_query,
-                            real_query: options.is_default ? "" : options.raw_query
+                            real_query: options.is_default ? "" : options.raw_query,
+                            type:       options.type
                         };
                     },
                     
@@ -2691,7 +2692,7 @@
                     }
                     
                     /// Is the query a verse lookup?
-                    if (verse_id > 0) {
+                    if ((position && position.type === verse_lookup) || verse_id > 0) {
                         /// Do we know what position the user should be brought to?
                         ///TODO: Make this work with searches as well.
                         if (position && position.verse_id) {
@@ -3141,7 +3142,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?3221164", {
+                BF.include("/js/secondary.js?3273871", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,

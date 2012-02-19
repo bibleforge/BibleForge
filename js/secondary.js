@@ -1491,7 +1491,8 @@
                                  */ 
                                 window.setTimeout(function ()
                                 {
-                                    var query_info = context.settings.user.last_query,
+                                    var position,
+                                        query_info = context.settings.user.last_query,
                                         query_str;
                                     
                                     /// Unless the query box is empty or contains the default text, use that text.  If it is empty, try getting the last query.
@@ -1510,8 +1511,13 @@
                                         query_info.is_default = false;
                                     }
                                     
+                                    if (qEl_str === query_info.raw_query || query_info.is_default || qEl_str_trim === "") {
+                                         position = context.settings.user.position;
+                                         position.type = query_info.type;
+                                    }
+                                    
                                     ///NOTE: If the user has not typed in a new query or the query was automated (i.e., query_info.is_default), keep the current position.
-                                    context.run_new_query(query_str, query_info.is_default, true, qEl_str === query_info.raw_query || query_info.is_default || qEl_str_trim === "" ? context.settings.user.position : undefined);
+                                    context.run_new_query(query_str, query_info.is_default, true, position);
                                 }, 0);
                             }
                             
