@@ -1501,26 +1501,30 @@
                                     ///NOTE: Because the placeholder is currently in the element's value, we must check for that.
                                     query_url_str = qEl_str_trim ? qEl_str : query_info.real_query;
                                     
-                                    if (qEl_str === query_info.raw_query || query_info.is_default || qEl_str_trim === "") {
+                                    /// Is the text in the query box empty or the same as the last query?
+                                    if (qEl_str === query_info.real_query || qEl_str_trim === "") {
                                         /// Use the current position as the query instead of the actual query.
                                         position = context.settings.user.position;
                                         /// Because the book name may not be recognized the same in the new language, make sure it knows how to handle this query.
                                         position.type = query_info.type;
                                         
                                         if (query_info.type === BF.const.verse_lookup) {
-                                        /// Because the book names are not the same in each language, recreate the verse and store it in the URL
-                                        /// so that if the page is refreshed, it will be able to load the correct verse.
-                                        query_url_str = BF.langs[lang_id].books_short[context.settings.user.position.b] + " " + context.settings.user.position.c + ":" + context.settings.user.position.v;
+                                            /// Because the book names are not the same in each language, recreate the verse and store it in the URL
+                                            /// so that if the page is refreshed, it will be able to load the correct verse.
+                                            query_url_str = BF.langs[lang_id].books_short[context.settings.user.position.b] + " " + context.settings.user.position.c + ":" + context.settings.user.position.v;
                                         }
-                                    }
-                                    
-                                    /// If the last query was the default query (query_info.is_default) and the user has not typed anything into the query box (query_str === query_info.real_query), use the default query (i.e., Genesis 1:1).
-                                    if (query_info.is_default && query_url_str === query_info.real_query) {
-                                        /// Use Genesis 1:1 as the query, but do not store it in the URL since it is the default query.
-                                        query_str = BF.lang.books_short[1] + " 1:1";
+                                        
+                                        /// If the last query was the default query (query_info.is_default) use the default query (i.e., Genesis 1:1).
+                                        if (query_info.is_default) {
+                                            /// Use Genesis 1:1 as the query, but do not store it in the URL since it is the default query.
+                                            query_str = BF.lang.books_short[1] + " 1:1";
+                                        } else {
+                                            query_str = qEl_str;
+                                        }
                                     } else {
                                         query_str = query_url_str;
-                                        /// If the user typed something into the query box, the query is not the default query.
+                                        ///NOTE: If the user typed something in the query box and not yet submitted the query, is_default is still TRUE,
+                                        ///      but now it needs to be FALSE because it will soon preform a new query.
                                         query_info.is_default = false;
                                     }
                                     
