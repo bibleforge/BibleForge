@@ -1436,7 +1436,7 @@
                             ///NOTE: Because the placeholder explanation is currently in the element's value, we must check for that.
                             var query_str;
                             
-                            if (context.settings.user.position.b && (qEl_str === "" || qEl_str === context.settings.user.last_query.real_query)) {
+                            if (context.settings.user.last_query.type === BF.const.verse_lookup && context.settings.user.position.b && (qEl_str === "" || qEl_str === context.settings.user.last_query.real_query)) {
                                 query_str = BF.langs[lang_id].books_short[context.settings.user.position.b] + " " + context.settings.user.position.c + ":" + context.settings.user.position.v;
                             } else if (qEl_str_trim !== "") {
                                 query_str = qEl_str;
@@ -1493,28 +1493,39 @@
                                 {
                                     var position,
                                         query_info = context.settings.user.last_query,
-                                        query_str;
+                                        query_str,
+                                        query_url_str;
                                     
                                     /// Unless the query box is empty or contains the default text, use that text.  If it is empty, try getting the last query.
                                     ///NOTE: If the last query was the default query (when the page first loads), we do not want to record the query in the URL.
                                     ///NOTE: Because the placeholder is currently in the element's value, we must check for that.
-                                    query_str = qEl_str_trim ? qEl_str : query_info.real_query;
+                                    query_url_str = qEl_str_trim ? qEl_str : query_info.real_query;
                                     
-                                    ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
-                                    BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(query_str) + "/");
+                                    if (qEl_str === query_info.raw_query || query_info.is_default || qEl_str_trim === "") {
+                                        /// Use the current position as the query instead of the actual query.
+                                        position = context.settings.user.position;
+                                        /// Because the book name may not be recognized the same in the new language, make sure it knows how to handle this query.
+                                        position.type = query_info.type;
+                                        
+                                        if (query_info.type === BF.const.verse_lookup) {
+                                        /// Because the book names are not the same in each language, recreate the verse and store it in the URL
+                                        /// so that if the page is refreshed, it will be able to load the correct verse.
+                                        query_url_str = BF.langs[lang_id].books_short[context.settings.user.position.b] + " " + context.settings.user.position.c + ":" + context.settings.user.position.v;
+                                        }
+                                    }
                                     
                                     /// If the last query was the default query (query_info.is_default) and the user has not typed anything into the query box (query_str === query_info.real_query), use the default query (i.e., Genesis 1:1).
-                                    if (query_info.is_default && query_str === query_info.real_query) {
+                                    if (query_info.is_default && query_url_str === query_info.real_query) {
+                                        /// Use Genesis 1:1 as the query, but do not store it in the URL since it is the default query.
                                         query_str = BF.lang.books_short[1] + " 1:1";
                                     } else {
+                                        query_str = query_url_str;
                                         /// If the user typed something into the query box, the query is not the default query.
                                         query_info.is_default = false;
                                     }
                                     
-                                    if (qEl_str === query_info.raw_query || query_info.is_default || qEl_str_trim === "") {
-                                         position = context.settings.user.position;
-                                         position.type = query_info.type;
-                                    }
+                                    ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
+                                    BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(query_url_str) + "/");
                                     
                                     ///NOTE: If the user has not typed in a new query or the query was automated (i.e., query_info.is_default), keep the current position.
                                     context.run_new_query(query_str, query_info.is_default, true, position);

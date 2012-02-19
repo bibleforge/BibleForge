@@ -1751,7 +1751,7 @@
                             }
                             /// Set updating_state_timeout to FALSE to make sure that a new timeout can be created later.
                             updating_state_timeout = false;
-                        }, 1000);
+                        }, 500);
                     }
                     
                     /**
@@ -2689,14 +2689,17 @@
                     if (!ignore_state) {
                         ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
                         ///NOTE: This needs to be called before the function returns if instead of querying it just scrolls to the verse.
-                        BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(raw_query) + "/", {position: position});
+                        BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(raw_query) + "/", position ? {position: position} : undefined);
                     }
                     
+                    /// After saving the state above, make sure that position is an object to make checking for its properties easier.
+                    position = position || {};
+                    
                     /// Is the query a verse lookup?
-                    if ((position && position.type === BF.const.verse_lookup) || verse_id > 0) {
+                    if (position.type === BF.const.verse_lookup || (verse_id > 0 && !position.type)) {
                         /// Do we know what position the user should be brought to?
                         ///TODO: Make this work with searches as well.
-                        if (position && position.verse_id) {
+                        if (position.verse_id) {
                             /// If the user is intended to be brought back to a particular passage, use that instead.
                             ///NOTE: This is used when the page first loads and the user is brought back to where they were last.
                             ///TODO: Make this work when moving back/forth through the history.
@@ -3143,7 +3146,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?3273871", {
+                BF.include("/js/secondary.js?3279538", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
