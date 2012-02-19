@@ -1421,6 +1421,9 @@
                     qEl_str = context.qEl.value,
                     qEl_str_trim;
                 
+                if (qEl_str === BF.lang.query_explanation) {
+                    qEl_str = "";
+                }
                 qEl_str_trim = qEl_str.trim();
                 
                 /// If the user is holding down Alt or Ctrl, open a new tab.
@@ -1433,9 +1436,9 @@
                             ///NOTE: Because the placeholder explanation is currently in the element's value, we must check for that.
                             var query_str;
                             
-                            if (context.settings.user.position.b && (qEl_str === "" || qEl_str === BF.lang.query_explanation || qEl_str === context.settings.user.last_query.real_query)) {
+                            if (context.settings.user.position.b && (qEl_str === "" || qEl_str === context.settings.user.last_query.real_query)) {
                                 query_str = BF.langs[lang_id].books_short[context.settings.user.position.b] + " " + context.settings.user.position.c + ":" + context.settings.user.position.v;
-                            } else if (context.qEl.value !== BF.lang.query_explanation && qEl_str_trim !== "") {
+                            } else if (qEl_str_trim !== "") {
                                 query_str = qEl_str;
                             } else {
                                 query_str = context.settings.user.last_query.real_query;
@@ -1445,7 +1448,7 @@
                         };
                         
                         /// Has the language code already been downloaded?
-                        if (!BF.langs[lang_id].loaded && (context.settings.user.position.b && (qEl_str === "" || qEl_str === BF.lang.query_explanation || qEl_str === context.settings.user.last_query.real_query))) {
+                        if (!BF.langs[lang_id].loaded && (context.settings.user.position.b && (qEl_str === "" || qEl_str === context.settings.user.last_query.real_query))) {
                             /// Because we needs to know the name of the book, it must first download the selected language and then open a new tab.
                             ///TODO: Notify the user if downloading takes too long.
                             ///NOTE: The last modified time is added (if available) to prevent browsers from caching an outdated file.
@@ -1494,7 +1497,7 @@
                                     /// Unless the query box is empty or contains the default text, use that text.  If it is empty, try getting the last query.
                                     ///NOTE: If the last query was the default query (when the page first loads), we do not want to record the query in the URL.
                                     ///NOTE: Because the placeholder is currently in the element's value, we must check for that.
-                                    query_str = qEl_str !== BF.lang.query_explanation && qEl_str_trim ? qEl_str : query_info.real_query;
+                                    query_str = qEl_str_trim ? qEl_str : query_info.real_query;
                                     
                                     ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
                                     BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(query_str) + "/");
