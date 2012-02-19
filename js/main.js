@@ -1725,28 +1725,32 @@
                         /// Store the state in the settings so that if the user comes back later, we can take them back to where they left off. 
                         settings.user.position = verse1;
                         
-                        if (updating_state_timeout === false) {
-                            /**
-                             * Update the state with the current position.
-                             *
-                             * @note Since the verse range may be called very frequently and updating the state is costly, this function needs to be delayed to prevent overwhelming the browser.
-                             */
-                            updating_state_timeout = window.setTimeout(function ()
-                            {
-                                var state = BF.history.getState();
-                                
-                                /// Update the history state so that using the back/forward buttons will take the user back to where they left off.
-                                ///NOTE: verse1 is from the function that initiated the timeout, so it is not necessarily up to date; therefore, use settings.user.position.
-                                if (state.verse_id !== settings.user.position.verse_id) {
-                                    state.position = settings.user.position;
-                                    ///NOTE: This causes Chromium's stop button to briefly change into the refresh button.  (Tested in Chromium 16.)
-                                    ///      See https://code.google.com/p/chromium/issues/detail?id=50298.
-                                    BF.history.updateState(state);
-                                }
-                                /// Set updating_state_timeout to FALSE to make sure that a new timeout can be created later.
-                                updating_state_timeout = false;
-                            }, 1000);
+                        /// Is it already queued to save the state?
+                        if (updating_state_timeout) {
+                            /// Since there is no reason to update while scrolling, stop the timeout.
+                            window.clearTimeout(updating_state_timeout);
                         }
+                        
+                        /**
+                         * Update the state with the current position.
+                         *
+                         * @note Since the verse range may be called very frequently and updating the state is costly, this function needs to be delayed to prevent overwhelming the browser.
+                         */
+                        updating_state_timeout = window.setTimeout(function ()
+                        {
+                            var state = BF.history.getState();
+                            
+                            /// Update the history state so that using the back/forward buttons will take the user back to where they left off.
+                            ///NOTE: verse1 is from the function that initiated the timeout, so it is not necessarily up to date; therefore, use settings.user.position.
+                            if (state.verse_id !== settings.user.position.verse_id) {
+                                state.position = settings.user.position;
+                                ///NOTE: This causes Chromium's stop button to briefly change into the refresh button.  (Tested in Chromium 16.)
+                                ///      See https://code.google.com/p/chromium/issues/detail?id=50298.
+                                BF.history.updateState(state);
+                            }
+                            /// Set updating_state_timeout to FALSE to make sure that a new timeout can be created later.
+                            updating_state_timeout = false;
+                        }, 1000);
                     }
                     
                     /**
