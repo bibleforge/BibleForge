@@ -362,13 +362,13 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
              */
             return function prepare_highlighter(search_terms)
             {
-                var count           = 0,
+                var add_morph_regex,
+                    count           = 0,
                     highlight_regex = [],
                     i               = 0,
                     j,
                     len_before,
                     len_after,
-                    no_morph,
                     term,
                     stemmed_arr     = [],
                     search_terms_arr,
@@ -384,7 +384,7 @@ first_loop:     while (i < search_terms_arr_len) {
                     len_before = term.length;
                     i += 1;
                     
-                    /// Fix special/unique words that the stemmer won't stem correctly.
+                    /// Possibly fix special/unique words that the stemmer won't stem correctly.
                     switch (term) {
                     case "does":
                     case "doth":
@@ -392,72 +392,49 @@ first_loop:     while (i < search_terms_arr_len) {
                     case "doeth":
                     case "doest":
                         stemmed_word = "do[esth]*";
-                        no_morph = true;
-                        break;
-                    case "haste":
-                    case "hasted":
-                        stemmed_word = "haste";
-                        no_morph = false;
+                        add_morph_regex = false;
                         break;
                     case "shalt":
                     case "shall":
                         stemmed_word = "shal[lt]";
-                        no_morph = true;
+                        add_morph_regex = false;
                         break;
                     case "wilt":
                     case "will":
                         stemmed_word = "wil[lt]";
-                        no_morph = true;
+                        add_morph_regex = false;
                         break;
                     case "have":
                     case "hast":
                     case "hath":
                         stemmed_word = "ha[vesth]+";
-                        no_morph = true;
+                        add_morph_regex = false;
                         break;
+                    case "haste":
+                    case "hasted":
+                        stemmed_word = "hast[ei]";
+                        add_morph_regex = true;
+                        break;
+                    
+                    /// Prevent words with no other form having the morphological regex added to the stem.
                     case "the":
-                        stemmed_word = "the";
-                        no_morph = true;
-                        break;
                     case "for":
-                        stemmed_word = "for";
-                        no_morph = true;
-                        break;
                     case "not":
-                        stemmed_word = "not";
-                        no_morph = true;
+                        stemmed_word = term;
+                        add_morph_regex = false;
                         break;
-                    ///TODO: This needs to be selected via a morphology stemmer.  There's just too many options.
-                    case "seek":
-                    case "seeks":
-                    case "seekest":
-                    case "seeketh":
-                    case "seeking":
-                    case "seeked":
-                    case "sought":
-                        stemmed_word = "s(?:eek|ought)";
-                        no_morph = false;
-                        break;
-                    case "brake":
-                    case "braking":
-                    case "brakest":
-                    case "braketh":
-                    case "broke":
-                    case "broken":
-                        stemmed_word = "br[ao]k";
-                        no_morph = false;
-                        break;
+                    
                     default:
                         /// Does the word contain a wildcard symbol (*)?
                         if (term.indexOf("*") !== -1) {
                             /// Don't stem; change it to a regex compatible form.
                             ///NOTE: Word breaks are found by looking for tag openings (<) or closings (>).
                             stemmed_word = term.replace(/\*/g, "[^<>]*");
-                            no_morph = true;
+                            add_morph_regex = false;
                         } else {
                             /// A normal word without a wildcard gets stemmed.
                             stemmed_word = stem_word(term);
-                            no_morph = false;
+                            add_morph_regex = true;
                         }
                     }
                     len_after = stemmed_word.length;
