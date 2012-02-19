@@ -1381,9 +1381,7 @@
                  */
                 function get_verse_at_position(the_pos, looking_upward, parent_el)
                 {
-                    var b,
-                        c,
-                        el,
+                    var el,
                         el_offset_height,
                         el_offset_top,
                         el_start_at,
@@ -1392,8 +1390,8 @@
                         possible_el,
                         parent_el_children_count = parent_el.childNodes.length,
                         parent_el_top            = parent_el.offsetTop,
-                        v,
-                        verse_id;
+                        verse_id,
+                        verse_obj;
                     
                     ///TODO: Rewrite this function to use document.elementFromPoint(clientX, clientY).
                     ///NOTE: Old versions of WebKit use pageX and pageY.
@@ -1478,11 +1476,10 @@
                         /// Found the verse, so calculate the verseID and call the success function.
                         verse_id = window.parseInt(el.id, 10);
                         
-                        v = verse_id % 1000;
-                        c = ((verse_id - v) % 1000000) / 1000;
-                        b = (verse_id - v - c * 1000) / 1000000;
+                        verse_obj = BF.get_b_c_v(verse_id);
+                        verse_obj.verse_id = verse_id;
                         
-                        return {b: b, c: c, v: v, verse_id: verse_id};
+                        return verse_obj;
                     default:
                         /// The verse has not yet been found.
                         return get_verse_at_position(the_pos, looking_upward, el);
@@ -1959,19 +1956,17 @@
                      */
                     function write_verses(type, direction, verse_ids, verse_html, paragraphs, in_paragraphs, verse_range)
                     {
-                        var b,
-                            c,
-                            chapter_text         = "",
+                        var chapter_text         = "",
                             end_paragraph_HTML   = "",
                             first_paragraph_HTML = "",
                             i,
                             html_str             = "",
                             newEl,
-                            num,
                             start_key            = 0,
                             start_paragraph_HTML = "",
                             stop_key             = verse_ids.length,
-                            v;
+                            verse_id,
+                            verse_obj;
                         
                         ///NOTE: Currently only grammatical_search searches data at the word level, so it is the only type that might stop in the middle of a verse and find more words in the same verse as the user scrolls.
                         if (type === grammatical_search) {
@@ -1995,47 +1990,45 @@
                         }
                         
                         for (i = start_key; i < stop_key; i += 1) {
-                            num = verse_ids[i];
-                            v   = num % 1000;                     /// Calculate the verse.
-                            c   = ((num - v) % 1000000) / 1000;   /// Calculate the chapter.
-                            b   = (num - v - c * 1000) / 1000000; /// Calculate the book by number (e.g., Genesis == 1).
+                            verse_id = verse_ids[i];
+                            verse_obj = BF.get_b_c_v(verse_id);
                             
                             ///TODO: Determine if it would be better to have two for loops instead of the if statement inside of this one.
                             if (type === verse_lookup) {
                                 /// Is this the first verse or the Psalm title?
-                                if (v < 2) {
+                                if (verse_obj.v < 2) {
                                     if (i !== start_key) {
                                         html_str += end_paragraph_HTML;
                                     }
                                     /// Is this chapter 1?  (We need to know if we should display the book name.)
-                                    if (c === 1) {
-                                        html_str += "<div class=book id=" + num + "_title><h2>" + BF.lang.books_long_pretitle[b] + "</h2><h1>" + BF.lang.books_long_main[b] + "</h1><h2>" + BF.lang.books_long_posttitle[b] + "</h2></div>";
+                                    if (verse_obj.c === 1) {
+                                        html_str += "<div class=book id=" + verse_id + "_title><h2>" + BF.lang.books_long_pretitle[verse_obj.b] + "</h2><h1>" + BF.lang.books_long_main[verse_obj.b] + "</h1><h2>" + BF.lang.books_long_posttitle[verse_obj.b] + "</h2></div>";
                                     /// Display chapter/psalm number (but not on verse 1 of psalms that have titles).
-                                    } else if (b !== 19 || v === 0 || !BF.psalm_has_title(c)) {
+                                    } else if (verse_obj.b !== 19 || verse_obj.v === 0 || !BF.psalm_has_title(verse_obj.c)) {
                                         /// Is this the book of Psalms?  (Psalms have a special name.)
-                                        if (b === 19) {
+                                        if (verse_obj.b === 19) {
                                             chapter_text = BF.lang.psalm;
                                         } else {
                                             chapter_text = BF.lang.chapter;
                                         }
-                                        html_str += "<h3 class=chapter id=" + num + "_chapter>" + chapter_text + " " + c + "</h3>";
+                                        html_str += "<h3 class=chapter id=" + verse_id + "_chapter>" + chapter_text + " " + verse_obj.c + "</h3>";
                                     }
                                     /// Is this a Psalm title (i.e., verse 0)?  (Psalm titles are displayed specially.)
-                                    if (v === 0) {
-                                        html_str += "<div class=psalm_title id=" + num + "_verse>" + verse_html[i] + "</div>";
+                                    if (verse_obj.v === 0) {
+                                        html_str += "<div class=psalm_title id=" + verse_id + "_verse>" + verse_html[i] + "</div>";
                                     } else {
                                         ///NOTE: The trailing space adds a space between verses in a paragraph and does not effect paragraph final verses.
-                                        html_str += first_paragraph_HTML + "<div class=first_verse id=" + num + "_verse>" + verse_html[i] + " </div>";
+                                        html_str += first_paragraph_HTML + "<div class=first_verse id=" + verse_id + "_verse>" + verse_html[i] + " </div>";
                                     }
                                 } else {
                                     /// Is it a subscription?
-                                    if (v === 255) {
+                                    if (verse_obj.v === 255) {
                                         /// Is there an open paragraph?
                                         if (in_paragraphs && i !== start_key) {
                                             ///NOTE: Since subscriptions are already set off by themselves, they do not need special paragraph HTML, but they may need to close existing paragraphs.
                                             html_str += end_paragraph_HTML;
                                         }
-                                        html_str += "<div class=subscription id=" + num + "_verse>" + verse_html[i] + "</div>";
+                                        html_str += "<div class=subscription id=" + verse_id + "_verse>" + verse_html[i] + "</div>";
                                     } else {
                                         /// Is there a paragraph break here?
                                         if (in_paragraphs && paragraphs[i]) {
@@ -2049,31 +2042,31 @@
                                         
                                         ///NOTE: The trailing space adds a space between verses in a paragraph and does not effect paragraph final verses.
                                         ///TODO: Determine if "class=verse_number" is needed.
-                                        html_str += "<div class=verse id=" + num + "_verse><span class=verse_number>" + v + "&nbsp;</span>" + verse_html[i] + " </div>";
+                                        html_str += "<div class=verse id=" + verse_id + "_verse><span class=verse_number>" + verse_obj.v + "&nbsp;</span>" + verse_html[i] + " </div>";
                                     }
                                 }
                                 
                             /// Searching
                             } else {
-                                if (v === 0) {
+                                if (verse_obj.v === 0) {
                                     /// Change verse 0 to indicate a Psalm title (e.g., change "Psalm 3:0" to "Psalm 3:title").
-                                    v = BF.lang.title;
-                                } else if (v === 255) {
+                                    verse_obj.v = BF.lang.title;
+                                } else if (verse_obj.v === 255) {
                                     /// Change verse 255 to indicate a Pauline subscription (e.g., change "Romans 16:255" to "Romans 16:subscription").
-                                    v = BF.lang.subscription;
+                                    verse_obj.v = BF.lang.subscription;
                                 }
                                 
                                 /// Is this verse from a different book than the last verse?
                                 ///NOTE: This assumes that searches are always additional (which is correct, currently).
-                                if (b !== verse_range.bottom_book) {
+                                if (verse_obj.b !== verse_range.bottom_book) {
                                     /// We only need to print out the book if it is different from the last verse.
-                                    verse_range.bottom_book = b;
+                                    verse_range.bottom_book = verse_obj.b;
                                     
                                     /// Convert the book number to text.
-                                    html_str += "<h1 class=short_book id=" + num + "_title>" + BF.lang.books_short[b] + "</h1>";
+                                    html_str += "<h1 class=short_book id=" + verse_id + "_title>" + BF.lang.books_short[verse_obj.b] + "</h1>";
                                 }
                                 
-                                html_str += "<div class=search_verse id=" + num + "_search><span>" + (BF.lang.chapter_count[b] === 1 ? "" : c + ":") + v + "</span> " + verse_html[i] + "</div>";
+                                html_str += "<div class=search_verse id=" + verse_id + "_search><span>" + (BF.lang.chapter_count[verse_obj.b] === 1 ? "" : verse_obj.c + ":") + verse_obj.v + "</span> " + verse_html[i] + "</div>";
                             }
                         }
                         
@@ -2761,7 +2754,7 @@
                     content_manager.clear_scroll();
                     
                     /// Clear the old position since the page is now cleared.
-                    ///NOTE: If no results are found, the position variable is not updated; therefor, it needs to be cleared now.
+                    ///NOTE: If no results are found, the position variable is not updated; therefore, it needs to be cleared now.
                     settings.user.position = {};
                     
                     /// Indicate that the lookup is in progress.
