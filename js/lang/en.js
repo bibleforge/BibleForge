@@ -415,7 +415,12 @@ first_loop:     while (i < search_terms_arr_len) {
                         stemmed_word = "hast[ei]";
                         add_morph_regex = true;
                         break;
-                    
+                    ///NOTE: "ate" must be here because the stem form is "at," which is ambiguous.
+                    ///NOTE: See "eat" and "eaten" below also.
+                    case "ate":
+                        stemmed_word = "(?:ate|eat)";
+                        add_morph_regex = true;
+                        break;
                     /// Prevent words with no other form having the morphological regex added to the stem.
                     case "the":
                     case "for":
@@ -424,6 +429,7 @@ first_loop:     while (i < search_terms_arr_len) {
                         add_morph_regex = false;
                         break;
                     
+                    /// Try stemming the word and then checking for strong words.
                     default:
                         /// Does the word contain a wildcard symbol (*)?
                         if (term.indexOf("*") !== -1) {
@@ -435,9 +441,123 @@ first_loop:     while (i < search_terms_arr_len) {
                             /// A normal word without a wildcard gets stemmed.
                             stemmed_word = stem_word(term);
                             add_morph_regex = true;
+                            
+                            /// Possibly fix strong words with proper morphological regex.
+                            switch (stemmed_word) {
+                            case "abid":
+                            case "abod":
+                                stemmed_word = "ab[io]d[ei]";
+                                break;
+                            case "aris":
+                            case "arisen":
+                            case "aros":
+                                stemmed_word = "ar[io]s[ei]";
+                                break;
+                            case "awak":
+                            case "awaken":
+                            case "awok":
+                                stemmed_word = "aw[ao]k";
+                                break;
+                            case "befal":
+                            case "befallen":
+                            case "befel":
+                                stemmed_word = "b[ae]fel";
+                                break;
+                            case "beheld":
+                            case "behold":
+                                stemmed_word = "beh[eo]ld";
+                                break;
+                            case "beseech":
+                            case "besought":
+                                stemmed_word = "bes(?:eech|ought)";
+                                break;
+                            case "becam":
+                            case "becom":
+                                stemmed_word = "bec[ao]m";
+                                break;
+                            case "began":
+                            case "begin":
+                            case "begun":
+                                stemmed_word = "beg[aiu]n";
+                                break;
+                            case "beget":
+                            case "begot":
+                            case "begotten":
+                                stemmed_word = "beg[eo]t";
+                                break;
+                            case "bend":
+                            case "bent":
+                            case "begotten":
+                                stemmed_word = "ben[dt]";
+                                break;
+                            case "bad[ei]":
+                            case "bid":
+                            case "bidden":
+                                ///NOTE: The negative look ahead (?!k) is to prevent highlighting the word "Bidkar" in 2 Kings 9:25.
+                                stemmed_word = "b(?:ad[ei]|id(?!k))";
+                                break;
+                            case "bind":
+                            case "bound":
+                                stemmed_word = "b(?:i|ou)nd";
+                                break;
+                            case "bit":
+                            case "bit[ei]":
+                            case "bitten":
+                                ///NOTE: The negative look ahead (?![ht]) is to prevent highlighting "Bithron," "Bithynia," and "bitter," but allow for "bit" and "bits."
+                                stemmed_word = "bit(?:(?![ht])|[ei]|ten)";
+                                break;
+                            case "blew":
+                            case "blow":
+                            case "blown":
+                                stemmed_word = "bl[eo]w";
+                                break;
+                            case "bred":
+                            case "br[ei]":
+                                stemmed_word = "bree?d";
+                                break;
+                            case "brethren":
+                            case "brother":
+                                ///NOTE: The negative look ahead (?!h) is to prevent highlighting "brotherhood."
+                                stemmed_word = "br[eo]the?r(?:en)?(?!h)";
+                                break;
+                            case "brak[ei]":
+                            case "brok[ei]":
+                            case "broken":
+                                stemmed_word = "br[ao]k[ei]";
+                                break;
+                            case "bring":
+                            case "brought":
+                            case "brung":
+                                ///NOTE: The negative look ahead (?!e) is to prevent highlighting "bringers."
+                                stemmed_word = "br(?:ing(?!e)|ought|ung)";
+                                break;
+                            case "build":
+                            case "built":
+                                ///NOTE: The negative look ahead (?!er) is to prevent highlighting "bringers" but allow for "buildedst."
+                                stemmed_word = "buil[dt](?!er)";
+                                break;
+                            case "burnt":
+                            case "burn":
+                                ///NOTE: The negative look ahead (?!is) is to prevent highlighting "burnished" but allow for "burning."
+                                stemmed_word = "burnt?(?!is)";
+                                break;
+                            case "bought":
+                            case "bu[yi]":
+                                ///NOTE: The negative look ahead (?!er) is to prevent highlighting "buyer" but allow for "buyest."
+                                stemmed_word = "b(?:uy(?!er)|ought)";
+                                break;
+                            ///NOTE: See "ate" above also.
+                            case "eat":
+                            case "eaten":
+                                stemmed_word = "(?:ate|eat)";
+                                break;
+                            case "seek":
+                            case "sought":
+                                stemmed_word = "s(?:eek|ought)";
+                                break;
+                            }
                         }
                     }
-                    len_after = stemmed_word.length;
                     
                     /// Skip words that are the same after stemming or regex'ing (e.g., "joyful joy" becomes "joy joy").
                     for (j = 0; j < count; j += 1) {
@@ -447,6 +567,8 @@ first_loop:     while (i < search_terms_arr_len) {
                         }
                     }
                     
+                    len_after = stemmed_word.length;
+                    
                     stemmed_arr[count] = stemmed_word;
                     
                     ///NOTE:  [<-] finds either the beginning of the close tag (</a>) or a hyphen (-).
@@ -455,7 +577,7 @@ first_loop:     while (i < search_terms_arr_len) {
                     ///       The current English version (KJV) does not use square brackets ([]).
                     ///FIXME: The punctuation ,.?!;:)( could be considered language specific.
                     ///TODO:  Bench mark different regex (creation and testing).
-                    if (no_morph || (len_after === len_before && len_after < 3)) {
+                    if (!add_morph_regex || (len_after === len_before && len_after < 3)) {
                         highlight_regex[count] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")[),.?!;:]*[<-]", "i");
                     } else {
                         /// Find most words based on stem morphology.
