@@ -421,6 +421,11 @@ first_loop:     while (i < search_terms_arr_len) {
                         stemmed_word = "(?:ate|eat)";
                         add_morph_regex = true;
                         break;
+                    ///NOTE: This is to make "comely" highlight "comeliness" and not "come."
+                    case "comely":
+                        stemmed_word = "comel[yi]";
+                        add_morph_regex = true;
+                        break;
                     /// Prevent words with no other form having the morphological regex added to the stem.
                     case "the":
                     case "for":
@@ -545,6 +550,15 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "bu[yi]":
                                 ///NOTE: The negative look ahead (?!er) is to prevent highlighting "buyer" but allow for "buyest."
                                 stemmed_word = "b(?:uy(?!er)|ought)";
+                                break;
+                            case "catch":
+                            case "caught":
+                                stemmed_word = "ca(?:tch|ught)";
+                                break;
+                            case "cam[ei]":
+                            case "com[ei]":
+                                /// The negative look ahead (?!l) is to prevent highlighting "comeliness" but allow for "comest."
+                                stemmed_word = "c[ao]m(?:i|e(?!l))";
                                 break;
                             ///NOTE: See "ate" above also.
                             case "eat":
