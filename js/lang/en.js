@@ -568,6 +568,25 @@ first_loop:     while (i < search_terms_arr_len) {
                                 /// The negative look ahead (?!l) is to prevent highlighting "comeliness" but allow for "comest."
                                 stemmed_word = "c[ao]m(?:i|e(?!l))";
                                 break;
+                            case "can":
+                            case "could":
+                                /// The negative look ahead (?!a|d|e|k|n) is to prevent highlighting "cannot," "Canaan," "Cana," "candle," "candlestick," "Candace," "cane," "canker," and "cankerworm" but allow for "canst."
+                                stemmed_word = "c(?:an(?!a|d|e|k|n)|ould)";
+                                break;
+                            case "child":
+                            case "children":
+                                /// The negative look ahead (?!l|h|b) is to prevent highlighting "childbearing," "childhood," and "childless" but allow for "children's."
+                                stemmed_word = "child(?:ren)?(?!b|h|l)";
+                                break;
+                            case "choos":
+                            case "chos[ei]":
+                            case "chosen":
+                                stemmed_word = "cho(?:s(?:en?|i)|ose)";
+                                break;
+                            case "creep":
+                            case "crept":
+                                stemmed_word = "cre(?:ep|pt)";
+                                break;
                             ///NOTE: See "ate" above also.
                             case "eat":
                             case "eaten":
