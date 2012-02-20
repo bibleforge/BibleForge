@@ -151,7 +151,7 @@ BF.langs.en = (function ()
                  * @todo    Document stem_word() better: give examples (from the KJV if possible) and reasonings for each regular expression, etc.
                  * @todo    Review stem_word() for optimizations: avoid regex when possible.
                  */
-                return function (w)
+                return function stem_word(w)
                 {
                     var fp,
                         last_letter,
@@ -171,7 +171,14 @@ BF.langs.en = (function ()
                         return w;
                     }
                     
-                    ///TODO: Determine if Step 0 is needed (see http://snowball.tartarus.org/algorithms/english/stemmer.html).
+                    /// Step 0
+                    /// Search for the longest among the suffixes
+                    ///     '
+                    ///     's
+                    ///     's'
+                    /// and remove if found.
+                    
+                    w = w.replace(/'(?:s|s')?$/, "");
                     
                     /// Step 1a
                     /// Find the longest suffix and preform the following:
@@ -326,7 +333,8 @@ BF.langs.en = (function ()
                 ///NOTE: (?:"[^"]*"?|[^\s]*) matches a phrase starting with a double quote (") or a single word.
                 ///NOTE: [~\/]\d* removes characters used for Sphinx query syntax.  I.e., proximity searches ("this that"~10) and quorum matching ("at least three of these"/3).
                 ///NOTE: -\B removes trailing hyphens.  (This might be unnecessary.)
-                initial_search_arr = search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?|[^\s]*)|[~\/]\d*|["',.:?!;&|\)\(\]\[\/\\`{}<$\^+]|-\B)/g, "").toLowerCase().split(" ");
+                ///NOTE: '(?!s\b) removes that are not followed by an "s" and only an "s."
+                initial_search_arr = search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?|[^\s]*)|[~\/]\d*|[",.:?!;&|\)\(\]\[\/\\`{}<$\^+]|-\B|'(?!s\b))/g, "").toLowerCase().split(" ");
                 
                 arr_len = initial_search_arr.length;
                 
