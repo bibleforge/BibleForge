@@ -394,14 +394,6 @@ first_loop:     while (i < search_terms_arr_len) {
                     
                     /// Possibly fix special/unique words that the stemmer won't stem correctly.
                     switch (term) {
-                    case "does":
-                    case "doth":
-                    case "do":
-                    case "doeth":
-                    case "doest":
-                        stemmed_word = "do[esth]*";
-                        add_morph_regex = false;
-                        break;
                     case "shalt":
                     case "shall":
                         stemmed_word = "shal[lt]";
@@ -586,6 +578,56 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "creep":
                             case "crept":
                                 stemmed_word = "cre(?:ep|pt)";
+                                break;
+                            case "deal":
+                            case "dealt":
+                                stemmed_word = "dealt?";
+                                break;
+                            case "did":
+                            case "didst":
+                            case "do":
+                            case "do[ei]":
+                            case "don[ei]":
+                            case "dost":
+                            case "doth":
+                                stemmed_word = "d(?:o(?:est?|ne|st|th)?|id(?:st)?)";
+                                /// Since this word is so short, it needs special regex to prevent false positives, so do not add additional morphological regex.
+                                add_morph_regex = false;
+                                break;
+                            case "draw":
+                            case "drawn":
+                            case "drew":
+                                /// The negative look ahead (?!e) is to prevent highlighting "drawers" but allow for "drawn."
+                                stemmed_word = "dr[ae]w(?!e)";
+                                break;
+                            case "driv[ei]":
+                            case "driven":
+                            case "drov[ei]":
+                                /// The negative look ahead (?!r) is to prevent highlighting "driver" but allow for "driving."
+                                stemmed_word = "dr[oi]v[ei]n?(?!r)";
+                                break;
+                            case "drank":
+                            case "drink":
+                            case "drunk":
+                                /// The negative look ahead (?!a|e) is to prevent highlighting "drunkard," "drinkers," "drunken," and "drunkenness" but allow for "drinking."
+                                stemmed_word = "dr[aiu]nk(?!a|e)";
+                                break;
+                            case "dig":
+                            case "dug":
+                                /// The negative look ahead (?!n) is to prevent highlighting "dignity" but allow for "digging."
+                                stemmed_word = "d[iu]g(?!n)";
+                                break;
+                            case "dwell":
+                            case "dwelt":
+                                /// The negative look ahead (?!er|i) is to prevent highlighting "dwelling," "dwellings," "dwellingplace," and "dwellers" but allow for "dwelled."
+                                ///NOTE: "dwelling" is primarily used as a noun.
+                                stemmed_word = "dwel[lt](?!er|i)";
+                                break;
+                            case "di[ei]":
+                            case "d[yi]":
+                                stemmed_word = "d(?:ie(?:d|th|st)?|ying)";
+                                /// Since this word is so short, it needs special regex to prevent false positives, so do not add additional morphological regex.
+                                add_morph_regex = false;
                                 break;
                             ///NOTE: See "ate" above also.
                             case "eat":
