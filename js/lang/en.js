@@ -63,7 +63,7 @@ BF.langs.en = (function ()
         
         /// Indicate the language name so it can be distinguished later.
         full_name:  "English (KJV)",
-        short_name: "en",
+        short_name: "KJV",
         id:         "en",
         lang_id:    0,
         
