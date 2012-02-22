@@ -62,7 +62,7 @@ BF.langs.en = (function ()
         loaded: true,
         
         /// Indicate the language name so it can be distinguished later.
-        full_name:  "English",
+        full_name:  "English (KJV)",
         short_name: "en",
         id:         "en",
         lang_id:    0,
@@ -446,6 +446,7 @@ first_loop:     while (i < search_terms_arr_len) {
                             /// A normal word without a wildcard gets stemmed.
                             stemmed_word = stem_word(term);
                             add_morph_regex = true;
+                            console.log(stemmed_word);
                             
                             /// Possibly fix strong words with proper morphological regex.
                             switch (stemmed_word) {
