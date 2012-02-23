@@ -426,6 +426,12 @@ first_loop:     while (i < search_terms_arr_len) {
                         stemmed_word = "comel[yi]";
                         add_morph_regex = true;
                         break;
+                    ///NOTE: This is to highlight "find," "findest," "findeth," and "found" but not "foundation," "founded," or "founder."
+                    ///NOTE: See "find" and "found" below also.
+                    case "found":
+                        stemmed_word = "f(?:ind(?:e(?:st|th)|ing)?|ound)";
+                        add_morph_regex = false;
+                        break;
                     /// Prevent words with no other form having the morphological regex added to the stem.
                     case "the":
                     case "for":
@@ -634,6 +640,45 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "eat":
                             case "eaten":
                                 stemmed_word = "(?:ate|eat)";
+                                break;
+                            case "enquir":
+                            case "enquir[yi]":
+                                stemmed_word = "inquir";
+                                break;
+                            case "fall":
+                            case "fallen":
+                            case "fell":
+                                stemmed_word = "f[ae]ll";
+                                break;
+                            case "fed":
+                            case "feed":
+                                stemmed_word = "fee?d";
+                                break;
+                            case "feet":
+                            case "foot":
+                                stemmed_word = "f(?:ee|oo)t";
+                                /// Since there are no other forms, there is no need to add additional morphological regex.
+                                add_morph_regex = false;
+                                break;
+                            case "feel":
+                            case "felt":
+                                stemmed_word = "fe(?:el|lt)";
+                                break;
+                            case "fight":
+                            case "fought":
+                                stemmed_word = "f(?:i|ou)ght";
+                                break;
+                            ///NOTE: This is to highlight "find," "findest," "findeth," and "found" but not "foundation," "founded," or "founder."
+                            ///NOTE: See "found" above and "found" below also.
+                            case "find":
+                                stemmed_word = "f(?:ind(?:e(?:st|th)|ing)?|ound)";
+                                add_morph_regex = false;
+                                break;
+                            ///NOTE: This is actually used to match "founded" and "foundest."
+                            ///NOTE: Other morphological variants that a user searches for (such as "foundeth") will also correctly use this regex.
+                            case "found":
+                                stemmed_word = "founde(?:d|st)";
+                                add_morph_regex = false;
                                 break;
                             case "seek":
                             case "sought":
