@@ -404,10 +404,15 @@ first_loop:     while (i < search_terms_arr_len) {
                         stemmed_word = "wil[lt]";
                         add_morph_regex = false;
                         break;
-                    case "have":
+                    ///NOTE: Could also include "haddest," but that is not found in the current English version.
+                    case "had":
+                    case "hadst":
+                    case "has":
                     case "hast":
                     case "hath":
-                        stemmed_word = "ha[vesth]+";
+                    case "have":
+                    case "having":
+                        stemmed_word = "ha(?:d(?:st)?|st?|th|v(?:e|ing))";
                         add_morph_regex = false;
                         break;
                     case "haste":
