@@ -436,6 +436,9 @@ first_loop:     while (i < search_terms_arr_len) {
                     case "the":
                     case "for":
                     case "not":
+                    /// Because "flies" always refers to the insect (not the verb) and "fly" is always a verb, prevent "flies" from being stemmed.
+                    ///NOTE: See "fl[yi]" below also.
+                    case "flies":
                         stemmed_word = term;
                         add_morph_regex = false;
                         break;
@@ -679,6 +682,20 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "found":
                                 stemmed_word = "founde(?:d|st)";
                                 add_morph_regex = false;
+                                break;
+                            case "fled":
+                            case "flee":
+                            case "fl[ei]":
+                            case "fle[ei]":
+                                ///NOTE: The negative look ahead (?!c|s|w) prevents highlighting "fleece" but allows for "fleest."
+                                stemmed_word = "fle(?:e|d)(?!c)";
+                                break;
+                            case "flew":
+                            case "flown":
+                            case "fl[yi]":
+                                ///NOTE: The negative look ahead (?!g|n) prevents highlighting "flight" and "flint" but allows for "flieth."
+                                ///NOTE: See "flies" above also.
+                                stemmed_word = "fl(?:ew|i(?!g|n)|y)";
                                 break;
                             case "seek":
                             case "sought":
