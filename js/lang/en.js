@@ -455,7 +455,6 @@ first_loop:     while (i < search_terms_arr_len) {
                             /// A normal word without a wildcard gets stemmed.
                             stemmed_word = stem_word(term);
                             add_morph_regex = true;
-                            console.log(stemmed_word);
                             
                             /// Possibly fix strong words with proper morphological regex.
                             switch (stemmed_word) {
@@ -696,6 +695,47 @@ first_loop:     while (i < search_terms_arr_len) {
                                 ///NOTE: The negative look ahead (?!g|n) prevents highlighting "flight" and "flint" but allows for "flieth."
                                 ///NOTE: See "flies" above also.
                                 stemmed_word = "fl(?:ew|i(?!g|n)|y)";
+                                break;
+                            case "forbad":
+                            case "forbid":
+                            case "forbidden":
+                                stemmed_word = "forb[ai]d";
+                                break;
+                            case "foreknew":
+                            case "foreknow":
+                            case "foreknown":
+                                ///NOTE: The negative look ahead (?!l) prevents highlighting "foreknowledge."
+                                stemmed_word = "forekn[eo]w(?:!l)";
+                                break;
+                            case "foresaw":
+                            case "foreseen":
+                            case "fores[ei]":
+                                stemmed_word = "fores(?:een?|aw)";
+                                break;
+                            case "foretel":
+                            case "foretold":
+                                stemmed_word = "foret(?:ell|old)";
+                                break;
+                            case "forget":
+                            case "forgot":
+                            case "forgotten":
+                                stemmed_word = "forg[eo]t";
+                                break;
+                            case "forgav":
+                            case "forgiv":
+                            case "forgiven":
+                                stemmed_word = "forg[ai]v";
+                                break;
+                            case "forsak":
+                            case "forsaken":
+                            case "forsook":
+                                stemmed_word = "fors(?:a|oo)k";
+                                break;
+                            case "freez":
+                            case "froz[ei]":
+                            case "frozen":
+                                ///NOTE: This word actually only occurs once (as "forzen").
+                                stemmed_word = "fr(?:ee|o)z";
                                 break;
                             case "seek":
                             case "sought":
