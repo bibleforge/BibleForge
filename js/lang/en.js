@@ -444,6 +444,9 @@ first_loop:     while (i < search_terms_arr_len) {
                     /// Because "flies" always refers to the insect (not the verb) and "fly" is always a verb, prevent "flies" from being stemmed.
                     ///NOTE: See "fl[yi]" below also.
                     case "flies":
+                    /// Because "goings" is a noun, it should not be stemmed to "go."
+                    ///NOTE: See "go" below also.
+                    case "goings":
                         stemmed_word = term;
                         add_morph_regex = false;
                         break;
@@ -748,11 +751,27 @@ first_loop:     while (i < search_terms_arr_len) {
                                 ///NOTE: The negative look ahead (?!r) prevents highlighting "giver" but allows for "giving."
                                 stemmed_word = "g[ai]v[ei](?!r)";
                                 break;
-                            /// "gently" stems to "gent".
+                            ///NOTE: "gently" stems to "gent".
                             case "gent":
                             case "gentl":
                                 /// This is to prevent "gently" from highlighting "Gentiles."
                                 stemmed_word = "gentl";
+                                break;
+                            ///NOTE: See "goings" above also.
+                            case "go":
+                            case "gon[ei]":
+                            case "went":
+                                stemmed_word = "(?:go(?:e(?:st|th)|ing|ne)?|went)";
+                                /// Because this word is so small, it is easier to white list all of the forms used.
+                                add_morph_regex = false;
+                                break;
+                            case "get":
+                            case "got":
+                            case "gotten":
+                                ///NOTE: The negative look ahead (?!h) prevents highlighting "Gether" and "Gethsemane" but allows for other forms, like "getting."
+                                stemmed_word = "g[eo]t(?!h)";
+                                /// Because this word is so small, it is easier to white list all of the forms used.
+                                add_morph_regex = false;
                                 break;
                             case "seek":
                             case "sought":
