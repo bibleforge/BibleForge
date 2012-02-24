@@ -432,6 +432,11 @@ first_loop:     while (i < search_terms_arr_len) {
                         stemmed_word = "f(?:ind(?:e(?:st|th)|ing)?|ound)";
                         add_morph_regex = false;
                         break;
+                    case "ye":
+                    case "you":
+                        stemmed_word = "y(?:e|ou)";
+                        add_morph_regex = false;
+                        break;
                     /// Prevent words with no other form having the morphological regex added to the stem.
                     case "the":
                     case "for":
@@ -736,6 +741,18 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "frozen":
                                 ///NOTE: This word actually only occurs once (as "forzen").
                                 stemmed_word = "fr(?:ee|o)z";
+                                break;
+                            case "gav[ei]":
+                            case "giv[ei]":
+                            case "given":
+                                ///NOTE: The negative look ahead (?!r) prevents highlighting "giver" but allows for "giving."
+                                stemmed_word = "g[ai]v[ei](?!r)";
+                                break;
+                            /// "gently" stems to "gent".
+                            case "gent":
+                            case "gentl":
+                                /// This is to prevent "gently" from highlighting "Gentiles."
+                                stemmed_word = "gentl";
                                 break;
                             case "seek":
                             case "sought":
