@@ -834,6 +834,38 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "hasten":
                                 stemmed_word = "hast[ei]";
                                 break;
+                            case "hear":
+                            case "heard":
+                                ///NOTE: The negative look ahead (?!er|k|r|t) prevents highlighting "hearer," "hearken," "heart," and "hearth" but allows for other forms, like "getting."
+                                stemmed_word = "heard?(?!er|k|r|t)";
+                                break;
+                            ///NOTE: "hearkenedst" does not stem properly.
+                            case "hearkenedst":
+                                stemmed_word = "hearken";
+                                break;
+                            case "held":
+                            case "hold":
+                                ///NOTE: The negative look ahead (?!ai|en) prevents highlighting "Heldai" and "holden" but allows for other forms, like "holdest."
+                                ///NOTE: The word "holds" is used in the Bible only as a noun, such as "strong holds"; however, it is a common Present Day English form.
+                                stemmed_word = "h[eo]ld(?!ai|en)";
+                                break;
+                            case "hew":
+                            case "hewn":
+                                ///NOTE: The negative look ahead (?!ai|en) prevents highlighting "hewer" but allows for other forms, like "hewn."
+                                stemmed_word = "hew(?!er)";
+                                break;
+                            case "hid":
+                            case "hid[ei]":
+                            case "hidden":
+                                ///NOTE: The negative look ahead (?!d(?:ek|a)) prevents highlighting "Hiddekel" and "Hiddai" but allows for "hidden."
+                                stemmed_word = "hid(?!d(?:ek|a))";
+                                break;
+                            case "hang":
+                            case "hung":
+                                ///NOTE: The negative look ahead (?!er|r) prevents highlighting "hunger" and "hungry" but allows for other forms, like "hangest."
+                                ///NOTE: "hanging" almost always refers to the noun; "hangings" always does.
+                                stemmed_word = "h[au]ng(?!er|r)";
+                                break;
                             case "seek":
                             case "sought":
                                 stemmed_word = "s(?:eek|ought)";
