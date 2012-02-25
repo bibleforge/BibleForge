@@ -825,8 +825,6 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "gotten":
                                 ///NOTE: The negative look ahead (?!h) prevents highlighting "Gether" and "Gethsemane" but allows for other forms, like "getting."
                                 stemmed_word = "g[eo]t(?!h)";
-                                /// Because this word is so small, it is easier to white list all of the forms used.
-                                add_morph_regex = false;
                                 break;
                             ///NOTE: "haste" is stemmed to "hast."
                             ///NOTE: "hast" is intercepted above, before stemming.
