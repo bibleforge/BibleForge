@@ -172,17 +172,26 @@ BF.langs.en = (function ()
                         return w;
                     }
                     
-                    /// **********
-                    /// * Step 0 *
-                    /// **********
+                    /// ***********
+                    /// * Step 0a *
+                    /// ***********
                     ///
                     /// Search for the longest among the suffixes
                     ///     '
                     ///     's
                     ///     's'
                     /// and remove if found.
-                    
+                                        
                     w = w.replace(/'(?:s'?)?$/, "");
+                    
+                    /// ***********
+                    /// * Step 0b *
+                    /// ***********
+                    ///
+                    /// Convert y's at the beginning of a word or after a vowel to upper case to indicate that they are to be treated as consonants.
+                    /// They are converted back to lower case near the end.
+                    
+                    w = w.replace(/(?:^y|([aeiouy])y)/g, "$1Y");
                     
                     /// ***********
                     /// * Step 1a *
@@ -345,6 +354,7 @@ BF.langs.en = (function ()
                         }
                     }
                     
+                    w = w.toLowerCase();
                     if (/ll$/.test(w) && (/^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(w))) {
                         w = w.slice(0, -1);
                     }
