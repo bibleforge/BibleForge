@@ -233,7 +233,7 @@ BF.langs.en = (function ()
                     ///TODO: Also stem "eedly" (porter2).
                     re  = /^(.+?)eed$/;
                     /// "Present-day" English: re2 = /^(.+?)(ingly|edly|ed|ing|ly)$/;
-                    re2 = /^(.+?)(ing(?:ly)?|ed(?:ly)?|ly|e(?:st|th))$/; /// Early Modern English fix
+                    re2 = /^(.+?)(ing(?:ly)?|e(?:d(?:ly)?|st|th)|ly)$/; /// Early Modern English fix
                     
                     if (re.test(w)) {
                         fp = re.exec(w);
