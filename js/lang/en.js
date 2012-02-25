@@ -178,7 +178,7 @@ BF.langs.en = (function ()
                     ///     's'
                     /// and remove if found.
                     
-                    w = w.replace(/'(?:s|s')?$/, "");
+                    w = w.replace(/'(?:s'?)?$/, "");
                     
                     /// Step 1a
                     /// Find the longest suffix and preform the following:
