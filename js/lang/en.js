@@ -134,7 +134,7 @@ BF.langs.en = (function ()
                     
                     ///TODO: Determine if there is a faster way to do this.  E.g., using an in_array() or isset() function.
                     /// Words to ignore that are already the root word but don't look like it.
-                    stop_words_re = /^th[iu]s|h[ai]s|was|yes|succeed|proceed|e(?:arly|xceed)|only|news$/i;
+                    stop_words_re = /^(?:th[iu]s|h[ai]s|was|yes|succeed|proceed|e(?:arly|xceed)|only|news)$/i;
                 
                 /**
                  * Convert an English word to its root form.
