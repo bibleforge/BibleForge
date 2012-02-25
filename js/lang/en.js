@@ -352,12 +352,13 @@ BF.langs.en = (function ()
                         if (re.test(stem) || (re2.test(stem) && !(re3.test(stem)))) {
                             w = stem;
                         }
+                    } else {
+                        if (/ll$/.test(w) && (/^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(w))) {
+                            w = w.slice(0, -1);
+                        }
                     }
                     
                     w = w.toLowerCase();
-                    if (/ll$/.test(w) && (/^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(w))) {
-                        w = w.slice(0, -1);
-                    }
                     
                     last_letter = w.slice(-1);
                     
