@@ -470,11 +470,6 @@ first_loop:     while (i < search_terms_arr_len) {
                         stemmed_word = "ha(?:d(?:st)?|st?|th|v(?:e|ing))";
                         add_morph_regex = false;
                         break;
-                    case "haste":
-                    case "hasted":
-                        stemmed_word = "hast[ei]";
-                        add_morph_regex = true;
-                        break;
                     ///NOTE: "ate" must be here because the stem form is "at," which is ambiguous.
                     ///NOTE: See "eat" and "eaten" below also.
                     case "ate":
@@ -832,6 +827,12 @@ first_loop:     while (i < search_terms_arr_len) {
                                 stemmed_word = "g[eo]t(?!h)";
                                 /// Because this word is so small, it is easier to white list all of the forms used.
                                 add_morph_regex = false;
+                                break;
+                            ///NOTE: "haste" is stemmed to "hast."
+                            ///NOTE: "hast" is intercepted above, before stemming.
+                            case "hast":
+                            case "hasten":
+                                stemmed_word = "hast[ei]";
                                 break;
                             case "seek":
                             case "sought":
