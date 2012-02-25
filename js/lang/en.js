@@ -909,7 +909,8 @@ first_loop:     while (i < search_terms_arr_len) {
                         ///TODO: Compare different regexes.
                         //highlight_regex[count++] = new RegExp("id=([0-9]+)>[(]*([^<]+-)?" + stemmed_word + "[a-z']{0,7}[),.?!;:]*[<-]", "i");
                         //highlight_regex[count] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")[^<]{0,7}[),.?!;:]*[<-]", "i");
-                        highlight_regex[count] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")(?:e|l)?(?:a(?:l|n(?:ce|t)|te|ble)|e(?:n(?:ce|t)|r|ment)|i(?:c|ble|on|sm|ti|ve|ze)|ment|ous?)?(?:ic(?:a(?:te|l)|iti)|a(?:tive|lize)|ful|ness|self)?(?:a(?:t(?:ion(?:al)?|or)|nci|l(?:li|i(?:sm|ti)))|tional|e(?:n(?:ci|til)|li)|i(?:z(?:er|ation)|v(?:eness|iti))|b(?:li|iliti)|ous(?:li|ness)|fulness|logi)?(?:i?ng(?:ly)?|e?(?:d(?:ly)?|ed(?:ly)?|st|th)|ly)?(?:e[sd]|s)?(?:'(?:s'?)?)?[),.?!;:]*[<-]", "i");
+                        ///NOTE: [bdfgmnprt]? selects possible doubles.
+                        highlight_regex[count] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")(?:e|l)?(?:a(?:l|n(?:ce|t)|te|ble)|e(?:n(?:ce|t)|r|ment)|i(?:c|ble|on|sm|ti|ve|ze)|ment|ous?)?(?:ic(?:a(?:te|l)|iti)|a(?:tive|lize)|ful|ness|self)?(?:a(?:t(?:ion(?:al)?|or)|nci|l(?:li|i(?:sm|ti)))|tional|e(?:n(?:ci|til)|li)|i(?:z(?:er|ation)|v(?:eness|iti))|b(?:li|iliti)|ous(?:li|ness)|fulness|logi)?(?:[bdfgmnprt]?(?:i?ng(?:ly)?|e?(?:d(?:ly)?|ed(?:ly)?|st|th)|ly))?(?:e[sd]|s)?(?:'(?:s'?)?)?[),.?!;:]*[<-]", "i");
                     }
                     count += 1;
                 }
