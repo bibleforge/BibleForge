@@ -145,6 +145,7 @@ BF.langs.en = (function ()
                  * @example root_word = stem_word("loving"); /// Returns "lov[ei]"
                  * @param   w (string) Word to stem.
                  * @return  Root word string.
+                 * @todo    Update this (and Sphinx) to the porter2 algorithm.
                  * @note    Called by prepare_highlighter() in js/main.js.
                  * @link    http://snowball.tartarus.org/algorithms/english/stemmer.html
                  * @link    http://www.tartarus.org/~martin/PorterStemmer
@@ -171,7 +172,10 @@ BF.langs.en = (function ()
                         return w;
                     }
                     
-                    /// Step 0
+                    /// **********
+                    /// * Step 0 *
+                    /// **********
+                    ///
                     /// Search for the longest among the suffixes
                     ///     '
                     ///     's
@@ -180,7 +184,10 @@ BF.langs.en = (function ()
                     
                     w = w.replace(/'(?:s'?)?$/, "");
                     
-                    /// Step 1a
+                    /// ***********
+                    /// * Step 1a *
+                    /// ***********
+                    ///
                     /// Find the longest suffix and preform the following:
                     /// Replace suffixes: sses             => ss     (witnesses => witness)
                     ///                   ??ied+ || ??ies* => ??i    (cried     => cri,      cries => cri)
@@ -196,9 +203,26 @@ BF.langs.en = (function ()
                         w = w.replace(re2, "$1$2");
                     }
                     
-                    /// Step 1b
-                    /// "Present-day" English: re = /^(.+?)eed$/;
-                    re  = /^(.+?)ee$/; /// Early Modern English fix
+                    /// ***********
+                    /// * Step 1b *
+                    /// ***********
+                    ///
+                    /// Replace "eed" with "ee" if after the first non-vowel following a vowel, or the end of the word if there is no such non-vowel (aka R1).
+                    ///     agreed => agree
+                    /// Delete
+                    ///     ed
+                    ///     edly
+                    ///     ing
+                    ///     ingly
+                    ///     eth
+                    ///     est
+                    /// if the preceding word part contains a vowel, and after the deletion:
+                    /// if the word ends with "at," "bl," or "iz," add "e" (so luxuriat => luxuriate), or
+                    /// if the word ends with a double remove the last letter (so hopp => hop), or
+                    /// if the word is short, add "e" (so hop => hope)
+                    
+                    ///TODO: Also stem "eedly" (porter2).
+                    re  = /^(.+?)eed$/;
                     /// "Present-day" English: re2 = /^(.+?)(ingly|edly|ed|ing|ly)$/;
                     re2 = /^(.+?)(ing(?:ly)?|ed(?:ly)?|ly|e(?:st|th))$/; /// Early Modern English fix
                     
@@ -226,7 +250,15 @@ BF.langs.en = (function ()
                         }
                     }
                     
-                    /// Step 1c
+                    /// ***********
+                    /// * Step 1c *
+                    /// ***********
+                    ///
+                    /// Replace y suffix by i if preceded by a non-vowel which is not the first letter of the word.
+                    ///     cry => cri
+                    ///     by  => by
+                    ///     say => say
+                    
                     re = /^(.+?)y$/;
                     if (re.test(w)) {
                         fp   = re.exec(w);
@@ -236,7 +268,12 @@ BF.langs.en = (function ()
                         }
                     }
                     
-                    /// Step 2
+                    /// **********
+                    /// * Step 2 *
+                    /// **********
+                    ///
+                    /// Replace stems in step2list if after the first non-vowel following a vowel, or the end of the word if there is no such non-vowel (aka R1).
+                    
                     re = /^(.+?)(a(?:t(?:ion(?:al)?|or)|nci|l(?:li|i(?:sm|ti)))|tional|e(?:n(?:ci|til)|li)|i(?:z(?:er|ation)|v(?:eness|iti))|b(?:li|iliti)|ous(?:li|ness)|fulness|logi)$/;
                     if (re.test(w)) {
                         fp     = re.exec(w);
@@ -247,7 +284,13 @@ BF.langs.en = (function ()
                         }
                     }
                     
-                    /// Step 3
+                    /// **********
+                    /// * Step 3 *
+                    /// **********
+                    ///
+                    /// Replace stems in step3list if after the first non-vowel following a vowel, or the end of the word if there is no such non-vowel (aka R1).
+                    ///NOTE: "ative" should be removed if after the first non-vowel following a vowel in R1 or the end of the word, if there is no such non-vowel (aka R2).
+                    
                     re = /^(.+?)(ic(?:a(?:te|l)|iti)|a(?:tive|lize)|ful|ness|self)$/;
                     if (re.test(w)) {
                         fp     = re.exec(w);
@@ -258,7 +301,12 @@ BF.langs.en = (function ()
                         }
                     }
                     
-                    /// Step 4
+                    /// **********
+                    /// * Step 4 *
+                    /// **********
+                    ///
+                    /// Essentially, delete certain suffixes if found in after the first non-vowel following a vowel in R1 or the end of the word, if there is no such non-vowel (aka R2).
+                    
                     re  = /^(.+?)(?:a(?:l|n(?:ce|t)|te|ble)|e(?:n(?:ce|t)|r|ment)|i(?:c|ble|sm|ti|ve|ze)|ment|ous?)$/;
                     re2 = /^(.+?)([st])ion$/;
                     
@@ -276,7 +324,14 @@ BF.langs.en = (function ()
                         }
                     }
                     
-                    /// Step 5
+                    /// **********
+                    /// * Step 5 *
+                    /// **********
+                    ///
+                    /// Delete "e" if in R2, or in R1 and not preceded by a short syllable.
+                    /// Delete "l" if in R2 and preceded by l:
+                    ///     tell => tel
+                    
                     re = /^(.+?)e$/;
                     if (re.test(w)) {
                         fp   = re.exec(w);
