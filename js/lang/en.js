@@ -539,17 +539,17 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "aris":
                             case "arisen":
                             case "aros":
-                                stemmed_word = "ar[io]s[ei]";
+                                stemmed_word = "ar[io]s(?:[ei]|en)";
                                 break;
                             case "awak":
                             case "awaken":
                             case "awok":
-                                stemmed_word = "aw[ao]k";
+                                stemmed_word = "aw[ao]k(?:en)?";
                                 break;
                             case "befal":
                             case "befallen":
                             case "befel":
-                                stemmed_word = "b[ae]fel";
+                                stemmed_word = "b[ae]fell?(?:en)?";
                                 break;
                             case "beheld":
                             case "behold":
@@ -571,18 +571,17 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "beget":
                             case "begot":
                             case "begotten":
-                                stemmed_word = "beg[eo]t";
+                                stemmed_word = "beg[eo]tt?(?:en)?";
                                 break;
                             case "bend":
                             case "bent":
                             case "begotten":
-                                stemmed_word = "ben[dt]";
+                                stemmed_word = "ben[dt]t?(?:en)?";
                                 break;
                             case "bad[ei]":
                             case "bid":
                             case "bidden":
-                                ///NOTE: The negative look ahead (?!k) is to prevent highlighting the word "Bidkar" in 2 Kings 9:25.
-                                stemmed_word = "b(?:ad[ei]|id(?!k))";
+                                stemmed_word = "b(?:ad[ei]|id(?:den)?)";
                                 break;
                             case "bind":
                             case "bound":
@@ -591,13 +590,12 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "bit":
                             case "bit[ei]":
                             case "bitten":
-                                ///NOTE: The negative look ahead (?![ht]) is to prevent highlighting "Bithron," "Bithynia," and "bitter," but allow for "bit" and "bits."
-                                stemmed_word = "bit(?:(?![ht])|[ei]|ten)";
+                                stemmed_word = "bit(?:[ei]|ten)?";
                                 break;
                             case "blew":
                             case "blow":
                             case "blown":
-                                stemmed_word = "bl[eo]w";
+                                stemmed_word = "bl[eo]wn?";
                                 break;
                             case "bred":
                             case "br[ei]":
@@ -605,34 +603,30 @@ first_loop:     while (i < search_terms_arr_len) {
                                 break;
                             case "brethren":
                             case "brother":
-                                ///NOTE: The negative look ahead (?!h) is to prevent highlighting "brotherhood."
-                                stemmed_word = "br[eo]the?r(?:en)?(?!h)";
+                                stemmed_word = "br[eo]the?r(?:en)?";
                                 break;
                             case "brak[ei]":
                             case "brok[ei]":
                             case "broken":
-                                stemmed_word = "br[ao]k[ei]";
+                                stemmed_word = "br[ao]k[ei](?:en)?";
                                 break;
                             case "bring":
                             case "brought":
                             case "brung":
-                                ///NOTE: The negative look ahead (?!e) is to prevent highlighting "bringers."
-                                stemmed_word = "br(?:ing(?!e)|ought|ung)";
+                                stemmed_word = "br(?:ing|ought|ung)";
                                 break;
                             case "build":
                             case "built":
-                                ///NOTE: The negative look ahead (?!er) is to prevent highlighting "bringers" but allow for "buildedst."
-                                stemmed_word = "buil[dt](?!er)";
+                            case "buildedst":
+                                stemmed_word = "buil[dt](?:edst)?";
                                 break;
                             case "burnt":
                             case "burn":
-                                ///NOTE: The negative look ahead (?!is) is to prevent highlighting "burnished" but allow for "burning."
-                                stemmed_word = "burnt?(?!is)";
+                                stemmed_word = "burnt?";
                                 break;
                             case "bought":
                             case "bu[yi]":
-                                ///NOTE: The negative look ahead (?!er) is to prevent highlighting "buyer" but allow for "buyest."
-                                stemmed_word = "b(?:uy(?!er)|ought)";
+                                stemmed_word = "b(?:uy|ought)";
                                 break;
                             case "catch":
                             case "caught":
@@ -640,18 +634,18 @@ first_loop:     while (i < search_terms_arr_len) {
                                 break;
                             case "cam[ei]":
                             case "com[ei]":
-                                /// The negative look ahead (?!l) is to prevent highlighting "comeliness" but allow for "comest."
+                                /// The negative look ahead (?!l) is to prevent highlighting "comeliness."
                                 stemmed_word = "c[ao]m(?:i|e(?!l))";
                                 break;
                             case "can":
+                            case "canst":
                             case "could":
-                                /// The negative look ahead (?!a|d|e|k|n) is to prevent highlighting "cannot," "Canaan," "Cana," "candle," "candlestick," "Candace," "cane," "canker," and "cankerworm" but allow for "canst."
-                                stemmed_word = "c(?:an(?!a|d|e|k|n)|ould)";
+                                /// The negative look ahead (?!e) is to prevent highlighting "cane."
+                                stemmed_word = "c(?:an(?:st)?(?!e)|ould)";
                                 break;
                             case "child":
                             case "children":
-                                /// The negative look ahead (?!l|h|b) is to prevent highlighting "childbearing," "childhood," and "childless" but allow for "children's."
-                                stemmed_word = "child(?:ren)?(?!b|h|l)";
+                                stemmed_word = "child(?:ren)?";
                                 break;
                             case "choos":
                             case "chos[ei]":
@@ -680,31 +674,27 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "draw":
                             case "drawn":
                             case "drew":
-                                /// The negative look ahead (?!e) is to prevent highlighting "drawers" but allow for "drawn."
-                                stemmed_word = "dr[ae]w(?!e)";
+                                stemmed_word = "dr[ae]wn?";
                                 break;
                             case "driv[ei]":
                             case "driven":
                             case "drov[ei]":
-                                /// The negative look ahead (?!r) is to prevent highlighting "driver" but allow for "driving."
-                                stemmed_word = "dr[oi]v[ei]n?(?!r)";
+                                stemmed_word = "dr[oi]v[ei]n?";
                                 break;
                             case "drank":
                             case "drink":
                             case "drunk":
-                                /// The negative look ahead (?!a|e) is to prevent highlighting "drunkard," "drinkers," "drunken," and "drunkenness" but allow for "drinking."
-                                stemmed_word = "dr[aiu]nk(?!a|e)";
+                                stemmed_word = "dr[aiu]nk";
                                 break;
                             case "dig":
                             case "dug":
-                                /// The negative look ahead (?!n) is to prevent highlighting "dignity" but allow for "digging."
-                                stemmed_word = "d[iu]g(?!n)";
+                                stemmed_word = "d[iu]g";
                                 break;
                             case "dwell":
                             case "dwelt":
-                                /// The negative look ahead (?!er|i) is to prevent highlighting "dwelling," "dwellings," "dwellingplace," and "dwellers" but allow for "dwelled."
+                                /// The negative look ahead (?!i) is to prevent highlighting "dwelling," "dwellings," "dwellingplace," and "dwellers" but allow for "dwelled."
                                 ///NOTE: "dwelling" is primarily used as a noun.
-                                stemmed_word = "dwel[lt](?!er|i)";
+                                stemmed_word = "dwel[lt](?!i)";
                                 break;
                             case "di[ei]":
                             case "d[yi]":
@@ -715,7 +705,7 @@ first_loop:     while (i < search_terms_arr_len) {
                             ///NOTE: See "ate" above also.
                             case "eat":
                             case "eaten":
-                                stemmed_word = "(?:ate|eat)";
+                                stemmed_word = "(?:ate|eat(?:en)?)";
                                 break;
                             case "enquir":
                             case "enquir[yi]":
@@ -724,7 +714,7 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "fall":
                             case "fallen":
                             case "fell":
-                                stemmed_word = "f[ae]ll";
+                                stemmed_word = "f[ae]ll(?:en)?";
                                 break;
                             case "fed":
                             case "feed":
@@ -760,15 +750,14 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "flee":
                             case "fl[ei]":
                             case "fle[ei]":
-                                ///NOTE: The negative look ahead (?!c|s|w) prevents highlighting "fleece" but allows for "fleest."
-                                stemmed_word = "fle(?:e|d)(?!c)";
+                                ///NOTE: The matching (?:e|d)? is optional so that it will correctly find forms like "fleeth."
+                                stemmed_word = "fle(?:e|d)?";
                                 break;
                             case "flew":
                             case "flown":
                             case "fl[yi]":
-                                ///NOTE: The negative look ahead (?!g|n) prevents highlighting "flight" and "flint" but allows for "flieth."
                                 ///NOTE: See "flies" above also.
-                                stemmed_word = "fl(?:ew|i(?!g|n)|y)";
+                                stemmed_word = "fl(?:ew|i|own?|y)";
                                 break;
                             case "forbad":
                             case "forbid":
@@ -778,8 +767,7 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "foreknew":
                             case "foreknow":
                             case "foreknown":
-                                ///NOTE: The negative look ahead (?!l) prevents highlighting "foreknowledge."
-                                stemmed_word = "forekn[eo]w(?:!l)";
+                                stemmed_word = "forekn[eo]w";
                                 break;
                             case "foresaw":
                             case "foreseen":
@@ -793,34 +781,32 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "forget":
                             case "forgot":
                             case "forgotten":
-                                stemmed_word = "forg[eo]t";
+                                stemmed_word = "forg[eo]tt?(?:en)?";
                                 break;
                             case "forgav":
                             case "forgiv":
                             case "forgiven":
-                                stemmed_word = "forg[ai]v";
+                                stemmed_word = "forg[ai]v[ei]n?";
                                 break;
                             case "forsak":
                             case "forsaken":
                             case "forsook":
-                                stemmed_word = "fors(?:a|oo)k";
+                                stemmed_word = "fors(?:a|oo)k[ei]n?";
                                 break;
                             case "freez":
                             case "froz[ei]":
                             case "frozen":
                                 ///NOTE: This word actually only occurs once (as "forzen").
-                                stemmed_word = "fr(?:ee|o)z";
+                                stemmed_word = "fr(?:ee|o)z[ei]n?";
                                 break;
                             case "gav[ei]":
                             case "giv[ei]":
                             case "given":
-                                ///NOTE: The negative look ahead (?!r) prevents highlighting "giver" but allows for "giving."
-                                stemmed_word = "g[ai]v[ei](?!r)";
+                                stemmed_word = "g[ai]v[ei]n?";
                                 break;
                             ///NOTE: "gently" stems to "gent".
                             case "gent":
                             case "gentl":
-                                /// This is to prevent "gently" from highlighting "Gentiles."
                                 stemmed_word = "gentl";
                                 break;
                             ///NOTE: See "goings" above also.
@@ -828,40 +814,38 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "gon[ei]":
                             case "went":
                                 stemmed_word = "(?:go(?:e(?:st|th)|ing|ne)?|went)";
-                                /// Because this word is so small, it is easier to white list all of the forms used.
+                                /// Because this word is so small and unique, it is easier to white list all of the forms used.
                                 add_morph_regex = false;
                                 break;
                             case "get":
                             case "got":
                             case "gotten":
-                                ///NOTE: The negative look ahead (?!h) prevents highlighting "Gether" and "Gethsemane" but allows for other forms, like "getting."
-                                stemmed_word = "g[eo]t(?!h)";
+                                stemmed_word = "g[eo]tt?(?:en)?";
                                 break;
                             ///NOTE: "haste" is stemmed to "hast."
                             ///NOTE: "hast" is intercepted above, before stemming.
                             case "hast":
                             case "hasten":
-                                stemmed_word = "hast[ei]";
+                                stemmed_word = "hast[ei]n?";
                                 break;
                             case "hear":
                             case "heard":
-                                ///NOTE: The negative look ahead (?!er|k|r|t) prevents highlighting "hearer," "hearken," "heart," and "hearth" but allows for other forms, like "getting."
-                                stemmed_word = "heard?(?!er|k|r|t)";
+                                ///NOTE: The negative look ahead (?!t) prevents highlighting "hearth" but allows for other forms.
+                                stemmed_word = "heard?(?!t)";
                                 break;
                             ///NOTE: "hearkenedst" does not stem properly.
+                            case "hearken":
                             case "hearkenedst":
-                                stemmed_word = "hearken";
+                                stemmed_word = "hearken(?:edst)?";
                                 break;
                             case "held":
                             case "hold":
-                                ///NOTE: The negative look ahead (?!ai|en) prevents highlighting "Heldai" and "holden" but allows for other forms, like "holdest."
                                 ///NOTE: The word "holds" is used in the Bible only as a noun, such as "strong holds"; however, it is a common Present Day English form.
-                                stemmed_word = "h[eo]ld(?!ai|en)";
+                                stemmed_word = "h[eo]ld";
                                 break;
                             case "hew":
                             case "hewn":
-                                ///NOTE: The negative look ahead (?!ai|en) prevents highlighting "hewer" but allows for other forms, like "hewn."
-                                stemmed_word = "hew(?!er)";
+                                stemmed_word = "hewn?";
                                 break;
                             case "hid":
                             case "hid[ei]":
@@ -871,9 +855,8 @@ first_loop:     while (i < search_terms_arr_len) {
                                 break;
                             case "hang":
                             case "hung":
-                                ///NOTE: The negative look ahead (?!er|r) prevents highlighting "hunger" and "hungry" but allows for other forms, like "hangest."
                                 ///NOTE: "hanging" almost always refers to the noun; "hangings" always does.
-                                stemmed_word = "h[au]ng(?!er|r)";
+                                stemmed_word = "h[au]ng";
                                 break;
                             case "seek":
                             case "sought":
