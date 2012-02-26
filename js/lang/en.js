@@ -734,24 +734,24 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "fought":
                                 stemmed_word = "f(?:i|ou)ght";
                                 break;
-                            ///NOTE: This is to highlight "find," "findest," "findeth," and "found" but not "foundation," "founded," or "founder."
-                            ///NOTE: See "found" above and "found" below also.
+                            ///NOTE: This is to highlight "find," "findest," "findeth," and "found" but not "founded" or "foundest."
+                            ///NOTE: See "found" above (which is a variant of this word) and "found" below (which is a different word).
                             case "find":
                                 stemmed_word = "f(?:ind(?:e(?:st|th)|ing)?|ound)";
                                 add_morph_regex = false;
                                 break;
                             ///NOTE: This is actually used to match "founded" and "foundest."
-                            ///NOTE: Other morphological variants that a user searches for (such as "foundeth") will also correctly use this regex.
+                            ///      Other morphological variants that a user searches for (such as "foundeth") will also correctly use this regex.
+                            ///NOTE: See "found" and "find" above (which match forms of another word).
                             case "found":
-                                stemmed_word = "founde(?:d|st)";
+                                stemmed_word = "founde";
                                 add_morph_regex = false;
                                 break;
                             case "fled":
                             case "flee":
                             case "fl[ei]":
                             case "fle[ei]":
-                                ///NOTE: The matching (?:e|d)? is optional so that it will correctly find forms like "fleeth."
-                                stemmed_word = "fle(?:e|d)?";
+                                stemmed_word = "fle[ed]";
                                 break;
                             case "flew":
                             case "flown":
@@ -851,7 +851,7 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "hid[ei]":
                             case "hidden":
                                 ///NOTE: The negative look ahead (?!d(?:ek|a)) prevents highlighting "Hiddekel" and "Hiddai" but allows for "hidden."
-                                stemmed_word = "hid(?!d(?:ek|a))";
+                                stemmed_word = "hidd?(?:en)?";
                                 break;
                             case "hang":
                             case "hung":
