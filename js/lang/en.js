@@ -822,6 +822,10 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "gotten":
                                 stemmed_word = "g[eo]tt?(?:en)?";
                                 break;
+                            case "graff":
+                            case "graft":
+                                stemmed_word = "graf[ft]";
+                                break;
                             ///NOTE: "haste" is stemmed to "hast."
                             ///NOTE: "hast" is intercepted above, before stemming.
                             case "hast":
