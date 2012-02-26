@@ -709,7 +709,7 @@ first_loop:     while (i < search_terms_arr_len) {
                                 break;
                             case "enquir":
                             case "enquir[yi]":
-                                stemmed_word = "inquir";
+                                stemmed_word = "inquir[eiy]?";
                                 break;
                             case "fall":
                             case "fallen":
@@ -762,7 +762,7 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "forbad":
                             case "forbid":
                             case "forbidden":
-                                stemmed_word = "forb[ai]d";
+                                stemmed_word = "forb[ai]d(?:e|den)?";
                                 break;
                             case "foreknew":
                             case "foreknow":
