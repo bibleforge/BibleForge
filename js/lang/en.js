@@ -875,6 +875,22 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "known":
                                 stemmed_word = "kn[eo]wn?";
                                 break;
+                            case "laid":
+                            case "la[yi]":
+                                stemmed_word = "la(?:y|id?)";
+                                break;
+                            case "lad[ei]":
+                            case "laden":
+                                stemmed_word = "lad(?:en?|i)";
+                                break;
+                            case "lept":
+                            case "leep":
+                                stemmed_word = "le(?:ep|pt)";
+                                break;
+                            case "leav":
+                            case "left":
+                                stemmed_word = "le(?:av|ft)";
+                                break;
                             case "seek":
                             case "sought":
                                 stemmed_word = "s(?:eek|ought)";
