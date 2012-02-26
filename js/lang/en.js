@@ -858,6 +858,19 @@ first_loop:     while (i < search_terms_arr_len) {
                                 ///NOTE: "hanging" almost always refers to the noun; "hangings" always does.
                                 stemmed_word = "h[au]ng";
                                 break;
+                            case "keep":
+                            case "kept":
+                                stemmed_word = "ke(?:ep|pt)";
+                                break;
+                            case "kneel":
+                            case "knelt":
+                                stemmed_word = "kne(?:el|lt)";
+                                break;
+                            case "knew":
+                            case "know":
+                            case "known":
+                                stemmed_word = "kn[eo]wn?";
+                                break;
                             case "seek":
                             case "sought":
                                 stemmed_word = "s(?:eek|ought)";
