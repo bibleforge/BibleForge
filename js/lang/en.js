@@ -887,9 +887,23 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "leep":
                                 stemmed_word = "le(?:ep|pt)";
                                 break;
+                            ///NOTE: This has conflicts with the adjective form of "left."
                             case "leav":
                             case "left":
                                 stemmed_word = "le(?:av|ft)";
+                                break;
+                            case "lend":
+                            case "lent":
+                                stemmed_word = "len[dt]";
+                                break;
+                            case "lien":
+                            case "li[ei]":
+                            case "l[yi]":
+                                stemmed_word = "l(?:ien?|y)";
+                                break;
+                            case "lit":
+                            case "light":
+                                stemmed_word = "li(?:gh)?t";
                                 break;
                             case "seek":
                             case "sought":
