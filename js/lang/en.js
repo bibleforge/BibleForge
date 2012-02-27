@@ -723,8 +723,6 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "feet":
                             case "foot":
                                 stemmed_word = "f(?:ee|oo)t";
-                                /// Since there are no other forms, there is no need to add additional morphological regex.
-                                add_morph_regex = false;
                                 break;
                             case "feel":
                             case "felt":
@@ -904,6 +902,14 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "lit":
                             case "light":
                                 stemmed_word = "li(?:gh)?t";
+                                break;
+                            case "mad[ei]":
+                            case "mak[ei]":
+                                stemmed_word = "ma[dk][ei]";
+                                break;
+                            case "man":
+                            case "men":
+                                stemmed_word = "m[ae]n";
                                 break;
                             case "seek":
                             case "sought":
