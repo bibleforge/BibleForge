@@ -911,6 +911,18 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "men":
                                 stemmed_word = "m[ae]n";
                                 break;
+                            case "met":
+                            case "meet":
+                                stemmed_word = "mee?t";
+                                break;
+                            case "mic[ei]":
+                            case "mous":
+                                stemmed_word = "m(?:ic|ous)[ei]";
+                                break;
+                            case "mow":
+                            case "mown":
+                                stemmed_word = "mown?";
+                                break;
                             case "seek":
                             case "sought":
                                 stemmed_word = "s(?:eek|ought)";
