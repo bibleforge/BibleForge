@@ -411,7 +411,7 @@
                 /**
                  * Send an Ajax request to the server.
                  *
-                 * @example query("POST", "query.php", "q=search", function (data) {}, function (status, data) {}, 10000, true);
+                 * @example .query("POST", "query.php", "q=search", function (data) {}, function (status, data) {}, 10000, true);
                  * @param   method    (string)              The HTTP method to use (GET || POST).
                  * @param   path      (string)              The URL to query.
                  * @param   message   (string)   (optional) The variables to send (URI format: "name1=value1&name2=value%202").
@@ -423,7 +423,7 @@
                  * @return  NULL
                  * @todo    Determine if it should change a method from GET to POST if it exceeds 2,083 characters (IE's rather small limit).
                  */
-                return function (method, path, message, onsuccess, onfailure, timeout, retry)
+                return function query(method, path, message, onsuccess, onfailure, timeout, retry)
                 {
                     /// Reset the aborted variable (needed if the query was previously aborted).
                     aborted = false;
