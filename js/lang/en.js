@@ -923,6 +923,24 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "mown":
                                 stemmed_word = "mown?";
                                 break;
+                            case "overcam":
+                            case "overcom":
+                                stemmed_word = "overc[ao]m";
+                                break;
+                            case "overtak":
+                            case "overtaken":
+                            case "overtook":
+                                stemmed_word = "overt(?:a(?:en)?|oo)k";
+                                break;
+                            case "overthrew":
+                            case "overthrow":
+                            case "overthrown":
+                                stemmed_word = "overthr[eo]wn?";
+                                break;
+                            case "ox":
+                            case "oxen":
+                                stemmed_word = "ox(?:en)?";
+                                break;
                             case "seek":
                             case "sought":
                                 stemmed_word = "s(?:eek|ought)";
