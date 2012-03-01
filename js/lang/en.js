@@ -223,8 +223,10 @@ BF.langs.en = (function ()
                     ///     edly
                     ///     ing
                     ///     ingly
+                    /// and for Early Modern English
                     ///     eth
                     ///     est
+                    ///     edst
                     /// if the preceding word part contains a vowel, and after the deletion:
                     /// if the word ends with "at," "bl," or "iz," add "e" (so luxuriat => luxuriate), or
                     /// if the word ends with a double remove the last letter (so hopp => hop), or
@@ -233,7 +235,7 @@ BF.langs.en = (function ()
                     ///TODO: Also stem "eedly" (porter2).
                     re  = /^(.+?)eed$/;
                     /// "Present-day" English: re2 = /^(.+?)(ingly|edly|ed|ing|ly)$/;
-                    re2 = /^(.+?)(ing(?:ly)?|e(?:d(?:ly)?|st|th)|ly)$/; /// Early Modern English fix
+                    re2 = /^(.+?)(ing(?:ly)?|e(?:d(?:ly|st)?|st|th)|ly)$/; /// Early Modern English fix
                     
                     if (re.test(w)) {
                         fp = re.exec(w);
@@ -617,8 +619,7 @@ first_loop:     while (i < search_terms_arr_len) {
                                 break;
                             case "build":
                             case "built":
-                            case "buildedst":
-                                stemmed_word = "buil[dt](?:edst)?";
+                                stemmed_word = "buil[dt]";
                                 break;
                             case "burnt":
                             case "burn":
@@ -835,10 +836,9 @@ first_loop:     while (i < search_terms_arr_len) {
                                 ///NOTE: The negative look ahead (?!t) prevents highlighting "hearth" but allows for other forms.
                                 stemmed_word = "heard?(?!t)";
                                 break;
-                            ///NOTE: "hearkenedst" does not stem properly.
                             case "hearken":
                             case "hearkenedst":
-                                stemmed_word = "hearken(?:edst)?";
+                                stemmed_word = "hearken";
                                 break;
                             case "held":
                             case "hold":
@@ -1014,7 +1014,7 @@ first_loop:     while (i < search_terms_arr_len) {
                         /// Find most words based on stem morphology.
                         /// Because it just uses the stem plus up to 7 additional characters, this can have false hits.
                         ///NOTE: [bdfgmnprt]? selects possible doubles.
-                        highlight_regex[count] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")(?:e|l)?(?:a(?:l|n(?:ce|t)|te|ble)|e(?:n(?:ce|t)|r|ment)|i(?:c|ble|on|sm|ti|ve|ze)|ment|ous?)?(?:ic(?:a(?:te|l)|iti)|a(?:tive|lize)|ful|ness|self)?(?:a(?:t(?:ion(?:al)?|or)|nci|l(?:li|i(?:sm|ti)))|tional|e(?:n(?:ci|til)|li)|i(?:z(?:er|ation)|v(?:eness|iti))|b(?:li|iliti)|ous(?:li|ness)|fulness|logi)?(?:[bdfgmnprt]?(?:i?ng(?:ly)?|e?(?:d(?:ly)?|ed(?:ly)?|st|th)|ly))?(?:e[sd]|s)?(?:'(?:s'?)?)?[),.?!;:]*[<-]", "i");
+                        highlight_regex[count] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")(?:e|l)?(?:a(?:l|n(?:ce|t)|te|ble)|e(?:n(?:ce|t)|r|ment)|i(?:c|ble|on|sm|ti|ve|ze)|ment|ous?)?(?:ic(?:a(?:te|l)|iti)|a(?:tive|lize)|ful|ness|self)?(?:a(?:t(?:ion(?:al)?|or)|nci|l(?:li|i(?:sm|ti)))|tional|e(?:n(?:ci|til)|li)|i(?:z(?:er|ation)|v(?:eness|iti))|b(?:li|iliti)|ous(?:li|ness)|fulness|logi)?(?:[bdfgmnprt]?(?:i?ng(?:ly)?|e?(?:d(?:ly)?|edst|st|th)|ly))?(?:e[sd]|s)?(?:'(?:s'?)?)?[),.?!;:]*[<-]", "i");
                     }
                     count += 1;
                 }
