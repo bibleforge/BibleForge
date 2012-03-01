@@ -954,6 +954,34 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "pluckt":
                                 stemmed_word = "pluckt?";
                                 break;
+                            case "rend":
+                            case "rent":
+                                stemmed_word = "ren[dt]";
+                                break;
+                            case "repaid":
+                            case "repa[yi]":
+                                ///NOTE: The word "repaid" does not actually occur in the Bible, but a user could still search for it.
+                                stemmed_word = "repa[iy]";
+                                break;
+                            case "rid[ei]":
+                            case "ridden":
+                            case "rod[ei]":
+                                stemmed_word = "r[oi]d(?:[ei]|den)";
+                                break;
+                            case "rang":
+                            case "ring":
+                            case "rung":
+                                stemmed_word = "r[aiu]ng";
+                                break;
+                            case "ris[ei]":
+                            case "risen":
+                            case "ros[ei]":
+                                stemmed_word = "r[io]s[ei]";
+                                break;
+                            case "ran":
+                            case "run":
+                                stemmed_word = "r[au]n";
+                                break;
                             case "seek":
                             case "sought":
                                 stemmed_word = "s(?:eek|ought)";
