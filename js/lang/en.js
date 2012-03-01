@@ -317,6 +317,28 @@ BF.langs.en = (function ()
                     /// **********
                     ///
                     /// Essentially, delete certain suffixes if found in after the first non-vowel following a vowel in R1 or the end of the word, if there is no such non-vowel (aka R2).
+                    ///
+                    /// Possibly delete these suffixes:
+                    ///     al
+                    ///     ance
+                    ///     ence
+                    ///     er
+                    ///     ic
+                    ///     able
+                    ///     ible
+                    ///     ant
+                    ///     ement
+                    ///     ment
+                    ///     ent
+                    ///     ism
+                    ///     ate
+                    ///     iti
+                    ///     ous
+                    ///     ive
+                    ///     ize 
+                    ///
+                    /// The following suffix must also be preceded by an "s" or "t" as well as the other requirements:
+                    ///     ion
                     
                     re  = /^(.+?)(?:a(?:l|n(?:ce|t)|te|ble)|e(?:n(?:ce|t)|r|ment)|i(?:c|ble|sm|ti|ve|ze)|ment|ous?)$/;
                     re2 = /^(.+?)([st])ion$/;
@@ -340,6 +362,7 @@ BF.langs.en = (function ()
                     /// **********
                     ///
                     /// Delete "e" if in R2, or in R1 and not preceded by a short syllable.
+                    ///     mediate => mediat
                     /// Delete "l" if in R2 and preceded by l:
                     ///     tell => tel
                     
