@@ -941,6 +941,19 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "oxen":
                                 stemmed_word = "ox(?:en)?";
                                 break;
+                            case "paid":
+                            case "pa[yi]":
+                                stemmed_word = "pa(?:id?|y)";
+                                break;
+                            case "plead":
+                            case "pled":
+                                ///NOTE: The word "pled" does not actually occur in the Bible, but a user could still search for it.
+                                stemmed_word = "plead";
+                                break;
+                            case "pluck":
+                            case "pluckt":
+                                stemmed_word = "pluckt?";
+                                break;
                             case "seek":
                             case "sought":
                                 stemmed_word = "s(?:eek|ought)";
