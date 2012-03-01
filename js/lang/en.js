@@ -627,6 +627,7 @@ first_loop:     while (i < search_terms_arr_len) {
                                 break;
                             case "bought":
                             case "bu[yi]":
+                            case "buy[ei]":
                                 stemmed_word = "b(?:uy|ought)";
                                 break;
                             case "catch":
@@ -708,6 +709,7 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "eaten":
                                 stemmed_word = "(?:ate|eat(?:en)?)";
                                 break;
+                            ///NOTE: Some versions of the King James Bible use "enquire" and others use "inquire."  BibleForge's uses "inquire."
                             case "enquir":
                             case "enquir[yi]":
                                 stemmed_word = "inquir[eiy]?";
@@ -875,6 +877,7 @@ first_loop:     while (i < search_terms_arr_len) {
                                 break;
                             case "laid":
                             case "la[yi]":
+                            case "lay[ei]":
                                 stemmed_word = "la(?:y|id?)";
                                 break;
                             case "lad[ei]":
@@ -943,6 +946,7 @@ first_loop:     while (i < search_terms_arr_len) {
                                 break;
                             case "paid":
                             case "pa[yi]":
+                            case "pay[ei]":
                                 stemmed_word = "pa(?:id?|y)";
                                 break;
                             case "plead":
