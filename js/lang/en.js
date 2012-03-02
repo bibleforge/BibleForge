@@ -452,7 +452,8 @@ BF.langs.en = (function ()
                         re2  = /^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*(?:[aeiouy][aeiou]*)?$/;
                         re3  = /^[^aeiou][^aeiouy]*[aeiouy][^aeiouwxy]$/;
                         
-                        if (r2.test(stem) || (re2.test(stem) && !(re3.test(stem)))) {
+                        ///NOTE: Change to the algorithm: stems ending in "y" should not be follwed by an "e."
+                        if (r2.test(stem) || (re2.test(stem) && !(re3.test(stem))) || /[yY]$/.test(stem)) {
                             w = stem;
                         }
                     } else {
@@ -728,7 +729,6 @@ first_loop:     while (i < search_terms_arr_len) {
                                 break;
                             case "bought":
                             case "bu[yi]":
-                            case "buy[ei]":
                                 stemmed_word = "b(?:uy|ought)";
                                 break;
                             case "catch":
@@ -978,7 +978,6 @@ first_loop:     while (i < search_terms_arr_len) {
                                 break;
                             case "laid":
                             case "la[yi]":
-                            case "lay[ei]":
                                 stemmed_word = "la(?:y|id?)";
                                 break;
                             case "lad[ei]":
@@ -1047,7 +1046,6 @@ first_loop:     while (i < search_terms_arr_len) {
                                 break;
                             case "paid":
                             case "pa[yi]":
-                            case "pay[ei]":
                                 stemmed_word = "pa(?:id?|y)";
                                 break;
                             case "plead":
