@@ -257,7 +257,7 @@ BF.langs.en = (function ()
                                 w += "e";
                             } else if (re3.test(w)) {
                                 w = w.slice(0, -1);
-                            } else if (re4.test(w)) {
+                            } else if (re4.test(w) || w.length < 4) {
                                 w += "e";
                             }
                         }
