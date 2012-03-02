@@ -1085,6 +1085,10 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "run":
                                 stemmed_word = "r[au]n";
                                 break;
+                            case "said":
+                            case "sa[yi]":
+                                stemmed_word = "sa(?:id|y)";
+                                break;
                             case "seek":
                             case "sought":
                                 stemmed_word = "s(?:eek|ought)";
