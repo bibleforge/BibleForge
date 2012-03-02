@@ -265,7 +265,7 @@ BF.langs.en = (function ()
                     /// * Step 1c *
                     /// ***********
                     ///
-                    /// Replace y suffix by i if preceded by a non-vowel which is not the first letter of the word.
+                    /// Replace y or Y suffixes with i if preceded by a non-vowel which is not the first letter of the word.
                     ///     cry => cri
                     ///     by  => by
                     ///     say => say
@@ -284,6 +284,56 @@ BF.langs.en = (function ()
                     /// **********
                     ///
                     /// Replace stems in step2list if after the first non-vowel following a vowel, or the end of the word if there is no such non-vowel (aka R1).
+                    ///
+                    /// Current:
+                    ///     ational => ate
+                    ///     tional  => tion
+                    ///     enci    => ence
+                    ///     anci    => ance
+                    ///     izer    => ize
+                    ///     bli     => ble
+                    ///     alli    => al
+                    ///     entli   => ent
+                    ///     eli     => e
+                    ///     ousli   => ous
+                    ///     ization => ize
+                    ///     ation   => ate
+                    ///     ator    => ate
+                    ///     alism   => al
+                    ///     iveness => ive
+                    ///     fulness => ful
+                    ///     ousness => ous
+                    ///     aliti   => al
+                    ///     iviti   => ive
+                    ///     biliti  => ble
+                    ///     logi    => log
+                    ///
+                    /// Porter 2:
+                    ///     tional  => tion
+                    ///     enci    => ence
+                    ///     anci    => ance
+                    ///     abli    => able
+                    ///     entli   => ent
+                    ///     izer    => ize
+                    ///     ization => ize
+                    ///     ational => ate
+                    ///     ation   => ate
+                    ///     ator    => ate
+                    ///     alism   => al
+                    ///     aliti   => al
+                    ///     alli    => al
+                    ///     fulness => ful
+                    ///     ousli   => ous
+                    ///     ousness => ous
+                    ///     iveness => ive
+                    ///     iviti   => ive
+                    ///     biliti  => ble
+                    ///     bli+    => ble
+                    ///     ogi+    => og (if preceded by l)
+                    ///     fulli+  => ful
+                    ///     lessli+ => less
+                    ///     li+     delete (if preceded by a valid li-ending)
+                    ///             A valid li-ending is one of these: c, d, e, g, h, k, m, n, r, t.
                     
                     re = /^(.+?)(a(?:t(?:ion(?:al)?|or)|nci|l(?:li|i(?:sm|ti)))|tional|e(?:n(?:ci|til)|li)|i(?:z(?:er|ation)|v(?:eness|iti))|b(?:li|iliti)|ous(?:li|ness)|fulness|logi)$/;
                     if (re.test(w)) {
@@ -301,8 +351,30 @@ BF.langs.en = (function ()
                     ///
                     /// Replace stems in step3list if after the first non-vowel following a vowel, or the end of the word if there is no such non-vowel (aka R1).
                     ///NOTE: "ative" should be removed if after the first non-vowel following a vowel in R1 or the end of the word, if there is no such non-vowel (aka R2).
+                    ///
+                    /// Current:
+                    ///     icate => ic
+                    ///     alize => al
+                    ///     iciti => ic
+                    ///     ical  => ic
+                    ///     ative delete
+                    ///     ful   delete
+                    ///     ness  delete
+                    ///     self  delete
+                    ///
+                    /// Porter 2:
+                    ///     tional+  => tion
+                    ///     ational+ => ate
+                    ///     alize    => al
+                    ///     icate    => ic
+                    ///     iciti    => ic
+                    ///     ical     => ic
+                    ///     ful      delete
+                    ///     ness     delete
+                    ///     ative*   delete (if in R2)
                     
                     re = /^(.+?)(ic(?:a(?:te|l)|iti)|a(?:tive|lize)|ful|ness|self)$/;
+                    
                     if (re.test(w)) {
                         fp     = re.exec(w);
                         stem   = fp[1];
