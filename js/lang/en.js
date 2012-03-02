@@ -441,7 +441,8 @@ BF.langs.en = (function ()
                     ///
                     /// Delete "e" if in R2, or in R1 and not preceded by a short syllable.
                     ///     mediate => mediat
-                    /// Delete "l" if in R2 and preceded by l:
+                    ///     eye     => eye
+                    /// Delete "l" if in R2 and preceded by "l":
                     ///     tell => tel
                     
                     re = /^(.+?)e$/;
@@ -450,10 +451,13 @@ BF.langs.en = (function ()
                         fp   = re.exec(w);
                         stem = fp[1];
                         re2  = /^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*(?:[aeiouy][aeiou]*)?$/;
-                        re3  = /^[^aeiou][^aeiouy]*[aeiouy][^aeiouwxy]$/;
+                        /// Check for a short syllable.
+                        ///NOTE: A short syllable is defined as either a vowel followed by a non-vowel other than w, x or Y and preceded by a non-vowel, or
+                        ///      a vowel at the beginning of the word followed by a non-vowel.
+                        re3  = /(?:^[aeiouy][^aeiouy]$|[^aeiouy][aeiouy][^aeiouwxyY]$)/;
                         
-                        ///NOTE: Change to the algorithm: stems ending in "y" should not be follwed by an "e."
-                        if (r2.test(stem) || (re2.test(stem) && !(re3.test(stem))) || /[yY]$/.test(stem)) {
+                        ///NOTE: Change to the algorithm: stems ending in "y" should not be followed by an "e" and it is more than three letters long.
+                        if (r2.test(stem) || (re2.test(stem) && !(re3.test(stem))) || /..[yY]$/.test(stem)) {
                             w = stem;
                         }
                     } else {
