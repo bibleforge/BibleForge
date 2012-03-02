@@ -156,6 +156,8 @@ BF.langs.en = (function ()
                 {
                     var fp,
                         last_letter,
+                        r1,
+                        r2,
                         re,
                         re2,
                         re3,
@@ -337,11 +339,13 @@ BF.langs.en = (function ()
                     ///             A valid li-ending is one of these: c, d, e, g, h, k, m, n, r, t.
                     
                     re = /^(.+?)(a(?:t(?:ion(?:al)?|or)|nci|l(?:li|i(?:sm|ti)))|tional|e(?:n(?:ci|til)|li)|i(?:z(?:er|ation)|v(?:eness|iti))|b(?:li|iliti)|ous(?:li|ness)|fulness|logi)$/;
+                    r1 = /^([^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*/;
+                    
                     if (re.test(w)) {
                         fp     = re.exec(w);
                         stem   = fp[1];
                         suffix = fp[2];
-                        if (/^([^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(stem)) {
+                        if (r1.test(stem)) {
                             w = stem + step2list[suffix];
                         }
                     }
@@ -380,7 +384,7 @@ BF.langs.en = (function ()
                         fp     = re.exec(w);
                         stem   = fp[1];
                         suffix = fp[2];
-                        if (/^([^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(stem)) {
+                        if (r1.test(stem)) {
                             w = stem + step3list[suffix];
                         }
                     }
@@ -415,17 +419,18 @@ BF.langs.en = (function ()
                     
                     re  = /^(.+?)(?:a(?:l|n(?:ce|t)|te|ble)|e(?:n(?:ce|t)|r|ment)|i(?:c|ble|sm|ti|ve|ze)|ment|ous?)$/;
                     re2 = /^(.+?)([st])ion$/;
+                    r2  = /^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/;
                     
                     if (re.test(w)) {
                         fp   = re.exec(w);
                         stem = fp[1];
-                        if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(stem)) {
+                        if (r2.test(stem)) {
                             w = stem;
                         }
                     } else if (re2.test(w)) {
                         fp   = re2.exec(w);
                         stem = fp[1] + fp[2];
-                        if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(stem)) {
+                        if (r2.test(stem)) {
                             w = stem;
                         }
                     }
@@ -440,18 +445,18 @@ BF.langs.en = (function ()
                     ///     tell => tel
                     
                     re = /^(.+?)e$/;
+                    
                     if (re.test(w)) {
                         fp   = re.exec(w);
                         stem = fp[1];
-                        re   = /^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/;
                         re2  = /^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*(?:[aeiouy][aeiou]*)?$/;
                         re3  = /^[^aeiou][^aeiouy]*[aeiouy][^aeiouwxy]$/;
                         
-                        if (re.test(stem) || (re2.test(stem) && !(re3.test(stem)))) {
+                        if (r2.test(stem) || (re2.test(stem) && !(re3.test(stem)))) {
                             w = stem;
                         }
                     } else {
-                        if (/ll$/.test(w) && (/^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(w))) {
+                        if (/ll$/.test(w) && (r2.test(w))) {
                             w = w.slice(0, -1);
                         }
                     }
