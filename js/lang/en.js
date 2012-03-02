@@ -270,7 +270,8 @@ BF.langs.en = (function ()
                     ///     by  => by
                     ///     say => say
                     
-                    re = /^(.+?)y$/;
+                    re = /^(.+?)[yY]$/;
+                    
                     if (re.test(w)) {
                         fp   = re.exec(w);
                         stem = fp[1];
