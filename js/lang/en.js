@@ -279,7 +279,7 @@ BF.langs.en = (function ()
                     if (re.test(w)) {
                         fp   = re.exec(w);
                         stem = fp[1];
-                        if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy]/.test(stem)) {
+                        if (/^.[^aeiouy]/.test(stem)) {
                             w = stem + "i";
                         }
                     }
