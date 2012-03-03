@@ -205,6 +205,7 @@ BF.langs.en = (function ()
                     ///                   ?ied+  || ?ies*  => ??ie   (tied      => tie,      ties  => tie)
                     ///                   {V}{C}s          => {V}{C} (gaps      => gap)
                     /// Ignore suffixes:  us+ && ss                  (grievous  => grievous, pass  => pass)
+                    
                     re  = /^(.+?)(ss|i)es$/;
                     re2 = /^(.+?)([^s])s$/;
                     
@@ -444,10 +445,11 @@ BF.langs.en = (function ()
                     /// **********
                     ///
                     /// Delete "e" if in R2, or in R1 and not preceded by a short syllable.
-                    ///     mediate => mediat
-                    ///     eye     => eye
+                    ///     creature => creatur
+                    ///     eye      => eye
                     /// Delete "l" if in R2 and preceded by "l":
-                    ///     tell => tel
+                    ///     fulfill => fulfil
+                    ///     tell    => tell
                     
                     re = /^(.+?)e$/;
                     
@@ -460,8 +462,15 @@ BF.langs.en = (function ()
                         ///      a vowel at the beginning of the word followed by a non-vowel.
                         re3  = /(?:^[aeiouy][^aeiouy]$|[^aeiouy][aeiouy][^aeiouwxyY]$)/;
                         
+                        ///NOTE: The only stem that causes false negatives is step 2's "ator" which becomes "ate" (which step 5 would convert from "ate" to "at").
+                        ///      Therefore, we must add optional regex to match against the "or" ending.
+                        ///      E.g., mediate => mediat(?:or)?
+                        ///      Since other words can end in "or" (e.g., "creator"), this must only be applied in special circumstances.
+                        ///NOTE: If a word is misspelled (like "mediat"), it will not add the extra regex, so it will return search results but not highlight them correctly.
+                        if (r2.test(stem) && stem.slice(-2) === "at") {
+                            w = stem + "(?:or)?";
                         ///NOTE: Change to the algorithm: stems ending in "y" should not be followed by an "e" and it is more than three letters long.
-                        if (r2.test(stem) || (re2.test(stem) && !(re3.test(stem))) || /..[yY]$/.test(stem)) {
+                        } else if (r2.test(stem) || (re2.test(stem) && !(re3.test(stem))) || /..[yY]$/.test(stem)) {
                             w = stem;
                         }
                     } else {
