@@ -1009,10 +1009,11 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "lent":
                                 stemmed_word = "len[dt]";
                                 break;
+                            case "lain":
                             case "lien":
                             case "li[ei]":
                             case "l[yi]":
-                                stemmed_word = "l(?:ien?|y)";
+                                stemmed_word = "l(?:ain|ien?|y)";
                                 break;
                             case "lit":
                             case "light":
