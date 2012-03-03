@@ -234,7 +234,7 @@ BF.langs.en = (function ()
                     /// After the deletion:
                     /// if the word ends with "at," "bl," or "iz," add "e" (so luxuriat => luxuriate), or
                     /// if the word ends with a double remove the last letter (so hopp => hop), or
-                    /// if the word is short, add "e" (so hop => hope)
+                    /// if the word (syllable) is short, add "e" (so hop => hope)
                     
                     ///TODO: Also stem "eedly" (porter2).
                     re  = /^(.+?)eed$/;
@@ -249,17 +249,19 @@ BF.langs.en = (function ()
                     } else if (re2.test(w)) {
                         fp   = re2.exec(w);
                         stem = fp[1];
+                        
                         if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy]/.test(stem)) {
                             w   = stem;
                             re2 = /(?:at|bl|iz)$/;
                             re3 = /([^aeiouylsz])\1$/; /// Look for repeating characters.
-                            re4 = /^[^aeiou][^aeiouy]*[aeiouy][^aeiouwxy]$/;
+                            /// Check for a short syllable.
+                            re4  = /(?:^[aeiouy][^aeiouy]$|[^aeiouy][aeiouy][^aeiouwxyY]$)/;
                             if (re2.test(w)) {
                                 /// TODO: Determine why if (re2.test(w)) and else if (re4.test(w)) should not be merged to the same line since they have the same code following.
                                 w += "e";
                             } else if (re3.test(w)) {
                                 w = w.slice(0, -1);
-                            } else if (re4.test(w) || w.length < 4) {
+                            } else if (re4.test(w)) {
                                 w += "e";
                             }
                         }
