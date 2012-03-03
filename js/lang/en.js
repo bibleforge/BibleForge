@@ -229,7 +229,9 @@ BF.langs.en = (function ()
                     ///     eth
                     ///     est
                     ///     edst
-                    /// if the preceding word part contains a vowel, and after the deletion:
+                    /// if the preceding word part contains a vowel.
+                    ///
+                    /// After the deletion:
                     /// if the word ends with "at," "bl," or "iz," add "e" (so luxuriat => luxuriate), or
                     /// if the word ends with a double remove the last letter (so hopp => hop), or
                     /// if the word is short, add "e" (so hop => hope)
@@ -237,7 +239,7 @@ BF.langs.en = (function ()
                     ///TODO: Also stem "eedly" (porter2).
                     re  = /^(.+?)eed$/;
                     /// "Present-day" English: re2 = /^(.+?)(ingly|edly|ed|ing|ly)$/;
-                    re2 = /^(.+?)(ing(?:ly)?|e(?:d(?:ly|st)?|st|th)|ly)$/; /// Early Modern English fix
+                    re2 = /^(.+?)(ing(?:ly)?|e(?:d(?:ly|st)?|st|th)|ly)$/;
                     
                     if (re.test(w)) {
                         fp = re.exec(w);
@@ -467,6 +469,10 @@ BF.langs.en = (function ()
                     }
                     
                     w = w.toLowerCase();
+                    
+                    /// In order to match different stemmed versions with regex, convert final y or i to [yi] and final e to [ei].
+                    ///     love => lov[ei] (therefore it can match "loving" and "hope")
+                    ///     cri  => cr[yi]  (therefore it can match "cried" and "cry")
                     
                     last_letter = w.slice(-1);
                     
