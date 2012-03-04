@@ -1234,6 +1234,69 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "spun":
                                 stemmed_word = "sp[aiu]n";
                                 break;
+                            case "spat":
+                            case "spit":
+                                stemmed_word = "sp[ai]t";
+                                break;
+                            case "sprang":
+                            case "spring":
+                            case "sprung":
+                                ///NOTE: The word "spring" occurs both as a noun as well as a verb.
+                                stemmed_word = "spr[aiu]ng";
+                                break;
+                            case "stand":
+                            case "stood":
+                                stemmed_word = "st(?:an|oo)d";
+                                break;
+                            case "steal":
+                            case "stol[ei]":
+                            case "stolen":
+                                stemmed_word = "st(?:eal|ol[ei]n?)";
+                                break;
+                            case "stick":
+                            case "stuck":
+                                ///NOTE: The word "stick" occurs both as a noun as well as a verb.
+                                stemmed_word = "st[iu]ck";
+                                break;
+                            case "sting":
+                            case "stung":
+                                ///NOTE: The word "sting" occurs both as a noun as well as a verb.
+                                stemmed_word = "st[iu]ng";
+                                break;
+                            case "stank":
+                            case "stink":
+                            case "stunk":
+                                ///NOTE: The word "stink" occurs both as a noun as well as a verb.
+                                ///NOTE: The word "stunk" does not occur but could be searched for.
+                                stemmed_word = "st[ia]nk";
+                                break;
+                            case "strik[ei]":
+                            case "struck":
+                                stemmed_word = "str(?:ik[ei]|uck)";
+                                break;
+                            case "striv[ei]":
+                            case "striven":
+                            case "strov[ei]":
+                                stemmed_word = "str[io]v(?:en?|i)";
+                                break;
+                            case "swam":
+                            case "swim":
+                            case "swum":
+                                stemmed_word = "sw[aiu]m";
+                                break;
+                            case "sweep":
+                            case "swept":
+                                stemmed_word = "swe(?:ep|pt)";
+                                break;
+                            case "swear":
+                            case "swor[ei]":
+                            case "sworn":
+                                stemmed_word = "sw(?:ear|or[ein])";
+                                break;
+                            case "swell":
+                            case "swollen":
+                                stemmed_word = "sw(?:ell|ollen)";
+                                break;
                             }
                         }
                     }
