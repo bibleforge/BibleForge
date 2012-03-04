@@ -1110,9 +1110,45 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "sa[yi]":
                                 stemmed_word = "sa(?:id|y)";
                                 break;
+                            case "sang":
+                            case "sing":
+                            case "sung":
+                                stemmed_word = "s[aiu]ng";
+                                break;
+                            case "sank":
+                            case "sink":
+                            case "sunk":
+                                stemmed_word = "s[aiu]nk";
+                                break;
+                            case "sat":
+                            case "sit":
+                                stemmed_word = "s[ai]t";
+                                break;
+                            case "saw":
+                            case "see":
+                            case "seen":
+                                stemmed_word = "s(?:aw|een?)";
+                                break;
                             case "seek":
                             case "sought":
                                 stemmed_word = "s(?:eek|ought)";
+                                break;
+                            case "send":
+                            case "sent":
+                                stemmed_word = "sen[dt]";
+                                break;
+                            case "sew":
+                            case "sewn":
+                                stemmed_word = "sewn?";
+                                break;
+                            case "shak[ei]":
+                            case "shaken":
+                            case "shook":
+                                stemmed_word = "sh(?:ak(?:en?|i)|ook)";
+                                break;
+                            case "shav[ei]":
+                            case "shaven":
+                                stemmed_word = "shak(?:en?|i)";
                                 break;
                             }
                         }
