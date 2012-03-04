@@ -469,8 +469,7 @@ BF.langs.en = (function ()
                         ///NOTE: If a word is misspelled (like "mediat"), it will not add the extra regex, so it will return search results but not highlight them correctly.
                         if (r2.test(stem) && stem.slice(-2) === "at") {
                             w = stem + "(?:or)?";
-                        ///NOTE: Change to the algorithm: stems ending in "y" should not be followed by an "e" and it is more than three letters long.
-                        } else if (r2.test(stem) || (re2.test(stem) && !(re3.test(stem))) || /..[yY]$/.test(stem)) {
+                        } else if (r2.test(stem) || (re2.test(stem) && !(re3.test(stem)))) {
                             w = stem;
                         }
                     } else {
