@@ -1150,6 +1150,90 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "shaven":
                                 stemmed_word = "shak(?:en?|i)";
                                 break;
+                            case "shin[ei]":
+                            case "shon[ei]":
+                                stemmed_word = "sh[io]n[ei]";
+                                break;
+                            case "shear":
+                            case "shorn":
+                                stemmed_word = "sh(?:ear|orn)";
+                                break;
+                            case "shot":
+                            case "shoot":
+                                stemmed_word = "shoo?t";
+                                break;
+                            ///NOTE: Because the word "show" never occurs in the current English Bible (KJV), "shew" already has the correct stemming, and therefore does not need to be modified.
+                            case "show":
+                                stemmed_word = "shew";
+                                break;
+                            ///NOTE: Because the word "showbread" never occurs in the current English Bible (KJV), "shewbread" already has the correct stemming, and therefore does not need to be modified.
+                            case "showbread":
+                                stemmed_word = "shewbread";
+                                break;
+                            case "shrank":
+                            case "shrink":
+                            case "shrunk":
+                                stemmed_word = "shr[aiu]nk";
+                                break;
+                            /// This makes "singly" also match "single"
+                            case "singl[yi]":
+                                stemmed_word = "singl";
+                                break;
+                            case "slang":
+                            case "sling":
+                            case "slung":
+                                ///NOTE: The word "slung" does not actually occur but could be searched for.
+                                stemmed_word = "sl[ai]ng";
+                                break;
+                            case "sleep":
+                            case "slept":
+                                stemmed_word = "sle(?:ep|pt)";
+                                break;
+                            case "sla[yi]":
+                            case "slain":
+                            case "slew":
+                                stemmed_word = "sl(?:a(?:[yi]|in)|ew)";
+                                break;
+                            case "slid":
+                            case "slid[ei]":
+                            case "slidden":
+                                stemmed_word = "slid(?:[ei]?|den)";
+                                break;
+                            case "smit[ei]":
+                            case "smitten":
+                            case "smot[ei]":
+                                stemmed_word = "sm(?:[io]t[ei]|itten)";
+                                break;
+                            case "sell":
+                            case "sold":
+                                stemmed_word = "s(?:ell|old)";
+                                break;
+                            case "sow":
+                            case "sown":
+                                stemmed_word = "sown?";
+                                break;
+                            case "speak":
+                            case "spok[ei]":
+                            case "spoken":
+                                stemmed_word = "sp(?:eak|ok[ei]n?)";
+                                break;
+                            case "sped":
+                            case "speed":
+                                stemmed_word = "spee?d";
+                                break;
+                            case "spend":
+                            case "spent":
+                                stemmed_word = "spen[dt]";
+                                break;
+                            case "spill":
+                            case "spilt":
+                                stemmed_word = "spil[lt]";
+                                break;
+                            case "span":
+                            case "spin":
+                            case "spun":
+                                stemmed_word = "sp[aiu]n";
+                                break;
                             }
                         }
                     }
