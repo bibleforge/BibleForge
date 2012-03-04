@@ -1297,6 +1297,47 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "swollen":
                                 stemmed_word = "sw(?:ell|ollen)";
                                 break;
+                            case "tak[ei]":
+                            case "taken":
+                            case "took":
+                                stemmed_word = "t(?:ak[ei]n|ook)";
+                                break;
+                            case "taught":
+                            case "teach":
+                                stemmed_word = "t(?:aught|each)";
+                                break;
+                            case "teeth":
+                            case "tooth":
+                                stemmed_word = "t(?:ee|oo)th";
+                                break;
+                            case "tear":
+                            case "tor[ei]":
+                            case "torn":
+                                stemmed_word = "t(?:ear|or[ein])";
+                                break;
+                            case "tell":
+                            case "told":
+                                stemmed_word = "t(?:ell|old)";
+                                break;
+                            case "think":
+                            case "thought":
+                                stemmed_word = "th(?:ink|ought)";
+                                break;
+                            case "threw":
+                            case "throw":
+                            case "thrown":
+                                stemmed_word = "thr[eo]wn?";
+                                break;
+                            case "tread":
+                            case "trod":
+                            case "trodden":
+                                stemmed_word = "tr(?:ead|od(?:den))";
+                                break;
+                            /// Convert the stemmed form of "tying" to match the word "tie" and other variants.
+                            ///NOTE: The word "tying" does not actually occur but might be searched for.
+                            case "t[yi]":
+                                stemmed_word = "ti[ei]";
+                                break;
                             }
                         }
                     }
