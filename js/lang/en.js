@@ -699,8 +699,7 @@ first_loop:     while (i < search_terms_arr_len) {
                                 break;
                             case "bend":
                             case "bent":
-                            case "begotten":
-                                stemmed_word = "ben[dt]t?(?:en)?";
+                                stemmed_word = "ben[dt]";
                                 break;
                             case "bad[ei]":
                             case "bid":
