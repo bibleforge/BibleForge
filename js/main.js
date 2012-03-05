@@ -8,6 +8,23 @@
  * @author  BibleForge <info@bibleforge.com>
  */
 
+/**
+ * Copyright (C) 2012
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see http://www.opensource.org/licenses/AGPL-3.0.
+ */
+
 /// Declare globals for JSLint.
 /*global document, window, BF */
 
@@ -3147,7 +3164,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?4552401", {
+                BF.include("/js/secondary.js?4609070", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
