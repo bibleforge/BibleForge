@@ -1436,7 +1436,7 @@
                             ///NOTE: Because the placeholder explanation is currently in the element's value, we must check for that.
                             var query_str;
                             
-                            if (context.settings.user.last_query.type === BF.const.verse_lookup && context.settings.user.position.b && (qEl_str === "" || qEl_str === context.settings.user.last_query.real_query)) {
+                            if (context.settings.user.last_query.type === BF.consts.verse_lookup && context.settings.user.position.b && (qEl_str === "" || qEl_str === context.settings.user.last_query.real_query)) {
                                 query_str = BF.langs[lang_id].books_short[context.settings.user.position.b] + " " + context.settings.user.position.c + ":" + context.settings.user.position.v;
                             } else if (qEl_str_trim !== "") {
                                 query_str = qEl_str;
@@ -1508,7 +1508,7 @@
                                         /// Because the book name may not be recognized the same in the new language, make sure it knows how to handle this query.
                                         position.type = query_info.type;
                                         
-                                        if (query_info.type === BF.const.verse_lookup) {
+                                        if (query_info.type === BF.consts.verse_lookup) {
                                             /// Because the book names are not the same in each language, recreate the verse and store it in the URL
                                             /// so that if the page is refreshed, it will be able to load the correct verse.
                                             query_url_str = BF.langs[lang_id].books_short[context.settings.user.position.b] + " " + context.settings.user.position.c + ":" + context.settings.user.position.v;

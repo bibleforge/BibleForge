@@ -65,7 +65,7 @@
     ///TODO: This should be based on browser language settings and IP address.
     BF.lang = BF.langs.en;
     
-    BF.const = {
+    BF.consts = {
         /// Query type "constants"
         verse_lookup:       1,
         mixed_search:       2,
@@ -965,7 +965,7 @@
                     
                     /// If the last query was a search, nothing needs to be done since only verse lookups are affected by paragraph mode.
                     ///NOTE: Since this function will be called before query_manager is created when loading saved settings, check to make sure it exists.
-                    if (typeof query_manager === "undefined" || query_manager.query_type !== BF.const.verse_lookup) {
+                    if (typeof query_manager === "undefined" || query_manager.query_type !== BF.consts.verse_lookup) {
                         return;
                     }
                     
@@ -1347,10 +1347,10 @@
                                 /// Since the page is scrolling, we need to determine if more content needs to be added or if some content should be hidden.
                                 
                                 if (scrolling_down) {
-                                    add_content_if_needed(BF.const.additional);
+                                    add_content_if_needed(BF.consts.additional);
                                     checking_excess_content_top = true;
                                 } else {
-                                    add_content_if_needed(BF.const.previous);
+                                    add_content_if_needed(BF.consts.previous);
                                     checking_excess_content_bottom = true;
                                 }
                                 
@@ -1535,7 +1535,7 @@
                                 @*/
                                 
                                 /// Check to see if we need to add more content.
-                                add_content_if_needed(BF.const.additional);
+                                add_content_if_needed(BF.consts.additional);
                             } else {
                                 /// Did the user scroll all the way to the very bottom?  (If so, then there is no more content to be gotten.)
                                 if (has_reached_bottom) {
@@ -1584,7 +1584,7 @@
                                 system.event.trigger("contentAddedAbove", {amount: newEl.clientHeight});
                                 
                                 /// Check to see if we need to add more content.
-                                add_content_if_needed(BF.const.previous);
+                                add_content_if_needed(BF.consts.previous);
                             } else {
                                 /// Did the user scroll all the way to the very top?  (If so, then there is no more content to be gotten.)
                                 if (has_reached_top) {
@@ -1600,7 +1600,7 @@
                     /**
                      * Find a verse element that is within a certain Y coordinate on the screen.
                      *
-                     * @example add_content_if_needed(BF.const.additional);
+                     * @example add_content_if_needed(BF.consts.additional);
                      * @param   direction (integer) The direction that verses should be added: additional || previous.
                      * @return  Null.  A function is run after a delay that may add verses to the page.
                      * @note    Called by add_content_bottom_if_needed(), add_content_top_if_needed(), handle_new_verses(), window.onresize(), and scrolling().
@@ -1610,7 +1610,7 @@
                     {
                         var lookup_delay = 50; /// In milliseconds
                         
-                        if (direction === BF.const.additional) {
+                        if (direction === BF.consts.additional) {
                             window.setTimeout(add_content_bottom_if_needed, lookup_delay);
                         } else {
                             window.setTimeout(add_content_top_if_needed,    lookup_delay);
@@ -1697,7 +1697,7 @@
                         query_type = query_manager.query_type;
                         /// The verse range is displayed differently based on the type of search (i.e., a verse lookup or a search).
                         ///TODO: Set the date of the verse (or when it was written).
-                        if (query_type === BF.const.verse_lookup) {
+                        if (query_type === BF.consts.verse_lookup) {
                             new_title = ref_range + " - " + BF.lang.app_name;
                         } else {
                             new_title = query_manager.base_query + " (" + ref_range + ") - " + BF.lang.app_name;
@@ -1710,7 +1710,7 @@
                             document.title = new_title;
                             
                             /// Display the verse range on the page if looking up verses.
-                            if (query_type === BF.const.verse_lookup) {
+                            if (query_type === BF.consts.verse_lookup) {
                                 ///TODO: Find a better way to clear leftInfo than using innerHTML.
                                 leftInfo.innerHTML = "";
                                 leftInfo.appendChild(document.createTextNode(ref_range));
@@ -1799,8 +1799,8 @@
                  */
                 window.addEventListener("resize", function ()
                 {
-                    add_content_if_needed(BF.const.additional);
-                    add_content_if_needed(BF.const.previous);
+                    add_content_if_needed(BF.consts.additional);
+                    add_content_if_needed(BF.consts.previous);
                     
                     update_verse_range();
                 }, false);
@@ -1949,7 +1949,7 @@
                      * Writes new verses to page.
                      *
                      * @example write_verses(type, direction, [verse_ids, ...], [verse_html, ...]);
-                     * @example write_verses(BF.const.verse_lookup, additional, [1001001], ["<a id=1>In</a> <a id=2>the</a> <a id=3>beginning....</a>"]);
+                     * @example write_verses(BF.consts.verse_lookup, additional, [1001001], ["<a id=1>In</a> <a id=2>the</a> <a id=3>beginning....</a>"]);
                      * @param   type        (integer) The type of query: verse_lookup || mixed_search || standard_search || grammatical_search.
                      * @param   direction   (integer) The direction of the verses to be retrieved: additional || previous.
                      * @param   verse_ids   (array)   An array of integers representing Bible verse references.
@@ -1974,8 +1974,8 @@
                             verse_obj;
                         
                         ///NOTE: Currently only grammatical_search searches data at the word level, so it is the only type that might stop in the middle of a verse and find more words in the same verse as the user scrolls.
-                        if (type === BF.const.grammatical_search) {
-                            if (direction === BF.const.additional) {
+                        if (type === BF.consts.grammatical_search) {
+                            if (direction === BF.consts.additional) {
                                 /// Is the first verse returned the same as the bottom verse on the page?
                                 if (verse_range.bottom_verse === verse_ids[0]) {
                                     start_key = 1;
@@ -1999,7 +1999,7 @@
                             verse_obj = BF.get_b_c_v(verse_id);
                             
                             ///TODO: Determine if it would be better to have two for loops instead of the if statement inside of this one.
-                            if (type === BF.const.verse_lookup) {
+                            if (type === BF.consts.verse_lookup) {
                                 /// Is this the first verse or the Psalm title?
                                 if (verse_obj.v < 2) {
                                     if (i !== start_key) {
@@ -2085,7 +2085,7 @@
                         ///      Also using "range = document.createRange(); newEl = range.createContextualFragment(html_str)" is also a possibility.
                         newEl.innerHTML = html_str;
                         
-                        if (direction === BF.const.additional) {
+                        if (direction === BF.consts.additional) {
                             page.appendChild(newEl);
                         } else {
                             page.insertBefore(newEl, page.childNodes[0]);
@@ -2144,11 +2144,11 @@
                                 {
                                     ///NOTE: Only standard and mixed searches need verse_html data to be sent.
                                     ///NOTE: word_ids is only needed for grammatical and mixed searches.
-                                    options.highlight((options.extra_highlighting || type !== BF.const.grammatical_search ? verse_html.join("") : false), word_ids);
+                                    options.highlight((options.extra_highlighting || type !== BF.consts.grammatical_search ? verse_html.join("") : false), word_ids);
                                 }, 0);
                             }
                             
-                            if (direction === BF.const.additional) {
+                            if (direction === BF.consts.additional) {
                                 /// The last verse ID need to be store so that the server knowns where to start future queries.
                                 options.verse_range.bottom_verse = verse_ids[verse_ids.length - 1];
                                 
@@ -2162,7 +2162,7 @@
                                     /// Indicate to the user that more content may be loading, and check for more content.
                                     ///TODO: Make a separate function for this.
                                     bottomLoader.style.visibility = "visible";
-                                    content_manager.add_content_if_needed(BF.const.additional);
+                                    content_manager.add_content_if_needed(BF.consts.additional);
                                 } else {
                                     /// Since the last verse is Revelation 22:21, there is no need to look for more.
                                     content_manager.reached_bottom();
@@ -2170,7 +2170,7 @@
                                 }
                             }
                             
-                            if (direction === BF.const.previous || initial_query) {
+                            if (direction === BF.consts.previous || initial_query) {
                                 /// The first verse ID need to be store so that the server knowns where to start future previous queries.
                                 options.verse_range.top_verse = verse_ids[0];
                                 
@@ -2184,7 +2184,7 @@
                                     /// Indicate to the user that more content may be loading, and check for more content.
                                     ///TODO: Make a separate function for this.
                                     topLoader.style.visibility = "visible";
-                                    content_manager.add_content_if_needed(BF.const.previous);
+                                    content_manager.add_content_if_needed(BF.consts.previous);
                                 } else {
                                     /// Since the first verse is Genesis 1:1, there is no need to look for more.
                                     content_manager.reached_top();
@@ -2196,14 +2196,14 @@
                             total = 0;
                             
                             ///TODO: Make a separate function for this.
-                            if (direction === BF.const.additional) {
+                            if (direction === BF.consts.additional) {
                                 /// The user has reached the bottom by scrolling down (either RETURNED_SEARCH or RETURNED_VERSES_PREVIOUS), so we need to hide the loading graphic.
                                 /// This is cause by scrolling to Revelation 22:21 or end of search or there were no results.
                                 content_manager.reached_bottom();
                                 bottomLoader.style.visibility = "hidden";
                             }
                             ///BUG: there can be no results if looking up beyond rev 22.21 (e.g., rev 23). FIX: Prevent looking up past 66022021
-                            if (direction === BF.const.previous || initial_query) {
+                            if (direction === BF.consts.previous || initial_query) {
                                 /// The user has reached the top of the page by scrolling up (either Genesis 1:1 or there were no search results), so we need to hide the loading graphic
                                 content_manager.reached_top();
                                 topLoader.style.visibility    = "hidden";
@@ -2213,7 +2213,7 @@
                         /// Is this is the first results of a query?
                         if (initial_query) {
                             /// Are the results displayed in paragraphs, and is the verse looked up not at the beginning of a paragraph?
-                            if (type === BF.const.verse_lookup && in_paragraphs && verse_ids[0] !== options.verse) {
+                            if (type === BF.consts.verse_lookup && in_paragraphs && verse_ids[0] !== options.verse) {
                                 /// Because the verse the user is looking for is not at the beginning of a paragraph
                                 /// the text needs to be scrolled so that the verse is at the top.
                                 content_manager.scroll_to_verse(BF.get_b_c_v(options.verse));
@@ -2229,7 +2229,7 @@
                             
                             leftInfo.innerHTML = "";
                             
-                            if (type !== BF.const.verse_lookup) {
+                            if (type !== BF.consts.verse_lookup) {
                                 /// Create the inital text.
                                 leftInfo.appendChild(document.createTextNode(BF.format_number(total) + BF.lang["found_" + (total === 1 ? "singular" : "plural")]));
                                 /// Create a <b> for the search terms.
@@ -2288,7 +2288,7 @@
                             
                             var query_str = "t=" + options.type;
                             
-                            if (options.type === BF.const.verse_lookup) {
+                            if (options.type === BF.consts.verse_lookup) {
                                 query_str += "&q=" + options.verse;
                                 
                                 ///NOTE: Paragraph mode is default for verse lookups; therefore, p only needs to be set if it is not in paragraph mode.
@@ -2297,7 +2297,7 @@
                                 }
                                 
                                 ///NOTE: Queries are additional by default; therefore, d only needs to be set for previous lookups.
-                                if (options.direction === BF.const.previous) {
+                                if (options.direction === BF.consts.previous) {
                                     query_str += "&d=" + options.direction;
                                     
                                 /// Is it possible that this query does not begin at a paragraph break?
@@ -2350,18 +2350,18 @@
                                     
                                     in_paragraphs = settings.view.in_paragraphs;
                                     
-                                    if (options.type === BF.const.verse_lookup || options.type === BF.const.standard_search) {
+                                    if (options.type === BF.consts.verse_lookup || options.type === BF.consts.standard_search) {
                                         /// Determine which verse to start from for the next query.
                                         ///NOTE: It does not matter whether or not the verse exists.  The server will simply retrieve the next available verse.
                                         ///      For example, Romans 1:33 will retrieve verses starting at Romans 2:1 (when the direction is additional).
-                                        if (direction === BF.const.additional) {
+                                        if (direction === BF.consts.additional) {
                                             options.verse = options.verse_range.bottom_verse + 1;
                                         } else {
                                             options.verse = options.verse_range.top_verse    - 1;
                                         }
                                     } else {
                                         /// Determine which word to begin searching at for grammatical/mixed searches.
-                                        if (direction === BF.const.additional) {
+                                        if (direction === BF.consts.additional) {
                                             options.start_at = options.verse_range.bottom_id + 1;
                                         } else {
                                             ///NOTE: Currently, all searches are additional, so this code does not yet run.
@@ -2414,7 +2414,7 @@
                                     options.initial_query = true;
                                     /// Initial queries are always additional.
                                     ///TODO: Determine if it should not store direction in the options because it changes between previous and additional searches.
-                                    options.direction     = BF.const.additional;
+                                    options.direction     = BF.consts.additional;
                                     /// Since this settings can be changed by the user at run time, it must be retrieved before each query.
                                     options.in_paragraphs = settings.view.in_paragraphs;
                                     /// Create an empty verse_range object, which will be filled in as verses are retrieved.
@@ -2435,8 +2435,8 @@
                                     this.store_query_options(options);
                                     
                                     /// Create the additional and previous functions for the content_manager to call when needed.
-                                    this.query_additional = next_query_maker(ajax_additional, BF.const.additional, options);
-                                    this.query_previous   = next_query_maker(ajax_previous,   BF.const.previous,   options);
+                                    this.query_additional = next_query_maker(ajax_additional, BF.consts.additional, options);
+                                    this.query_previous   = next_query_maker(ajax_previous,   BF.consts.previous,   options);
                                 };
                             }());
                         }());
@@ -2582,7 +2582,7 @@
                                     {
                                         /// Concatenate the last attribute found (like above) along with the exlude array.
                                         query: grammar_json + grammar_attribute_json + BF.lang.grammar_keywords[grammar_attributes.slice(split_start).trim()] + "],[" + exclude_json.slice(0, -1) + "]]",
-                                        type:  BF.const.grammatical_search
+                                        type:  BF.consts.grammatical_search
                                     }
                                 ];
                             }
@@ -2594,7 +2594,7 @@
                         {
                             query:          window.encodeURIComponent(search_terms),
                             standard_terms: search_terms,
-                            type:           BF.const.standard_search
+                            type:           BF.consts.standard_search
                         }
                     ];
                 }
@@ -2696,7 +2696,7 @@
                     position = position || {};
                     
                     /// Is the query a verse lookup?
-                    if (position.type === BF.const.verse_lookup || (verse_id > 0 && !position.type)) {
+                    if (position.type === BF.consts.verse_lookup || (verse_id > 0 && !position.type)) {
                         /// Do we know what position the user should be brought to?
                         ///TODO: Make this work with searches as well.
                         if (position.verse_id) {
@@ -2713,7 +2713,7 @@
                         }
                         
                         options.verse = verse_id;
-                        options.type  = BF.const.verse_lookup;
+                        options.type  = BF.consts.verse_lookup;
                         
                         /// If the query is a verse lookup and the verse is visible, just scroll to it.
                         ///TODO: The second parameter (smooth) should (probably) be TRUE, but it is not implemented yet.
@@ -2734,7 +2734,7 @@
                         if (query.length > 1) {
                             ///TODO: Implement mixed searching.
                             options.query = query;
-                            options.type  = BF.const.mixed_search;
+                            options.type  = BF.consts.mixed_search;
                         } else {
                             ///NOTE: If it is not mixed, then there is currently only one array element, so get the variables out of it.
                             options.query  = query[0].query;
@@ -2779,7 +2779,7 @@
                     }
                     
                     /// Was the query a search?  Searches need to have the highlight function prepared for the incoming results.
-                    if (options.type !== BF.const.verse_lookup || options.extra_highlighting) {
+                    if (options.type !== BF.consts.verse_lookup || options.extra_highlighting) {
                         /**
                          * Create the highlight function and closure and prepare the regular expression used to do the highlighting.
                          *
@@ -2794,7 +2794,7 @@
                             var highlight_re;
                             
                             /// TODO: Handle mixed searches.
-                            if (options.type === BF.const.standard_search || options.extra_highlighting) {
+                            if (options.type === BF.consts.standard_search || options.extra_highlighting) {
                                 /// standard_terms is a string containing all of the terms in a standard search (i.e., excluding grammatical search terms when preforming a mixed search).
                                 highlight_re = BF.lang.prepare_highlighter((standard_terms + (options.extra_highlighting ? " " + options.extra_highlighting : "")).trim());
                             }
@@ -2850,7 +2850,7 @@
                     /// Is there any chance that there are verses above the starting verse?
                     /// Or, in other words, is the query a search or a verse lookup starting at Genesis 1:1?
                     ///NOTE: In the future, it may be possible for searches to start midway.
-                    if (options.type !== BF.const.verse_lookup || options.verse === 1001001) {
+                    if (options.type !== BF.consts.verse_lookup || options.verse === 1001001) {
                         /// There is no reason to look for previous verses when the results start at the beginning.
                         content_manager.reached_top();
                     }
@@ -3118,7 +3118,7 @@
                         
                         /// Prepare to highlight the search terms on the verse lookup.
                         ///TODO: Figure out how to highlight grammatical (as well as mixed) searches.
-                        if (query_manager.query_type !== BF.const.grammatical_search) {
+                        if (query_manager.query_type !== BF.consts.grammatical_search) {
                             ///TODO: Instead of using prepared_query, it might be good to just use a simple list terms.
                             highlighting = (query_manager.prepared_query + (query_manager.extra_highlighting ? " " + query_manager.extra_highlighting : ""));
                             if (highlighting) {
@@ -3146,7 +3146,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?3280861", {
+                BF.include("/js/secondary.js?4552174", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
