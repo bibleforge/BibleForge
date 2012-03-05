@@ -1338,6 +1338,14 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "t[yi]":
                                 stemmed_word = "ti[ei]";
                                 break;
+                            case "understand":
+                            case "understood":
+                                stemmed_word = "underst(?:an|oo)d";
+                                break;
+                            case "upheld":
+                            case "uphold":
+                                stemmed_word = "uph[eo]ld";
+                                break;
                             }
                         }
                     }
