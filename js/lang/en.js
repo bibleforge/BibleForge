@@ -1346,6 +1346,73 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "uphold":
                                 stemmed_word = "uph[eo]ld";
                                 break;
+                            case "wax":
+                            case "waxen":
+                                stemmed_word = "wax(?:en)?";
+                                break;
+                            ///NOTE: Since "who" can be searched for in the possessive form (who's), we must match this work after stemming.
+                            case "who":
+                            case "whom":
+                                stemmed_word = "whom?";
+                                break;
+                            case "whosoev":
+                            case "whomsoev":
+                                stemmed_word = "whom?soever";
+                                break;
+                            case "wak[ei]":
+                            case "wok[ei]":
+                            ///NOTE: The word "woken" does not actually occur but might be searched for.
+                            case "woken":
+                                stemmed_word = "w[ao]k[ei]";
+                                break;
+                            case "woman":
+                            case "women":
+                                stemmed_word = "wom[ae]n";
+                                break;
+                            /// Convert the stemmed form of "wore" to match the word "wear" and other variants.
+                            ///NOTE: The word "wore" does not actually occur but might be searched for.
+                            case "wor[ei]":
+                            /// Convert the stemmed form of "worn" to match the word "wear" and other variants.
+                            ///NOTE: The word "worn" does not actually occur but might be searched for.
+                            case "worn":
+                                stemmed_word = "wear";
+                                break;
+                            case "weav":
+                            case "wov[ei]":
+                            case "woven":
+                                stemmed_word = "w(?:ea|o)v[ei]n?";
+                                break;
+                            case "win":
+                            case "won":
+                                stemmed_word = "w[io]n";
+                                break;
+                            case "withdraw":
+                            case "withdrawn":
+                            case "withdrew":
+                                stemmed_word = "withdr[ae]wn?";
+                                break;
+                            case "withheld":
+                            case "withhold":
+                            case "withholden":
+                                stemmed_word = "withh[eo]ld(?:en)?";
+                                break;
+                            case "withstand":
+                            case "withstood":
+                                stemmed_word = "withst(?:an|oo)d";
+                                break;
+                            case "wring":
+                            case "wrung":
+                                stemmed_word = "wr[iu]ng";
+                                break;
+                            case "writ[ei]":
+                            case "written":
+                            case "wrot[ei]":
+                                stemmed_word = "wr[io]t(?:[ei]|ten)";
+                                break;
+                            case "work":
+                            case "wrought":
+                                stemmed_word = "w(?:ork|rought)";
+                                break;
                             }
                         }
                     }
