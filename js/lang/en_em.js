@@ -133,9 +133,9 @@ BF.langs.en_em = (function ()
                 var step2list = {ational: "ate", tional: "tion", enci: "ence", anci: "ance", izer: "ize", bli: "ble", alli: "al", entli: "ent", eli: "e", ousli: "ous", ization: "ize", ation: "ate", ator: "ate", alism: "al", iveness: "ive", fulness: "ful", ousness: "ous", aliti: "al", iviti: "ive", biliti: "ble", logi: "log"},
                     step3list = {icate: "ic", ative: "", alize: "al", iciti: "ic", ical: "ic", ful: "", ness: "", self: ""},
                     
-                    ///TODO: Determine if there is a faster way to do this.  E.g., using a in_array() or isset() function.
+                    ///TODO: Determine if there is a faster way to do this.  E.g., using an in_array() or isset() function.
                     /// Words to ignore that are already the root word but don't look like it.
-                    stop_words_re = /^th[iu]s|h[ai]s|was|yes|succeed|proceed|e(?:arly|xceed)|only|news$/i;
+                    stop_words_re = /^(?:th[iu]s|h[ai]s|was|yes|succeed|proceed|e(?:arly|xceed)|only|news)$/i;
                 
                 /**
                  * Convert an English word to its root form.
@@ -146,16 +146,19 @@ BF.langs.en_em = (function ()
                  * @example root_word = stem_word("loving"); /// Returns "lov[ei]"
                  * @param   w (string) Word to stem.
                  * @return  Root word string.
+                 * @todo    Update this (and Sphinx) to the porter2 algorithm.
                  * @note    Called by prepare_highlighter() in js/main.js.
                  * @link    http://snowball.tartarus.org/algorithms/english/stemmer.html
                  * @link    http://www.tartarus.org/~martin/PorterStemmer
                  * @todo    Document stem_word() better: give examples (from the KJV if possible) and reasonings for each regular expression, etc.
                  * @todo    Review stem_word() for optimizations: avoid regex when possible.
                  */
-                return function (w)
+                return function stem_word(w)
                 {
                     var fp,
                         last_letter,
+                        r1,
+                        r2,
                         re,
                         re2,
                         re3,
@@ -172,15 +175,38 @@ BF.langs.en_em = (function ()
                         return w;
                     }
                     
-                    ///TODO: Determine if Step 0 is needed (see http://snowball.tartarus.org/algorithms/english/stemmer.html).
+                    /// ***********
+                    /// * Step 0a *
+                    /// ***********
+                    ///
+                    /// Search for the longest among the suffixes
+                    ///     '
+                    ///     's
+                    ///     's'
+                    /// and remove if found.
+                                        
+                    w = w.replace(/'(?:s'?)?$/, "");
                     
-                    /// Step 1a
+                    /// ***********
+                    /// * Step 0b *
+                    /// ***********
+                    ///
+                    /// Convert y's at the beginning of a word or after a vowel to upper case to indicate that they are to be treated as consonants.
+                    /// They are converted back to lower case near the end.
+                    
+                    w = w.replace(/(?:^y|([aeiouy])y)/g, "$1Y");
+                    
+                    /// ***********
+                    /// * Step 1a *
+                    /// ***********
+                    ///
                     /// Find the longest suffix and preform the following:
                     /// Replace suffixes: sses             => ss     (witnesses => witness)
                     ///                   ??ied+ || ??ies* => ??i    (cried     => cri,      cries => cri)
                     ///                   ?ied+  || ?ies*  => ??ie   (tied      => tie,      ties  => tie)
                     ///                   {V}{C}s          => {V}{C} (gaps      => gap)
                     /// Ignore suffixes:  us+ && ss                  (grievous  => grievous, pass  => pass)
+                    
                     re  = /^(.+?)(ss|i)es$/;
                     re2 = /^(.+?)([^s])s$/;
                     
@@ -190,11 +216,32 @@ BF.langs.en_em = (function ()
                         w = w.replace(re2, "$1$2");
                     }
                     
-                    /// Step 1b
-                    /// "Present-day" English: re = /^(.+?)eed$/;
-                    re  = /^(.+?)ee$/; /// Early Modern English fix
+                    /// ***********
+                    /// * Step 1b *
+                    /// ***********
+                    ///
+                    /// Replace "eed" with "ee" if after the first non-vowel following a vowel, or the end of the word if there is no such non-vowel (aka R1).
+                    ///     agreed => agree
+                    /// Delete
+                    ///     ed
+                    ///     edly
+                    ///     ing
+                    ///     ingly
+                    /// and for Early Modern English
+                    ///     eth
+                    ///     est
+                    ///     edst
+                    /// if the preceding word part contains a vowel.
+                    ///
+                    /// After the deletion:
+                    /// if the word ends with "at," "bl," or "iz," add "e" (so luxuriat => luxuriate), or
+                    /// if the word ends with a double remove the last letter (so hopp => hop), or
+                    /// if the word (syllable) is short, add "e" (so hop => hope)
+                    
+                    ///TODO: Also stem "eedly" (porter2).
+                    re  = /^(.+?)eed$/;
                     /// "Present-day" English: re2 = /^(.+?)(ingly|edly|ed|ing|ly)$/;
-                    re2 = /^(.+?)(ing(?:ly)?|ed(?:ly)?|ly|e(?:st|th))$/; /// Early Modern English fix
+                    re2 = /^(.+?)(ing(?:ly)?|e(?:d(?:ly|st)?|st|th)|ly)$/;
                     
                     if (re.test(w)) {
                         fp = re.exec(w);
@@ -204,11 +251,13 @@ BF.langs.en_em = (function ()
                     } else if (re2.test(w)) {
                         fp   = re2.exec(w);
                         stem = fp[1];
+                        
                         if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy]/.test(stem)) {
                             w   = stem;
                             re2 = /(?:at|bl|iz)$/;
                             re3 = /([^aeiouylsz])\1$/; /// Look for repeating characters.
-                            re4 = /^[^aeiou][^aeiouy]*[aeiouy][^aeiouwxy]$/;
+                            /// Check for a short syllable.
+                            re4  = /(?:^[aeiouy][^aeiouy]$|[^aeiouy][aeiouy][^aeiouwxyY]$)/;
                             if (re2.test(w)) {
                                 /// TODO: Determine why if (re2.test(w)) and else if (re4.test(w)) should not be merged to the same line since they have the same code following.
                                 w += "e";
@@ -220,73 +269,221 @@ BF.langs.en_em = (function ()
                         }
                     }
                     
-                    /// Step 1c
-                    re = /^(.+?)y$/;
+                    /// ***********
+                    /// * Step 1c *
+                    /// ***********
+                    ///
+                    /// Replace y or Y suffixes with i if preceded by a non-vowel which is not the first letter of the word.
+                    ///     cry => cri
+                    ///     by  => by
+                    ///     say => say
+                    
+                    re = /^(.+?)[yY]$/;
+                    
                     if (re.test(w)) {
                         fp   = re.exec(w);
                         stem = fp[1];
-                        if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy]/.test(stem)) {
+                        if (/^.[^aeiouy]/.test(stem)) {
                             w = stem + "i";
                         }
                     }
                     
-                    /// Step 2
+                    /// **********
+                    /// * Step 2 *
+                    /// **********
+                    ///
+                    /// Replace stems in step2list if after the first non-vowel following a vowel, or the end of the word if there is no such non-vowel (aka R1).
+                    ///
+                    /// Current:
+                    ///     ational => ate
+                    ///     tional  => tion
+                    ///     enci    => ence
+                    ///     anci    => ance
+                    ///     izer    => ize
+                    ///     bli     => ble
+                    ///     alli    => al
+                    ///     entli   => ent
+                    ///     eli     => e
+                    ///     ousli   => ous
+                    ///     ization => ize
+                    ///     ation   => ate
+                    ///     ator    => ate
+                    ///     alism   => al
+                    ///     iveness => ive
+                    ///     fulness => ful
+                    ///     ousness => ous
+                    ///     aliti   => al
+                    ///     iviti   => ive
+                    ///     biliti  => ble
+                    ///     logi    => log
+                    ///
+                    /// Porter 2:
+                    ///     tional  => tion
+                    ///     enci    => ence
+                    ///     anci    => ance
+                    ///     abli    => able
+                    ///     entli   => ent
+                    ///     izer    => ize
+                    ///     ization => ize
+                    ///     ational => ate
+                    ///     ation   => ate
+                    ///     ator    => ate
+                    ///     alism   => al
+                    ///     aliti   => al
+                    ///     alli    => al
+                    ///     fulness => ful
+                    ///     ousli   => ous
+                    ///     ousness => ous
+                    ///     iveness => ive
+                    ///     iviti   => ive
+                    ///     biliti  => ble
+                    ///     bli+    => ble
+                    ///     ogi+    => og (if preceded by l)
+                    ///     fulli+  => ful
+                    ///     lessli+ => less
+                    ///     li+     delete (if preceded by a valid li-ending)
+                    ///             A valid li-ending is one of these: c, d, e, g, h, k, m, n, r, t.
+                    
                     re = /^(.+?)(a(?:t(?:ion(?:al)?|or)|nci|l(?:li|i(?:sm|ti)))|tional|e(?:n(?:ci|til)|li)|i(?:z(?:er|ation)|v(?:eness|iti))|b(?:li|iliti)|ous(?:li|ness)|fulness|logi)$/;
+                    r1 = /^([^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*/;
+                    
                     if (re.test(w)) {
                         fp     = re.exec(w);
                         stem   = fp[1];
                         suffix = fp[2];
-                        if (/^([^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(stem)) {
+                        if (r1.test(stem)) {
                             w = stem + step2list[suffix];
                         }
                     }
                     
-                    /// Step 3
+                    /// **********
+                    /// * Step 3 *
+                    /// **********
+                    ///
+                    /// Replace stems in step3list if after the first non-vowel following a vowel, or the end of the word if there is no such non-vowel (aka R1).
+                    ///NOTE: "ative" should be removed if after the first non-vowel following a vowel in R1 or the end of the word, if there is no such non-vowel (aka R2).
+                    ///
+                    /// Current:
+                    ///     icate => ic
+                    ///     alize => al
+                    ///     iciti => ic
+                    ///     ical  => ic
+                    ///     ative delete
+                    ///     ful   delete
+                    ///     ness  delete
+                    ///     self  delete
+                    ///
+                    /// Porter 2:
+                    ///     tional+  => tion
+                    ///     ational+ => ate
+                    ///     alize    => al
+                    ///     icate    => ic
+                    ///     iciti    => ic
+                    ///     ical     => ic
+                    ///     ful      delete
+                    ///     ness     delete
+                    ///     ative*   delete (if in R2)
+                    
                     re = /^(.+?)(ic(?:a(?:te|l)|iti)|a(?:tive|lize)|ful|ness|self)$/;
+                    
                     if (re.test(w)) {
                         fp     = re.exec(w);
                         stem   = fp[1];
                         suffix = fp[2];
-                        if (/^([^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(stem)) {
+                        if (r1.test(stem)) {
                             w = stem + step3list[suffix];
                         }
                     }
                     
-                    /// Step 4
+                    /// **********
+                    /// * Step 4 *
+                    /// **********
+                    ///
+                    /// Essentially, delete certain suffixes if found in after the first non-vowel following a vowel in R1 or the end of the word, if there is no such non-vowel (aka R2).
+                    ///
+                    /// Possibly delete these suffixes:
+                    ///     al
+                    ///     ance
+                    ///     ence
+                    ///     er
+                    ///     ic
+                    ///     able
+                    ///     ible
+                    ///     ant
+                    ///     ement
+                    ///     ment
+                    ///     ent
+                    ///     ism
+                    ///     ate
+                    ///     iti
+                    ///     ous
+                    ///     ive
+                    ///     ize 
+                    ///
+                    /// The following suffix must also be preceded by an "s" or "t" as well as the other requirements:
+                    ///     ion
+                    
                     re  = /^(.+?)(?:a(?:l|n(?:ce|t)|te|ble)|e(?:n(?:ce|t)|r|ment)|i(?:c|ble|sm|ti|ve|ze)|ment|ous?)$/;
                     re2 = /^(.+?)([st])ion$/;
+                    r2  = /^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/;
                     
                     if (re.test(w)) {
                         fp   = re.exec(w);
                         stem = fp[1];
-                        if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(stem)) {
+                        if (r2.test(stem)) {
                             w = stem;
                         }
                     } else if (re2.test(w)) {
                         fp   = re2.exec(w);
                         stem = fp[1] + fp[2];
-                        if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(stem)) {
+                        if (r2.test(stem)) {
                             w = stem;
                         }
                     }
                     
-                    /// Step 5
+                    /// **********
+                    /// * Step 5 *
+                    /// **********
+                    ///
+                    /// Delete "e" if in R2, or in R1 and not preceded by a short syllable.
+                    ///     creature => creatur
+                    ///     eye      => eye
+                    /// Delete "l" if in R2 and preceded by "l":
+                    ///     fulfill => fulfil
+                    ///     tell    => tell
+                    
                     re = /^(.+?)e$/;
+                    
                     if (re.test(w)) {
                         fp   = re.exec(w);
                         stem = fp[1];
-                        re   = /^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/;
                         re2  = /^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*(?:[aeiouy][aeiou]*)?$/;
-                        re3  = /^[^aeiou][^aeiouy]*[aeiouy][^aeiouwxy]$/;
+                        /// Check for a short syllable.
+                        ///NOTE: A short syllable is defined as either a vowel followed by a non-vowel other than w, x or Y and preceded by a non-vowel, or
+                        ///      a vowel at the beginning of the word followed by a non-vowel.
+                        re3  = /(?:^[aeiouy][^aeiouy]$|[^aeiouy][aeiouy][^aeiouwxyY]$)/;
                         
-                        if (re.test(stem) || (re2.test(stem) && !(re3.test(stem)))) {
+                        ///NOTE: The only stem that causes false negatives is step 2's "ator" which becomes "ate" (which step 5 would convert from "ate" to "at").
+                        ///      Therefore, we must add optional regex to match against the "or" ending.
+                        ///      E.g., mediate => mediat(?:or)?
+                        ///      Since other words can end in "or" (e.g., "creator"), this must only be applied in special circumstances.
+                        ///NOTE: If a word is misspelled (like "mediat"), it will not add the extra regex, so it will return search results but not highlight them correctly.
+                        if (r2.test(stem) && stem.slice(-2) === "at") {
+                            w = stem + "(?:or)?";
+                        } else if (r2.test(stem) || (re2.test(stem) && !(re3.test(stem)))) {
                             w = stem;
+                        }
+                    } else {
+                        if (/ll$/.test(w) && (r2.test(w))) {
+                            w = w.slice(0, -1);
                         }
                     }
                     
-                    if (/ll$/.test(w) && (/^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(w))) {
-                        w = w.slice(0, -1);
-                    }
+                    w = w.toLowerCase();
+                    
+                    /// In order to match different stemmed versions with regex, convert final y or i to [yi] and final e to [ei].
+                    ///     love => lov[ei] (therefore it can match "loving" and "hope")
+                    ///     cri  => cr[yi]  (therefore it can match "cried" and "cry")
                     
                     last_letter = w.slice(-1);
                     
@@ -327,7 +524,8 @@ BF.langs.en_em = (function ()
                 ///NOTE: (?:"[^"]*"?|[^\s]*) matches a phrase starting with a double quote (") or a single word.
                 ///NOTE: [~\/]\d* removes characters used for Sphinx query syntax.  I.e., proximity searches ("this that"~10) and quorum matching ("at least three of these"/3).
                 ///NOTE: -\B removes trailing hyphens.  (This might be unnecessary.)
-                initial_search_arr = search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?|[^\s]*)|[~\/]\d*|["',.:?!;&|\)\(\]\[\/\\`{}<$\^+]|-\B)/g, "").toLowerCase().split(" ");
+                ///NOTE: '(?!s\b) removes that are not followed by an "s" and only an "s."
+                initial_search_arr = search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?|[^\s]*)|[~\/]\d*|[",.:?!;&|\)\(\]\[\/\\`{}<$\^+]|-\B|'(?!s\b))/g, "").toLowerCase().split(" ");
                 
                 arr_len = initial_search_arr.length;
                 
@@ -364,13 +562,13 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
              */
             return function prepare_highlighter(search_terms)
             {
-                var count           = 0,
+                var add_morph_regex,
+                    count           = 0,
                     highlight_regex = [],
                     i               = 0,
                     j,
                     len_before,
                     len_after,
-                    no_morph,
                     term,
                     stemmed_arr     = [],
                     search_terms_arr,
@@ -386,91 +584,850 @@ first_loop:     while (i < search_terms_arr_len) {
                     len_before = term.length;
                     i += 1;
                     
-                    /// Fix special/unique words that the stemmer won't stem correctly.
+                    /// Possibly fix special/unique words that the stemmer won't stem correctly.
                     switch (term) {
-                    case "does":
-                    case "doth":
-                    case "do":
-                    case "doeth":
-                    case "doest":
-                        stemmed_word = "do[esth]*";
-                        no_morph = true;
-                        break;
-                    case "haste":
-                    case "hasted":
-                        stemmed_word = "haste";
-                        no_morph = false;
-                        break;
                     case "shalt":
                     case "shall":
                         stemmed_word = "shal[lt]";
-                        no_morph = true;
+                        add_morph_regex = false;
                         break;
                     case "wilt":
                     case "will":
                         stemmed_word = "wil[lt]";
-                        no_morph = true;
+                        add_morph_regex = false;
                         break;
-                    case "have":
+                    ///NOTE: Could also include "haddest," but that is not found in the current English version.
+                    case "had":
+                    case "hadst":
+                    case "has":
                     case "hast":
                     case "hath":
-                        stemmed_word = "ha[vesth]+";
-                        no_morph = true;
+                    case "have":
+                    case "having":
+                        stemmed_word = "ha(?:d(?:st)?|st?|th|v(?:e|ing))";
+                        add_morph_regex = false;
                         break;
+                    ///NOTE: "ate" must be here because the stem form is "at," which is ambiguous.
+                    ///NOTE: See "eat" and "eaten" below also.
+                    case "ate":
+                        stemmed_word = "(?:ate|eat)";
+                        add_morph_regex = true;
+                        break;
+                    ///NOTE: This is to make "comely" highlight "comeliness" and not "come."
+                    case "comely":
+                        stemmed_word = "comel[yi]";
+                        add_morph_regex = true;
+                        break;
+                    ///NOTE: This is to highlight "find," "findest," "findeth," and "found" but not "foundation," "founded," or "founder."
+                    ///NOTE: See "find" and "found" below also.
+                    case "found":
+                        stemmed_word = "f(?:ind(?:e(?:st|th)|ing)?|ound)";
+                        add_morph_regex = false;
+                        break;
+                    case "ye":
+                    case "you":
+                        stemmed_word = "y(?:e|ou)";
+                        add_morph_regex = false;
+                        break;
+                    /// Prevent words with no other form having the morphological regex added to the stem.
                     case "the":
-                        stemmed_word = "the";
-                        no_morph = true;
-                        break;
                     case "for":
-                        stemmed_word = "for";
-                        no_morph = true;
-                        break;
                     case "not":
-                        stemmed_word = "not";
-                        no_morph = true;
+                    /// Because "flies" always refers to the insect (not the verb) and "fly" is always a verb, prevent "flies" from being stemmed.
+                    ///NOTE: See "fl[yi]" below also.
+                    case "flies":
+                    /// Because "goings" is a noun, it should not be stemmed to "go."
+                    ///NOTE: See "go" below also.
+                    case "goings":
+                        stemmed_word = term;
+                        add_morph_regex = false;
                         break;
-                    ///TODO: This needs to be selected via a morphology stemmer.  There's just too many options.
-                    case "seek":
-                    case "seeks":
-                    case "seekest":
-                    case "seeketh":
-                    case "seeking":
-                    case "seeked":
-                    case "sought":
-                        stemmed_word = "s(?:eek|ought)";
-                        no_morph = false;
-                        break;
-                    case "brake":
-                    case "braking":
-                    case "brakest":
-                    case "braketh":
-                    case "broke":
-                    case "broken":
-                        stemmed_word = "br[ao]k";
-                        no_morph = false;
-                        break;
+                    
+                    /// Try stemming the word and then checking for strong words.
                     default:
                         /// Does the word contain a wildcard symbol (*)?
                         if (term.indexOf("*") !== -1) {
                             /// Don't stem; change it to a regex compatible form.
                             ///NOTE: Word breaks are found by looking for tag openings (<) or closings (>).
                             stemmed_word = term.replace(/\*/g, "[^<>]*");
-                            no_morph = true;
+                            add_morph_regex = false;
                         } else {
                             /// A normal word without a wildcard gets stemmed.
                             stemmed_word = stem_word(term);
-                            no_morph = false;
+                            add_morph_regex = true;
+                            
+                            /// Possibly fix strong words with proper morphological regex.
+                            switch (stemmed_word) {
+                            case "abid":
+                            case "abod":
+                                stemmed_word = "ab[io]d[ei]";
+                                break;
+                            case "aris":
+                            case "arisen":
+                            case "aros":
+                                stemmed_word = "ar[io]s(?:[ei]|en)";
+                                break;
+                            case "awak":
+                            case "awaken":
+                            case "awok":
+                                stemmed_word = "aw[ao]k(?:en)?";
+                                break;
+                            case "befal":
+                            case "befallen":
+                            case "befel":
+                                stemmed_word = "b[ae]fell?(?:en)?";
+                                break;
+                            case "beheld":
+                            case "behold":
+                                stemmed_word = "beh[eo]ld";
+                                break;
+                            case "beseech":
+                            case "besought":
+                                stemmed_word = "bes(?:eech|ought)";
+                                break;
+                            case "becam":
+                            case "becom":
+                                stemmed_word = "bec[ao]m";
+                                break;
+                            case "began":
+                            case "begin":
+                            case "begun":
+                                stemmed_word = "beg[aiu]n";
+                                break;
+                            case "beget":
+                            case "begot":
+                            case "begotten":
+                                stemmed_word = "beg[eo]tt?(?:en)?";
+                                break;
+                            case "bend":
+                            case "bent":
+                            case "begotten":
+                                stemmed_word = "ben[dt]t?(?:en)?";
+                                break;
+                            case "bad[ei]":
+                            case "bid":
+                            case "bidden":
+                                stemmed_word = "b(?:ad[ei]|id(?:den)?)";
+                                break;
+                            case "bind":
+                            case "bound":
+                                stemmed_word = "b(?:i|ou)nd";
+                                break;
+                            case "bit":
+                            case "bit[ei]":
+                            case "bitten":
+                                stemmed_word = "bit(?:[ei]|ten)?";
+                                break;
+                            case "blew":
+                            case "blow":
+                            case "blown":
+                                stemmed_word = "bl[eo]wn?";
+                                break;
+                            case "bred":
+                            case "br[ei]":
+                                stemmed_word = "bree?d";
+                                break;
+                            case "brethren":
+                            case "brother":
+                                stemmed_word = "br[eo]the?r(?:en)?";
+                                break;
+                            case "brak[ei]":
+                            case "brok[ei]":
+                            case "broken":
+                                stemmed_word = "br[ao]k[ei](?:en)?";
+                                break;
+                            case "bring":
+                            case "brought":
+                            case "brung":
+                                stemmed_word = "br(?:ing|ought|ung)";
+                                break;
+                            case "build":
+                            case "built":
+                                stemmed_word = "buil[dt]";
+                                break;
+                            case "burnt":
+                            case "burn":
+                                stemmed_word = "burnt?";
+                                break;
+                            case "bought":
+                            case "bu[yi]":
+                                stemmed_word = "b(?:uy|ought)";
+                                break;
+                            case "catch":
+                            case "caught":
+                                stemmed_word = "ca(?:tch|ught)";
+                                break;
+                            case "cam[ei]":
+                            case "com[ei]":
+                                /// The negative look ahead (?!l) is to prevent highlighting "comeliness."
+                                stemmed_word = "c[ao]m(?:i|e(?!l))";
+                                break;
+                            case "can":
+                            case "canst":
+                            case "could":
+                                /// The negative look ahead (?!e) is to prevent highlighting "cane."
+                                stemmed_word = "c(?:an(?:st)?(?!e)|ould)";
+                                break;
+                            case "child":
+                            case "children":
+                                stemmed_word = "child(?:ren)?";
+                                break;
+                            case "choos":
+                            case "chos[ei]":
+                            case "chosen":
+                                stemmed_word = "cho(?:s(?:en?|i)|ose)";
+                                break;
+                            case "creep":
+                            case "crept":
+                                stemmed_word = "cre(?:ep|pt)";
+                                break;
+                            case "deal":
+                            case "dealt":
+                                stemmed_word = "dealt?";
+                                break;
+                            case "did":
+                            case "didst":
+                            case "do":
+                            case "do[ei]":
+                            case "don[ei]":
+                            case "dost":
+                            case "doth":
+                                stemmed_word = "d(?:o(?:est?|ne|st|th)?|id(?:st)?)";
+                                /// Since this word is so short, it needs special regex to prevent false positives, so do not add additional morphological regex.
+                                add_morph_regex = false;
+                                break;
+                            case "draw":
+                            case "drawn":
+                            case "drew":
+                                stemmed_word = "dr[ae]wn?";
+                                break;
+                            case "driv[ei]":
+                            case "driven":
+                            case "drov[ei]":
+                                stemmed_word = "dr[oi]v[ei]n?";
+                                break;
+                            case "drank":
+                            case "drink":
+                            case "drunk":
+                                stemmed_word = "dr[aiu]nk";
+                                break;
+                            case "dig":
+                            case "dug":
+                                stemmed_word = "d[iu]g";
+                                break;
+                            case "dwell":
+                            case "dwelt":
+                                /// The negative look ahead (?!i) is to prevent highlighting "dwelling," "dwellings," "dwellingplace," and "dwellers" but allow for "dwelled."
+                                ///NOTE: "dwelling" is primarily used as a noun.
+                                stemmed_word = "dwel[lt](?!i)";
+                                break;
+                            case "di[ei]":
+                            case "d[yi]":
+                                stemmed_word = "d(?:ie(?:d|th|st)?|ying)";
+                                /// Since this word is so short, it needs special regex to prevent false positives, so do not add additional morphological regex.
+                                add_morph_regex = false;
+                                break;
+                            ///NOTE: See "ate" above also.
+                            case "eat":
+                            case "eaten":
+                                stemmed_word = "(?:ate|eat(?:en)?)";
+                                break;
+                            ///NOTE: Some versions of the King James Bible use "enquire" and others use "inquire."  BibleForge's uses "inquire."
+                            case "enquir":
+                            case "enquir[yi]":
+                                stemmed_word = "inquir[eiy]?";
+                                break;
+                            case "fall":
+                            case "fallen":
+                            case "fell":
+                                stemmed_word = "f[ae]ll(?:en)?";
+                                break;
+                            case "fed":
+                            case "feed":
+                                stemmed_word = "fee?d";
+                                break;
+                            case "feet":
+                            case "foot":
+                                stemmed_word = "f(?:ee|oo)t";
+                                break;
+                            case "feel":
+                            case "felt":
+                                stemmed_word = "fe(?:el|lt)";
+                                break;
+                            case "fight":
+                            case "fought":
+                                stemmed_word = "f(?:i|ou)ght";
+                                break;
+                            ///NOTE: This is to highlight "find," "findest," "findeth," and "found" but not "founded" or "foundest."
+                            ///NOTE: See "found" above (which is a variant of this word) and "found" below (which is a different word).
+                            case "find":
+                                stemmed_word = "f(?:ind(?:e(?:st|th)|ing)?|ound)";
+                                add_morph_regex = false;
+                                break;
+                            ///NOTE: This is actually used to match "founded" and "foundest."
+                            ///      Other morphological variants that a user searches for (such as "foundeth") will also correctly use this regex.
+                            ///NOTE: See "found" and "find" above (which match forms of another word).
+                            case "found":
+                                stemmed_word = "founde";
+                                add_morph_regex = false;
+                                break;
+                            case "fled":
+                            case "flee":
+                            case "fl[ei]":
+                            case "fle[ei]":
+                                stemmed_word = "fle[ed]";
+                                break;
+                            case "flew":
+                            case "flown":
+                            case "fl[yi]":
+                                ///NOTE: See "flies" above also.
+                                stemmed_word = "fl(?:ew|i|own?|y)";
+                                break;
+                            case "forbad":
+                            case "forbid":
+                            case "forbidden":
+                                stemmed_word = "forb[ai]d(?:e|den)?";
+                                break;
+                            case "foreknew":
+                            case "foreknow":
+                            case "foreknown":
+                                stemmed_word = "forekn[eo]w";
+                                break;
+                            case "foresaw":
+                            case "foreseen":
+                            case "fores[ei]":
+                                stemmed_word = "fores(?:een?|aw)";
+                                break;
+                            case "foretel":
+                            case "foretold":
+                                stemmed_word = "foret(?:ell|old)";
+                                break;
+                            case "forget":
+                            case "forgot":
+                            case "forgotten":
+                                stemmed_word = "forg[eo]tt?(?:en)?";
+                                break;
+                            case "forgav":
+                            case "forgiv":
+                            case "forgiven":
+                                stemmed_word = "forg[ai]v[ei]n?";
+                                break;
+                            case "forsak":
+                            case "forsaken":
+                            case "forsook":
+                                stemmed_word = "fors(?:a|oo)k[ei]n?";
+                                break;
+                            case "freez":
+                            case "froz[ei]":
+                            case "frozen":
+                                ///NOTE: This word actually only occurs once (as "forzen").
+                                stemmed_word = "fr(?:ee|o)z[ei]n?";
+                                break;
+                            case "gav[ei]":
+                            case "giv[ei]":
+                            case "given":
+                                stemmed_word = "g[ai]v[ei]n?";
+                                break;
+                            ///NOTE: "gently" stems to "gent".
+                            case "gent":
+                            case "gentl":
+                                stemmed_word = "gentl";
+                                break;
+                            ///NOTE: See "goings" above also.
+                            case "go":
+                            case "gon[ei]":
+                            case "went":
+                                stemmed_word = "(?:go(?:e(?:st|th)|ing|ne)?|went)";
+                                /// Because this word is so small and unique, it is easier to white list all of the forms used.
+                                add_morph_regex = false;
+                                break;
+                            case "get":
+                            case "got":
+                            case "gotten":
+                                stemmed_word = "g[eo]tt?(?:en)?";
+                                break;
+                            case "graff":
+                            case "graft":
+                                stemmed_word = "graf[ft]";
+                                break;
+                            ///NOTE: "haste" is stemmed to "hast."
+                            ///NOTE: "hast" is intercepted above, before stemming.
+                            case "hast":
+                            case "hasten":
+                                stemmed_word = "hast[ei]n?";
+                                break;
+                            case "hear":
+                            case "heard":
+                                ///NOTE: The negative look ahead (?!t) prevents highlighting "hearth" but allows for other forms.
+                                stemmed_word = "heard?(?!t)";
+                                break;
+                            case "hearken":
+                            case "hearkenedst":
+                                stemmed_word = "hearken";
+                                break;
+                            case "held":
+                            case "hold":
+                                ///NOTE: The word "holds" is used in the Bible only as a noun, such as "strong holds"; however, it is a common Present Day English form.
+                                stemmed_word = "h[eo]ld";
+                                break;
+                            case "hew":
+                            case "hewn":
+                                stemmed_word = "hewn?";
+                                break;
+                            case "hid":
+                            case "hid[ei]":
+                            case "hidden":
+                                ///NOTE: The negative look ahead (?!d(?:ek|a)) prevents highlighting "Hiddekel" and "Hiddai" but allows for "hidden."
+                                stemmed_word = "hidd?(?:en)?";
+                                break;
+                            case "hang":
+                            case "hung":
+                                ///NOTE: "hanging" almost always refers to the noun; "hangings" always does.
+                                stemmed_word = "h[au]ng";
+                                break;
+                            case "keep":
+                            case "kept":
+                                stemmed_word = "ke(?:ep|pt)";
+                                break;
+                            case "kneel":
+                            case "knelt":
+                                stemmed_word = "kne(?:el|lt)";
+                                break;
+                            case "knew":
+                            case "know":
+                            case "known":
+                                stemmed_word = "kn[eo]wn?";
+                                break;
+                            case "laid":
+                            case "la[yi]":
+                                stemmed_word = "la(?:y|id?)";
+                                break;
+                            case "lad[ei]":
+                            case "laden":
+                                stemmed_word = "lad(?:en?|i)";
+                                break;
+                            case "lept":
+                            case "leep":
+                                stemmed_word = "le(?:ep|pt)";
+                                break;
+                            ///NOTE: This has conflicts with the adjective form of "left."
+                            case "leav":
+                            case "left":
+                                stemmed_word = "le(?:av|ft)";
+                                break;
+                            case "lend":
+                            case "lent":
+                                stemmed_word = "len[dt]";
+                                break;
+                            case "lain":
+                            case "lien":
+                            case "li[ei]":
+                            case "l[yi]":
+                                stemmed_word = "l(?:ain|ien?|y)";
+                                break;
+                            case "lit":
+                            case "light":
+                                stemmed_word = "li(?:gh)?t";
+                                break;
+                            case "mad[ei]":
+                            case "mak[ei]":
+                                stemmed_word = "ma[dk][ei]";
+                                break;
+                            case "man":
+                            case "men":
+                                stemmed_word = "m[ae]n";
+                                break;
+                            case "met":
+                            case "meet":
+                                stemmed_word = "mee?t";
+                                break;
+                            case "mic[ei]":
+                            case "mous":
+                                stemmed_word = "m(?:ic|ous)[ei]";
+                                break;
+                            case "mow":
+                            case "mown":
+                                stemmed_word = "mown?";
+                                break;
+                            case "overcam":
+                            case "overcom":
+                                stemmed_word = "overc[ao]m";
+                                break;
+                            case "overtak":
+                            case "overtaken":
+                            case "overtook":
+                                stemmed_word = "overt(?:a(?:en)?|oo)k";
+                                break;
+                            case "overthrew":
+                            case "overthrow":
+                            case "overthrown":
+                                stemmed_word = "overthr[eo]wn?";
+                                break;
+                            case "ox":
+                            case "oxen":
+                                stemmed_word = "ox(?:en)?";
+                                break;
+                            case "paid":
+                            case "pa[yi]":
+                                stemmed_word = "pa(?:id?|y)";
+                                break;
+                            case "plead":
+                            case "pled":
+                                ///NOTE: The word "pled" does not actually occur in the Bible, but a user could still search for it.
+                                stemmed_word = "plead";
+                                break;
+                            case "pluck":
+                            case "pluckt":
+                                stemmed_word = "pluckt?";
+                                break;
+                            case "rend":
+                            case "rent":
+                                stemmed_word = "ren[dt]";
+                                break;
+                            case "repaid":
+                            case "repa[yi]":
+                                ///NOTE: The word "repaid" does not actually occur in the Bible, but a user could still search for it.
+                                stemmed_word = "repa[iy]";
+                                break;
+                            case "rid[ei]":
+                            case "ridden":
+                            case "rod[ei]":
+                                stemmed_word = "r[oi]d(?:[ei]|den)";
+                                break;
+                            case "rang":
+                            case "ring":
+                            case "rung":
+                                stemmed_word = "r[aiu]ng";
+                                break;
+                            case "ris[ei]":
+                            case "risen":
+                            case "ros[ei]":
+                                stemmed_word = "r[io]s[ei]";
+                                break;
+                            case "ran":
+                            case "run":
+                                stemmed_word = "r[au]n";
+                                break;
+                            case "said":
+                            case "sa[yi]":
+                                stemmed_word = "sa(?:id|y)";
+                                break;
+                            case "sang":
+                            case "sing":
+                            case "sung":
+                                stemmed_word = "s[aiu]ng";
+                                break;
+                            case "sank":
+                            case "sink":
+                            case "sunk":
+                                stemmed_word = "s[aiu]nk";
+                                break;
+                            case "sat":
+                            case "sit":
+                                stemmed_word = "s[ai]t";
+                                break;
+                            case "saw":
+                            case "see":
+                            case "seen":
+                                stemmed_word = "s(?:aw|een?)";
+                                break;
+                            case "seek":
+                            case "sought":
+                                stemmed_word = "s(?:eek|ought)";
+                                break;
+                            case "send":
+                            case "sent":
+                                stemmed_word = "sen[dt]";
+                                break;
+                            case "sew":
+                            case "sewn":
+                                stemmed_word = "sewn?";
+                                break;
+                            case "shak[ei]":
+                            case "shaken":
+                            case "shook":
+                                stemmed_word = "sh(?:ak(?:en?|i)|ook)";
+                                break;
+                            case "shav[ei]":
+                            case "shaven":
+                                stemmed_word = "shak(?:en?|i)";
+                                break;
+                            case "shin[ei]":
+                            case "shon[ei]":
+                                stemmed_word = "sh[io]n[ei]";
+                                break;
+                            case "shear":
+                            case "shorn":
+                                stemmed_word = "sh(?:ear|orn)";
+                                break;
+                            case "shot":
+                            case "shoot":
+                                stemmed_word = "shoo?t";
+                                break;
+                            ///NOTE: Because the word "show" never occurs in the current English Bible (KJV), "shew" already has the correct stemming, and therefore does not need to be modified.
+                            case "show":
+                                stemmed_word = "shew";
+                                break;
+                            ///NOTE: Because the word "showbread" never occurs in the current English Bible (KJV), "shewbread" already has the correct stemming, and therefore does not need to be modified.
+                            case "showbread":
+                                stemmed_word = "shewbread";
+                                break;
+                            case "shrank":
+                            case "shrink":
+                            case "shrunk":
+                                stemmed_word = "shr[aiu]nk";
+                                break;
+                            /// This makes "singly" also match "single"
+                            case "singl[yi]":
+                                stemmed_word = "singl";
+                                break;
+                            case "slang":
+                            case "sling":
+                            case "slung":
+                                ///NOTE: The word "slung" does not actually occur but could be searched for.
+                                stemmed_word = "sl[ai]ng";
+                                break;
+                            case "sleep":
+                            case "slept":
+                                stemmed_word = "sle(?:ep|pt)";
+                                break;
+                            case "sla[yi]":
+                            case "slain":
+                            case "slew":
+                                stemmed_word = "sl(?:a(?:[yi]|in)|ew)";
+                                break;
+                            case "slid":
+                            case "slid[ei]":
+                            case "slidden":
+                                stemmed_word = "slid(?:[ei]?|den)";
+                                break;
+                            case "smit[ei]":
+                            case "smitten":
+                            case "smot[ei]":
+                                stemmed_word = "sm(?:[io]t[ei]|itten)";
+                                break;
+                            case "sell":
+                            case "sold":
+                                stemmed_word = "s(?:ell|old)";
+                                break;
+                            case "sow":
+                            case "sown":
+                                stemmed_word = "sown?";
+                                break;
+                            case "speak":
+                            case "spok[ei]":
+                            case "spoken":
+                                stemmed_word = "sp(?:eak|ok[ei]n?)";
+                                break;
+                            case "sped":
+                            case "speed":
+                                stemmed_word = "spee?d";
+                                break;
+                            case "spend":
+                            case "spent":
+                                stemmed_word = "spen[dt]";
+                                break;
+                            case "spill":
+                            case "spilt":
+                                stemmed_word = "spil[lt]";
+                                break;
+                            case "span":
+                            case "spin":
+                            case "spun":
+                                stemmed_word = "sp[aiu]n";
+                                break;
+                            case "spat":
+                            case "spit":
+                                stemmed_word = "sp[ai]t";
+                                break;
+                            case "sprang":
+                            case "spring":
+                            case "sprung":
+                                ///NOTE: The word "spring" occurs both as a noun as well as a verb.
+                                stemmed_word = "spr[aiu]ng";
+                                break;
+                            case "stand":
+                            case "stood":
+                                stemmed_word = "st(?:an|oo)d";
+                                break;
+                            case "steal":
+                            case "stol[ei]":
+                            case "stolen":
+                                stemmed_word = "st(?:eal|ol[ei]n?)";
+                                break;
+                            case "stick":
+                            case "stuck":
+                                ///NOTE: The word "stick" occurs both as a noun as well as a verb.
+                                stemmed_word = "st[iu]ck";
+                                break;
+                            case "sting":
+                            case "stung":
+                                ///NOTE: The word "sting" occurs both as a noun as well as a verb.
+                                stemmed_word = "st[iu]ng";
+                                break;
+                            case "stank":
+                            case "stink":
+                            case "stunk":
+                                ///NOTE: The word "stink" occurs both as a noun as well as a verb.
+                                ///NOTE: The word "stunk" does not occur but could be searched for.
+                                stemmed_word = "st[ia]nk";
+                                break;
+                            case "strik[ei]":
+                            case "struck":
+                                stemmed_word = "str(?:ik[ei]|uck)";
+                                break;
+                            case "striv[ei]":
+                            case "striven":
+                            case "strov[ei]":
+                                stemmed_word = "str[io]v(?:en?|i)";
+                                break;
+                            case "swam":
+                            case "swim":
+                            case "swum":
+                                stemmed_word = "sw[aiu]m";
+                                break;
+                            case "sweep":
+                            case "swept":
+                                stemmed_word = "swe(?:ep|pt)";
+                                break;
+                            case "swear":
+                            case "swor[ei]":
+                            case "sworn":
+                                stemmed_word = "sw(?:ear|or[ein])";
+                                break;
+                            case "swell":
+                            case "swollen":
+                                stemmed_word = "sw(?:ell|ollen)";
+                                break;
+                            case "tak[ei]":
+                            case "taken":
+                            case "took":
+                                stemmed_word = "t(?:ak[ei]n|ook)";
+                                break;
+                            case "taught":
+                            case "teach":
+                                stemmed_word = "t(?:aught|each)";
+                                break;
+                            case "teeth":
+                            case "tooth":
+                                stemmed_word = "t(?:ee|oo)th";
+                                break;
+                            case "tear":
+                            case "tor[ei]":
+                            case "torn":
+                                stemmed_word = "t(?:ear|or[ein])";
+                                break;
+                            case "tell":
+                            case "told":
+                                stemmed_word = "t(?:ell|old)";
+                                break;
+                            case "think":
+                            case "thought":
+                                stemmed_word = "th(?:ink|ought)";
+                                break;
+                            case "threw":
+                            case "throw":
+                            case "thrown":
+                                stemmed_word = "thr[eo]wn?";
+                                break;
+                            case "tread":
+                            case "trod":
+                            case "trodden":
+                                stemmed_word = "tr(?:ead|od(?:den))";
+                                break;
+                            /// Convert the stemmed form of "tying" to match the word "tie" and other variants.
+                            ///NOTE: The word "tying" does not actually occur but might be searched for.
+                            case "t[yi]":
+                                stemmed_word = "ti[ei]";
+                                break;
+                            case "understand":
+                            case "understood":
+                                stemmed_word = "underst(?:an|oo)d";
+                                break;
+                            case "upheld":
+                            case "uphold":
+                                stemmed_word = "uph[eo]ld";
+                                break;
+                            case "wax":
+                            case "waxen":
+                                stemmed_word = "wax(?:en)?";
+                                break;
+                            ///NOTE: Since "who" can be searched for in the possessive form (who's), we must match this work after stemming.
+                            case "who":
+                            case "whom":
+                                stemmed_word = "whom?";
+                                break;
+                            case "whosoev":
+                            case "whomsoev":
+                                stemmed_word = "whom?soever";
+                                break;
+                            case "wak[ei]":
+                            case "wok[ei]":
+                            ///NOTE: The word "woken" does not actually occur but might be searched for.
+                            case "woken":
+                                stemmed_word = "w[ao]k[ei]";
+                                break;
+                            case "woman":
+                            case "women":
+                                stemmed_word = "wom[ae]n";
+                                break;
+                            /// Convert the stemmed form of "wore" to match the word "wear" and other variants.
+                            ///NOTE: The word "wore" does not actually occur but might be searched for.
+                            case "wor[ei]":
+                            /// Convert the stemmed form of "worn" to match the word "wear" and other variants.
+                            ///NOTE: The word "worn" does not actually occur but might be searched for.
+                            case "worn":
+                                stemmed_word = "wear";
+                                break;
+                            case "weav":
+                            case "wov[ei]":
+                            case "woven":
+                                stemmed_word = "w(?:ea|o)v[ei]n?";
+                                break;
+                            case "win":
+                            case "won":
+                                stemmed_word = "w[io]n";
+                                break;
+                            case "withdraw":
+                            case "withdrawn":
+                            case "withdrew":
+                                stemmed_word = "withdr[ae]wn?";
+                                break;
+                            case "withheld":
+                            case "withhold":
+                            case "withholden":
+                                stemmed_word = "withh[eo]ld(?:en)?";
+                                break;
+                            case "withstand":
+                            case "withstood":
+                                stemmed_word = "withst(?:an|oo)d";
+                                break;
+                            case "wring":
+                            case "wrung":
+                                stemmed_word = "wr[iu]ng";
+                                break;
+                            case "writ[ei]":
+                            case "written":
+                            case "wrot[ei]":
+                                stemmed_word = "wr[io]t(?:[ei]|ten)";
+                                break;
+                            case "work":
+                            case "wrought":
+                                stemmed_word = "w(?:ork|rought)";
+                                break;
+                            }
                         }
                     }
-                    len_after = stemmed_word.length;
                     
-                    /// Skip words that are the same after stemming or regex'ing (e.g., "joy joyful" becomes "joy joy").
+                    /// Skip words that are the same after stemming or regex'ing (e.g., "joyful joy" becomes "joy joy").
                     for (j = 0; j < count; j += 1) {
                         if (stemmed_word === stemmed_arr[j]) {
                             ///NOTE: This is the same as "continue 2" in PHP.
                             continue first_loop;
                         }
                     }
+                    
+                    len_after = stemmed_word.length;
                     
                     stemmed_arr[count] = stemmed_word;
                     
@@ -480,13 +1437,13 @@ first_loop:     while (i < search_terms_arr_len) {
                     ///       The current English version (KJV) does not use square brackets ([]).
                     ///FIXME: The punctuation ,.?!;:)( could be considered language specific.
                     ///TODO:  Bench mark different regex (creation and testing).
-                    if (no_morph || (len_after === len_before && len_after < 3)) {
+                    if (!add_morph_regex || (len_after === len_before && len_after < 3)) {
                         highlight_regex[count] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")[),.?!;:]*[<-]", "i");
                     } else {
-                        /// Find most words based on stem morphology, but also can have false hits.
-                        ///TODO: Compare different regexes.
-                        //highlight_regex[count++] = new RegExp("id=([0-9]+)>[(]*([^<]+-)?" + stemmed_word + "[a-z']{0,7}[),.?!;:]*[<-]", "i");
-                        highlight_regex[count] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")[^<]{0,7}[),.?!;:]*[<-]", "i");
+                        /// Find most words based on stem morphology.
+                        /// Because it just uses the stem plus up to 7 additional characters, this can have false hits.
+                        ///NOTE: [bdfgmnprt]? selects possible doubles.
+                        highlight_regex[count] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")(?:e|l)?(?:a(?:l|n(?:ce|t)|te|ble)|e(?:n(?:ce|t)|r|ment)|i(?:c|ble|on|sm|t[iy]|ve|ze)|ment|ous?)?(?:ic(?:a(?:te|l)|it[iy])|a(?:tive|lize)|ful|ness|self)?(?:a(?:t(?:ion(?:al)?|or)|nci|l(?:l[iy]|i(?:sm|t[iy])))|tional|e(?:n(?:ci|til)|l[iy])|i(?:z(?:er|ation)|v(?:eness|it[iy]))|b(?:l[iy]|ilit[iy])|ous(?:l[iy]|ness)|fulness|log[iy])?(?:[bdfgmnprt]?(?:i?ng(?:ly)?|e?(?:d(?:ly)?|edst|st|th)|ly))?(?:e[sd]|s)?(?:'(?:s'?)?)?[),.?!;:]*[<-]", "i");
                     }
                     count += 1;
                 }
@@ -919,7 +1876,7 @@ first_loop:     while (i < search_terms_arr_len) {
                 return book + chapter + verse;
             };
         }()),
-
+		
         /**
          * Prepares search terms to adhere to Sphinx syntax before submission to the server.
          *
