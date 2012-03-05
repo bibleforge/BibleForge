@@ -1875,7 +1875,7 @@ first_loop:     while (i < search_terms_arr_len) {
                 return book + chapter + verse;
             };
         }()),
-		
+        
         /**
          * Prepares search terms to adhere to Sphinx syntax before submission to the server.
          *

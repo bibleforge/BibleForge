@@ -1487,8 +1487,7 @@ first_loop:     while (i < search_terms_arr_len) {
                 
                 switch (ref.slice(0, 1).toLowerCase()) {
                 case "j":
-                    if (book_arr_re[43].test(ref)) {
-                        /// John
+                    if (book_arr_re[43].test(ref)) {        /// John
                         book = "43";
                         break;
                     } else if (book_arr_re[32].test(ref)) { /// Jonah
