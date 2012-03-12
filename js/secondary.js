@@ -1222,7 +1222,8 @@
              */
             (function ()
             {
-                var callouts = [],
+                var callouts  = [],
+                    lex_cache = {},
                     remove;
                 
                 /// Since this is not styled by initially, it needs to be set now.
@@ -1240,17 +1241,15 @@
                     var ajax = new BF.Create_easy_ajax(),
                         callout,
                         ///NOTE: IE/Chromium/Safari/Opera use srcElement, Firefox uses originalTarget.
-                        clicked_el = e.srcElement || e.originalTarget;
+                        clicked_el = e.srcElement || e.originalTarget,
+                        display_callout;
                     
                     /// Does this language support lexical lookups, and did the user click on a word?
                     ///NOTE: All words in the text are in <a> tags.
                     if (BF.lang.linked_to_orig && clicked_el && clicked_el.tagName === "A") {
-                        ///TODO: Determine if the lexicon query (type 5) should be defined somewhere.
-                        ajax.query("post", "/query.php", "t=5&q=" + clicked_el.id, function (data)
+                        display_callout = function (data)
                         {
                             var html;
-                            
-                            data = BF.parse_json(data);
                             
                             if (data.word) {
                                 ///FIXME: Currently, .pronunciation is the base word, not the actual word.
@@ -1269,8 +1268,25 @@
                                 ///TODO: In the future, there could be other information, like notes.
                                 html = "<div class=lex-body><em>" + BF.lang.italics_explanation + "</em></div>";
                             }
+                            
                             callout.replace_HTML(html);
-                        });
+                        };
+                        
+                        if (lex_cache[clicked_el.id]) {
+                            /// Delay the code so that the following will execute first and prepare the callout variable.
+                            window.setTimeout(function ()
+                            {
+                                display_callout(lex_cache[clicked_el.id]);
+                            }, 0);
+                        } else {
+                            ///TODO: Determine if the lexicon query (type 5) should be defined somewhere.
+                            ajax.query("post", "/query.php", "t=5&q=" + clicked_el.id, function (data)
+                            {
+                                data = BF.parse_json(data);
+                                lex_cache[clicked_el.id] = data;
+                                display_callout(data);
+                            });
+                        }
                         
                         callout = create_callout(clicked_el, ajax, {mouse_x: e.clientX, mouse_y: e.clientY});
                         callouts[callouts.length] = callout;
@@ -1365,11 +1381,13 @@
                     var i;
                     
                     for (i = callouts.length - 1; i >= 0; i -= 1) {
-                        if (!callouts[i].pinned) {
-                            callouts[i].destroy();
-                            callouts.remove(i);
-                        }
+                        callouts[i].destroy();
                     }
+                    
+                    callouts = [];
+                    
+                    /// Clear lexical data cache to prevent it from building up too large.
+                    lex_cache = {};
                 });
                 
                 /**
