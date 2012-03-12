@@ -238,8 +238,6 @@
     /**
      * Safely parse JSON.
      *
-     * A cross browser JSON parsing solution.
-     *
      * @param  str (string) The string to parse.
      * @return Returns the value of the JSON or "" if an empty string.
      * @note   It could also check to make sure that the string starts with a curly bracket ({) straight bracket ([) double quote (") or number (hyphen (-) or digit) to attempt to ensure that it is valid JSON.
