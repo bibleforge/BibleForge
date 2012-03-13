@@ -453,11 +453,12 @@
         {
             var aborted,
                 ajax = new window.XMLHttpRequest(),
+                ajax_obj,
                 ajax_timeout,
                 retry_func,
                 retrying = false;
             
-            return {
+            ajax_obj = {
                 /**
                  * Stop the query if it is already in progress.
                  *
@@ -511,7 +512,7 @@
                             ///NOTE: ajax_timeout is cleared if the query completes before the timeout is fired (successfully or unsuccessfully). 
                             ajax_timeout = window.setTimeout(function ()
                             {
-                                ajax.abort();
+                                ajax_obj.abort();
                                 if (retry) {
                                     retrying = true;
                                     ///NOTE: retry_func() was created in the query() function but initialized outside to give other functions access to it.
@@ -538,7 +539,9 @@
                      */
                     return function query(method, path, message, onsuccess, onfailure, timeout, retry)
                     {
-                        /// Reset the aborted variable (needed if the query was previously aborted).
+                        /// Because queries could be stored in the global_retry and run later, we need to make sure any cued queries are aborted.
+                        ajax_obj.abort();
+                        /// Reset the aborted variable because we are starting a new query.
                         aborted = false;
                         
                         /// Determine if arguments were passed to the last two parameters.  If not, set the defaults.
@@ -620,6 +623,8 @@
                     };
                 }())
             };
+            
+            return ajax_obj;
         };
     }());
     
