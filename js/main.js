@@ -377,123 +377,166 @@
      * @example var ajax = new BF.Create_easy_ajax();
      * @return  Returns an object that makes ajax easier.
      */
-    BF.Create_easy_ajax = function ()
+    BF.Create_easy_ajax = (function ()
     {
-        var aborted,
-            ajax = new window.XMLHttpRequest(),
-            ajax_timeout;
-        
-        return {
-            abort: function ()
+        var attach_retry = (function ()
+        {
+            var func_list = [],
+                retrying  = false;
+            
+            function retry()
             {
-                /// Is a query in progress?  If readyState > 0 and < 4, it needs to be aborted.
-                if (ajax.readyState % 4) {
-                    /// Stop it from retrying first.
-                    window.clearTimeout(ajax_timeout);
-                    ajax.abort();
-                    aborted = true;
-                }
-            },
-            is_busy: function ()
-            {
-                ///NOTE: Anything not 0 or 4 is busy.
-                return ajax.readyState % 4;
-            },
-            query: (function ()
-            {
-                /**
-                 * Send the Ajax request and start timeout timer.
-                 *
-                 * @return NULL
-                 * @note   This code is a separate function to reduce code duplication.
-                 * @note   Called by the BF.Create_easy_ajax.query().
-                 */
-                function send_query(message, timeout, retry)
-                {
-                    ajax.send(message);
-                    
-                    if (timeout) {
-                        /// Begin the timeout timer to ensure that the download does not freeze.
-                        ajax_timeout = window.setTimeout(function ()
-                        {
-                            ajax.abort();
-                            if (retry) {
-                                send_query(message, timeout, retry);
-                            }
-                        }, timeout);
-                    }
+                var i;
+                
+                for (i = func_list.length - 1; i >= 0; i -= 1) {
+                    ///NOTE: The functions are executed via setTimeout to ensure that no other functions will get attached in the mean time.
+                    window.setTimeout(func_list[i], 0);
                 }
                 
-                /**
-                 * Send an Ajax request to the server.
-                 *
-                 * @example .query("POST", "query.php", "q=search", function (data) {}, function (status, data) {}, 10000, true);
-                 * @param   method    (string)              The HTTP method to use (GET || POST).
-                 * @param   path      (string)              The URL to query.
-                 * @param   message   (string)   (optional) The variables to send (URI format: "name1=value1&name2=value%202").
-                 * @param   onsuccess (function) (optional) The function to run on a successful query.
-                 * @param   onfailure (function) (optional) The function to run if the query fails.
-                 * @param   timeout   (number)   (optional) How long to wait before giving up on the script to load (in milliseconds).
-                 *                                          A falsey value (such as 0 or FALSE) disables timing out.         (Default is 10,000 milliseconds.)
-                 * @param   retry     (boolean)  (optional) Whether or not to retry loading the script if a timeout occurs.  (Default is TRUE.)
-                 * @return  NULL
-                 * @todo    Determine if it should change a method from GET to POST if it exceeds 2,083 characters (IE's rather small limit).
-                 */
-                return function query(method, path, message, onsuccess, onfailure, timeout, retry)
+                /// After re-running all of the Ajax queries, clear the list.  If there is still a problem, they will get re-attached.
+                func_list = [];
+                retrying  = false;
+            }
+            
+            return function attach_retry(func)
+            {
+                if (typeof func === "function") {
+                    func_list[func_list.length] = func;
+                    
+                    if (!retrying) {
+                        ///TODO: Adjust the delay according to how many times the queries have failed.
+                        window.setTimeout(retry, 5000);
+                        retrying = true;
+                    }
+                }
+            };
+        }());
+        
+        return function Create_easy_ajax()
+        {
+            var aborted,
+                ajax = new window.XMLHttpRequest(),
+                ajax_timeout;
+            
+            return {
+                abort: function ()
                 {
-                    /// Reset the aborted variable (needed if the query was previously aborted).
-                    aborted = false;
-                    
-                    /// Determine if arguments were passed to the last two parameters.  If not, set the defaults.
-                    if (typeof timeout === "undefined") {
-                        /// Default to 10 seconds.
-                        ///TODO: This should be dynamic based on the quality of the connection to the server.
-                        timeout = 10000;
+                    /// Is a query in progress?  If readyState > 0 and < 4, it needs to be aborted.
+                    if (ajax.readyState % 4) {
+                        /// Stop it from retrying first.
+                        window.clearTimeout(ajax_timeout);
+                        ajax.abort();
+                        aborted = true;
                     }
-                    
-                    if (typeof retry === "undefined") {
-                        retry = true;
-                    }
-                    
-                    ///TODO: determine if the first parameter should be different.
-                    ajax.open(method, path);
-                    /// Without the correct content-type, the data in the message will not become variables on the server.
-                    ajax.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-                    ajax.onreadystatechange = function ()
+                },
+                is_busy: function ()
+                {
+                    ///NOTE: Anything not 0 or 4 is busy.
+                    return ajax.readyState % 4;
+                },
+                query: (function ()
+                {
+                    /**
+                    * Send the Ajax request and start timeout timer.
+                    *
+                    * @return NULL
+                    * @note   This code is a separate function to reduce code duplication.
+                    * @note   Called by the BF.Create_easy_ajax.query().
+                    */
+                    function send_query(message, timeout, retry_func)
                     {
-                        /// readyState status codes:
-                        /// 0 = uninitialized    (.open() has not been called)
-                        /// 1 = opened           (.open() called but .send() has not been called)
-                        /// 2 = headers_recieved (.send() called and the headers and status are ready)
-                        /// 3 = loading          (downloading content; .responseText should have some data)
-                        /// 4 = completed        (finished downloading all data)
-                        if (ajax.readyState === 4) {
-                            /// Stop the timeout timer that may be running so it does not try again.
-                            window.clearTimeout(ajax_timeout);
-                            
-                            /// Was the request successful?
-                            if (ajax.status === 200) {
-                                ///NOTE: It is not eval'ed here because it may be needed to be eval'ed in a different (and safer) context or not be parsed at all.
-                                if (onsuccess) {
-                                    onsuccess(ajax.responseText);
+                        ajax.send(message);
+                        
+                        if (timeout) {
+                            /// Begin the timeout timer to ensure that the download does not freeze.
+                            ajax_timeout = window.setTimeout(function ()
+                            {
+                                ajax.abort();
+                                if (retry_func) {
+                                    attach_retry(retry_func);
                                 }
-                            } else {
-                                if (onfailure) {
-                                    onfailure(ajax.status, ajax.responseText);
-                                }
+                            }, timeout);
+                        }
+                    }
+                    
+                    /**
+                    * Send an Ajax request to the server.
+                    *
+                    * @example .query("POST", "query.php", "q=search", function (data) {}, function (status, data) {}, 10000, true);
+                    * @param   method    (string)              The HTTP method to use (GET || POST).
+                    * @param   path      (string)              The URL to query.
+                    * @param   message   (string)   (optional) The variables to send (URI format: "name1=value1&name2=value%202").
+                    * @param   onsuccess (function) (optional) The function to run on a successful query.
+                    * @param   onfailure (function) (optional) The function to run if the query fails.
+                    * @param   timeout   (number)   (optional) How long to wait before giving up on the script to load (in milliseconds).
+                    *                                          A falsey value (such as 0 or FALSE) disables timing out.         (Default is 10,000 milliseconds.)
+                    * @param   retry     (boolean)  (optional) Whether or not to retry loading the script if a timeout occurs.  (Default is TRUE.)
+                    * @return  NULL
+                    * @todo    Determine if it should change a method from GET to POST if it exceeds 2,083 characters (IE's rather small limit).
+                    */
+                    return function query(method, path, message, onsuccess, onfailure, timeout, retry)
+                    {
+                        var retry_func;
+                        
+                        /// Reset the aborted variable (needed if the query was previously aborted).
+                        aborted = false;
+                        
+                        /// Determine if arguments were passed to the last two parameters.  If not, set the defaults.
+                        if (typeof timeout === "undefined") {
+                            /// Default to 10 seconds.
+                            ///TODO: This should be dynamic based on the quality of the connection to the server.
+                            timeout = 10000;
+                        }
+                        
+                        if (typeof retry === "undefined") {
+                            retry = true;
+                        }
+                        
+                        retry_func = function ()
+                        {
+                            query(method, path, message, onsuccess, onfailure, timeout, retry);
+                        };
+                        
+                        ///TODO: determine if the first parameter should be different.
+                        ajax.open(method, path);
+                        /// Without the correct content-type, the data in the message will not become variables on the server.
+                        ajax.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                        ajax.onreadystatechange = function ()
+                        {
+                            /// readyState status codes:
+                            /// 0 = uninitialized    (.open() has not been called)
+                            /// 1 = opened           (.open() called but .send() has not been called)
+                            /// 2 = headers_recieved (.send() called and the headers and status are ready)
+                            /// 3 = loading          (downloading content; .responseText should have some data)
+                            /// 4 = completed        (finished downloading all data)
+                            if (ajax.readyState === 4) {
+                                /// Stop the timeout timer that may be running so it does not try again.
+                                window.clearTimeout(ajax_timeout);
                                 
-                                /// Should it retry?
-                                if (retry && !aborted) {
-                                    send_query(message, timeout, retry);
+                                /// Was the request successful?
+                                if (ajax.status === 200) {
+                                    ///NOTE: It is not eval'ed here because it may be needed to be eval'ed in a different (and safer) context or not be parsed at all.
+                                    if (onsuccess) {
+                                        onsuccess(ajax.responseText);
+                                    }
+                                } else {
+                                    if (onfailure) {
+                                        onfailure(ajax.status, ajax.responseText);
+                                    }
+                                    
+                                    /// Should it retry?
+                                    if (retry && !aborted) {
+                                        attach_retry(retry_func);
+                                    }
                                 }
                             }
-                        }
+                        };
+                        send_query(message, timeout, retry, retry_func);
                     };
-                    send_query(message, timeout, retry);
-                };
-            }())
+                }())
+            };
         };
-    };
+    }());
     
     /**
      * Load some Javascript and optionally send it some variables from the closure.
