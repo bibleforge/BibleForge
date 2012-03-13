@@ -379,34 +379,47 @@
      */
     BF.Create_easy_ajax = (function ()
     {
-        var attach_retry = (function ()
+        var global_retry = (function ()
         {
-            var func_list = [],
+            var func_arr = [],
                 retrying  = false;
             
             function retry()
             {
                 var i;
                 
-                for (i = func_list.length - 1; i >= 0; i -= 1) {
+                for (i = func_arr.length - 1; i >= 0; i -= 1) {
                     ///NOTE: The functions are executed via setTimeout to ensure that no other functions will get attached in the mean time.
-                    window.setTimeout(func_list[i], 0);
+                    window.setTimeout(func_arr[i], 0);
                 }
                 
                 /// After re-running all of the Ajax queries, clear the list.  If there is still a problem, they will get re-attached.
-                func_list = [];
+                func_arr = [];
                 retrying  = false;
             }
             
-            return function attach_retry(func)
-            {
-                if (typeof func === "function") {
-                    func_list[func_list.length] = func;
+            return {
+                attach: function (func)
+                {
+                    if (typeof func === "function") {
+                        func_arr[func_arr.length] = func;
+                        
+                        if (!retrying) {
+                            ///TODO: Adjust the delay according to how many times the queries have failed.
+                            window.setTimeout(retry, 5000);
+                            retrying = true;
+                        }
+                    }
+                },
+                detach: function (func)
+                {
+                    var i;
                     
-                    if (!retrying) {
-                        ///TODO: Adjust the delay according to how many times the queries have failed.
-                        window.setTimeout(retry, 5000);
-                        retrying = true;
+                    for (i = func_arr.length - 1; i >= 0; i -= 1) {
+                        if (func_arr[i] === func) {
+                            func_arr.remove(i);
+                            return;
+                        }
                     }
                 }
             };
@@ -416,23 +429,29 @@
         {
             var aborted,
                 ajax = new window.XMLHttpRequest(),
-                ajax_timeout;
+                ajax_timeout,
+                retry_func,
+                retrying = false;
             
             return {
                 abort: function ()
                 {
                     /// Is a query in progress?  If readyState > 0 and < 4, it needs to be aborted.
                     if (ajax.readyState % 4) {
-                        /// Stop it from retrying first.
+                        /// Stop it from retrying from a timeout.
                         window.clearTimeout(ajax_timeout);
                         ajax.abort();
                         aborted = true;
                     }
+                    if (retrying) {
+                        global_retry.detach(retry_func);
+                    }
                 },
                 is_busy: function ()
                 {
-                    ///NOTE: Anything not 0 or 4 is busy.
-                    return ajax.readyState % 4;
+                    /// Even though the Ajax object is idle when retrying, it should still be considered busy since a query is still potentially coming.
+                    ///NOTE: Any readyState not 0 or 4 is busy.
+                    return retrying || Boolean(ajax.readyState % 4);
                 },
                 query: (function ()
                 {
@@ -443,7 +462,7 @@
                     * @note   This code is a separate function to reduce code duplication.
                     * @note   Called by the BF.Create_easy_ajax.query().
                     */
-                    function send_query(message, timeout, retry_func)
+                    function send_query(message, timeout, retry)
                     {
                         ajax.send(message);
                         
@@ -452,8 +471,9 @@
                             ajax_timeout = window.setTimeout(function ()
                             {
                                 ajax.abort();
-                                if (retry_func) {
-                                    attach_retry(retry_func);
+                                if (retry) {
+                                    retrying = true;
+                                    global_retry.attach(retry_func);
                                 }
                             }, timeout);
                         }
@@ -469,23 +489,21 @@
                     * @param   onsuccess (function) (optional) The function to run on a successful query.
                     * @param   onfailure (function) (optional) The function to run if the query fails.
                     * @param   timeout   (number)   (optional) How long to wait before giving up on the script to load (in milliseconds).
-                    *                                          A falsey value (such as 0 or FALSE) disables timing out.         (Default is 10,000 milliseconds.)
+                    *                                          A falsey value (such as 0 or FALSE) disables timing out.         (Default is 30,000 milliseconds.)
                     * @param   retry     (boolean)  (optional) Whether or not to retry loading the script if a timeout occurs.  (Default is TRUE.)
                     * @return  NULL
                     * @todo    Determine if it should change a method from GET to POST if it exceeds 2,083 characters (IE's rather small limit).
                     */
                     return function query(method, path, message, onsuccess, onfailure, timeout, retry)
                     {
-                        var retry_func;
-                        
                         /// Reset the aborted variable (needed if the query was previously aborted).
                         aborted = false;
                         
                         /// Determine if arguments were passed to the last two parameters.  If not, set the defaults.
                         if (typeof timeout === "undefined") {
-                            /// Default to 10 seconds.
+                            /// Default to 30 seconds.
                             ///TODO: This should be dynamic based on the quality of the connection to the server.
-                            timeout = 10000;
+                            timeout = 30000;
                         }
                         
                         if (typeof retry === "undefined") {
@@ -494,6 +512,8 @@
                         
                         retry_func = function ()
                         {
+                            /// Set retrying to FALSE tells the Ajax object not to consider the query busy anymore when idle.
+                            retrying = false;
                             query(method, path, message, onsuccess, onfailure, timeout, retry);
                         };
                         
@@ -526,12 +546,13 @@
                                     
                                     /// Should it retry?
                                     if (retry && !aborted) {
-                                        attach_retry(retry_func);
+                                        retrying = true;
+                                        global_retry.attach(retry_func);
                                     }
                                 }
                             }
                         };
-                        send_query(message, timeout, retry, retry_func);
+                        send_query(message, timeout, retry);
                     };
                 }())
             };
