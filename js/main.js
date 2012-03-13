@@ -356,19 +356,19 @@
                     this.replaceState(cur_url, state);
                 }
             };
-        } else {
-            /// If the browser does not support the history API, just create dummy functions to prevent errors from being thrown.
-            ///NOTE: The site will still work; just the back and forward buttons won't.
-            return {
-                attach: attach,
-                getState: function ()
-                {
-                    return {};
-                },
-                pushState: function () {},
-                replaceState: function () {}
-            };
         }
+        
+        /// If the browser does not support the history API, just create dummy functions to prevent errors from being thrown.
+        ///NOTE: The site will still work; just the back and forward buttons won't.
+        return {
+            attach: attach,
+            getState: function ()
+            {
+                return {};
+            },
+            pushState: function () {},
+            replaceState: function () {}
+        };
     }());
     
     /**
