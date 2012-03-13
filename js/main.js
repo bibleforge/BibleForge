@@ -436,15 +436,17 @@
             return {
                 abort: function ()
                 {
+                    /// If the query is waiting to be retried, it needs to be removed from the retrying cue.
+                    if (retrying) {
+                        retrying = false;
+                        global_retry.detach(retry_func);
+                    }
                     /// Is a query in progress?  If readyState > 0 and < 4, it needs to be aborted.
                     if (ajax.readyState % 4) {
                         /// Stop it from retrying from a timeout.
                         window.clearTimeout(ajax_timeout);
                         ajax.abort();
                         aborted = true;
-                    }
-                    if (retrying) {
-                        global_retry.detach(retry_func);
                     }
                 },
                 is_busy: function ()
