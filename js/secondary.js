@@ -1247,10 +1247,23 @@
                     /// Does this language support lexical lookups, and did the user click on a word?
                     ///NOTE: All words in the text are in <a> tags.
                     if (BF.lang.linked_to_orig && clicked_el && clicked_el.tagName === "A") {
+                        /// To avoid code duplication, create the function that displays the data in the callout.
+                        /**
+                         * Take the lexical data and turn it into HTML to be displayed in the callout.
+                         *
+                         * @param data (object) An object describing the lexical information of a word.
+                         */
                         display_callout = function (data)
                         {
+                            ///NOTE: The data structure is expected to be changed.
+                            /// data Object structure: 
+                            /// word          (string) The original Greek, Hebrew, or Aramaic word, in Unicode.
+                            /// pronunciation (string) A dictionary format pronunciation guide.
+                            /// long_def      (object) An object containing detailed information about the word (including the the property "lit", which is the literal meaning of word).
+                            /// short_def     (string) A concise definition of the word.
                             var html;
                             
+                            /// Did the query return any results?
                             if (data.word) {
                                 ///FIXME: Currently, .pronunciation is the base word, not the actual word.
                                 /// Thin spaces are added to separate the word from the vertical bars so that they do not appear to be part of the word.
@@ -1272,17 +1285,20 @@
                             callout.replace_HTML(html);
                         };
                         
+                        /// Has this data already been cached?
                         if (lex_cache[clicked_el.id]) {
-                            /// Delay the code so that the following will execute first and prepare the callout variable.
+                            /// Delay the code so that the remained of the code will execute first and prepare the callout variable.
                             window.setTimeout(function ()
                             {
                                 display_callout(lex_cache[clicked_el.id]);
                             }, 0);
                         } else {
                             ///TODO: Determine if the lexicon query (type 5) should be defined somewhere.
-                            ajax.query("post", "/query.php", "t=5&q=" + clicked_el.id, function (data)
+                            ajax.query("post", "/query.php", "t=5&q=" + clicked_el.id, function success(data)
                             {
                                 data = BF.parse_json(data);
+                                /// Temporarily cache the data so that it does not have to re-queried.
+                                ///NOTE: The cache is cleared before each query.
                                 lex_cache[clicked_el.id] = data;
                                 display_callout(data);
                             });

@@ -2271,7 +2271,7 @@
                             initial_query = options.initial_query,
                             type          = options.type,
                             
-                            /// Data object format:
+                            /// Data object structure:
                             /// i Word IDs      (array)  (optional) An array containing word IDs indicating which words should be highlighted in grammatical searches
                             /// n Verse Numbers (array)             An array containing verse IDs for each verse returned
                             /// p Paragraphs    (array)  (optional) An array of 1's and 0's corresponding to n array indicating which verses are at the beginning of a paragraph
@@ -3295,7 +3295,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?5198560", {
+                BF.include("/js/secondary.js?5441026", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
