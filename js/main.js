@@ -2308,12 +2308,35 @@
                             write_verses(type, direction, verse_ids, verse_html, paragraphs, in_paragraphs, options.verse_range);
                             
                             if (options.highlight) {
-                                window.setTimeout(function ()
+                                ///TODO: Determine if these variables should be isolated.
+                                (function ()
                                 {
-                                    ///NOTE: Only standard and mixed searches need verse_html data to be sent.
-                                    ///NOTE: word_ids is only needed for grammatical and mixed searches.
-                                    options.highlight((options.extra_highlighting || type !== BF.consts.grammatical_search ? verse_html.join("") : false), word_ids);
-                                }, 0);
+                                    /// In order to display the text as fast as possible, highlight the text is on the scroll.
+                                    ///NOTE: Because the highlighter is called via setTimeout, it is possible that the user might begin another query before the highlighter function runs.
+                                    ///      This is especially true when using the back and forward buttons.
+                                    ///      If the highlighter function attempts to run after another query has started, then the highlighter function with either throw an error when trying to highlight a word that is no longer present
+                                    ///      or, even worse, it will highlight a word that should not be.
+                                    ///      Therefore, the timeout must be stopped when the scroll is cleared.
+                                    ///NOTE: There are other occasions when words are removed from the scroll (like when caching sections of text),
+                                    ///      but it seems unlikely to cause an error with highlighting; however, the highlighter function should check to see if a word still exists.
+                                    var highlight_timeout = window.setTimeout(function ()
+                                        {
+                                            /// Since the timeout executed before the scroll was cleared, the event can be detached.
+                                            system.event.detach("scrollCleared", onScrollCleared, true);
+                                            ///NOTE: Only standard and mixed searches need verse_html data to be sent.
+                                            ///NOTE: word_ids is only needed for grammatical and mixed searches.
+                                            options.highlight((options.extra_highlighting || type !== BF.consts.grammatical_search ? verse_html.join("") : false), word_ids);
+                                        }, 0),
+                                        /**
+                                         * Prevent the highlighting code from running after the scroll is cleared.
+                                         */
+                                        onScrollCleared = function ()
+                                        {
+                                            window.clearTimeout(highlight_timeout);
+                                        };
+                                    
+                                    system.event.attach("scrollCleared", onScrollCleared, true);
+                                }());
                             }
                             
                             if (direction === BF.consts.additional) {
