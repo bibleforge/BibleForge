@@ -1157,17 +1157,21 @@
                     
                     return {
                         /**
-                            * Add one or more events to the event cue.
-                            *
-                            * @example system.event.attach("contentAddedAbove", function (e) {});
-                            * @example system.event.attach(["contentAddedAbove", "contentRemovedAbove"], function (e) {});
-                            * @param   name (string || array) The name of the event or an array of names of events.
-                            * @param   func (function)        The function to call when the event it triggered.
-                            * @return  NULL
-                            * @note    If func(e) calls e.stopPropagation(), it will stop further event propagation.
-                            * @todo    Determine the value of adding a run_once property that removes function after the first run.
-                            */
-                        attach: function (name, func)
+                         * Add one or more events to the event cue.
+                         *
+                         * @example system.event.attach("contentAddedAbove", function (e) {});
+                         * @example system.event.attach("contentAddedAbove", function (e) {}, true);
+                         * @example system.event.attach(["contentAddedAbove", "contentRemovedAbove"], function (e) {});
+                         * @example system.event.attach(["contentAddedAbove", "contentRemovedAbove"], function (e) {}, true);
+                         * @example system.event.attach(["contentAddedAbove", "contentRemovedAbove"], function (e) {}, [true, false]);
+                         * @param   name (string || array)             The name of the event or an array of names of events.
+                         * @param   func (function)                    The function to call when the event it triggered.
+                         * @param   once (boolean || array) (optional) Whether or not to detach this function after being executed once. If "name" is an array, then "once" can also be an array of booleans.
+                         * @return  NULL
+                         * @note    If func(e) calls e.stopPropagation(), it will stop further event propagation.
+                         * @todo    Determine the value of adding a run_once property that removes function after the first run.
+                         */
+                        attach: function (name, func, once)
                         {
                             var arr_len,
                                 i;
@@ -1176,34 +1180,41 @@
                             if (name instanceof Array) {
                                 arr_len = name.length;
                                 for (i = 0; i < arr_len; i += 1) {
-                                    this.attach(name[i], func);
+                                    /// If "once" is an array, then use the elements of the array.
+                                    /// If "once" is not an array, then just send the "once" variable each time.
+                                    this.attach(name[i], func, once instanceof Array ? once[i] : once);
                                 }
                             } else {
                                 if (typeof func === "function") {
+                                    /// Has a function been previously attached to this event? If not, create a function to handle them.
                                     if (!func_list[name]) {
                                         func_list[name] = [];
                                     }
-                                    func_list[name][func_list[name].length] = func;
+                                    func_list[name][func_list[name].length] = {
+                                        func: func,
+                                        once: once
+                                    };
                                 }
                             }
                         },
                         /**
-                            * Remove an event from the event cue.
-                            *
-                            * @example system.event.detach("contentAddedAbove", function (e) {});
-                            * @param   name (string)   The name of the event.
-                            * @param   func (function) The function that was attached to the specified event.
-                            * @return  NULL
-                            * @note    Not currently used.
-                            * @note    The name parameter cannot be an array (unlike attach()).
-                            */
+                         * Remove an event from the event cue.
+                         *
+                         * @example system.event.detach("contentAddedAbove", function (e) {});
+                         * @param   name (string)   The name of the event.
+                         * @param   func (function) The function that was attached to the specified event.
+                         * @return  NULL
+                         * @note    Not currently used.
+                         * @note    The name parameter cannot be an array (unlike attach()).
+                         */
                         detach: function (name, func)
                         {
                             var i;
                             
                             if (func_list[name]) {
                                 for (i = func_list[name].length - 1; i >= 0; i -= 1) {
-                                    if (func_list[name][i] === func) {
+                                    ///NOTE: Could also insist that the "once" variable also matches.
+                                    if (func_list[name][i].func === func) {
                                         func_list[name].remove(i);
                                         /// Since only one event should be removed at a time, we can end now.
                                         return;
@@ -1212,33 +1223,41 @@
                             }
                         },
                         /**
-                            * Trigger the functions attached to an event.
-                            *
-                            * @param  name (string) The name of the event to trigger.
-                            * @param  e    (object) The event object sent to the called functions.
-                            * @return NULL
-                            */
+                         * Trigger the functions attached to an event.
+                         *
+                         * @param  name (string) The name of the event to trigger.
+                         * @param  e    (object) The event object sent to the called functions.
+                         * @return NULL
+                         */
                         trigger: function (name, e)
                         {
                             var func_arr_len,
                                 i,
                                 stop_propagation;
                             
+                            /// Does this event have any functions attached to it?
                             if (func_list[name]) {
                                 func_arr_len = func_list[name].length;
                                 
                                 if (!BF.is_object(e)) {
+                                    /// If the event object was not specificed, it needs to be created in order to attach stopPropagation() to it.
                                     e = {};
                                 }
                                 
-                                /// If an attached function runs this function, it will stop calling other functions.
+                                ///NOTE: If an attached function runs this function, it will stop calling other functions.
                                 e.stopPropagation = function ()
                                 {
                                     stop_propagation = true;
                                 };
                                 
                                 for (i = 0; i < func_arr_len; i += 1) {
-                                    func_list[name][i](e);
+                                    func_list[name][i].func(e);
+                                    
+                                    /// Is this function only supposed to be executed once?
+                                    if (func_list[name][i].once) {
+                                        func_list[name].remove(i);
+                                    }
+                                    
                                     /// Was e.stopPropagation() called?
                                     if (stop_propagation) {
                                         break;
