@@ -1201,20 +1201,21 @@
                          * Remove an event from the event cue.
                          *
                          * @example system.event.detach("contentAddedAbove", function (e) {});
-                         * @param   name (string)   The name of the event.
-                         * @param   func (function) The function that was attached to the specified event.
+                         * @param   name (string)             The name of the event.
+                         * @param   func (function)           The function that was attached to the specified event.
+                         * @param   once (boolean) (optional) Whether or not to detach the function is only supposed to executed once
                          * @return  NULL
                          * @note    Not currently used.
                          * @note    The name parameter cannot be an array (unlike attach()).
                          */
-                        detach: function (name, func)
+                        detach: function (name, func, once)
                         {
                             var i;
                             
                             if (func_list[name]) {
                                 for (i = func_list[name].length - 1; i >= 0; i -= 1) {
-                                    ///NOTE: Could also insist that the "once" variable also matches.
-                                    if (func_list[name][i].func === func) {
+                                    ///NOTE: Both func and once must match.
+                                    if (func_list[name][i].func === func && func_list[name][i].once === once) {
                                         func_list[name].remove(i);
                                         /// Since only one event should be removed at a time, we can end now.
                                         return;
