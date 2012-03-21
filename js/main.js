@@ -757,6 +757,7 @@
             ///TODO: Determine if it should loop through all styles sheets.
             style_sheet = document.styleSheets[0];
         
+        /// Should it add a new rule to the CSS?
         if (insert) {
             /// Mozilla/WebKit/Opera/IE9
             style_sheet.insertRule(selector + "{" + new_CSS + "}", 0);
@@ -765,6 +766,7 @@
             for (i = CSS_rules.length - 1; i >= 0; i -= 1) {
                 if (CSS_rules[i].selectorText === selector) {
                     CSS_rules[i].style.cssText = new_CSS;
+                    /// Should it stop after changing the first so that it does not need to loop through all of the rules.
                     if (!change_all) {
                         return;
                     }
