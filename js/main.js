@@ -3244,7 +3244,7 @@
                             system.event.attach("secondaryLoaded", function ()
                             {
                                 BF.change_language(lang_id, true, do_query);
-                            });
+                            }, true);
                         }
                     } else if (!e.initial_page_load) {
                         do_query();
