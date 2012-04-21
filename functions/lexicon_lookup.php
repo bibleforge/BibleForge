@@ -31,9 +31,9 @@ function retrieve_lexical_data($word_id, $language)
     ///TODO:  Determine if there is a better way to handle the different languages.
     ///FIXME: 621740 is just for the English version, so this needs to be dynamic when more languages are added.
     if ($word_id < 621740) {
-        $SQL_query = 'SELECT `bible_original`.word, `lexicon_hebrew`.* FROM `bible_' . $language['identifier'] . '`, `bible_original`, `lexicon_hebrew`, `morphology` WHERE `bible_' . $language['identifier'] . '`.id = ' . ((int)$word_id) . ' AND `bible_original`.id = `bible_' . $language['identifier'] . '`.orig_id AND lexicon_hebrew.strongs = `bible_original`.strongs LIMIT 1';
+        $SQL_query = 'SELECT `bible_original`.word, `lexicon_hebrew`.*, `bible_original`.pronunciation FROM `bible_' . $language['identifier'] . '`, `bible_original`, `lexicon_hebrew`, `morphology` WHERE `bible_' . $language['identifier'] . '`.id = ' . ((int)$word_id) . ' AND `bible_original`.id = `bible_' . $language['identifier'] . '`.orig_id AND lexicon_hebrew.strongs = `bible_original`.strongs LIMIT 1';
     } else {
-        $SQL_query = 'SELECT `bible_original`.word, `lexicon_greek`.*, `morphology`.* FROM `bible_' . $language['identifier'] . '`, `bible_original`, `lexicon_greek`, `morphology` WHERE `bible_' . $language['identifier'] . '`.id = ' . ((int)$word_id) . ' AND `bible_original`.id = `bible_' . $language['identifier'] . '`.orig_id AND lexicon_greek.strongs = `bible_original`.strongs AND `morphology`.id = `bible_original`.id LIMIT 1';
+        $SQL_query = 'SELECT `bible_original`.word, `lexicon_greek`.*, `bible_original`.pronunciation, `morphology`.* FROM `bible_' . $language['identifier'] . '`, `bible_original`, `lexicon_greek`, `morphology` WHERE `bible_' . $language['identifier'] . '`.id = ' . ((int)$word_id) . ' AND `bible_original`.id = `bible_' . $language['identifier'] . '`.orig_id AND lexicon_greek.strongs = `bible_original`.strongs AND `morphology`.id = `bible_original`.id LIMIT 1';
     }
     
     ///FIXME: Currently, BibleForge links words to the lexicon by Strong's numbers; however, this is too simplistic because some Strong's numbers have multiple entries.

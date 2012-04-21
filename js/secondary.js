@@ -1258,7 +1258,7 @@
                             ///NOTE: The data structure is expected to be changed.
                             /// data Object structure: 
                             /// word          (string) The original Greek, Hebrew, or Aramaic word, in Unicode.
-                            /// pronunciation (string) A dictionary format pronunciation guide.
+                            /// pronunciation (string) A JSON string containing the pronunciation of the word in reconstructed Biblical Hebrew/Aramaic/Greek (IPA and dictionary form), Modern Hebrew/Greek (IPA and dictionary form), and in the Society of Biblical Literature (SBL) phonemic transliteration.
                             /// long_def      (object) An object containing detailed information about the word (including the the property "lit", which is the literal meaning of word).
                             /// short_def     (string) A concise definition of the word.
                             var html;
@@ -1267,7 +1267,7 @@
                             if (data.word) {
                                 ///FIXME: Currently, .pronunciation is the base word, not the actual word.
                                 /// Thin spaces are added to separate the word from the vertical bars so that they do not appear to be part of the word.
-                                html  = "<div class=lex-title><span class=lex-orig_word>" + data.word + "</span> <span class=lex-pronun>|&thinsp;" + data.pronunciation + "&thinsp;|</span></div>";
+                                html  = "<div class=lex-title><span class=lex-orig_word>" + data.word + "</span> <span class=lex-pronun>|&thinsp;" + JSON.parse(data.pronunciation).dic + "&thinsp;|</span></div>";
                                 /// Wrap the rest of the text in a separate tag so that it can all be moved slightly to the left to line up (more or less) with the title.
                                 html += "<div class=lex-body>";
                                 ///FIXME: data.long_def.lit should be somewhere else.
