@@ -805,6 +805,7 @@
             }
         }
         
+        /// If the class name was not found and the class name must be added, add it to the end.
         if (!found && force !== 0) {
             new_class = className + " " + new_class;
         }
