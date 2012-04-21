@@ -686,11 +686,16 @@ label {
 .lex-orig_word {
     font-family: 'BFHebrew', 'Palatino Linotype', Palatino, TexGyrePagella, 'TeX Gyre Pagella', 'URWPalladioL', 'Book Antiqua', 'Times new Roman', Times, serif;
     font-size: 30px;
+    /* The vertical alignment is required simply to match up with .lex-pronun. */
+    vertical-align: super;
 }
 
 .lex-pronun {
     font-size: 14px;
     white-space: nowrap;
+    /* Because this element can wrap if the word is long and the line height is rather large due to the large original word one the line above, */
+    /* it needs to be centered above the baseline to look good. */
+    vertical-align: super;
 }
 
 .lex-body {
