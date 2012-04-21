@@ -1088,6 +1088,11 @@ h2 {
     padding: 5px 14px;
 }
 
+/* Because Opera raises these elements regardless of whether they are on the same line or not, the alignment must be reverted, */
+/* and thereby causing the .lex-pronun element to be improperly aligned if it wraps. */
+.opera .lex-orig_word, .opera .lex-pronun {
+    vertical-align: baseline;
+}
 
 /* IE specific CSS */
 
