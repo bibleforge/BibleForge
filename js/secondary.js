@@ -1255,12 +1255,30 @@
                          */
                         display_callout = function (data)
                         {
-                            ///NOTE: The data structure is expected to be changed.
                             /// data Object structure: 
-                            /// word          (string) The original Greek, Hebrew, or Aramaic word, in Unicode.
-                            /// pronunciation (string) A JSON string containing the pronunciation of the word in reconstructed Biblical Hebrew/Aramaic/Greek (IPA and dictionary form), Modern Hebrew/Greek (IPA and dictionary form), and in the Society of Biblical Literature (SBL) phonemic transliteration.
-                            /// long_def      (object) An object containing detailed information about the word (including the the property "lit", which is the literal meaning of word).
-                            /// short_def     (string) A concise definition of the word.
+                            /// word      (string)  The original Greek, Hebrew, or Aramaic word, in Unicode.
+                            /// pronun    (string)  A JSON string containing the pronunciation of the word in reconstructed Biblical Hebrew/Aramaic/Greek (IPA and dictionary form), Modern Hebrew/Greek (IPA and dictionary form), and in the Society of Biblical Literature (SBL) phonemic transliteration.
+                            /// strongs   (integer) The designated Strong's number for that word.
+                            /// base_word (string)  The original Greek, Hebrew, or Aramaic base form of the word, in Unicode.
+                            /// data      (string)  A JSON object containing the lexical information about the word.
+                            ///                     Object structure:
+                            ///                     def: {lit:    "The literal definition of a word (especially a name)",
+                            ///                           long:  ["A multi-dimensional array of various possible definitions"],
+                            ///                           short:  "A short and simple definition"}
+                            ///                     deriv:  "Information about words this word is derived from",
+                            ///                     pronun: {ipa:     "IPA Biblical reconstructed pronunciation (base form)",
+                            ///                              ipa_mod: "IPA modern pronunciation (base form)",
+                            ///                              dic:     "Dictionary Biblical reconstructed pronunciation (base form)",
+                            ///                              dic_mod: "Dictionary modern pronunciation (base form)",
+                            ///                              sbl:     "The Society of Biblical Literature's phonemic transliteration"}
+                            ///                     see:    ["An array of Strong's numbers identifying additional words of interest."]
+                            ///                     comment: "A string containing additional useful information"
+                            /// usage     (string)  A list of ways the word is translated.
+                            ///NOTE: The usage data is planned to be completely redone and expanded.
+                            ///NOTE: Also, any number of the following:
+                            ///TODO: Document more fully.
+                            /// part_of_speech, declinability, case_5, number, gender, degree, tense, voice, mood, person, middle, transitivity, miscellaneous, noun_type, numerical, form, dialect, type, pronoun_type
+                            
                             var html,
                                 lex_data;
                             
