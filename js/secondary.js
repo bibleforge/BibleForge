@@ -1261,20 +1261,22 @@
                             /// pronunciation (string) A JSON string containing the pronunciation of the word in reconstructed Biblical Hebrew/Aramaic/Greek (IPA and dictionary form), Modern Hebrew/Greek (IPA and dictionary form), and in the Society of Biblical Literature (SBL) phonemic transliteration.
                             /// long_def      (object) An object containing detailed information about the word (including the the property "lit", which is the literal meaning of word).
                             /// short_def     (string) A concise definition of the word.
-                            var html;
+                            var html,
+                                lex_data;
                             
                             /// Did the query return any results?
                             if (data.word) {
+                                lex_data = JSON.parse(data.data);
                                 ///FIXME: Currently, .pronunciation is the base word, not the actual word.
                                 /// Thin spaces are added to separate the word from the vertical bars so that they do not appear to be part of the word.
-                                html  = "<div class=lex-title><span class=lex-orig_word>" + data.word + "</span> <span class=lex-pronun>|&thinsp;" + JSON.parse(data.pronunciation).dic + "&thinsp;|</span></div>";
+                                html  = "<div class=lex-title><span class=lex-orig_word>" + data.word + "</span> <span class=lex-pronun>|&thinsp;" + JSON.parse(data.pronun).dic + "&thinsp;|</span></div>";
                                 /// Wrap the rest of the text in a separate tag so that it can all be moved slightly to the left to line up (more or less) with the title.
                                 html += "<div class=lex-body>";
                                 ///FIXME: data.long_def.lit should be somewhere else.
-                                if (data.long_def && data.long_def.lit) {
-                                    html += "<div>&#8220;" + data.long_def.lit + "&#8221;</div>";
+                                if (lex_data.def.lit) {
+                                    html += "<div>&#8220;" + lex_data.def.lit + "&#8221;</div>";
                                 }
-                                html += "<div>" + data.short_def + "</div>";
+                                html += "<div>" + lex_data.def.short + "</div>";
                                 html += "</div>";
                                 ///TODO: Add a way to get more details.
                             } else {
