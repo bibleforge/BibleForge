@@ -1257,7 +1257,7 @@
                         {
                             /// data Object structure: 
                             /// word      (string)  The original Greek, Hebrew, or Aramaic word, in Unicode.
-                            /// pronun    (string)  A JSON string containing the pronunciation of the word in reconstructed Biblical Hebrew/Aramaic/Greek (IPA and dictionary form), Modern Hebrew/Greek (IPA and dictionary form), and in the Society of Biblical Literature (SBL) phonemic transliteration.
+                            /// pronun    (string)  A JSON string containing the pronunciation of the word (same as data.pronun below except for the actual word, not the base form).
                             /// strongs   (integer) The designated Strong's number for that word.
                             /// base_word (string)  The original Greek, Hebrew, or Aramaic base form of the word, in Unicode.
                             /// data      (string)  A JSON object containing the lexical information about the word.
