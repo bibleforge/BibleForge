@@ -1192,13 +1192,18 @@
                         /**
                          * Write HTML to the callout and prevent the loading notifier from loading, if it has not already appeared.
                          *
-                         * @param html (string) The HTML display in the callout.
+                         * @param html (string OR DOM element) The HTML or DOM element display in the callout.
                          */
                         replace_HTML: function (html)
                         {
                             /// Prevent the loading graphic from loading if it has not loaded yet.
                             window.clearTimeout(loading_timer);
-                            inside.innerHTML = html;
+                            if (typeof html === "string") {
+                                inside.innerHTML = html;
+                            } else {
+                                inside.innerHTML = "";
+                                inside.appendChild(html);
+                            }
                         },
                         
                         /// Properties
@@ -1279,23 +1284,58 @@
                             ///TODO: Document more fully.
                             /// part_of_speech, declinability, case_5, number, gender, degree, tense, voice, mood, person, middle, transitivity, miscellaneous, noun_type, numerical, form, dialect, type, pronoun_type
                             
-                            var html,
+                            var parent_el,
+                                child_el,
+                                html,
                                 lex_data;
                             
                             /// Did the query return any results?
                             if (data.word) {
                                 lex_data = JSON.parse(data.data);
-                                ///FIXME: Currently, .pronunciation is the base word, not the actual word.
-                                /// Thin spaces are added to separate the word from the vertical bars so that they do not appear to be part of the word.
-                                html  = "<div class=lex-title><span class=lex-orig_word>" + data.word + "</span> <span class=lex-pronun>|&thinsp;" + JSON.parse(data.pronun).dic + "&thinsp;|</span></div>";
-                                /// Wrap the rest of the text in a separate tag so that it can all be moved slightly to the left to line up (more or less) with the title.
-                                html += "<div class=lex-body>";
-                                ///FIXME: data.long_def.lit should be somewhere else.
+                                
+                                /// DOM Structure:
+                                ///   ┌─►lex-title
+                                ///   │   ├─►lex-orig_word
+                                ///   │   ├─►text node (space)
+                                ///   │   └─►pronunciation drop down box
+                                ///   └─►lex-body
+                                ///       ├─►literal pronunciation (optional)
+                                ///       └─►short definition
+                                
+                                /// Create a lightweight container for the DOM elements.
+                                ///NOTE: The fragment is discarded when attached to the DOM tree and only its children remain.
+                                html = document.createDocumentFragment();
+                                /// Create lex-title.
+                                parent_el = document.createElement("div");
+                                parent_el.className = "lex-title";
+                                /// Create lex-orig_word.
+                                child_el = document.createElement("span");
+                                child_el.className = "lex-orig_word";
+                                child_el.appendChild(document.createTextNode(data.word));
+                                parent_el.appendChild(child_el);
+                                /// Add a space between the word and pronunication drop down box to separate the two elements.
+                                parent_el.appendChild(document.createTextNode(" "));
+                                /// Create pronunciation drop down box.
+                                //parent_el.appendChild(create_drop_down_box());
+                                ///TODO: Create pronunciation drop down box.
+                                
+                                html.appendChild(parent_el);
+                                
+                                /// Create lex-body.
+                                parent_el = document.createElement("div");
+                                parent_el.className = "lex-body";
+                                
                                 if (lex_data.def.lit) {
-                                    html += "<div>&#8220;" + lex_data.def.lit + "&#8221;</div>";
+                                    /// Optionally, create the literal pronunication.
+                                    child_el = document.createElement("div");
+                                    child_el.appendChild(document.createTextNode("“" + lex_data.def.lit + "”"));
+                                    parent_el.appendChild(child_el);
                                 }
-                                html += "<div>" + lex_data.def.short + "</div>";
-                                html += "</div>";
+                                /// Create the short definition.
+                                child_el = document.createElement("div");
+                                child_el.appendChild(document.createTextNode(lex_data.def.short));
+                                parent_el.appendChild(child_el);
+                                html.appendChild(parent_el);
                                 ///TODO: Add a way to get more details.
                             } else {
                                 ///TODO: In the future, there could be other information, like notes.
