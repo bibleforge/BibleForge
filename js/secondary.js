@@ -74,7 +74,8 @@
      */
     return function (context)
     {
-        var page = context.page,
+        var create_drop_down_box,
+            page = context.page,
             show_context_menu,
             show_panel;
         
@@ -1222,6 +1223,22 @@
                 };
             }());
             
+            
+            create_drop_down_box = function (options, select)
+            {
+                var el = document.createElement("span");
+                el.className = "dropdown";
+                
+                el.appendChild(document.createTextNode(options[select] ? options[select].display : options[0].display));
+                
+                el.onclick = function ()
+                {
+                    ///TODO: Create drop down menu.
+                };
+                
+                return el;
+            };
+            
             /**
              * Create the callouts array and attach the event functions.
              */
@@ -1248,6 +1265,37 @@
                         ///NOTE: IE/Chromium/Safari/Opera use srcElement, Firefox uses originalTarget.
                         clicked_el = e.srcElement || e.originalTarget,
                         display_callout;
+                    
+                    function options_from_pronun(pronun)
+                    {
+                        return [
+                            {
+                                display: "|\u2009" + pronun.dic + "\u2009|",
+                                details: pronun.dic + " " + "Biblical",
+                                title:   "Biblical Reconstructed Pronunciation"
+                            },
+                            {
+                                display: "/\u2009" + pronun.ipa + "\u2009/",
+                                details: pronun.dic + " " + "Biblical IPA",
+                                title:   "Biblical Reconstructed IPA"
+                            },
+                            {
+                                display: "|\u2009" + pronun.dic_mod + "\u2009|",
+                                details: pronun.dic + " " + "Modern",
+                                title:   "Modern Pronunciation"
+                            },
+                            {
+                                display: "/\u2009" + pronun.ipa_mod + "\u2009/",
+                                details: pronun.dic + " " + "Modern IPA",
+                                title:   "Modern IPA"
+                            },
+                            {
+                                display: "|\u2009" + pronun.sbl + "\u2009|",
+                                details: pronun.dic + " " + "Transliteration",
+                                title:   "Society of Biblical Languages Transliteration"
+                            }
+                        ];
+                    }
                     
                     /// Does this language support lexical lookups, and did the user click on a word?
                     ///NOTE: All words in the text are in <a> tags.
@@ -1313,12 +1361,12 @@
                                 child_el.className = "lex-orig_word";
                                 child_el.appendChild(document.createTextNode(data.word));
                                 parent_el.appendChild(child_el);
-                                /// Add a space between the word and pronunication drop down box to separate the two elements.
+                                /// Add a space between the word and pronunciation drop down box to separate the two elements.
                                 parent_el.appendChild(document.createTextNode(" "));
                                 /// Create pronunciation drop down box.
-                                //parent_el.appendChild(create_drop_down_box());
-                                ///TODO: Create pronunciation drop down box.
-                                
+                                child_el = create_drop_down_box(options_from_pronun(JSON.parse(data.pronun)), 0);
+                                child_el.className = "lex-pronun";
+                                parent_el.appendChild(child_el);
                                 html.appendChild(parent_el);
                                 
                                 /// Create lex-body.
@@ -1326,7 +1374,7 @@
                                 parent_el.className = "lex-body";
                                 
                                 if (lex_data.def.lit) {
-                                    /// Optionally, create the literal pronunication.
+                                    /// Optionally, create the literal pronunciation.
                                     child_el = document.createElement("div");
                                     child_el.appendChild(document.createTextNode("“" + lex_data.def.lit + "”"));
                                     parent_el.appendChild(child_el);
