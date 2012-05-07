@@ -1268,37 +1268,38 @@
                     
                     function options_from_pronun(pronun)
                     {
+                        /// Thin spaces (\u2009) are placed around the words to separate them slightly from the dividing symbols.
                         return [
                             {
                                 display: "|\u2009" + pronun.dic + "\u2009|",
-                                details: pronun.dic + " " + "Biblical",
-                                title:   "Biblical Reconstructed Pronunciation"
+                                details: pronun.dic + " " + BF.lang.biblical,
+                                title:   BF.lang.biblical_long
                             },
                             {
                                 display: "/\u2009" + pronun.ipa + "\u2009/",
-                                details: pronun.dic + " " + "Biblical IPA",
-                                title:   "Biblical Reconstructed IPA"
+                                details: pronun.dic + " " + BF.lang.biblical_ipa,
+                                title:   BF.lang.biblical_ipa_long
                             },
                             {
                                 display: "|\u2009" + pronun.dic_mod + "\u2009|",
-                                details: pronun.dic + " " + "Modern",
-                                title:   "Modern Pronunciation"
+                                details: pronun.dic + " " + BF.lang.modern,
+                                title:   BF.lang.modern_pronun
                             },
                             {
                                 display: "/\u2009" + pronun.ipa_mod + "\u2009/",
-                                details: pronun.dic + " " + "Modern IPA",
-                                title:   "Modern IPA"
+                                details: pronun.dic + " " + BF.lang.modern_ipa,
+                                title:   BF.lang.modern_ipa
                             },
                             {
                                 display: "|\u2009" + pronun.sbl + "\u2009|",
-                                details: pronun.dic + " " + "Transliteration",
-                                title:   "Society of Biblical Languages Transliteration"
+                                details: pronun.dic + " " + BF.lang.translit,
+                                title:   BF.lang.translit_long
                             }
                         ];
                     }
                     
                     /// Does this language support lexical lookups, and did the user click on a word?
-                    ///NOTE: All words in the text are in <a> tags.
+                    ///NOTE: All words in the text are wrapped in <a> tags.
                     if (BF.lang.linked_to_orig && clicked_el && clicked_el.tagName === "A") {
                         /// To avoid code duplication, create the function that displays the data in the callout.
                         /**
@@ -1372,7 +1373,6 @@
                                 /// Create lex-body.
                                 parent_el = document.createElement("div");
                                 parent_el.className = "lex-body";
-                                
                                 if (lex_data.def.lit) {
                                     /// Optionally, create the literal pronunciation.
                                     child_el = document.createElement("div");

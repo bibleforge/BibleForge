@@ -100,6 +100,10 @@ BF.langs.en = (function ()
         /// Miscellaneous Text
         about:             "About",                                               /// Context menu item
         app_name:          "BibleForge",                                          /// The name of the application
+        biblical:          "Biblical",                                            /// The short name for the Biblical reconstructed pronunciation displayed on the menu
+        biblical_pronun:   "Biblical Reconstructed Pronunciation",                /// The long name for the Biblical reconstructed pronunciation displayed in a tooltip
+        biblical_ipa:      "Biblical IPA",                                        /// The short name for the Biblical reconstructed IPA pronunciation displayed on the menu
+        biblical_ipa_long: "Biblical Reconstructed IPA",                          /// The long name for the Biblical reconstructed IPA pronunciation displayed in a tooltip
         blog:              "Blog",                                                /// Context menu item
         chapter:           "Chapter",                                             /// Chapter headings
         configure:         "Configure",                                           /// Context menu item
@@ -111,16 +115,21 @@ BF.langs.en = (function ()
         in_paragraphs:     "Paragraphs",                                          /// In the View configuration panel
         ///FIXME: Not all italic words are implied; some are questionable.
         italics_explanation: "This word is implied by context or required in order to translate properly; it was not translated directly from a word in the original languages.", /// When clicking on an italic word
-        no_results1:       "Your search\u200A\u2014\u200A",                       /// Displayed when preforming a search that returns no results (before the search terms).
-        no_results2:       "\u200A\u2014\u200Adid not return any results.",       /// Displayed when preforming a search that returns no results (after the search terms).
+        modern:            "Modern",                                              /// The short name for the modern pronunciation displayed on the menu
+        modern_pronun:     "Modern Pronunciation",                                /// The long name for the modern pronunciation displayed in a tooltip
+        modern_ipa:        "Modern IPA",                                          /// The name for the modern IPA pronunciation displayed on the menu and tooltip
+        no_results1:       "Your search\u200A\u2014\u200A",                       /// Displayed when preforming a search that returns no results (before the search terms)
+        no_results2:       "\u200A\u2014\u200Adid not return any results.",       /// Displayed when preforming a search that returns no results (after the search terms)
         psalm:             "Psalm",                                               /// The title of chapters in the book of Psalms
         query_explanation: 'Keyword or Reference: "God so loved" or Romans 3:23', /// In a blank query input box before a search has been preformed
-        query_button_title:"Click here (or press Enter)",                         /// The text displayed when hovering over the magnifying glass (query button).
-        query_button_alt:  "Go",                                                  /// The text to display for the magnifying glass (query button) if images are disabled.
+        query_button_title:"Click here (or press Enter)",                         /// The text displayed when hovering over the magnifying glass (query button)
+        query_button_alt:  "Go",                                                  /// The text to display for the magnifying glass (query button) if images are disabled
         ///NOTE: This key must be the same as the value in the settings.
         red_letters:       "Red Letters",                                         /// In the View configuration panel
         subscription:      "subscription",                                        /// Used instead of 255 for subscripts to Paul's epistles
         title:             "title",                                               /// Used instead of 0 for Psalm title verse references
+        translit:          "Transliteration",                                     /// The short name for the SBL transliteration display on the menu
+        translit_long:     "Society of Biblical Languages Transliteration",       /// The long name for the SBL transliteration display on a tooltip
         view:              "View",                                                /// The title of a configuration panel
         ///TODO: Determine if the app_name should be dynamically appended to the string below or if it should be done in the build system
         wrench_title:      "Customize and Configure BibleForge",                  /// The text displayed when hovering over the wrench menu
