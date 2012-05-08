@@ -699,6 +699,14 @@ label {
     vertical-align: super;
 }
 
+.dropdown {
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAGCAQAAAC/O6xzAAAAXklEQVQI12Ng4GJIZXjP8B8JTmYQY2BgY9BmWMjwFS54lMEHqJSBCUgYMSyBShxnCGTgZ2BmYABJcAMlFjN8AaoMZBBgYGGAApAOPYYSBnegSrggRIINKMQB0c7AAAAMyxgJkjHDSAAAAABJRU5ErkJggg==);
+    background-repeat: no-repeat;
+    background-position: 100% 75%;
+    padding-right: 12px;
+    cursor: pointer;
+}
+
 .lex-body {
     /* Push the text over a little to make it line up (more or less) with the title. */
     margin-left: 4px;

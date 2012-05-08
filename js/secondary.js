@@ -1366,7 +1366,8 @@
                                 parent_el.appendChild(document.createTextNode(" "));
                                 /// Create pronunciation drop down box.
                                 child_el = create_drop_down_box(options_from_pronun(JSON.parse(data.pronun)), 0);
-                                child_el.className = "lex-pronun";
+                                /// Since the drop down box already has a style ("dropdown") concatenate "lex-pronun" to the end.
+                                BF.toggleCSS(child_el, "lex-pronun", 1);
                                 parent_el.appendChild(child_el);
                                 html.appendChild(parent_el);
                                 
