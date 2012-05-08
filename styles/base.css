@@ -351,7 +351,6 @@ body {
 
 
 .contextMenu {
-    display:    none;
     opacity:    0;
     position:   fixed;
     background: #FFF;

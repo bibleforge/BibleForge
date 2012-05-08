@@ -88,12 +88,14 @@
          */
         show_context_menu = (function ()
         {
-            var context_menu = document.createElement("div"),
+            var close_menu,
+                context_menu = document.createElement("div"),
                 is_open = false,
                 key_handler;
             
             ///NOTE: The default style does has "display" set to "none" and "position" set to "fixed."
             context_menu.className = "contextMenu";
+            context_menu.style.display = "none";
             
             /// Attach the element to the DOM now so that it does not have to be done each time it is displayed.
             document.body.insertBefore(context_menu, null);
@@ -108,28 +110,40 @@
              * @todo    It would be nice to make the menu item that was clicked fade out slowly.
              * @return  NULL
              */
-            function close_menu(callback)
+            close_menu = (function ()
             {
-                /// First, stop the element from being displayed.
-                context_menu.style.display = "none";
-                /// Then reset the opacity so that it will fade in when the menu is re-displayed later.
-                context_menu.style.opacity = 0;
+                var is_closing;
                 
-                /// Release control of the keyboard.
-                context.system.keyboard_busy = false;
-                document.removeEventListener("keydown", key_handler, false);
-                
-                /// A delay is needed so that if there is a callback, it will run after the menu has been visually removed from the page.
-                window.setTimeout(function ()
+                return close_menu(callback)
                 {
-                    /// Set the menu's is_open status to false after the delay to prevent the menu from being re-opened in the meantime.
-                    is_open = false;
-                    
-                    if (typeof callback === "function") {
-                        callback();
+                    /// Because this function could be called multiple times (e.g., a user clicks on a function link), make sure it does not run more than needed.
+                    if (!is_closing) {
+                        is_closing = true;
+                        
+                        /// First, stop the element from being displayed.
+                        context_menu.style.display = "none";
+                        /// Then reset the opacity so that it will fade in when the menu is re-displayed later.
+                        context_menu.style.opacity = 0;
+                        
+                        /// Release control of the keyboard.
+                        context.system.keyboard_busy = false;
+                        document.removeEventListener("keydown", key_handler, false);
+                        
+                        /// A delay is needed so that if there is a callback, it will run after the menu has been visually removed from the page.
+                        window.setTimeout(function ()
+                        {
+                            is_closing = false;
+                            
+                            /// Set the menu's is_open status to false after the delay to prevent the menu from being re-opened in the meantime.
+                            is_open = false;
+                            
+                            if (typeof callback === "function") {
+                                callback();
+                            }
+                        }, 0);
                     }
-                }, 0);
-            }
+                }
+            }());
             
             
             /**
@@ -176,6 +190,10 @@
                     return function (e)
                     {
                         func(e);
+                        
+                        /// Close the context menu if the user clicks a link.
+                        ///NOTE: This is only needed if the e.stopPropagation() function was called by func().
+                        close_menu(close_callback);
                         
                         e.preventDefault();
                         ///TODO: Determine if returning FALSE is necessary.
