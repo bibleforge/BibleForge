@@ -1244,14 +1244,42 @@
             
             create_drop_down_box = function (options, select)
             {
-                var el = document.createElement("span");
+                var el = document.createElement("span"),
+                    i,
+                    menu_items = [];
+                
+                function make_onclick(which)
+                {
+                    return function (e)
+                    {
+                        el.innerHTML = "";
+                        el.appendChild(document.createTextNode(options[which].display));
+                        select = which;
+                        e.stopPropagation();
+                    };
+                }
+                
+                for (i = options.length - 1; i >= 0; i -= 1) {
+                    menu_items[i] = {
+                        id:    i,
+                        text:  options[i].details,
+                        title: options[i].title,
+                        link:  make_onclick(i)
+                    };
+                }
+                
                 el.className = "dropdown";
                 
                 el.appendChild(document.createTextNode(options[select] ? options[select].display : options[0].display));
                 
-                el.onclick = function ()
+                el.onclick = function (e)
                 {
+                    var el_pos = BF.get_position(el);
                     ///TODO: Create drop down menu.
+                    show_context_menu(el_pos.left, el_pos.top + el.offsetHeight, menu_items, select);
+                    e.stopPropagation();
+                    e.preventDefault();
+                    return false;
                 };
                 
                 return el;
