@@ -1291,26 +1291,26 @@
                             {
                                 display: "|\u2009" + pronun.dic + "\u2009|",
                                 details: pronun.dic + " " + BF.lang.biblical,
-                                title:   BF.lang.biblical_long
+                                title:   BF.lang.biblical_pronun
                             },
                             {
                                 display: "/\u2009" + pronun.ipa + "\u2009/",
-                                details: pronun.dic + " " + BF.lang.biblical_ipa,
+                                details: pronun.ipa + " " + BF.lang.biblical_ipa,
                                 title:   BF.lang.biblical_ipa_long
                             },
                             {
                                 display: "|\u2009" + pronun.dic_mod + "\u2009|",
-                                details: pronun.dic + " " + BF.lang.modern,
+                                details: pronun.dic_mod + " " + BF.lang.modern,
                                 title:   BF.lang.modern_pronun
                             },
                             {
                                 display: "/\u2009" + pronun.ipa_mod + "\u2009/",
-                                details: pronun.dic + " " + BF.lang.modern_ipa,
+                                details: pronun.ipa_mod + " " + BF.lang.modern_ipa,
                                 title:   BF.lang.modern_ipa
                             },
                             {
                                 display: "|\u2009" + pronun.sbl + "\u2009|",
-                                details: pronun.dic + " " + BF.lang.translit,
+                                details: pronun.sbl + " " + BF.lang.translit,
                                 title:   BF.lang.translit_long
                             }
                         ];
