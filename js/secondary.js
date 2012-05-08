@@ -1826,18 +1826,6 @@
                 ///NOTE: \u05d0 is the Hebrew letter Aleph, and \u03b1 is the Greek letter Alpha.
                 BF.preload_font("lex-orig_word", "\u05d0\u03b1");
             }, 250);
-            
-            if (BF.is_WebKit) {
-                ///HACK: A tremendously ugly hack to make WebKit not center align langEl.
-                (function ()
-                {
-                    /// If there is an input element before langEl, it will align correctly.
-                    var dummy = document.createElement("input");
-                    dummy.type = "image";
-                    dummy.style.cssText = "width: 0; height: 0;";
-                    langEl.parentNode.insertBefore(dummy, langEl);
-                }());
-            }
         }());
         
         window.setTimeout(function ()
