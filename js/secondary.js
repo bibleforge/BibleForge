@@ -1284,6 +1284,7 @@
                     var el_pos = BF.get_position(el);
                     ///TODO: Create drop down menu.
                     show_context_menu(el_pos.left, el_pos.top + el.offsetHeight, menu_items, select);
+                    /// Prevent the event from trigger other events, like the callout onclick event.
                     e.stopPropagation();
                     e.preventDefault();
                     return false;
