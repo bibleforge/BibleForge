@@ -114,7 +114,7 @@
             {
                 var is_closing;
                 
-                return close_menu(callback)
+                return function close_menu(callback)
                 {
                     /// Because this function could be called multiple times (e.g., a user clicks on a function link), make sure it does not run more than needed.
                     if (!is_closing) {
@@ -142,7 +142,7 @@
                             }
                         }, 0);
                     }
-                }
+                };
             }());
             
             
