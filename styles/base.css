@@ -696,12 +696,17 @@ label {
     /* Because this element can wrap if the word is long and the line height is rather large due to the large original word one the line above, */
     /* it needs to be centered above the baseline to look good. */
     vertical-align: super;
+    /* This pushes down the context menu and drop down arrow slightly */
+    padding-bottom: 3px;
 }
 
 .dropdown {
+    /* The drop down arrow. */
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAGCAQAAAC/O6xzAAAAXklEQVQI12Ng4GJIZXjP8B8JTmYQY2BgY9BmWMjwFS54lMEHqJSBCUgYMSyBShxnCGTgZ2BmYABJcAMlFjN8AaoMZBBgYGGAApAOPYYSBnegSrggRIINKMQB0c7AAAAMyxgJkjHDSAAAAABJRU5ErkJggg==);
     background-repeat: no-repeat;
-    background-position: 100% 75%;
+    /* Move the arrow all the way to the right and center it vertically . */
+    background-position: 100%;
+    /* Add some extra space to the right for the drop down arrow. */
     padding-right: 12px;
     cursor: pointer;
 }
