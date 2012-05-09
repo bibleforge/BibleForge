@@ -201,6 +201,13 @@
                     };
                 }
                 
+                /**
+                 * Makes the function that fires when the cursor moves over a menu item.
+                 *
+                 * @param  id (integer) The number representing the menu item that is being hovered over.
+                 * @return The function to be attached to the onmousemove even.
+                 * @note   This function must be created outside of the loop in order for the id variable to be correct.
+                 */
                 function make_onmousemove(id)
                 {
                     return function ()
@@ -1312,6 +1319,13 @@
                         clicked_el = e.srcElement || e.originalTarget,
                         display_callout;
                     
+                    /**
+                     * Create an array of options for the simple drop down box from the lexical pronunciation object.
+                     *
+                     * @param   pronun (object) The pronun property returned form a lexical lookup.
+                     * @return  An array of objects conforming to the simple drop down box's structure.
+                     * @example create_drop_down_box(options_from_pronun({}));
+                     */
                     function options_from_pronun(pronun)
                     {
                         /// Thin spaces (\u2009) are placed around the words to separate them slightly from the dividing symbols.
