@@ -637,7 +637,7 @@
      * @param   timeout (number)  (optional) How long to wait before giving up on the script to load (in milliseconds).
      *                                       A falsey value (such as 0 or FALSE) disables timing out.         (Default is 10,000 milliseconds.)
      * @param   retry   (boolean) (optional) Whether or not to retry loading the script if a timeout occurs.  (Default is TRUE.)
-     * @return  NULL.   Runs code.
+     * @return  NULL.  Executes code.
      * @todo    If the code has already been loaded, simply run the script without re-downloading anything.
      * @todo    Determine if it would be better to use a callback function rather than passing context.
      */
@@ -694,7 +694,7 @@
         var left_pos = 0,
             top_pos  = 0;
         
-        /// Does the element have another element above it (i.e., offsetParent) (it should atleast have an HTMl element as a parent)?
+        /// Does the element have another element above it (i.e., offsetParent) (it should at least have an HTMl element as a parent)?
         if (el.offsetParent) {
             do {
                 left_pos += el.offsetLeft;
@@ -1001,53 +1001,6 @@
             (function ()
             {
                 /**
-                 * Create an object with getter and setter abilities.
-                 *
-                 * @param  cur_val  (mixed)    (optional) The default value.
-                 * @param  onchange (function) (optional) The function to be called after the set method is called.
-                 * @return An object containing get and set methods.
-                 * @note   This is used to handle data in the settings object.
-                 * @todo   Determine if there should be a validate_change function as a parameter that can accept or reject a change.
-                 * @todo   Determine if it is a good idea to delete this and other functions after they are no longer needed.
-                 */
-                function create_get_set(cur_val, onchange)
-                {
-                    return {
-                        get: function ()
-                        {
-                            return cur_val;
-                        },
-                        set: function (new_val)
-                        {
-                            /// Temporarily store the original value to be sent to the onchange function.
-                            var old_val = cur_val;
-                            
-                            /// Set the new value.
-                            cur_val = new_val;
-                            
-                            if (window.localStorage) {
-                                /// Save the settings object so that the user's settings can be loaded the next time the page is accessed.
-                                window.localStorage.setItem("settings", JSON.stringify(settings));
-                            }
-                            
-                            /// Optionally, run a function after the value is changed.
-                            if (typeof onchange === "function") {
-                                onchange({old_val: old_val, new_val: new_val});
-                            }
-                        },
-                        
-                        /// Default property settings:
-                        ///NOTE: The "writable" property is not used when using a get function.
-                        
-                        /// With configurable set to FALSE, these properties cannot be changed later.
-                        ///NOTE: Since we use a get function, the value can be set to a different type of variable.
-                        configurable: false,
-                        /// Make sure that the property is retrieved when using JSON.stringify().
-                        enumerable:   true
-                    };
-                }
-                
-                /**
                  * Recersively step through an object and load saved settings.
                  *
                  * @example load_settings({view:{in_paragraphs: false}}, settings);
@@ -1078,7 +1031,7 @@
                                 if (!settings_obj[prop]) {
                                     settings_obj[prop] = {};
                                 }
-                                /// Recursively call itself to step through the objects' objects.
+                                /// Recursively call itself to step through the object's objects.
                                 load_settings(new_settings[prop], settings_obj[prop]);
                             } else {
                                 /// Only set the property if it is different (i.e., not default).
@@ -1109,9 +1062,86 @@
                     }
                 };
                 
+                Object.defineProperty(settings, "add_property", {
+                    /// Make sure it cannot be deleted (or the type changed).
+                    configurable: false,
+                    /// Make sure it will not be listed when using JSON.stringify().
+                    enumerable:   false,
+                    /// Make sure the function cannot be changed.
+                    writable:     false,
+                    ///NOTE: No get or set property is needed when using value.
+                    /**
+                     * Create an object with getter and setter abilities.
+                     *
+                     * @example add_property(settings.view, "red_letters", true, function onchange(values) {});
+                     * @param   parent_obj (object)              The object to which the property will be attached.
+                     * @param   name       (string)              The name of the property.
+                     * @param   cur_val    (mixed)    (optional) The default value.
+                     * @param   onchange   (function) (optional) The function to be called after the set method is called.
+                     *                                           When the onchange is called, an object is passed to it containing the previous value (.old_val)
+                     *                                           and the current value (.new_val).
+                     * @return  NULL.  The property is attached to the object.
+                     * @note    onchange() is called after the value is changed.
+                     * @note    This is used to handle data in the settings object.
+                     * @note    Could make parent_obj a string that refers to an element on the settings object, but then it could not accept nested properties.
+                     * @todo    Determine if there should be a validate_change function as a parameter that can accept or reject a change.
+                     */
+                    value: function add_property(parent_obj, name, cur_val, onchange)
+                    {
+                        Object.defineProperty(parent_obj, name, {
+                            /**
+                             * Get the property.
+                             *
+                             * @return The current value of the property.
+                             */
+                            get: function ()
+                            {
+                                return cur_val;
+                            },
+                            /**
+                             * Set the property and trigger the onchange function.
+                             *
+                             * @param new_val (mixed) The value to set the property to.
+                             */
+                            set: function (new_val)
+                            {
+                                /// Temporarily store the original value to be sent to the onchange function.
+                                var old_val = cur_val;
+                                
+                                /// Set the new value.
+                                cur_val = new_val;
+                                
+                                if (window.localStorage) {
+                                    /// Save the settings object so that the user's settings can be loaded the next time the page is accessed.
+                                    window.localStorage.setItem("settings", JSON.stringify(settings));
+                                }
+                                
+                                /// Optionally, run a function after the value is changed.
+                                if (typeof onchange === "function") {
+                                    onchange({old_val: old_val, new_val: new_val});
+                                }
+                            },
+                            
+                            /// Default property settings:
+                            ///NOTE: The "writable" property is not used when using a get function.
+                            
+                            /// With configurable set to FALSE, these properties cannot be changed later.
+                            ///NOTE: Since we use a get function, the value can be set to a different type of variable.
+                            configurable: false,
+                            /// Make sure that the property is retrieved when using JSON.stringify().
+                            enumerable:   true
+                        });
+                    }
+                });
+                
                 /// Create get/set pairs with Object.defineProperty, and load default settings.
                 
-                Object.defineProperty(settings.view, "in_paragraphs", create_get_set(true, function ()
+                /**
+                 * Reload the content when switching between paragraph modes.
+                 *
+                 * @todo Make sure this works even if the user has not preformed a query yet.
+                 */
+                settings.add_property(settings.view, "in_paragraphs", true, function ()
                 {
                     /// Handle changing paragraph mode.
                     
@@ -1130,18 +1160,23 @@
                         /// Reload verses to where the user left off.
                         run_new_query(settings.user.last_query.real_query, false, true, settings.user.position);
                     }
-                }));
+                });
                 
-                Object.defineProperty(settings.view, "red_letters", create_get_set(true, function (values)
+                /**
+                 * Modify the CSS when switching between red- and black-letter mode.
+                 *
+                 * @param values (object) The previous and current values of the red_letters properties.
+                 */
+                settings.add_property(settings.view, "red_letters", true, function (values)
                 {
                     /// Alternate between red and black letters.
                     ///TODO: Add other options, such as custom color, and (in the future) highlighting of other people's words (e.g., highlight the words of Paul in blue).
                     BF.changeCSS(".q", "color: " + (values.new_val ? "#D00;" : "#000;"));
-                }));
+                });
                 
-                Object.defineProperty(settings.user, "last_query", create_get_set({}));
+                settings.add_property(settings.user, "last_query", {});
                 
-                Object.defineProperty(settings.user, "position", create_get_set({}));
+                settings.add_property(settings.user, "position", {});
                 
                 
                 /// Load user settings (if any).
