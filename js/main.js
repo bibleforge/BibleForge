@@ -1000,50 +1000,6 @@
              */
             (function ()
             {
-                /**
-                 * Recersively step through an object and load saved settings.
-                 *
-                 * @example load_settings({view:{in_paragraphs: false}}, settings);
-                 * @example load_settings({in_paragraphs: false}, settings.view);
-                 * @param   new_setting  (object) The new settings to load.
-                 * @param   settings_obj (object) The part of the settings variable to change.
-                 * @return  NULL
-                 * @note    This function is desifned to call itself.
-                 */
-                function load_settings(new_settings, settings_obj)
-                {
-                    var prop;
-                    
-                    if (!BF.is_object(new_settings)) {
-                        return;
-                    }
-                    
-                    for (prop in new_settings) {
-                        ///NOTE: According to Crockford (http://yuiblog.com/blog/2006/09/26/for-in-intrigue/), for in loops should be filtered.
-                        if (new_settings.hasOwnProperty(prop)) {
-                            if (BF.is_object(new_settings[prop])) {
-                                /// If the new_settings object is trying to load a setting that does not yet exist in the settings variable,
-                                /// create a new object and attach it to the settings variable.
-                                ///NOTE: The thought is that, in the future, extensions that are be loaded later could have their own settings,
-                                ///      so we need to load the saved settings, and when the extension later loads, it can check to see if
-                                ///      the settings have been already set.  If they are set, it would then grab the data and then create
-                                ///      get/set properties to handle changing the settings later on.
-                                if (!settings_obj[prop]) {
-                                    settings_obj[prop] = {};
-                                }
-                                /// Recursively call itself to step through the object's objects.
-                                load_settings(new_settings[prop], settings_obj[prop]);
-                            } else {
-                                /// Only set the property if it is different (i.e., not default).
-                                if (settings_obj[prop] !== new_settings[prop]) {
-                                    settings_obj[prop] = new_settings[prop];
-                                }
-                            }
-                        }
-                    }
-                }
-                
-                
                 /// Create settings object.
                 settings = {
                     user: {},
@@ -1183,7 +1139,48 @@
                 /// Does the browser support localStorage? (All modern browsers should.)
                 ///NOTE: BibleForge does not prune unused settings from the localStorage (extension loaded later might use seemingly unused settings).
                 if (window.localStorage) {
-                    load_settings(BF.parse_json(window.localStorage.getItem("settings")), settings);
+                    /**
+                     * Recursively step through an object and load saved settings.
+                     *
+                     * @example load_settings({view:{in_paragraphs: false}}, settings);
+                     * @example load_settings({in_paragraphs: false}, settings.view);
+                     * @param   new_setting  (object) The new settings to load.
+                     * @param   settings_obj (object) The part of the settings variable to change.
+                     * @return  NULL
+                     * @note    Because no other functions call this function, it is called immediately as a function statement.
+                     */
+                    (function load_settings(new_settings, settings_obj)
+                    {
+                        var prop;
+                        
+                        if (!BF.is_object(new_settings)) {
+                            return;
+                        }
+                        
+                        for (prop in new_settings) {
+                            ///NOTE: According to Crockford (http://yuiblog.com/blog/2006/09/26/for-in-intrigue/), for in loops should be filtered.
+                            if (new_settings.hasOwnProperty(prop)) {
+                                if (BF.is_object(new_settings[prop])) {
+                                    /// If the new_settings object is trying to load a setting that does not yet exist in the settings variable,
+                                    /// create a new object and attach it to the settings variable.
+                                    ///NOTE: The thought is that, in the future, extensions that are be loaded later could have their own settings,
+                                    ///      so we need to load the saved settings, and when the extension later loads, it can check to see if
+                                    ///      the settings have been already set.  If they are set, it would then grab the data and then create
+                                    ///      get/set properties to handle changing the settings later on.
+                                    if (!settings_obj[prop]) {
+                                        settings_obj[prop] = {};
+                                    }
+                                    /// Recursively call itself to step through the object's objects.
+                                    load_settings(new_settings[prop], settings_obj[prop]);
+                                } else {
+                                    /// Only set the property if it is different (i.e., not default).
+                                    if (settings_obj[prop] !== new_settings[prop]) {
+                                        settings_obj[prop] = new_settings[prop];
+                                    }
+                                }
+                            }
+                        }
+                    }(BF.parse_json(window.localStorage.getItem("settings")), settings));
                 }
             }());
             
