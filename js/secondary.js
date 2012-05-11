@@ -1249,7 +1249,7 @@
             }());
             
             
-            create_drop_down_box = function (options, select)
+            create_drop_down_box = function (options, select, onchange)
             {
                 var el = document.createElement("span"),
                     i,
@@ -1263,6 +1263,10 @@
                         el.appendChild(document.createTextNode(options[which].display));
                         select = which;
                         e.stopPropagation();
+                        
+                        if (typeof onchange === "function") {
+                            onchange(which);
+                        }
                     };
                 }
                 
@@ -1416,7 +1420,10 @@
                                 /// Add a space between the word and pronunciation drop down box to separate the two elements.
                                 parent_el.appendChild(document.createTextNode(" "));
                                 /// Create pronunciation drop down box.
-                                child_el = create_drop_down_box(options_from_pronun(JSON.parse(data.pronun)), 0);
+                                child_el = create_drop_down_box(options_from_pronun(JSON.parse(data.pronun)), context.settings.user.pronun_type, function onchange (val)
+                                {
+                                    context.settings.user.pronun_type = val;
+                                }, 0);
                                 /// Since the drop down box already has a style ("dropdown") concatenate "lex-pronun" to the end.
                                 BF.toggleCSS(child_el, "lex-pronun", 1);
                                 parent_el.appendChild(child_el);
