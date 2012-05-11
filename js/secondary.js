@@ -1309,68 +1309,56 @@
                 
                 /// Initialize the settings.user.pronun_type setting.
                 context.settings.add_property(context.settings.user, "pronun_type", 0);
-                /**
-                 * Create a callout if a word with lexical information was clicked on.
-                 *
-                 * @param e (event object) The mouse event object.
-                 */
-                page.addEventListener("click", function(e)
+                
+                (function ()
                 {
-                    var ajax = new BF.Create_easy_ajax(),
-                        callout,
-                        ///NOTE: IE/Chromium/Safari/Opera use srcElement, Firefox uses originalTarget.
-                        clicked_el = e.srcElement || e.originalTarget,
-                        display_callout;
-                    
                     /**
-                     * Create an array of options for the simple drop down box from the lexical pronunciation object.
-                     *
-                     * @param   pronun (object) The pronun property returned form a lexical lookup.
-                     * @return  An array of objects conforming to the simple drop down box's structure.
-                     * @example create_drop_down_box(options_from_pronun({}));
-                     */
-                    function options_from_pronun(pronun)
+                    * Take the lexical data and turn it into HTML to be displayed in the callout.
+                    *
+                    * @param data (object) An object describing the lexical information of a word.
+                    */
+                    var display_callout = (function ()
                     {
-                        /// Thin spaces (\u2009) are placed around the words to separate them slightly from the dividing symbols.
-                        return [
-                            {
-                                display: "|\u2009" + pronun.dic + "\u2009|",
-                                details: pronun.dic + " " + BF.lang.biblical,
-                                title:   BF.lang.biblical_pronun
-                            },
-                            {
-                                display: "/\u2009" + pronun.ipa + "\u2009/",
-                                details: pronun.ipa + " " + BF.lang.biblical_ipa,
-                                title:   BF.lang.biblical_ipa_long
-                            },
-                            {
-                                display: "|\u2009" + pronun.dic_mod + "\u2009|",
-                                details: pronun.dic_mod + " " + BF.lang.modern,
-                                title:   BF.lang.modern_pronun
-                            },
-                            {
-                                display: "/\u2009" + pronun.ipa_mod + "\u2009/",
-                                details: pronun.ipa_mod + " " + BF.lang.modern_ipa,
-                                title:   BF.lang.modern_ipa
-                            },
-                            {
-                                display: "|\u2009" + pronun.sbl + "\u2009|",
-                                details: pronun.sbl + " " + BF.lang.translit,
-                                title:   BF.lang.translit_long
-                            }
-                        ];
-                    }
-                    
-                    /// Does this language support lexical lookups, and did the user click on a word?
-                    ///NOTE: All words in the text are wrapped in <a> tags.
-                    if (BF.lang.linked_to_orig && clicked_el && clicked_el.tagName === "A") {
-                        /// To avoid code duplication, create the function that displays the data in the callout.
                         /**
-                         * Take the lexical data and turn it into HTML to be displayed in the callout.
-                         *
-                         * @param data (object) An object describing the lexical information of a word.
-                         */
-                        display_callout = function (data)
+                        * Create an array of options for the simple drop down box from the lexical pronunciation object.
+                        *
+                        * @param   pronun (object) The pronun property returned form a lexical lookup.
+                        * @return  An array of objects conforming to the simple drop down box's structure.
+                        * @example create_drop_down_box(options_from_pronun({}));
+                        */
+                        function options_from_pronun(pronun)
+                        {
+                            /// Thin spaces (\u2009) are placed around the words to separate them slightly from the dividing symbols.
+                            return [
+                                {
+                                    display: "|\u2009" + pronun.dic + "\u2009|",
+                                    details: pronun.dic + " " + BF.lang.biblical,
+                                    title:   BF.lang.biblical_pronun
+                                },
+                                {
+                                    display: "/\u2009" + pronun.ipa + "\u2009/",
+                                    details: pronun.ipa + " " + BF.lang.biblical_ipa,
+                                    title:   BF.lang.biblical_ipa_long
+                                },
+                                {
+                                    display: "|\u2009" + pronun.dic_mod + "\u2009|",
+                                    details: pronun.dic_mod + " " + BF.lang.modern,
+                                    title:   BF.lang.modern_pronun
+                                },
+                                {
+                                    display: "/\u2009" + pronun.ipa_mod + "\u2009/",
+                                    details: pronun.ipa_mod + " " + BF.lang.modern_ipa,
+                                    title:   BF.lang.modern_ipa
+                                },
+                                {
+                                    display: "|\u2009" + pronun.sbl + "\u2009|",
+                                    details: pronun.sbl + " " + BF.lang.translit,
+                                    title:   BF.lang.translit_long
+                                }
+                            ];
+                        }
+                        
+                        return function display_callout(callout, data)
                         {
                             /// data Object structure: 
                             /// word      (string)  The original Greek, Hebrew, or Aramaic word, in Unicode.
@@ -1456,31 +1444,47 @@
                             
                             callout.replace_HTML(html);
                         };
+                    }());
+                    
+                    /**
+                    * Create a callout if a word with lexical information was clicked on.
+                    *
+                    * @param e (event object) The mouse event object.
+                    */
+                    page.addEventListener("click", function(e)
+                    {
+                        var ajax = new BF.Create_easy_ajax(),
+                            callout,
+                            ///NOTE: IE/Chromium/Safari/Opera use srcElement, Firefox uses originalTarget.
+                            clicked_el = e.srcElement || e.originalTarget;
                         
-                        /// Has this data already been cached?
-                        if (lex_cache[clicked_el.id]) {
-                            /// Delay the code so that the remained of the code will execute first and prepare the callout variable.
-                            window.setTimeout(function ()
-                            {
-                                display_callout(lex_cache[clicked_el.id]);
-                            }, 0);
-                        } else {
-                            ///TODO: Determine if the lexicon query (type 5) should be defined somewhere.
-                            ajax.query("post", "/query.php", "t=5&q=" + clicked_el.id, function success(data)
-                            {
-                                data = BF.parse_json(data);
-                                /// Temporarily cache the data so that it does not have to re-queried.
-                                ///NOTE: The cache is cleared before each query.
-                                lex_cache[clicked_el.id] = data;
-                                display_callout(data);
-                            });
+                        /// Does this language support lexical lookups, and did the user click on a word?
+                        ///NOTE: All words in the text are wrapped in <a> tags.
+                        if (BF.lang.linked_to_orig && clicked_el && clicked_el.tagName === "A") {
+                            /// Has this data already been cached?
+                            if (lex_cache[clicked_el.id]) {
+                                /// Delay the code so that the remained of the code will execute first and prepare the callout variable.
+                                window.setTimeout(function ()
+                                {
+                                    display_callout(callout, lex_cache[clicked_el.id]);
+                                }, 0);
+                            } else {
+                                ///TODO: Determine if the lexicon query (type 5) should be defined somewhere.
+                                ajax.query("post", "/query.php", "t=5&q=" + clicked_el.id, function success(data)
+                                {
+                                    data = BF.parse_json(data);
+                                    /// Temporarily cache the data so that it does not have to re-queried.
+                                    ///NOTE: The cache is cleared before each query.
+                                    lex_cache[clicked_el.id] = data;
+                                    display_callout(callout, data);
+                                });
+                            }
+                            
+                            callout = create_callout(clicked_el, ajax, {mouse_x: e.clientX, mouse_y: e.clientY});
+                            callouts[callouts.length] = callout;
                         }
-                        
-                        callout = create_callout(clicked_el, ajax, {mouse_x: e.clientX, mouse_y: e.clientY});
-                        callouts[callouts.length] = callout;
-                    }
-                }, false);
-                
+                    }, false);
+                }());
                 ///TODO: Instead of attaching functions here and looping through an array of callouts, it probably should attach a separate function inside the callout closure.
                 
                 /**
