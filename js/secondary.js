@@ -150,8 +150,8 @@
              * Display the context menu.
              *
              * @example open_menu(leftOffset, topOffset, [{text: "Menu Item 1", link: "http://link.com"}, [text: "Menu Item 2", link: some_function, line: true}]); /// Creates a menu with one external link and one link that runs a function with a line break separating the two.
-             * @param   x_pos          (number)              The X position of the menu.
-             * @param   y_pos          (number)              The Y position of the menu.
+             * @param   pos            (object)              An object describing the context menu's X and Y and optionally the CSS position style.
+             *                                               Object format: {x: (number), y: (number)[, absolute: (boolean)]}
              * @param   menu_items     (array)               An array containing object(s) specifying the text of the menu items, the corresponding links, whether or not to add a line break, and an optional ID.
              *                                               Array format: [{text: (string), link: (string or function), line: (truthy or falsey (optional)), id: (variable (optional))}, ...]
              * @param   selected       (variable)            The ID of the menu item that should be selected by default.  Sending FALSE will ignore all IDs.
@@ -160,7 +160,7 @@
              * @note    Called by show_context_menu() and close_menu() (as the callback function).
              * @return  NULL
              */
-            function open_menu(x_pos, y_pos, menu_items, selected, open_callback, close_callback)
+            function open_menu(pos, menu_items, selected, open_callback, close_callback)
             {
                 var cur_item = -1,
                     i,
@@ -259,7 +259,7 @@
                 context_menu.appendChild(menu_container);
                 
                 ///TODO: Determine if the menu will go off of the page and adjust the position accordingly.
-                context_menu.style.cssText = "left:" + x_pos + "px;top:" + y_pos + "px;display:block";
+                context_menu.style.cssText = "left:" + pos.x + "px;top:" + pos.y + "px;position:" + (pos.absolute ? "absolute" : "fixed") + ";display:block";
                 
                 ///TODO: Determine if it would be good to also close the menu on document blur.
                 /**
@@ -348,9 +348,9 @@
             /**
              * Handle opening the context menu, even if one is already open.
              *
-             * @example show_context_menu(leftOffset, topOffset, [{text: "Menu Item 1", link: "http://link.com"}, [text: "Menu Item 2", link: some_function, line: true}]); /// Creates a menu with one external link and one link that runs a function with a line break separating the two.
-             * @param   x_pos          (number)              The X position of the menu.
-             * @param   y_pos          (number)              The Y position of the menu.
+             * @example show_context_menu({x: leftOffset, y: topOffset, fixed: true}, [{text: "Menu Item 1", link: "http://link.com"}, [text: "Menu Item 2", link: some_function, line: true}]); /// Creates a menu with one external link and one link that runs a function with a line break separating the two.
+             * @param   pos            (object)              An object describing the context menu's X and Y and optionally the CSS position style.
+             *                                               Object format: {x: (number), y: (number)[, absolute: (boolean)]}
              * @param   menu_items     (array)               An array containing object(s) specifying the text of the menu items, the corresponding links, whether or not to add a line break, and an optional ID.
              *                                               Array format: [{text: (string), link: (string or function), line: (truthy or falsey (optional)), id: (variable (optional))}, ...]
              * @param   selected       (variable)            The ID of the menu item that should be selected by default.  Sending FALSE will ignore all IDs.
@@ -360,7 +360,7 @@
              * @note    Called by the wrench menu onclick event.
              * @return  NULL
              */
-            return function show_context_menu(x_pos, y_pos, menu_items, selected, open_callback, close_callback)
+            return function show_context_menu(pos, menu_items, selected, open_callback, close_callback)
             {
                 /// If it is already open, close it and then re-open it with the new menu.
                 ///TODO: Determine if this can (or should) ever happen.
@@ -370,10 +370,10 @@
                         if (typeof close_callback === "function") {
                             close_callback();
                         }
-                        open_menu(x_pos, y_pos, menu_items, selected, open_callback, close_callback);
+                        open_menu(pos, menu_items, selected, open_callback, close_callback);
                     });
                 } else {
-                    open_menu(x_pos, y_pos, menu_items, selected, open_callback, close_callback);
+                    open_menu(pos, menu_items, selected, open_callback, close_callback);
                 }
             };
         }());
@@ -943,7 +943,7 @@
             {
                 var wrench_pos = BF.get_position(wrench_button);
                 
-                show_context_menu(wrench_pos.left, wrench_pos.top + wrench_button.offsetHeight, [
+                show_context_menu({x: wrench_pos.left, y: wrench_pos.top + wrench_button.offsetHeight}, [
                         {
                             text: BF.lang.configure,
                             link: show_configure_panel
@@ -1286,8 +1286,8 @@
                 el.onclick = function (e)
                 {
                     var el_pos = BF.get_position(el);
-                    ///TODO: Create drop down menu.
-                    show_context_menu(el_pos.left, el_pos.top + el.offsetHeight, menu_items, select);
+                    
+                    show_context_menu({x: el_pos.left, y: el_pos.top + el.offsetHeight, absolute: true}, menu_items, select);
                     /// Prevent the event from trigger other events, like the callout onclick event.
                     e.stopPropagation();
                     e.preventDefault();
@@ -1854,8 +1854,7 @@
                 {
                     var langEl_pos = BF.get_position(langEl);
                     
-                    ///TODO: Make show_context_menu() take a position object, not two variables.
-                    show_context_menu(langEl_pos.left, langEl_pos.top + langEl.offsetHeight, lang_menu, BF.lang.id,
+                    show_context_menu({x: langEl_pos.left, y: langEl_pos.top + langEl.offsetHeight}, lang_menu, BF.lang.id,
                         function open()
                         {
                             /// Because the menu is open, keep the button dark.
