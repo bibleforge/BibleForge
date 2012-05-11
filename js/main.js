@@ -1042,8 +1042,10 @@
                      * @note    Could make parent_obj a string that refers to an element on the settings object, but then it could not accept nested properties.
                      * @todo    Determine if there should be a validate_change function as a parameter that can accept or reject a change.
                      */
-                    value: function add_property(parent_obj, name, cur_val, onchange)
+                    value: function add_property(parent_obj, name, default_val, onchange)
                     {
+                        var cur_val = (parent_obj[name] === undefined) ? default_val : parent_obj[name];
+                        
                         Object.defineProperty(parent_obj, name, {
                             /**
                              * Get the property.
