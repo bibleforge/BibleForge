@@ -2357,14 +2357,7 @@
                                     ///      Therefore, the timeout must be stopped when the scroll is cleared.
                                     ///NOTE: There are other occasions when words are removed from the scroll (like when caching sections of text),
                                     ///      but it seems unlikely to cause an error with highlighting; however, the highlighter function should check to see if a word still exists.
-                                    var highlight_timeout = window.setTimeout(function ()
-                                        {
-                                            /// Since the timeout executed before the scroll was cleared, the event can be detached.
-                                            system.event.detach("scrollCleared", onScrollCleared, true);
-                                            ///NOTE: Only standard and mixed searches need verse_html data to be sent.
-                                            ///NOTE: word_ids is only needed for grammatical and mixed searches.
-                                            options.highlight((options.extra_highlighting || type !== BF.consts.grammatical_search ? verse_html.join("") : false), word_ids);
-                                        }, 0),
+                                    var highlight_timeout,
                                         /**
                                          * Prevent the highlighting code from running after the scroll is cleared.
                                          */
@@ -2372,6 +2365,15 @@
                                         {
                                             window.clearTimeout(highlight_timeout);
                                         };
+                                    
+                                    highlight_timeout = window.setTimeout(function ()
+                                    {
+                                        /// Since the timeout executed before the scroll was cleared, the event can be detached.
+                                        system.event.detach("scrollCleared", onScrollCleared, true);
+                                        ///NOTE: Only standard and mixed searches need verse_html data to be sent.
+                                        ///NOTE: word_ids is only needed for grammatical and mixed searches.
+                                        options.highlight((options.extra_highlighting || type !== BF.consts.grammatical_search ? verse_html.join("") : false), word_ids);
+                                    }, 0);
                                     
                                     system.event.attach("scrollCleared", onScrollCleared, true);
                                 }());
