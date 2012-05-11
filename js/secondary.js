@@ -1317,19 +1317,19 @@
                 (function ()
                 {
                     /**
-                    * Take the lexical data and turn it into HTML to be displayed in the callout.
-                    *
-                    * @param data (object) An object describing the lexical information of a word.
-                    */
+                     * Take the lexical data and turn it into HTML to be displayed in the callout.
+                     *
+                     * @param data (object) An object describing the lexical information of a word.
+                     */
                     var display_callout = (function ()
                     {
                         /**
-                        * Create an array of options for the simple drop down box from the lexical pronunciation object.
-                        *
-                        * @param   pronun (object) The pronun property returned form a lexical lookup.
-                        * @return  An array of objects conforming to the simple drop down box's structure.
-                        * @example create_drop_down_box(options_from_pronun({}));
-                        */
+                         * Create an array of options for the simple drop down box from the lexical pronunciation object.
+                         *
+                         * @param   pronun (object) The pronun property returned form a lexical lookup.
+                         * @return  An array of objects conforming to the simple drop down box's structure.
+                         * @example create_drop_down_box(options_from_pronun({}));
+                         */
                         function options_from_pronun(pronun)
                         {
                             /// Thin spaces (\u2009) are placed around the words to separate them slightly from the dividing symbols.
@@ -1454,10 +1454,10 @@
                     }());
                     
                     /**
-                    * Create a callout if a word with lexical information was clicked on.
-                    *
-                    * @param e (event object) The mouse event object.
-                    */
+                     * Create a callout if a word with lexical information was clicked on.
+                     *
+                     * @param e (event object) The mouse event object.
+                     */
                     page.addEventListener("click", function(e)
                     {
                         var ajax = new BF.Create_easy_ajax(),
