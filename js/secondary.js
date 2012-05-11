@@ -1307,6 +1307,8 @@
                     BF.toggleCSS(page, "linked", 1);
                 }
                 
+                /// Initialize the settings.user.pronun_type setting.
+                context.settings.add_property(context.settings.user, "pronun_type", 0);
                 /**
                  * Create a callout if a word with lexical information was clicked on.
                  *
