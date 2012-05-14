@@ -288,16 +288,39 @@
                 {
                     var pos = get_pos();
                     
+                    ///NOTE: The position attribute must be set first because it effects the way offsetWidth is measured.
+                    context_menu.style.position = (pos.absolute ? "absolute" : "fixed");
+                    
+                    /// Prevent the menu from going too far right.
+                    ///NOTE: A small amount of buffer room (about 22 pixels) seems to be necessary to place the menu properly aligned on the right edge.
+                    if (pos.x + context_menu.offsetWidth > window.innerWidth - 22) {
+                        pos.x = window.innerWidth - context_menu.offsetWidth - 22;
+                    }
+                    /// Prevent the menu from going to far left.
+                    ///NOTE: Since the code above could move the menu too far left, this much be checked for second.
+                    if (pos.x < 0) {
+                        pos.x = 0;
+                    }
+                    
                     context_menu.style.left = pos.x + "px";
                     context_menu.style.top  = pos.y + "px";
-                    context_menu.style.position = (pos.absolute ? "absolute" : "fixed");
                 };
                 
-                /// Align the menu immediately.
-                align_menu();
-                
-                /// Now, make it visible.
+                /// Make the element displayable so that the offsetWidth (in align_menu(), which will be called shortly) will be measured correctly.
                 context_menu.style.display = "block";
+                /// Because it needs to be displayable before it is aligned, make it invisible.
+                context_menu.style.visibility = "hidden";
+                
+                /// A short timeout is needed for the CSS above to take effect.
+                /**
+                 * Position the context menu the first time and make it visible.
+                 */
+                window.setTimeout(function ()
+                {
+                    align_menu();
+                    /// Since the menu is now aligned, make it visible.
+                    context_menu.style.visibility = "visible";
+                }, 0);
                 
                 /// Attach event listeners to events that could cause the menu to need to be moved.
                 /// These will be detached by close_menu().
