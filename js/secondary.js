@@ -161,7 +161,7 @@
              * @param   get_pos        (function)            A function that returns an object describing the context menu's X and Y and optionally the CSS position style.
              *                                               Object format: {x: (number), y: (number)[, absolute: (boolean)]}
              * @param   menu_items     (array)               An array containing object(s) specifying the text of the menu items, the corresponding links, whether or not to add a line break, and an optional ID.
-             *                                               Array format: [{text: (string), link: (string or function), line: (truthy or falsey (optional)), id: (variable (optional))}, ...]
+             *                                               Array format: [{text: (string), link: (string or function), line: (truthy or falsey (optional)), id: (variable (optional)), title: (string) (optional)}, ...]
              * @param   selected       (variable)            The ID of the menu item that should be selected by default.  Sending FALSE will ignore all IDs.
              * @param   open_callback  (function) (optional) The function to run when the menu opens.
              * @param   close_callback (function) (optional) The function to send to close_menu() as a callback when the menu closes.
@@ -252,6 +252,9 @@
                     if (menu_items[i].line) {
                         menu_item.style.borderTop = "1px solid #A3A3A3";
                     }
+                    
+                    /// Add a title if present.
+                    menu_item.title = menu_items[i].title || "";
                     
                     /// In order to allow for both mouse and keyboard interaction, a menu item must be selected when the mouse moves over it.
                     menu_item.onmousemove = make_onmousemove(i);
