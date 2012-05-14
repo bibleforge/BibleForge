@@ -120,7 +120,7 @@
                 
                 return function close_menu(callback)
                 {
-                    /// Because this function could be called multiple times (e.g., a user clicks on a function link), make sure it does not run more than needed.
+                    /// Because this function could be called multiple times (e.g., a user holds down enter), make sure it does not run more than needed.
                     if (!is_closing) {
                         is_closing = true;
                         
