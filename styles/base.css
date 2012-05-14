@@ -392,8 +392,9 @@ body {
 /* Menu items */
 .contextMenu div a {
     color:           #555;
-    /* Block display is needed to make the width 100%. */
-    display:         block;
+    /* Block table-row is needed to make the possible table cells to display correctly (e.g., the pronunciation selection menu). */
+    /* Any display type that is block (as opposed to inline) is needed to make the width become 100%. */
+    display:         table-row;
     padding:         1px 0;
     text-decoration: none;
     /* Prevent the text from wrapping. */
@@ -404,6 +405,20 @@ body {
     -moz-transition:    background .2s, color .2s;
     -webkit-transition: background .2s, color .2s;
     -o-transition:      background .2s, color .2s;
+}
+
+/* CSS table cell */
+/* The pronunciation context menu uses this. */
+.cell {
+    display: table-cell;
+    /* Add some space between the columns. */
+    padding-right: 8px;
+}
+
+/* The last column. */
+.cell:last-of-type {
+    /* Prevent the last column from displaying space on the right of it. */
+    padding-right: 0;
 }
 
 .menu_item_selected {

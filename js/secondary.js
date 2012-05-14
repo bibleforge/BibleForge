@@ -161,12 +161,13 @@
              * @param   get_pos        (function)            A function that returns an object describing the context menu's X and Y and optionally the CSS position style.
              *                                               Object format: {x: (number), y: (number)[, absolute: (boolean)]}
              * @param   menu_items     (array)               An array containing object(s) specifying the text of the menu items, the corresponding links, whether or not to add a line break, and an optional ID.
-             *                                               Array format: [{text: (string), link: (string or function), line: (truthy or falsey (optional)), id: (variable (optional)), title: (string) (optional)}, ...]
+             *                                               Either .text or .html must be present, and .text is prefered to .html because it will inject HTML.
+             *                                               Array format: [{text: (string), html: (string), link: (string or function), line: (truthy or falsey (optional)), id: (variable (optional)), title: (string) (optional)}, ...]
              * @param   selected       (variable)            The ID of the menu item that should be selected by default.  Sending FALSE will ignore all IDs.
              * @param   open_callback  (function) (optional) The function to run when the menu opens.
              * @param   close_callback (function) (optional) The function to send to close_menu() as a callback when the menu closes.
              * @note    Called by show_context_menu() and close_menu() (as the callback function).
-             * @return  NULL
+             * @note    In order to display multiple columns, the menu_items array .html property can contain elements with the table-cell CSS display attribute.
              */
             function open_menu(get_pos, menu_items, selected, open_callback, close_callback)
             {
@@ -259,8 +260,13 @@
                     /// In order to allow for both mouse and keyboard interaction, a menu item must be selected when the mouse moves over it.
                     menu_item.onmousemove = make_onmousemove(i);
                     
-                    ///NOTE: document.createTextNode() is akin to innerText.  It does not inject HTML.
-                    menu_item.appendChild(document.createTextNode(menu_items[i].text));
+                    /// If there is text, use that; otherwise, use HTML.
+                    if (menu_items[i].text) {
+                        ///NOTE: document.createTextNode() is akin to innerText.  It does not inject HTML.
+                        menu_item.appendChild(document.createTextNode(menu_items[i].text));
+                    } else {
+                        menu_item.innerHTML = menu_items[i].html;
+                    }
                     menu_container.appendChild(menu_item);
                 }
                 
@@ -1317,7 +1323,7 @@
                 for (i = options.length - 1; i >= 0; i -= 1) {
                     menu_items[i] = {
                         id:    i,
-                        text:  options[i].details,
+                        html:  options[i].details,
                         title: options[i].title,
                         link:  make_onclick(i)
                     };
@@ -1382,27 +1388,27 @@
                             return [
                                 {
                                     display: "|\u2009" + pronun.dic + "\u2009|",
-                                    details: pronun.dic + " " + BF.lang.biblical,
+                                    details: "<span class=cell>" + pronun.dic + "</span><span class=cell>(" + BF.lang.biblical + ")</span>",
                                     title:   BF.lang.biblical_pronun
                                 },
                                 {
                                     display: "/\u2009" + pronun.ipa + "\u2009/",
-                                    details: pronun.ipa + " " + BF.lang.biblical_ipa,
+                                    details: "<span class=cell>" + pronun.ipa + "</span><span class=cell>(" + BF.lang.biblical_ipa + ")</span>",
                                     title:   BF.lang.biblical_ipa_long
                                 },
                                 {
                                     display: "|\u2009" + pronun.dic_mod + "\u2009|",
-                                    details: pronun.dic_mod + " " + BF.lang.modern,
+                                    details: "<span class=cell>" + pronun.dic_mod + "</span><span class=cell>(" + BF.lang.modern + ")</span>",
                                     title:   BF.lang.modern_pronun
                                 },
                                 {
                                     display: "/\u2009" + pronun.ipa_mod + "\u2009/",
-                                    details: pronun.ipa_mod + " " + BF.lang.modern_ipa,
+                                    details: "<span class=cell>" + pronun.ipa_mod + "</span><span class=cell>(" + BF.lang.modern_ipa + ")</span>",
                                     title:   BF.lang.modern_ipa
                                 },
                                 {
                                     display: "|\u2009" + pronun.sbl + "\u2009|",
-                                    details: pronun.sbl + " " + BF.lang.translit,
+                                    details: "<span class=cell>" + pronun.sbl + "</span><span class=cell>(" + BF.lang.translit + ")</span>",
                                     title:   BF.lang.translit_long
                                 }
                             ];
