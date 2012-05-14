@@ -262,8 +262,8 @@
                     
                     /// If there is text, use that; otherwise, use HTML.
                     if (menu_items[i].text) {
-                        ///NOTE: document.createTextNode() is akin to innerText.  It does not inject HTML.
-                        menu_item.appendChild(document.createTextNode(menu_items[i].text));
+                        ///NOTE: textContent is akin to innerText.  It does not inject HTML.
+                        menu_item.textContent = menu_items[i].text;
                     } else {
                         menu_item.innerHTML = menu_items[i].html;
                     }
@@ -917,8 +917,7 @@
                         
                         /// The label identifies with the input element via a unique id.
                         label_el.htmlFor = pane + "_" + config.options[cur_option].settings;
-                        ///NOTE: document.createTextNode() is akin to innerText.  It does not inject HTML.
-                        label_el.appendChild(document.createTextNode(BF.lang[config.options[cur_option].settings]));
+                        label_el.textContent = BF.lang[config.options[cur_option].settings];
                         table_cell.appendChild(label_el);
                         
                         /// Insert a <td> for the input element.
@@ -1333,7 +1332,7 @@
                     return function (e)
                     {
                         el.innerHTML = "";
-                        el.appendChild(document.createTextNode(options[which].display));
+                        el.textContent = options[which].display;
                         select = which;
                         e.stopPropagation();
                         
@@ -1354,7 +1353,7 @@
                 
                 el.className = "dropdown";
                 
-                el.appendChild(document.createTextNode(options[select] ? options[select].display : options[0].display));
+                el.textContent = options[select] ? options[select].display : options[0].display;
                 
                 el.onclick = function (e)
                 {
@@ -1490,7 +1489,7 @@
                                 /// Create lex-orig_word.
                                 child_el = document.createElement("span");
                                 child_el.className = "lex-orig_word";
-                                child_el.appendChild(document.createTextNode(data.word));
+                                child_el.textContent = data.word;
                                 parent_el.appendChild(child_el);
                                 /// Add a space between the word and pronunciation drop down box to separate the two elements.
                                 parent_el.appendChild(document.createTextNode(" "));
@@ -1510,12 +1509,12 @@
                                 if (lex_data.def.lit) {
                                     /// Optionally, create the literal pronunciation.
                                     child_el = document.createElement("div");
-                                    child_el.appendChild(document.createTextNode("“" + lex_data.def.lit + "”"));
+                                    child_el.textContent = "“" + lex_data.def.lit + "”";
                                     parent_el.appendChild(child_el);
                                 }
                                 /// Create the short definition.
                                 child_el = document.createElement("div");
-                                child_el.appendChild(document.createTextNode(lex_data.def.short));
+                                child_el.textContent = lex_data.def.short;
                                 parent_el.appendChild(child_el);
                                 html.appendChild(parent_el);
                                 ///TODO: Add a way to get more details.

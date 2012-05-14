@@ -931,7 +931,7 @@
      * and then load the remainder lazily.
      *
      * @param  viewPort     (object) The HTML element which encapsulates all of the other objects.
-     * @param  doc_docEl    (object) The document.documentElement element (the HTML element).
+     * @param  doc_docEl    (object) The document.documentElement element (the <html> element).
      * @return NULL.  Some functions are attached to events and the rest accompany them via closure.
      */
     BF.create_viewport = function (viewPort, doc_docEl)
@@ -1917,9 +1917,7 @@
                             
                             /// Display the verse range on the page if looking up verses.
                             if (query_type === BF.consts.verse_lookup) {
-                                ///TODO: Find a better way to clear leftInfo than using innerHTML.
-                                leftInfo.innerHTML = "";
-                                leftInfo.appendChild(document.createTextNode(ref_range));
+                                leftInfo.textContent = ref_range;
                             }
                             
                             /// Store the verse range for future reference.
@@ -3377,7 +3375,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?10645258", {
+                BF.include("/js/secondary.js?10652133", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
