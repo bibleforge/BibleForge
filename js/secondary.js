@@ -39,7 +39,7 @@
     bottom, button, c, change_language, checked, childNodes, className, 
     clearTimeout, clear_scroll, click, clientWidth, clientX, clientY, configure, 
     consts, content_manager, createDocumentFragment, createElement, createEvent, 
-    createTextNode, cssText, cssTransitions, ctrl, ctrlKey, currentTarget, data, 
+    createTextNode, cssTransitions, ctrl, ctrlKey, currentTarget, data, 
     def, destroy, detail, details, dic, dic_mod, dispatchEvent, display, done, 
     encodeURIComponent, event, full_name, getClientRects, getElementById, 
     get_position, hasOwnProperty, height, help, history, href, htmlFor, id, 
@@ -91,7 +91,8 @@
          */
         show_context_menu = (function ()
         {
-            var close_menu,
+            var align_menu,
+                close_menu,
                 context_menu = document.createElement("div"),
                 is_open = false,
                 key_handler;
@@ -128,6 +129,10 @@
                         /// Then reset the opacity so that it will fade in when the menu is re-displayed later.
                         context_menu.style.opacity = 0;
                         
+                        /// Detach menu aligning function.
+                        context.system.event.detach(["contentAddedAbove", "contentRemovedAbove"], align_menu);
+                        document.removeEventListener("resize", align_menu, false);
+                        
                         /// Release control of the keyboard.
                         context.system.keyboard_busy = false;
                         document.removeEventListener("keydown", key_handler, false);
@@ -153,7 +158,7 @@
              * Display the context menu.
              *
              * @example open_menu(leftOffset, topOffset, [{text: "Menu Item 1", link: "http://link.com"}, [text: "Menu Item 2", link: some_function, line: true}]); /// Creates a menu with one external link and one link that runs a function with a line break separating the two.
-             * @param   pos            (object)              An object describing the context menu's X and Y and optionally the CSS position style.
+             * @param   get_pos        (function)            A function that returns an object describing the context menu's X and Y and optionally the CSS position style.
              *                                               Object format: {x: (number), y: (number)[, absolute: (boolean)]}
              * @param   menu_items     (array)               An array containing object(s) specifying the text of the menu items, the corresponding links, whether or not to add a line break, and an optional ID.
              *                                               Array format: [{text: (string), link: (string or function), line: (truthy or falsey (optional)), id: (variable (optional))}, ...]
@@ -163,9 +168,10 @@
              * @note    Called by show_context_menu() and close_menu() (as the callback function).
              * @return  NULL
              */
-            function open_menu(pos, menu_items, selected, open_callback, close_callback)
+            function open_menu(get_pos, menu_items, selected, open_callback, close_callback)
             {
-                var cur_item = -1,
+                var align,
+                    cur_item = -1,
                     i,
                     menu_container = document.createElement("div"),
                     menu_count = menu_items.length,
@@ -259,10 +265,35 @@
                 ///TODO: Determine if there is a better way to do this.  Since the items are contained in a single <div> tag, it should not be slow.
                 context_menu.innerHTML = "";
                 
+                /// Add the DOM element containing the menu items to the menu.
+                ///TODO: See if document.createDocumentFragment() would work better since it would not create an extra DOM element.
                 context_menu.appendChild(menu_container);
                 
-                ///TODO: Determine if the menu will go off of the page and adjust the position accordingly.
-                context_menu.style.cssText = "left:" + pos.x + "px;top:" + pos.y + "px;position:" + (pos.absolute ? "absolute" : "fixed") + ";display:block";
+                /// Create the align function that can be use when the window is resized or content is added to keep the menu in the right spot.
+                /**
+                 * Position the context menu on the page.
+                 *
+                 * @note This function is called immediately and on various events.
+                 */
+                align_menu = function ()
+                {
+                    var pos = get_pos();
+                    
+                    context_menu.style.left = pos.x + "px";
+                    context_menu.style.top  = pos.y + "px";
+                    context_menu.style.position = (pos.absolute ? "absolute" : "fixed");
+                };
+                
+                /// Align the menu immediately.
+                align_menu();
+                
+                /// Now, make it visible.
+                context_menu.style.display = "block";
+                
+                /// Attach event listeners to events that could cause the menu to need to be moved.
+                /// These will be detached by close_menu().
+                context.system.event.attach(["contentAddedAbove", "contentRemovedAbove"], align_menu);
+                window.addEventListener("resize", align_menu, false);
                 
                 ///TODO: Determine if it would be good to also close the menu on document blur.
                 /**
@@ -334,6 +365,7 @@
                     return false;
                 };
                 
+                /// This will be detached by close_menu().
                 document.addEventListener("keydown", key_handler, false);
                 
                 /// A delay is needed in order for the CSS transition to occur.
@@ -352,7 +384,7 @@
              * Handle opening the context menu, even if one is already open.
              *
              * @example show_context_menu({x: leftOffset, y: topOffset, fixed: true}, [{text: "Menu Item 1", link: "http://link.com"}, [text: "Menu Item 2", link: some_function, line: true}]); /// Creates a menu with one external link and one link that runs a function with a line break separating the two.
-             * @param   pos            (object)              An object describing the context menu's X and Y and optionally the CSS position style.
+             * @param   get_pos        (function)            A function that returns an object describing the context menu's X and Y and optionally the CSS position style.
              *                                               Object format: {x: (number), y: (number)[, absolute: (boolean)]}
              * @param   menu_items     (array)               An array containing object(s) specifying the text of the menu items, the corresponding links, whether or not to add a line break, and an optional ID.
              *                                               Array format: [{text: (string), link: (string or function), line: (truthy or falsey (optional)), id: (variable (optional))}, ...]
@@ -944,9 +976,11 @@
              */
             wrench_button.onclick = function (e)
             {
-                var wrench_pos = BF.get_position(wrench_button);
-                
-                show_context_menu({x: wrench_pos.left, y: wrench_pos.top + wrench_button.offsetHeight}, [
+                show_context_menu(function ()
+                {
+                    var wrench_pos = BF.get_position(wrench_button);
+                    return {x: wrench_pos.left, y: wrench_pos.top + wrench_button.offsetHeight};
+                }, [
                         {
                             text: BF.lang.configure,
                             link: show_configure_panel
@@ -1288,9 +1322,11 @@
                 
                 el.onclick = function (e)
                 {
-                    var el_pos = BF.get_position(el);
-                    
-                    show_context_menu({x: el_pos.left, y: el_pos.top + el.offsetHeight, absolute: true}, menu_items, select);
+                    show_context_menu(function ()
+                    {
+                        var el_pos = BF.get_position(el);
+                        return {x: el_pos.left, y: el_pos.top + el.offsetHeight, absolute: true};
+                    }, menu_items, select);
                     /// Prevent the event from trigger other events, like the callout onclick event.
                     e.stopPropagation();
                     e.preventDefault();
@@ -1522,7 +1558,7 @@
                     }
                     
                     /// Remove unpinned callous and non-new callouts.
-                    ///NOTE: When a callout is created, this function (i.e., the onclick event) will fire, thus potentially removing the callout immedately;
+                    ///NOTE: When a callout is created, this function (i.e., the onclick event) will fire, thus potentially removing the callout immediately;
                     ///      therefore, use just_created to see if the callout was recently created and should be left alone.
                     for (i = callouts.length - 1; i >= 0; i -= 1) {
                         if (!callouts[i].just_created && !callouts[i].pinned) {
@@ -1855,9 +1891,11 @@
                  */
                 return function onclick(e)
                 {
-                    var langEl_pos = BF.get_position(langEl);
-                    
-                    show_context_menu({x: langEl_pos.left, y: langEl_pos.top + langEl.offsetHeight}, lang_menu, BF.lang.id,
+                    show_context_menu(function ()
+                    {
+                        var langEl_pos = BF.get_position(langEl);
+                        return {x: langEl_pos.left, y: langEl_pos.top + langEl.offsetHeight};
+                    }, lang_menu, BF.lang.id,
                         function open()
                         {
                             /// Because the menu is open, keep the button dark.
