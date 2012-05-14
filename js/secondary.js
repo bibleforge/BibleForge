@@ -302,6 +302,18 @@
                         pos.x = 0;
                     }
                     
+                    /// Prevent the menu from going off the bottom of the page (unless the menu is far enough below the fold).
+                    ///NOTE: If both the top and bottom of the menu would not be visible, then ignore it because the user apparently scroll away from the menu; therefore, we do not need to bring it back into view.
+                    if (pos.y + context_menu.offsetHeight > window.pageYOffset + window.innerHeight && pos.y < window.pageYOffset + window.innerHeight + 20) {
+                        pos.y = window.pageYOffset + window.innerHeight - context_menu.offsetHeight;
+                    }
+                    
+                    /// Prevent the menu from going off the top of the page (unless the menu is far enough above).
+                    ///NOTE: If both the top and bottom of the menu would not be visible, then ignore it because the user apparently scroll away from the menu; therefore, we do not need to bring it back into view.
+                    if (pos.y < window.pageYOffset && pos.y + context_menu.offsetHeight > window.pageYOffset) {
+                        pos.y = window.pageYOffset;
+                    }
+                    
                     context_menu.style.left = pos.x + "px";
                     context_menu.style.top  = pos.y + "px";
                 };

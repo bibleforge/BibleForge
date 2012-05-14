@@ -3375,7 +3375,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?10652133", {
+                BF.include("/js/secondary.js?10653974", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
@@ -3388,14 +3388,14 @@
                 });
             }, 1000);
         }());
-        /// ***********************************************
+        /// ************************************************
         /// * End of main BibleForge initializing function *
-        /// ***********************************************
+        /// ************************************************
         
         
-        /**************
-         * Set Events *
-         **************/
+        /// **************
+        /// * Set events *
+        /// **************
         
         /**
          * Capture form submit events and begin a new query.
@@ -3457,6 +3457,10 @@
         
         /// Besides setting the text, is there a reason to call this function?
         qEl.onblur();
+        
+        /// *********************
+        /// * Enf of set events *
+        /// *********************
     };
     /// *******************************
     /// * End of Bf.create_viewport() *
