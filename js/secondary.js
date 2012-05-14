@@ -324,7 +324,8 @@
                     var fake_event,
                         old_item = cur_item;
                     
-                    if (e.keyCode === 38) { /// Up
+                    /// Up
+                    if (e.keyCode === 38) {
                         /// If at the top, loop to the bottom.
                         if (cur_item < 1) {
                             cur_item = menu_count - 1;
@@ -332,7 +333,8 @@
                             cur_item -= 1;
                         }
                         highlight_item(old_item);
-                    } else if (e.keyCode === 40) { /// Down
+                    /// Down
+                    } else if (e.keyCode === 40) {
                         /// If at the bottom, loop to the top.
                         if (cur_item === menu_count - 1) {
                             cur_item = 0;
@@ -340,7 +342,8 @@
                             cur_item += 1;
                         }
                         highlight_item(old_item);
-                    } else if (e.keyCode === 13) { /// Enter
+                    /// Enter
+                    } else if (e.keyCode === 13) {
                         if (cur_item > -1) {
                             if (typeof menu_container.childNodes[cur_item].click === "function") {
                                 /// Firefox
@@ -353,7 +356,8 @@
                                 menu_container.childNodes[cur_item].dispatchEvent(fake_event);
                             }
                         }
-                    } else if (e.keyCode === 27) { /// Escape
+                    /// Escape
+                    } else if (e.keyCode === 27) {
                         close_menu(close_callback);
                     } else {
                         /// Allow all other keys to pass to the rest of the page like normal.
