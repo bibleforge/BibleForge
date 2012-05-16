@@ -2442,7 +2442,7 @@
                         /// Is this is the first results of a query?
                         if (initial_query) {
                             /// Are the results displayed in paragraphs, and is the verse looked up not at the beginning of a paragraph?
-                            if (type === BF.consts.verse_lookup && in_paragraphs && verse_ids[0] !== options.verse) {
+                            if (type === BF.consts.verse_lookup && in_paragraphs && verse_ids && verse_ids[0] !== options.verse) {
                                 /// Because the verse the user is looking for is not at the beginning of a paragraph
                                 /// the text needs to be scrolled so that the verse is at the top.
                                 content_manager.scroll_to_verse(BF.get_b_c_v(options.verse));
@@ -2469,16 +2469,23 @@
                             }
                             
                             if (!total) {
-                                ///TODO: It should try to spell check (using the right language) and make suggestions (like did you mean "Godhead" if they enter "Trinity").
-                                no_results = document.createElement("div");
-                                no_results.className = "no_results";
-                                no_results.appendChild(document.createTextNode(BF.lang.no_results1));
-                                b_tag = document.createElement("b");
-                                b_tag.appendChild(document.createTextNode(options.base_query));
-                                no_results.appendChild(b_tag);
-                                no_results.appendChild(document.createTextNode(BF.lang.no_results2));
-                                page.appendChild(no_results);
-                                ///TODO: Add suggestions.
+                                /// Is it a search?
+                                if (type !== BF.consts.verse_lookup) {
+                                    ///TODO: It should try to spell check (using the right language) and make suggestions (like did you mean "Godhead" if they enter "Trinity").
+                                    no_results = document.createElement("div");
+                                    no_results.className = "no_results";
+                                    no_results.appendChild(document.createTextNode(BF.lang.no_results1));
+                                    b_tag = document.createElement("b");
+                                    b_tag.textContent = options.base_query;
+                                    no_results.appendChild(b_tag);
+                                    no_results.appendChild(document.createTextNode(BF.lang.no_results2));
+                                    page.appendChild(no_results);
+                                    ///TODO: Add suggestions.
+                                } else {
+                                    /// Verse lookups should never return an empty result on the initial query; therefore, something went wrong.
+                                    ///FIXME: Make this language specific.
+                                    page.textContent = "An error occurred. Please try again.";
+                                }
                             }
                         }
                     };
