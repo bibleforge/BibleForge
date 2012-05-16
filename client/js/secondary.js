@@ -1569,7 +1569,7 @@
                                 }, 0);
                             } else {
                                 ///TODO: Determine if the lexicon query (type 5) should be defined somewhere.
-                                ajax.query("post", "/query.php", "t=5&q=" + clicked_el.id, function success(data)
+                                ajax.query("GET", "/api", "t=5&q=" + clicked_el.id, function success(data)
                                 {
                                     data = BF.parse_json(data);
                                     /// Temporarily cache the data so that it does not have to re-queried.

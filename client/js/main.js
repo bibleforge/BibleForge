@@ -525,7 +525,7 @@
                     /**
                      * Send an Ajax request to the server.
                      *
-                     * @example .query("POST", "query.php", "q=search", function (data) {}, function (status, data) {}, 10000, true);
+                     * @example .query("POST", "api", "q=search", function (data) {}, function (status, data) {}, 10000, true);
                      * @param   method    (string)              The HTTP method to use (GET || POST).
                      * @param   path      (string)              The URL to query.
                      * @param   message   (string)   (optional) The variables to send (URI format: "name1=value1&name2=value%202").
@@ -2339,7 +2339,7 @@
                             word_ids   = data.i;
                         
                         /// Were there any verses returned?
-                        ///FIXME: Lookups always return 1 for success instead of the number of verses.  See functions/verse_lookup.php.
+                        ///FIXME: Lookups always return 1 for success instead of the number of verses.
                         if (total) {
                             write_verses(type, direction, verse_ids, verse_html, paragraphs, in_paragraphs, options.verse_range);
                             
@@ -2603,7 +2603,7 @@
                                     options.in_paragraphs = in_paragraphs;
                                     options.lang_id = BF.lang.lang_id;
                                     
-                                    ajax.query("post", "/query.php", create_query_message(options), function success(data)
+                                    ajax.query("GET", "/api", create_query_message(options), function success(data)
                                     {
                                         ///NOTE: direction and in_paragraphs need to be set again because they could have been changed by another query in the mean time.
                                         ///      options.verse and options.start_at could also be changed but they are not needed in handle_new_verses().
@@ -2656,7 +2656,7 @@
                                     options.lang_id = BF.lang.lang_id;
                                     
                                     /// Make the initial query with ajax_additional because all initial queries add more verses.
-                                    ajax_additional.query("post", "/query.php", create_query_message(options), function success(data)
+                                    ajax_additional.query("GET", "/api", create_query_message(options), function success(data)
                                     {
                                         handle_new_verses(BF.parse_json(data), options);
                                     });
@@ -3375,7 +3375,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?10654328", {
+                BF.include("/js/secondary.js?10721929", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
