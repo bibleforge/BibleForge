@@ -11,6 +11,6 @@
 .htaccess
 config.php
 google*
-robots.txt
-sitemap.xml
-node_modules
+client/robots.txt
+client/sitemap.xml
+server/node_modules
