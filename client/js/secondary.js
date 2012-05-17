@@ -180,6 +180,7 @@
                 var align,
                     cur_item = -1,
                     i,
+                    item_container,
                     menu_container = document.createElement("div"),
                     menu_count = menu_items.length,
                     menu_item;
@@ -272,8 +273,11 @@
                     
                     /// If there is text, use that; otherwise, use HTML.
                     if (menu_items[i].text) {
+                        item_container = document.createElement("div");
+                        item_container.className = "cell";
                         ///NOTE: textContent is akin to innerText.  It does not inject HTML.
-                        menu_item.textContent = menu_items[i].text;
+                        item_container.textContent = menu_items[i].text;
+                        menu_item.appendChild(item_container);
                     } else {
                         menu_item.innerHTML = menu_items[i].html;
                     }

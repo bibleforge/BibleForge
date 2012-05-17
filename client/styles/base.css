@@ -396,7 +396,6 @@ body {
     /* Any display type that is block (as opposed to inline) is needed to make the width become 100%. */
     /* NOTE: table-row could also works except for the fact that in Chrome, the element is treated as inline (cannot click on the space to the right) even though the background extends all the way. */
     display:         table-row-group;
-    padding:         1px 0;
     text-decoration: none;
     /* Prevent the text from wrapping. */
     white-space:     nowrap;
@@ -406,6 +405,11 @@ body {
     -moz-transition:    background .2s, color .2s;
     -webkit-transition: background .2s, color .2s;
     -o-transition:      background .2s, color .2s;
+}
+
+/* The container for a (text) menu item. */
+.contextMenu div a div {
+    padding: 1px 0;
 }
 
 /* CSS table cell */
