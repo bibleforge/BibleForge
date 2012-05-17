@@ -392,9 +392,10 @@ body {
 /* Menu items */
 .contextMenu div a {
     color:           #555;
-    /* Block table-row is needed to make the possible table cells to display correctly (e.g., the pronunciation selection menu). */
+    /* Block table-row-group is needed to make the possible table cells to display correctly (e.g., the pronunciation selection menu). */
     /* Any display type that is block (as opposed to inline) is needed to make the width become 100%. */
-    display:         table-row;
+    /* NOTE: table-row could also works except for the fact that in Chrome, the element is treated as inline (cannot click on the space to the right) even though the background extends all the way. */
+    display:         table-row-group;
     padding:         1px 0;
     text-decoration: none;
     /* Prevent the text from wrapping. */
