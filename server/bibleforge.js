@@ -127,10 +127,10 @@ BF.include = (function ()
 BF.db_query = (function ()
 {
     var db = new (require("db-mysql")).Database({
-        hostname: config.db.host,
-        user:     config.db.user,
-        password: config.db.pass,
-        database: config.db.base,
+        hostname: BF.config.db.host,
+        user:     BF.config.db.user,
+        password: BF.config.db.pass,
+        database: BF.config.db.base,
         async: false
     });
     
