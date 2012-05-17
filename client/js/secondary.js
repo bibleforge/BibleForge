@@ -261,7 +261,7 @@
                     }
                     /// Should there be a line break before this item?
                     if (menu_items[i].line) {
-                        menu_item.style.borderTop = "1px solid #A3A3A3";
+                        BF.toggleCSS(menu_item, "menu_item_line", 1);
                     }
                     
                     /// Add a title if present.
