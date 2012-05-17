@@ -95,7 +95,8 @@
                 close_menu,
                 context_menu = document.createElement("div"),
                 is_open = false,
-                key_handler;
+                key_handler,
+                onclose;
             
             ///NOTE: The default style does has "display" set to "none" and "position" set to "fixed."
             context_menu.className = "contextMenu";
@@ -144,6 +145,11 @@
                             
                             /// Set the menu's is_open status to false after the delay to prevent the menu from being re-opened in the meantime.
                             is_open = false;
+                            
+                            if (typeof onclose === "function") {
+                                ///NOTE: This function was is open_menu()'s close_callback() function.
+                                onclose();
+                            }
                             
                             if (typeof callback === "function") {
                                 callback();
@@ -229,6 +235,10 @@
                 }
                 
                 is_open = true;
+                
+                /// Set the onclose event that will be called by close_menu().
+                ///NOTE: Because the menu can be closed by other functions (i.e., if show_context_menu() is run again), we must set the onclose event to a variable that is outside of this closure.
+                onclose = close_callback;
                 
                 for (i = 0; i < menu_count; i += 1) {
                     menu_item = document.createElement("a");
@@ -355,7 +365,7 @@
                 document.addEventListener("click", function ()
                 {
                     /// Close the context menu if the user clicks the page.
-                    close_menu(close_callback);
+                    close_menu();
                 }, false);
                 
                 /// Take control of the keyboard (primarily, prevent the view from scrolling when the arrow keys are used).
@@ -405,7 +415,7 @@
                         }
                     /// Escape
                     } else if (e.keyCode === 27) {
-                        close_menu(close_callback);
+                        close_menu();
                     } else {
                         /// Allow all other keys to pass to the rest of the page like normal.
                         return;
