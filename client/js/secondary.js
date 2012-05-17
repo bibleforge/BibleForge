@@ -266,7 +266,9 @@
                     }
                     
                     /// Add a title if present.
-                    menu_item.title = menu_items[i].title || "";
+                    if (menu_items[i].title) {
+                        menu_item.title = menu_items[i].title;
+                    }
                     
                     /// In order to allow for both mouse and keyboard interaction, a menu item must be selected when the mouse moves over it.
                     menu_item.onmousemove = make_onmousemove(i);
