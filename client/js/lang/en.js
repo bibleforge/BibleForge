@@ -56,7 +56,7 @@
     eli, en, enci, entli, exec, found_plural, found_singular, ful, full_name, 
     fulness, grammar_keywords, grammar_marker, grammar_marker_len, 
     grammar_separator, help, ical, icate, iciti, id, in_paragraphs, indexOf, 
-    italics_explanation, iveness, iviti, ization, izer, lang_id, langs, length, 
+    italics_explanation, iveness, iviti, ization, izer, langs, length, 
     linked_to_orig, loaded, logi, modern, modern_ipa, modern_pronun, ness, 
     no_results1, no_results2, ousli, ousness, prepare_highlighter, prepare_query, 
     psalm, query_button_alt, query_button_title, query_explanation, red_letters, 
@@ -83,9 +83,12 @@ BF.langs.en = (function ()
         full_name:  "English (KJV)",
         short_name: "KJV",
         id:         "en",
-        lang_id:    0,
         
         linked_to_orig: true,
+        
+        /// Information about this particular Bible translation needed by the server.
+        paragraph_limit:        90, /// The longest paragraph length
+        minimum_desired_verses: 40, /// The number of verses to request for a normal verse lookup (It should more than fill up the screen.)
         
         /// Book names
         books_long_main:      ["", "Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy", "Joshua", "Judges", "Ruth", "Samuel", "Samuel", "The Kings", "The Kings", "Chronicles", "Chronicles", "Ezra", "Nehemiah", "Esther", "Job", "Psalms", "Proverbs", "Ecclesiastes", "Songs", "Isaiah", "Jeremiah", "Lamentations", "Ezekiel", "Daniel", "Hosea", "Joel", "Amos", "Obadiah", "Jonah", "Micah", "Nahum", "Habakkuk", "Zephaniah", "Haggai", "Zechariah", "Malachi", "Matthew", "Mark", "Luke", "John", "The Acts", "Romans", "Corinthians", "Corinthians", "Galatians", "Ephesians", "Philippians", "Colossians", "Thessalonians", "Thessalonians", "Timothy", "Timothy", "Titus", "Philemon", "Hebrews", "James", "Peter", "Peter", "John", "John", "John", "Jude", "The Revelation"],

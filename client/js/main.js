@@ -2563,7 +2563,7 @@
                                 }
                             }
                             
-                            if (options.lang_id) {
+                            if (options.lang_id !== "en") {
                                 query_str += "&l=" + options.lang_id;
                             }
                             
@@ -2618,7 +2618,7 @@
                                     options.direction = direction;
                                     /// Since these settings can be changed by the user at run time, it must be retrieved before each query.
                                     options.in_paragraphs = in_paragraphs;
-                                    options.lang_id = BF.lang.lang_id;
+                                    options.lang_id = BF.lang.id;
                                     
                                     ajax.query("GET", "/api", create_query_message(options), function success(data)
                                     {
@@ -2670,7 +2670,7 @@
                                         top_id:       0,
                                         top_verse:    0
                                     };
-                                    options.lang_id = BF.lang.lang_id;
+                                    options.lang_id = BF.lang.id;
                                     
                                     /// Make the initial query with ajax_additional because all initial queries add more verses.
                                     ajax_additional.query("GET", "/api", create_query_message(options), function success(data)
