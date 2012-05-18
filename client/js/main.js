@@ -570,8 +570,18 @@
                             query(method, path, message, onsuccess, onfailure, timeout, retry);
                         };
                         
-                        ///TODO: determine if the first parameter should be different.
-                        ajax.open(method, path);
+                        if (method.toLowerCase() === "get") {
+                            /// GET requests need the message appended to the path.
+                            ///TODO: Check to see if the message is to long and switch to POST.
+                            ///TODO: Check to see if it has a leading question mark (?).
+                            ajax.open(method, path + "?" + message);
+                            /// Since the message has been attached to the path, it does not need to be sent later, so it must be deleted now.
+                            message = "";
+                        } else {
+                            /// POST requests send the message later on (with .send()).
+                            ajax.open(method, path);
+                        }
+                        
                         /// Without the correct content-type, the data in the message will not become variables on the server.
                         ajax.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
                         /**
