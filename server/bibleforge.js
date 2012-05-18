@@ -156,7 +156,7 @@ BF.db_query = (function ()
 BF.lookup = function (data, connection)
 {
     var extra_fields,
-        direction = Number(data.d),
+        direction = data.d ? Number(data.d) : BF.consts.additional,
         find_paragraph_start = Boolean(data.f),
         in_paragraphs = data.p ? Boolean(data.d) : true,
         lang = data.l || "en",
@@ -211,8 +211,58 @@ BF.lookup = function (data, connection)
     
     BF.db_query("SELECT id, words" + extra_fields + " FROM `bible_" + lang + "_html` WHERE id " + operator + starting_verse + order_by + " LIMIT " + limit, function (data)
     {
-        console.log(data);
-        connection.end("{}");
+        var break_after,
+            i,
+            len = data.length - 1,
+            res = {
+                n: [],
+                v: []
+            };
+        
+        if (in_paragraphs) {
+            res.p = [];
+            
+            for (i = 0; i < len; i += 1) {
+                /// Did it find enough verses to send to the browser?
+                if (data[i].paragraph && i >= limit) {
+                    /// The first verse should be at a paragraph beginning, and the last verse
+                    /// should be just before one. Therefore, when looking up previous verses,
+                    /// we must get this verse (because previous lookups are in reverse).
+                    /// So, additional lookups should stop now because the next verse is at the
+                    /// beginning of a paragraph, but previous lookups need to get this last verse,
+                    /// which is actually the first verse (because the arrays will be reversed shortly).
+                    if (direction === BF.consts.additional) {
+                        break;
+                    }
+                    break_after = true;
+                }
+                
+                res.n[i] = data[i].id;
+                res.v[i] = data[i].words;
+                res.p[i] = Number(data[i].paragraph);
+                
+                if (break_after) {
+                    break;
+                }
+            }
+        } else {
+            for (i = 0; i < len; i += 1) {
+                res.n[i] = data[i].id;
+                res.v[i] = data[i].words;
+            }
+        }
+        
+        if (direction === BF.consts.previous) {
+            res.n.reverse();
+            res.v.reverse();
+            if (res.p) {
+                res.p.reverse();
+            }
+        }
+            
+        res.t = res.n.length;
+        
+        connection.end(JSON.stringify(res));
     });
 };
 
