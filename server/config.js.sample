@@ -4,5 +4,6 @@ this.config = {
         user: "user",
         pass: "password",
         base: "bf"
-    }
+    },
+    static_path: "../client/"
 };

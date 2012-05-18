@@ -90,43 +90,7 @@ BF.consts = {
     previous:   2
 };
 
-BF.include = (function ()
-{
-    /**
-     * Eval code in a neutral scope.
-     *
-     * @param  code (string) The string to eval.
-     * @return The result of the eval'ed code.
-     * @note   This is used to prevent included code from having access to the variables inside of the function's scope.
-     */
-    function evaler(code)
-    {
-        return eval(code);
-    }
-    
-    return (function ()
-    {
-        /// Stores files that have already been loaded so that they do not have to be downloaded more than once.
-        ///TODO: Use the data in this variable and maybe make a way to ignore the cache is needed.
-        var fs = require("fs");
-        
-        return function (path, context, callback, timeout, retry)
-        {
-            fs.readFile(path, "utf8", function (err, data)
-            {
-                var code = evaler(data);
-                
-                if (code === "function") {
-                    code(context);
-                }
-                
-                if (typeof callback === "function") {
-                    callback(err);
-                }
-            });
-        };
-    }());
-}());
+
 
 BF.db_query = (function ()
 {
@@ -266,6 +230,64 @@ BF.lookup = function (data, connection)
     });
 };
 
+
+/// Pepare the langs object for the languages to attach to.
 BF.langs = {};
 
-BF.include("../client/js/lang/en.js", null, start_server);
+/// Load the languages
+(function ()
+{
+    /**
+     * Eval code in a neutral scope.
+     *
+     * @param  code (string) The string to eval.
+     * @return The result of the eval'ed code.
+     * @note   This is used to prevent included code from having access to the variables inside of the function's scope.
+     */
+    function evaler(code)
+    {
+        return eval(code);
+    }
+    
+    (function ()
+    {
+        var fs = require("fs"),
+            include;
+        
+        include = (function ()
+        {
+            return (function ()
+            {
+                return function (path, context, callback, timeout, retry)
+                {
+                    fs.readFile(path, "utf8", function (err, data)
+                    {
+                        var code = evaler(data);
+                        
+                        if (code === "function") {
+                            code(context);
+                        }
+                        
+                        if (typeof callback === "function") {
+                            callback(err);
+                        }
+                    });
+                };
+            }());
+        }());
+        
+        fs.readdir(BF.config.static_path + "js/lang/", function (err, files)
+        {
+            var len = files.length;
+            
+            (function load_file(i)
+            {
+                if (i === len) {
+                    start_server();
+                } else {
+                    include(BF.config.static_path + "js/lang/" + files[i], null, load_file(i + 1));
+                }
+            }(0));
+        });
+     }());   
+}());
