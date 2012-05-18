@@ -16,7 +16,7 @@ function start_server()
 {
     var handle_query = (function ()
     {
-        return function handle_query(data, connection)
+        return function handle_query(path, data, connection)
         {
             switch (Number(data.t)) {
                 case BF.consts.verse_lookup:
@@ -56,12 +56,12 @@ function start_server()
                 {
                     response.writeHead(statusCode, headers);
                 }
-            };
+            }, url_parsed = url.parse(request.url);
             
             /// Is there GET data?
             ///TODO: Merge POST data with GET data.
             if (request.method === "GET") {
-                handle_query(qs.parse(url.parse(request.url).query), connection);
+                handle_query(url_parsed.pathname, qs.parse(url_parsed.query), connection);
             } else {
                 ///TODO: Also handle POST data.
                 /// If there is no data, close the connection.
