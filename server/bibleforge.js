@@ -18,18 +18,22 @@ function start_server()
     {
         return function handle_query(path, data, connection)
         {
-            switch (Number(data.t)) {
-                case BF.consts.verse_lookup:
-                    BF.lookup(data, connection);
-                    break;
-                case BF.consts.standard_search:
-                    connection.end("test " + (new Date()).getTime());
-                    break;
-                case BF.consts.grammatical_search:
-                    connection.end("test " + (new Date()).getTime());
-                    break;
-                default:
-                    connection.end("test " + (new Date()).getTime());
+            if (path === "/api") {
+                switch (Number(data.t)) {
+                    case BF.consts.verse_lookup:
+                        BF.lookup(data, connection);
+                        break;
+                    case BF.consts.standard_search:
+                        connection.end("test " + (new Date()).getTime());
+                        break;
+                    case BF.consts.grammatical_search:
+                        connection.end("test " + (new Date()).getTime());
+                        break;
+                    default:
+                        connection.end("test " + (new Date()).getTime());
+                }
+            } else {
+                connection.end("test " + (new Date()).getTime());
             }
         }
     }());
@@ -151,8 +155,65 @@ BF.db_query = (function ()
 
 BF.lookup = function (data, connection)
 {
+    var extra_fields,
+        direction = Number(data.d),
+        find_paragraph_start = Boolean(data.f),
+        in_paragraphs = data.p ? Boolean(data.d) : true,
+        lang = data.l || "en",
+        limit,
+        operator,
+        order_by,
+        starting_verse,
+        verse_id  = Number(data.q);
+    
+    /// Send the proper header.
     connection.writeHead(200, {"Content-Type": "application/json"});
-    connection.end("{}");
+    
+    /// Quickly check to see if the verse_id is outside of the valid range.
+    ///TODO: Determine if verse_id < 1001001 should default to 1001001 and verse_id > 66022021 to 66022021.
+    ///TODO: 66022021 may need to be language dependent because different languages have different verse breaks.
+    /// Also, check to see if the language specified is valid.
+    if (verse_id < 1001001 || verse_id > 66022021 || !BF.langs[lang]) {
+        connection.end("{}");
+        return;
+    }
+    
+    ///NOTE: To get PREVIOUS verses, we need to sort the database by id in reverse order because
+    ///      chapter and book boundaries are not predictable (i.e., we can't just say "WHERE id >= id - LIMIT").
+    
+    if (direction === BF.consts.additional) {
+        operator = ">=";
+        order_by = "";
+    } else {
+        operator = "<=";
+        ///NOTE: Leading space is needed in case the preceding variable does end with whitespace.
+        order_by = " ORDER BY id DESC";
+    }
+    
+    if (in_paragraphs) {
+        /// The limit must be set to the minimum length of the longest paragraph because paragraphs cannot be split.
+        limit = BF.langs[lang].paragraph_limit;
+        extra_fields = ", paragraph";
+    } else {
+        limit = BF.langs[lang].minimum_desired_verses;
+        extra_fields = "";
+    }
+    
+    if (find_paragraph_start) {
+        /// Create a subquery that will return the nearest verse that is at a paragraph break.
+        ///NOTE: Currently, find_paragraph_start is never true when direction === BF.consts.previous because previous lookups always start at a paragraph break.
+        ///      In order to find the correct starting verse when looking up in reverse, the comparison operator (<=) would need to be greater than or equal to (>=),
+        ///      and 1 would need to be subtracted from the found starting id.
+        starting_verse = "(SELECT id FROM `bible_" + lang + "_html` WHERE id <= " + verse_id + " AND paragraph = 1 ORDER BY id DESC LIMIT 1)";
+    } else {
+        starting_verse = verse_id;
+    }
+    
+    BF.db_query("SELECT id, words" + extra_fields + " FROM `bible_" + lang + "_html` WHERE id " + operator + starting_verse + order_by + " LIMIT " + limit, function (data)
+    {
+        console.log(data);
+        connection.end("{}");
+    });
 };
 
 BF.langs = {};
