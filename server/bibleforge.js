@@ -177,11 +177,20 @@ BF.lookup = function (data, connection)
     {
         var break_after,
             i,
-            len = data.length - 1,
+            len,
             res = {
                 n: [],
                 v: []
             };
+        
+        /// Was there no response from the database?  This could mean the database crashed.
+        if (!data) {
+            /// Send a blank response, and exit.
+            connection.end("{}");
+            return;
+        }
+        
+        len = data.length - 1;
         
         if (in_paragraphs) {
             res.p = [];
