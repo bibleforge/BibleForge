@@ -87,7 +87,7 @@ BF.langs.en = (function ()
         linked_to_orig: true,
         
         /// Information about this particular Bible translation needed by the server.
-        paragraph_limit:        90, /// The longest paragraph length
+        paragraph_limit:        58, /// The longest paragraph length
         minimum_desired_verses: 40, /// The number of verses to request for a normal verse lookup (It should more than fill up the screen.)
         
         /// Book names
