@@ -292,6 +292,8 @@ BF.langs = {};
             (function load_file(i)
             {
                 if (i === len) {
+                    /// Now that every this is loaded, start the server.
+                    ///TODO: Start the server first, but make it wait for the rest to load.
                     start_server();
                 } else {
                     include(BF.config.static_path + "js/lang/" + files[i], null, load_file(i + 1));
