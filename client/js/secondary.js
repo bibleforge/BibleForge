@@ -1365,7 +1365,6 @@
                 {
                     return function (e)
                     {
-                        el.innerHTML = "";
                         el.textContent = options[which].display;
                         select = which;
                         e.stopPropagation();
