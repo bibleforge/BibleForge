@@ -87,8 +87,16 @@ BF.langs.en = (function ()
         linked_to_orig: true,
         
         /// Information about this particular Bible translation needed by the server.
+        ///NOTE: paragraph_limit can be calculated in the Forge via find_longest_paragraph.js.
         paragraph_limit:        58, /// The longest paragraph length
         minimum_desired_verses: 40, /// The number of verses to request for a normal verse lookup (It should more than fill up the screen.)
+        
+        /// Information about different sections of the Bible
+        divisions: {
+            ///NOTE: Currently, only the division between the Old and New Testaments is needed.
+            /// Calculated via find_beginning_of_nt.js.
+            nt: 621740
+        },
         
         /// Book names
         books_long_main:      ["", "Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy", "Joshua", "Judges", "Ruth", "Samuel", "Samuel", "The Kings", "The Kings", "Chronicles", "Chronicles", "Ezra", "Nehemiah", "Esther", "Job", "Psalms", "Proverbs", "Ecclesiastes", "Songs", "Isaiah", "Jeremiah", "Lamentations", "Ezekiel", "Daniel", "Hosea", "Joel", "Amos", "Obadiah", "Jonah", "Micah", "Nahum", "Habakkuk", "Zephaniah", "Haggai", "Zechariah", "Malachi", "Matthew", "Mark", "Luke", "John", "The Acts", "Romans", "Corinthians", "Corinthians", "Galatians", "Ephesians", "Philippians", "Colossians", "Thessalonians", "Thessalonians", "Timothy", "Timothy", "Titus", "Philemon", "Hebrews", "James", "Peter", "Peter", "John", "John", "John", "Jude", "The Revelation"],

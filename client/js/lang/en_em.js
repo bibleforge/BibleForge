@@ -87,8 +87,16 @@ BF.langs.en_em = (function ()
         linked_to_orig: false,
         
         /// Information about this particular Bible translation needed by the server.
+        ///NOTE: paragraph_limit can be calculated in the Forge via find_longest_paragraph.js.
         paragraph_limit:        76, /// The longest paragraph length
         minimum_desired_verses: 40, /// The number of verses to request for a normal verse lookup (It should more than fill up the screen.)
+        
+        /// Information about different sections of the Bible
+        divisions: {
+            ///NOTE: Currently, only the division between the Old and New Testaments is needed.
+            /// Calculated via find_beginning_of_nt.js.
+            nt: 610569
+        },
         
         /// Book names
         books_long_main:      ["", "Genesis", "Exodus", "Leuiticus", "Numbers", "Deuteronomie", "Ioshua", "Iudges", "Ruth", "Samuel", "Samuel", "The Kings", "The Kings", "Chronicles", "Chronicles", "Ezra", "Nehemiah", "Esther", "Iob", "Psalmes", "The Prouerbes", "Ecclesiastes", "Solomon", "Prophet Isaiah", "Prophet Ieremiah", "The Lamentations", "Prophet Ezekiel", "Daniel", "Hosea", "Ioel", "Amos", "Obadiah", "Ionah", "Micah", "Nahum", "Habakkuk", "Zephaniah", "Haggai", "Zechariah", "Malachi", "Matthew", "Marke", "Luke", "Iohn", "The Actes of", "Epistle of Paul the", "of Paul the Apostle to the", "of Paul the Apostle to the", "Paul to the Galatians", "the Apostle to the Ephesians", "the Apostle to the Philippians", "the Apostle to the Colossians", "Paul the Apostle to the Thessalonians", "of Paul the Apostle to the", "of Paul the Apostle to Timothie", "of Paul the Apostle to Timothie", "Paul to Titus", "Paul to Philemon", "the Apostle to the Hebrewes", "Epistle of Iames", "generall of Peter", "generall of Peter", "generall of Iohn", "The second Epistle of Iohn", "The third Epistle of Iohn", "Epistle of Iude", "The Reuelation"],
