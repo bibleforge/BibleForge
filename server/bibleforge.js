@@ -226,13 +226,15 @@ BF.lookup = function (data, connection)
         }
         
         if (direction === BF.consts.previous) {
+            /// Because the database returns the verses in reverse order when preforming a previous lookup, they need to be reordered.
+            ///NOTE: Because in paragraph mode, there is no way to know how many verses will be returned, it cannot simply put the verses in the array in reverse order above.
             res.n.reverse();
             res.v.reverse();
             if (res.p) {
                 res.p.reverse();
             }
         }
-            
+        
         res.t = res.n.length;
         
         connection.end(JSON.stringify(res));

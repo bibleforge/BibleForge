@@ -95,7 +95,9 @@
         previous:   2
     };
     
-    /// Prototypes
+    /// ***********************
+    /// * Start of prototypes *
+    /// ***********************
     
     /**
      * Remove an element or a range of elements from an array.
@@ -116,6 +118,10 @@
         this.length = from < 0 ? this.length + from : from;
         return this.push.apply(this, rest);
     };
+    
+    /// *********************
+    /// * End of prototypes *
+    /// *********************
     
     /// Detect WebKit based browsers.
     ///NOTE: Since the user agent string can be modified by the user, it is not bulletproof.
@@ -2349,7 +2355,6 @@
                             word_ids   = data.i;
                         
                         /// Were there any verses returned?
-                        ///FIXME: Lookups always return 1 for success instead of the number of verses.
                         if (total) {
                             write_verses(type, direction, verse_ids, verse_html, paragraphs, in_paragraphs, options.verse_range);
                             
