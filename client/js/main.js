@@ -89,6 +89,7 @@
         mixed_search:       2,
         standard_search:    3,
         grammatical_search: 4,
+        lexical_lookup:     5,
         
         /// Direction "constants"
         additional: 1,
@@ -3397,7 +3398,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?10910528", {
+                BF.include("/js/secondary.js?11242719", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,

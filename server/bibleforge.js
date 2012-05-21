@@ -32,6 +32,8 @@ function start_server()
                     case BF.consts.grammatical_search:
                         connection.end("test " + (new Date()).getTime());
                         break;
+                    case BF.consts.lexical_lookup:
+                        break;
                     default:
                         connection.end("test " + (new Date()).getTime());
                 }
@@ -102,6 +104,7 @@ BF.consts = {
     mixed_search:       2,
     standard_search:    3,
     grammatical_search: 4,
+    lexical_lookup:     5,
     
     /// Direction "constants"
     additional: 1,
