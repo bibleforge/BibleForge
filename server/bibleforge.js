@@ -10,7 +10,9 @@
 
 "use strict";
 
-var BF = {};
+var BF = {
+    fs: require("fs")
+};
 
 function start_server()
 {
@@ -18,6 +20,7 @@ function start_server()
     {
         return function handle_query(path, data, connection)
         {
+            /// Is the request for the API's?
             if (path === "/api") {
                 switch (Number(data.t)) {
                     case BF.consts.verse_lookup:
@@ -33,7 +36,22 @@ function start_server()
                         connection.end("test " + (new Date()).getTime());
                 }
             } else {
-                connection.end("test " + (new Date()).getTime());
+                /// Is the request for the normal full version?
+                /// Googlebot converts hash bangs (#!) into "?_escaped_fragment_=", so URIs with this in it should also be sent to the basic version.
+                if (path.substr(-1) !== "!" && (!data || !data["_escaped_fragment_"])) {
+                    /// Just send it the HTML of index.html.
+                    connection.writeHead(200, {"Content-Type": "text/html"});
+                    
+                    ///FIXME: Cache index.html and modified time.  (Make an option to not cache the data for development purposes).
+                    ///TODO:  Optionally send a gzipped version.
+                    ///TODO:  Check headers for the presence of a cached copy.
+                    BF.fs.readFile(BF.config.static_path + "index.html", "utf8", function (err, data)
+                    {
+                        connection.end(data);
+                    });
+                } else {
+                    ///TODO: Build a non-JavaScript version.
+                }
             }
         }
     }());
@@ -262,32 +280,23 @@ BF.langs = {};
     
     (function ()
     {
-        var fs = require("fs"),
-            include;
-        
-        include = (function ()
+        function include(path, context, callback, timeout, retry)
         {
-            return (function ()
+            BF.fs.readFile(path, "utf8", function (err, data)
             {
-                return function (path, context, callback, timeout, retry)
-                {
-                    fs.readFile(path, "utf8", function (err, data)
-                    {
-                        var code = evaler(data);
-                        
-                        if (code === "function") {
-                            code(context);
-                        }
-                        
-                        if (typeof callback === "function") {
-                            callback(err);
-                        }
-                    });
-                };
-            }());
-        }());
+                var code = evaler(data);
+                
+                if (code === "function") {
+                    code(context);
+                }
+                
+                if (typeof callback === "function") {
+                    callback(err);
+                }
+            });
+        }
         
-        fs.readdir(BF.config.static_path + "js/lang/", function (err, files)
+        BF.fs.readdir(BF.config.static_path + "js/lang/", function (err, files)
         {
             var len = files.length;
             
