@@ -1355,18 +1355,45 @@
             }());
             
             
+            /**
+             * Create a simple drop down box element.
+             *
+             * @example create_drop_down_box([{display: "Option 1", details: "Option 1: The first option"}, {display: "Option 2", details: "Option 2: The second option"}]);
+             * @example create_drop_down_box(options_from_pronun({}));
+             * @param   options  (array)    An array of objects defining the drop down options.
+             *                              Array structure:
+             *                              [{display: "The text to display when selected", details: "The HTML to display when the drop down menu is displayed", title: "The option's tooltip (optional)"}, ...]
+             * @param   select   (integer)  The option that should be selected by default
+             * @param   onchange (function) The function trigged whenever a selection is made by the user.
+             * @return  A DOM element representing the drop down box.
+             */
             create_drop_down_box = function (options, select, onchange)
             {
                 var el = document.createElement("span"),
                     i,
                     menu_items = [];
                 
+                /**
+                 * Create the function that fires when a menu item is selected.
+                 *
+                 * @param  which (integer) The option that is selected.
+                 * @return A function that triggers the onchange callback.
+                 * @note   Since functions should not be created in loops, this function must be declared before the loop.
+                 */
                 function make_onclick(which)
                 {
+                    /**
+                     * Trigger the onchange callback
+                     *
+                     * @param e (event object) The onclick mouse event.
+                     */
                     return function (e)
                     {
+                        /// Change the text in the drop down box.
                         el.textContent = options[which].display;
+                        /// Remember which option was last chosen.
                         select = which;
+                        /// Do not let this mouse event cascade and cause other events to fire (like closing a lexical callout).
                         e.stopPropagation();
                         
                         if (typeof onchange === "function") {
@@ -1375,6 +1402,7 @@
                     };
                 }
                 
+                /// Create the menu items to sent to show_context_menu().
                 for (i = options.length - 1; i >= 0; i -= 1) {
                     menu_items[i] = {
                         id:    i,
@@ -1386,12 +1414,21 @@
                 
                 el.className = "dropdown";
                 
+                /// Display the default text (if it exists).
                 el.textContent = options[select] ? options[select].display : options[0].display;
                 
+                /**
+                 * Open the drop down menu
+                 *
+                 * @param  e (event object) The onclick mouse event.
+                 * @return FALSE to prevent the default action.
+                 * @todo   Determine if sending FALSE is necessary.
+                 */
                 el.onclick = function (e)
                 {
                     show_context_menu(function ()
                     {
+                        /// Calculate the proper location for the drop down menu.
                         var el_pos = BF.get_position(el);
                         return {x: el_pos.left, y: el_pos.top + el.offsetHeight, absolute: true};
                     }, menu_items, select);
@@ -1440,27 +1477,33 @@
                         function options_from_pronun(pronun)
                         {
                             /// Thin spaces (\u2009) are placed around the words to separate them slightly from the dividing symbols.
+                            ///NOTE: The "cell" class makes the <span> tags behave like <td> tags.
                             return [
+                                /// Biblical Reconstructed Dictionary Pronunciation
                                 {
                                     display: "|\u2009" + pronun.dic + "\u2009|",
                                     details: "<span class=cell>" + pronun.dic + "</span><span class=cell>(" + BF.lang.biblical + ")</span>",
                                     title:   BF.lang.biblical_pronun
                                 },
+                                /// Biblical Reconstructed IPA
                                 {
                                     display: "/\u2009" + pronun.ipa + "\u2009/",
                                     details: "<span class=cell>" + pronun.ipa + "</span><span class=cell>(" + BF.lang.biblical_ipa + ")</span>",
                                     title:   BF.lang.biblical_ipa_long
                                 },
+                                /// Modern Dictionary Pronunciation
                                 {
                                     display: "|\u2009" + pronun.dic_mod + "\u2009|",
                                     details: "<span class=cell>" + pronun.dic_mod + "</span><span class=cell>(" + BF.lang.modern + ")</span>",
                                     title:   BF.lang.modern_pronun
                                 },
+                                /// Modern IPA
                                 {
                                     display: "/\u2009" + pronun.ipa_mod + "\u2009/",
                                     details: "<span class=cell>" + pronun.ipa_mod + "</span><span class=cell>(" + BF.lang.modern_ipa + ")</span>",
                                     title:   BF.lang.modern_ipa
                                 },
+                                /// Society of Biblical Languages Transliteration
                                 {
                                     display: "|\u2009" + pronun.sbl + "\u2009|",
                                     details: "<span class=cell>" + pronun.sbl + "</span><span class=cell>(" + BF.lang.translit + ")</span>",
