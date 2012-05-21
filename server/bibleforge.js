@@ -196,8 +196,8 @@ BF.lookup = function (data, connection)
             res.p = [];
             
             for (i = 0; i < len; i += 1) {
-                /// Did it find enough verses to send to the browser?
-                if (data[i].paragraph && i >= limit) {
+                /// Is it at a paragraph break and did it find enough verses to send to the client?
+                if (data[i].paragraph && i >= BF.langs[lang].minimum_desired_verses) {
                     /// The first verse should be at a paragraph beginning, and the last verse
                     /// should be just before one. Therefore, when looking up previous verses,
                     /// we must get this verse (because previous lookups are in reverse).
