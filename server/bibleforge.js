@@ -33,6 +33,7 @@ function start_server()
                         connection.end("test " + (new Date()).getTime());
                         break;
                     case BF.consts.lexical_lookup:
+                        BF.lexical_lookup(data, connection);
                         break;
                     default:
                         connection.end("test " + (new Date()).getTime());
@@ -262,6 +263,39 @@ BF.lookup = function (data, connection)
     });
 };
 
+BF.lexical_lookup = function (data, connection)
+{
+    var lang = data.l || "en",
+        query,
+        word_id = Number(data.q);
+    
+    /// Is the language invalid?
+    if (!BF.langs[lang]) {
+        connection.end("{}");
+        return;
+    }
+    
+    /// Is it an Old Testament word?
+    if (word_id < BF.langs[lang].divisions.nt) {
+        query = "SELECT `bible_original`.word, `bible_original`.pronun, `lexicon_hebrew`.strongs, `lexicon_hebrew`.base_word, `lexicon_hebrew`.data, `lexicon_hebrew`.usage FROM `bible_" + lang + "`, `bible_original`, `lexicon_hebrew`, `morphology` WHERE `bible_" + lang + "`.id = " + word_id + " AND `bible_original`.id = `bible_" + lang + "`.orig_id AND lexicon_hebrew.strongs = `bible_original`.strongs LIMIT 1";
+    } else {
+        query = "SELECT `bible_original`.word, `bible_original`.pronun, `lexicon_greek`.strongs, `lexicon_greek`.base_word, `lexicon_greek`.data, `lexicon_greek`.usage, `morphology`.part_of_speech, `morphology`.declinability, `morphology`.case_5, `morphology`.number, `morphology`.gender, `morphology`.degree, `morphology`.tense, `morphology`.voice, `morphology`.mood, `morphology`.person, `morphology`.middle, `morphology`.transitivity, `morphology`.miscellaneous, `morphology`.noun_type, `morphology`.numerical, `morphology`.form, `morphology`.dialect, `morphology`.type, `morphology`.pronoun_type FROM `bible_" + lang + "`, `bible_original`, `lexicon_greek`, `morphology` WHERE `bible_" + lang + "`.id = " + word_id + " AND `bible_original`.id = `bible_" + lang + "`.orig_id AND lexicon_greek.strongs = `bible_original`.strongs AND `morphology`.id = `bible_original`.id LIMIT 1";
+    }
+    
+    ///FIXME: Currently, BibleForge links words to the lexicon by Strong's numbers; however, this is too simplistic because some Strong's numbers have multiple entries.
+    ///       So, there needs to be another identifier.
+    BF.db_query(query, function (data)
+    {
+        /// Was there no response from the database?  This could mean the database crashed.
+        if (!data) {
+            /// Send a blank response, and exit.
+            connection.end("{}");
+            return;
+        }
+        
+        connection.end(JSON.stringify(data[0]));
+    });
+};
 
 /// Pepare the langs object for the languages to attach to.
 BF.langs = {};
