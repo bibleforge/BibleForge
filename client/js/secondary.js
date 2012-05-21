@@ -595,9 +595,9 @@
         }());
         
         
-        /*********************************
-         * Start of Mouse Hiding Closure *
-         *********************************/
+        /// *********************************
+        /// * Start of Mouse Hiding Closure *
+        /// *********************************
         
         /**
          * Register events to manage the cursor for better readability.
@@ -787,9 +787,9 @@
             window.onfocus = hide_cursor_delayed;
         }());
         
-        /*******************************
-         * End of Mouse Hiding Closure *
-         *******************************/
+        /// *******************************
+        /// * End of Mouse Hiding Closure *
+        /// *******************************
         
         /**
          * Add the rest of the BibleForge user interface (currently, just the wrench menu).
