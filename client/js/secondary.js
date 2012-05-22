@@ -1429,8 +1429,10 @@
                     show_context_menu(function ()
                     {
                         /// Calculate the proper location for the drop down menu.
-                        var el_pos = BF.get_position(el);
-                        return {x: el_pos.left, y: el_pos.top + el.offsetHeight, absolute: true};
+                        ///NOTE: Because the callout itself can have a scroll bar, we must calculate the actual position on the viewport and then add in the scroll position of the entire scroll (window.pageYOffset).
+                        var el_pos = el.getClientRects()[0];
+                        
+                        return {x: el_pos.left, y: el_pos.bottom + window.pageYOffset, absolute: true};
                     }, menu_items, select);
                     /// Prevent the event from trigger other events, like the callout onclick event.
                     e.stopPropagation();

@@ -702,9 +702,10 @@
      * Gets the distance of an object from the top of the scroll.
      *
      * @example get_top_position(element);
-     * @param   el (element) An element on the page.
+     * @param   el (DOM element) An element in the DOM tree.
      * @return  Returns the distance of obj from the top of the scroll.
      * @note    Called by content_manager.scroll_to_verse() and wrench button onclick() in secondary.js.
+     * @note    This does not take scroll position of nested elements.  Use getClientRects() to get the actual position on the viewport.
      */
     BF.get_position = function (el)
     {
@@ -718,7 +719,7 @@
                 top_pos  += el.offsetTop;
                 
                 el = el.offsetParent;
-            ///NOTE: The variable el is falsey (null) when no more parents exist.
+            ///NOTE: The variable el is falsey (NULL) when no more parents exist.
             } while (el);
         }
         
@@ -3398,7 +3399,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?11258877", {
+                BF.include("/js/secondary.js?11298732", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
