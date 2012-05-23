@@ -2345,8 +2345,8 @@
                             type          = options.type,
                             
                             /// Data object structure:
-                            /// i Word IDs      (array)  (optional) An array containing word IDs indicating which words should be highlighted in grammatical searches
-                            /// n Verse Numbers (array)             An array containing verse IDs for each verse returned
+                            /// i Word IDs      (array)  (optional) An array of integers containing word IDs indicating which words should be highlighted in grammatical searches
+                            /// n Verse Numbers (array)             An array of integers containing verse IDs for each verse returned
                             /// p Paragraphs    (array)  (optional) An array of 1's and 0's corresponding to n array indicating which verses are at the beginning of a paragraph
                             /// t Total         (number)            The total number of verses returned
                             /// v Verse HTML    (array)             An array containing the HTML of the verses returned

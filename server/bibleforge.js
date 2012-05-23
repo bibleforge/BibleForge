@@ -242,7 +242,7 @@ BF.lookup = function (data, connection)
                     break_after = true;
                 }
                 
-                res.n[i] = data[i].id;
+                res.n[i] = Number(data[i].id);
                 res.v[i] = data[i].words;
                 res.p[i] = Number(data[i].paragraph);
                 
@@ -252,7 +252,7 @@ BF.lookup = function (data, connection)
             }
         } else {
             for (i = 0; i < len; i += 1) {
-                res.n[i] = data[i].id;
+                res.n[i] = Number(data[i].id);
                 res.v[i] = data[i].words;
             }
         }
@@ -394,7 +394,7 @@ BF.standard_search = function (data, connection)
         len = data.length;
         
         for (i = 0; i < len; i += 1) {
-            res.n[i] = data[i].id;
+            res.n[i] = Number(data[i].id);
             res.v[i] = data[i].words;
         }
         
@@ -434,6 +434,7 @@ BF.lexical_lookup = function (data, connection)
         
         ///NOTE: Currently, only one results is requested, so it can simply send data[0].
         ///      In the future, it should return multiple results for some words (e.g., hyphenated words).
+        console.log(JSON.stringify(data[0]));
         connection.end(JSON.stringify(data[0]));
     });
 };
