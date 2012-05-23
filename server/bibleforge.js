@@ -114,7 +114,7 @@ BF.consts = {
 
 
 
-BF.db_query = (function ()
+BF.db = (function ()
 {
     var db = new (require("db-mysql")).Database({
         hostname: BF.config.db.host,
@@ -128,15 +128,25 @@ BF.db_query = (function ()
         
     db.query().execute("SET NAMES 'utf8'", {async: false});
     
-    return function db_query(sql, callback)
-    {
-        db.query().execute(sql, [], function (err, data)
+    return {
+        escape: function (str)
         {
-            if (typeof callback === "function") {
-                callback(data);
-            }
-        });
-    }
+            return db.escape(str);
+        },
+        name: function (str)
+        {
+            return db.name(str);
+        },
+        query: function (sql, callback)
+        {
+            db.query().execute(sql, [], function (err, data)
+            {
+                if (typeof callback === "function") {
+                    callback(data, err);
+                }
+            });
+        }
+    };
 }());
 
 BF.lookup = function (data, connection)
@@ -195,7 +205,7 @@ BF.lookup = function (data, connection)
         starting_verse = verse_id;
     }
     
-    BF.db_query("SELECT id, words" + extra_fields + " FROM `bible_" + lang + "_html` WHERE id " + operator + starting_verse + order_by + " LIMIT " + limit, function (data)
+    BF.db.query("SELECT id, words" + extra_fields + " FROM `bible_" + lang + "_html` WHERE id " + operator + starting_verse + order_by + " LIMIT " + limit, function (data)
     {
         var break_after,
             i,
@@ -284,7 +294,7 @@ BF.lexical_lookup = function (data, connection)
     
     ///FIXME: Currently, BibleForge links words to the lexicon by Strong's numbers; however, this is too simplistic because some Strong's numbers have multiple entries.
     ///       So, there needs to be another identifier.
-    BF.db_query(query, function (data)
+    BF.db.query(query, function (data)
     {
         /// Was there no response from the database?  This could mean the database crashed.
         if (!data) {
