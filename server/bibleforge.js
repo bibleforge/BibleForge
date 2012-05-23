@@ -27,7 +27,7 @@ function start_server()
                         BF.lookup(data, connection);
                         break;
                     case BF.consts.standard_search:
-                        connection.end("test " + (new Date()).getTime());
+                        BF.standard_search(data, connection);
                         break;
                     case BF.consts.grammatical_search:
                         connection.end("test " + (new Date()).getTime());
@@ -160,7 +160,7 @@ BF.lookup = function (data, connection)
         operator,
         order_by,
         starting_verse,
-        verse_id  = Number(data.q);
+        verse_id = Number(data.q);
     
     /// Send the proper header.
     connection.writeHead(200, {"Content-Type": "application/json"});
@@ -268,6 +268,135 @@ BF.lookup = function (data, connection)
         }
         
         res.t = res.n.length;
+        
+        connection.end(JSON.stringify(res));
+    });
+};
+
+BF.standard_search = function (data, connection)
+{
+    var direction = data.d ? Number(data.d) : BF.consts.additional,
+        initial,
+        lang = data.l || "en",
+        query,
+        start_at = data.s ? Number(data.s) : 0,
+        terms = String(data.q);
+    
+    /// Is the language invalid?
+    if (!BF.langs[lang]) {
+        connection.end("{}");
+        return;
+    }
+    
+    /// Is this not the first search query?
+    ///NOTE: Currently, the first query does not specifiy a verse.
+    initial = !Boolean(start_at);
+    
+    /// Create the first part of the SQL/SphinxQL query.
+    query = "SELECT `verse_text_" + lang + "`.id, `bible_" + lang + "_html`.words FROM `verse_text_" + lang + "`, `bible_" + lang + "_html` WHERE `bible_" + lang + "_html`.id = `verse_text_" + lang + "`.id AND `verse_text_" + lang + "`.query = \"" + BF.db.escape(terms) + ";limit=" + BF.langs[lang].minimum_desired_verses + ";ranker=none";
+    
+    /// Should the query start somewhere in the middle of the Bible?
+    if (start_at) {
+        ///NOTE: By keeping all of the settings in the Sphinx query, Sphinx can preform the best optimizations.
+        ///      Another less optimized approach would be to use the database itself to filter the results like this:
+        ///         ...WHERE id >= start_at AND query="...;limit=9999999" LIMIT BF.langs[lang].minimum_desired_verses
+        query += ";minid=" + start_at;
+    }
+    
+    /// Determine the search mode.
+    /// Default is SPH_MATCH_ALL (i.e., all words are required: word1 & word2).
+    /// SPH_MATCH_ALL should be the fastest and needs no sorting.
+    
+    /// Is there more than one word?
+    ///FIXME: These could be one word with a hyphen (e.g., -bad).  However, this search would cause an error, currently.
+    if (terms.indexOf(" ") >= 0) {
+        /// Are there more than 10 search terms in the query, or does the query contains double quotes (")?
+        ///NOTE: Could use the more accurate (preg_match('/([a-z-]+[^a-z-]+){11}/i', $query) == 1) to find word count, but it is slower.
+        if (terms.indexOf('"') >= 0 || terms.split(" ").length > 9) {
+            /// By default, other modes stop at 10, but SPH_MATCH_EXTENDED does more (256?).
+            /// Phrases (words in quotes) require SPH_MATCH_EXTENDED mode.
+            ///NOTE: SPH_MATCH_BOOLEAN is supposed to find more than 10 words too but doesn't seem to.
+            /// mode=extended is the most complex (and slowest?).
+            /// Since we want the verses in canonical order, we need to sort the results by id, not based on weight.
+            query += ";mode=extended;sort=extended:@id asc";
+        /// Are boolean operators present?
+        ///NOTE: This detects ampersands (&), pipes (|), and hyphens (-) at the beginning of the string (e.g., "-word1 word2") or after a space (e.g., "word1 -word2").
+        } else if (/(?:(?:^| )-|&|\|)/.test(terms)) {
+            /// Set mode to boolean and order by id.
+            query += ";mode=boolean;sort=extended:@id asc";
+        /// Multiple words are being searched for but nothing else special.
+        } else {
+            /// Just order by id.
+            query += ";sort=extended:@id asc";
+        }
+    }
+    
+    if (initial) {
+        /// Initial queries need to calculate the total verse.
+        ///NOTE: SphinxSE does not return statistics by default, but we can retrieve them by running another query immediately after the first
+        ///      on the INFORMATION_SCHEMA.SESSION_STATUS table and UNION'ing it to the first.
+        ///      The only draw back to this is that both queries must have the same number of columns.
+        ///      Other ways to get the statistics is with the the following queries:
+        ///         SHOW ENGINE SPHINX STATUS;
+        ///             +--------+-------+-------------------------------------------------+
+        ///             | Type   | Name  | Status                                          |
+        ///             +--------+-------+-------------------------------------------------+
+        ///             | SPHINX | stats | total: 421, total found: 421, time: 1, words: 1 |
+        ///             | SPHINX | words | love:421:498                                    |
+        ///             +--------+-------+-------------------------------------------------+
+        ///
+        ///         SHOW STATUS LIKE 'sphinx_%';
+        ///             +--------------------------------+--------------+
+        ///             | Variable_name                  | Value        |
+        ///             +--------------------------------+--------------+
+        ///             | sphinx_error_commits           | 0            |
+        ///             | sphinx_error_group_commits     | 0            |
+        ///             | sphinx_error_snapshot_file     |              |
+        ///             | sphinx_error_snapshot_position | 0            |
+        ///             | sphinx_time                    | 1            |
+        ///             | sphinx_total                   | 421          |
+        ///             | sphinx_total_found             | 421          |
+        ///             | sphinx_word_count              | 1            |
+        ///             | sphinx_words                   | love:421:498 |
+        ///             +--------------------------------+--------------+
+        ///
+        ///     However, because these queries are SHOW queries and not SELECT queries, they must be executed after the initial SELECT query.
+        query += "\" UNION SELECT VARIABLE_NAME, VARIABLE_VALUE FROM INFORMATION_SCHEMA.SESSION_STATUS WHERE VARIABLE_NAME = 'sphinx_total_found'";
+    } else {
+        query += '"';
+    }
+    
+    /// Run the Sphinx search and return both the verse IDs and the HTML.
+    BF.db.query(query, function (data)
+    {
+        var i,
+            len,
+            res = {
+                n: [],
+                v: []
+            };
+        
+        /// Was there no response from the database?  This could mean the database or Sphinx crashed.
+        if (!data) {
+            /// Send a blank response, and exit.
+            connection.end("{}");
+            return;
+        }
+        
+        if (initial) {
+            /// Because all of the columns share the same name when using UNION, the total verses found statistic is in the "words" column.
+            res.t = data.pop().words;
+        } else {
+            ///BUG: Without a truthy value here, the client thinks the results are empty.
+            res.t = 1;
+        }
+        
+        len = data.length;
+        
+        for (i = 0; i < len; i += 1) {
+            res.n[i] = data[i].id;
+            res.v[i] = data[i].words;
+        }
         
         connection.end(JSON.stringify(res));
     });
