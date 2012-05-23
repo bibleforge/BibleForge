@@ -1430,8 +1430,8 @@
                     {
                         /// Calculate the proper location for the drop down menu.
                         ///NOTE: Because the callout itself can have a scroll bar, we must calculate the actual position on the viewport and then add in the scroll position of the entire scroll (window.pageYOffset).
+                        ///NOTE: Because the white-space CSS style is set to "nowrap", the element will not separate; therefore, there will only be one rectangle.
                         var el_pos = el.getClientRects()[0];
-                        
                         return {x: el_pos.left, y: el_pos.bottom + window.pageYOffset, absolute: true};
                     }, menu_items, select);
                     /// Prevent the event from trigger other events, like the callout onclick event.
@@ -1555,7 +1555,7 @@
                                 ///   │   ├─►text node (space)
                                 ///   │   └─►pronunciation drop down box
                                 ///   └─►lex-body
-                                ///       ├─►literal pronunciation (optional)
+                                ///       ├─►literal definition (optional)
                                 ///       └─►short definition
                                 
                                 /// Create a lightweight container for the DOM elements.
@@ -1572,8 +1572,9 @@
                                 /// Add a space between the word and pronunciation drop down box to separate the two elements.
                                 parent_el.appendChild(document.createTextNode(" "));
                                 /// Create pronunciation drop down box.
-                                child_el = create_drop_down_box(options_from_pronun(JSON.parse(data.pronun)), context.settings.user.pronun_type, function onchange (val)
+                                child_el = create_drop_down_box(options_from_pronun(JSON.parse(data.pronun)), context.settings.user.pronun_type, function onchange(val)
                                 {
+                                    /// Store the user's pronunciation preference in the settings.
                                     context.settings.user.pronun_type = val;
                                 }, 0);
                                 /// Since the drop down box already has a style ("dropdown") concatenate "lex-pronun" to the end.
