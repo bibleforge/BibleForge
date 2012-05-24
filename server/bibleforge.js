@@ -20,7 +20,7 @@ function start_server()
     {
         return function handle_query(path, data, connection)
         {
-            /// Is the request for the API's?
+            /// Is the request for the APIs?
             if (path === "/api") {
                 switch (Number(data.t)) {
                     case BF.consts.verse_lookup:
@@ -30,13 +30,13 @@ function start_server()
                         BF.standard_search(data, connection);
                         break;
                     case BF.consts.grammatical_search:
-                        connection.end("test " + (new Date()).getTime());
+                        BF.grammatical_search(data, connection);
                         break;
                     case BF.consts.lexical_lookup:
                         BF.lexical_lookup(data, connection);
                         break;
                     default:
-                        connection.end("test " + (new Date()).getTime());
+                        connection.end();
                 }
             } else {
                 /// Is the request for the normal full version?
@@ -402,6 +402,123 @@ BF.standard_search = function (data, connection)
     });
 };
 
+
+BF.grammatical_search = function (data, connection)
+{
+    var direction = data.d ? Number(data.d) : BF.consts.additional,
+        i,
+        initial,
+        lang = data.l || "en",
+        query,
+        start_at = data.s ? Number(data.s) : 0,
+        ///TODO: Make this an object instead.
+        query_arr = JSON.parse(data.q);
+    
+    /// Is the language invalid?
+    if (!BF.langs[lang]) {
+        connection.end("{}");
+        return;
+    }
+    
+    ///NOTE: Currently, the first query does not specifiy a verse.
+    initial = !Boolean(start_at);
+    
+    /// Create the first part of the SQL/SphinxQL query.
+    query = "SELECT `morphological_" + lang + "`.id, `morphological_" + lang + "`.verseID, `bible_" + lang + "_html`.words FROM `morphological_" + lang + "`, `bible_" + lang + "_html` WHERE `bible_" + lang + "_html`.id = `morphological_" + lang + "`.verseID AND `morphological_" + lang + "`.query = \"" + BF.db.escape(query_arr[0]) + ";limit=" + BF.langs[lang].minimum_desired_verses + ";ranker=none";
+    
+    /// Should the query start somewhere in the middle of the Bible?
+    if (start_at) {
+        ///NOTE: By keeping all of the settings in the Sphinx query, Sphinx can preform the best optimizations.
+        ///      Another less optimized approach would be to use the database itself to filter the results like this:
+        ///         ...WHERE id >= start_at AND query="...;limit=9999999" LIMIT BF.langs[lang].minimum_desired_verses
+        query += ";minid=" + start_at;
+    }
+    
+    for (i = query_arr[1].length - 1; i >= 0; i -= 1) {
+        query += ";" + (query_arr[2][i] ? "!" : "") + "filter=" + BF.langs[lang].grammar_categories[query_arr[1][i][0]] + "," + query_arr[1][i][1];
+    }
+    
+    
+    if (initial) {
+        /// Initial queries need to calculate the total verse.
+        ///NOTE: SphinxSE does not return statistics by default, but we can retrieve them by running another query immediately after the first
+        ///      on the INFORMATION_SCHEMA.SESSION_STATUS table and UNION'ing it to the first.
+        ///      The only draw back to this is that both queries must have the same number of columns.
+        ///      Other ways to get the statistics is with the the following queries:
+        ///         SHOW ENGINE SPHINX STATUS;
+        ///             +--------+-------+-------------------------------------------------+
+        ///             | Type   | Name  | Status                                          |
+        ///             +--------+-------+-------------------------------------------------+
+        ///             | SPHINX | stats | total: 421, total found: 421, time: 1, words: 1 |
+        ///             | SPHINX | words | love:421:498                                    |
+        ///             +--------+-------+-------------------------------------------------+
+        ///
+        ///         SHOW STATUS LIKE 'sphinx_%';
+        ///             +--------------------------------+--------------+
+        ///             | Variable_name                  | Value        |
+        ///             +--------------------------------+--------------+
+        ///             | sphinx_error_commits           | 0            |
+        ///             | sphinx_error_group_commits     | 0            |
+        ///             | sphinx_error_snapshot_file     |              |
+        ///             | sphinx_error_snapshot_position | 0            |
+        ///             | sphinx_time                    | 1            |
+        ///             | sphinx_total                   | 421          |
+        ///             | sphinx_total_found             | 421          |
+        ///             | sphinx_word_count              | 1            |
+        ///             | sphinx_words                   | love:421:498 |
+        ///             +--------------------------------+--------------+
+        ///
+        ///     However, because these queries are SHOW queries and not SELECT queries, they must be executed after the initial SELECT query.
+        ///
+        ///NOTE: The first two columns are currently ignored.
+        query += "\" UNION SELECT 0, 0, VARIABLE_VALUE FROM INFORMATION_SCHEMA.SESSION_STATUS WHERE VARIABLE_NAME = 'sphinx_total_found'";
+    } else {
+        query += '"';
+    }
+    console.log(query);
+    /// Run the Sphinx search and return both the verse IDs and the HTML.
+    BF.db.query(query, function (data)
+    {
+        var i,
+            len,
+            res = {
+                i: [],
+                n: [],
+                v: []
+            },
+            verse_count = 0;
+        
+        /// Was there no response from the database?  This could mean the database or Sphinx crashed.
+        if (!data) {
+            /// Send a blank response, and exit.
+            connection.end("{}");
+            return;
+        }
+        
+        if (initial) {
+            /// Because all of the columns share the same name when using UNION, the total verses found statistic is in the "words" column.
+            res.t = Number(data.pop().words);
+        } else {
+            ///BUG: Without a truthy value here, the client thinks the results are empty.
+            res.t = 1;
+        }
+        
+        len = data.length;
+        
+        for (i = 0; i < len; i += 1) {
+            res.i[i] = Number(data[i].id);
+            /// Because Sphinx is searching at the word level, it might return multiple verses, so only add non-duplicate verses.
+            if (res.n[verse_count - 1] !== Number(data[i].verseID)) {
+                res.n[verse_count] = Number(data[i].verseID);
+                res.v[verse_count] = data[i].words;
+                verse_count += 1;
+            }
+        }
+        console.log(res);
+        connection.end(JSON.stringify(res));
+    });
+};
+
 BF.lexical_lookup = function (data, connection)
 {
     var lang = data.l || "en",
@@ -437,6 +554,7 @@ BF.lexical_lookup = function (data, connection)
         connection.end(JSON.stringify(data[0]));
     });
 };
+
 
 /// Pepare the langs object for the languages to attach to.
 BF.langs = {};
