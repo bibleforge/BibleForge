@@ -434,7 +434,6 @@ BF.lexical_lookup = function (data, connection)
         
         ///NOTE: Currently, only one results is requested, so it can simply send data[0].
         ///      In the future, it should return multiple results for some words (e.g., hyphenated words).
-        console.log(JSON.stringify(data[0]));
         connection.end(JSON.stringify(data[0]));
     });
 };
