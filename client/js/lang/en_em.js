@@ -146,6 +146,9 @@ BF.langs.en_em = (function ()
         ///TODO: Determine if the app_name should be dynamically appended to the string below or if it should be done in the build system
         wrench_title:      "Cuſtomiſe & Configure BibleForge",                    /// The text displayed when hovering over the wrench menu
         
+        /// ****************************************
+        /// * Start of Language Specific Functions *
+        /// ****************************************
         
         prepare_highlighter: (function ()
         {
