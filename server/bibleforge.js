@@ -273,6 +273,7 @@ BF.lookup = function (data, connection)
     });
 };
 
+
 BF.standard_search = function (data, connection)
 {
     var direction = data.d ? Number(data.d) : BF.consts.additional,
@@ -288,7 +289,6 @@ BF.standard_search = function (data, connection)
         return;
     }
     
-    /// Is this not the first search query?
     ///NOTE: Currently, the first query does not specifiy a verse.
     initial = !Boolean(start_at);
     
@@ -361,7 +361,9 @@ BF.standard_search = function (data, connection)
         ///             +--------------------------------+--------------+
         ///
         ///     However, because these queries are SHOW queries and not SELECT queries, they must be executed after the initial SELECT query.
-        query += "\" UNION SELECT VARIABLE_NAME, VARIABLE_VALUE FROM INFORMATION_SCHEMA.SESSION_STATUS WHERE VARIABLE_NAME = 'sphinx_total_found'";
+        ///
+        ///NOTE: The first column is currently ignored.
+        query += "\" UNION SELECT 0, VARIABLE_VALUE FROM INFORMATION_SCHEMA.SESSION_STATUS WHERE VARIABLE_NAME = 'sphinx_total_found'";
     } else {
         query += '"';
     }
@@ -385,7 +387,7 @@ BF.standard_search = function (data, connection)
         
         if (initial) {
             /// Because all of the columns share the same name when using UNION, the total verses found statistic is in the "words" column.
-            res.t = data.pop().words;
+            res.t = Number(data.pop().words);
         } else {
             ///BUG: Without a truthy value here, the client thinks the results are empty.
             res.t = 1;
@@ -475,7 +477,7 @@ BF.grammatical_search = function (data, connection)
     } else {
         query += '"';
     }
-    console.log(query);
+    
     /// Run the Sphinx search and return both the verse IDs and the HTML.
     BF.db.query(query, function (data)
     {
@@ -514,7 +516,7 @@ BF.grammatical_search = function (data, connection)
                 verse_count += 1;
             }
         }
-        console.log(res);
+        
         connection.end(JSON.stringify(res));
     });
 };
