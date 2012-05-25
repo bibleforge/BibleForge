@@ -17,5 +17,6 @@ this.config = {
         pass: "password",
         base: "bf"
     },
+    use_ssl: false,
     static_path: "../client/"
 };

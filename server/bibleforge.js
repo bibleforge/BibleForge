@@ -18,12 +18,66 @@ function start_server()
 {
     var handle_query = (function ()
     {
-        return function handle_query(path, data, connection)
+        function create_simple_page(url, data, connection)
+        {
+            /// Because the URI starts with a slash (/), the first array element is empty.
+            var full_featured_uri,
+                lang,
+                query,
+                query_arr = url.path.split("/", 3);
+            
+            /// Is the first parameter a valid language ID?
+            if (BF.langs[query_arr[1]]) {
+                lang = query_arr[1];
+                /// Is the second parameter a query?
+                if (query_arr[2] && query_arr[2] !== "!") {
+                    query = query_arr[2];
+                }
+            } else {
+                /// Since the first parameter was not a language ID, the first parameter should be the query.
+                ///TODO: Determine how to determine the default language.
+                lang = "en";
+                /// Is the first parameter a query?
+                if (query_arr[1] && query_arr[1] !== "!") {
+                    query = query_arr[1];
+                }
+            }
+            
+            if (query === undefined || query === "") {
+                if (data && data.q) {
+                    query = data.q;
+                } else {
+                    /// If there is no query present, then preform a verse lookup starting at the beginning of the Bible (e.g., Genesis 1:1).
+                    query = BF.langs[lang].books_long_main[1] + " 1:1";
+                }
+            }
+            
+            ///NOTE: Both the leading and trailing slashes (/) are necessary.
+            full_featured_uri = "/" + lang + "/" + global.encodeURIComponent(query) + "/";
+            
+            /// If a query string is present, we want to redirect it to the correct URL.
+            ///TODO: Check for the presence of both the exclamation point (!) and _escaped_fragment_ and redirect to a page without the exclamation point .
+            ///TODO: Retrieve any query in the _escaped_fragment_ variable.
+            if (data && data.q) {
+                connection.writeHead(301, {"Location": "http" + (BF.config.use_ssl ? "s" : "") + "://" + url.host + (Number(url.port) !== 80 ? ":" + url.port : "") + full_featured_uri});
+                connection.end();
+                return;
+            }
+            
+            /// Override the default 404 header.
+            connection.writeHead(200, {"Content-Type": "text/html"});
+            
+            
+            connection.end();
+        }
+        
+        return function handle_query(url, data, connection)
         {
             /// Is the request for the APIs?
             if (url.path === "/api") {
                 /// Send the proper header.
                 connection.writeHead(200, {"Content-Type": "application/json"});
+                
                 switch (Number(data.t)) {
                     case BF.consts.verse_lookup:
                         BF.lookup(data, connection);
@@ -57,6 +111,7 @@ function start_server()
                     });
                 } else {
                     ///TODO: Build a non-JavaScript version.
+                    create_simple_page(url, data, connection);
                 }
             }
         }
