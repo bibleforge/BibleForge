@@ -84,8 +84,11 @@ function start_server()
                 {
                     response.writeHead(statusCode, headers);
                 }
-            }, url_parsed = url.parse(request.url);
             
+            },
+                ///NOTE: Use the X-Request-URI header if present because sometimes the original URL gets modified.
+                url_parsed = url.parse(request.headers["x-request-uri"] || request.headers.url);
+            console.log(request);
             /// Is there GET data?
             ///TODO: Merge POST data with GET data.
             if (request.method === "GET") {
