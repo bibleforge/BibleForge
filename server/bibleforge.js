@@ -22,6 +22,8 @@ function start_server()
         {
             /// Is the request for the APIs?
             if (path === "/api") {
+                /// Send the proper header.
+                connection.writeHead(200, {"Content-Type": "application/json"});
                 switch (Number(data.t)) {
                     case BF.consts.verse_lookup:
                         BF.lookup(data, connection);
@@ -167,9 +169,6 @@ BF.lookup = function (data, connection)
         order_by,
         starting_verse,
         verse_id = Number(data.q);
-    
-    /// Send the proper header.
-    connection.writeHead(200, {"Content-Type": "application/json"});
     
     /// Quickly check to see if the verse_id is outside of the valid range.
     ///TODO: Determine if verse_id < 1001001 should default to 1001001 and verse_id > 66022021 to 66022021.
