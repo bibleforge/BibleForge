@@ -21,7 +21,7 @@ function start_server()
         return function handle_query(path, data, connection)
         {
             /// Is the request for the APIs?
-            if (path === "/api") {
+            if (url.path === "/api") {
                 /// Send the proper header.
                 connection.writeHead(200, {"Content-Type": "application/json"});
                 switch (Number(data.t)) {
@@ -38,12 +38,13 @@ function start_server()
                         BF.lexical_lookup(data, connection);
                         break;
                     default:
+                        /// The request type was invalid, so close the connection.
                         connection.end();
                 }
             } else {
                 /// Is the request for the normal full version?
                 /// Googlebot converts hash bangs (#!) into "?_escaped_fragment_=", so URIs with this in it should also be sent to the basic version.
-                if (path.substr(-1) !== "!" && (!data || !data["_escaped_fragment_"])) {
+                if (url.path.substr(-1) !== "!" && (!data || !data["_escaped_fragment_"])) {
                     /// Just send it the HTML of index.html.
                     connection.writeHead(200, {"Content-Type": "text/html"});
                     
@@ -88,7 +89,7 @@ function start_server()
             /// Is there GET data?
             ///TODO: Merge POST data with GET data.
             if (request.method === "GET") {
-                handle_query(url_parsed.pathname, qs.parse(url_parsed.query), connection);
+                handle_query({host: request.headers.host, path: url_parsed.pathname, port: request.headers.port}, qs.parse(url_parsed.query), connection);
             } else {
                 ///TODO: Also handle POST data.
                 /// If there is no data, close the connection.
