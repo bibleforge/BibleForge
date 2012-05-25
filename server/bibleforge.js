@@ -113,6 +113,12 @@ BF.consts = {
 };
 
 
+BF.parse_json = function (str)
+{
+    try {
+        return JSON.parse(str);
+    } catch (e) {}
+};
 
 BF.db = (function ()
 {
@@ -414,10 +420,10 @@ BF.grammatical_search = function (data, connection)
         query,
         start_at = data.s ? Number(data.s) : 0,
         ///TODO: Make this an object instead.
-        query_arr = JSON.parse(data.q);
+        query_arr = BF.parse_json(data.q);
     
-    /// Is the language invalid?
-    if (!BF.langs[lang]) {
+    /// Is the language or query invalid?
+    if (!BF.langs[lang] || !query_arr) {
         connection.end("{}");
         return;
     }
