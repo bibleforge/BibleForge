@@ -2183,8 +2183,7 @@
                      */
                     function write_verses(type, direction, verse_ids, verse_html, paragraphs, in_paragraphs, verse_range)
                     {
-                        var chapter_text         = "",
-                            end_paragraph_HTML   = "",
+                        var end_paragraph_HTML   = "",
                             first_paragraph_HTML = "",
                             i,
                             html_str             = "",
@@ -2224,6 +2223,7 @@
                             if (type === BF.consts.verse_lookup) {
                                 /// Is this the first verse or the Psalm title?
                                 if (verse_obj.v < 2) {
+                                    ///TODO: Explain what this code is doing.
                                     if (i !== start_key) {
                                         html_str += end_paragraph_HTML;
                                     }
@@ -2233,12 +2233,7 @@
                                     /// Display chapter/psalm number (but not on verse 1 of psalms that have titles).
                                     } else if (verse_obj.b !== 19 || verse_obj.v === 0 || !BF.psalm_has_title(verse_obj.c)) {
                                         /// Is this the book of Psalms?  (Psalms have a special name.)
-                                        if (verse_obj.b === 19) {
-                                            chapter_text = BF.lang.psalm;
-                                        } else {
-                                            chapter_text = BF.lang.chapter;
-                                        }
-                                        html_str += "<h3 class=chapter id=" + verse_id + "_chapter>" + chapter_text + " " + verse_obj.c + "</h3>";
+                                        html_str += "<h3 class=chapter id=" + verse_id + "_chapter>" + (verse_obj.b === 19 ? BF.lang.psalm : BF.lang.chapter) + " " + verse_obj.c + "</h3>";
                                     }
                                     /// Is this a Psalm title (i.e., verse 0)?  (Psalm titles are displayed specially.)
                                     if (verse_obj.v === 0) {
