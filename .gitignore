@@ -9,7 +9,6 @@
 #
 
 .htaccess
-config.php
 google*
 client/robots.txt
 client/sitemap.xml
