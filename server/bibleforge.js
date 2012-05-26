@@ -78,18 +78,23 @@ function start_server()
                 /// Send the proper header.
                 connection.writeHead(200, {"Content-Type": "application/json"});
                 
+                send_results = function (data)
+                {
+                    connection.end(data);
+                }
+                
                 switch (Number(data.t)) {
                     case BF.consts.verse_lookup:
-                        BF.lookup(data, connection);
+                        BF.lookup(data, send_results);
                         break;
                     case BF.consts.standard_search:
-                        BF.standard_search(data, connection);
+                        BF.standard_search(data, send_results);
                         break;
                     case BF.consts.grammatical_search:
-                        BF.grammatical_search(data, connection);
+                        BF.grammatical_search(data, send_results);
                         break;
                     case BF.consts.lexical_lookup:
-                        BF.lexical_lookup(data, connection);
+                        BF.lexical_lookup(data, send_results);
                         break;
                     default:
                         /// The request type was invalid, so close the connection.
@@ -216,7 +221,7 @@ BF.db = (function ()
     };
 }());
 
-BF.lookup = function (data, connection)
+BF.lookup = function (data, callback)
 {
     var extra_fields,
         direction = data.d ? Number(data.d) : BF.consts.additional,
@@ -234,7 +239,7 @@ BF.lookup = function (data, connection)
     ///TODO: 66022021 may need to be language dependent because different languages have different verse breaks.
     /// Also, check to see if the language specified is valid.
     if (verse_id < 1001001 || verse_id > 66022021 || !BF.langs[lang]) {
-        connection.end("{}");
+        callback("{}");
         return;
     }
     
@@ -282,7 +287,7 @@ BF.lookup = function (data, connection)
         /// Was there no response from the database?  This could mean the database crashed.
         if (!data) {
             /// Send a blank response, and exit.
-            connection.end("{}");
+            callback("{}");
             return;
         }
         
@@ -333,12 +338,12 @@ BF.lookup = function (data, connection)
         
         res.t = res.n.length;
         
-        connection.end(JSON.stringify(res));
+        callback(JSON.stringify(res));
     });
 };
 
 
-BF.standard_search = function (data, connection)
+BF.standard_search = function (data, callback)
 {
     var direction = data.d ? Number(data.d) : BF.consts.additional,
         initial,
@@ -349,7 +354,7 @@ BF.standard_search = function (data, connection)
     
     /// Is the language invalid?
     if (!BF.langs[lang]) {
-        connection.end("{}");
+        callback("{}");
         return;
     }
     
@@ -445,7 +450,7 @@ BF.standard_search = function (data, connection)
         /// Was there no response from the database?  This could mean the database or Sphinx crashed.
         if (!data) {
             /// Send a blank response, and exit.
-            connection.end("{}");
+            callback("{}");
             return;
         }
         
@@ -464,12 +469,12 @@ BF.standard_search = function (data, connection)
             res.v[i] = data[i].words;
         }
         
-        connection.end(JSON.stringify(res));
+        callback(JSON.stringify(res));
     });
 };
 
 
-BF.grammatical_search = function (data, connection)
+BF.grammatical_search = function (data, callback)
 {
     var direction = data.d ? Number(data.d) : BF.consts.additional,
         i,
@@ -482,7 +487,7 @@ BF.grammatical_search = function (data, connection)
     
     /// Is the language or query invalid?
     if (!BF.langs[lang] || !query_arr) {
-        connection.end("{}");
+        callback("{}");
         return;
     }
     
@@ -557,7 +562,7 @@ BF.grammatical_search = function (data, connection)
         /// Was there no response from the database?  This could mean the database or Sphinx crashed.
         if (!data) {
             /// Send a blank response, and exit.
-            connection.end("{}");
+            callback("{}");
             return;
         }
         
@@ -581,11 +586,11 @@ BF.grammatical_search = function (data, connection)
             }
         }
         
-        connection.end(JSON.stringify(res));
+        callback(JSON.stringify(res));
     });
 };
 
-BF.lexical_lookup = function (data, connection)
+BF.lexical_lookup = function (data, callback)
 {
     var lang = data.l || "en",
         query,
@@ -593,7 +598,7 @@ BF.lexical_lookup = function (data, connection)
     
     /// Is the language invalid?
     if (!BF.langs[lang]) {
-        connection.end("{}");
+        callback("{}");
         return;
     }
     
@@ -611,13 +616,13 @@ BF.lexical_lookup = function (data, connection)
         /// Was there no response from the database?  This could mean the database crashed.
         if (!data) {
             /// Send a blank response, and exit.
-            connection.end("{}");
+            callback("{}");
             return;
         }
         
         ///NOTE: Currently, only one results is requested, so it can simply send data[0].
         ///      In the future, it should return multiple results for some words (e.g., hyphenated words).
-        connection.end(JSON.stringify(data[0]));
+        callback(JSON.stringify(data[0]));
     });
 };
 
