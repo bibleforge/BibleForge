@@ -119,7 +119,7 @@ function start_server()
             /// Override the default 404 header.
             connection.writeHead(200, {"Content-Type": "text/html"});
             
-            BF.fs.readFile(BF.config.static_path + "index_non-js.html", "utf8", function (err, html)
+            BF.fs.readFile(__dirname + "/index_non-js.html", "utf8", function (err, html)
             {
                 var b,
                     c,
