@@ -173,7 +173,13 @@ BF.parse_json = function (str)
     } catch (e) {}
 };
 
+
+BF.escape_html = function (str)
 {
+    ///NOTE: It must first replace ampersands (&) otherwise, it will escape the other entities.
+    return str.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/'/g, "&#39;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+};
+
 
 BF.db = (function ()
 {
