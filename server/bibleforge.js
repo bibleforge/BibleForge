@@ -73,6 +73,8 @@ function start_server()
         
         return function handle_query(url, data, connection)
         {
+            var send_results;
+            
             /// Is the request for the APIs?
             if (url.path === "/api") {
                 /// Send the proper header.
