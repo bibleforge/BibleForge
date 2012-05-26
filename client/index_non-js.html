@@ -1,0 +1,91 @@
+<!doctype html>
+<!-- NOTE: The doctype tag must be first in order for IE to render the page correctly. -->
+
+<html>
+<head>
+    <!-- NOTE: If the charset meta parameter is placed after the 1024th byte, some browsers reload the page after parsing the meta data. -->
+    <meta charset=utf-8>
+<!--
+
+/**
+ * BibleForge
+ *
+ * @date    05-26-12
+ * @version alpha (α)
+ * @link    http://BibleForge.com
+ * @license GNU Affero General Public License 3.0 (AGPL-3.0)
+ * @author  BibleForge <info@bibleforge.com>
+ */
+
+/**
+ * Copyright (C) 2012
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see http://www.opensource.org/licenses/AGPL-3.0.
+ */
+
+Welcome to hacking BibleForge.
+
+This is a non-JavaScript version of the HTML.  See index.html for more info about BibleForge.
+
+-->
+    <title>__TITLE__</title>
+    <link rel=stylesheet href="/styles/base.css?10901536">
+    <link rel="icon" type="image/png" href="/images/favicon.png">
+    <!-- This graphic is used by handhelds and tablets for a bookmark icon. -->
+    <!-- NOTE: Ideally, this should be at least 114 pixels. -->
+    <link rel="apple-touch-icon" href="/images/scroll_64.png">
+    <meta name=description content="BibleForge: The free, open source Bible Study web app. __DESC__">
+    <!-- Safari on the iPhone or iPad requires that the viewport width be set. -->
+    <!-- The Froyo browser on Android 2.2 needs scaling disabled in order for fixed positioning to work. -->
+    <!-- TODO: The correct header should probably be sent dynamically from the server. -->
+    <meta name=viewport content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <!-- Redirect unsupported browsers and those with JavaScript turned off to a non-JS version. -->
+    <!-- Tell Googlebot (and maybe other bots) to retry the same address with "?_escaped_fragment_=" at the end. -->
+    <!-- Then the server can create a page for Googlebot to index. -->
+    <meta name="fragment" content="!">
+    <!--[if !IE]> -->
+        <script>
+            window.location.replace("__FULL_URI__");
+        </script>
+    <!-- <![endif]-->
+    <!--[if gte IE 9]>
+        <script>
+            window.location.replace("__FULL_URI__");
+        </script>
+    <![endif]-->
+</head>
+<body
+><!-- TODO: Add language selector and wrench menu. --><div class=viewPorts id=viewPort0
+    ><div class=topBars
+        ><div class=searchBars
+            ><form action="/!"
+                ><label for=q0 class=queryPadding
+                    ><nobr
+                        ><input type=button class=lang
+                        ><input type=text value="__QUERY__" name=q id=q0 class=queryInput
+                        ><input type=image class=inputIcon alt=Go src="data:image/gif;base64,R0lGODlhEAAQAPIHAAIFARweHDU3NFlbWHJ0cZ2fnNDTz/3//CH5BAAKAAAALAAAAAAQABAAAANDeLpnAyAQRgsYxhQBDD2WxxDABxTfIUxMmRYBY7jfTNGU3YrUMPQ4xYwnhPAsKNmJBIEkF05ZqkmcGlOMwBW74FSxCQA7"
+                        ><!-- Hide the submit button that gets created when JavaScript is disabled. --><input type=submit style="display:none;"
+                    ></nobr
+                ></label
+            ></form
+        ></div
+        ><div class=infoBars
+            ><div class=infoLeft></div
+        ></div
+    ></div
+    ><!-- This <div> is used to push the data down below the top bar. --><div class=loaders></div
+    ><div class=scrolls>__CONTENT__</div
+></div
+></body
+></html>

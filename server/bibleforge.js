@@ -18,6 +18,52 @@ function start_server()
 {
     var handle_query = (function ()
     {
+        /**
+         * Create the previous and next chapter links.
+         *
+         * @param  lang (string)  Which language to use.
+         * @param  b    (integer) The current book number.
+         * @param  c    (integer) The current chapter number.
+         * @return NULL.  HTML is printed to the buffer.
+         * @todo   Make the text language specific.
+         */
+        function get_prev_next(lang, b, c)
+        {
+            var next_b,
+                next_c,
+                prev_b,
+                prev_c,
+                res = "";
+            
+            /// Is this not Genesis 1?
+            if (b !== 1 || c !== 1) {
+                if (c === 1) {
+                    prev_b = b - 1;
+                    prev_c = lang.chapter_count[prev_b];
+                } else {
+                    prev_b = b;
+                    prev_c = c - 1;
+                }
+                
+                res += '<a style="float:left;" href="/' + lang.id + "/" + lang.books_short[prev_b] + "%20" + prev_c + "/!" + '">&lt; Previous ' + (prev_b === 19 ? lang.psalm : lang.chapter) + "</a>";
+            }
+            
+            /// Is this not Revelation 22?
+            if (b !== 66 || c !== lang.chapter_count[66]) {
+                if (c === lang.chapter_count[b]) {
+                    next_b = b + 1;
+                    next_c = 1;
+                } else {
+                    next_b = b;
+                    next_c = c + 1;
+                }
+                
+                res += '<a style="float:right;" href="/' + lang.id + "/" + lang.books_short[next_b] + "%20" + next_c + "/!" + '">Next ' + (next_b === 19 ? lang.psalm : lang.chapter) + " &gt;</a>";
+            }
+            
+            return res;
+        }
+        
         function create_simple_page(url, data, connection)
         {
             /// Because the URI starts with a slash (/), the first array element is empty.
@@ -28,35 +74,41 @@ function start_server()
             
             /// Is the first parameter a valid language ID?
             if (BF.langs[query_arr[1]]) {
-                lang = query_arr[1];
+                lang = BF.langs[query_arr[1]];
                 /// Is the second parameter a query?
                 if (query_arr[2] && query_arr[2] !== "!") {
                     query = query_arr[2];
                 }
             } else {
-                /// Since the first parameter was not a language ID, the first parameter should be the query.
+                /// Since there was no language specified, use the default language.
                 ///TODO: Determine how to determine the default language.
-                lang = "en";
+                lang = BF.langs["en"];
+                /// Since the first parameter was not a language ID, the first parameter should be the query (if present).
                 /// Is the first parameter a query?
                 if (query_arr[1] && query_arr[1] !== "!") {
                     query = query_arr[1];
                 }
             }
             
+            /// Was there no query specified in the URL?
             if (query === undefined || query === "") {
+                /// Was there a query specified in the GET data?
+                ///NOTE: For example, this will occur when submitting a query from the query box in the non-JavaScript version.
                 if (data && data.q) {
                     query = data.q;
                 } else {
                     /// If there is no query present, then preform a verse lookup starting at the beginning of the Bible (e.g., Genesis 1:1).
-                    query = BF.langs[lang].books_long_main[1] + " 1:1";
+                    query = lang.books_short[1] + " 1:1";
                 }
+            } else {
+                query = global.decodeURIComponent(query);
             }
             
             ///NOTE: Both the leading and trailing slashes (/) are necessary.
-            full_featured_uri = "/" + lang + "/" + global.encodeURIComponent(query) + "/";
+            full_featured_uri = "/" + lang.id + "/" + global.encodeURIComponent(query) + "/";
             
             /// If a query string is present, we want to redirect it to the correct URL.
-            ///TODO: Check for the presence of both the exclamation point (!) and _escaped_fragment_ and redirect to a page without the exclamation point .
+            ///TODO: Check for the presence of both the exclamation point (!) and _escaped_fragment_ and redirect to a page without the exclamation point.
             ///TODO: Retrieve any query in the _escaped_fragment_ variable.
             if (data && data.q) {
                 connection.writeHead(301, {"Location": "http" + (BF.config.use_ssl ? "s" : "") + "://" + url.host + (Number(url.port) !== 80 ? ":" + url.port : "") + full_featured_uri});
@@ -67,8 +119,82 @@ function start_server()
             /// Override the default 404 header.
             connection.writeHead(200, {"Content-Type": "text/html"});
             
-            
-            connection.end();
+            BF.fs.readFile(BF.config.static_path + "index_non-js.html", "utf8", function (err, html)
+            {
+                var b,
+                    c,
+                    verseID = lang.determine_reference(query);
+                
+                html = html.replace(/__FULL_URI__/g, full_featured_uri);
+                html = html.replace("__QUERY__", BF.escape_html(query));
+                
+                /// Is it a verse lookup?
+                if (verseID !== false) {
+                    c = ((verseID - (verseID % 1000)) % 1000000) / 1000;
+                    b = (verseID - (verseID % 1000) - c * 1000) / 1000000;
+                    
+                    BF.db.query("SELECT id, words FROM `bible_" + lang.id + "_html` WHERE book = " + b + " AND chapter = " + c, function (data)
+                    {
+                        var back_next,
+                            i,
+                            len,
+                            res = "",
+                            v;
+                        
+                        /// Was there no response from the database?  This could mean the database crashed.
+                        if (!data) {
+                            res = lang.no_results1 + "<b>" + BF.escape_html(query) + "</b>" + lang.no_results2;
+                        } else {
+                            len = data.length;
+                            v = (data[0].id % 1000);
+                            
+                            back_next = get_prev_next(lang, b, c);
+                            
+                            res += back_next;
+                            
+                            for (i = 0; i < len; i += 1) {
+                                /// Is this the first verse or the Psalm title?
+                                if (v < 2) {
+                                    /// Is this chapter 1?  (We need to know if we should display the book name.)
+                                    if (c === 1) {
+                                        res += "<div class=book id=" + data[i].id + "_title><h2>" + lang.books_long_pretitle[b] + "</h2><h1>" + lang.books_long_main[b] + "</h1><h2>" + lang.books_long_posttitle[b] + "</h2></div>";
+                                    /// Display chapter/psalm number (but not on verse 1 of psalms that have titles).
+                                    } else if (i === 0) {
+                                        /// Is this the book of Psalms?  (Psalms have a special name.)
+                                        res += "<h3 class=chapter id=" + data[i].id + "_chapter>" + (b === 19 ? lang.psalm : lang.chapter) + " " + c + "</h3>";
+                                    }
+                                    /// Is this a Psalm title (i.e., verse 0)?  (Psalm titles are displayed specially.)
+                                    if (v === 0) {
+                                        res += "<div class=psalm_title id=" + data[i].id + "_verse>" + data[i].words + "</div>";
+                                    } else {
+                                        res += "<div class=first_verse id=" + data[i].id + "_verse>" + data[i].words + " </div>";
+                                    }
+                                } else {
+                                    /// Is it a subscription?
+                                    if (i === len - 1 && (data[i].id % 1000) === 255) {
+                                        res += "<div class=subscription id=" + data[i].id  + "_verse>" + data[i].words + "</div>";
+                                    } else {
+                                        ///TODO: Determine if "class=verse_number" is needed.
+                                        res += "<div class=verse id=" + data[i].id + "_verse><span class=verse_number>" + v + "&nbsp;</span>" + data[i].words + " </div>";
+                                    }
+                                }
+                                v += 1;
+                            }
+                            
+                            res += back_next;
+                        }
+                        
+                        html = html.replace("__CONTENT__", res);
+                        connection.end(html);
+                    });
+                    
+                    /// While the query is running, prepare the HTML more.
+                    html = html.replace("__TITLE__", lang.books_short[b] + " " + c + " - " + lang.app_name);
+                } else {
+                    connection.end(html);
+                }
+                
+            });
         }
         
         return function handle_query(url, data, connection)
