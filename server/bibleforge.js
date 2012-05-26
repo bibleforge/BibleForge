@@ -129,7 +129,7 @@ function start_server()
                 html = html.replace("__QUERY__", BF.escape_html(query));
                 
                 /// Is it a verse lookup?
-                if (verseID !== false) {
+                if (verseID) {
                     c = ((verseID - (verseID % 1000)) % 1000000) / 1000;
                     b = (verseID - (verseID % 1000) - c * 1000) / 1000000;
                     
