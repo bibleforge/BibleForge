@@ -107,12 +107,11 @@ function start_server()
                     /// Just send it the HTML of index.html.
                     connection.writeHead(200, {"Content-Type": "text/html"});
                     
-                    ///FIXME: Cache index.html and modified time.  (Make an option to not cache the data for development purposes).
-                    ///TODO:  Optionally send a gzipped version.
-                    ///TODO:  Check headers for the presence of a cached copy.
-                    BF.fs.readFile(BF.config.static_path + "index.html", "utf8", function (err, data)
+                    ///FIXME: If a last modified time header is present, check (and cache) modified time and send the not modified header.
+                    ///TODO:  Determine if nginx gzip's the HTML.
+                    BF.get_index(function (html)
                     {
-                        connection.end(data);
+                        connection.end(html);
                     });
                 } else {
                     ///TODO: Build a non-JavaScript version.
@@ -148,7 +147,7 @@ function start_server()
             },
                 ///NOTE: Use the X-Request-URI header if present because sometimes the original URL gets modified.
                 url_parsed = url.parse(request.headers["x-request-uri"] || request.headers.url);
-            console.log(request);
+            
             /// Is there GET data?
             ///TODO: Merge POST data with GET data.
             if (request.method === "GET") {
@@ -185,6 +184,38 @@ BF.parse_json = function (str)
         return JSON.parse(str);
     } catch (e) {}
 };
+
+/**
+ * Retreave BibleForge's HTML.
+ *
+ * @param callback (function) The function to which the data shall be returned.
+ * @note  The callback() function will be called back immediately (i.e., synchronously) if the data is cached.
+ */
+BF.get_index = (function ()
+{
+    var cache;
+    
+    return function (callback)
+    {
+        if (!cache) {
+            BF.fs.readFile(BF.config.static_path + "index.html", "utf8", function (err, data)
+            {
+                ///NOTE: Production servers should cache the index file so that the hard drive does not need to be accessed each time;
+                ///      however, when testing, it is better not to cache so that changes to the index file will take effect without restarting the server.
+                if (BF.config.cache_index) {
+                    cache = data;
+                }
+                if (typeof callback === "function") {
+                    callback(data);
+                }
+            });
+        } else {
+            if (typeof callback === "function") {
+                callback(cache);
+            }
+        }
+    }
+}());
 
 BF.db = (function ()
 {
