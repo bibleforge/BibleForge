@@ -221,7 +221,7 @@ BF.lookup = function (data, connection)
     var extra_fields,
         direction = data.d ? Number(data.d) : BF.consts.additional,
         find_paragraph_start = Boolean(data.f),
-        in_paragraphs = data.p ? Boolean(data.d) : true,
+        in_paragraphs = data.p ? Boolean(data.p) : true,
         lang = data.l || "en",
         limit,
         operator,
