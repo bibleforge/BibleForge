@@ -18,52 +18,6 @@ function start_server()
 {
     var handle_query = (function ()
     {
-        /**
-         * Create the previous and next chapter links.
-         *
-         * @param  lang (string)  Which language to use.
-         * @param  b    (integer) The current book number.
-         * @param  c    (integer) The current chapter number.
-         * @return NULL.  HTML is printed to the buffer.
-         * @todo   Make the text language specific.
-         */
-        function get_prev_next(lang, b, c)
-        {
-            var next_b,
-                next_c,
-                prev_b,
-                prev_c,
-                res = "";
-            
-            /// Is this not Genesis 1?
-            if (b !== 1 || c !== 1) {
-                if (c === 1) {
-                    prev_b = b - 1;
-                    prev_c = lang.chapter_count[prev_b];
-                } else {
-                    prev_b = b;
-                    prev_c = c - 1;
-                }
-                
-                res += '<a style="float:left;" href="/' + lang.id + "/" + lang.books_short[prev_b] + "%20" + prev_c + "/!" + '">&lt; Previous ' + (prev_b === 19 ? lang.psalm : lang.chapter) + "</a>";
-            }
-            
-            /// Is this not Revelation 22?
-            if (b !== 66 || c !== lang.chapter_count[66]) {
-                if (c === lang.chapter_count[b]) {
-                    next_b = b + 1;
-                    next_c = 1;
-                } else {
-                    next_b = b;
-                    next_c = c + 1;
-                }
-                
-                res += '<a style="float:right;" href="/' + lang.id + "/" + lang.books_short[next_b] + "%20" + next_c + "/!" + '">Next ' + (next_b === 19 ? lang.psalm : lang.chapter) + " &gt;</a>";
-            }
-            
-            return res;
-        }
-        
         function create_simple_page(url, data, connection)
         {
             /// Because the URI starts with a slash (/), the first array element is empty.
@@ -148,8 +102,48 @@ function start_server()
                             len = data.length;
                             v = (data[0].id % 1000);
                             
-                            back_next = get_prev_next(lang, b, c);
-                            
+                            /**
+                             * Create the previous and next chapter links.
+                             *
+                             * @return A string containing HTML.
+                             * @todo   Make the text language specific.
+                             */
+                            back_next = (function ()
+                            {
+                                var next_b,
+                                    next_c,
+                                    prev_b,
+                                    prev_c,
+                                    res = "";
+                                
+                                /// Is this not Genesis 1?
+                                if (b !== 1 || c !== 1) {
+                                    if (c === 1) {
+                                        prev_b = b - 1;
+                                        prev_c = lang.chapter_count[prev_b];
+                                    } else {
+                                        prev_b = b;
+                                        prev_c = c - 1;
+                                    }
+                                    
+                                    res += '<a style="float:left;" href="/' + lang.id + "/" + lang.books_short[prev_b] + "%20" + prev_c + "/!" + '">&lt; Previous ' + (prev_b === 19 ? lang.psalm : lang.chapter) + "</a>";
+                                }
+                                
+                                /// Is this not Revelation 22?
+                                if (b !== 66 || c !== lang.chapter_count[66]) {
+                                    if (c === lang.chapter_count[b]) {
+                                        next_b = b + 1;
+                                        next_c = 1;
+                                    } else {
+                                        next_b = b;
+                                        next_c = c + 1;
+                                    }
+                                    
+                                    res += '<a style="float:right;" href="/' + lang.id + "/" + lang.books_short[next_b] + "%20" + next_c + "/!" + '">Next ' + (next_b === 19 ? lang.psalm : lang.chapter) + " &gt;</a>";
+                                }
+                                
+                                return res;
+                            }());
                             res += back_next;
                             
                             for (i = 0; i < len; i += 1) {
