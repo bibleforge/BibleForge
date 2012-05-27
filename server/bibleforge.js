@@ -183,9 +183,52 @@ function start_server()
                     });
                     
                     /// While the query is running, prepare the HTML more.
-                    html = html.replace("__TITLE__", lang.books_short[b] + " " + c + " - " + lang.app_name);
+                    html = html.replace("__TITLE__", BF.escape_html(lang.books_short[b]) + " " + c + " - " + lang.app_name);
                 } else {
-                    connection.end(html);
+                    ///TODO: Determine the search type.
+                    BF.standard_search({q: lang.prepare_query(query), l: lang.id}, function (data)
+                    {
+                        var i,
+                            last_b,
+                            len,
+                            res = "",
+                            verse_obj;
+                        
+                        /// Was there no response from the database?  This could mean the database crashed.
+                        
+                        if (!data || !data.n || !data.n.length) {
+                            res = lang.no_results1 + "<b>" + BF.escape_html(query) + "</b>" + lang.no_results2;
+                        } else {
+                            len = data.n.length;
+                            for (i = 0; i < len; i += 1) {
+                                verse_obj = BF.get_b_c_v(data.n[i]);
+                                
+                                if (verse_obj.v === 0) {
+                                    /// Change verse 0 to indicate a Psalm title (e.g., change "Psalm 3:0" to "Psalm 3:title").
+                                    verse_obj.v = lang.title;
+                                } else if (verse_obj.v === 255) {
+                                    /// Change verse 255 to indicate a Pauline subscription (e.g., change "Romans 16:255" to "Romans 16:subscription").
+                                    verse_obj.v = lang.subscription;
+                                }
+                                
+                                /// Is this verse from a different book than the last verse?
+                                ///NOTE: This assumes that searches are always additional (which is correct, currently).
+                                if (verse_obj.b !== last_b) {
+                                    /// We only need to print out the book if it is different from the last verse.
+                                    last_b = verse_obj.b;
+                                    
+                                    /// Convert the book number to text.
+                                    res += "<h1 class=short_book id=" + data.n[i] + "_title>" + lang.books_short[verse_obj.b] + "</h1>";
+                                }
+                                
+                                res += "<div class=search_verse id=" + data.n[i] + "_search><span>" + (lang.chapter_count[verse_obj.b] === 1 ? "" : verse_obj.c + ":") + verse_obj.v + "</span> " + data.v[i] + "</div>";
+                            }
+                        }
+                        html = html.replace("__CONTENT__", res);
+                        connection.end(html);
+                    });
+                    /// While the query is running, prepare the HTML more.
+                    html = html.replace("__TITLE__", BF.escape_html(query) + " - " + lang.app_name);
                 }
                 
             });
@@ -306,6 +349,20 @@ BF.escape_html = function (str)
 {
     ///NOTE: It must first replace ampersands (&) otherwise, it will escape the other entities.
     return str.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/'/g, "&#39;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+};
+
+BF.get_b_c_v = function (verseID)
+{
+    var c,
+        v = verseID % 1000;
+    
+    c = ((verseID - v) % 1000000) / 1000;
+    
+    return {
+        b: (verseID - v - c * 1000) / 1000000,
+        c: c,
+        v: v
+    };
 };
 
 
