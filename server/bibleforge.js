@@ -202,7 +202,7 @@ function start_server()
                 
                 send_results = function (data)
                 {
-                    connection.end(data);
+                    connection.end(JSON.stringify(data));
                 }
                 
                 switch (Number(data.t)) {
@@ -362,7 +362,7 @@ BF.lookup = function (data, callback)
     ///TODO: 66022021 may need to be language dependent because different languages have different verse breaks.
     /// Also, check to see if the language specified is valid.
     if (verse_id < 1001001 || verse_id > 66022021 || !BF.langs[lang]) {
-        callback("{}");
+        callback({});
         return;
     }
     
@@ -410,7 +410,7 @@ BF.lookup = function (data, callback)
         /// Was there no response from the database?  This could mean the database crashed.
         if (!data) {
             /// Send a blank response, and exit.
-            callback("{}");
+            callback({});
             return;
         }
         
@@ -461,7 +461,7 @@ BF.lookup = function (data, callback)
         
         res.t = res.n.length;
         
-        callback(JSON.stringify(res));
+        callback(res);
     });
 };
 
@@ -477,7 +477,7 @@ BF.standard_search = function (data, callback)
     
     /// Is the language invalid?
     if (!BF.langs[lang]) {
-        callback("{}");
+        callback({});
         return;
     }
     
@@ -573,7 +573,7 @@ BF.standard_search = function (data, callback)
         /// Was there no response from the database?  This could mean the database or Sphinx crashed.
         if (!data) {
             /// Send a blank response, and exit.
-            callback("{}");
+            callback({});
             return;
         }
         
@@ -592,7 +592,7 @@ BF.standard_search = function (data, callback)
             res.v[i] = data[i].words;
         }
         
-        callback(JSON.stringify(res));
+        callback(res);
     });
 };
 
@@ -610,7 +610,7 @@ BF.grammatical_search = function (data, callback)
     
     /// Is the language or query invalid?
     if (!BF.langs[lang] || !query_arr) {
-        callback("{}");
+        callback({});
         return;
     }
     
@@ -685,7 +685,7 @@ BF.grammatical_search = function (data, callback)
         /// Was there no response from the database?  This could mean the database or Sphinx crashed.
         if (!data) {
             /// Send a blank response, and exit.
-            callback("{}");
+            callback({});
             return;
         }
         
@@ -709,7 +709,7 @@ BF.grammatical_search = function (data, callback)
             }
         }
         
-        callback(JSON.stringify(res));
+        callback(res);
     });
 };
 
@@ -721,7 +721,7 @@ BF.lexical_lookup = function (data, callback)
     
     /// Is the language invalid?
     if (!BF.langs[lang]) {
-        callback("{}");
+        callback({});
         return;
     }
     
@@ -739,13 +739,13 @@ BF.lexical_lookup = function (data, callback)
         /// Was there no response from the database?  This could mean the database crashed.
         if (!data || !data.length) {
             /// Send a blank response, and exit.
-            callback("{}");
+            callback({});
             return;
         }
         
         ///NOTE: Currently, only one results is requested, so it can simply send data[0].
         ///      In the future, it should return multiple results for some words (e.g., hyphenated words).
-        callback(JSON.stringify(data[0]));
+        callback(data[0]);
     });
 };
 
