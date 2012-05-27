@@ -743,7 +743,7 @@ BF.lexical_lookup = function (data, callback)
     BF.db.query(query, function (data)
     {
         /// Was there no response from the database?  This could mean the database crashed.
-        if (!data) {
+        if (!data || !data.length) {
             /// Send a blank response, and exit.
             callback("{}");
             return;
