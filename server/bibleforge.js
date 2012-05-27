@@ -111,7 +111,7 @@ function start_server()
             ///TODO: Check for the presence of both the exclamation point (!) and _escaped_fragment_ and redirect to a page without the exclamation point.
             ///TODO: Retrieve any query in the _escaped_fragment_ variable.
             if (data && data.q) {
-                connection.writeHead(301, {"Location": "http" + (BF.config.use_ssl ? "s" : "") + "://" + url.host + (Number(url.port) !== 80 ? ":" + url.port : "") + full_featured_uri});
+                connection.writeHead(301, {"Location": "http" + (BF.config.use_ssl ? "s" : "") + "://" + url.host + (Number(url.port) !== 80 ? ":" + url.port : "") + full_featured_uri + "!"});
                 connection.end();
                 return;
             }
