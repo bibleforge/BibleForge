@@ -142,7 +142,7 @@ function start_server()
                             v;
                         
                         /// Was there no response from the database?  This could mean the database crashed.
-                        if (!data) {
+                        if (!data || !data.length) {
                             res = lang.no_results1 + "<b>" + BF.escape_html(query) + "</b>" + lang.no_results2;
                         } else {
                             len = data.length;
