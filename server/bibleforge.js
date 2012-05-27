@@ -275,6 +275,14 @@ function start_server()
     }());
 }
 
+/// Catch errors so that it does not cause the entire server to crash.
+process.on("uncaughtException", function(e)
+{
+    ///TODO: Log errors.
+    console.error(e.message);
+    console.error(e.stack);
+});
+
 BF.config = require("./config.js").config;
 
 ///TODO: This needs to be linked to the client side code.
