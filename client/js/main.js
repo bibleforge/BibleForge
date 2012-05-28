@@ -1886,10 +1886,13 @@
                             return;
                         }
                         
+                        /// Store the query type in a variable because it may need to be accessed more than once.
+                        query_type = query_manager.query_type;
+                        
                         /// The titles in the book of Psalms are referenced as verse zero (cf. Psalm 3).
                         /// The subscriptions at the end of Paul's epistles are referenced as verse 255 (cf. Romans 16).
-                        verse1.full_verse = (verse1.v === 0 ? BF.lang.title : (verse1.v === 255 ? BF.lang.subscription : verse1.v));
-                        verse2.full_verse = (verse2.v === 0 ? BF.lang.title : (verse2.v === 255 ? BF.lang.subscription : verse2.v));
+                        verse1.full_verse = (verse1.v === 0 ? (query_type === BF.consts.verse_lookup ? 1 : BF.lang.title) : (verse1.v === 255 ? BF.lang.subscription : verse1.v));
+                        verse2.full_verse = (verse2.v === 0 ? (query_type === BF.consts.verse_lookup ? 1 : BF.lang.title) : (verse2.v === 255 ? BF.lang.subscription : verse2.v));
                         
                         /// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
                         ///NOTE: verse2.full_book is set here even though it is not always needed now,
@@ -1917,8 +1920,6 @@
                             ref_range += "\u2013" + verse2.full_book + " " + (BF.lang.chapter_count[verse2.b] === 1 ? "" : verse2.c + ":") + verse2.full_verse;
                         }
                         
-                        /// Store the query type in a variable because it may need to be accessed more than once.
-                        query_type = query_manager.query_type;
                         /// The verse range is displayed differently based on the type of search (i.e., a verse lookup or a search).
                         ///TODO: Set the date of the verse (or when it was written).
                         if (query_type === BF.consts.verse_lookup) {
