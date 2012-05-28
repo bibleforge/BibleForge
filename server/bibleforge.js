@@ -366,40 +366,7 @@ BF.get_b_c_v = function (verseID)
 };
 
 
-BF.db = (function ()
-{
-    var db = new (require("db-mysql")).Database({
-        hostname: BF.config.db.host,
-        user:     BF.config.db.user,
-        password: BF.config.db.pass,
-        database: BF.config.db.base,
-        async: false
-    });
-    
-    db.connect({async: false});
-        
-    db.query().execute("SET NAMES 'utf8'", {async: false});
-    
-    return {
-        escape: function (str)
-        {
-            return db.escape(str);
-        },
-        name: function (str)
-        {
-            return db.name(str);
-        },
-        query: function (sql, callback)
-        {
-            db.query().execute(sql, [], function (err, data)
-            {
-                if (typeof callback === "function") {
-                    callback(data, err);
-                }
-            });
-        }
-    };
-}());
+BF.db = require("./modules/db.js").db(BF.config);
 
 BF.lookup = function (data, callback)
 {
