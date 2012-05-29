@@ -435,7 +435,7 @@ BF.lookup = function (data, callback)
             } else {
                 len = data.length - 1;
             }
-    
+            
             for (i = 0; i < len; i += 1) {
                 res.n[i] = Number(data[i].id);
                 res.v[i] = data[i].words;
@@ -464,9 +464,18 @@ BF.lookup = function (data, callback)
     ///TODO: Determine if verse_id < 1001001 should default to 1001001 and verse_id > 66022021 to 66022021.
     ///TODO: 66022021 may need to be language dependent because different languages have different verse breaks.
     /// Also, check to see if the language specified is valid.
-    if (verse_id < 1001001 || verse_id > 66022021 || !BF.langs[lang]) {
+    if (verse_id < 1001001 || !BF.langs[lang]) {
         callback({});
         return;
+    }
+    
+    /// If the user is looking for a verse beyond Revelation 22:21, just return the last verse.
+    if (verse_id > 66022021) {
+        verse_id = 66022021;
+        /// If returning paragraphs, make sure to find the beginning of the last paragraph.
+        if (in_paragraphs) {
+            find_paragraph_start = true;
+        }
     }
     
     ///NOTE: To get PREVIOUS verses, we need to sort the database by id in reverse order because
