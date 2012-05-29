@@ -381,6 +381,85 @@ BF.lookup = function (data, callback)
         starting_verse,
         verse_id = Number(data.q);
     
+    /**
+     * Send the query to the database.
+     *
+     * @note This is a separate query because it can be called at two different times (and one is from an asynchronous callback).
+     */
+    function run_query()
+    {
+        BF.db.query("SELECT id, words" + extra_fields + " FROM `bible_" + lang + "_html` WHERE id " + operator + starting_verse + order_by + " LIMIT " + limit, function (data)
+        {
+            var break_after,
+                i,
+                len,
+                res = {
+                    n: [],
+                    v: []
+                };
+            
+            /// Was there no response from the database?  This could mean the database crashed.
+            if (!data) {
+                /// Send a blank response, and exit.
+                callback({});
+                return;
+            }
+            
+            if (in_paragraphs) {
+                res.p = [];
+                
+                /// Determine the actual number of verses that should be returned (starting from the end).
+                ///NOTE: Because the last verse cannot be in the middle of a paragraph break, it has to trim off the last partial paragraph from the database results.
+                len = data.length - 1
+                /// Did it return the expected number of verses?
+                /// If not, then it must have reached the end of the Bible, in which case it has also reached the end of a paragraph.
+                if (len === limit) {
+                    for(;;) {
+                        /// Is it at a paragraph break?
+                        if (data[len].paragraph) {
+                            /// The first verse should be at a paragraph beginning, and the last verse
+                            /// should be just before one. Therefore, when looking up previous verses,
+                            /// we must get this verse (because previous lookups are in reverse).
+                            /// So, additional lookups should stop now because the next verse is at the
+                            /// beginning of a paragraph, but previous lookups need to get this last verse,
+                            /// which is actually the first verse (because the arrays will be reversed shortly).
+                            if (direction === BF.consts.additional) {
+                                break;
+                            }
+                            len -= 1;
+                            break;
+                        }
+                        len -= 1;
+                    }
+                }
+            } else {
+                len = data.length - 1;
+            }
+    
+            for (i = 0; i < len; i += 1) {
+                res.n[i] = Number(data[i].id);
+                res.v[i] = data[i].words;
+                if (in_paragraphs) {
+                    res.p[i] = Number(data[i].paragraph);
+                }
+            }
+            
+            if (direction === BF.consts.previous) {
+                /// Because the database returns the verses in reverse order when preforming a previous lookup, they need to be reordered.
+                ///NOTE: Because in paragraph mode, there is no way to know how many verses will be returned, it cannot simply put the verses in the array in reverse order above.
+                res.n.reverse();
+                res.v.reverse();
+                if (in_paragraphs) {
+                    res.p.reverse();
+                }
+            }
+            
+            res.t = res.n.length;
+            
+            callback(res);
+        });
+    }
+    
     /// Quickly check to see if the verse_id is outside of the valid range.
     ///TODO: Determine if verse_id < 1001001 should default to 1001001 and verse_id > 66022021 to 66022021.
     ///TODO: 66022021 may need to be language dependent because different languages have different verse breaks.
@@ -412,85 +491,27 @@ BF.lookup = function (data, callback)
     }
     
     if (find_paragraph_start) {
-        /// Create a subquery that will return the nearest verse that is at a paragraph break.
+        /// Look up the nearest verse that is at a paragraph break, and then run the query.
+        ///NOTE: This is much faster than adding a subquery to the main query.
         ///NOTE: Currently, find_paragraph_start is never true when direction === BF.consts.previous because previous lookups always start at a paragraph break.
         ///      In order to find the correct starting verse when looking up in reverse, the comparison operator (<=) would need to be greater than or equal to (>=),
         ///      and 1 would need to be subtracted from the found starting id.
-        starting_verse = "(SELECT id FROM `bible_" + lang + "_html` WHERE id <= " + verse_id + " AND paragraph = 1 ORDER BY id DESC LIMIT 1)";
+        BF.db.query("SELECT id FROM `bible_" + lang + "_html` WHERE id <= " + verse_id + " AND paragraph = 1 ORDER BY id DESC LIMIT 1", function (data)
+        {
+            /// Was there no response from the database?  This could mean the database crashed.
+            if (!data || !data[0]) {
+                /// Send a blank response, and exit.
+                callback({});
+                return;
+            }
+            
+            starting_verse = data[0].id;
+            run_query();
+        });
     } else {
         starting_verse = verse_id;
+        run_query();
     }
-    
-    BF.db.query("SELECT id, words" + extra_fields + " FROM `bible_" + lang + "_html` WHERE id " + operator + starting_verse + order_by + " LIMIT " + limit, function (data)
-    {
-        var break_after,
-            i,
-            len,
-            res = {
-                n: [],
-                v: []
-            };
-        
-        /// Was there no response from the database?  This could mean the database crashed.
-        if (!data) {
-            /// Send a blank response, and exit.
-            callback({});
-            return;
-        }
-        
-        if (in_paragraphs) {
-            res.p = [];
-            
-            /// Determine the actual number of verses that should be returned (starting from the end).
-            ///NOTE: Because the last verse cannot be in the middle of a paragraph break, it has to trim off the last partial paragraph from the database results.
-            len = data.length - 1
-            /// Did it return the expected number of verses?
-            /// If not, then it must have reached the end of the Bible, in which case it has also reached the end of a paragraph.
-            if (len === limit) {
-                for(;;) {
-                    /// Is it at a paragraph break?
-                    if (data[len].paragraph) {
-                        /// The first verse should be at a paragraph beginning, and the last verse
-                        /// should be just before one. Therefore, when looking up previous verses,
-                        /// we must get this verse (because previous lookups are in reverse).
-                        /// So, additional lookups should stop now because the next verse is at the
-                        /// beginning of a paragraph, but previous lookups need to get this last verse,
-                        /// which is actually the first verse (because the arrays will be reversed shortly).
-                        if (direction === BF.consts.additional) {
-                            break;
-                        }
-                        len -= 1;
-                        break;
-                    }
-                    len -= 1;
-                }
-            }
-        } else {
-            len = data.length - 1;
-        }
-
-        for (i = 0; i < len; i += 1) {
-            res.n[i] = Number(data[i].id);
-            res.v[i] = data[i].words;
-            if (in_paragraphs) {
-                res.p[i] = Number(data[i].paragraph);
-            }
-        }
-        
-        if (direction === BF.consts.previous) {
-            /// Because the database returns the verses in reverse order when preforming a previous lookup, they need to be reordered.
-            ///NOTE: Because in paragraph mode, there is no way to know how many verses will be returned, it cannot simply put the verses in the array in reverse order above.
-            res.n.reverse();
-            res.v.reverse();
-            if (in_paragraphs) {
-                res.p.reverse();
-            }
-        }
-        
-        res.t = res.n.length;
-        
-        callback(res);
-    });
 };
 
 
