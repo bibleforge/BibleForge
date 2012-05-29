@@ -438,14 +438,15 @@ BF.lookup = function (data, callback)
             return;
         }
         
-        len = data.length - 1;
-        
         if (in_paragraphs) {
             res.p = [];
             
-            for (i = 0; i < len; i += 1) {
-                /// Is it at a paragraph break and did it find enough verses to send to the client?
-                if (data[i].paragraph && i >= BF.langs[lang].minimum_desired_verses) {
+            /// Determine the actual number of verses that should be returned (starting from the end).
+            ///NOTE: Because the last verse cannot be in the middle of a paragraph break, it has to trim off the last partial paragraph from the database results.
+            len = data.length - 1
+            for(;;) {
+                /// Is it at a paragraph break?
+                if (data[len].paragraph) {
                     /// The first verse should be at a paragraph beginning, and the last verse
                     /// should be just before one. Therefore, when looking up previous verses,
                     /// we must get this verse (because previous lookups are in reverse).
@@ -455,21 +456,20 @@ BF.lookup = function (data, callback)
                     if (direction === BF.consts.additional) {
                         break;
                     }
-                    break_after = true;
-                }
-                
-                res.n[i] = Number(data[i].id);
-                res.v[i] = data[i].words;
-                res.p[i] = Number(data[i].paragraph);
-                
-                if (break_after) {
+                    len -= 1;
                     break;
                 }
+                len -= 1;
             }
         } else {
-            for (i = 0; i < len; i += 1) {
-                res.n[i] = Number(data[i].id);
-                res.v[i] = data[i].words;
+            len = data.length - 1;
+        }
+
+        for (i = 0; i < len; i += 1) {
+            res.n[i] = Number(data[i].id);
+            res.v[i] = data[i].words;
+            if (in_paragraphs) {
+                res.p[i] = Number(data[i].paragraph);
             }
         }
         
@@ -478,7 +478,7 @@ BF.lookup = function (data, callback)
             ///NOTE: Because in paragraph mode, there is no way to know how many verses will be returned, it cannot simply put the verses in the array in reverse order above.
             res.n.reverse();
             res.v.reverse();
-            if (res.p) {
+            if (in_paragraphs) {
                 res.p.reverse();
             }
         }
