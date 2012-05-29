@@ -444,22 +444,26 @@ BF.lookup = function (data, callback)
             /// Determine the actual number of verses that should be returned (starting from the end).
             ///NOTE: Because the last verse cannot be in the middle of a paragraph break, it has to trim off the last partial paragraph from the database results.
             len = data.length - 1
-            for(;;) {
-                /// Is it at a paragraph break?
-                if (data[len].paragraph) {
-                    /// The first verse should be at a paragraph beginning, and the last verse
-                    /// should be just before one. Therefore, when looking up previous verses,
-                    /// we must get this verse (because previous lookups are in reverse).
-                    /// So, additional lookups should stop now because the next verse is at the
-                    /// beginning of a paragraph, but previous lookups need to get this last verse,
-                    /// which is actually the first verse (because the arrays will be reversed shortly).
-                    if (direction === BF.consts.additional) {
+            /// Did it return the expected number of verses?
+            /// If not, then it must have reached the end of the Bible, in which case it has also reached the end of a paragraph.
+            if (len === limit) {
+                for(;;) {
+                    /// Is it at a paragraph break?
+                    if (data[len].paragraph) {
+                        /// The first verse should be at a paragraph beginning, and the last verse
+                        /// should be just before one. Therefore, when looking up previous verses,
+                        /// we must get this verse (because previous lookups are in reverse).
+                        /// So, additional lookups should stop now because the next verse is at the
+                        /// beginning of a paragraph, but previous lookups need to get this last verse,
+                        /// which is actually the first verse (because the arrays will be reversed shortly).
+                        if (direction === BF.consts.additional) {
+                            break;
+                        }
+                        len -= 1;
                         break;
                     }
                     len -= 1;
-                    break;
                 }
-                len -= 1;
             }
         } else {
             len = data.length - 1;
