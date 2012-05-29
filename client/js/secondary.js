@@ -1164,7 +1164,17 @@
                     if (point_to_rects.length > 1) {
                         /// Did it already figure out which part of the word was clicked on?
                         if (split_info.which_rect) {
-                            which_rect = split_info.which_rect;
+                            /// Does the rectangle that the user first clicked exist?
+                            ///NOTE: For example, if the viewport is very small and word "Jonath-elem-rechokim" in Psalm 56:title wraps twice times and the user clicked on the third part,
+                            ///      and then the user resized the viewport so that now it only wraps once, there will be just two rectangles, not three.
+                            ///      So in this case, when the viewport is resized, it will select the second section.
+                            if (split_info.which_rect < point_to_rects.length) {
+                                /// Since the rectangle exists, use that.
+                                which_rect = split_info.which_rect;
+                            } else {
+                                /// Since the rectangle does not exist, use the last one.
+                                which_rect = point_to_rects.length - 1;
+                            }
                         } else {
                             /// Loop through each rectangle, and try to find which part the use clicked on.
                             for (i = point_to_rects.length - 1; i >= 0; i -= 1) {
