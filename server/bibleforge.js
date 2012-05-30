@@ -410,22 +410,27 @@ BF.lookup = function (data, callback)
                 
                 /// Determine the actual number of verses that should be returned (starting from the end).
                 ///NOTE: Because the last verse cannot be in the middle of a paragraph break, it has to trim off the last partial paragraph from the database results.
-                len = data.length - 1
+                len = data.length;
                 /// Did it return the expected number of verses?
                 /// If not, then it must have reached the end of the Bible, in which case it has also reached the end of a paragraph.
                 if (len === limit) {
-                    for(;;) {
+                    /// Start at the end of the dataset, and look for the last (i.e., first in reverse order) paragraph marker.
+                    /// Once found, trim off the last, incomplete paragraph (if any).
+                    ///NOTE: When preforming previous lookups, there might not be anything to trim off, but additional lookups must at least trim off one verse
+                    ///      because it must stop before the last paragraph marker.
+                    ///NOTE: (len >= 0) is just to make sure that it cannot get stuck in an infinite loop.
+                    while (len >= 0) {
                         /// Is it at a paragraph break?
-                        if (data[len].paragraph) {
+                        if (data[len - 1].paragraph) {
                             /// The first verse should be at a paragraph beginning, and the last verse
                             /// should be just before one. Therefore, when looking up previous verses,
                             /// we must get this verse (because previous lookups are in reverse).
-                            /// So, additional lookups should stop now because the next verse is at the
-                            /// beginning of a paragraph, but previous lookups need to get this last verse,
-                            /// which is actually the first verse (because the arrays will be reversed shortly).
-                            if (direction === BF.consts.additional) {
+                            /// So, previous lookups should stop now because this verse is at the
+                            /// beginning of a paragraph, but additional lookups need to get the verse before.
+                            if (direction === BF.consts.previous) {
                                 break;
                             }
+                            /// Move back one to get the verse before the paragraph break.
                             len -= 1;
                             break;
                         }
@@ -433,7 +438,7 @@ BF.lookup = function (data, callback)
                     }
                 }
             } else {
-                len = data.length - 1;
+                len = data.length;
             }
             
             for (i = 0; i < len; i += 1) {
