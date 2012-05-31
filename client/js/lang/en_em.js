@@ -24,6 +24,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see http://www.opensource.org/licenses/AGPL-3.0.
  */
+ "use strict";
 
 /// Declare globals for JSLint.
 /*global window, BF */
@@ -67,16 +68,31 @@
 /**
  * Create the BibleForge language specific object for Early Modern English.
  *
+ * @param   that (object) The global used to attach the code to.
  * @note    The object that is created is used by main.js to preform language specific operations.
- * @return  Returns an object containing language specific functions and variables.
+ * @return  NULL.  Attaches an object containing language specific functions and variables to the global BF object.
  */
-BF.langs.en_em = (function ()
+(function (that)
 {
     "use strict";
     
+    /// In the eval context, this is undefined, so it needs to get the global object manually.
+    if (that === undefined) {
+        that = typeof window !== "undefined" ? window : {};
+    }
+    
+    /// Has the BF object already been created?
+    ///NOTE: "that" is "this", which is "window" in browsers and "global" in node.
+    ///NOTE: This also allows this code to be accessed via Node.js' require() function.
+    if (!that.BF) {
+        that.BF = {langs: {}};
+    } else if (!that.BF.langs) {
+        that.BF.langs = {};
+    }
+    
     /// Return the language variables and functions.
-    return {
-        /// Incidate that the code has been downloaded and parsed.
+    that.BF.langs.en_em = {
+        /// Indicate that the code has been downloaded and parsed.
         loaded: true,
         
         /// Indicate the language name so it can be distinguished later.
@@ -1939,4 +1955,4 @@ first_loop:     while (i < search_terms_arr_len) {
             return query.replace(" IN RED", " AS RED").replace(/\s+/g, " ").replace(/\sAND\s/g, " & ").replace(/\sOR\s/g, " | ").replace(/(?:\s-|\s*\bNOT)\s/g, " -").replace(/ſ/g, "s").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[\u2011-\u2015]/g, "-").replace(/([0-9]+)[:.;,\s]title/ig, "$1:0").replace(/([:.;,\s])subscript(?:ion)?/ig, "$1255");
         }
     };
-}());
+}(this));
