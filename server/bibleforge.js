@@ -11,6 +11,7 @@
 "use strict";
 
 var BF = {
+    ///TODO: Remove this from the global scope.  Actually, remove it completely since it should not be necessary in a production environment.
     fs: require("fs")
 };
 
@@ -70,7 +71,6 @@ function start_server()
                 return;
             }
             
-            /// Override the default 404 header.
             connection.writeHead(200, {"Content-Type": "text/html"});
             
             BF.fs.readFile(__dirname + "/index_non-js.html", "utf8", function (err, html)
@@ -81,6 +81,8 @@ function start_server()
                 
                 html = html.replace(/__FULL_URI__/g, full_featured_uri);
                 html = html.replace("__QUERY__", BF.escape_html(query));
+                
+                ///TODO: Modify the classnames so that it displays the right style for each language.
                 
                 /// Is it a verse lookup?
                 if (verseID) {
@@ -813,56 +815,26 @@ BF.lexical_lookup = function (data, callback)
 };
 
 
-/// Pepare the langs object for the languages to attach to.
-BF.langs = {};
-
-/// Load the languages
+/**
+ * Load the languages
+ */
 (function ()
 {
-    /**
-     * Eval code in a neutral scope.
-     *
-     * @param  code (string) The string to eval.
-     * @return The result of the eval'ed code.
-     * @note   This is used to prevent included code from having access to the variables inside of the function's scope.
-     */
-    function evaler(code)
-    {
-        return eval(code);
+    ///NOTE: Since the server cannot start until this is done, async only slows things down.
+    var files = BF.fs.readdirSync(BF.config.static_path + "js/lang"),
+        i,
+        id,
+        lang;
+    
+    /// Pepare the langs object for the languages to attach to.
+    BF.langs = {};
+    
+    for (i = files.length - 1; i >= 0; i -= 1) {
+        lang = require(BF.config.static_path + "js/lang/" + files[i]).BF.langs;
+        ///NOTE: Object.keys() ignores prototypes, so there is no need for hasOwnProperty().
+        id = Object.keys(lang)[0];
+        BF.langs[id] = lang[id];
     }
     
-    (function ()
-    {
-        function include(path, context, callback, timeout, retry)
-        {
-            BF.fs.readFile(path, "utf8", function (err, data)
-            {
-                var code = evaler(data);
-                
-                if (code === "function") {
-                    code(context);
-                }
-                
-                if (typeof callback === "function") {
-                    callback(err);
-                }
-            });
-        }
-        
-        BF.fs.readdir(BF.config.static_path + "js/lang/", function (err, files)
-        {
-            var len = files.length;
-            
-            (function load_file(i)
-            {
-                if (i === len) {
-                    /// Now that every this is loaded, start the server.
-                    ///TODO: Start the server first, but make it wait for the rest to load.
-                    start_server();
-                } else {
-                    include(BF.config.static_path + "js/lang/" + files[i], null, load_file(i + 1));
-                }
-            }(0));
-        });
-     }());   
+    start_server();
 }());
