@@ -79,6 +79,8 @@
 {
     "use strict";
     
+    ///NOTE: The global BF object is created by the first language file to load (currently en.js).
+    
     /// Set the default language.
     ///TODO: Use the browser language settings and IP address to determine the default language.
     ///NOTE: Could use window.navigator.language (or perhaps navigator.userLanguage) to determine the user's language.
