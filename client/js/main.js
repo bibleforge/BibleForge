@@ -560,6 +560,8 @@
                      */
                     return function query(method, path, message, onsuccess, onfailure, timeout, retry)
                     {
+                        var post_message;
+                        
                         /// Because queries could be stored in the global_retry and run later, we need to make sure any cued queries are aborted.
                         ajax_obj.abort();
                         /// Reset the aborted variable because we are starting a new query.
@@ -596,11 +598,10 @@
                             ///TODO: Check to see if the message is to long and switch to POST.
                             ///TODO: Check to see if it has a leading question mark (?).
                             ajax.open(method, path + "?" + message);
-                            /// Since the message has been attached to the path, it does not need to be sent later, so it must be deleted now.
-                            message = "";
                         } else {
                             /// POST requests send the message later on (with .send()).
                             ajax.open(method, path);
+                            post_message = message;
                         }
                         
                         /// Without the correct content-type, the data in the message will not become variables on the server.
@@ -650,7 +651,7 @@
                                 }
                             }
                         };
-                        send_query(message, timeout, retry);
+                        send_query(post_message, timeout, retry);
                     };
                 }())
             };
