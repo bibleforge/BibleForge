@@ -80,8 +80,20 @@
     "use strict";
     
     /// Set the default language.
-    ///TODO: This should be based on browser language settings and IP address.
+    ///TODO: Use the browser language settings and IP address to determine the default language.
+    ///NOTE: Could use window.navigator.language (or perhaps navigator.userLanguage) to determine the user's language.
+    ///NOTE: On the server side, the Accept-Language header could be used.
     BF.lang = BF.langs.en;
+    
+    ///NOTE: The elements in this object are overwritten if/when the code is actually downloaded.
+    
+    ///TODO: These additions to the BF.langs object need to be created in the Forge.
+    if (!BF.lang.en_em) {
+        BF.langs.en_em = {
+            full_name: "Early Modern English (1611)",
+            modified:  12123453
+        };
+    }
     
     BF.consts = {
         /// Query type "constants"
