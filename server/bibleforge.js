@@ -252,7 +252,7 @@ function start_server()
                 
                 switch (Number(data.t)) {
                     case BF.consts.verse_lookup:
-                        BF.lookup(data, send_results);
+                        BF.verse_lookup(data, send_results);
                         break;
                     case BF.consts.standard_search:
                         BF.standard_search(data, send_results);
@@ -370,7 +370,7 @@ BF.get_b_c_v = function (verseID)
 
 BF.db = require("./modules/db.js").db(BF.config);
 
-BF.lookup = function (data, callback)
+BF.verse_lookup = function (data, callback)
 {
     var extra_fields,
         direction = data.d ? Number(data.d) : BF.consts.additional,
