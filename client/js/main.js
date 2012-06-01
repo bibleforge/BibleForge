@@ -55,7 +55,7 @@
     last_query, left, length, line_height, localStorage, location, map, metaKey, 
     mixed_search, n, navigator, new_val, nextSibling, no_results1, no_results2, 
     offsetHeight, offsetLeft, offsetParent, offsetTop, old_val, onblur, once, 
-    onfocus, onreadystatechange, onsubmit, open, opera, options, originalTarget, 
+    onfocus, onsubmit, open, opera, options, originalTarget, 
     p, page, pageXOffset, pageYOffset, parentNode, parse, parseInt, parse_json, 
     pathname, position, preload_font, prepare_highlighter, prepare_query, 
     prepared_query, prev_lang, preventDefault, previous, previousSibling, 
@@ -609,48 +609,40 @@
                         /**
                          * Handle the request once it has been completed.
                          */
-                        ajax.onreadystatechange = function ()
+                        ajax.onload = function ()
                         {
-                            /// readyState status codes:
-                            /// 0 = uninitialized    (.open() has not been called)
-                            /// 1 = opened           (.open() called but .send() has not been called)
-                            /// 2 = headers_recieved (.send() called and the headers and status are ready)
-                            /// 3 = loading          (downloading content; .responseText should have some data)
-                            /// 4 = completed        (finished downloading all data)
-                            if (ajax.readyState === 4) {
-                                /// Stop the timeout timer that may be running so it does not try again.
-                                window.clearTimeout(ajax_timeout);
+                            /// Stop the timeout timer that may be running so it does not try again.
+                            window.clearTimeout(ajax_timeout);
+                            
+                            /// HTTP status codes:
+                            /// 1xx Informational
+                            /// 2xx Success
+                            /// 3xx Redirection
+                            /// 4xx Client Error
+                            /// 5xx Server Error
+                            ///NOTE: If the status code is 0 that means that the server did not send back any response.
+                            
+                            /// Was the request successful?
+                            ///NOTE: It may be good to accept other 200 level codes.
+                            if (ajax.status === 200) {
+                                if (onsuccess) {
+                                    ///NOTE: It is not parsed here because it may not be parsed at all.
+                                    onsuccess(ajax.responseText);
+                                }
+                            } else {
+                                if (onfailure) {
+                                    onfailure(ajax.status, ajax.responseText);
+                                }
                                 
-                                /// HTTP status codes:
-                                /// 1xx Informational
-                                /// 2xx Success
-                                /// 3xx Redirection
-                                /// 4xx Client Error
-                                /// 5xx Server Error
-                                ///NOTE: If the status code is 0 that means that the server did not send back any response.
-                                
-                                /// Was the request successful?
-                                ///NOTE: It may be good to accept other 200 level codes.
-                                if (ajax.status === 200) {
-                                    if (onsuccess) {
-                                        ///NOTE: It is not parsed here because it may not be parsed at all.
-                                        onsuccess(ajax.responseText);
-                                    }
-                                } else {
-                                    if (onfailure) {
-                                        onfailure(ajax.status, ajax.responseText);
-                                    }
-                                    
-                                    /// Should it retry?
-                                    ///NOTE: Since 400 errors indicate a problem with the client, most 400 errors should not be repeated.
-                                    ///      Error 408 (Request Timeout) can be repeated by the client without modification.
-                                    if (retry && !aborted) {
-                                        retrying = true;
-                                        global_retry.attach(retry_func);
-                                    }
+                                /// Should it retry?
+                                ///NOTE: Since 400 errors indicate a problem with the client, most 400 errors should not be repeated.
+                                ///      Error 408 (Request Timeout) can be repeated by the client without modification.
+                                if (retry && !aborted) {
+                                    retrying = true;
+                                    global_retry.attach(retry_func);
                                 }
                             }
-                        };
+                    };
                         send_query(post_message, timeout, retry);
                     };
                 }())
