@@ -11,6 +11,8 @@
 "use strict";
 
 this.config = {
+    /// Whether or not to cache the contents of index_non-js.html.  Should be TRUE on production servers.
+    cache_simple_html: true,
     db: {
         host: "127.0.0.1",
         user: "user",
