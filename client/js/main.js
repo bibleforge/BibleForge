@@ -595,8 +595,8 @@
                         
                         if (method.toLowerCase() === "get") {
                             /// GET requests need the message appended to the path.
+                            ///NOTE: Could check to see if the path or message already have question mark (?).
                             ///TODO: Check to see if the message is to long and switch to POST.
-                            ///TODO: Check to see if it has a leading question mark (?).
                             ajax.open(method, path + "?" + message);
                         } else {
                             /// POST requests send the message later on (with .send()).
@@ -693,7 +693,8 @@
                 ajax.query("GET", path, "", function (response)
                 {
                     files[path] = evaler(response);
-                    ///TODO: Determine what kind of error handling should be done.
+                    
+                    /// If the eval'ed code is a function, send it the context.
                     if (typeof files[path] === "function") {
                         files[path](context);
                     }
@@ -3584,7 +3585,7 @@
                 }
             }
             output = (lastLastIndex === this.length ? (s.test("") && !lastLength ? output : output.concat("")) : (limit ? output : output.concat(this.slice(lastLastIndex))));
-            /// TODO: Determine if this next line of code is necessary.
+            
             s.lastIndex = origLastIndex;
             return output;
         };
