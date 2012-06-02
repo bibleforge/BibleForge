@@ -536,19 +536,24 @@ BF.verse_lookup = function (data, callback)
 BF.standard_search = function (data, callback)
 {
     var direction = data.d ? Number(data.d) : BF.consts.additional,
+        html_table,
         initial,
         /// Select the language object specified by the query or use the default.
         lang = BF.langs[data.l] || BF.langs["en"],
         query,
         start_at = data.s ? Number(data.s) : 0,
-        terms = String(data.q);
+        terms = String(data.q),
+        verse_table;
+    
+    html_table  = "`bible_" + lang.id + "_html`";
+    verse_table = "`verse_text_" + lang.id + "`";
     
     
     ///NOTE: Currently, the first query does not specifiy a verse.
     initial = !Boolean(start_at);
     
     /// Create the first part of the SQL/SphinxQL query.
-    query = "SELECT `verse_text_" + lang.id + "`.id, `bible_" + lang.id + "_html`.words FROM `verse_text_" + lang.id + "`, `bible_" + lang.id + "_html` WHERE `bible_" + lang.id + "_html`.id = `verse_text_" + lang.id + "`.id AND `verse_text_" + lang.id + "`.query = \"" + BF.db.escape(terms) + ";limit=" + BF.langs[lang].minimum_desired_verses + ";ranker=none";
+    query = "SELECT " + verse_table + ".id, " + html_table + ".words FROM " + verse_table + ", " + html_table + " WHERE " + html_table + ".id = " + verse_table + ".id AND " + verse_table + ".query = \"" + BF.db.escape(terms) + ";limit=" + lang.minimum_desired_verses + ";ranker=none";
     
     /// Should the query start somewhere in the middle of the Bible?
     if (start_at) {
@@ -663,20 +668,24 @@ BF.standard_search = function (data, callback)
 BF.grammatical_search = function (data, callback)
 {
     var direction = data.d ? Number(data.d) : BF.consts.additional,
+        html_table,
         i,
         initial,
         /// Select the language object specified by the query or use the default.
         lang = BF.langs[data.l] || BF.langs["en"],
+        morphological_table,
         query,
         start_at = data.s ? Number(data.s) : 0,
         ///TODO: Make this an object instead.
         query_arr = BF.parse_json(data.q);
     
+    html_table = "`bible_" + lang.id + "_html`";
+    morphological_table = "`morphological_" + lang.id + "`";
     ///NOTE: Currently, the first query does not specifiy a verse.
     initial = !Boolean(start_at);
     
     /// Create the first part of the SQL/SphinxQL query.
-    query = "SELECT `morphological_" + lang.id + "`.id, `morphological_" + lang.id + "`.verseID, `bible_" + lang.id + "_html`.words FROM `morphological_" + lang.id + "`, `bible_" + lang.id + "_html` WHERE `bible_" + lang.id + "_html`.id = `morphological_" + lang.id + "`.verseID AND `morphological_" + lang.id + "`.query = \"" + BF.db.escape(query_arr[0]) + ";limit=" + lang.minimum_desired_verses + ";ranker=none";
+    query = "SELECT " + morphological_table + ".id, " + morphological_table + ".verseID, " + html_table + ".words FROM " + morphological_table + ", " + html_table + " WHERE " + html_table + ".id = " + morphological_table + ".verseID AND " + morphological_table + ".query = \"" + BF.db.escape(query_arr[0]) + ";limit=" + lang.minimum_desired_verses + ";ranker=none";
     
     /// Should the query start somewhere in the middle of the Bible?
     if (start_at) {
@@ -774,21 +783,18 @@ BF.grammatical_search = function (data, callback)
 BF.lexical_lookup = function (data, callback)
 {
     /// Select the language object specified by the query or use the default.
-    var lang = BF.langs[data.l] || BF.langs["en"],
+    var bible_table,
+        lang = BF.langs[data.l] || BF.langs["en"],
         query,
         word_id = Number(data.q);
     
-    /// Is the language invalid?
-    if (!lang) {
-        callback({});
-        return;
-    }
+    bible_table = "`bible_" + lang.id + "`";
     
     /// Is it an Old Testament word?
     if (word_id < lang.divisions.nt) {
-        query = "SELECT `bible_original`.word, `bible_original`.pronun, `lexicon_hebrew`.strongs, `lexicon_hebrew`.base_word, `lexicon_hebrew`.data, `lexicon_hebrew`.usage FROM `bible_" + lang.id + "`, `bible_original`, `lexicon_hebrew`, `morphology` WHERE `bible_" + lang.id + "`.id = " + word_id + " AND `bible_original`.id = `bible_" + lang.id + "`.orig_id AND lexicon_hebrew.strongs = `bible_original`.strongs LIMIT 1";
+        query = "SELECT `bible_original`.word, `bible_original`.pronun, `lexicon_hebrew`.strongs, `lexicon_hebrew`.base_word, `lexicon_hebrew`.data, `lexicon_hebrew`.usage FROM " + bible_table + ", `bible_original`, `lexicon_hebrew`, `morphology` WHERE " + bible_table + ".id = " + word_id + " AND `bible_original`.id = " + bible_table + ".orig_id AND lexicon_hebrew.strongs = `bible_original`.strongs LIMIT 1";
     } else {
-        query = "SELECT `bible_original`.word, `bible_original`.pronun, `lexicon_greek`.strongs, `lexicon_greek`.base_word, `lexicon_greek`.data, `lexicon_greek`.usage, `morphology`.part_of_speech, `morphology`.declinability, `morphology`.case_5, `morphology`.number, `morphology`.gender, `morphology`.degree, `morphology`.tense, `morphology`.voice, `morphology`.mood, `morphology`.person, `morphology`.middle, `morphology`.transitivity, `morphology`.miscellaneous, `morphology`.noun_type, `morphology`.numerical, `morphology`.form, `morphology`.dialect, `morphology`.type, `morphology`.pronoun_type FROM `bible_" + lang.id + "`, `bible_original`, `lexicon_greek`, `morphology` WHERE `bible_" + lang.id + "`.id = " + word_id + " AND `bible_original`.id = `bible_" + lang.id + "`.orig_id AND lexicon_greek.strongs = `bible_original`.strongs AND `morphology`.id = `bible_original`.id LIMIT 1";
+        query = "SELECT `bible_original`.word, `bible_original`.pronun, `lexicon_greek`.strongs, `lexicon_greek`.base_word, `lexicon_greek`.data, `lexicon_greek`.usage, `morphology`.part_of_speech, `morphology`.declinability, `morphology`.case_5, `morphology`.number, `morphology`.gender, `morphology`.degree, `morphology`.tense, `morphology`.voice, `morphology`.mood, `morphology`.person, `morphology`.middle, `morphology`.transitivity, `morphology`.miscellaneous, `morphology`.noun_type, `morphology`.numerical, `morphology`.form, `morphology`.dialect, `morphology`.type, `morphology`.pronoun_type FROM " + bible_table + ", `bible_original`, `lexicon_greek`, `morphology` WHERE " + bible_table + ".id = " + word_id + " AND `bible_original`.id = " + bible_table + ".orig_id AND lexicon_greek.strongs = `bible_original`.strongs AND `morphology`.id = `bible_original`.id LIMIT 1";
     }
     
     ///FIXME: Currently, BibleForge links words to the lexicon by Strong's numbers; however, this is too simplistic because some Strong's numbers have multiple entries.
