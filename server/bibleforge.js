@@ -349,7 +349,7 @@ BF.parse_json = function (str)
 
 BF.escape_html = function (str)
 {
-    ///NOTE: It must first replace ampersands (&) otherwise, it will escape the other entities.
+    ///NOTE: It must first replace ampersands (&); otherwise, the other entities would be escaped twice.
     return str.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/'/g, "&#39;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 };
 
@@ -376,7 +376,8 @@ BF.verse_lookup = function (data, callback)
         direction = data.d ? Number(data.d) : BF.consts.additional,
         find_paragraph_start = Boolean(data.f),
         in_paragraphs = data.p ? Boolean(data.p) : true,
-        lang = data.l || "en",
+        /// Select the language object specified by the query or use the default.
+        lang = BF.langs[data.l] || BF.langs["en"],
         limit,
         operator,
         order_by,
@@ -390,7 +391,7 @@ BF.verse_lookup = function (data, callback)
      */
     function run_query()
     {
-        BF.db.query("SELECT id, words" + extra_fields + " FROM `bible_" + lang + "_html` WHERE id " + operator + starting_verse + order_by + " LIMIT " + limit, function (data)
+        BF.db.query("SELECT id, words" + extra_fields + " FROM `bible_" + lang.id + "_html` WHERE id " + operator + starting_verse + order_by + " LIMIT " + limit, function (data)
         {
             var break_after,
                 i,
@@ -470,7 +471,6 @@ BF.verse_lookup = function (data, callback)
     /// Quickly check to see if the verse_id is outside of the valid range.
     ///TODO: Determine if verse_id < 1001001 should default to 1001001 and verse_id > 66022021 to 66022021.
     ///TODO: 66022021 may need to be language dependent because different languages have different verse breaks.
-    /// Also, check to see if the language specified is valid.
     if (verse_id < 1001001 || !BF.langs[lang]) {
         callback({});
         return;
@@ -485,34 +485,36 @@ BF.verse_lookup = function (data, callback)
         }
     }
     
-    ///NOTE: To get PREVIOUS verses, we need to sort the database by id in reverse order because
-    ///      chapter and book boundaries are not predictable (i.e., we can't just say "WHERE id >= id - LIMIT").
-    
     if (direction === BF.consts.additional) {
         operator = ">=";
         order_by = "";
     } else {
+        ///NOTE: To get the right verses in a previous verse lookup, we need to sort the database by id in reverse order because
+        ///      chapter and book boundaries are not predictable (i.e., we can't just say "WHERE id >= id - LIMIT").
         operator = "<=";
         ///NOTE: Leading space is needed in case the preceding variable does end with whitespace.
         order_by = " ORDER BY id DESC";
     }
     
     if (in_paragraphs) {
-        /// The limit must be set to the minimum length of the longest paragraph because paragraphs cannot be split.
-        limit = BF.langs[lang].paragraph_limit;
+        /// The limit must be larger than the minimum length of the longest paragraph because paragraphs cannot be split.
+        limit = lang.paragraph_limit;
         extra_fields = ", paragraph";
     } else {
-        limit = BF.langs[lang].minimum_desired_verses;
+        limit = lang.minimum_desired_verses;
         extra_fields = "";
     }
     
+    /// If this is the first query and the query does not begin at an obvious paragraph break (e.g., the beginning of a chapter), we must first determine the where the paragraph begins.
+    ///NOTE: For example, if the query is for Deuteronomy 6:4 (in paragraphs), the query cannot begin at Deuteronomy 6:4 because that is (or at least could be) the middle of a paragraph.
+    ///      So, we must first use another query to determine the first paragraph break before (or at) Deuteronomy 6:4.  Currently, in the English version, it is Deuteronomy 6:3, so that will be used for starting_verse.
     if (find_paragraph_start) {
         /// Look up the nearest verse that is at a paragraph break, and then run the query.
         ///NOTE: This is much faster than adding a subquery to the main query.
         ///NOTE: Currently, find_paragraph_start is never true when direction === BF.consts.previous because previous lookups always start at a paragraph break.
         ///      In order to find the correct starting verse when looking up in reverse, the comparison operator (<=) would need to be greater than or equal to (>=),
         ///      and 1 would need to be subtracted from the found starting id.
-        BF.db.query("SELECT id FROM `bible_" + lang + "_html` WHERE id <= " + verse_id + " AND paragraph = 1 ORDER BY id DESC LIMIT 1", function (data)
+        BF.db.query("SELECT id FROM `bible_" + lang.id + "_html` WHERE id <= " + verse_id + " AND paragraph = 1 ORDER BY id DESC LIMIT 1", function (data)
         {
             /// Was there no response from the database?  This could mean the database crashed.
             if (!data || !data[0]) {
@@ -535,28 +537,24 @@ BF.standard_search = function (data, callback)
 {
     var direction = data.d ? Number(data.d) : BF.consts.additional,
         initial,
-        lang = data.l || "en",
+        /// Select the language object specified by the query or use the default.
+        lang = BF.langs[data.l] || BF.langs["en"],
         query,
         start_at = data.s ? Number(data.s) : 0,
         terms = String(data.q);
     
-    /// Is the language invalid?
-    if (!BF.langs[lang]) {
-        callback({});
-        return;
-    }
     
     ///NOTE: Currently, the first query does not specifiy a verse.
     initial = !Boolean(start_at);
     
     /// Create the first part of the SQL/SphinxQL query.
-    query = "SELECT `verse_text_" + lang + "`.id, `bible_" + lang + "_html`.words FROM `verse_text_" + lang + "`, `bible_" + lang + "_html` WHERE `bible_" + lang + "_html`.id = `verse_text_" + lang + "`.id AND `verse_text_" + lang + "`.query = \"" + BF.db.escape(terms) + ";limit=" + BF.langs[lang].minimum_desired_verses + ";ranker=none";
+    query = "SELECT `verse_text_" + lang.id + "`.id, `bible_" + lang.id + "_html`.words FROM `verse_text_" + lang.id + "`, `bible_" + lang.id + "_html` WHERE `bible_" + lang.id + "_html`.id = `verse_text_" + lang.id + "`.id AND `verse_text_" + lang.id + "`.query = \"" + BF.db.escape(terms) + ";limit=" + BF.langs[lang].minimum_desired_verses + ";ranker=none";
     
     /// Should the query start somewhere in the middle of the Bible?
     if (start_at) {
         ///NOTE: By keeping all of the settings in the Sphinx query, Sphinx can preform the best optimizations.
         ///      Another less optimized approach would be to use the database itself to filter the results like this:
-        ///         ...WHERE id >= start_at AND query="...;limit=9999999" LIMIT BF.langs[lang].minimum_desired_verses
+        ///         ...WHERE id >= start_at AND query="...;limit=9999999" LIMIT lang.minimum_desired_verses
         query += ";minid=" + start_at;
     }
     
@@ -667,34 +665,29 @@ BF.grammatical_search = function (data, callback)
     var direction = data.d ? Number(data.d) : BF.consts.additional,
         i,
         initial,
-        lang = data.l || "en",
+        /// Select the language object specified by the query or use the default.
+        lang = BF.langs[data.l] || BF.langs["en"],
         query,
         start_at = data.s ? Number(data.s) : 0,
         ///TODO: Make this an object instead.
         query_arr = BF.parse_json(data.q);
     
-    /// Is the language or query invalid?
-    if (!BF.langs[lang] || !query_arr) {
-        callback({});
-        return;
-    }
-    
     ///NOTE: Currently, the first query does not specifiy a verse.
     initial = !Boolean(start_at);
     
     /// Create the first part of the SQL/SphinxQL query.
-    query = "SELECT `morphological_" + lang + "`.id, `morphological_" + lang + "`.verseID, `bible_" + lang + "_html`.words FROM `morphological_" + lang + "`, `bible_" + lang + "_html` WHERE `bible_" + lang + "_html`.id = `morphological_" + lang + "`.verseID AND `morphological_" + lang + "`.query = \"" + BF.db.escape(query_arr[0]) + ";limit=" + BF.langs[lang].minimum_desired_verses + ";ranker=none";
+    query = "SELECT `morphological_" + lang.id + "`.id, `morphological_" + lang.id + "`.verseID, `bible_" + lang.id + "_html`.words FROM `morphological_" + lang.id + "`, `bible_" + lang.id + "_html` WHERE `bible_" + lang.id + "_html`.id = `morphological_" + lang.id + "`.verseID AND `morphological_" + lang.id + "`.query = \"" + BF.db.escape(query_arr[0]) + ";limit=" + lang.minimum_desired_verses + ";ranker=none";
     
     /// Should the query start somewhere in the middle of the Bible?
     if (start_at) {
         ///NOTE: By keeping all of the settings in the Sphinx query, Sphinx can preform the best optimizations.
         ///      Another less optimized approach would be to use the database itself to filter the results like this:
-        ///         ...WHERE id >= start_at AND query="...;limit=9999999" LIMIT BF.langs[lang].minimum_desired_verses
+        ///         ...WHERE id >= start_at AND query="...;limit=9999999" LIMIT lang.minimum_desired_verses
         query += ";minid=" + start_at;
     }
     
     for (i = query_arr[1].length - 1; i >= 0; i -= 1) {
-        query += ";" + (query_arr[2][i] ? "!" : "") + "filter=" + BF.langs[lang].grammar_categories[query_arr[1][i][0]] + "," + query_arr[1][i][1];
+        query += ";" + (query_arr[2][i] ? "!" : "") + "filter=" + lang.grammar_categories[query_arr[1][i][0]] + "," + query_arr[1][i][1];
     }
     
     
@@ -780,21 +773,22 @@ BF.grammatical_search = function (data, callback)
 
 BF.lexical_lookup = function (data, callback)
 {
-    var lang = data.l || "en",
+    /// Select the language object specified by the query or use the default.
+    var lang = BF.langs[data.l] || BF.langs["en"],
         query,
         word_id = Number(data.q);
     
     /// Is the language invalid?
-    if (!BF.langs[lang]) {
+    if (!lang) {
         callback({});
         return;
     }
     
     /// Is it an Old Testament word?
-    if (word_id < BF.langs[lang].divisions.nt) {
-        query = "SELECT `bible_original`.word, `bible_original`.pronun, `lexicon_hebrew`.strongs, `lexicon_hebrew`.base_word, `lexicon_hebrew`.data, `lexicon_hebrew`.usage FROM `bible_" + lang + "`, `bible_original`, `lexicon_hebrew`, `morphology` WHERE `bible_" + lang + "`.id = " + word_id + " AND `bible_original`.id = `bible_" + lang + "`.orig_id AND lexicon_hebrew.strongs = `bible_original`.strongs LIMIT 1";
+    if (word_id < lang.divisions.nt) {
+        query = "SELECT `bible_original`.word, `bible_original`.pronun, `lexicon_hebrew`.strongs, `lexicon_hebrew`.base_word, `lexicon_hebrew`.data, `lexicon_hebrew`.usage FROM `bible_" + lang.id + "`, `bible_original`, `lexicon_hebrew`, `morphology` WHERE `bible_" + lang.id + "`.id = " + word_id + " AND `bible_original`.id = `bible_" + lang.id + "`.orig_id AND lexicon_hebrew.strongs = `bible_original`.strongs LIMIT 1";
     } else {
-        query = "SELECT `bible_original`.word, `bible_original`.pronun, `lexicon_greek`.strongs, `lexicon_greek`.base_word, `lexicon_greek`.data, `lexicon_greek`.usage, `morphology`.part_of_speech, `morphology`.declinability, `morphology`.case_5, `morphology`.number, `morphology`.gender, `morphology`.degree, `morphology`.tense, `morphology`.voice, `morphology`.mood, `morphology`.person, `morphology`.middle, `morphology`.transitivity, `morphology`.miscellaneous, `morphology`.noun_type, `morphology`.numerical, `morphology`.form, `morphology`.dialect, `morphology`.type, `morphology`.pronoun_type FROM `bible_" + lang + "`, `bible_original`, `lexicon_greek`, `morphology` WHERE `bible_" + lang + "`.id = " + word_id + " AND `bible_original`.id = `bible_" + lang + "`.orig_id AND lexicon_greek.strongs = `bible_original`.strongs AND `morphology`.id = `bible_original`.id LIMIT 1";
+        query = "SELECT `bible_original`.word, `bible_original`.pronun, `lexicon_greek`.strongs, `lexicon_greek`.base_word, `lexicon_greek`.data, `lexicon_greek`.usage, `morphology`.part_of_speech, `morphology`.declinability, `morphology`.case_5, `morphology`.number, `morphology`.gender, `morphology`.degree, `morphology`.tense, `morphology`.voice, `morphology`.mood, `morphology`.person, `morphology`.middle, `morphology`.transitivity, `morphology`.miscellaneous, `morphology`.noun_type, `morphology`.numerical, `morphology`.form, `morphology`.dialect, `morphology`.type, `morphology`.pronoun_type FROM `bible_" + lang.id + "`, `bible_original`, `lexicon_greek`, `morphology` WHERE `bible_" + lang.id + "`.id = " + word_id + " AND `bible_original`.id = `bible_" + lang.id + "`.orig_id AND lexicon_greek.strongs = `bible_original`.strongs AND `morphology`.id = `bible_original`.id LIMIT 1";
     }
     
     ///FIXME: Currently, BibleForge links words to the lexicon by Strong's numbers; however, this is too simplistic because some Strong's numbers have multiple entries.
