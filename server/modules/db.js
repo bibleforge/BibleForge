@@ -1,3 +1,13 @@
+/**
+ * BibleForge
+ *
+ * @date    05-28-12
+ * @version alpha (α)
+ * @link    http://BibleForge.com
+ * @license GNU Affero General Public License 3.0 (AGPL-3.0)
+ * @author  BibleForge <info@bibleforge.com>
+ */
+
 "use strict";
 
 this.db = function (config)
@@ -5,10 +15,10 @@ this.db = function (config)
     return (function ()
     {
         var db = new (require("db-mysql")).Database({
-            hostname: config.db.host,
-            user:     config.db.user,
-            password: config.db.pass,
-            database: config.db.base,
+            hostname: config.host,
+            user:     config.user,
+            password: config.pass,
+            database: config.base,
             async: false
         });
         

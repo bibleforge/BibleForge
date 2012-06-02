@@ -368,7 +368,7 @@ BF.get_b_c_v = function (verseID)
 };
 
 
-BF.db = require("./modules/db.js").db(BF.config);
+BF.db = require("./modules/db.js").db(BF.config.db);
 
 BF.verse_lookup = function (data, callback)
 {
