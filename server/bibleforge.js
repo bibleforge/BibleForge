@@ -648,9 +648,6 @@ BF.standard_search = function (data, callback)
         if (initial) {
             /// Because all of the columns share the same name when using UNION, the total verses found statistic is in the "words" column.
             res.t = Number(data.pop().words);
-        } else {
-            ///BUG: Without a truthy value here, the client thinks the results are empty.
-            res.t = 1;
         }
         
         len = data.length;
@@ -759,9 +756,6 @@ BF.grammatical_search = function (data, callback)
         if (initial) {
             /// Because all of the columns share the same name when using UNION, the total verses found statistic is in the "words" column.
             res.t = Number(data.pop().words);
-        } else {
-            ///BUG: Without a truthy value here, the client thinks the results are empty.
-            res.t = 1;
         }
         
         len = data.length;

@@ -2360,7 +2360,7 @@
                             word_ids   = data.i;
                         
                         /// Were there any verses returned?
-                        if (total) {
+                        if (verse_ids && verse_ids.length) {
                             write_verses(type, direction, verse_ids, verse_html, paragraphs, in_paragraphs, options.verse_range);
                             
                             if (options.highlight) {
