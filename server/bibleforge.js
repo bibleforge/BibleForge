@@ -403,7 +403,7 @@ BF.verse_lookup = function (data, callback)
             
             /// Was there no response from the database?  This could mean the database crashed.
             if (!data) {
-                /// Send a blank response, and exit.
+                /// Send an empty response, and exit.
                 callback({});
                 return;
             }
@@ -468,16 +468,16 @@ BF.verse_lookup = function (data, callback)
         });
     }
     
-    /// Quickly check to see if the verse_id is outside of the valid range.
-    ///TODO: Determine if verse_id < 1001001 should default to 1001001 and verse_id > 66022021 to 66022021.
-    ///TODO: 66022021 may need to be language dependent because different languages have different verse breaks.
-    if (verse_id < 1001001 || !BF.langs[lang]) {
+    /// If verse_id is not a number, send an empty response, and exit.
+    if (isNaN(verse_id)) {
         callback({});
         return;
-    }
-    
-    /// If the user is looking for a verse beyond Revelation 22:21, just return the last verse.
-    if (verse_id > 66022021) {
+    } else if (verse_id < 1001001) {
+        /// Default to Genesis 1:1 if the verse_id is too small.
+        verse_id = 1001001;
+    } else if (verse_id > 66022021) {
+        /// If the user is looking for a verse past the end, default to Revelation 22:21.
+        ///NOTE: 66022021 may need to be language dependent because different languages have different verse breaks.
         verse_id = 66022021;
         /// If returning paragraphs, make sure to find the beginning of the last paragraph.
         if (in_paragraphs) {
@@ -518,7 +518,7 @@ BF.verse_lookup = function (data, callback)
         {
             /// Was there no response from the database?  This could mean the database crashed.
             if (!data || !data[0]) {
-                /// Send a blank response, and exit.
+                /// Send an empty response, and exit.
                 callback({});
                 return;
             }
@@ -635,7 +635,7 @@ BF.standard_search = function (data, callback)
         
         /// Was there no response from the database?  This could mean the database or Sphinx crashed.
         if (!data) {
-            /// Send a blank response, and exit.
+            /// Send an empty response, and exit.
             callback({});
             return;
         }
@@ -742,7 +742,7 @@ BF.grammatical_search = function (data, callback)
         
         /// Was there no response from the database?  This could mean the database or Sphinx crashed.
         if (!data) {
-            /// Send a blank response, and exit.
+            /// Send an empty response, and exit.
             callback({});
             return;
         }
@@ -797,7 +797,7 @@ BF.lexical_lookup = function (data, callback)
     {
         /// Was there no response from the database?  This could mean the database crashed.
         if (!data || !data.length) {
-            /// Send a blank response, and exit.
+            /// Send an empty response, and exit.
             callback({});
             return;
         }
