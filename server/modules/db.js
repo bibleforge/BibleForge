@@ -11,8 +11,12 @@
 "use strict";
 
 /**
+ * Create the database abstraction layer.
  *
- * @todo Reconnect to the server if it gets disconnected.
+ * @param config (object) An object defining the database parameters.
+ *                        Object format: {host: "The hostname to connect to", user: "The database username", pass: "The user's password", base: "The database name"}
+ * @todo  Determine if the hostname can contain a port or socket.  If not, allow this to be configured as separate options.
+ * @todo  Reconnect to the server if it gets disconnected.
  */
 this.db = function (config)
 {
@@ -20,15 +24,24 @@ this.db = function (config)
     {
         var connected,
             db = new (require("db-mysql")).Database({
-            charset:  "utf8", /// With this, we do not need to send "SET NAMES utf8;" when the connection is made.
-            hostname: config.host,
-            user:     config.user,
-            password: config.pass,
-            database: config.base
-        }),
+                charset:  "utf8", /// With this, we do not need to send "SET NAMES utf8;" when the connection is made.
+                ///NOTE: Could also use "port" and "socket".
+                hostname: config.host,
+                user:     config.user,
+                password: config.pass,
+                database: config.base
+                /// Other options:
+                ///     compress        (default FALSE)
+                ///     reconnect       (default TRUE)
+                ///     initCommand
+                ///     readTimeout     (default 0)
+                ///     sslVerifyServer (default FALSE)
+                ///     timeout         (default 0)
+                ///     writeTimeout    (default 0)
+            }),
             /// The queue object is used to store any queries that are called before a connection to the database has been established.
             /// This is only used before the database has started.  The intended purpose is to allow the BibleForge server to start up
-            /// before the database itself has started.  If the BibleForge loses its connection to the database later, the queiries are
+            /// before the database itself has started.  If the BibleForge loses its connection to the database later, the queries are
             /// simply rejected.  Once the database is running again, a connection will automatically be re-established.
             queue = (function ()
             {
@@ -38,20 +51,27 @@ this.db = function (config)
                     /**
                      * Add an additional query to the queue.
                      *
-                     * @param sql      (string)   The SQL query to send.
-                     * @param callback (function) The function to call after the query returns.
+                     * @param sql      (string)   The SQL query to execute
+                     * @param callback (function) The function to call after the query returns
                      * @todo  Remove old queued queries when the client that requested them closes.
                      */
                     add: function (sql, callback)
                     {
                         queries[queries.length] = {sql: sql, callback: callback};
                     },
+                    /**
+                     * Execute queued queries.
+                     *
+                     * @note Since executing the queries is done asynchronously, this function may call itself.
+                     */
                     flush: function ()
                     {
                         var query;
                         
+                        /// Are there any queries?  If not, this function will simply end.
                         if (queries.length) {
                             
+                            /// Get the first array item and simultaneously remove it form the array.
                             query = queries.shift();
                             
                             db.query().execute(query.sql, [], function (err, data)
@@ -59,6 +79,7 @@ this.db = function (config)
                                 if (typeof query.callback === "function") {
                                     query.callback(data, err);
                                 }
+                                /// Call this function again to preform the next query (if any).
                                 queue.flush();
                             });
                         }
@@ -66,6 +87,11 @@ this.db = function (config)
                 };
             }());
         
+        /**
+         * Attempt to connect to the database.
+         *
+         * @note If a connection cannot be made, this function will call itself after a short delay.
+         */
         function connect()
         {
             db.connect(function (err)
@@ -73,23 +99,44 @@ this.db = function (config)
                 if (err) {
                     setTimeout(connect, 50);
                 } else {
+                    /// If a connection is made, prevent queries form being stored and flush any that have already been stored.
                     connected = true;
                     queue.flush();
                 }
             });
         }
         
+        /// Try to connect to the database.
         connect();
         
         return {
+            /**
+             * Escape a query argument.
+             *
+             * @example var sql = "SELECT * FROM `table` WHERE field = \"" + db.escape("\"; DROP TABLE table;") + "\"";
+             * @param   str (string) The string to escape.
+             */
             escape: function (str)
             {
                 return db.escape(str);
             },
+            /**
+             * Escape a table or field name.
+             *
+             * @example var sql = "SELECT * FROM " + db.name("table name");
+             * @param   str (string) The string to escape.
+             */
             name: function (str)
             {
                 return db.name(str);
             },
+            /**
+             * Execute a query.
+             *
+             * @param sql      (string)   The SQL query to execute
+             * @param callback (function) The function to call after the query returns
+             * @note  If the database has not yet been connected to, the query will be queued.
+             */
             query: function (sql, callback)
             {
                 if (connected) {
