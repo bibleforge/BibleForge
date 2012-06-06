@@ -139,14 +139,17 @@ this.db = function (config)
              */
             query: function (sql, callback)
             {
+                /// Has a connection been established?
                 if (connected) {
                     db.query().execute(sql, [], function (err, data)
                     {
+                        ///TODO: Log errors.
                         if (typeof callback === "function") {
                             callback(data, err);
                         }
                     });
                 } else {
+                    /// Queue queries if the database has not yet started up.
                     queue.add(sql, callback);
                 }
             }
