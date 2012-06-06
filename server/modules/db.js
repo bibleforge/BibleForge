@@ -8,6 +8,33 @@
  * @author  BibleForge <info@bibleforge.com>
  */
 
+/**
+ * Copyright (C) 2012
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see http://www.opensource.org/licenses/AGPL-3.0.
+ */
+
+/// Set JSLint options.
+/*jslint node: true, indent: 4, white: true */
+
+/// Indicate all object properties used.  JSLint checks this list for misspellings.
+/*properties
+    Database, add, base, callback, charset, connect, database, db, escape, 
+    execute, flush, host, hostname, length, name, pass, password, query, shift, 
+    sql, user
+*/
+
 "use strict";
 
 /**
