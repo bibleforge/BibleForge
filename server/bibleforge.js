@@ -61,7 +61,7 @@ function start_server()
                 } else {
                     /// Since there was no language specified, use the default language.
                     ///TODO: Determine how to determine the default language.
-                    lang = BF.langs["en"];
+                    lang = BF.langs.en;
                     /// Since the first parameter was not a language ID, the first parameter should be the query (if present).
                     /// Is the first parameter a query?
                     if (query_arr[1] && query_arr[1] !== "!") {
@@ -259,7 +259,7 @@ function start_server()
                     }
                     
                 });
-            }
+            };
         }());
         
         return function handle_query(url, data, connection)
@@ -274,7 +274,7 @@ function start_server()
                 send_results = function (data)
                 {
                     connection.end(JSON.stringify(data));
-                }
+                };
                 
                 switch (Number(data.t)) {
                     case BF.consts.verse_lookup:
@@ -297,7 +297,7 @@ function start_server()
                 /// Build the non-JavaScript version.
                 create_simple_page(url, data, connection);
             }
-        }
+        };
     }());
     
     (function ()
@@ -403,7 +403,7 @@ BF.verse_lookup = function (data, callback)
         find_paragraph_start = Boolean(data.f),
         in_paragraphs = data.p ? Boolean(data.p) : true,
         /// Select the language object specified by the query or use the default.
-        lang = BF.langs[data.l] || BF.langs["en"],
+        lang = BF.langs[data.l] || BF.langs.en,
         limit,
         operator,
         order_by,
@@ -419,8 +419,7 @@ BF.verse_lookup = function (data, callback)
     {
         BF.db.query("SELECT id, words" + extra_fields + " FROM `bible_" + lang.id + "_html` WHERE id " + operator + starting_verse + order_by + " LIMIT " + limit, function (data)
         {
-            var break_after,
-                i,
+            var i,
                 len,
                 res = {
                     n: [],
@@ -498,7 +497,9 @@ BF.verse_lookup = function (data, callback)
     if (isNaN(verse_id)) {
         callback({});
         return;
-    } else if (verse_id < 1001001) {
+    }
+    
+    if (verse_id < 1001001) {
         /// Default to Genesis 1:1 if the verse_id is too small.
         verse_id = 1001001;
     } else if (verse_id > 66022021) {
@@ -561,11 +562,10 @@ BF.verse_lookup = function (data, callback)
 
 BF.standard_search = function (data, callback)
 {
-    var direction = data.d ? Number(data.d) : BF.consts.additional,
-        html_table,
+    var html_table,
         initial,
         /// Select the language object specified by the query or use the default.
-        lang = BF.langs[data.l] || BF.langs["en"],
+        lang = BF.langs[data.l] || BF.langs.en,
         query,
         start_at = data.s ? Number(data.s) : 0,
         terms = String(data.q),
@@ -690,12 +690,11 @@ BF.standard_search = function (data, callback)
 
 BF.grammatical_search = function (data, callback)
 {
-    var direction = data.d ? Number(data.d) : BF.consts.additional,
-        html_table,
+    var html_table,
         i,
         initial,
         /// Select the language object specified by the query or use the default.
-        lang = BF.langs[data.l] || BF.langs["en"],
+        lang = BF.langs[data.l] || BF.langs.en,
         morphological_table,
         query,
         start_at = data.s ? Number(data.s) : 0,
@@ -804,7 +803,7 @@ BF.lexical_lookup = function (data, callback)
 {
     /// Select the language object specified by the query or use the default.
     var bible_table,
-        lang = BF.langs[data.l] || BF.langs["en"],
+        lang = BF.langs[data.l] || BF.langs.en,
         query,
         word_id = Number(data.q);
     
