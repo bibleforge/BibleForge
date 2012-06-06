@@ -642,7 +642,7 @@
                                     global_retry.attach(retry_func);
                                 }
                             }
-                    };
+                        };
                         send_query(post_message, timeout, retry);
                     };
                 }())
