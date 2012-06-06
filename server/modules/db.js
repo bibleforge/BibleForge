@@ -20,19 +20,27 @@ this.db = function (config)
     {
         var connected,
             db = new (require("db-mysql")).Database({
+            charset:  "utf8", /// With this, we do not need to send "SET NAMES utf8;" when the connection is made.
             hostname: config.host,
             user:     config.user,
             password: config.pass,
             database: config.base
         }),
+            /// The queue object is used to store any queries that are called before a connection to the database has been established.
+            /// This is only used before the database has started.  The intended purpose is to allow the BibleForge server to start up
+            /// before the database itself has started.  If the BibleForge loses its connection to the database later, the queiries are
+            /// simply rejected.  Once the database is running again, a connection will automatically be re-established.
             queue = (function ()
             {
                 var queries = [];
                 
                 return {
                     /**
+                     * Add an additional query to the queue.
                      *
-                     * @todo Remove old queued queries when the client that requested them closes.
+                     * @param sql      (string)   The SQL query to send.
+                     * @param callback (function) The function to call after the query returns.
+                     * @todo  Remove old queued queries when the client that requested them closes.
                      */
                     add: function (sql, callback)
                     {
@@ -65,7 +73,6 @@ this.db = function (config)
                 if (err) {
                     setTimeout(connect, 50);
                 } else {
-                    db.query().execute("SET NAMES 'utf8'", {async: false});
                     connected = true;
                     queue.flush();
                 }
