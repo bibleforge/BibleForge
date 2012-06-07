@@ -375,7 +375,7 @@ function start_server()
                 /// If there is no data, close the connection.
                 connection.end();
             }
-        }).listen(7777);
+        }).listen(BF.config.port);
     }());
 }
 
