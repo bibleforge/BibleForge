@@ -368,7 +368,7 @@ function start_server()
             
             /// Is there GET data?
             ///TODO: Merge POST data with GET data.
-            if (request.method === "GET") {
+            if (request.method.toUpperCase() === "GET") {
                 handle_query({host: request.headers.host, path: url_parsed.pathname, port: request.headers.port}, qs.parse(url_parsed.query), connection);
             } else {
                 ///TODO: Also handle POST data.
