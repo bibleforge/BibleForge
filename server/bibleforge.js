@@ -337,6 +337,9 @@ function start_server()
         };
     }());
     
+    /**
+     * Start the server.
+     */
     (function ()
     {
         var url = require("url"),
@@ -347,20 +350,19 @@ function start_server()
             ///TODO: Determine if there the connection should be able to timeout.
             /// Give an object with a subset of the response's functions.
             var connection = {
-                end: function (data, encoding)
-                {
-                    response.end(data, encoding);
+                    end: function (data, encoding)
+                    {
+                        response.end(data, encoding);
+                    },
+                    write: function (chunk, encoding)
+                    {
+                        response.write(chunk, encoding);
+                    },
+                    writeHead: function (statusCode, headers)
+                    {
+                        response.writeHead(statusCode, headers);
+                    }
                 },
-                write: function (chunk, encoding)
-                {
-                    response.write(chunk, encoding);
-                },
-                writeHead: function (statusCode, headers)
-                {
-                    response.writeHead(statusCode, headers);
-                }
-            
-            },
                 ///NOTE: Use the X-Request-URI header if present because sometimes the original URL gets modified.
                 url_parsed = url.parse(request.headers["x-request-uri"] || request.headers.url);
             
@@ -377,7 +379,9 @@ function start_server()
     }());
 }
 
-/// Catch errors so that it does not cause the entire server to crash.
+/**
+ * Catch errors so that it does not cause the entire server to crash.
+ */
 process.on("uncaughtException", function(e)
 {
     ///TODO: Log errors.
@@ -621,7 +625,7 @@ BF.standard_search = function (data, callback)
     /// Should the query start somewhere in the middle of the Bible?
     if (start_at) {
         ///NOTE: By keeping all of the settings in the Sphinx query, Sphinx can preform the best optimizations.
-        ///      Another less optimized approach would be to use the database itself to filter the results like this:
+        ///      Another, less optimized, approach would be to use the database itself to filter the results like this:
         ///         ...WHERE id >= start_at AND query="...;limit=9999999" LIMIT lang.minimum_desired_verses
         query += ";minid=" + start_at;
     }
@@ -643,7 +647,8 @@ BF.standard_search = function (data, callback)
             /// Since we want the verses in canonical order, we need to sort the results by id, not based on weight.
             query += ";mode=extended;sort=extended:@id asc";
         /// Are boolean operators present?
-        ///NOTE: This detects ampersands (&), pipes (|), and hyphens (-) at the beginning of the string (e.g., "-word1 word2") or after a space (e.g., "word1 -word2").
+        ///NOTE: This detects all ampersands (&), all pipes (|), and hyphens (-) only at the beginning of the string (e.g., "-word1 word2") or after a space (e.g., "word1 -word2").
+        ///      The reason why only some hyphens are detected is that hyphens are only special symbols in certain positions.  If a hyphen separates two words (e.g., " Baal-peor"), it is not a special symbol.
         } else if (/(?:(?:^| )-|&|\|)/.test(terms)) {
             /// Set mode to boolean and order by id.
             query += ";mode=boolean;sort=extended:@id asc";
@@ -872,7 +877,7 @@ BF.lexical_lookup = function (data, callback)
 
 
 /**
- * Load the languages
+ * Load the language specific files.
  */
 (function ()
 {
