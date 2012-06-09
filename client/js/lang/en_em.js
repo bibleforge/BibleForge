@@ -24,7 +24,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see http://www.opensource.org/licenses/AGPL-3.0.
  */
- "use strict";
 
 /// Declare globals for JSLint.
 /*global window, BF */
