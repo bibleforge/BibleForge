@@ -911,6 +911,7 @@ h2 {
 }
 
 .lang_en_em .hebrew_title {
+    /* The original printing of the King James uses all caps for Psalm 119's stanza headings. */
     text-transform: uppercase;
 }
 
