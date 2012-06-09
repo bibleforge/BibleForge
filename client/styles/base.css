@@ -882,7 +882,7 @@ h2 {
 
 /* The divine name of God */
 .d {
-    /* Firefox 4.0+ also supports -moz-font-feature-settings:'smcp=1' which turns on small caps as well */
+    /* Firefox 4.0+ and recent version of Chrome also support font-feature-settings:"smcp" which turns on small caps as well. */
     font-variant: small-caps;
     font-size: 16px;
     /* Different fonts have different line-heights.  This eliminates the inconsistency. */
@@ -1116,13 +1116,6 @@ h2 {
     margin-top:    5px;
     padding: 1px;
 }
-
-/* When using @font-face, "font-variant: small-caps" does not work in WebKit, so make the text all uppercase instead. */
-/* See https://code.google.com/p/chromium/issues/detail?id=46931 */
-.webkit .d {
-    text-transform: uppercase;
-}
-
 
 /* Opera specific CSS */
 
