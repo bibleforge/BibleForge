@@ -41,7 +41,7 @@
     paragraph_limit, parse, parse_json, path, pathname, pop, port, prepare_query, 
     previous, psalm, q, query, readFile, readdirSync, replace, reverse, s, split, 
     stack, standard_search, static_path, stringify, subscription, t, test, title, 
-    url, use_ssl, v, verseID, verse_lookup, words, write, writeHead, 
+    toUpperCase, url, use_ssl, v, verseID, verse_lookup, words, write, writeHead, 
     'x-request-uri'
 */
 

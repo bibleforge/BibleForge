@@ -35,7 +35,7 @@
 /*properties
     ABBREVIATED, ACCUSATIVE, ACTIVE, ADJECTIVE, ADVERB, AEOLIC, 
     AMBIGUOUS_CORRELATIVE_INTERROGATIVE_PRONOUN, AMBIGUOUS_MIDDLE_PASSIVE, 
-    AMBIGUOUS_MIDDLE_PASSIVE_DEPONENT, AORIST, APOCOPATED, ARAMAIC, ATTIC, 
+    AMBIGUOUS_MIDDLE_PASSIVE_DEPONENT, AORIST, APOCOPATED, ARAMAIC, ATTIC, BF, 
     COMPARATIVE, CONDITIONAL, CONJUNCTION, CONTRACTED, CORRELATIVE_PRONOUN, 
     DATIVE, DEFINITE_ARTICLE, DEMONSTRATIVE_PRONOUN, DIVINE, FEMININE, 
     FIRST_FORM, FIRST_PERSON, FUTURE, GENITIVE, HEBREW, IMPERATIVE, 
@@ -52,16 +52,18 @@
     alism, aliti, alize, alli, anci, app_name, ation, ational, ative, ator, 
     biblical, biblical_ipa, biblical_ipa_long, biblical_pronun, biliti, bli, 
     blog, books_long_main, books_long_posttitle, books_long_pretitle, 
-    books_short, chapter, chapter_count, configure, determine_reference, done, 
-    eli, en, enci, entli, exec, found_plural, found_singular, ful, full_name, 
-    fulness, grammar_keywords, grammar_marker, grammar_marker_len, 
-    grammar_separator, help, ical, icate, iciti, id, in_paragraphs, indexOf, 
-    italics_explanation, iveness, iviti, ization, izer, langs, length, 
-    linked_to_orig, loaded, logi, modern, modern_ipa, modern_pronun, ness, 
-    no_results1, no_results2, ousli, ousness, prepare_highlighter, prepare_query, 
-    psalm, query_button_alt, query_button_title, query_explanation, red_letters, 
-    replace, self, short_name, slice, split, subscription, test, tional, title, 
-    toLowerCase, translit, translit_long, view, wrench_title
+    books_short, chapter, chapter_count, configure, determine_reference, 
+    divisions, done, eli, en, enci, entli, exec, found_plural, found_singular, 
+    ful, full_name, fulness, grammar_categories, grammar_keywords, 
+    grammar_marker, grammar_marker_len, grammar_separator, hebrew_alphabet, help, 
+    ical, icate, iciti, id, in_paragraphs, indexOf, italics_explanation, iveness, 
+    iviti, ization, izer, langs, length, linked_to_orig, loaded, logi, 
+    minimum_desired_verses, modern, modern_ipa, modern_pronun, ness, no_results1, 
+    no_results2, nt, ousli, ousness, paragraph_limit, prepare_highlighter, 
+    prepare_query, psalm, query_button_alt, query_button_title, 
+    query_explanation, red_letters, replace, self, short_name, slice, split, 
+    subscription, test, tional, title, toLowerCase, translit, translit_long, 
+    view, wrench_title
 */
 
 /**
