@@ -93,7 +93,7 @@
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (1611)",
-            modified:  12123453
+            modified:  12850072
         };
     }
     
@@ -1706,6 +1706,7 @@
                     case "short_book":
                     case "psalm_title":
                     case "subscription":
+                    case "hebrew_title":
                         /// Found the verse, so calculate the verseID and call the success function.
                         verse_id = window.parseInt(el.id, 10);
                         
@@ -2192,16 +2193,19 @@
                      */
                     function write_verses(type, direction, verse_ids, verse_html, paragraphs, in_paragraphs, verse_range)
                     {
-                        var end_paragraph_HTML   = "",
+                        var aleph_beth = ["\u05d0", "\u05d1", "\u05d2", "\u05d3", "\u05d4", "\u05d5", "\u05d6", "\u05d7", "\u05d8", "\u05d9", "\u05db", "\u05dc", "\u05de", "\u05e0", "\u05e1", "\u05e2", "\u05e4", "\u05e6", "\u05e7", "\u05e8", "\u05e9", "\u05ea"],
+                            end_paragraph_HTML   = "",
                             first_paragraph_HTML = "",
                             i,
+                            hebrew_heading,
                             html_str             = "",
                             newEl,
                             start_key            = 0,
                             start_paragraph_HTML = "",
                             stop_key             = verse_ids.length,
                             verse_id,
-                            verse_obj;
+                            verse_obj,
+                            which_hebrew_letter;
                         
                         ///NOTE: Currently only grammatical_search searches data at the word level, so it is the only type that might stop in the middle of a verse and find more words in the same verse as the user scrolls.
                         if (type === BF.consts.grammatical_search) {
@@ -2230,6 +2234,17 @@
                             
                             ///TODO: Determine if it would be better to have two for loops instead of the if statement inside of this one.
                             if (type === BF.consts.verse_lookup) {
+                                
+                                /// Is this the beginning of a stanza in Psalm 119?
+                                ///NOTE: Each stanza has 8 verses.
+                                if (verse_obj.b === 19 && verse_obj.c === 119 && verse_obj.v % 8 === 1) {
+                                    /// Determine which stanza this is.
+                                    which_hebrew_letter = Math.floor(verse_obj.v / 8);
+                                    hebrew_heading = "<div class=hebrew_title id=" + verse_id + ">" + aleph_beth[which_hebrew_letter] + " " + BF.lang.hebrew_alphabet[which_hebrew_letter] + "</div>";
+                                } else {
+                                    hebrew_heading = "";
+                                }
+                                
                                 /// Is this the first verse or the Psalm title?
                                 if (verse_obj.v < 2) {
                                     ///TODO: Explain what this code is doing.
@@ -2244,6 +2259,9 @@
                                         /// Is this the book of Psalms?  (Psalms have a special name.)
                                         html_str += "<h3 class=chapter id=" + verse_id + "_chapter>" + (verse_obj.b === 19 ? BF.lang.psalm : BF.lang.chapter) + " " + verse_obj.c + "</h3>";
                                     }
+                                    
+                                    html_str += hebrew_heading;
+                                    
                                     /// Is this a Psalm title (i.e., verse 0)?  (Psalm titles are displayed specially.)
                                     if (verse_obj.v === 0) {
                                         html_str += "<div class=psalm_title id=" + verse_id + "_verse>" + verse_html[i] + "</div>";
@@ -2267,8 +2285,10 @@
                                             if (i !== start_key) {
                                                 html_str += end_paragraph_HTML;
                                             }
-                                            
+                                            html_str += hebrew_heading;
                                             html_str += start_paragraph_HTML;
+                                        } else {
+                                            html_str += hebrew_heading;
                                         }
                                         
                                         ///NOTE: The trailing space adds a space between verses in a paragraph and does not effect paragraph final verses.

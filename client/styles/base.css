@@ -705,7 +705,7 @@ label {
     margin-left: 7px;
 }
 
-.lex-orig_word {
+.lex-orig_word, .hebrew_title {
     font-family: 'BFHebrew', 'Palatino Linotype', Palatino, TexGyrePagella, 'TeX Gyre Pagella', 'URWPalladioL', 'Book Antiqua', 'Times new Roman', Times, serif;
     font-size: 30px;
     /* The vertical alignment is required simply to match up with .lex-pronun. */
@@ -849,7 +849,7 @@ label {
     font-size: 23px;
 }
 
-.chapter, .short_book {
+.chapter, .short_book, .hebrew_title {
     padding:     13px 0 13px 0;
     margin:      0;
     line-height: 31px;
@@ -904,6 +904,15 @@ h2 {
     margin-top: 10px;
 }
 
+
+.hebrew_title {
+    text-align: center;
+    font-size: 23px;
+}
+
+.lang_en_em .hebrew_title {
+    text-transform: uppercase;
+}
 
 .lang_en_em, .lang_en_em .verse_number, .lang_en_em .book, .lang_en_em .chapter, .lang_en_em .short_book, .lang_en_em .first_verse:first-letter, .lang_en_em .first_paragraph:first-letter, .lang_en_em .d {
     /* Enable advanced OpenType typographic features. */
