@@ -2963,9 +2963,9 @@
                             verse_id = position.verse_id;
                         }
                         
-                        /// Is the lookup verse possibly the beginning of a Psalm with a title?  If so, we need to start at the title, so go back one verse.
-                        ///NOTE: To get the titles of Psalms, select verse 0 instead of verse 1.
-                        if (verse_id > 19003000 && verse_id < 19145002 && verse_id % 1000 === 1) {
+                        /// Is the lookup verse the beginning of a Psalm with a title?  If so, we need to start at the title.
+                        if (verse_id % 1000 === 1 && Math.floor(verse_id / 1000000) === 19 && BF.psalm_has_title(BF.get_b_c_v(verse_id).c)) {
+                            /// To get the titles of Psalms, go back one verse from 1 to 0.
                             verse_id -= 1;
                         }
                         
