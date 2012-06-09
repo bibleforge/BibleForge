@@ -8,6 +8,14 @@
  * @author  BibleForge <info@bibleforge.com>
  */
 
+/// Set JSLint options.
+/*jslint node: true, indent: 4, white: true */
+
+/*properties
+    base, cache_simple_html, config, db, host, pass, port, static_path, use_ssl, 
+    user
+*/
+
 "use strict";
 
 this.config = {
