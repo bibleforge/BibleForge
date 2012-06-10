@@ -41,9 +41,12 @@
  * Create the database abstraction layer.
  *
  * @param config (object) An object defining the database parameters.
- *                        Object format: {host: "The hostname to connect to", user: "The database username", pass: "The user's password", base: "The database name"}
+ *                        Object format:
+ *                          {host: "The hostname to connect to",
+ *                           user: "The database username",
+ *                           pass: "The user's password",
+ *                           base: "The database name"}
  * @todo  Determine if the hostname can contain a port or socket.  If not, allow this to be configured as separate options.
- * @todo  Reconnect to the server if it gets disconnected.
  */
 this.db = function (config)
 {
@@ -58,18 +61,21 @@ this.db = function (config)
                 password: config.pass,
                 database: config.base
                 /// Other options:
-                ///     compress        (default FALSE)
-                ///     reconnect       (default TRUE)
-                ///     initCommand
-                ///     readTimeout     (default 0)
-                ///     sslVerifyServer (default FALSE)
-                ///     timeout         (default 0)
-                ///     writeTimeout    (default 0)
+                ///     compress        (default: FALSE)
+                ///     reconnect       (default: TRUE)
+                ///     initCommand     (default: undefined)
+                ///     readTimeout     (default: 0)
+                ///     sslVerifyServer (default: FALSE)
+                ///     timeout         (default: 0)
+                ///     writeTimeout    (default: 0)
             }),
             /// The queue object is used to store any queries that are called before a connection to the database has been established.
             /// This is only used before the database has started.  The intended purpose is to allow the BibleForge server to start up
             /// before the database itself has started.  If the BibleForge loses its connection to the database later, the queries are
             /// simply rejected.  Once the database is running again, a connection will automatically be re-established.
+            /**
+             * Create the queue object to handle queued queries.
+             */
             queue = (function ()
             {
                 var queries = [];
@@ -121,8 +127,10 @@ this.db = function (config)
          */
         function connect()
         {
+            /// Try to connect to the database.
             db.connect(function (err)
             {
+                /// If an error occured, try again shortly.
                 if (err) {
                     setTimeout(connect, 50);
                 } else {
@@ -133,7 +141,6 @@ this.db = function (config)
             });
         }
         
-        /// Try to connect to the database.
         connect();
         
         return {
