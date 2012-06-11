@@ -26,10 +26,10 @@
  */
 
 /// Declare globals for JSLint.
-/*global document, window, BF */
+/*global BF */
 
 /// Set JSLint options.
-/*jslint evil: true, continue: true, regexp: true, indent: 4, white: true */
+/*jslint  browser: true, evil: true, continue: true, regexp: true, indent: 4, white: true */
 
 /// Indicate all object properties used.  JSLint checks this list for misspellings.
 /*properties
@@ -94,7 +94,7 @@
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (1611)",
-            modified:  12850072
+            modified:  13044794
         };
     }
     

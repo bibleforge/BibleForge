@@ -25,11 +25,8 @@
  * along with this program.  If not, see http://www.opensource.org/licenses/AGPL-3.0.
  */
 
-/// Declare globals for JSLint.
-/*global window, BF */
-
 /// Set JSLint options.
-/*jslint continue: true, regexp: true, indent: 4, white: true */
+/*jslint browser: true, continue: true, regexp: true, indent: 4, white: true */
 
 /// Indicate all object properties used.  JSLint checks this list for misspellings.
 /*properties

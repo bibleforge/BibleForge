@@ -26,10 +26,10 @@
  */
 
 /// Declare globals for JSLint.
-/*global document, window, BF */
+/*global BF */
 
 /// Set JSLint options.
-/*jslint indent: 4, white: true */
+/*jslint browser: true, indent: 4, white: true */
 
 /// Indicate all object properties used.  JSLint checks this list for misspellings.
 /*properties
