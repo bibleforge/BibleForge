@@ -177,8 +177,7 @@
              */
             function open_menu(get_pos, menu_items, selected, open_callback, close_callback)
             {
-                var align,
-                    cur_item = -1,
+                var cur_item = -1,
                     i,
                     item_container,
                     menu_container = document.createElement("div"),
