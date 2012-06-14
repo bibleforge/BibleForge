@@ -47,30 +47,58 @@
 
 "use strict";
 
+/// Create the BibleForge global object to which everything else attaches.
 var BF = {};
 
+/**
+ * Listen for HTTP forwarded requests.
+ */
 function start_server()
 {
+    /**
+     * Create a closure to handle queries from the client.
+     *
+     * @return A function to handle queries.
+     */
     var handle_query = (function ()
     {
+        /**
+         * Create a closure to house the code to produce the non-JavaScript version.
+         *
+         * @return A function to create the HTML for the non-JavaScript version.
+         */
         var create_simple_page = (function ()
         {
+            /**
+             * Create a closure to get the base HTML of the non-JavaScript code.
+             *
+             * @return A function to get the HTML for the non-JavaScript version.
+             */
             var get_simple_html = (function ()
             {
+                /// Prepare a variable in the closure to cache the results.
                 var html;
                 
                 /**
+                 * Get the base HTML of the non-JavaScript code.
                  *
-                 * @note The callback function could be called synchronously or asynchronously.
+                 * @param  callback (function) The function to send the HTML back to.
+                 * @return NULL
+                 * @note   The callback function could be called synchronously or asynchronously.
                  */
                 return function get_simple_html(callback)
                 {
+                    /// Has the HTML already been cached?
                     if (html) {
                         callback(html);
                     } else {
+                        /// Asynchronously read the file.
                         require("fs").readFile(__dirname + "/index_non-js.html", "utf8", function (err, data)
                         {
+                            /// Is BibleForge configued to cache the results?
+                            ///NOTE: Production servers should use the cache.
                             if (BF.config.cache_simple_html) {
+                                /// Optionally, cache the HTML in the closure.
                                 html = data;
                             }
                             
@@ -80,19 +108,44 @@ function start_server()
                 };
             }());
             
+            /**
+             * Create the non-JavaScript version and send the results to the client.
+             *
+             * @param  url        
+             * @param  data       
+             * @param  connection 
+             * @return NULL
+             */
             return function create_simple_page(url, data, connection)
             {
                 /// Because the URI starts with a slash (/), the first array element is empty.
                 var full_featured_uri,
                     lang,
                     query,
+                    /// Separate the URL to possibly obtain the language and query.
+                    ///NOTE: Three matches are possibly returned because the leading slash (/) counts as one black result.
+                    ///      I.e., "/en/love/".split("/", 3) returns ["", "en", "love"].
                     query_arr = url.path.split("/", 3);
+                
+                /// First, parse the query array for valid langauges and searches.
+                /// Example queries:
+                ///     /!
+                ///     /en/!
+                ///     /en/love/!
+                ///     /en_em/Romans 3:16/!
+                ///     /love/!
+                ///     /Romans 3:16/!
                 
                 /// Is the first parameter a valid language ID?
                 if (BF.langs[query_arr[1]]) {
+                    /// Examples:
+                    ///     /en/!
+                    ///     /en/.../!
                     lang = BF.langs[query_arr[1]];
                     /// Is the second parameter a query?
+                    ///NOTE: If the last parameter is simply a question mark, it is not a valid query and indicates the switch to the non-JavaScript version.
                     if (query_arr[2] && query_arr[2] !== "!") {
+                        /// Example query: /en/love/!
                         query = query_arr[2];
                     }
                 } else {
@@ -101,15 +154,22 @@ function start_server()
                     lang = BF.langs.en;
                     /// Since the first parameter was not a language ID, the first parameter should be the query (if present).
                     /// Is the first parameter a query?
+                    ///NOTE: If the first parameter not a valid language ID, the first parameter is treated as the query and any other parameters are discarded.
+                    ///NOTE: If the last parameter is simply a question mark, it is not a valid query and indicates the switch to the non-JavaScript version.
                     if (query_arr[1] && query_arr[1] !== "!") {
+                        /// Example query: /love/!
                         query = query_arr[1];
                     }
                 }
                 
                 /// Was there no query specified in the URL?
+                /// Example queries:
+                ///     /!
+                ///     /en/!
                 if (query === undefined || query === "") {
                     /// Was there a query specified in the GET data?
                     ///NOTE: For example, this will occur when submitting a query from the query box in the non-JavaScript version.
+                    /// Example query: /en/!?q=love
                     if (data && data.q) {
                         query = data.q;
                     } else {
@@ -117,13 +177,16 @@ function start_server()
                         query = lang.books_short[1] + " 1:1";
                     }
                 } else {
+                    /// Convert special symbols to normal ones (e.g., "%26" becomes "&").
                     query = global.decodeURIComponent(query);
                 }
                 
+                /// Create the URL to the full-featured page, used to possibly redirect proper browsers to.
+                ///NOTE: A scenario where this could be used is if someone using the non-JavaScript version sends a link to someone with a browser capable of handing the full-featured page.
                 ///NOTE: Both the leading and trailing slashes (/) are necessary.
                 full_featured_uri = "/" + lang.id + "/" + global.encodeURIComponent(query) + "/";
                 
-                /// If a query string is present, we want to redirect it to the correct URL.
+                /// If a query string is present, redirect it to the correct URL and cloes the connection.
                 ///TODO: Check for the presence of both the exclamation point (!) and _escaped_fragment_ and redirect to a page without the exclamation point.
                 ///TODO: Retrieve any query in the _escaped_fragment_ variable.
                 if (data && data.q) {
@@ -132,16 +195,25 @@ function start_server()
                     return;
                 }
                 
+                /// Now that we know the request will not be redirected, send the OK status code and appropriate header.
                 connection.writeHead(200, {"Content-Type": "text/html"});
                 
-                ///NOTE: The callback function could be called synchronously or asynchronously.
+                /**
+                 * Create the page based on the retrieved HTML and send it to the client.
+                 *
+                 * @param html (string) The HTML of the non-JavaScript version.
+                 * @note  The callback function could be called synchronously or asynchronously. 
+                 */
                 get_simple_html(function (html)
                 {
                     var b,
                         c,
                         verseID = lang.determine_reference(query);
                     
+                    /// Add the full URL to the page to redirect capable browsers to the full-featured page.
+                    ///NOTE: A regular expresion is used because this string occurs twice.
                     html = html.replace(/__FULL_URI__/g, full_featured_uri);
+                    /// Add the query string to the query box.
                     html = html.replace("__QUERY__", BF.escape_html(query));
                     
                     ///TODO: Modify the classnames so that it displays the right style for each language.
@@ -159,7 +231,7 @@ function start_server()
                                 res = "",
                                 v;
                             
-                            /// Was there no response from the database?  This could mean the database crashed.
+                            /// Was there no response from the database?  This could mean the database crashed or the verse is invalid.
                             if (!data || !data.length) {
                                 res = lang.no_results1 + "<b>" + BF.escape_html(query) + "</b>" + lang.no_results2;
                             } else {
@@ -167,11 +239,12 @@ function start_server()
                                 v = (data[0].id % 1000);
                                 
                                 /**
-                                * Create the previous and next chapter links.
-                                *
-                                * @return A string containing HTML.
-                                * @todo   Make the text language specific.
-                                */
+                                 * Create the previous and next chapter links.
+                                 *
+                                 * @return A string containing HTML for the previous and next links.
+                                 * @note   This function is run immediately.
+                                 * @todo   Make the text language specific.
+                                 */
                                 back_next = (function ()
                                 {
                                     var next_b,
@@ -208,8 +281,11 @@ function start_server()
                                     
                                     return res;
                                 }());
+                                
+                                /// Add the previous and next links above the results.
                                 res += back_next;
                                 
+                                /// Loop through the verses and concatenate them to the results string.
                                 for (i = 0; i < len; i += 1) {
                                     /// Is this the first verse or the Psalm title?
                                     if (v < 2) {
@@ -239,17 +315,22 @@ function start_server()
                                     v += 1;
                                 }
                                 
+                                /// Add the previous and next links below the results.
                                 res += back_next;
                             }
                             
+                            /// Add the verses to the page.
                             html = html.replace("__CONTENT__", res);
                             connection.end(html);
                         });
                         
-                        /// While the query is running, prepare the HTML more.
+                        /// While the database is looking up the verses, prepare the HTML more.
+                        /// Add the full verse book name along with the chapter and BibleForge's name to the <title> tag.
                         html = html.replace("__TITLE__", BF.escape_html(lang.books_short[b]) + " " + c + " - " + lang.app_name);
+                    /// If it is not a verse lookup, it must be a search of some kind.
                     } else {
-                        ///TODO: Determine the search type.
+                        /// Preform a standard search.
+                        ///FIXME: Currently, it assumes all searches are standard searches.
                         BF.standard_search({q: lang.prepare_query(query), l: lang.id}, function (data)
                         {
                             var i,
@@ -258,8 +339,7 @@ function start_server()
                                 res = "",
                                 verse_obj;
                             
-                            /// Was there no response from the database?  This could mean the database crashed.
-                            
+                            /// Was there no response from the database?  This could mean the database crashed or Sphinx is not running.
                             if (!data || !data.n || !data.n.length) {
                                 res = lang.no_results1 + "<b>" + BF.escape_html(query) + "</b>" + lang.no_results2;
                             } else {
@@ -288,17 +368,32 @@ function start_server()
                                     res += "<div class=search_verse id=" + data.n[i] + "_search><span>" + (lang.chapter_count[verse_obj.b] === 1 ? "" : verse_obj.c + ":") + verse_obj.v + "</span> " + data.v[i] + "</div>";
                                 }
                             }
+                            /// Add the verses to the page.
                             html = html.replace("__CONTENT__", res);
                             connection.end(html);
                         });
-                        /// While the query is running, prepare the HTML more.
+                        /// While the database is looking up the verses, prepare the HTML more.
+                        /// Add the query and BibleForge's name to the <title> tag.
                         html = html.replace("__TITLE__", BF.escape_html(query) + " - " + lang.app_name);
                     }
-                    
                 });
             };
         }());
         
+        /**
+         * Handle all incomming requests.
+         *
+         * @param url        (object) The parsed URL.
+         *                            Object structure:
+         *                               {host: "The server (e.g., 'bibleforge.com')",
+         *                                path: "The URL path (e.g., '/api'),
+         *                                port: "The port number (as a string) (e.g., '80')"}
+         * @param data       (object) The GET data.
+         * @param connection (object) The object used to communicate with the client.
+         *                            Object structure:
+         *                               {end:       function (data, encoding)
+         *                                writeHead: function (statusCode, headers)}
+         */
         return function handle_query(url, data, connection)
         {
             var send_results;
@@ -308,6 +403,11 @@ function start_server()
                 /// Send the proper header.
                 connection.writeHead(200, {"Content-Type": "application/json"});
                 
+                /**
+                 * Send the results back to the client as a JSON string.
+                 *
+                 * @param data (object) The data to be sent back to the client.
+                 */
                 send_results = function (data)
                 {
                     connection.end(JSON.stringify(data));
@@ -331,7 +431,7 @@ function start_server()
                         connection.end();
                 }
             } else {
-                /// Build the non-JavaScript version.
+                /// All other requests are replied to with the non-Javascript version.
                 create_simple_page(url, data, connection);
             }
         };
@@ -345,25 +445,42 @@ function start_server()
         var url = require("url"),
             qs  = require("querystring");
         
-        require('http').createServer(function (request, response)
+        /**
+         * Finally create the server.
+         *
+         * @param request  (object) The object containing info about the request.
+         * @param response (object) The object used to communicate back to the client.
+         */
+        require("http").createServer(function (request, response)
         {
-            ///TODO: Determine if there the connection should be able to timeout.
             /// Give an object with a subset of the response's functions.
             var connection = {
+                    /**
+                     * Close the connection to the client and optionally write a final message.
+                     *
+                     * @param data     (string OR buffer) (optional) The final message to write to the client.
+                     * @param encoding (string)           (optional) The encoding of the data.
+                     * @note  This must be called in order for the client to finish the request.
+                     */
                     end: function (data, encoding)
                     {
                         response.end(data, encoding);
                     },
-                    write: function (chunk, encoding)
-                    {
-                        response.write(chunk, encoding);
-                    },
+                    /**
+                     * Write the header to the client.
+                     *
+                     * @example connection.writeHead(200, {"Content-Type": "text/html"});
+                     * @param   statusCode (number) The HTTP status code (e.g., 200 for OK; 404 for file not found)
+                     * @param   headers    (object) An object containing the headers to be sent.
+                     * @note    This must be called in order for the client to finish the request.
+                     */
                     writeHead: function (statusCode, headers)
                     {
                         response.writeHead(statusCode, headers);
                     }
                 },
-                ///NOTE: Use the X-Request-URI header if present because sometimes the original URL gets modified.
+                /// Get the original URI that is being requested and parse it.
+                ///NOTE: Use the X-Request-URI header if present because sometimes the original URL gets modified (e.g., a request to /en/love/ is redirected to /api).
                 url_parsed = url.parse(request.headers["x-request-uri"] || request.headers.url);
             
             /// Is there GET data?
@@ -391,7 +508,7 @@ process.on("uncaughtException", function(e)
 
 BF.config = require("./config.js").config;
 
-///TODO: This needs to be linked to the client side code.
+///TODO: Link this with the client-side code, perhaps using the Forge.
 BF.consts = {
     /// Query type "constants"
     verse_lookup:       1,
@@ -406,6 +523,12 @@ BF.consts = {
 };
 
 
+/**
+ * Safely parse JSON.
+ *
+ * @param  str (string) the JSON encoded string.
+ * @return The parsed JSON or NULL if the JSON is invalid.
+ */
 BF.parse_json = function (str)
 {
     try {
@@ -638,7 +761,7 @@ BF.standard_search = function (data, callback)
     ///FIXME: These could be one word with a hyphen (e.g., -bad).  However, this search would cause an error, currently.
     if (terms.indexOf(" ") >= 0) {
         /// Are there more than 10 search terms in the query, or does the query contains double quotes (")?
-        ///NOTE: Could use the more accurate (preg_match('/([a-z-]+[^a-z-]+){11}/i', $query) == 1) to find word count, but it is slower.
+        ///NOTE: Could use the more accurate (/([a-z-]+[^a-z-]+){11}/.test(terms)) to find word count, but it is slower.
         if (terms.indexOf('"') >= 0 || terms.split(" ").length > 9) {
             /// By default, other modes stop at 10, but SPH_MATCH_EXTENDED does more (256?).
             /// Phrases (words in quotes) require SPH_MATCH_EXTENDED mode.
