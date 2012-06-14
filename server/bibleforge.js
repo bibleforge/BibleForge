@@ -607,7 +607,6 @@ BF.verse_lookup = function (data, callback)
         limit,
         operator,
         order_by,
-        starting_verse,
         verse_id = Number(data.q);
     
     /**
@@ -615,7 +614,7 @@ BF.verse_lookup = function (data, callback)
      *
      * @note This is a separate query because it can be called at two different times (and one is from an asynchronous callback).
      */
-    function run_query()
+    function run_query(starting_verse)
     {
         BF.db.query("SELECT id, words" + extra_fields + " FROM `bible_" + lang.id + "_html` WHERE id " + operator + starting_verse + order_by + " LIMIT " + limit, function (verses)
         {
@@ -754,12 +753,11 @@ BF.verse_lookup = function (data, callback)
                 return;
             }
             
-            starting_verse = start_id[0].id;
-            run_query();
+            run_query(start_id[0].id);
         });
     } else {
-        starting_verse = verse_id;
-        run_query();
+        /// Since if not grouping the verses in paragraphs, it does not matter where the query starts, so just start with the verse being queried.
+        run_query(verse_id);
     }
 };
 
