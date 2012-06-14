@@ -581,7 +581,7 @@ BF.verse_lookup = function (data, callback)
      */
     function run_query()
     {
-        BF.db.query("SELECT id, words" + extra_fields + " FROM `bible_" + lang.id + "_html` WHERE id " + operator + starting_verse + order_by + " LIMIT " + limit, function (data)
+        BF.db.query("SELECT id, words" + extra_fields + " FROM `bible_" + lang.id + "_html` WHERE id " + operator + starting_verse + order_by + " LIMIT " + limit, function (verses)
         {
             var i,
                 len,
@@ -591,7 +591,7 @@ BF.verse_lookup = function (data, callback)
                 };
             
             /// Was there no response from the database?  This could mean the database crashed.
-            if (!data) {
+            if (!verses) {
                 /// Send an empty response, and exit.
                 callback({});
                 return;
@@ -602,7 +602,7 @@ BF.verse_lookup = function (data, callback)
                 
                 /// Determine the actual number of verses that should be returned (starting from the end).
                 ///NOTE: Because the last verse cannot be in the middle of a paragraph break, it has to trim off the last partial paragraph from the database results.
-                len = data.length;
+                len = verses.length;
                 /// Did it return the expected number of verses?
                 /// If not, then it must have reached the end of the Bible, in which case it has also reached the end of a paragraph.
                 if (len === limit) {
@@ -613,7 +613,7 @@ BF.verse_lookup = function (data, callback)
                     ///NOTE: (len >= 0) is just to make sure that it cannot get stuck in an infinite loop.
                     while (len >= 0) {
                         /// Is it at a paragraph break?
-                        if (data[len - 1].paragraph) {
+                        if (verses[len - 1].paragraph) {
                             /// The first verse should be at a paragraph beginning, and the last verse
                             /// should be just before one. Therefore, when looking up previous verses,
                             /// we must get this verse (because previous lookups are in reverse).
@@ -630,14 +630,14 @@ BF.verse_lookup = function (data, callback)
                     }
                 }
             } else {
-                len = data.length;
+                len = verses.length;
             }
             
             for (i = 0; i < len; i += 1) {
-                res.n[i] = Number(data[i].id);
-                res.v[i] = data[i].words;
+                res.n[i] = Number(verses[i].id);
+                res.v[i] = verses[i].words;
                 if (in_paragraphs) {
-                    res.p[i] = Number(data[i].paragraph);
+                    res.p[i] = Number(verses[i].paragraph);
                 }
             }
             
@@ -705,16 +705,16 @@ BF.verse_lookup = function (data, callback)
         ///NOTE: Currently, find_paragraph_start is never true when direction === BF.consts.previous because previous lookups always start at a paragraph break.
         ///      In order to find the correct starting verse when looking up in reverse, the comparison operator (<=) would need to be greater than or equal to (>=),
         ///      and 1 would need to be subtracted from the found starting id.
-        BF.db.query("SELECT id FROM `bible_" + lang.id + "_html` WHERE id <= " + verse_id + " AND paragraph = 1 ORDER BY id DESC LIMIT 1", function (data)
+        BF.db.query("SELECT id FROM `bible_" + lang.id + "_html` WHERE id <= " + verse_id + " AND paragraph = 1 ORDER BY id DESC LIMIT 1", function (start_id)
         {
             /// Was there no response from the database?  This could mean the database crashed.
-            if (!data || !data[0]) {
+            if (!start_id || !start_id[0]) {
                 /// Send an empty response, and exit.
                 callback({});
                 return;
             }
             
-            starting_verse = data[0].id;
+            starting_verse = start_id[0].id;
             run_query();
         });
     } else {
