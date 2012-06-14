@@ -702,7 +702,7 @@ BF.lexical_lookup = function (data, callback)
                     if (BF.langs[query_arr[1]]) {
                         /// Example queries:
                         ///     /en/!
-                        ///     /en/.../!
+                        ///     /en/love/!
                         lang = BF.langs[query_arr[1]];
                         /// Is the second parameter a query?
                         ///NOTE: If the last parameter is simply a question mark, it is not a valid query and indicates the switch to the non-JavaScript version.
@@ -815,29 +815,38 @@ BF.lexical_lookup = function (data, callback)
                                             prev_c,
                                             res = "";
                                         
-                                        /// Is this not Genesis 1?
+                                        /// Is this not Genesis 1? (Genesis 1 does not need a previous link.)
                                         if (b !== 1 || c !== 1) {
                                             if (c === 1) {
+                                                /// If it is looking up the first chapter, the previous link should point to the last chapter of the previous book.
                                                 prev_b = b - 1;
                                                 prev_c = lang.chapter_count[prev_b];
                                             } else {
+                                                /// If this is not the first chapter, the previous link shoudl simply point back one chapter.
                                                 prev_b = b;
                                                 prev_c = c - 1;
                                             }
                                             
+                                            ///NOTE: Psalms uses a special name (i.e., "psalm" instead of "chapter").
+                                            ///TODO: Stylize this HTML in the style sheet, and use a language specific text.
                                             res += '<a style="float:left;" href="/' + lang.id + "/" + lang.books_short[prev_b] + "%20" + prev_c + "/!" + '">&lt; Previous ' + (prev_b === 19 ? lang.psalm : lang.chapter) + "</a>";
                                         }
                                         
-                                        /// Is this not Revelation 22?
+                                        /// Is this not Revelation 22? (Revelation 22 does not need a next link.)
                                         if (b !== 66 || c !== lang.chapter_count[66]) {
+                                            /// Is this the last chapter in the book?
                                             if (c === lang.chapter_count[b]) {
+                                                /// If this is the last chapter, the next link should point to the first chapter of the next book.
                                                 next_b = b + 1;
                                                 next_c = 1;
                                             } else {
+                                                /// If this is not the last chapter, the next link should simply point to the next chapter.
                                                 next_b = b;
                                                 next_c = c + 1;
                                             }
                                             
+                                            ///NOTE: Psalms uses a special name (i.e., "psalm" instead of "chapter").
+                                            ///TODO: Stylize this HTML in the style sheet, and use a language specific text.
                                             res += '<a style="float:right;" href="/' + lang.id + "/" + lang.books_short[next_b] + "%20" + next_c + "/!" + '">Next ' + (next_b === 19 ? lang.psalm : lang.chapter) + " &gt;</a>";
                                         }
                                         
