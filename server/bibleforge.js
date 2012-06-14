@@ -138,7 +138,7 @@ function start_server()
                 
                 /// Is the first parameter a valid language ID?
                 if (BF.langs[query_arr[1]]) {
-                    /// Examples:
+                    /// Example queries:
                     ///     /en/!
                     ///     /en/.../!
                     lang = BF.langs[query_arr[1]];
@@ -385,14 +385,14 @@ function start_server()
          *
          * @param url        (object) The parsed URL.
          *                            Object structure:
-         *                               {host: "The server (e.g., 'bibleforge.com')",
-         *                                path: "The URL path (e.g., '/api'),
-         *                                port: "The port number (as a string) (e.g., '80')"}
+         *                            host: "The server (e.g., 'bibleforge.com')",
+         *                            path: "The URL path (e.g., '/api'),
+         *                            port: "The port number (as a string) (e.g., '80')"
          * @param data       (object) The GET data.
          * @param connection (object) The object used to communicate with the client.
          *                            Object structure:
-         *                               {end:       function (data, encoding)
-         *                                writeHead: function (statusCode, headers)}
+         *                            end:       function (data, encoding)
+         *                            writeHead: function (statusCode, headers)
          */
         return function handle_query(url, data, connection)
         {
@@ -537,12 +537,27 @@ BF.parse_json = function (str)
 };
 
 
+/**
+ * Escape a string to be safely added inside HTML.
+ *
+ * @example BF.escape_html('This is a "harmless" comment <script>...</script>'); /// Returns "This is a &quot;harmless&quot; comment &lt;script&gt;...&lt;/script&gt;"
+ * @param   str (string) The string to be escaped
+ * @note    This code only escapes the few dangerous symbols, not all of them.
+ */
 BF.escape_html = function (str)
 {
     ///NOTE: It must first replace ampersands (&); otherwise, the other entities would be escaped twice.
     return str.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/'/g, "&#39;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 };
 
+/**
+ * Get the book, chapter, and verse numbers from a verse ID.
+ *
+ * @example BF.get_b_c_v(1002003); /// Returns {b: 1, c: 2, v: 3}
+ * @param   verseID (number || string) The verse ID to convert.
+ * @return  An object containing the book, chapter, and verse numbers: {b: book, c: chapter, v: verse}
+ * @note    Load this code from the client side (or copy it via the Forge).
+ */
 BF.get_b_c_v = function (verseID)
 {
     var c,
@@ -557,9 +572,30 @@ BF.get_b_c_v = function (verseID)
     };
 };
 
-
+/// Attach the database object.
 BF.db = require("./modules/db.js").db(BF.config.db);
 
+/**
+ * Retrieve verses from the database.
+ *
+ * @example BF.verse_lookup({t: "1", q: "1001001"}, function (data) {}); /// Look up verses starting with Genesis 1:1.
+ * @example BF.verse_lookup({t: "1", q: "19119160", f: "1"}, function (data) {}); /// Look up verses starting with Psalm 119:160.
+ * @example BF.verse_lookup({t: "1", q: "19119152", d: "2"}, function (data) {}); /// Look up previous verses starting with Psalm 119:152.
+ * @param   data     (object)   An object containing the query and query options.
+ *                              Object structure:
+ *                              q: "The verse ID",
+ *                              d: "The direction (BF.consts.additional OR BF.consts.previous)" (optional) (default: BF.consts.additional)
+ *                              f: "Whether or not to find the start of a paragraph"            (optional) (default: FALSE)
+ *                              l: "The language ID"                                            (optional) (default: "en")
+ *                              p: "Whether or not to return verses in groups of paragraphs"    (optional) (default: TRUE)
+ * @param   callback (function) The function to send the results to.
+ * @return  An object contianing the results (if any).
+ *          Object structure:
+ *          n: (array)  An array of verse IDs for each verse returned
+ *          v: (array)  An array of strings containing the HTML of the verses
+ *          p: (array)  An array of numbers either 1 (indicating a paragraph break at that verse) or 0 (no paragraph break)
+ *          t: (number) The total number of verses
+ */
 BF.verse_lookup = function (data, callback)
 {
     var extra_fields,
@@ -630,9 +666,11 @@ BF.verse_lookup = function (data, callback)
                     }
                 }
             } else {
+                /// When not breaking at paragraphs, just send back all of the verses retrieved from the database.
                 len = verses.length;
             }
             
+            /// Loop through the verses and fill in the results object.
             for (i = 0; i < len; i += 1) {
                 res.n[i] = Number(verses[i].id);
                 res.v[i] = verses[i].words;
@@ -641,6 +679,7 @@ BF.verse_lookup = function (data, callback)
                 }
             }
             
+            /// Is the query looking up previous verses?
             if (direction === BF.consts.previous) {
                 /// Because the database returns the verses in reverse order when preforming a previous lookup, they need to be reordered.
                 ///NOTE: Because in paragraph mode, there is no way to know how many verses will be returned, it cannot simply put the verses in the array in reverse order above.
@@ -651,6 +690,7 @@ BF.verse_lookup = function (data, callback)
                 }
             }
             
+            /// Add the total number of verses being sent back to the client.
             res.t = res.n.length;
             
             callback(res);
