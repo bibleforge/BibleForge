@@ -51,452 +51,6 @@
 var BF = {};
 
 /**
- * Listen for HTTP forwarded requests.
- */
-function start_server()
-{
-    /**
-     * Create a closure to handle queries from the client.
-     *
-     * @return A function to handle queries.
-     */
-    var handle_query = (function ()
-    {
-        /**
-         * Create a closure to house the code to produce the non-JavaScript version.
-         *
-         * @return A function to create the HTML for the non-JavaScript version.
-         */
-        var create_simple_page = (function ()
-        {
-            /**
-             * Create a closure to get the base HTML of the non-JavaScript code.
-             *
-             * @return A function to get the HTML for the non-JavaScript version.
-             */
-            var get_simple_html = (function ()
-            {
-                /// Prepare a variable in the closure to cache the results.
-                var html;
-                
-                /**
-                 * Get the base HTML of the non-JavaScript code.
-                 *
-                 * @param  callback (function) The function to send the HTML back to.
-                 * @return NULL
-                 * @note   The callback function could be called synchronously or asynchronously.
-                 */
-                return function get_simple_html(callback)
-                {
-                    /// Has the HTML already been cached?
-                    if (html) {
-                        callback(html);
-                    } else {
-                        /// Asynchronously read the file.
-                        require("fs").readFile(__dirname + "/index_non-js.html", "utf8", function (err, data)
-                        {
-                            /// Is BibleForge configued to cache the results?
-                            ///NOTE: Production servers should use the cache.
-                            if (BF.config.cache_simple_html) {
-                                /// Optionally, cache the HTML in the closure.
-                                html = data;
-                            }
-                            
-                            callback(data);
-                        });
-                    }
-                };
-            }());
-            
-            /**
-             * Create the non-JavaScript version and send the results to the client.
-             *
-             * @param  url        
-             * @param  data       
-             * @param  connection 
-             * @return NULL
-             */
-            return function create_simple_page(url, data, connection)
-            {
-                /// Because the URI starts with a slash (/), the first array element is empty.
-                var full_featured_uri,
-                    lang,
-                    query,
-                    /// Separate the URL to possibly obtain the language and query.
-                    ///NOTE: Three matches are possibly returned because the leading slash (/) counts as one black result.
-                    ///      I.e., "/en/love/".split("/", 3) returns ["", "en", "love"].
-                    query_arr = url.path.split("/", 3);
-                
-                /// First, parse the query array for valid langauges and searches.
-                /// Example queries:
-                ///     /!
-                ///     /en/!
-                ///     /en/love/!
-                ///     /en_em/Romans 3:16/!
-                ///     /love/!
-                ///     /Romans 3:16/!
-                
-                /// Is the first parameter a valid language ID?
-                if (BF.langs[query_arr[1]]) {
-                    /// Example queries:
-                    ///     /en/!
-                    ///     /en/.../!
-                    lang = BF.langs[query_arr[1]];
-                    /// Is the second parameter a query?
-                    ///NOTE: If the last parameter is simply a question mark, it is not a valid query and indicates the switch to the non-JavaScript version.
-                    if (query_arr[2] && query_arr[2] !== "!") {
-                        /// Example query: /en/love/!
-                        query = query_arr[2];
-                    }
-                } else {
-                    /// Since there was no language specified, use the default language.
-                    ///TODO: Determine how to determine the default language.
-                    lang = BF.langs.en;
-                    /// Since the first parameter was not a language ID, the first parameter should be the query (if present).
-                    /// Is the first parameter a query?
-                    ///NOTE: If the first parameter not a valid language ID, the first parameter is treated as the query and any other parameters are discarded.
-                    ///NOTE: If the last parameter is simply a question mark, it is not a valid query and indicates the switch to the non-JavaScript version.
-                    if (query_arr[1] && query_arr[1] !== "!") {
-                        /// Example query: /love/!
-                        query = query_arr[1];
-                    }
-                }
-                
-                /// Was there no query specified in the URL?
-                /// Example queries:
-                ///     /!
-                ///     /en/!
-                if (query === undefined || query === "") {
-                    /// Was there a query specified in the GET data?
-                    ///NOTE: For example, this will occur when submitting a query from the query box in the non-JavaScript version.
-                    /// Example query: /en/!?q=love
-                    if (data && data.q) {
-                        query = data.q;
-                    } else {
-                        /// If there is no query present, then preform a verse lookup starting at the beginning of the Bible (e.g., Genesis 1:1).
-                        query = lang.books_short[1] + " 1:1";
-                    }
-                } else {
-                    /// Convert special symbols to normal ones (e.g., "%26" becomes "&").
-                    query = global.decodeURIComponent(query);
-                }
-                
-                /// Create the URL to the full-featured page, used to possibly redirect proper browsers to.
-                ///NOTE: A scenario where this could be used is if someone using the non-JavaScript version sends a link to someone with a browser capable of handing the full-featured page.
-                ///NOTE: Both the leading and trailing slashes (/) are necessary.
-                full_featured_uri = "/" + lang.id + "/" + global.encodeURIComponent(query) + "/";
-                
-                /// If a query string is present, redirect it to the correct URL and cloes the connection.
-                ///TODO: Check for the presence of both the exclamation point (!) and _escaped_fragment_ and redirect to a page without the exclamation point.
-                ///TODO: Retrieve any query in the _escaped_fragment_ variable.
-                if (data && data.q) {
-                    connection.writeHead(301, {"Location": "http" + (BF.config.use_ssl ? "s" : "") + "://" + url.host + (Number(url.port) !== 80 ? ":" + url.port : "") + full_featured_uri + "!"});
-                    connection.end();
-                    return;
-                }
-                
-                /// Now that we know the request will not be redirected, send the OK status code and appropriate header.
-                connection.writeHead(200, {"Content-Type": "text/html"});
-                
-                /**
-                 * Create the page based on the retrieved HTML and send it to the client.
-                 *
-                 * @param html (string) The HTML of the non-JavaScript version.
-                 * @note  The callback function could be called synchronously or asynchronously. 
-                 */
-                get_simple_html(function (html)
-                {
-                    var b,
-                        c,
-                        verseID = lang.determine_reference(query);
-                    
-                    /// Add the full URL to the page to redirect capable browsers to the full-featured page.
-                    ///NOTE: A regular expresion is used because this string occurs twice.
-                    html = html.replace(/__FULL_URI__/g, full_featured_uri);
-                    /// Add the query string to the query box.
-                    html = html.replace("__QUERY__", BF.escape_html(query));
-                    
-                    ///TODO: Modify the classnames so that it displays the right style for each language.
-                    
-                    /// Is it a verse lookup?
-                    if (verseID) {
-                        c = ((verseID - (verseID % 1000)) % 1000000) / 1000;
-                        b = (verseID - (verseID % 1000) - c * 1000) / 1000000;
-                        
-                        BF.db.query("SELECT id, words FROM `bible_" + lang.id + "_html` WHERE book = " + b + " AND chapter = " + c, function (data)
-                        {
-                            var back_next,
-                                i,
-                                len,
-                                res = "",
-                                v;
-                            
-                            /// Was there no response from the database?  This could mean the database crashed or the verse is invalid.
-                            if (!data || !data.length) {
-                                res = lang.no_results1 + "<b>" + BF.escape_html(query) + "</b>" + lang.no_results2;
-                            } else {
-                                len = data.length;
-                                v = (data[0].id % 1000);
-                                
-                                /**
-                                 * Create the previous and next chapter links.
-                                 *
-                                 * @return A string containing HTML for the previous and next links.
-                                 * @note   This function is run immediately.
-                                 * @todo   Make the text language specific.
-                                 */
-                                back_next = (function ()
-                                {
-                                    var next_b,
-                                        next_c,
-                                        prev_b,
-                                        prev_c,
-                                        res = "";
-                                    
-                                    /// Is this not Genesis 1?
-                                    if (b !== 1 || c !== 1) {
-                                        if (c === 1) {
-                                            prev_b = b - 1;
-                                            prev_c = lang.chapter_count[prev_b];
-                                        } else {
-                                            prev_b = b;
-                                            prev_c = c - 1;
-                                        }
-                                        
-                                        res += '<a style="float:left;" href="/' + lang.id + "/" + lang.books_short[prev_b] + "%20" + prev_c + "/!" + '">&lt; Previous ' + (prev_b === 19 ? lang.psalm : lang.chapter) + "</a>";
-                                    }
-                                    
-                                    /// Is this not Revelation 22?
-                                    if (b !== 66 || c !== lang.chapter_count[66]) {
-                                        if (c === lang.chapter_count[b]) {
-                                            next_b = b + 1;
-                                            next_c = 1;
-                                        } else {
-                                            next_b = b;
-                                            next_c = c + 1;
-                                        }
-                                        
-                                        res += '<a style="float:right;" href="/' + lang.id + "/" + lang.books_short[next_b] + "%20" + next_c + "/!" + '">Next ' + (next_b === 19 ? lang.psalm : lang.chapter) + " &gt;</a>";
-                                    }
-                                    
-                                    return res;
-                                }());
-                                
-                                /// Add the previous and next links above the results.
-                                res += back_next;
-                                
-                                /// Loop through the verses and concatenate them to the results string.
-                                for (i = 0; i < len; i += 1) {
-                                    /// Is this the first verse or the Psalm title?
-                                    if (v < 2) {
-                                        /// Is this chapter 1?  (We need to know if we should display the book name.)
-                                        if (c === 1) {
-                                            res += "<div class=book id=" + data[i].id + "_title><h2>" + lang.books_long_pretitle[b] + "</h2><h1>" + lang.books_long_main[b] + "</h1><h2>" + lang.books_long_posttitle[b] + "</h2></div>";
-                                        /// Display chapter/psalm number (but not on verse 1 of psalms that have titles).
-                                        } else if (i === 0) {
-                                            /// Is this the book of Psalms?  (Psalms have a special name.)
-                                            res += "<h3 class=chapter id=" + data[i].id + "_chapter>" + (b === 19 ? lang.psalm : lang.chapter) + " " + c + "</h3>";
-                                        }
-                                        /// Is this a Psalm title (i.e., verse 0)?  (Psalm titles are displayed specially.)
-                                        if (v === 0) {
-                                            res += "<div class=psalm_title id=" + data[i].id + "_verse>" + data[i].words + "</div>";
-                                        } else {
-                                            res += "<div class=first_verse id=" + data[i].id + "_verse>" + data[i].words + " </div>";
-                                        }
-                                    } else {
-                                        /// Is it a subscription?
-                                        if (i === len - 1 && (data[i].id % 1000) === 255) {
-                                            res += "<div class=subscription id=" + data[i].id  + "_verse>" + data[i].words + "</div>";
-                                        } else {
-                                            ///TODO: Determine if "class=verse_number" is needed.
-                                            res += "<div class=verse id=" + data[i].id + "_verse><span class=verse_number>" + v + "&nbsp;</span>" + data[i].words + " </div>";
-                                        }
-                                    }
-                                    v += 1;
-                                }
-                                
-                                /// Add the previous and next links below the results.
-                                res += back_next;
-                            }
-                            
-                            /// Add the verses to the page.
-                            html = html.replace("__CONTENT__", res);
-                            connection.end(html);
-                        });
-                        
-                        /// While the database is looking up the verses, prepare the HTML more.
-                        /// Add the full verse book name along with the chapter and BibleForge's name to the <title> tag.
-                        html = html.replace("__TITLE__", BF.escape_html(lang.books_short[b]) + " " + c + " - " + lang.app_name);
-                    /// If it is not a verse lookup, it must be a search of some kind.
-                    } else {
-                        /// Preform a standard search.
-                        ///FIXME: Currently, it assumes all searches are standard searches.
-                        BF.standard_search({q: lang.prepare_query(query), l: lang.id}, function (data)
-                        {
-                            var i,
-                                last_b,
-                                len,
-                                res = "",
-                                verse_obj;
-                            
-                            /// Was there no response from the database?  This could mean the database crashed or Sphinx is not running.
-                            if (!data || !data.n || !data.n.length) {
-                                res = lang.no_results1 + "<b>" + BF.escape_html(query) + "</b>" + lang.no_results2;
-                            } else {
-                                len = data.n.length;
-                                for (i = 0; i < len; i += 1) {
-                                    verse_obj = BF.get_b_c_v(data.n[i]);
-                                    
-                                    if (verse_obj.v === 0) {
-                                        /// Change verse 0 to indicate a Psalm title (e.g., change "Psalm 3:0" to "Psalm 3:title").
-                                        verse_obj.v = lang.title;
-                                    } else if (verse_obj.v === 255) {
-                                        /// Change verse 255 to indicate a Pauline subscription (e.g., change "Romans 16:255" to "Romans 16:subscription").
-                                        verse_obj.v = lang.subscription;
-                                    }
-                                    
-                                    /// Is this verse from a different book than the last verse?
-                                    ///NOTE: This assumes that searches are always additional (which is correct, currently).
-                                    if (verse_obj.b !== last_b) {
-                                        /// We only need to print out the book if it is different from the last verse.
-                                        last_b = verse_obj.b;
-                                        
-                                        /// Convert the book number to text.
-                                        res += "<h1 class=short_book id=" + data.n[i] + "_title>" + lang.books_short[verse_obj.b] + "</h1>";
-                                    }
-                                    
-                                    res += "<div class=search_verse id=" + data.n[i] + "_search><span>" + (lang.chapter_count[verse_obj.b] === 1 ? "" : verse_obj.c + ":") + verse_obj.v + "</span> " + data.v[i] + "</div>";
-                                }
-                            }
-                            /// Add the verses to the page.
-                            html = html.replace("__CONTENT__", res);
-                            connection.end(html);
-                        });
-                        /// While the database is looking up the verses, prepare the HTML more.
-                        /// Add the query and BibleForge's name to the <title> tag.
-                        html = html.replace("__TITLE__", BF.escape_html(query) + " - " + lang.app_name);
-                    }
-                });
-            };
-        }());
-        
-        /**
-         * Handle all incomming requests.
-         *
-         * @param url        (object) The parsed URL.
-         *                            Object structure:
-         *                            host: "The server (e.g., 'bibleforge.com')",
-         *                            path: "The URL path (e.g., '/api'),
-         *                            port: "The port number (as a string) (e.g., '80')"
-         * @param data       (object) The GET data.
-         * @param connection (object) The object used to communicate with the client.
-         *                            Object structure:
-         *                            end:       function (data, encoding)
-         *                            writeHead: function (statusCode, headers)
-         */
-        return function handle_query(url, data, connection)
-        {
-            var send_results;
-            
-            /// Is the request for the APIs?
-            if (url.path === "/api") {
-                /// Send the proper header.
-                connection.writeHead(200, {"Content-Type": "application/json"});
-                
-                /**
-                 * Send the results back to the client as a JSON string.
-                 *
-                 * @param data (object) The data to be sent back to the client.
-                 */
-                send_results = function (data)
-                {
-                    connection.end(JSON.stringify(data));
-                };
-                
-                switch (Number(data.t)) {
-                    case BF.consts.verse_lookup:
-                        BF.verse_lookup(data, send_results);
-                        break;
-                    case BF.consts.standard_search:
-                        BF.standard_search(data, send_results);
-                        break;
-                    case BF.consts.grammatical_search:
-                        BF.grammatical_search(data, send_results);
-                        break;
-                    case BF.consts.lexical_lookup:
-                        BF.lexical_lookup(data, send_results);
-                        break;
-                    default:
-                        /// The request type was invalid, so close the connection.
-                        connection.end();
-                }
-            } else {
-                /// All other requests are replied to with the non-Javascript version.
-                create_simple_page(url, data, connection);
-            }
-        };
-    }());
-    
-    /**
-     * Start the server.
-     */
-    (function ()
-    {
-        var url = require("url"),
-            qs  = require("querystring");
-        
-        /**
-         * Finally create the server.
-         *
-         * @param request  (object) The object containing info about the request.
-         * @param response (object) The object used to communicate back to the client.
-         */
-        require("http").createServer(function (request, response)
-        {
-            /// Give an object with a subset of the response's functions.
-            var connection = {
-                    /**
-                     * Close the connection to the client and optionally write a final message.
-                     *
-                     * @param data     (string OR buffer) (optional) The final message to write to the client.
-                     * @param encoding (string)           (optional) The encoding of the data.
-                     * @note  This must be called in order for the client to finish the request.
-                     */
-                    end: function (data, encoding)
-                    {
-                        response.end(data, encoding);
-                    },
-                    /**
-                     * Write the header to the client.
-                     *
-                     * @example connection.writeHead(200, {"Content-Type": "text/html"});
-                     * @param   statusCode (number) The HTTP status code (e.g., 200 for OK; 404 for file not found)
-                     * @param   headers    (object) An object containing the headers to be sent.
-                     * @note    This must be called in order for the client to finish the request.
-                     */
-                    writeHead: function (statusCode, headers)
-                    {
-                        response.writeHead(statusCode, headers);
-                    }
-                },
-                /// Get the original URI that is being requested and parse it.
-                ///NOTE: Use the X-Request-URI header if present because sometimes the original URL gets modified (e.g., a request to /en/love/ is redirected to /api).
-                url_parsed = url.parse(request.headers["x-request-uri"] || request.headers.url);
-            
-            /// Is there GET data?
-            ///TODO: Merge POST data with GET data.
-            if (request.method.toUpperCase() === "GET") {
-                handle_query({host: request.headers.host, path: url_parsed.pathname, port: request.headers.port}, qs.parse(url_parsed.query), connection);
-            } else {
-                ///TODO: Also handle POST data.
-                /// If there is no data, close the connection.
-                connection.end();
-            }
-        }).listen(BF.config.port);
-    }());
-}
-
-/**
  * Catch errors so that it does not cause the entire server to crash.
  */
 process.on("uncaughtException", function(e)
@@ -1058,5 +612,449 @@ BF.lexical_lookup = function (data, callback)
         BF.langs[id] = lang[id];
     }
     
-    start_server();
+    /**
+     * Listen for HTTP forwarded requests.
+     */
+    (function start_server()
+    {
+        /**
+         * Create a closure to handle queries from the client.
+         *
+         * @return A function to handle queries.
+         */
+        var handle_query = (function ()
+        {
+            /**
+             * Create a closure to house the code to produce the non-JavaScript version.
+             *
+             * @return A function to create the HTML for the non-JavaScript version.
+             */
+            var create_simple_page = (function ()
+            {
+                /**
+                 * Create a closure to get the base HTML of the non-JavaScript code.
+                 *
+                 * @return A function to get the HTML for the non-JavaScript version.
+                 */
+                var get_simple_html = (function ()
+                {
+                    /// Prepare a variable in the closure to cache the results.
+                    var html;
+                    
+                    /**
+                     * Get the base HTML of the non-JavaScript code.
+                     *
+                     * @param  callback (function) The function to send the HTML back to.
+                     * @return NULL
+                     * @note   The callback function could be called synchronously or asynchronously.
+                     */
+                    return function get_simple_html(callback)
+                    {
+                        /// Has the HTML already been cached?
+                        if (html) {
+                            callback(html);
+                        } else {
+                            /// Asynchronously read the file.
+                            require("fs").readFile(__dirname + "/index_non-js.html", "utf8", function (err, data)
+                            {
+                                /// Is BibleForge configued to cache the results?
+                                ///NOTE: Production servers should use the cache.
+                                if (BF.config.cache_simple_html) {
+                                    /// Optionally, cache the HTML in the closure.
+                                    html = data;
+                                }
+                                
+                                callback(data);
+                            });
+                        }
+                    };
+                }());
+                
+                /**
+                 * Create the non-JavaScript version and send the results to the client.
+                 *
+                 * @param  url        
+                 * @param  data       
+                 * @param  connection 
+                 * @return NULL
+                 */
+                return function create_simple_page(url, data, connection)
+                {
+                    /// Because the URI starts with a slash (/), the first array element is empty.
+                    var full_featured_uri,
+                        lang,
+                        query,
+                        /// Separate the URL to possibly obtain the language and query.
+                        ///NOTE: Three matches are possibly returned because the leading slash (/) counts as one black result.
+                        ///      I.e., "/en/love/".split("/", 3) returns ["", "en", "love"].
+                        query_arr = url.path.split("/", 3);
+                    
+                    /// First, parse the query array for valid langauges and searches.
+                    /// Example queries:
+                    ///     /!
+                    ///     /en/!
+                    ///     /en/love/!
+                    ///     /en_em/Romans 3:16/!
+                    ///     /love/!
+                    ///     /Romans 3:16/!
+                    
+                    /// Is the first parameter a valid language ID?
+                    if (BF.langs[query_arr[1]]) {
+                        /// Example queries:
+                        ///     /en/!
+                        ///     /en/.../!
+                        lang = BF.langs[query_arr[1]];
+                        /// Is the second parameter a query?
+                        ///NOTE: If the last parameter is simply a question mark, it is not a valid query and indicates the switch to the non-JavaScript version.
+                        if (query_arr[2] && query_arr[2] !== "!") {
+                            /// Example query: /en/love/!
+                            query = query_arr[2];
+                        }
+                    } else {
+                        /// Since there was no language specified, use the default language.
+                        ///TODO: Determine how to determine the default language.
+                        lang = BF.langs.en;
+                        /// Since the first parameter was not a language ID, the first parameter should be the query (if present).
+                        /// Is the first parameter a query?
+                        ///NOTE: If the first parameter not a valid language ID, the first parameter is treated as the query and any other parameters are discarded.
+                        ///NOTE: If the last parameter is simply a question mark, it is not a valid query and indicates the switch to the non-JavaScript version.
+                        if (query_arr[1] && query_arr[1] !== "!") {
+                            /// Example query: /love/!
+                            query = query_arr[1];
+                        }
+                    }
+                    
+                    /// Was there no query specified in the URL?
+                    /// Example queries:
+                    ///     /!
+                    ///     /en/!
+                    if (query === undefined || query === "") {
+                        /// Was there a query specified in the GET data?
+                        ///NOTE: For example, this will occur when submitting a query from the query box in the non-JavaScript version.
+                        /// Example query: /en/!?q=love
+                        if (data && data.q) {
+                            query = data.q;
+                        } else {
+                            /// If there is no query present, then preform a verse lookup starting at the beginning of the Bible (e.g., Genesis 1:1).
+                            query = lang.books_short[1] + " 1:1";
+                        }
+                    } else {
+                        /// Convert special symbols to normal ones (e.g., "%26" becomes "&").
+                        query = global.decodeURIComponent(query);
+                    }
+                    
+                    /// Create the URL to the full-featured page, used to possibly redirect proper browsers to.
+                    ///NOTE: A scenario where this could be used is if someone using the non-JavaScript version sends a link to someone with a browser capable of handing the full-featured page.
+                    ///NOTE: Both the leading and trailing slashes (/) are necessary.
+                    full_featured_uri = "/" + lang.id + "/" + global.encodeURIComponent(query) + "/";
+                    
+                    /// If a query string is present, redirect it to the correct URL and cloes the connection.
+                    ///TODO: Check for the presence of both the exclamation point (!) and _escaped_fragment_ and redirect to a page without the exclamation point.
+                    ///TODO: Retrieve any query in the _escaped_fragment_ variable.
+                    if (data && data.q) {
+                        connection.writeHead(301, {"Location": "http" + (BF.config.use_ssl ? "s" : "") + "://" + url.host + (Number(url.port) !== 80 ? ":" + url.port : "") + full_featured_uri + "!"});
+                        connection.end();
+                        return;
+                    }
+                    
+                    /// Now that we know the request will not be redirected, send the OK status code and appropriate header.
+                    connection.writeHead(200, {"Content-Type": "text/html"});
+                    
+                    /**
+                    * Create the page based on the retrieved HTML and send it to the client.
+                    *
+                    * @param html (string) The HTML of the non-JavaScript version.
+                    * @note  The callback function could be called synchronously or asynchronously. 
+                    */
+                    get_simple_html(function (html)
+                    {
+                        var b,
+                            c,
+                            verseID = lang.determine_reference(query);
+                        
+                        /// Add the full URL to the page to redirect capable browsers to the full-featured page.
+                        ///NOTE: A regular expresion is used because this string occurs twice.
+                        html = html.replace(/__FULL_URI__/g, full_featured_uri);
+                        /// Add the query string to the query box.
+                        html = html.replace("__QUERY__", BF.escape_html(query));
+                        
+                        ///TODO: Modify the classnames so that it displays the right style for each language.
+                        
+                        /// Is it a verse lookup?
+                        if (verseID) {
+                            c = ((verseID - (verseID % 1000)) % 1000000) / 1000;
+                            b = (verseID - (verseID % 1000) - c * 1000) / 1000000;
+                            
+                            BF.db.query("SELECT id, words FROM `bible_" + lang.id + "_html` WHERE book = " + b + " AND chapter = " + c, function (data)
+                            {
+                                var back_next,
+                                    i,
+                                    len,
+                                    res = "",
+                                    v;
+                                
+                                /// Was there no response from the database?  This could mean the database crashed or the verse is invalid.
+                                if (!data || !data.length) {
+                                    res = lang.no_results1 + "<b>" + BF.escape_html(query) + "</b>" + lang.no_results2;
+                                } else {
+                                    len = data.length;
+                                    v = (data[0].id % 1000);
+                                    
+                                    /**
+                                     * Create the previous and next chapter links.
+                                     *
+                                     * @return A string containing HTML for the previous and next links.
+                                     * @note   This function is run immediately.
+                                     * @todo   Make the text language specific.
+                                     */
+                                    back_next = (function ()
+                                    {
+                                        var next_b,
+                                            next_c,
+                                            prev_b,
+                                            prev_c,
+                                            res = "";
+                                        
+                                        /// Is this not Genesis 1?
+                                        if (b !== 1 || c !== 1) {
+                                            if (c === 1) {
+                                                prev_b = b - 1;
+                                                prev_c = lang.chapter_count[prev_b];
+                                            } else {
+                                                prev_b = b;
+                                                prev_c = c - 1;
+                                            }
+                                            
+                                            res += '<a style="float:left;" href="/' + lang.id + "/" + lang.books_short[prev_b] + "%20" + prev_c + "/!" + '">&lt; Previous ' + (prev_b === 19 ? lang.psalm : lang.chapter) + "</a>";
+                                        }
+                                        
+                                        /// Is this not Revelation 22?
+                                        if (b !== 66 || c !== lang.chapter_count[66]) {
+                                            if (c === lang.chapter_count[b]) {
+                                                next_b = b + 1;
+                                                next_c = 1;
+                                            } else {
+                                                next_b = b;
+                                                next_c = c + 1;
+                                            }
+                                            
+                                            res += '<a style="float:right;" href="/' + lang.id + "/" + lang.books_short[next_b] + "%20" + next_c + "/!" + '">Next ' + (next_b === 19 ? lang.psalm : lang.chapter) + " &gt;</a>";
+                                        }
+                                        
+                                        return res;
+                                    }());
+                                    
+                                    /// Add the previous and next links above the results.
+                                    res += back_next;
+                                    
+                                    /// Loop through the verses and concatenate them to the results string.
+                                    for (i = 0; i < len; i += 1) {
+                                        /// Is this the first verse or the Psalm title?
+                                        if (v < 2) {
+                                            /// Is this chapter 1?  (We need to know if we should display the book name.)
+                                            if (c === 1) {
+                                                res += "<div class=book id=" + data[i].id + "_title><h2>" + lang.books_long_pretitle[b] + "</h2><h1>" + lang.books_long_main[b] + "</h1><h2>" + lang.books_long_posttitle[b] + "</h2></div>";
+                                            /// Display chapter/psalm number (but not on verse 1 of psalms that have titles).
+                                            } else if (i === 0) {
+                                                /// Is this the book of Psalms?  (Psalms have a special name.)
+                                                res += "<h3 class=chapter id=" + data[i].id + "_chapter>" + (b === 19 ? lang.psalm : lang.chapter) + " " + c + "</h3>";
+                                            }
+                                            /// Is this a Psalm title (i.e., verse 0)?  (Psalm titles are displayed specially.)
+                                            if (v === 0) {
+                                                res += "<div class=psalm_title id=" + data[i].id + "_verse>" + data[i].words + "</div>";
+                                            } else {
+                                                res += "<div class=first_verse id=" + data[i].id + "_verse>" + data[i].words + " </div>";
+                                            }
+                                        } else {
+                                            /// Is it a subscription?
+                                            if (i === len - 1 && (data[i].id % 1000) === 255) {
+                                                res += "<div class=subscription id=" + data[i].id  + "_verse>" + data[i].words + "</div>";
+                                            } else {
+                                                ///TODO: Determine if "class=verse_number" is needed.
+                                                res += "<div class=verse id=" + data[i].id + "_verse><span class=verse_number>" + v + "&nbsp;</span>" + data[i].words + " </div>";
+                                            }
+                                        }
+                                        v += 1;
+                                    }
+                                    
+                                    /// Add the previous and next links below the results.
+                                    res += back_next;
+                                }
+                                
+                                /// Add the verses to the page.
+                                html = html.replace("__CONTENT__", res);
+                                connection.end(html);
+                            });
+                            
+                            /// While the database is looking up the verses, prepare the HTML more.
+                            /// Add the full verse book name along with the chapter and BibleForge's name to the <title> tag.
+                            html = html.replace("__TITLE__", BF.escape_html(lang.books_short[b]) + " " + c + " - " + lang.app_name);
+                        /// If it is not a verse lookup, it must be a search of some kind.
+                        } else {
+                            /// Preform a standard search.
+                            ///FIXME: Currently, it assumes all searches are standard searches.
+                            BF.standard_search({q: lang.prepare_query(query), l: lang.id}, function (data)
+                            {
+                                var i,
+                                    last_b,
+                                    len,
+                                    res = "",
+                                    verse_obj;
+                                
+                                /// Was there no response from the database?  This could mean the database crashed or Sphinx is not running.
+                                if (!data || !data.n || !data.n.length) {
+                                    res = lang.no_results1 + "<b>" + BF.escape_html(query) + "</b>" + lang.no_results2;
+                                } else {
+                                    len = data.n.length;
+                                    for (i = 0; i < len; i += 1) {
+                                        verse_obj = BF.get_b_c_v(data.n[i]);
+                                        
+                                        if (verse_obj.v === 0) {
+                                            /// Change verse 0 to indicate a Psalm title (e.g., change "Psalm 3:0" to "Psalm 3:title").
+                                            verse_obj.v = lang.title;
+                                        } else if (verse_obj.v === 255) {
+                                            /// Change verse 255 to indicate a Pauline subscription (e.g., change "Romans 16:255" to "Romans 16:subscription").
+                                            verse_obj.v = lang.subscription;
+                                        }
+                                        
+                                        /// Is this verse from a different book than the last verse?
+                                        ///NOTE: This assumes that searches are always additional (which is correct, currently).
+                                        if (verse_obj.b !== last_b) {
+                                            /// We only need to print out the book if it is different from the last verse.
+                                            last_b = verse_obj.b;
+                                            
+                                            /// Convert the book number to text.
+                                            res += "<h1 class=short_book id=" + data.n[i] + "_title>" + lang.books_short[verse_obj.b] + "</h1>";
+                                        }
+                                        
+                                        res += "<div class=search_verse id=" + data.n[i] + "_search><span>" + (lang.chapter_count[verse_obj.b] === 1 ? "" : verse_obj.c + ":") + verse_obj.v + "</span> " + data.v[i] + "</div>";
+                                    }
+                                }
+                                /// Add the verses to the page.
+                                html = html.replace("__CONTENT__", res);
+                                connection.end(html);
+                            });
+                            /// While the database is looking up the verses, prepare the HTML more.
+                            /// Add the query and BibleForge's name to the <title> tag.
+                            html = html.replace("__TITLE__", BF.escape_html(query) + " - " + lang.app_name);
+                        }
+                    });
+                };
+            }());
+            
+            /**
+             * Handle all incomming requests.
+             *
+             * @param url        (object) The parsed URL.
+             *                            Object structure:
+             *                            host: "The server (e.g., 'bibleforge.com')",
+             *                            path: "The URL path (e.g., '/api'),
+             *                            port: "The port number (as a string) (e.g., '80')"
+             * @param data       (object) The GET data.
+             * @param connection (object) The object used to communicate with the client.
+             *                            Object structure:
+             *                            end:       function (data, encoding)
+             *                            writeHead: function (statusCode, headers)
+             */
+            return function handle_query(url, data, connection)
+            {
+                var send_results;
+                
+                /// Is the request for the APIs?
+                if (url.path === "/api") {
+                    /// Send the proper header.
+                    connection.writeHead(200, {"Content-Type": "application/json"});
+                    
+                    /**
+                     * Send the results back to the client as a JSON string.
+                     *
+                     * @param data (object) The data to be sent back to the client.
+                     */
+                    send_results = function (data)
+                    {
+                        connection.end(JSON.stringify(data));
+                    };
+                    
+                    switch (Number(data.t)) {
+                        case BF.consts.verse_lookup:
+                            BF.verse_lookup(data, send_results);
+                            break;
+                        case BF.consts.standard_search:
+                            BF.standard_search(data, send_results);
+                            break;
+                        case BF.consts.grammatical_search:
+                            BF.grammatical_search(data, send_results);
+                            break;
+                        case BF.consts.lexical_lookup:
+                            BF.lexical_lookup(data, send_results);
+                            break;
+                        default:
+                            /// The request type was invalid, so close the connection.
+                            connection.end();
+                    }
+                } else {
+                    /// All other requests are replied to with the non-Javascript version.
+                    create_simple_page(url, data, connection);
+                }
+            };
+        }());
+        
+        /**
+         * Start the server.
+         */
+        (function ()
+        {
+            var url = require("url"),
+                qs  = require("querystring");
+            
+            /**
+             * Finally create the server.
+             *
+             * @param request  (object) The object containing info about the request.
+             * @param response (object) The object used to communicate back to the client.
+             */
+            require("http").createServer(function (request, response)
+            {
+                /// Give an object with a subset of the response's functions.
+                var connection = {
+                        /**
+                         * Close the connection to the client and optionally write a final message.
+                         *
+                         * @param data     (string OR buffer) (optional) The final message to write to the client.
+                         * @param encoding (string)           (optional) The encoding of the data.
+                         * @note  This must be called in order for the client to finish the request.
+                         */
+                        end: function (data, encoding)
+                        {
+                            response.end(data, encoding);
+                        },
+                        /**
+                         * Write the header to the client.
+                         *
+                         * @example connection.writeHead(200, {"Content-Type": "text/html"});
+                         * @param   statusCode (number) The HTTP status code (e.g., 200 for OK; 404 for file not found)
+                         * @param   headers    (object) An object containing the headers to be sent.
+                         * @note    This must be called in order for the client to finish the request.
+                         */
+                        writeHead: function (statusCode, headers)
+                        {
+                            response.writeHead(statusCode, headers);
+                        }
+                    },
+                    /// Get the original URI that is being requested and parse it.
+                    ///NOTE: Use the X-Request-URI header if present because sometimes the original URL gets modified (e.g., a request to /en/love/ is redirected to /api).
+                    url_parsed = url.parse(request.headers["x-request-uri"] || request.headers.url);
+                
+                /// Is there GET data?
+                ///TODO: Merge POST data with GET data.
+                if (request.method.toUpperCase() === "GET") {
+                    handle_query({host: request.headers.host, path: url_parsed.pathname, port: request.headers.port}, qs.parse(url_parsed.query), connection);
+                } else {
+                    ///TODO: Also handle POST data.
+                    /// If there is no data, close the connection.
+                    connection.end();
+                }
+            }).listen(BF.config.port);
+        }());
+    }());
 }());
