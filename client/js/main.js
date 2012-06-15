@@ -260,13 +260,14 @@
     /**
      * Safely parse JSON.
      *
-     * @param  str (string) The string to parse.
-     * @return Returns the value of the JSON or "" if an empty string.
-     * @note   It could also check to make sure that the string starts with a curly bracket ({) straight bracket ([) double quote (") or number (hyphen (-) or digit) to attempt to ensure that it is valid JSON.
+     * @param  str (string) The JSON encoded string to parse.
+     * @return The parsed JSON or NULL if the JSON is invalid.
      */
     BF.parse_json = function (str)
     {
-        return str === "" ? "" : JSON.parse(str);
+        try {
+            return JSON.parse(str);
+        } catch (e) {}
     };
     
     /**

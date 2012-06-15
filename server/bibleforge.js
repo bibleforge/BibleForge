@@ -80,8 +80,9 @@ BF.consts = {
 /**
  * Safely parse JSON.
  *
- * @param  str (string) the JSON encoded string.
+ * @param  str (string) The JSON encoded string to parse.
  * @return The parsed JSON or NULL if the JSON is invalid.
+ * @todo   Load this code from the client side (or copy it via the Forge).
  */
 BF.parse_json = function (str)
 {
@@ -89,7 +90,6 @@ BF.parse_json = function (str)
         return JSON.parse(str);
     } catch (e) {}
 };
-
 
 /**
  * Escape a string to be safely added inside HTML.
@@ -110,7 +110,7 @@ BF.escape_html = function (str)
  * @example BF.get_b_c_v(1002003); /// Returns {b: 1, c: 2, v: 3}
  * @param   verseID (number || string) The verse ID to convert.
  * @return  An object containing the book, chapter, and verse numbers: {b: book, c: chapter, v: verse}
- * @note    Load this code from the client side (or copy it via the Forge).
+ * @todo    Load this code from the client side (or copy it via the Forge).
  */
 BF.get_b_c_v = function (verseID)
 {
