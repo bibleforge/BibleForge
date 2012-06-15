@@ -56,13 +56,14 @@
 {
     "use strict";
     
-    /// In the eval context, this is undefined, so it needs to get the global object manually.
+    /// In the eval context, "this" is undefined, so it needs to get the global object manually.
     if (that === undefined) {
-        that = typeof window !== "undefined" ? window : {};
+        /// Since only the browser might load the code via eval(), use the "window" object.
+        that = window;
     }
     
     /// Has the BF object already been created?
-    ///NOTE: "that" is "this", which is "window" in browsers and "global" in node.
+    ///NOTE: "that" is "this", which is "window" in browsers and a global object in Node.js.
     ///NOTE: This also allows this code to be accessed via Node.js' require() function.
     if (!that.BF) {
         that.BF = {langs: {}};
