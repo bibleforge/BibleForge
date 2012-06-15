@@ -330,7 +330,6 @@ BF.standard_search = function (data, callback)
     html_table  = "`bible_" + lang.id + "_html`";
     verse_table = "`verse_text_" + lang.id + "`";
     
-    
     ///NOTE: Currently, the first query does not specifiy a verse.
     initial = !Boolean(start_at);
     
@@ -477,7 +476,6 @@ BF.grammatical_search = function (data, callback)
     for (i = query_arr[1].length - 1; i >= 0; i -= 1) {
         query += ";" + (query_arr[2][i] ? "!" : "") + "filter=" + lang.grammar_categories[query_arr[1][i][0]] + "," + query_arr[1][i][1];
     }
-    
     
     if (initial) {
         /// Initial queries need to calculate the total verse.
