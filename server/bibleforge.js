@@ -60,7 +60,9 @@ process.on("uncaughtException", function(e)
     console.error(e.stack);
 });
 
-BF.config = require("./config.js").config;
+/// ********************
+/// * Create constants *
+/// ********************
 
 ///TODO: Link this with the client-side code, perhaps using the Forge.
 BF.consts = {
@@ -76,6 +78,18 @@ BF.consts = {
     previous:   2
 };
 
+/// ****************
+/// * Load modules *
+/// ****************
+
+BF.config = require("./config.js").config;
+
+/// Attach the database object.
+BF.db = require("./modules/db.js").db(BF.config.db);
+
+/// ***************************
+/// * Create helper functions *
+/// ***************************
 
 /**
  * Safely parse JSON.
@@ -126,8 +140,10 @@ BF.get_b_c_v = function (verseID)
     };
 };
 
-/// Attach the database object.
-BF.db = require("./modules/db.js").db(BF.config.db);
+
+/// **************************
+/// * Create query functions *
+/// **************************
 
 /**
  * Retrieve verses from the database.
@@ -669,8 +685,12 @@ BF.lexical_lookup = function (data, callback)
 };
 
 
+/// *******************************
+/// * Prepare to start the server *
+/// *******************************
+
 /**
- * Load the language specific files.
+ * Load the language specific files and start the server.
  */
 (function ()
 {
@@ -1119,7 +1139,7 @@ BF.lexical_lookup = function (data, callback)
                          * Write the header to the client.
                          *
                          * @example connection.writeHead(200, {"Content-Type": "text/html"});
-                         * @param   statusCode (number) The HTTP status code (e.g., 200 for OK; 404 for file not found)
+                         * @param   statusCode (number) The HTTP status code (e.g., 200 for "OK"; 404 for "File not found")
                          * @param   headers    (object) An object containing the headers to be sent.
                          * @note    This must be called in order for the client to finish the request.
                          */
