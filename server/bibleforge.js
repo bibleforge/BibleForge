@@ -132,9 +132,10 @@ BF.db = require("./modules/db.js").db(BF.config.db);
 /**
  * Retrieve verses from the database.
  *
- * @example BF.verse_lookup({t: "1", q: "1001001"}, function (data) {}); /// Look up verses starting with Genesis 1:1.
- * @example BF.verse_lookup({t: "1", q: "19119160", f: "1"}, function (data) {}); /// Look up verses starting with Psalm 119:160.
- * @example BF.verse_lookup({t: "1", q: "19119152", d: "2"}, function (data) {}); /// Look up previous verses starting with Psalm 119:152.
+ * @example BF.verse_lookup({q: "1001001"}, function (data) {});                      /// Look up verses starting with Genesis 1:1.
+ * @example BF.verse_lookup({q: "19119160", f: "1"}, function (data) {});             /// Look up verses starting with Psalm 119:160.
+ * @example BF.verse_lookup({q: "19119152", d: "2"}, function (data) {});             /// Look up previous verses starting with Psalm 119:152.
+ * @example BF.verse_lookup({q: "66022021", f: "1", l: "en_em"}, function (data) {}); /// Look up verses starting with Revelation 22:21 in Early Modern English.
  * @param   data     (object)   An object containing the query and query options.
  *                              Object structure:
  *                              q: "The verse ID",
@@ -143,7 +144,7 @@ BF.db = require("./modules/db.js").db(BF.config.db);
  *                              l: "The language ID"                                            (optional) (default: "en")
  *                              p: "Whether or not to return verses in groups of paragraphs"    (optional) (default: TRUE)
  * @param   callback (function) The function to send the results to.
- * @return  An object contianing the results (if any).
+ * @return  An object containing the results (if any).
  *          Object structure:
  *          n: (array)  An array of verse IDs for each verse returned
  *          v: (array)  An array of strings containing the HTML of the verses
@@ -316,6 +317,23 @@ BF.verse_lookup = function (data, callback)
 };
 
 
+/**
+ * Preform a standard search of the Bible.
+ *
+ * @example BF.standard_search({q: "love"}, function (data) {});               /// Preform a search for the word "love."
+ * @example BF.standard_search({q: "love", s: "5033004"}, function (data) {}); /// Preform a search for the word "love" starting from Deuteronomy 33:4.
+ * @param   data     (object)   An object containing the query and query options.
+ *                              Object structure:
+ *                              q: "The search query",
+ *                              l: "The language ID"                             (optional) (default: "en")
+ *                              s: "The verse ID from which to start the search" (optional) (default: 0)
+ * @param   callback (function) The function to send the results to.
+ * @return  An object containing the results (if any).
+ *          Object structure:
+ *          n: (array)  An array of verse IDs for each verse returned
+ *          v: (array)  An array of strings containing the HTML of the verses
+ *          t: (number) The total number of verses found in the search, not the total sent back, only present on intial queries
+ */
 BF.standard_search = function (data, callback)
 {
     var html_table,
@@ -443,7 +461,29 @@ BF.standard_search = function (data, callback)
     });
 };
 
-
+/**
+ * Preform a grammatical (morphological) search of the Bible.
+ *
+ * @example BF.standard_search({q: '["love",[[3,1]],[0]]'}, function (data) {});                 /// Preform a search for the word "love" when spoken by Jesus (i.e., red letter).
+ * @example BF.standard_search({q: '["love",[[3,1]],[0]]', s: "704772"}, function (data) {});    /// Preform a search for the word "love" when spoken by Jesus (i.e., red letter) starting from the 704772th word (in English).
+ * @example BF.standard_search({q: '["love",[[3,1],[6,3],[5,2]],[1,0,0]]'}, function (data) {}); /// Preform a search for the word "love" when not spoken by Jesus (i.e., black letter) and that is in the third person plural.
+ * @param   data     (object)   An object containing the query and query options.
+ *                              Object structure:
+ *                              q: "A JSON encoed string defining an array of search terms and grammatical properties.",
+ *                                 JSON structure:
+ *                                 ["WORD", [[(number) GRAMMATICAL_CATEGORY, (number) ATTRIBUTE], ...],[(boolean) EXCLUDE, ...]]
+ *                              l: "The language ID"                                                         (optional) (default: "en")
+ *                              s: "The word ID (in the translated language) from which to start the search" (optional) (default: 0)
+ * @param   callback (function) The function to send the results to.
+ * @return  An object containing the results (if any).
+ *          Object structure:
+ *          i: (array)  An array of word IDs for each highlighted word
+ *          n: (array)  An array of verse IDs for each verse returned
+ *          v: (array)  An array of strings containing the HTML of the verses
+ *          t: (number) The total number of verses found in the search, not the total sent back, only present on intial queries
+ * @note    Grammatical searches examine the morphology of the original languages, not translations.
+ * @note    The data.s property refers to the word ID, not the verse ID.
+ */
 BF.grammatical_search = function (data, callback)
 {
     var html_table,
@@ -473,6 +513,12 @@ BF.grammatical_search = function (data, callback)
         query += ";minid=" + start_at;
     }
     
+    /// Create the filter from the query.
+    /// Examples:
+    ///     ... AS RED                           => ["...", [[3, 1]], [0]]                      => "...;filter=red,1"
+    ///     ... AS NOT RED                       => ["...", [[3, 1]], [1]]                      => "...;!filter=red,1"
+    ///     ... AS NOT RED, THIRD_PERSON, PLURAL => ["...", [[3, 1], [6, 3], [5, 2]],[1, 0, 0]] => "...;filter=number,2;filter=person,3;!filter=red,1"
+    ///NOTE: The filters are added in reverse order simply to make the loop simpler.
     for (i = query_arr[1].length - 1; i >= 0; i -= 1) {
         query += ";" + (query_arr[2][i] ? "!" : "") + "filter=" + lang.grammar_categories[query_arr[1][i][0]] + "," + query_arr[1][i][1];
     }
@@ -554,6 +600,39 @@ BF.grammatical_search = function (data, callback)
     });
 };
 
+/**
+ * Retrieve lexical data from the database.
+ *
+ * @example BF.standard_search({q: "1"}, function (data) {}); /// Get the lexical data for the first word in the english Bible.
+ * @param   data     (object)   An object containing the query and query options.
+ *                              Object structure:
+ *                              q: "The word ID (in the translated language)",
+ *                              l: "The language ID" (optional) (default: "en")
+ * @param   callback (function) The function to send the results to.
+ * @return  An object containing the results (if any).
+ *          Object structure:
+ *          word      (string)  The original Greek, Hebrew, or Aramaic word, in Unicode.
+ *          pronun    (string)  A JSON string containing the pronunciation of the word (same as data.pronun below except for the actual word, not the base form).
+ *          strongs   (integer) The designated Strong's number for that word.
+ *          base_word (string)  The original Greek, Hebrew, or Aramaic base form of the word, in Unicode.
+ *          data      (string)  A JSON object containing the lexical information about the word.
+ *                              Object structure:
+ *                              def: {lit:    "The literal definition of a word (especially a name)",
+ *                                    long:  ["A multi-dimensional array of various possible definitions"],
+ *                                    short:  "A short and simple definition"}
+ *                              deriv:  "Information about words this word is derived from",
+ *                              pronun: {ipa:     "IPA Biblical reconstructed pronunciation (base form)",
+ *                                       ipa_mod: "IPA modern pronunciation (base form)",
+ *                                       dic:     "Dictionary Biblical reconstructed pronunciation (base form)",
+ *                                       dic_mod: "Dictionary modern pronunciation (base form)",
+ *                                       sbl:     "The Society of Biblical Literature's phonemic transliteration"}
+ *                              see:    ["An array of Strong's numbers identifying additional words of interest."]
+ *                              comment: "A string containing additional useful information"
+ *          usage     (string)  A list of ways the word is translated.
+ * @note    The usage data is planned to be completely redone and expanded.
+ * @note    Also, any number of the following:
+ *          part_of_speech, declinability, case_5, number, gender, degree, tense, voice, mood, person, middle, transitivity, miscellaneous, noun_type, numerical, form, dialect, type, pronoun_type
+ */
 BF.lexical_lookup = function (data, callback)
 {
     /// Select the language object specified by the query or use the default.
@@ -584,6 +663,7 @@ BF.lexical_lookup = function (data, callback)
         
         ///NOTE: Currently, only one results is requested, so it can simply send data[0].
         ///      In the future, it should return multiple results for some words (e.g., hyphenated words).
+        
         callback(data[0]);
     });
 };
