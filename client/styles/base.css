@@ -719,7 +719,7 @@ label {
     /* Because this element can wrap if the word is long and the line height is rather large due to the large original word one the line above, */
     /* it needs to be centered above the baseline to look good. */
     vertical-align: super;
-    /* This pushes down the context menu and drop down arrow slightly */
+    /* This pushes down the context menu and drop down arrow slightly. */
     padding-bottom: 3px;
 }
 
@@ -727,7 +727,7 @@ label {
     /* The drop down arrow. */
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAGCAQAAAC/O6xzAAAAXklEQVQI12Ng4GJIZXjP8B8JTmYQY2BgY9BmWMjwFS54lMEHqJSBCUgYMSyBShxnCGTgZ2BmYABJcAMlFjN8AaoMZBBgYGGAApAOPYYSBnegSrggRIINKMQB0c7AAAAMyxgJkjHDSAAAAABJRU5ErkJggg==);
     background-repeat: no-repeat;
-    /* Move the arrow all the way to the right and center it vertically . */
+    /* Move the arrow all the way to the right, and center it vertically. */
     background-position: 100%;
     /* Add some extra space to the right for the drop down arrow. */
     padding-right: 12px;
@@ -772,8 +772,10 @@ label {
     line-height: 19px;
 }
 
-
+/***************************************/
 /* Verses created from a verse lookup. */
+/***************************************/
+
 .psalm_title {
     /* Adding padding to the sides and bottom to distinguish the Psalm title from the rest of the text. */
     /*NOTE: Padding should always be used for verses instead of margin because it can interfere with determining the verse range. */
@@ -794,7 +796,7 @@ label {
     font-size: 51px;
     float:     left;
     
-    /* Bold makes some letters better, especially P's. */
+    /*NOTE: Bold makes some letters better, especially P's. */
     /* This fixes the spacing problem with some letters, like W, but not quite capital J's (see Psalm 43). */
     margin-bottom: -9px;
     
@@ -802,8 +804,8 @@ label {
     line-height: 19px!important;
 }
 
-/* Fixes a bug where the last word of the first verse sometimes wraps. */
 .first_verse {
+    /* This fixes a bug where the last word of the first verse sometimes wraps. */
     width: 100%;
     /* This makes sure that the first line is at least two lines long to give the drop caps just enough space. */
     min-height: 38px;
@@ -1108,8 +1110,9 @@ h2 {
     font-style: italic;
 }
 
-
+/***********************/
 /* WebKit specific CSS */
+/***********************/
 
 /* Make the drop caps aligned with the second line of text. */
 .webkit .first_verse:first-letter, .webkit .first_paragraph:first-letter {
@@ -1118,7 +1121,9 @@ h2 {
     padding: 1px;
 }
 
+/**********************/
 /* Opera specific CSS */
+/**********************/
 
 /* Make the drop caps take up two lines, so that wrapping text is not placed over it.  (See John 4:1.) */
 .opera .first_verse:first-letter, .opera .first_paragraph:first-letter {
@@ -1138,7 +1143,9 @@ h2 {
     vertical-align: baseline;
 }
 
+/*******************/
 /* IE specific CSS */
+/*******************/
 
 /* Make the inputIcon appear next to the queryInput. */
 /*NOTE: The query box is slightly off centered in IE with this CSS. */
