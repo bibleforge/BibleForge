@@ -1030,9 +1030,9 @@ h2 {
 @font-face {
     font-family: 'TeX Gyre Pagella';
     src: local('TeX Gyre Pagella Bold'),
-                    local('TeXGyrePagella-Bold'),
-                    url('../fonts/texgyrepagella-bold.otf') format('opentype');
-                    font-weight: bold;
+         local('TeXGyrePagella-Bold'),
+         url('../fonts/texgyrepagella-bold.otf') format('opentype');
+    font-weight: bold;
 }
 
 @font-face {
@@ -1092,8 +1092,8 @@ h2 {
     src: local('IM Fell DW Pica');
     src: url('../fonts/imfepirm28p.eot');
     src: url('../fonts/imfepirm28p.eot?#iefix') format('embedded-opentype'),
-         url('../fonts/imfepirm28p.woff') format('woff'),
-         url('../fonts/imfepirm28p.ttf') format('truetype');
+         url('../fonts/imfepirm28p.woff')       format('woff'),
+         url('../fonts/imfepirm28p.ttf')        format('truetype');
     font-weight: normal;
     font-style: normal;
 
@@ -1104,8 +1104,8 @@ h2 {
     src: local('IM Fell DW Pica');
     src: url('../fonts/imfepiit28p.eot');
     src: url('../fonts/imfepiit28p.eot?#iefix') format('embedded-opentype'),
-         url('../fonts/imfepiit28p.woff') format('woff'),
-         url('../fonts/imfepiit28p.ttf') format('truetype');
+         url('../fonts/imfepiit28p.woff')       format('woff'),
+         url('../fonts/imfepiit28p.ttf')        format('truetype');
     font-weight: normal;
     font-style: italic;
 }
