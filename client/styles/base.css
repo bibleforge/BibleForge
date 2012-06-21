@@ -912,6 +912,24 @@ h2 {
     font-size: 23px;
 }
 
+/* Style the previous and next links for the non-JavaScript version. */
+.static_link {
+    text-decoration: none;
+    color: #000;
+    opacity: .5;
+}
+.static_link:hover {
+    opacity: 1;
+}
+
+.prev {
+    float: left;
+}
+
+.next {
+    float: right;
+}
+
 .lang_en_em .hebrew_title {
     /* The original printing of the King James uses all caps for Psalm 119's stanza headings. */
     text-transform: uppercase;
