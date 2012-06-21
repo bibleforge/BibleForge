@@ -133,8 +133,10 @@
         modern:            "Modern",                                              /// The short name for the modern pronunciation displayed on the menu
         modern_pronun:     "Modern Pronunciation",                                /// The long name for the modern pronunciation displayed in a tooltip
         modern_ipa:        "Modern IPA",                                          /// The name for the modern IPA pronunciation displayed on the menu and tooltip
+        next:              "Next",                                                /// The next chapter link in the non-JavaScript version
         no_results1:       "Your search\u200A\u2014\u200A",                       /// Displayed when preforming a search that returns no results (before the search terms).
         no_results2:       "\u200A\u2014\u200Adid not return any results.",       /// Displayed when preforming a search that returns no results (after the search terms).
+        previous:          "Previous",                                            /// The previous chapter link in the non-JavaScript version
         psalm:             "Psalme",                                              /// The title of chapters in the book of Psalms
         query_explanation: 'Keyword or Reference: "God ſo loued" or Romans 3:23', /// In a blank query input box before a search has been preformed
         query_button_title:"Click here (or preſſe Enter)",                        /// The text displayed when hovering over the magnifying glass (query button).
