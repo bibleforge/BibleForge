@@ -875,6 +875,8 @@ BF.lexical_lookup = function (data, callback)
                         html = html.replace(/__FULL_URI__/g, full_featured_uri);
                         /// Add the query string to the query box.
                         html = html.replace("__QUERY__", BF.escape_html(query));
+                        /// Add the language ID to the scroll's class to allow the CSS to change based on language.
+                        html = html.replace("__LANG__", lang.id);
                         
                         ///TODO: Modify the classnames so that it displays the right style for each language.
                         
