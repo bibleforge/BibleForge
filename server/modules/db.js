@@ -130,11 +130,13 @@ this.db = function (config)
             /// Try to connect to the database.
             db.connect(function (err)
             {
-                /// If an error occured, try again shortly.
+                /// If an error occurred, try again shortly.
                 if (err) {
                     setTimeout(connect, 50);
                 } else {
                     /// If a connection is made, prevent queries form being stored and flush any that have already been stored.
+                    ///NOTE: Sometimes this gives false positives.
+                    ///TODO: Look in to using isConnected(), to determine if it really connected to the database.
                     connected = true;
                     queue.flush();
                 }

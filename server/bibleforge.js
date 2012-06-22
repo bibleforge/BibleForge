@@ -55,6 +55,16 @@ var BF = {};
  */
 process.on("uncaughtException", function(e)
 {
+    /// Did db.js incorrectly connect to the database?
+    ///TODO: Determine if there is a way to detect this error without using e.message.
+    if (e.message === "Can't execute a query without being connected") {
+        /// Something is wrong with the database connection, try to re-establish a connection.
+        ///NOTE: Theoretically, this should never be necessary because db.js should queue connections while waiting to connect to the database;
+        ///      however, sometimes the database module sends false positives, indicating that it is connected when it is in fact not.
+        ///      This is especially true when BibleForge tries to connect to the database as the database sever is starting.
+        BF.db.reconnect();
+    }
+    
     ///TODO: Log errors.
     console.error(e.message);
     console.error(e.stack);
