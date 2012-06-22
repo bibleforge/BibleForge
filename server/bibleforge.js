@@ -216,8 +216,7 @@ BF.verse_lookup = function (data, callback)
                     /// Once found, trim off the last, incomplete paragraph (if any).
                     ///NOTE: When preforming previous lookups, there might not be anything to trim off, but additional lookups must at least trim off one verse
                     ///      because it must stop before the last paragraph marker.
-                    ///NOTE: (len >= 0) is just to make sure that it cannot get stuck in an infinite loop.
-                    while (len >= 0) {
+                    while (true) {
                         /// Is it at a paragraph break?
                         if (verses[len - 1].paragraph) {
                             /// The first verse should be at a paragraph beginning, and the last verse
