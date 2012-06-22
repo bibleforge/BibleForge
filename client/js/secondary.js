@@ -942,7 +942,7 @@
                     ///FIXME: Only create the selected pane and create the other panes when they are clicked on.
                     while (cur_option < option_count) {
                         ///NOTE: Passing -1 to insertRow() and insertCell() adds a row/cell to the end of the table.
-                        table_row  = table_el.insertRow(-1);
+                        table_row = table_el.insertRow(-1);
                         
                         /// Insert a <td> for the name of the setting.
                         table_cell = table_row.insertCell(-1);
@@ -981,7 +981,7 @@
                             break;
                         }
                         /// Give the input element an id that matches the label so that clicking the label will interact with the input field.
-                        input_el.id   = label_el.htmlFor;
+                        input_el.id = label_el.htmlFor;
                         
                         table_cell.appendChild(input_el);
                         
@@ -1164,7 +1164,7 @@
                         /// Did it already figure out which part of the word was clicked on?
                         if (split_info.which_rect) {
                             /// Does the rectangle that the user first clicked exist?
-                            ///NOTE: For example, if the viewport is very small and word "Jonath-elem-rechokim" in Psalm 56:title wraps twice times and the user clicked on the third part,
+                            ///NOTE: For example, if the viewport is very small, the word "Jonath-elem-rechokim" in Psalm 56:title may wrap twice times, and if the user clicked on the third part,
                             ///      and then the user resized the viewport so that now it only wraps once, there will be just two rectangles, not three.
                             ///      So in this case, when the viewport is resized, it will select the second section.
                             if (split_info.which_rect < point_to_rects.length) {
