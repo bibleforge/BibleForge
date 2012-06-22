@@ -1427,7 +1427,7 @@
                     
                     (function ()
                     {
-                        var buffer_rem = 10000, /// In milliseconds
+                        var buffer_rem = 10000, /// In pixels
                             
                             checking_excess_content_bottom = false,
                             checking_excess_content_top    = false,
@@ -1734,7 +1734,7 @@
                  */
                 add_content_if_needed = (function ()
                 {
-                    var buffer_add = 1000; /// In milliseconds
+                    var buffer_add = 800; /// In pixels
                     
                     /**
                      * Add content to bottom of the page (off the screen)
