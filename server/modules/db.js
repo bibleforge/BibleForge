@@ -186,6 +186,15 @@ this.db = function (config)
                     /// Queue queries if the database has not yet started up.
                     queue.add(sql, callback);
                 }
+            },
+            /**
+             * Attempt to re-establish a connection with the server.
+             */
+            reconnect: function ()
+            {
+                db.disconnect();
+                connected = false;
+                connect();
             }
         };
     }());
