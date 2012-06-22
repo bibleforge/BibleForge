@@ -576,7 +576,7 @@ BF.grammatical_search = function (data, callback)
         query += '"';
     }
     
-    /// Run the Sphinx search and return both the verse IDs and the HTML.
+    /// Run the Sphinx search, and return both the verse IDs and the HTML.
     BF.db.query(query, function (data)
     {
         var i,
@@ -905,7 +905,6 @@ BF.lexical_lookup = function (data, callback)
                                      *
                                      * @return A string containing HTML for the previous and next links.
                                      * @note   This function is run immediately.
-                                     * @todo   Make the text language specific.
                                      */
                                     back_next = (function ()
                                     {
