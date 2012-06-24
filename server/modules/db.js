@@ -53,22 +53,35 @@ this.db = function (config)
     return (function ()
     {
         var connected,
-            db = new (require("db-mysql")).Database({
-                charset:  "utf8", /// With this, we do not need to send "SET NAMES utf8;" when the connection is made.
-                ///NOTE: Could also use "port" and "socket".
-                hostname: config.host,
-                user:     config.user,
-                password: config.pass,
-                database: config.base
-                /// Other options:
-                ///     compress        (default: FALSE)
-                ///     reconnect       (default: TRUE)
-                ///     initCommand     (default: undefined)
-                ///     readTimeout     (default: 0)
-                ///     sslVerifyServer (default: FALSE)
-                ///     timeout         (default: 0)
-                ///     writeTimeout    (default: 0)
-            }),
+            db = new (require("db-mysql")).Database((function ()
+            {
+                var settings = {
+                    charset:  "utf8", /// With this, we do not need to send "SET NAMES utf8;" when the connection is made.
+                    user:     config.user,
+                    password: config.pass,
+                    database: config.base
+                    /// Other options:
+                    ///     compress        (default: FALSE)
+                    ///     reconnect       (default: TRUE)
+                    ///     initCommand     (default: undefined)
+                    ///     readTimeout     (default: 0)
+                    ///     sslVerifyServer (default: FALSE)
+                    ///     timeout         (default: 0)
+                    ///     writeTimeout    (default: 0)
+                };
+                
+                if (config.host) {
+                    settings.hostname = config.host;
+                }
+                if (config.port) {
+                    settings.port     = config.port;
+                }
+                if (config.sock) {
+                    settings.socket   = config.sock;
+                }
+                
+                return settings;
+            }())),
             /// The queue object is used to store any queries that are called before a connection to the database has been established.
             /// This is only used before the database has started.  The intended purpose is to allow the BibleForge server to start up
             /// before the database itself has started.  If the BibleForge loses its connection to the database later, the queries are

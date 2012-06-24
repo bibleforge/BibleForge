@@ -39,10 +39,14 @@ this.config = {
     cache_simple_html: true, /// Whether or not to cache the contents of index_non-js.html.  Should be TRUE on production servers.
     /// The database options.
     db: {
-        host: "127.0.0.1", /// The hostname to connect to
-        user: "user",      /// The database username
-        pass: "password",  /// The user's password
-        base: "bf"         /// The database name
+        base: "bf",         /// The database name
+        ///NOTE: If connecting via a network host, remove the "sock" property.
+        host: "127.0.0.1",  /// The hostname to connect to
+        user: "user",       /// The database username
+        pass: "password",   /// The user's password
+        port: 3306,         /// The port to connect to (must be an integer) (optional: default 3306)
+        ///NOTE: If connecting via a file socket, remove the "host" and "port" properties.
+        sock: "mysqld.sock" /// The Unix socket file
     },
     use_ssl: false, /// Whether or not to use SSL (partially implemented)
     port: 7777,     /// The port for the BibleForge server to listen to.  This is the port that HTTP server forwards requests to, no the port of the HTTP server.
