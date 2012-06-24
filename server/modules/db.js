@@ -145,6 +145,7 @@ this.db = function (config)
             {
                 /// If an error occurred, try again shortly.
                 if (err) {
+                    console.error(err);
                     setTimeout(connect, 50);
                 } else {
                     /// If a connection is made, prevent queries form being stored and flush any that have already been stored.
