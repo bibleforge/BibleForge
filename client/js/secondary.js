@@ -1886,10 +1886,10 @@
                                  */ 
                                 window.setTimeout(function ()
                                 {
-                                    var position,
+                                    var position,      /// The object that indicates the actual position on the page
                                         query_info = context.settings.user.last_query,
-                                        query_str,
-                                        query_url_str;
+                                        query_str,     /// The actual text used for the query
+                                        query_url_str; /// The text that appears in the URL when history.pushState() is applied
                                     
                                     /// Unless the query box is empty or contains the default text, use that text.  If it is empty, try getting the last query.
                                     ///NOTE: If the last query was the default query (when the page first loads), we do not want to record the query in the URL.
@@ -1927,6 +1927,7 @@
                                     BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(query_url_str) + "/");
                                     
                                     ///NOTE: If the user has not typed in a new query or the query was automated (i.e., query_info.is_default), keep the current position.
+                                    ///NOTE: query_str may be blank; in such cases, the position object will be used to create the proper query.
                                     context.run_new_query(query_str, query_info.is_default, true, position);
                                 }, 0);
                             }
