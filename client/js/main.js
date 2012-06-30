@@ -2947,7 +2947,7 @@
                     ///NOTE: Whitespace must be trimmed after this function because it may create excess whitespace.
                     query = BF.lang.prepare_query(query).trim();
                     
-                    if (query === "") {
+                    if (query === "" && typeof position === "undefined") {
                         /// TODO: Determine what else should be done to notify the user that no query will be preformed.
                         return;
                     }
@@ -3425,7 +3425,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?13971403", {
+                BF.include("/js/secondary.js?14663376", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
