@@ -2947,6 +2947,8 @@
                     ///NOTE: Whitespace must be trimmed after this function because it may create excess whitespace.
                     query = BF.lang.prepare_query(query).trim();
                     
+                    ///NOTE: Even if the query is blank, a query can be created from the position object.
+                    ///      This occurs is the user clears the query box and then changes the language.
                     if (query === "" && typeof position === "undefined") {
                         /// TODO: Determine what else should be done to notify the user that no query will be preformed.
                         return;
