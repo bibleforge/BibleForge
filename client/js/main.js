@@ -1164,6 +1164,9 @@
                 
                 settings.add_property(settings.user, "position", {});
                 
+                /// The entered_text property stores what the user last typed in to the query box, even if the user never actually submitted the query.
+                settings.add_property(settings.user, "entered_text", undefined);
+                
                 
                 /// Load user settings (if any).
                 /// Does the browser support localStorage? (All modern browsers should.)
@@ -3250,8 +3253,9 @@
                         run_new_query(raw_query, is_default, true, position);
                         
                         /// Only change the text in the query input if the user has not started typing and the user actually typed in the query.
-                        if (!is_default && (!e.initial_page_load || qEl.value === BF.lang.query_explanation)) {
-                            qEl.value = raw_query;
+                        if (!is_default && (!e.initial_page_load || qEl.value === BF.lang.query_explanation) && typeof settings.user.entered_text !== "undefined") {
+                            /// Fill in the last query that the user typed in, which is not necessary the same as what the user lasted queried.
+                            qEl.value = settings.user.entered_text;
                         }
                     }
                     
@@ -3422,6 +3426,18 @@
                     }
                 }
             }, false);
+            
+            /**
+             * Capture the text the user enters into the query box.
+             *
+             * This text is then put back in to the query box when the user next visits the page, regardless of whether or not the user submits the query.
+             */
+            qEl.onchange = function ()
+            {
+                if (qEl.value !== BF.lang.query_explanation) {
+                    settings.user.entered_text = qEl.value;
+                }
+            };
             
             /// After a short delay, lazily load extra, nonessential (or at least not immediately essential) code, like the wrench menu.
             ///TODO: Determine if there is any problem hitting the server again so quickly.
