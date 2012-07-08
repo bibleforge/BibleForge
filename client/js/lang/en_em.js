@@ -666,6 +666,14 @@ first_loop:     while (i < search_terms_arr_len) {
                         stemmed_word = "y(?:e|ou)";
                         add_morph_regex = false;
                         break;
+                    /// Prevent the word "wast" from highlighting "waste" (or other variants).
+                    ///NOTE: See "wast" below also.
+                    case "was":
+                    case "wast":
+                        stemmed_word = "wast?";
+                        add_morph_regex = false;
+                        break;
+                    
                     /// Prevent words with no other form having the morphological regex added to the stem.
                     case "the":
                     case "for":
@@ -1383,6 +1391,11 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "upheld":
                             case "uphold":
                                 stemmed_word = "uph[eo]ld";
+                                break;
+                            /// Prevent the word "waste" (and other morphological variants) from incorrectly highlighting "wast."
+                            ///NOTE: See "was" and "wast" above.
+                            case "wast":
+                                stemmed_word = "wast(?:e|i)";
                                 break;
                             case "wax":
                             case "waxen":
