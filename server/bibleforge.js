@@ -1004,6 +1004,8 @@ BF.lexical_lookup = function (data, callback)
                             /// While the database is looking up the verses, prepare the HTML more.
                             /// Add the full verse book name along with the chapter and BibleForge's name to the <title> tag.
                             html = html.replace("__TITLE__", BF.escape_html(lang.books_short[b]) + " " + c + " - " + lang.app_name);
+                            
+                            html = html.replace("__DESC__", BF.escape_html(lang.books_short[b]) + " " + c + " in " + lang.full_name);
                         /// If it is not a verse lookup, it must be a search of some kind.
                         } else {
                             /// Preform a standard search.
@@ -1052,6 +1054,8 @@ BF.lexical_lookup = function (data, callback)
                             /// While the database is looking up the verses, prepare the HTML more.
                             /// Add the query and BibleForge's name to the <title> tag.
                             html = html.replace("__TITLE__", BF.escape_html(query) + " - " + lang.app_name);
+                            
+                            html = html.replace("__DESC__", BF.escape_html("Results for " + query + " in " + lang.full_name));
                         }
                     });
                 };
