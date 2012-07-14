@@ -126,6 +126,7 @@
         found_plural:      " verſes found for ",                                  /// On the info bar when searching (multiple results)
         found_singular:    " verſe found for ",                                   /// On the info bar when searching (one result)
         help:              "Succor",                                              /// Context menu item
+        "in":              "in",                                                  /// Used in the meta description in the non-JavaScript version to indicate the language being used.
         ///NOTE: This key must be the same as the value in the settings.
         in_paragraphs:     "Paragraphs",                                          /// In the View configuration panel
         ///FIXME: Not all italic words are implied; some are questionable.
@@ -143,6 +144,7 @@
         query_button_alt:  "Goe",                                                 /// The text to display for the magnifying glass (query button) if images are disabled.
         ///NOTE: This key must be the same as the value in the settings.
         red_letters:       "Red Letters",                                         /// In the View configuration panel
+        results_for:       "Results for",                                         /// Used in the meta description of searches in the non-JavaScript version to indicate the results for the query.
         subscription:      "subscription",                                        /// Used instead of 255 for subscripts to Paul's epistles
         title:             "title",                                               /// Used instead of 0 for Psalm title verse references
         translit:          "Tranſliteration",                                     /// The short name for the SBL transliteration display on the menu
