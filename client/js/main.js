@@ -2910,6 +2910,7 @@
                         query,
                         ///NOTE: This is set to an empty string so that it can be concatenated with extra highlighting terms on lookups.
                         standard_terms = "", /// Search terms that are not grammatical.
+                        using_position,
                         verse_id;
                     
                     /// ***********
@@ -2988,6 +2989,7 @@
                             ///NOTE: This is used when the page first loads and the user is brought back to where they were last.
                             ///TODO: Make this work when moving back/forth through the history.
                             verse_id = position.verse_id;
+                            using_position = true;
                         }
                         
                         /// Is the lookup verse the beginning of a Psalm with a title?  If so, we need to start at the title.
@@ -3057,7 +3059,8 @@
                     ///TODO: Determine if this should be done by a separate function.
                     document.title = raw_query + " - " + BF.lang.app_name;
                     
-                    if (!is_default) {
+                    /// Since the default query might be overridden by the position, check if the position is being used as the query.
+                    if (!is_default || using_position) {
                         /// Stop filling in the explanation text so that the user can make the query box blank.  (Text in the query box can be distracting while reading.)
                         qEl.onblur = function () {};
                     }
@@ -3241,7 +3244,8 @@
                         lang_id,
                         position,
                         raw_query,
-                        split_query;
+                        split_query,
+                        using_url;
                     
                     /**
                      * Execute the query and possibly change the query box text.
@@ -3253,9 +3257,14 @@
                         run_new_query(raw_query, is_default, true, position);
                         
                         /// Only change the text in the query input if the user has not started typing and the user actually typed in the query.
-                        if (!is_default && (!e.initial_page_load || qEl.value === BF.lang.query_explanation) && typeof settings.user.entered_text !== "undefined") {
-                            /// Fill in the last query that the user typed in, which is not necessary the same as what the user lasted queried.
-                            qEl.value = settings.user.entered_text;
+                        if (!e.initial_page_load || qEl.value === BF.lang.query_explanation) {
+                            if (e.initial_page_load && !using_url && typeof settings.user.entered_text !== "undefined") {
+                                /// Fill in the last query that the user typed in, which is not necessary the same as what the user lasted queried.
+                                qEl.value = settings.user.entered_text;
+                            } else if (!is_default) {
+                                /// As long as it is not the default query, use the query the user entered in.
+                                qEl.value = raw_query;
+                            }
                         }
                     }
                     
@@ -3300,15 +3309,17 @@
                                 /// If the language has already been loaded, there is no need to change the language.
                                 lang_id   = split_query[0];
                                 raw_query = split_query[1];
+                                using_url = true;
                             } else {
                                 /// Is the parameter a valid language ID?
                                 if (BF.langs[split_query[0]]) {
-                                    lang_id = split_query[0];    
+                                    lang_id = split_query[0];
                                 } else {
                                     /// If no language was specified, default to English.
                                     ///TODO: Consider changing the default language based on the user's location and settings.
                                     lang_id   = "en";
                                     raw_query = split_query[0];
+                                    using_url = true;
                                 }
                             }
                         }
@@ -3343,7 +3354,7 @@
                     } else if (!e.initial_page_load) {
                         do_query();
                     } else {
-                        /// Since the page just loaded, wait for a moment before executing the query (to give the client a server a moment's rest).
+                        /// Since the page just loaded, wait for a moment before executing the query (to give the server a moment's rest).
                         window.setTimeout(function ()
                         {
                             /// If the user has not sent a query, execute the default query.
