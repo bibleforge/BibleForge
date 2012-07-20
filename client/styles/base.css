@@ -219,6 +219,16 @@ body {
     background-color: #FFF;
 }
 
+/**
+ * Keep the placeholder text grayed out. */
+ */
+/* NOTE: Webkit does not need this because the placeholder text does not change colors on focus. */
+/* NOTE: Webkit's placeholder property is "::-webkit-input-placeholder" (note the double colons as well as different text). */
+/*       IE 10 might use ":-ms-input-placeholder". */
+.queryInput:-moz-placeholder {
+    color: #A7A7A7;
+}
+
 
 .queryPadding {
     padding: 8px;

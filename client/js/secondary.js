@@ -53,7 +53,7 @@
     onmouseout, opacity, open, options, originalTarget, paddingLeft, page, 
     pageXOffset, pageYOffset, parentNode, parse, parse_json, pinned, 
     point_to_el_exists, position, preload_font, prev_lang, preventDefault, 
-    pronun, pronun_type, properties, pushState, qEl, query, query_explanation, 
+    pronun, pronun_type, properties, pushState, qEl, query, 
     real_query, relatedTarget, remove, removeChild, removeEventListener, 
     replace_HTML, right, run_new_query, sbl, scrollBy, setTimeout, settings, 
     short, short_name, src, srcElement, stopPropagation, style, system, tagName, 
@@ -1816,9 +1816,6 @@
                     qEl_str = context.qEl.value,
                     qEl_str_trim;
                 
-                if (qEl_str === BF.lang.query_explanation) {
-                    qEl_str = "";
-                }
                 qEl_str_trim = qEl_str.trim();
                 
                 /// If the user is holding down Alt or Ctrl, open a new tab.

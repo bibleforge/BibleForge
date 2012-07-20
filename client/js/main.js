@@ -55,10 +55,10 @@
     lastChild, last_query, left, length, lexical_lookup, line_height, 
     localStorage, location, map, metaKey, mixed_search, modified, n, navigator, 
     new_val, nextSibling, no_results1, no_results2, offsetHeight, offsetLeft, 
-    offsetParent, offsetTop, old_val, onblur, once, onfocus, onload, onsubmit, 
+    offsetParent, offsetTop, old_val, once, onload, onsubmit, 
     open, opera, options, originalTarget, p, page, pageXOffset, pageYOffset, 
     parentNode, parse, parseInt, parse_json, pathname, position, preload_font, 
-    prepare_highlighter, prepare_query, prepared_query, prev_lang, 
+    prepare_highlighter, prepare_query, prepared_query, 
     preventDefault, previous, previousSibling, properties, prototype, psalm, 
     psalm_has_title, push, pushState, qEl, query, query_additional, 
     query_button_alt, query_button_title, query_explanation, query_previous, 
@@ -3059,12 +3059,6 @@
                     ///TODO: Determine if this should be done by a separate function.
                     document.title = raw_query + " - " + BF.lang.app_name;
                     
-                    /// Since the default query might be overridden by the position, check if the position is being used as the query.
-                    if (!is_default || using_position) {
-                        /// Stop filling in the explanation text so that the user can make the query box blank.  (Text in the query box can be distracting while reading.)
-                        qEl.onblur = function () {};
-                    }
-                    
                     /// Was the query a search?  Searches need to have the highlight function prepared for the incoming results.
                     if (options.type !== BF.consts.verse_lookup || options.extra_highlighting) {
                         /**
@@ -3257,13 +3251,17 @@
                         run_new_query(raw_query, is_default, true, position);
                         
                         /// Only change the text in the query input if the user has not started typing and the user actually typed in the query.
-                        if (!e.initial_page_load || qEl.value === BF.lang.query_explanation) {
+                        if (!e.initial_page_load || qEl.value === "") {
                             if (e.initial_page_load && !using_url && typeof settings.user.entered_text !== "undefined") {
                                 /// Fill in the last query that the user typed in, which is not necessary the same as what the user lasted queried.
                                 qEl.value = settings.user.entered_text;
+                                /// Clear the placeholder text to allow for the user to clear the query box so that he is not distracted.
+                                qEl.placeholder = "";
                             } else if (!is_default) {
                                 /// As long as it is not the default query, use the query the user entered in.
                                 qEl.value = raw_query;
+                                /// Clear the placeholder text to allow for the user to clear the query box so that he is not distracted.
+                                qEl.placeholder = "";
                             }
                         }
                     }
@@ -3335,7 +3333,7 @@
                     }
                     
                     /// If the default query is empty, lookup Genesis 1:1.
-                    if (!raw_query || raw_query === BF.lang.query_explanation) {
+                    if (!raw_query) {
                         raw_query = BF.lang.books_short[1] + " 1:1";
                         is_default = true;
                     }
@@ -3378,14 +3376,14 @@
             queryButton.title = BF.lang.query_button_title;
             queryButton.alt   = BF.lang.query_button_alt;
             
-            system.event.attach("languageChange", function (e)
+            system.event.attach("languageChange", function ()
             {
                 queryButton.title = BF.lang.query_button_title;
                 queryButton.alt   = BF.lang.query_button_alt;
                 
-                /// If the query text is the same as the previous query explaination, change it to the current language's.
-                if (qEl.value.trim() === BF.langs[e.prev_lang].query_explanation) {
-                    qEl.value = BF.lang.query_explanation;
+                /// If the placeholder still exists (i.e., the user has not typed anything) set it to the new langauge's.
+                if (qEl.placeholder) {
+                    qEl.placeholder = BF.lang.query_explanation;
                 }
             });
             
@@ -3445,16 +3443,15 @@
              */
             qEl.onchange = function ()
             {
-                if (qEl.value !== BF.lang.query_explanation) {
-                    settings.user.entered_text = qEl.value;
-                }
+                settings.user.entered_text = qEl.value;
+                this.placeholder = "";
             };
             
             /// After a short delay, lazily load extra, nonessential (or at least not immediately essential) code, like the wrench menu.
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?14664579", {
+                BF.include("/js/secondary.js?16428409", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
@@ -3486,8 +3483,8 @@
         {
             var raw_query = qEl.value;
             
-            /// Is the query is the same as the explanation?  If so, do not submit the query; just draw attention to the query box.
-            if (raw_query === BF.lang.query_explanation) {
+            /// If the user has not entered in a query, draw attention to the input box.
+            if (raw_query.trim() === "") {
                 qEl.focus();
             } else {
                 /// If the Alt and/or Ctrl key is pressed, open in a new tab.
@@ -3505,37 +3502,8 @@
             return false;
         };
         
-        
-        /**
-         * Set the query input box text with an explanation of what the user can enter in.
-         *
-         * @return NULL
-         * @note   Called on qEl blur.
-         * @note   This function is removed after the user submits a search by prepare_new_search() because the user no longer needs the instructions.
-         */
-        qEl.onblur = function ()
-        {
-            if (this.value.trim() === "") {
-                this.value = BF.lang.query_explanation;
-            }
-        };
-        
-        
-        /**
-         * Remove the explanation text so that the user can type.
-         *
-         * @return NULL
-         * @note   Called on qEl focus.
-         */
-        qEl.onfocus = function ()
-        {
-            if (this.value === BF.lang.query_explanation) {
-                this.value = "";
-            }
-        };
-        
-        /// Besides setting the text, is there a reason to call this function?
-        qEl.onblur();
+        /// Set the default placeholder text.
+        qEl.placeholder = BF.lang.query_explanation;
         
         /// *********************
         /// * Enf of set events *
