@@ -485,6 +485,8 @@
                 } else {
                     open_menu(pos, menu_items, selected, open_callback, close_callback);
                 }
+                
+                return close_menu;
             };
         }());
         
@@ -1243,6 +1245,7 @@
                         pointer = document.createElement("div"),
                         
                         callout_obj,
+                        destory_funcs = [],
                         loading_timer,
                         pos = {};
                     
@@ -1310,9 +1313,16 @@
                          */
                         destroy: function ()
                         {
-                            document.body.removeChild(callout);
+                            var i;
+                            
                             /// In case the data is still loading, try to abort the request.
                             ajax.abort();
+                            
+                            for (i = destory_funcs.length - 1; i >= 0; i -= 1) {
+                                destory_funcs[i]();
+                            }
+                            
+                            document.body.removeChild(callout);
                         },
                         /**
                          * Move the callout up or down.
@@ -1323,6 +1333,12 @@
                         {
                             pos.top += y;
                             callout.style.top = pos.top + "px";
+                        },
+                        ondestroy: function (func)
+                        {
+                            if (typeof func === "function") {
+                                destory_funcs[destory_funcs.length] = func;
+                            }
                         },
                         /**
                          * Determine if the element that the callout is pointing to still exists.
@@ -1382,10 +1398,12 @@
              * @param   onchange (function) The function trigged whenever a selection is made by the user.
              * @return  A DOM element representing the drop down box.
              */
-            create_drop_down_box = function (options, select, onchange)
+            create_drop_down_box = function (options, select, onchange, ondestroy)
             {
-                var el = document.createElement("span"),
+                var close_menu,
+                    el = document.createElement("span"),
                     i,
+                    is_open,
                     menu_items = [];
                 
                 /**
@@ -1441,22 +1459,36 @@
                  */
                 el.onclick = function (e)
                 {
-                    show_context_menu(function ()
-                    {
-                        /// Calculate the proper location for the drop down menu.
-                        ///NOTE: Because the callout itself can have a scroll bar, we must calculate the actual position on the viewport and then add in the scroll position of the entire scroll (window.pageYOffset).
-                        ///NOTE: Because the white-space CSS style is set to "nowrap", the element will not separate; therefore, there will only be one rectangle.
-                        var el_pos = el.getClientRects()[0];
-                    }, menu_items, select);
+                    close_menu = show_context_menu(function ()
+                        {
+                            /// Calculate the proper location for the drop down menu.
+                            ///NOTE: Because the callout itself can have a scroll bar, we must calculate the actual position on the viewport and then add in the scroll position of the entire scroll (window.pageYOffset).
+                            ///NOTE: Because the white-space CSS style is set to "nowrap", the element will not separate; therefore, there will only be one rectangle.
+                            var el_pos = el.getClientRects()[0];
+                            
                             /// Is the element still on the page; if not return undefined.
                             if (el_pos) {
                                 return {x: el_pos.left, y: el_pos.bottom + window.pageYOffset, absolute: true};
                             }
+                        }, menu_items, select, function onopen()
+                        {
+                            is_open = true;
+                        }, function onclose()
+                        {
+                            is_open = false;
+                        });
                     /// Prevent the event from trigger other events, like the callout onclick event.
                     e.stopPropagation();
                     e.preventDefault();
                     return false;
                 };
+                
+                ondestroy(function ()
+                {
+                    if (is_open) {
+                        close_menu();
+                    }
+                });
                 
                 return el;
             };
@@ -1594,7 +1626,7 @@
                                 {
                                     /// Store the user's pronunciation preference in the settings.
                                     context.settings.user.pronun_type = val;
-                                }, 0);
+                                },  callout.ondestroy);
                                 /// Since the drop down box already has a style ("dropdown") concatenate "lex-pronun" to the end.
                                 BF.toggleCSS(child_el, "lex-pronun", 1);
                                 parent_el.appendChild(child_el);
