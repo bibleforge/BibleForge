@@ -3098,6 +3098,7 @@
                             return function highlight(html, word_ids)
                             {
                                 var i,
+                                    j,
                                     ids,
                                     re_id,
                                     tmp_found_ids = [];
@@ -3105,18 +3106,28 @@
                                 /// Are there standard verses to highlight?
                                 /// TODO: Handle mixed searches too.
                                 if (html) {
-                                    re_id = highlight_re.length;
-                                    while (re_id >= 0) {
-                                        tmp_found_ids = html.split(highlight_re[re_id]);
+                                    for (re_id = highlight_re.length - 1; re_id >= 0; re_id -= 1) {
+                                        tmp_found_ids = html.split(highlight_re[re_id].regex);
                                         
                                         ids = tmp_found_ids.length;
                                         ///NOTE: search_str.split() creates an array of the HTML with the correct ids every third one.
-                                        for (i = 1; i < ids; i += 2) {
-                                            ///TODO: Determine if there is a downside to having a space at the start of the className.
-                                            ///TODO: Determine if we ever need to replace an existing f* className.
-                                            document.getElementById(tmp_found_ids[i]).className += " f" + (re_id + 1);
+                                        //debugger;
+                                        //for (i = 1; i < ids; i += 2) {
+                                        i = 1;
+                                        while (i < ids) {
+                                            j = highlight_re[re_id].word_count;
+                                            while (j > 0) {
+                                                ///TODO: Determine if there is a downside to having a space at the start of the className.
+                                                ///TODO: Determine if we ever need to replace an existing f* className.
+                                                document.getElementById(tmp_found_ids[i]).className += " f" + (re_id + 1);
+                                                /// Move the tmp_found_ids array up one
+                                                i += 1;
+                                                /// Countdown until the end end of the number of words in the phrase.
+                                                j -= 1;
+                                            }
+                                            /// Skip passed the html section of the split array.
+                                            i += 1;
                                         }
-                                        re_id -= 1;
                                     }
                                 ///NOTE: In order to support mixed searches, this will have to be a separate IF statement.
                                 }

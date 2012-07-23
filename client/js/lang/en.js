@@ -591,11 +591,13 @@
                 ///NOTE: (?:"[^"]*"?|[^\s]*) matches a phrase starting with a double quote (") or a single word.
                 ///NOTE: [~\/]\d* removes characters used for Sphinx query syntax.  I.e., proximity searches ("this that"~10) and quorum matching ("at least three of these"/3).
                 ///NOTE: -\B removes trailing hyphens.  (This might be unnecessary.)
-                ///NOTE: '(?!s\b) removes that are not followed by an "s" and only an "s."
-                initial_search_arr = search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?|[^\s]*)|[~\/]\d*|[",.:?!;&|\)\(\]\[\/\\`{}<$\^+]|-\B|'(?!s\b))/g, "").toLowerCase().split(" ");
-                
+                ///NOTE: '(?!s\b) removes apostrophes that are not followed by an "s" and only an "s."
+                //initial_search_arr = search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?|[^\s]*)|[~\/]\d*|[",.:?!;&|\)\(\]\[\/\\`{}<$\^+]|-\B|'(?!s\b))/g, "").toLowerCase().split(" ");
+                initial_search_arr = search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?|[^\s]*)|[~\/]\d*|[,.:?!;&|\)\(\]\[\/\\`{}<$\^+]|-\B|'(?!s\b))/g, "").toLowerCase().match(/"([^"])+"|(\S+)/g);
+                console.log(initial_search_arr);
+                //debugger;
                 arr_len = initial_search_arr.length;
-                
+                                
                 /// Filter out duplicates (i.e., PHP's array_unique()).
 first_loop:     for (i = 0; i < arr_len; i += 1) {
                     /// Skip empty strings.
@@ -611,6 +613,62 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                         new_arr_len += 1;
                     }
                 }
+                
+                for (i = final_search_arr.length - 1; i >= 0; i -= 1) {
+                    final_search_arr[i] = final_search_arr[i].replace(/"/g, "").trim();
+                    if (final_search_arr[i].indexOf(" ") !== -1) {
+                        final_search_arr[i] = final_search_arr[i].split(" ");
+                    }
+                }
+                
+                //console.log(final_search_arr);
+                
+                /*
+                var quote_open,
+                    quote_opening,
+                    quoted_words = {};
+                
+                for (i = 0; i < arr_len; i += 1) {
+                    /// Does it start with a quote?
+                    if (initial_search_arr[i][0] === '"') {
+                        ///NOTE: An intial quote can be an ending quote.
+                        ///      E.g., "this is a phrase followed by a "word
+                        if (quote_open) {
+                            quote_open = false;
+                        } else {
+                            /// Since the first word in a phrase has no word before it, open the quote after adding new words.
+                            quote_opening = true;
+                        }
+                        /// Remove the leading quote.
+                        initial_search_arr[i] = initial_search_arr[i].substring(1);
+                    }
+                    
+                    /// If this is not the first word in a phrase, add it to the object.
+                    if (quote_open) {
+                        quoted_words[i] = i - 1;
+                    }
+                    
+                    /// Now open the quote since it would have already skipped the first word in the phrase.
+                    if (quote_opening) {
+                        quote_open = true;
+                        quote_opening = false;
+                    }
+                    
+                    /// Since a single word could have quotes on both sides, these IF statements must be separate.
+                    if (initial_search_arr[i][initial_search_arr[i].length - 1] === '"') {
+                        if (quote_open) {
+                            quote_open = false
+                        } else {
+                            quote_open = true;
+                        }
+                        /// Remove a trailing quote.
+                        initial_search_arr[i] = initial_search_arr[i].substring(0, initial_search_arr[i].length - 1);
+                    }
+                }
+                console.log(initial_search_arr);
+                //console.log(quoted_words);
+                */
+
                 
                 return final_search_arr;
             }
@@ -628,6 +686,7 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
              */
             return function prepare_highlighter(search_terms)
             {
+            /*
                 var add_morph_regex,
                     count           = 0,
                     highlight_regex = [],
@@ -640,27 +699,31 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                     search_terms_arr,
                     search_terms_arr_len,
                     stemmed_word;
-                
-                search_terms_arr     = filter_terms_for_highlighter(search_terms);
+              */
+                var reverse_stem,
+                    search_terms_arr = filter_terms_for_highlighter(search_terms),
+                    search_terms_arr_len;
+                //debugger;
                 search_terms_arr_len = search_terms_arr.length;
                 
-                ///TODO: Determine if a normal FOR loop would be better.
-first_loop:     while (i < search_terms_arr_len) {
-                    term       = search_terms_arr[i];
-                    len_before = term.length;
-                    i += 1;
+                reverse_stem = function (term)
+                {
+                    var do_not_add_morph_regex,
+                        len_before = term.length,
+                        len_after,
+                        stemmed_word;
                     
                     /// Possibly fix special/unique words that the stemmer won't stem correctly.
                     switch (term) {
                     case "shalt":
                     case "shall":
                         stemmed_word = "shal[lt]";
-                        add_morph_regex = false;
+                        do_not_add_morph_regex = true;
                         break;
                     case "wilt":
                     case "will":
                         stemmed_word = "wil[lt]";
-                        add_morph_regex = false;
+                        do_not_add_morph_regex = true;
                         break;
                     ///NOTE: Could also include "haddest," but that is not found in the current English version.
                     case "had":
@@ -671,37 +734,35 @@ first_loop:     while (i < search_terms_arr_len) {
                     case "have":
                     case "having":
                         stemmed_word = "ha(?:d(?:st)?|st?|th|v(?:e|ing))";
-                        add_morph_regex = false;
+                        do_not_add_morph_regex = true;
                         break;
                     ///NOTE: "ate" must be here because the stem form is "at," which is ambiguous.
                     ///NOTE: See "eat" and "eaten" below also.
                     case "ate":
                         stemmed_word = "(?:ate|eat)";
-                        add_morph_regex = true;
                         break;
                     ///NOTE: This is to make "comely" highlight "comeliness" and not "come."
                     case "comely":
                         stemmed_word = "comel[yi]";
-                        add_morph_regex = true;
                         break;
                     ///NOTE: This is to highlight "find," "findest," "findeth," and "found" but not "foundation," "founded," or "founder."
                     ///NOTE: See "find" and "found" below also.
                     case "found":
                         stemmed_word = "f(?:ind(?:e(?:st|th)|ing)?|ound)";
-                        add_morph_regex = false;
+                        do_not_add_morph_regex = true;
                         break;
                     ///TODO: Consider adding the possessive form (your).
                     case "ye":
                     case "you":
                         stemmed_word = "y(?:e|ou)";
-                        add_morph_regex = false;
+                        do_not_add_morph_regex = true;
                         break;
                     /// Prevent the word "wast" from highlighting "waste" (or other variants).
                     ///NOTE: See "wast" below also.
                     case "was":
                     case "wast":
                         stemmed_word = "wast?";
-                        add_morph_regex = false;
+                        do_not_add_morph_regex = true;
                         break;
                     
                     /// Prevent words with no other form having the morphological regex added to the stem.
@@ -715,7 +776,7 @@ first_loop:     while (i < search_terms_arr_len) {
                     ///NOTE: See "go" below also.
                     case "goings":
                         stemmed_word = term;
-                        add_morph_regex = false;
+                        do_not_add_morph_regex = true;
                         break;
                     
                     /// Try stemming the word and then checking for strong words.
@@ -725,11 +786,10 @@ first_loop:     while (i < search_terms_arr_len) {
                             /// Don't stem; change it to a regex compatible form.
                             ///NOTE: Word breaks are found by looking for tag openings (<) or closings (>).
                             stemmed_word = term.replace(/\*/g, "[^<>]*");
-                            add_morph_regex = false;
+                            do_not_add_morph_regex = true;
                         } else {
                             /// A normal word without a wildcard gets stemmed.
                             stemmed_word = stem_word(term);
-                            add_morph_regex = true;
                             
                             /// Possibly fix strong words with proper morphological regex.
                             switch (stemmed_word) {
@@ -868,7 +928,7 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "doth":
                                 stemmed_word = "d(?:o(?:est?|ne|st|th)?|id(?:st)?)";
                                 /// Since this word is so short, it needs special regex to prevent false positives, so do not add additional morphological regex.
-                                add_morph_regex = false;
+                                do_not_add_morph_regex = true;
                                 break;
                             case "draw":
                             case "drawn":
@@ -899,7 +959,7 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "d[yi]":
                                 stemmed_word = "d(?:ie(?:d|th|st)?|ying)";
                                 /// Since this word is so short, it needs special regex to prevent false positives, so do not add additional morphological regex.
-                                add_morph_regex = false;
+                                do_not_add_morph_regex = true;
                                 break;
                             ///NOTE: See "ate" above also.
                             case "eat":
@@ -936,14 +996,14 @@ first_loop:     while (i < search_terms_arr_len) {
                             ///NOTE: See "found" above (which is a variant of this word) and "found" below (which is a different word).
                             case "find":
                                 stemmed_word = "f(?:ind(?:e(?:st|th)|ing)?|ound)";
-                                add_morph_regex = false;
+                                do_not_add_morph_regex = true;
                                 break;
                             ///NOTE: This is actually used to match "founded" and "foundest."
                             ///      Other morphological variants that a user searches for (such as "foundeth") will also correctly use this regex.
                             ///NOTE: See "found" and "find" above (which match forms of another word).
                             case "found":
                                 stemmed_word = "founde";
-                                add_morph_regex = false;
+                                do_not_add_morph_regex = true;
                                 break;
                             case "fled":
                             case "flee":
@@ -1013,7 +1073,7 @@ first_loop:     while (i < search_terms_arr_len) {
                             case "went":
                                 stemmed_word = "(?:go(?:e(?:st|th)|ing|ne)?|went)";
                                 /// Because this word is so small and unique, it is easier to white list all of the forms used.
-                                add_morph_regex = false;
+                                do_not_add_morph_regex = true;
                                 break;
                             case "get":
                             case "got":
@@ -1498,17 +1558,17 @@ first_loop:     while (i < search_terms_arr_len) {
                         }
                     }
                     
+                    /*
                     /// Skip words that are the same after stemming or regex'ing (e.g., "joyful joy" becomes "joy joy").
                     for (j = 0; j < count; j += 1) {
                         if (stemmed_word === stemmed_arr[j]) {
-                            ///NOTE: This is the same as "continue 2" in PHP.
-                            continue first_loop;
+                            return;
                         }
                     }
-                    
+                    */
                     len_after = stemmed_word.length;
                     
-                    stemmed_arr[count] = stemmed_word;
+                    //stemmed_arr[count] = stemmed_word;
                     
                     ///NOTE:  [<-] finds either the beginning of the close tag (</a>) or a hyphen (-).
                     ///       The hyphen is to highlight hyphenated words that would otherwise be missed (matching first word only) (i.e., "Beth").
@@ -1516,16 +1576,55 @@ first_loop:     while (i < search_terms_arr_len) {
                     ///       The current English version (KJV) does not use square brackets ([]).
                     ///FIXME: The punctuation ,.?!;:)( could be considered language specific.
                     ///TODO:  Bench mark different regex (creation and testing).
-                    if (!add_morph_regex || (len_after === len_before && len_after < 3)) {
-                        highlight_regex[count] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")[),.?!;:]*[<-]", "i");
-                    } else {
-                        /// Find most words based on stem morphology.
-                        ///NOTE: [bdfgmnprt]? selects possible doubles.
-                        highlight_regex[count] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")(?:e|l)?(?:a(?:l|n(?:ce|t)|te|ble)|e(?:n(?:ce|t)|r|ment)|i(?:c|ble|on|sm|t[iy]|ve|ze)|ment|ous?)?(?:ic(?:a(?:te|l)|it[iy])|a(?:tive|lize)|ful|ness|self)?(?:a(?:t(?:ion(?:al)?|or)|nci|l(?:l[iy]|i(?:sm|t[iy])))|tional|e(?:n(?:ci|til)|l[iy])|i(?:z(?:er|ation)|v(?:eness|it[iy]))|b(?:l[iy]|ilit[iy])|ous(?:l[iy]|ness)|fulness|log[iy])?(?:[bdfgmnprt]?(?:i?ng(?:ly)?|e?(?:d(?:ly)?|edst|st|th)|ly))?(?:e[sd]|s)?(?:'(?:s'?)?)?[),.?!;:]*[<-]", "i");
+                    if (do_not_add_morph_regex || (len_after === len_before && len_after < 3)) {
+                        //highlight_regex[count] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")[),.?!;:]*[<-]", "i");
+                        return "=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")[),.?!;:]*[<-]";
                     }
-                    count += 1;
+                    /// Find most words based on stem morphology.
+                    ///NOTE: [bdfgmnprt]? selects possible doubles.
+                    //highlight_regex[count] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")(?:e|l)?(?:a(?:l|n(?:ce|t)|te|ble)|e(?:n(?:ce|t)|r|ment)|i(?:c|ble|on|sm|t[iy]|ve|ze)|ment|ous?)?(?:ic(?:a(?:te|l)|it[iy])|a(?:tive|lize)|ful|ness|self)?(?:a(?:t(?:ion(?:al)?|or)|nci|l(?:l[iy]|i(?:sm|t[iy])))|tional|e(?:n(?:ci|til)|l[iy])|i(?:z(?:er|ation)|v(?:eness|it[iy]))|b(?:l[iy]|ilit[iy])|ous(?:l[iy]|ness)|fulness|log[iy])?(?:[bdfgmnprt]?(?:i?ng(?:ly)?|e?(?:d(?:ly)?|edst|st|th)|ly))?(?:e[sd]|s)?(?:'(?:s'?)?)?[),.?!;:]*[<-]", "i");
+                    return "=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")(?:e|l)?(?:a(?:l|n(?:ce|t)|te|ble)|e(?:n(?:ce|t)|r|ment)|i(?:c|ble|on|sm|t[iy]|ve|ze)|ment|ous?)?(?:ic(?:a(?:te|l)|it[iy])|a(?:tive|lize)|ful|ness|self)?(?:a(?:t(?:ion(?:al)?|or)|nci|l(?:l[iy]|i(?:sm|t[iy])))|tional|e(?:n(?:ci|til)|l[iy])|i(?:z(?:er|ation)|v(?:eness|it[iy]))|b(?:l[iy]|ilit[iy])|ous(?:l[iy]|ness)|fulness|log[iy])?(?:[bdfgmnprt]?(?:i?ng(?:ly)?|e?(?:d(?:ly)?|edst|st|th)|ly))?(?:e[sd]|s)?(?:'(?:s'?)?)?[),.?!;:]*[<-]";
+                    //count += 1;
+                };
+                
+                var highlight_regex = [],
+                    i,
+                    j,
+                    stemmed,
+                    stemmed_obj = {},
+                    stemmed_tmp,
+                    word_count;
+                
+                for (i = 0; i < search_terms_arr_len; i += 1) {
+                    if (typeof search_terms_arr[i] === "string") {
+                        stemmed = reverse_stem(search_terms_arr[i]);
+                        word_count = 1;
+                    } else {
+                        /// If it is not a string, then it should be an array of strings.
+                        stemmed = "";
+                        word_count = search_terms_arr[i].length;
+                        for (j = word_count - 1; j >= 0; j -= 1) {
+                            stemmed_tmp = reverse_stem(search_terms_arr[i][j]);
+                            if (j > 0) {
+                                stemmed_tmp = "[^<]*[^>]*" + stemmed_tmp;
+                            }
+                            stemmed = stemmed_tmp + stemmed;
+                        }
+                    }
+                    
+                    /// Has this not already been added?
+                    if (!stemmed_obj[stemmed]) {
+                        stemmed_obj[stemmed] = true;
+                        
+                        //console.log(stemmed);
+                        highlight_regex[highlight_regex.length] = {
+                            regex: new RegExp(stemmed, "i"),
+                            word_count: word_count
+                        };
+                    }
                 }
                 
+                //console.log(highlight_regex);
                 return highlight_regex;
             };
         }()),
