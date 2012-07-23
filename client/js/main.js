@@ -1269,18 +1269,24 @@
                          * Remove an event from the event cue.
                          *
                          * @example system.event.detach("contentAddedAbove", function (e) {});
-                         * @param   name (string)             The name of the event.
-                         * @param   func (function)           The function that was attached to the specified event.
-                         * @param   once (boolean) (optional) Whether or not to detach the function is only supposed to executed once
-                         * @return  NULL
-                         * @note    Not currently used.
-                         * @note    The name parameter cannot be an array (unlike attach()).
+                         * @example system.event.detach(["contentAddedAbove", "contentRemovedAbove"], function (e) {}, [true, false]);
+                         * @example system.event.detach(["contentAddedAbove", "contentRemovedAbove"], function (e) {}, true);
+                         * @param   name (string || array)             The name of the event or an array of names of events.
+                         * @param   func (function)                    The function that was attached to the specified event.
+                         * @param   once (boolean || array) (optional) Whether or not to detach this function after being executed once. If "name" is an array, then "once" can also be an array of booleans.
                          */
                         detach: function (name, func, once)
                         {
                             var i;
                             
-                            if (func_list[name]) {
+                            /// Are there multiple events to remove?
+                            if (name instanceof Array) {
+                                for (i = name.length - 1; i >= 0; i -= 1) {
+                                    /// If "once" is an array, then use the elements of the array.
+                                    /// If "once" is not an array, then just send the "once" variable each time.
+                                    this.detach(name[i], func, once instanceof Array ? once[i] : once);
+                                }
+                            } else if (func_list[name]) {
                                 for (i = func_list[name].length - 1; i >= 0; i -= 1) {
                                     ///NOTE: Both func and once must match.
                                     if (func_list[name][i].func === func && func_list[name][i].once === once) {
