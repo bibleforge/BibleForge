@@ -306,6 +306,12 @@
                         ///NOTE: A small amount of buffer room (about 22 pixels) seems to be necessary to place the menu properly aligned on the right edge.
                         window_right  = window.innerWidth - 22;
                     
+                    /// If there is a problem with getting the position, just stop, don't throw an error that will kill the rest of the code.
+                    ///NOTE: Because this is called via a event trigger, a critical error here could cause devastating effects elsewhere.
+                    if (pos === undefined) {
+                        return;
+                    }
+                    
                     ///NOTE: The position attribute must be set first because it effects the way offsetWidth is measured.
                     context_menu.style.position = (pos.absolute ? "absolute" : "fixed");
                     
@@ -1441,8 +1447,11 @@
                         ///NOTE: Because the callout itself can have a scroll bar, we must calculate the actual position on the viewport and then add in the scroll position of the entire scroll (window.pageYOffset).
                         ///NOTE: Because the white-space CSS style is set to "nowrap", the element will not separate; therefore, there will only be one rectangle.
                         var el_pos = el.getClientRects()[0];
-                        return {x: el_pos.left, y: el_pos.bottom + window.pageYOffset, absolute: true};
                     }, menu_items, select);
+                            /// Is the element still on the page; if not return undefined.
+                            if (el_pos) {
+                                return {x: el_pos.left, y: el_pos.bottom + window.pageYOffset, absolute: true};
+                            }
                     /// Prevent the event from trigger other events, like the callout onclick event.
                     e.stopPropagation();
                     e.preventDefault();
