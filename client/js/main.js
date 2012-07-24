@@ -28,53 +28,8 @@
 /// Declare globals for JSLint.
 /*global BF */
 
-/// Set JSLint options.
-/*jslint  browser: true, evil: true, continue: true, regexp: true, indent: 4, white: true */
-
-/// Indicate all object properties used.  JSLint checks this list for misspellings.
-/*properties
-    Create_easy_ajax, MozTransition, OTransition, XMLHttpRequest, abort, 
-    activeElement, addEventListener, add_content_if_needed, add_property, 
-    additional, alt, altKey, amount, app_name, appendChild, apply, attach, b, 
-    base_query, body, books_long_main, books_long_posttitle, books_long_pretitle, 
-    books_short, bottom_book, bottom_id, bottom_verse, c, changeCSS, 
-    change_language, chapter, chapter_count, childNodes, chrome, className, 
-    clearInterval, clearTimeout, clear_scroll, clientHeight, configurable, 
-    consts, content_manager, createElement, createTextNode, create_verse_id, 
-    create_viewport, cssRules, cssText, cssTransitions, ctrl, ctrlKey, 
-    decodeURIComponent, defineProperty, detach, determine_reference, direction, 
-    documentElement, en, en_em, encodeURIComponent, enumerable, event, 
-    extra_highlighting, firstChild, floor, focus, format_number, full_book, 
-    full_name, full_verse, func, get, getElementById, getElementsByTagName, 
-    getItem, getState, get_b_c_v, get_position, grammar_keywords, grammar_marker, 
-    grammar_marker_len, grammar_separator, grammatical_search, hasOwnProperty, 
-    hebrew_alphabet, height, highlight, history, i, id, in_paragraphs, include, 
-    indexOf, indicate_loading, initial_page_load, initial_query, innerHTML, 
-    insertBefore, insertRule, is_WebKit, is_busy, is_default, is_object, join, 
-    keyCode, keyboard_busy, keys_pressed, lang, langEl, lang_id, langs, 
-    lastChild, last_query, left, length, lexical_lookup, line_height, 
-    localStorage, location, map, metaKey, mixed_search, modified, n, navigator, 
-    new_val, nextSibling, no_results1, no_results2, offsetHeight, offsetLeft, 
-    offsetParent, offsetTop, old_val, once, onload, onsubmit, 
-    open, opera, options, originalTarget, p, page, pageXOffset, pageYOffset, 
-    parentNode, parse, parseInt, parse_json, pathname, position, preload_font, 
-    prepare_highlighter, prepare_query, prepared_query, 
-    preventDefault, previous, previousSibling, properties, prototype, psalm, 
-    psalm_has_title, push, pushState, qEl, query, query_additional, 
-    query_button_alt, query_button_title, query_explanation, query_previous, 
-    query_type, raw_query, reached_bottom, reached_top, readyState, real_query, 
-    remove, removeChild, replace, replaceState, responseText, round, 
-    run_new_query, scrollBy, scrollHeight, scrollTo, scroll_to_verse, 
-    scroll_view_to, selectorText, send, set, setInterval, setItem, 
-    setRequestHeader, setTimeout, settings, shift, shiftKey, slice, split, 
-    srcElement, standard_search, standard_terms, start_at, state, status, 
-    stopPropagation, store_query_options, stringify, style, styleSheets, 
-    subscription, substr, system, t, tagName, test, textContent, title, 
-    toLowerCase, toggleCSS, top, topBar, topBar_height, top_id, top_verse, 
-    trigger, trim, type, updateState, update_verse_range, user, userAgent, v, 
-    value, verse, verse_id, verse_lookup, verse_range, view, viewPort_count, 
-    viewPort_num, visibility, webkitTransition, writable
-*/
+/// Set JSHint options.
+/*jshint forin:true, noarg:true, noempty:true, eqeqeq:true, evil:true, bitwise:true, strict:true, undef:true, curly:true, immed:true, latedef:true, newcap:true, nonew:true, plusplus:true, es5:true, onevar:true, browser:true */
 
 (function ()
 {
@@ -1710,8 +1665,8 @@
                         while ((looking_upward ? (possible_el = el.previousSibling) : (possible_el = el.nextSibling)) !== null && the_pos >= possible_el.offsetTop && the_pos <= possible_el.offsetTop + possible_el.offsetHeight) {
                             el = possible_el;
                         }
-                        ///NOTE: Intentional fall through
                     /// These elements will never have another verse on the same line, so we can skip the above checking.
+                    /* falls through */
                     case "chapter":
                     case "book":
                     case "short_book":
