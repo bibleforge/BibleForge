@@ -171,6 +171,11 @@ this.db = function (config)
                 /// Because question marks (?) are a special symbol to db-mysql, they must be escaped too.
                 return db.escape(str).replace(/\?/g, "\\?");
             },
+            escape_sphinx: function (str)
+            {
+                /// Because question marks (?) are a special symbol to db-mysql, they must be escaped too.
+                return db.escape(str).replace(/\?/g, "\\?").replace(/;/g, "\\\\;");
+            },
             /**
              * Escape a table or field name.
              *

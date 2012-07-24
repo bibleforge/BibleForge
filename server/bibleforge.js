@@ -377,7 +377,7 @@ BF.standard_search = function (data, callback)
     initial = !Boolean(start_at);
     
     /// Create the first part of the SQL/SphinxQL query.
-    query = "SELECT " + verse_table + ".id, " + html_table + ".words FROM " + verse_table + ", " + html_table + " WHERE " + html_table + ".id = " + verse_table + ".id AND " + verse_table + ".query = \"" + BF.db.escape(terms) + ";limit=" + lang.minimum_desired_verses + ";ranker=none";
+    query = "SELECT " + verse_table + ".id, " + html_table + ".words FROM " + verse_table + ", " + html_table + " WHERE " + html_table + ".id = " + verse_table + ".id AND " + verse_table + ".query = \"" + BF.db.escape_sphinx(terms) + ";limit=" + lang.minimum_desired_verses + ";ranker=none";
     
     /// Should the query start somewhere in the middle of the Bible?
     if (start_at) {
@@ -528,7 +528,7 @@ BF.grammatical_search = function (data, callback)
     initial = !Boolean(start_at);
     
     /// Create the first part of the SQL/SphinxQL query.
-    query = "SELECT " + morphological_table + ".id, " + morphological_table + ".verseID, " + html_table + ".words FROM " + morphological_table + ", " + html_table + " WHERE " + html_table + ".id = " + morphological_table + ".verseID AND " + morphological_table + ".query = \"" + BF.db.escape(query_arr[0]) + ";limit=" + lang.minimum_desired_verses + ";ranker=none";
+    query = "SELECT " + morphological_table + ".id, " + morphological_table + ".verseID, " + html_table + ".words FROM " + morphological_table + ", " + html_table + " WHERE " + html_table + ".id = " + morphological_table + ".verseID AND " + morphological_table + ".query = \"" + BF.db.escape_sphinx(query_arr[0]) + ";limit=" + lang.minimum_desired_verses + ";ranker=none";
     
     /// Should the query start somewhere in the middle of the Bible?
     if (start_at) {
