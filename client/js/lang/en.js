@@ -1578,12 +1578,12 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                     ///TODO:  Bench mark different regex (creation and testing).
                     if (do_not_add_morph_regex || (len_after === len_before && len_after < 3)) {
                         //highlight_regex[count] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")[),.?!;:]*[<-]", "i");
-                        return "=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")[),.?!;:]*[<-]";
+                        return "=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")[),.?!;:—]*[<-]";
                     }
                     /// Find most words based on stem morphology.
                     ///NOTE: [bdfgmnprt]? selects possible doubles.
                     //highlight_regex[count] = new RegExp("=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")(?:e|l)?(?:a(?:l|n(?:ce|t)|te|ble)|e(?:n(?:ce|t)|r|ment)|i(?:c|ble|on|sm|t[iy]|ve|ze)|ment|ous?)?(?:ic(?:a(?:te|l)|it[iy])|a(?:tive|lize)|ful|ness|self)?(?:a(?:t(?:ion(?:al)?|or)|nci|l(?:l[iy]|i(?:sm|t[iy])))|tional|e(?:n(?:ci|til)|l[iy])|i(?:z(?:er|ation)|v(?:eness|it[iy]))|b(?:l[iy]|ilit[iy])|ous(?:l[iy]|ness)|fulness|log[iy])?(?:[bdfgmnprt]?(?:i?ng(?:ly)?|e?(?:d(?:ly)?|edst|st|th)|ly))?(?:e[sd]|s)?(?:'(?:s'?)?)?[),.?!;:]*[<-]", "i");
-                    return "=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")(?:e|l)?(?:a(?:l|n(?:ce|t)|te|ble)|e(?:n(?:ce|t)|r|ment)|i(?:c|ble|on|sm|t[iy]|ve|ze)|ment|ous?)?(?:ic(?:a(?:te|l)|it[iy])|a(?:tive|lize)|ful|ness|self)?(?:a(?:t(?:ion(?:al)?|or)|nci|l(?:l[iy]|i(?:sm|t[iy])))|tional|e(?:n(?:ci|til)|l[iy])|i(?:z(?:er|ation)|v(?:eness|it[iy]))|b(?:l[iy]|ilit[iy])|ous(?:l[iy]|ness)|fulness|log[iy])?(?:[bdfgmnprt]?(?:i?ng(?:ly)?|e?(?:d(?:ly)?|edst|st|th)|ly))?(?:e[sd]|s)?(?:'(?:s'?)?)?[),.?!;:]*[<-]";
+                    return "=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")(?:e|l)?(?:a(?:l|n(?:ce|t)|te|ble)|e(?:n(?:ce|t)|r|ment)|i(?:c|ble|on|sm|t[iy]|ve|ze)|ment|ous?)?(?:ic(?:a(?:te|l)|it[iy])|a(?:tive|lize)|ful|ness|self)?(?:a(?:t(?:ion(?:al)?|or)|nci|l(?:l[iy]|i(?:sm|t[iy])))|tional|e(?:n(?:ci|til)|l[iy])|i(?:z(?:er|ation)|v(?:eness|it[iy]))|b(?:l[iy]|ilit[iy])|ous(?:l[iy]|ness)|fulness|log[iy])?(?:[bdfgmnprt]?(?:i?ng(?:ly)?|e?(?:d(?:ly)?|edst|st|th)|ly))?(?:e[sd]|s)?(?:'(?:s'?)?)?[),.?!;:—]*[<-]";
                     //count += 1;
                 };
                 
