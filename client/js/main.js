@@ -3124,7 +3124,7 @@
                                         /// Then replace the hyphen with a fake HTML tag.
                                         return replace_hyphens(arguments[1]) + "<=" + arguments[2] + ">";
                                     });
-                                };
+                                }
                                 
                                 /// Are there standard verses to highlight?
                                 /// TODO: Handle mixed searches too.
