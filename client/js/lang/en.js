@@ -594,7 +594,7 @@
                 ///NOTE: '(?!s\b) removes apostrophes that are not followed by an "s" and only an "s."
                 //initial_search_arr = search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?|[^\s]*)|[~\/]\d*|[",.:?!;&|\)\(\]\[\/\\`{}<$\^+]|-\B|'(?!s\b))/g, "").toLowerCase().split(" ");
                 initial_search_arr = search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?|[^\s]*)|[~\/]\d*|[,.:?!;&|\)\(\]\[\/\\`{}<$\^+]|-\B|'(?!s\b))/g, "").toLowerCase().match(/"([^"])+"|(\S+)/g);
-                console.log(initial_search_arr);
+                //console.log(initial_search_arr);
                 //debugger;
                 arr_len = initial_search_arr.length;
                                 
@@ -2019,6 +2019,9 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
          */
         prepare_query: function (query)
         {
+            var i,
+                query_arr;
+            
             ///NOTE: /\s+/g gets rid of double spaces within the words (e.g., "here    there" becomes "here there")
             ///      and converts all types of white space to the normal space (e.g., converts non-breaking spaces to normal spaces).
             ///NOTE: /\s+-\s+/g ensures that filter_array() will filter out negative words like "this - that" (i.e., "that" does not need to be highlighted).
@@ -2026,7 +2029,29 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
             ///NOTE: replace(/([0-9]+)[:.;,\s]title/ig, "$1:0") replaces Psalm title references into an acceptable format (e.g., "Psalm 3:title" becomes "Psalm 3:0").
             ///NOTE: replace(/([:.;,\s])subscript(?:ion)?/ig, "$1255" replaces the word "subscription" with the verse number (255) used internally by BibleForge for Pauline subscriptions (e.g., "Philemon subscription" becomes "Philemon 255").
             ///NOTE: "$1255" replaces the text with the first placeholder followed by the literal "255" (without quotes).
-            return query.replace(" IN RED", " AS RED").replace(/\s+/g, " ").replace(/\sAND\s/g, " & ").replace(/\sOR\s/g, " | ").replace(/(?:\s-|\s*\bNOT)\s/g, " -").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[\u2011-\u2015]/g, "-").replace(/([0-9]+)[:.;,\s]title/ig, "$1:0").replace(/([:.;,\s])subscript(?:ion)?/ig, "$1255");
+            //query = query.replace(/[.,;:]/g, "").replace(" IN RED", " AS RED").replace(/\s+/g, " ").replace(/\sAND\s/g, " & ").replace(/\sOR\s/g, " | ").replace(/(?:\s-|\s*\bNOT)\s/g, " -").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[\u2011-\u2015]/g, "-").replace(/([0-9]+)[:.;,\s]title/ig, "$1:0").replace(/([:.;,\s])subscript(?:ion)?/ig, "$1255");
+            query = query.replace(" IN RED", " AS RED").replace(/\s+/g, " ").replace(/\sAND\s/g, " & ").replace(/\sOR\s/g, " | ").replace(/(?:\s-|\s*\bNOT)\s/g, " -").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[\u2011-\u2015]/g, "-").replace(/([0-9]+)[:.;,\s]title/ig, "$1:0").replace(/([:.;,\s])subscript(?:ion)?/ig, "$1255");
+            
+            query_arr = query.split('"');
+            
+            query = "";
+            
+            for (i = query_arr.length - 1; i >= 0; i -= 1) {
+                /// Was this part in quotes?
+                if (i % 2) {
+                    /// Convert all hyphens to spaces because they are already in specified order.
+                    ///NOTE: The plus (+) is to prevent multiple spaces side-by-side from multiple hyphens.
+                    ///NOTE: Since the array will be joined with spaces, remove all trailing and leading spaces.
+                    query_arr[i] = '"' + query_arr[i].replace(/-+/g, " ").trim() + '"';
+                } else {
+                    query_arr[i] = query_arr[i].replace(/\S*-\S*/g, function (a)
+                    {
+                        return '"' + a.replace(/-+/g, " ") + '"';
+                    });
+                }
+            }
+            
+            return query_arr.join(" ");
         }
     };
 }(this));

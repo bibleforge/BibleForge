@@ -3107,19 +3107,24 @@
                                 /// TODO: Handle mixed searches too.
                                 if (html) {
                                     for (re_id = highlight_re.length - 1; re_id >= 0; re_id -= 1) {
-                                        tmp_found_ids = html.split(highlight_re[re_id].regex);
+                                        //tmp_found_ids = html.replace(/(=(\d+)>[^<]+?)-/g, "$1<=$2>").split(highlight_re[re_id].regex);
+                                        tmp_found_ids = html.replace(/(=(\d+)>[^<]+?)-/g, "$1<=$2>").replace(/(=(\d+)>[^<]+?)-/g, "$1<=$2>").split(highlight_re[re_id].regex);
+                                        console.log(tmp_found_ids[0]);
+                                        console.log(highlight_re[re_id].regex);
                                         
                                         ids = tmp_found_ids.length;
                                         ///NOTE: search_str.split() creates an array of the HTML with the correct ids every third one.
                                         //debugger;
-                                        //for (i = 1; i < ids; i += 2) {
+                                        
                                         i = 1;
                                         while (i < ids) {
                                             j = highlight_re[re_id].word_count;
                                             while (j > 0) {
                                                 ///TODO: Determine if there is a downside to having a space at the start of the className.
                                                 ///TODO: Determine if we ever need to replace an existing f* className.
-                                                document.getElementById(tmp_found_ids[i]).className += " f" + (re_id + 1);
+                                                if (tmp_found_ids[i] !== "0") {
+                                                    document.getElementById(tmp_found_ids[i]).className += " f" + (re_id + 1);
+                                                }
                                                 /// Move the tmp_found_ids array up one
                                                 i += 1;
                                                 /// Countdown until the end end of the number of words in the phrase.
