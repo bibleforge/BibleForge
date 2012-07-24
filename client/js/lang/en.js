@@ -1543,6 +1543,7 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                 return "=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")(?:e|l)?(?:a(?:l|n(?:ce|t)|te|ble)|e(?:n(?:ce|t)|r|ment)|i(?:c|ble|on|sm|t[iy]|ve|ze)|ment|ous?)?(?:ic(?:a(?:te|l)|it[iy])|a(?:tive|lize)|ful|ness|self)?(?:a(?:t(?:ion(?:al)?|or)|nci|l(?:l[iy]|i(?:sm|t[iy])))|tional|e(?:n(?:ci|til)|l[iy])|i(?:z(?:er|ation)|v(?:eness|it[iy]))|b(?:l[iy]|ilit[iy])|ous(?:l[iy]|ness)|fulness|log[iy])?(?:[bdfgmnprt]?(?:i?ng(?:ly)?|e?(?:d(?:ly)?|edst|st|th)|ly))?(?:e[sd]|s)?(?:'(?:s'?)?)?[),.?!;:—]*[<-]";
             }
             
+            /**
              * Prepare search terms for highlighting.
              *
              * Create regex array to search through the verses that will soon be returned by the server.
@@ -1567,36 +1568,42 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                 
                 search_terms_arr_len = search_terms_arr.length;
                 
+                /// Loop through the array of words and phrases to create the regular expression.
                 for (i = 0; i < search_terms_arr_len; i += 1) {
+                    /// Is it a single word (it will be a string)?
                     if (typeof search_terms_arr[i] === "string") {
                         stemmed = reverse_stem(search_terms_arr[i]);
                         word_count = 1;
+                    /// If it is not a string, then it should be an array of strings.
                     } else {
-                        /// If it is not a string, then it should be an array of strings.
                         stemmed = "";
                         word_count = search_terms_arr[i].length;
+                        /// Loop through each word in the phrase to get a regular expression to highlight it and then combine it with the others.
                         for (j = word_count - 1; j >= 0; j -= 1) {
                             stemmed_tmp = reverse_stem(search_terms_arr[i][j]);
                             if (j > 0) {
+                                /// Add a short regular expression to "glue" the regular expressions for each word together to create a regular expression for the entire phrase.
+                                /// [^<]*[^>]* is used to skip over an HTML tag.
                                 stemmed_tmp = "[^<]*[^>]*" + stemmed_tmp;
                             }
+                            /// Since we are looping backward, add it to the beginning of the string.
                             stemmed = stemmed_tmp + stemmed;
                         }
                     }
                     
-                    /// Has this not already been added?
+                    /// Is this regular expression not a duplicate?
                     if (!stemmed_obj[stemmed]) {
                         stemmed_obj[stemmed] = true;
                         
-                        //console.log(stemmed);
                         highlight_regex[highlight_regex.length] = {
+                            /// Create the regular expression for the phrase or word (and make it case insensitive).
                             regex: new RegExp(stemmed, "i"),
+                            /// word_count is used when looping through the results of the regular expression to know how many IDs to look for.
                             word_count: word_count
                         };
                     }
                 }
                 
-                //console.log(highlight_regex);
                 return highlight_regex;
             };
         }()),
@@ -2001,21 +2008,24 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
             ///NOTE: replace(/([0-9]+)[:.;,\s]title/ig, "$1:0") replaces Psalm title references into an acceptable format (e.g., "Psalm 3:title" becomes "Psalm 3:0").
             ///NOTE: replace(/([:.;,\s])subscript(?:ion)?/ig, "$1255" replaces the word "subscription" with the verse number (255) used internally by BibleForge for Pauline subscriptions (e.g., "Philemon subscription" becomes "Philemon 255").
             ///NOTE: "$1255" replaces the text with the first placeholder followed by the literal "255" (without quotes).
-            //query = query.replace(/[.,;:]/g, "").replace(" IN RED", " AS RED").replace(/\s+/g, " ").replace(/\sAND\s/g, " & ").replace(/\sOR\s/g, " | ").replace(/(?:\s-|\s*\bNOT)\s/g, " -").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[\u2011-\u2015]/g, "-").replace(/([0-9]+)[:.;,\s]title/ig, "$1:0").replace(/([:.;,\s])subscript(?:ion)?/ig, "$1255");
             query = query.replace(" IN RED", " AS RED").replace(/\s+/g, " ").replace(/\sAND\s/g, " & ").replace(/\sOR\s/g, " | ").replace(/(?:\s-|\s*\bNOT)\s/g, " -").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[\u2011-\u2015]/g, "-").replace(/([0-9]+)[:.;,\s]title/ig, "$1:0").replace(/([:.;,\s])subscript(?:ion)?/ig, "$1255");
             
-            query_arr = query.split('"');
+            /// In order to handle hyphenated words correctly, we treat them as a quoted phrase.
+            /// So we need to wrap hyphenated words in quotes (if they are not in a quotation already) and replace the hyphens with spaces.
             
-            query = "";
+            /// Start by splitting the query into an array of quoted and unquoted segments.
+            query_arr = query.split('"');
             
             for (i = query_arr.length - 1; i >= 0; i -= 1) {
                 /// Was this part in quotes?
+                ///NOTE: The way the array is arranged, odd numbered indicies were in quotes.
                 if (i % 2) {
                     /// Convert all hyphens to spaces because they are already in specified order.
                     ///NOTE: The plus (+) is to prevent multiple spaces side-by-side from multiple hyphens.
                     ///NOTE: Since the array will be joined with spaces, remove all trailing and leading spaces.
                     query_arr[i] = '"' + query_arr[i].replace(/-+/g, " ").trim() + '"';
                 } else {
+                    /// Find all hyphenated words, wrap them in quotes, and remove the hyphens.
                     query_arr[i] = query_arr[i].replace(/\S*-\S*/g, function (a)
                     {
                         return '"' + a.replace(/-+/g, " ") + '"';
