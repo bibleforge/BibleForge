@@ -3103,18 +3103,39 @@
                                     re_id,
                                     tmp_found_ids = [];
                                 
+                                /**
+                                 * Recursively replace hyphens with fake HTML tags.
+                                 *
+                                 * Because use can search for just part of a hyphenated word,
+                                 * We must modify the HTML to make hyphenated words look like separate words.
+                                 *
+                                 * @example replace_hyphens("<a id=1234>El-beth-el</a>") /// Returns "<a id=1234>El<=1234>beth<=1234>el</a>"
+                                 * @todo    Split hyphenated words in the premade HTML and delete this.
+                                 */
+                                function replace_hyphens(str)
+                                {
+                                    return str.replace(/(=(\d+)>[^<]+)-/g, function ()
+                                    {
+                                        /// arguments[0] = The entire string found.
+                                        /// arguments[1] = Everything execpt the final hyphen.
+                                        /// arguments[2] = The tag's ID.
+                                        
+                                        /// First, recursivly check the first part of the returned string for more hyphens to be replaced.
+                                        /// Then replace the hyphen with a fake HTML tag.
+                                        return replace_hyphens(arguments[1]) + "<=" + arguments[2] + ">";
+                                    });
+                                };
+                                
                                 /// Are there standard verses to highlight?
                                 /// TODO: Handle mixed searches too.
                                 if (html) {
                                     for (re_id = highlight_re.length - 1; re_id >= 0; re_id -= 1) {
                                         //tmp_found_ids = html.replace(/(=(\d+)>[^<]+?)-/g, "$1<=$2>").split(highlight_re[re_id].regex);
-                                        tmp_found_ids = html.replace(/(=(\d+)>[^<]+?)-/g, "$1<=$2>").replace(/(=(\d+)>[^<]+?)-/g, "$1<=$2>").split(highlight_re[re_id].regex);
-                                        //console.log(tmp_found_ids[0]);
-                                        //console.log(highlight_re[re_id].regex);
+                                        //tmp_found_ids = html.replace(/(=(\d+)>[^<]+?)-/g, "$1<=$2>").replace(/(=(\d+)>[^<]+?)-/g, "$1<=$2>").split(highlight_re[re_id].regex);
+                                        
+                                        tmp_found_ids = replace_hyphens(html).split(highlight_re[re_id].regex);
                                         
                                         ids = tmp_found_ids.length;
-                                        ///NOTE: search_str.split() creates an array of the HTML with the correct ids every third one.
-                                        //debugger;
                                         
                                         i = 1;
                                         while (i < ids) {
