@@ -168,7 +168,8 @@ this.db = function (config)
              */
             escape: function (str)
             {
-                return db.escape(str);
+                /// Because question marks (?) are a special symbol to db-mysql, they must be escaped too.
+                return db.escape(str).replace(/\?/g, "\\?");
             },
             /**
              * Escape a table or field name.
