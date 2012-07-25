@@ -1919,9 +1919,11 @@ first_loop:     while (i < search_terms_arr_len) {
          *
          * Converts special words to symbols, and converts certain characters to a format adhere to Sphinx syntax.
          *
-         * @example query = prepare_search("NOT in  the  AND good OR  beginning  "); /// Returns "-in the & good | beginning  "
-         * @example query = prepare_search("ps 16:title");                           /// Returns "ps 16:0"
-         * @example query = prepare_search("“God is good”");                         /// Returns '"God is good"' (Note the curly quotes.)
+         * @example query = prepare_search("NOT in  the  AND good OR  beginning  ");  /// Returns "-in the & good | beginning  "
+         * @example query = prepare_search("ps 16:title");                            /// Returns "ps 16:0"
+         * @example query = prepare_search("“God is good”");                          /// Returns '"God is good"' (Note the curly quotes.)
+         * @example query = prepare_search('he build El-beth-el "beth-el: becauſe"'); /// Returns 'he build "El beth el" "beth el: because"' (Note the lack of long S, hyphens, and added quotes.)
+         * @example query = prepare_search("rom 16:subscription");                    /// Returns "rom 16:255" (Verse 255 is used internally by BibleForge for subscriptions.)
          * @param   query (string) The terms to be examined.
          * @return  A string that conforms to Sphinx syntax.
          * @note    Called by preform_query() in js/main.js.
@@ -1940,7 +1942,35 @@ first_loop:     while (i < search_terms_arr_len) {
             ///NOTE: replace(/([0-9]+)[:.;,\s]title/ig, "$1:0") replaces Psalm title references into an acceptable format (e.g., "Psalm 3:title" becomes "Psalm 3:0").
             ///NOTE: replace(/([:.;,\s])subscript(?:ion)?/ig, "$1255" replaces the word "subscription" with the verse number (255) used internally by BibleForge for Pauline subscriptions (e.g., "Philemon subscription" becomes "Philemon 255").
             ///NOTE: "$1255" replaces the text with the first placeholder followed by the literal "255" (without quotes).
-            return query.replace(" IN RED", " AS RED").replace(/\s+/g, " ").replace(/\sAND\s/g, " & ").replace(/\sOR\s/g, " | ").replace(/(?:\s-|\s*\bNOT)\s/g, " -").replace(/ſ/g, "s").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[\u2011-\u2015]/g, "-").replace(/([0-9]+)[:.;,\s]title/ig, "$1:0").replace(/([:.;,\s])subscript(?:ion)?/ig, "$1255");
+            return query.replace(" IN RED", " AS RED").replace(/\s+/g, " ").replace(/\sAND\s/g, " & ").replace(/\sOR\s/g, " | ").replace(/(?:\s-|\s*\bNOT)\s/g, " -").replace(/ſ/g, "s").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[\u2011-\u2015]/g, "-").replace(/([0-9]+)[:.;,\s]title/ig, "$1:0").replace(/([:.;,\s])subscript(?:ion)?/ig, "$1255")
+                /// In order to handle hyphenated words correctly, we treat them as a quoted phrase.
+                /// So we need to wrap hyphenated words in quotes (if they are not in a quotation already) and replace the hyphens with spaces.
+               .replace(/"[^"]+"?|[^"\s]+/g, function (terms)
+                {
+                    var prefix = "";
+                    
+                    /// Is this a negative boolean?
+                    /// E.g., "-not"
+                    if (terms[0] === "-") {
+                        /// Store the hyphen to be appended at the end.
+                        prefix = "-";
+                        /// Remove the leading hyphen so that it does not add extra space at the beginning after the hyphens are removed.
+                        terms = terms.substring(1);
+                    }
+                    
+                    /// Does the rest of the string have a hyphen in it?  If so, remove hyphens; if not, just return the original string.
+                    if (terms.indexOf("-") > -1) {
+                        /// Replace all hyphens with spaces and trim any possible space that might have been created.
+                        /// In case a hyphen was surrounded by spaces, remove any spaces as well.
+                        terms = terms.replace(/\s*-+\s*/g, " ").trim();
+                        /// Was this word not wrapped in double quotes.  If not, then it needs to be now in order to force the words to be found in order.
+                        if (terms[0] !== '"') {
+                            terms = '"' + terms + '"';
+                        }
+                    }
+                    
+                    return prefix + terms;
+                });
         }
     };
 }(this));
