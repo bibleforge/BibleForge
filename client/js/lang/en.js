@@ -1498,8 +1498,7 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                     /// Is it a single word (it will be a string)?
                     if (typeof search_terms_arr[i] === "string") {
                         stemmed = reverse_stem(search_terms_arr[i]);
-                        console.log(search_terms_arr[i])
-                        console.log(stemmed)
+                        
                         word_count = 1;
                     /// If it is not a string, then it should be an array of strings.
                     } else {
