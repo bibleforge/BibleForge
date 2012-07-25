@@ -553,6 +553,12 @@
                 ///NOTE: Unterminated double quotes are treated as a phrase that ends at the end of the query, so '"unterminated quote' is treated as '"unterminated quote"'.
                 initial_search_arr = search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?|[^\s]*)|[~\/]\d*|[,.:?!;&|\)\(\]\[\/\\`{}<$\^+]|-\B|'(?!s\b))/g, "").toLowerCase().match(/"[^"]+"?|[^"\s]+/g);
                 
+                /// Where no terms found?  If so, return an empty array.
+                ///NOTE: This could happen if all of the search terms are negative (e.g., "NOT bad").
+                if (!initial_search_arr) {
+                    return [];
+                }
+                
                 arr_len = initial_search_arr.length;
                 
                 /// Filter out duplicates (i.e., PHP's array_unique()).
