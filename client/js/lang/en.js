@@ -579,7 +579,7 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                 }
                 
                 for (i = final_search_arr.length - 1; i >= 0; i -= 1) {
-                    final_search_arr[i] = final_search_arr[i].replace(/"/g, "").trim();
+                    final_search_arr[i] = final_search_arr[i].replace(/\s*"\s*/g, "");
                     if (final_search_arr[i].indexOf(" ") !== -1) {
                         final_search_arr[i] = final_search_arr[i].split(" ");
                     }
