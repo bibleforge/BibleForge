@@ -25,15 +25,8 @@
  * along with this program.  If not, see http://www.opensource.org/licenses/AGPL-3.0.
  */
 
-/// Set JSLint options.
-/*jslint node: true, indent: 4, white: true */
-
-/// Indicate all object properties used.  JSLint checks this list for misspellings.
-/*properties
-    Database, add, base, callback, charset, connect, database, db, escape, 
-    execute, flush, host, hostname, length, name, pass, password, query, shift, 
-    sql, user
-*/
+/// Set JSHint options.
+/*jshint forin:true, noarg:true, noempty:true, eqeqeq:true, bitwise:true, strict:true, undef:true, curly:true, immed:true, latedef:true, newcap:true, nonew:true, plusplus:true, es5:true, onevar:true, node:true */
 
 "use strict";
 

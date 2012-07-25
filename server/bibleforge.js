@@ -26,24 +26,7 @@
  */
 
 /// Set JSLint options.
-/*jslint node: true, nomen: true, indent: 4, white: true */
-
-/// Indicate all object properties used.  JSLint checks this list for misspellings.
-/*properties
-    BF, 'Content-Type', Location, additional, app_name, b, books_long_main, 
-    books_long_posttitle, books_long_pretitle, books_short, c, cache_simple_html, 
-    chapter, chapter_count, config, consts, createServer, d, db, 
-    decodeURIComponent, determine_reference, divisions, en, encodeURIComponent, 
-    end, error, escape, escape_html, f, get_b_c_v, grammar_categories, 
-    grammatical_search, headers, host, i, id, indexOf, keys, l, langs, length, 
-    lexical_lookup, listen, message, method, minimum_desired_verses, 
-    mixed_search, n, no_results1, no_results2, nt, on, p, paragraph, 
-    paragraph_limit, parse, parse_json, path, pathname, pop, port, prepare_query, 
-    previous, psalm, q, query, readFile, readdirSync, replace, reverse, s, split, 
-    stack, standard_search, static_path, stringify, subscription, t, test, title, 
-    toUpperCase, url, use_ssl, v, verseID, verse_lookup, words, write, writeHead, 
-    'x-request-uri'
-*/
+/*jshint forin:true, noarg:true, noempty:true, eqeqeq:true, bitwise:true, strict:true, undef:true, curly:true, immed:true, latedef:true, newcap:true, nonew:true, plusplus:true, es5:true, onevar:true, node:true */
 
 "use strict";
 
