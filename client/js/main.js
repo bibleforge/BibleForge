@@ -2747,7 +2747,6 @@
                  * @example determine_search_type("go AS IMPERATIVE, -SINGULAR");         /// Returns [{type: grammatical_search, query: '["go",[[9,3],[5,1]],[0,1]]'}]
                  * @example determine_search_type("go* AS PASSIVE, -PERFECT,INDICATIVE"); /// Returns [{type: grammatical_search, query: '["go*",[[8,3],[7,5],[9,1]],[0,1,0]]'}]
                  * @example determine_search_type("* AS RED, IMPERATIVE");                /// Returns [{type: grammatical_search, query: '["",[[3,1],[9,3]],[0,0]]'}]
-                 * //@example determine_search_type("love AS NOUN & more | less -good AS ADJECTIVE"); /// Returns [{type: grammatical_search, query: '["love",[[4,1]],[0]]'}, {type: standard_search, query: "& more | less -good"}, {type: grammatical_search, query: '["good",[[4,3]],[1]]'}]
                  * @param   search_terms (string) The prepared terms to be examined.
                  * @return  An array filled with objects describing the type of search.
                  * @note    Called by run_new_query().
@@ -3044,7 +3043,7 @@
                             /**
                              * Highlight the search results.
                              *
-                             * @example options.highlight("<a id=1>In</a> <a id=2>the</a> <a id=3>beginning</a> <a>...</a>");
+                             * @example options.highlight("<a id=1>In</a> <a id=2>the</a> <a id=3>beginning</a> ...");
                              * @example options.highlight("", [1, 4002, ...]);
                              * @param   html     (string) A string containing the all of the verses in HTML format (only used by standard searches).
                              * @param   word_ids (array)  An array of word ids to be highlighted (only used by grammatical searches).
@@ -3085,9 +3084,6 @@
                                 /// TODO: Handle mixed searches too.
                                 if (html) {
                                     for (re_id = highlight_re.length - 1; re_id >= 0; re_id -= 1) {
-                                        //tmp_found_ids = html.replace(/(=(\d+)>[^<]+?)-/g, "$1<=$2>").split(highlight_re[re_id].regex);
-                                        //tmp_found_ids = html.replace(/(=(\d+)>[^<]+?)-/g, "$1<=$2>").replace(/(=(\d+)>[^<]+?)-/g, "$1<=$2>").split(highlight_re[re_id].regex);
-                                        
                                         tmp_found_ids = replace_hyphens(html).split(highlight_re[re_id].regex);
                                         
                                         ids = tmp_found_ids.length;
