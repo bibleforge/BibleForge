@@ -26,24 +26,7 @@
  */
 
 /// Set JSLint options.
-/*jslint browser: true, continue: true, regexp: true, indent: 4, white: true */
-
-/// Indicate all object properties used.  JSLint checks this list for misspellings.
-/*properties
-    BF, about, alism, aliti, alize, alli, anci, app_name, ation, ational, ative, 
-    ator, biblical, biblical_ipa, biblical_ipa_long, biblical_pronun, biliti, 
-    bli, blog, books_long_main, books_long_posttitle, books_long_pretitle, 
-    books_short, chapter, chapter_count, configure, determine_reference, 
-    divisions, done, eli, en_em, enci, entli, exec, found_plural, found_singular, 
-    ful, full_name, fulness, hebrew_alphabet, help, ical, icate, iciti, id, 
-    in_paragraphs, indexOf, italics_explanation, iveness, iviti, ization, izer, 
-    langs, length, linked_to_orig, loaded, logi, minimum_desired_verses, modern, 
-    modern_ipa, modern_pronun, ness, no_results1, no_results2, nt, ousli, 
-    ousness, paragraph_limit, prepare_highlighter, prepare_query, psalm, 
-    query_button_alt, query_button_title, query_explanation, red_letters, 
-    replace, self, short_name, slice, split, subscription, test, tional, title, 
-    toLowerCase, translit, translit_long, view, wrench_title
-*/
+/*jshint forin:true, noarg:true, noempty:true, eqeqeq:true, bitwise:true, strict:true, undef:true, curly:true, immed:true, latedef:true, newcap:true, nonew:true, plusplus:true, es5:true, onevar:true, browser:true */
 
 /**
  * Create the BibleForge language specific object for Early Modern English.
@@ -1705,6 +1688,7 @@ first_loop:     while (i < search_terms_arr_len) {
                         break;
                     }
                     ///NOTE: Don't break so that references like "I Kings" will be checked.
+                    /* falls through */
                 case "1":
                 case "f":
                     if (book_arr_re[46].test(ref)) {        /// 1 Corinthians | First Corinthians| I Corinthians
@@ -1733,6 +1717,7 @@ first_loop:     while (i < search_terms_arr_len) {
                         break;
                     }
                     ///NOTE: Don't break so that references like "II Kings" will be checked.
+                    /* falls through */
                 case "2":
                 case "s":
                     if (book_arr_re[47].test(ref)) {        /// 2 Corinthians | Second Corinthians| II Corinthians
@@ -1770,6 +1755,7 @@ first_loop:     while (i < search_terms_arr_len) {
                         break;
                     }
                     ///NOTE: Don't break so that references like "III John" will be checked.
+                    /* falls through */
                 case "3":
                 case "t":
                     if (book_arr_re[64].test(ref)) {        /// 3 John | Third John | III John
@@ -1807,6 +1793,7 @@ first_loop:     while (i < search_terms_arr_len) {
                         break;
                     }
                     ///NOTE: Don't break so that references like "IV Kings" will be checked.
+                    /* falls through */
                 case "4":
                     if (book_arr_re[12].test(ref)) { /// 2 Kings (4 Kings)
                         book = "12";
