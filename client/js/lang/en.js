@@ -589,7 +589,16 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
             }
             
             /**
-             * @todo Document
+             * Create a regular expression (as a string) that will find a word in its various forms.
+             *
+             * The regular expression will also ignores common punctuation and capture the word ID from the HTML tag before it.
+             *
+             * @example reverse_stem("in");     /// Returns "=([0-9]+)>\(*(?:in|[^<]+-in)[),.?!;:—]*[<-]"
+             * @example reverse_stem("joyful"); /// Returns "=([0-9]+)>\(*(?:jo[yi]|[^<]+-jo[yi])(?:e|l)?(?:a(?:l|n(?:ce|t)|te|ble)|e(?:n(?:ce|t)|r|ment)|i(?:c|ble|on|sm|t[iy]|ve|ze)|ment|ous?)?(?:ic(?:a(?:te|l)|it[iy])|a(?:tive|lize)|ful|ness|self)?(?:a(?:t(?:ion(?:al)?|or)|nci|l(?:l[iy]|i(?:sm|t[iy])))|tional|e(?:n(?:ci|til)|l[iy])|i(?:z(?:er|ation)|v(?:eness|it[iy]))|b(?:l[iy]|ilit[iy])|ous(?:l[iy]|ness)|fulness|log[iy])?(?:[bdfgmnprt]?(?:i?ng(?:ly)?|e?(?:d(?:ly)?|edst|st|th)|ly))?(?:e[sd]|s)?(?:'(?:s'?)?)?[),.?!;:—]*[<-]"
+             * @example reverse_stem("run");    /// Returns "=([0-9]+)>\(*(?:r[au]n|[^<]+-r[au]n)(?:e|l)?(?:a(?:l|n(?:ce|t)|te|ble)|e(?:n(?:ce|t)|r|ment)|i(?:c|ble|on|sm|t[iy]|ve|ze)|ment|ous?)?(?:ic(?:a(?:te|l)|it[iy])|a(?:tive|lize)|ful|ness|self)?(?:a(?:t(?:ion(?:al)?|or)|nci|l(?:l[iy]|i(?:sm|t[iy])))|tional|e(?:n(?:ci|til)|l[iy])|i(?:z(?:er|ation)|v(?:eness|it[iy]))|b(?:l[iy]|ilit[iy])|ous(?:l[iy]|ness)|fulness|log[iy])?(?:[bdfgmnprt]?(?:i?ng(?:ly)?|e?(?:d(?:ly)?|edst|st|th)|ly))?(?:e[sd]|s)?(?:'(?:s'?)?)?[),.?!;:—]*[<-]"
+             * @param   term (string) The (lowercase) word to reverse stem.
+             * @return  A string that contains a regular expression to match a word in its various forms.
+             * @todo    Update the regex created to compensate for changes to the way hyphenation is handled.
              */
             function reverse_stem(term)
             {
@@ -1489,6 +1498,8 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                     /// Is it a single word (it will be a string)?
                     if (typeof search_terms_arr[i] === "string") {
                         stemmed = reverse_stem(search_terms_arr[i]);
+                        console.log(search_terms_arr[i])
+                        console.log(stemmed)
                         word_count = 1;
                     /// If it is not a string, then it should be an array of strings.
                     } else {
@@ -1903,9 +1914,12 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
          *
          * Converts special words to symbols, and converts certain characters to a format adhere to Sphinx syntax.
          *
-         * @example query = prepare_search("NOT in  the  AND good OR  beginning  "); /// Returns "-in the & good | beginning  "
-         * @example query = prepare_search("ps 16:title");                           /// Returns "ps 16:0"
-         * @example query = prepare_search("“God is good”");                         /// Returns '"God is good"' (Note the curly quotes.)
+         * @example query = prepare_search("NOT in  the  AND good OR  beginning  ");  /// Returns "-in the & good | beginning  "
+         * @example query = prepare_search("ps 16:title");                            /// Returns "ps 16:0"
+         * @example query = prepare_search("“God is good”");                          /// Returns '"God is good"' (Note the curly quotes.)
+         * @example query = prepare_search('he build El-beth-el "beth-el: because"'); /// Returns 'he build "El beth el" "beth el: because"' (Note the lack of hyphens and added quotes.)
+         * @example query = prepare_search("rom 16:subscription");                    /// Returns "rom 16:255" (Verse 255 is used internally by BibleForge for subscriptions.)
+         
          * @param   query (string) The terms to be examined.
          * @return  A string that conforms to Sphinx syntax.
          * @note    Called by preform_query() in js/main.js.
