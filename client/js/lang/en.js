@@ -552,17 +552,22 @@
                     new_arr_len         = 0;
                 
                 /// Remove punctuation and break up the query string into individual parts to filter out duplicates.
+                /// E.g., 'in "and the earths "earths | in | earth. | "in the beginning God"' =>
+                ///       ["in","\"and the earths \"","earths","in","earth","\"in the beginning god\""]
                 ///NOTE: (?:^|\s)- makes sure not to filter out hyphenated words by ensuring that a hyphen must occur at the beginning or before a space to be counted as a NOT operator.
                 ///NOTE: (?:"[^"]*"?|[^\s]*) matches a phrase starting with a double quote (") or a single word.
                 ///NOTE: [~\/]\d* removes characters used for Sphinx query syntax.  I.e., proximity searches ("this that"~10) and quorum matching ("at least three of these"/3).
                 ///NOTE: -\B removes trailing hyphens.  (This might be unnecessary.)
                 ///NOTE: '(?!s\b) removes apostrophes that are not followed by an "s" and only an "s."
                 ///NOTE: "[^"]+"?|[^"\s]+ is used to split the string into groups of individual words and quoted phrases.
+                ///NOTE: Unterminated double quotes are treated as a phrase that ends at the end of the query, so '"unterminated quote' is treated as '"unterminated quote"'.
                 initial_search_arr = search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?|[^\s]*)|[~\/]\d*|[,.:?!;&|\)\(\]\[\/\\`{}<$\^+]|-\B|'(?!s\b))/g, "").toLowerCase().match(/"[^"]+"?|[^"\s]+/g);
                 
                 arr_len = initial_search_arr.length;
                                 
                 /// Filter out duplicates (i.e., PHP's array_unique()).
+                /// E.g., ["in","\"and the earths \"","earths","in","earth","\"in the beginning god\""] =>
+                ///       ["in","\"and the earths \"","earths","earth","\"in the beginning god\""]
 first_loop:     for (i = 0; i < arr_len; i += 1) {
                     /// Skip empty strings.
                     if (initial_search_arr[i] !== "") {
@@ -578,9 +583,15 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                     }
                 }
                 
+                /// Loop through all of words and phrases and remove any double quotes and add to the array as individual words or arrays of words.
+                /// E.g., ["in","\"and the earths \"","earths","earth","\"in the beginning god\""] =>
+                ///       ["in",["and","the","earths"],"earths","earth",["in","the","beginning","god"]]
                 for (i = final_search_arr.length - 1; i >= 0; i -= 1) {
+                    /// Since a quotation mark might be followed or preceded by a space, make sure to remove any extra space when removing double quotes.
                     final_search_arr[i] = final_search_arr[i].replace(/\s*"\s*/g, "");
+                    /// Is this a phrase (multiple words that were in double quotes)?
                     if (final_search_arr[i].indexOf(" ") !== -1) {
+                        /// Add phrases as an array of individual words.
                         final_search_arr[i] = final_search_arr[i].split(" ");
                     }
                 }
@@ -607,7 +618,7 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                     len_after,
                     stemmed_word;
                 
-                /// Possibly fix special/unique words that the stemmer won't stem correctly.
+                /// First, possibly fix special/unique words that the stemmer wouldn't stem correctly.
                 switch (term) {
                 case "shalt":
                 case "shall":
@@ -645,7 +656,6 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                     stemmed_word = "f(?:ind(?:e(?:st|th)|ing)?|ound)";
                     do_not_add_morph_regex = true;
                     break;
-                ///TODO: Consider adding the possessive form (your).
                 case "ye":
                 case "you":
                     stemmed_word = "y(?:e|ou)";
@@ -1478,6 +1488,7 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
              * @param   search_terms (string) The terms to look for.
              * @return  An array of regular expressions.
              * @note    Called by run_new_query().
+             * @todo    Determine if this can be moved out of the language specific files.
              */
             return function prepare_highlighter(search_terms)
             {
