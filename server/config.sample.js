@@ -35,7 +35,7 @@
 
 "use strict";
 
-this.config = {
+exports.config = {
     cache_simple_html: true, /// Whether or not to cache the contents of index_non-js.html.  Should be TRUE on production servers.
     /// The database options.
     db: {

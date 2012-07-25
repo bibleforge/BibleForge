@@ -48,7 +48,7 @@
  *                           base: "The database name"}
  * @todo  Determine if the hostname can contain a port or socket.  If not, allow this to be configured as separate options.
  */
-this.db = function (config)
+exports.db = function (config)
 {
     return (function ()
     {
