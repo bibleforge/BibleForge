@@ -25,7 +25,7 @@
  * along with this program.  If not, see http://www.opensource.org/licenses/AGPL-3.0.
  */
 
-/// Set JSLint options.
+/// Set JSHint options.
 /*jshint forin:true, noarg:true, noempty:true, eqeqeq:true, bitwise:true, strict:true, undef:true, curly:true, immed:true, latedef:true, newcap:true, nonew:true, plusplus:true, es5:true, onevar:true, node:true */
 
 "use strict";

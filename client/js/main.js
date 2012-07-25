@@ -25,7 +25,7 @@
  * along with this program.  If not, see http://www.opensource.org/licenses/AGPL-3.0.
  */
 
-/// Declare globals for JSLint.
+/// Declare globals for JSHint.
 /*global BF */
 
 /// Set JSHint options.
@@ -49,7 +49,7 @@
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (1611)",
-            modified:  16835083
+            modified:  16837230
         };
     }
     
@@ -3443,7 +3443,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?16834883", {
+                BF.include("/js/secondary.js?16837182", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,

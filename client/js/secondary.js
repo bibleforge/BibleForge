@@ -25,7 +25,7 @@
  * along with this program.  If not, see http://www.opensource.org/licenses/AGPL-3.0.
  */
 
-/// Declare globals for JSLint.
+/// Declare globals for JSHint.
 /*global BF */
 
 /// Set JSHint options.
