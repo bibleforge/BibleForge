@@ -49,7 +49,7 @@
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (1611)",
-            modified:  16880413
+            modified:  16905419
         };
     }
     
