@@ -576,7 +576,8 @@
                 ///       ["in","\"and the earths \"","earths","earth","\"in the beginning god\""]
 first_loop:     for (i = 0; i < arr_len; i += 1) {
                     /// Skip empty strings.
-                    if (initial_search_arr[i] !== "") {
+                    
+                    if (initial_search_arr[i] !== "" && initial_search_arr[i] !== "*") {
                         for (j = 0; j < new_arr_len; j += 1) {
                             if (final_search_arr[j] === initial_search_arr[i]) {
                                 /// This words already exists; jump to the first loop and get the next word.
