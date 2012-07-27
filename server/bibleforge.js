@@ -889,6 +889,7 @@ BF.lexical_lookup = function (data, callback)
                                 if (!data || !data.length) {
                                     res = lang.no_results1 + "<b>" + BF.escape_html(query) + "</b>" + lang.no_results2;
                                 } else {
+                                    ///TODO: Reuse code from the client side to create the HTML.
                                     len = data.length;
                                     v = (data[0].id % 1000);
                                     
@@ -987,8 +988,10 @@ BF.lexical_lookup = function (data, callback)
                             /// While the database is looking up the verses, prepare the HTML more.
                             /// Add the full verse book name along with the chapter and BibleForge's name to the <title> tag.
                             html = html.replace("__TITLE__", BF.escape_html(lang.books_short[b]) + " " + c + " - " + lang.app_name);
-                            
+                            /// Add a description to the <meta name=description> tag.
                             html = html.replace("__DESC__", BF.escape_html(lang.books_short[b]) + " " + c + " " + lang.in + " " + lang.full_name);
+                            /// Now, wait for the database to return the results to the function above.
+                            
                         /// If it is not a verse lookup, it must be a search of some kind.
                         } else {
                             /// Preform a standard search.
@@ -1005,6 +1008,7 @@ BF.lexical_lookup = function (data, callback)
                                 if (!data || !data.n || !data.n.length) {
                                     res = lang.no_results1 + "<b>" + BF.escape_html(query) + "</b>" + lang.no_results2;
                                 } else {
+                                    ///TODO: Reuse code from the client side to create the HTML.
                                     len = data.n.length;
                                     for (i = 0; i < len; i += 1) {
                                         verse_obj = BF.get_b_c_v(data.n[i]);
@@ -1037,8 +1041,9 @@ BF.lexical_lookup = function (data, callback)
                             /// While the database is looking up the verses, prepare the HTML more.
                             /// Add the query and BibleForge's name to the <title> tag.
                             html = html.replace("__TITLE__", BF.escape_html(query) + " - " + lang.app_name);
-                            
+                            /// Add a description to the <meta name=description> tag.
                             html = html.replace("__DESC__", BF.escape_html(lang.results_for + " " + query + " " + lang.in + " " + lang.full_name));
+                            /// Now, wait for the database to return the results to the function above.
                         }
                     });
                 };
