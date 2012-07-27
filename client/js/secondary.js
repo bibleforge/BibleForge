@@ -360,52 +360,56 @@
                     var fake_event,
                         old_item = cur_item;
                     
-                    /// Up
-                    if (e.keyCode === 38) {
-                        /// If at the top, loop to the bottom.
-                        if (cur_item < 1) {
-                            cur_item = menu_count - 1;
-                        } else {
-                            cur_item -= 1;
-                        }
-                        highlight_item(old_item);
-                    /// Down
-                    } else if (e.keyCode === 40) {
-                        /// If at the bottom, loop to the top.
-                        if (cur_item === menu_count - 1) {
-                            cur_item = 0;
-                        } else {
-                            cur_item += 1;
-                        }
-                        highlight_item(old_item);
-                    /// Enter
-                    } else if (e.keyCode === 13) {
-                        if (cur_item > -1) {
-                            if (typeof menu_container.childNodes[cur_item].click === "function") {
-                                /// Firefox
-                                ///NOTE: Sadly, opening new tabs this way (or with the simulated event) trigger's the pop-up blocker.
-                                menu_container.childNodes[cur_item].click();
+                    /// Check to make sure that the menu is still being displayed.
+                    /// Although this function should be detached when the menu is removed from view, it is possible for that to fail.  It happend once, but does not appear to be repeatable.
+                    if (menu_container.parentNode.style.display === "block") {
+                        /// Up
+                        if (e.keyCode === 38) {
+                            /// If at the top, loop to the bottom.
+                            if (cur_item < 1) {
+                                cur_item = menu_count - 1;
                             } else {
-                                /// Simulate a mouse click.
-                                fake_event = document.createEvent("MouseEvents"); 
-                                fake_event.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null); 
-                                menu_container.childNodes[cur_item].dispatchEvent(fake_event);
+                                cur_item -= 1;
                             }
+                            highlight_item(old_item);
+                        /// Down
+                        } else if (e.keyCode === 40) {
+                            /// If at the bottom, loop to the top.
+                            if (cur_item === menu_count - 1) {
+                                cur_item = 0;
+                            } else {
+                                cur_item += 1;
+                            }
+                            highlight_item(old_item);
+                        /// Enter
+                        } else if (e.keyCode === 13) {
+                            if (cur_item > -1) {
+                                if (typeof menu_container.childNodes[cur_item].click === "function") {
+                                    /// Firefox
+                                    ///NOTE: Sadly, opening new tabs this way (or with the simulated event) trigger's the pop-up blocker.
+                                    menu_container.childNodes[cur_item].click();
+                                } else {
+                                    /// Simulate a mouse click.
+                                    fake_event = document.createEvent("MouseEvents"); 
+                                    fake_event.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null); 
+                                    menu_container.childNodes[cur_item].dispatchEvent(fake_event);
+                                }
+                            }
+                        /// Escape
+                        } else if (e.keyCode === 27) {
+                            close_menu();
+                        } else {
+                            /// Allow all other keys to pass to the rest of the page like normal.
+                            return;
                         }
-                    /// Escape
-                    } else if (e.keyCode === 27) {
-                        close_menu();
-                    } else {
-                        /// Allow all other keys to pass to the rest of the page like normal.
-                        return;
+                        
+                        e.stopPropagation();
+                        /// Chromium somtimes does not have preventDefault().
+                        if (typeof e.preventDefault === "function") {
+                            e.preventDefault();
+                        }
+                        return false;
                     }
-                    
-                    e.stopPropagation();
-                    /// Chromium somtimes does not have preventDefault().
-                    if (typeof e.preventDefault === "function") {
-                        e.preventDefault();
-                    }
-                    return false;
                 };
                 
                 /// This will be detached by close_menu().
