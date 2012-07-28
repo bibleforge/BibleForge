@@ -1554,10 +1554,11 @@
                             ///TODO: Document more fully.
                             /// part_of_speech, declinability, case_5, number, gender, degree, tense, voice, mood, person, middle, transitivity, miscellaneous, noun_type, numerical, form, dialect, type, pronoun_type
                             
-                            var parent_el,
-                                child_el,
+                            var child_el,
                                 html,
-                                lex_data;
+                                lex_data,
+                                more_el,
+                                parent_el;
                             
                             /// Did the query return any results?
                             if (data.word) {
@@ -1571,6 +1572,8 @@
                                 ///   └─►lex-body
                                 ///       ├─►literal definition (optional)
                                 ///       └─►short definition
+                                ///         └─►more-button-buffer
+                                ///         └─►more-button
                                 
                                 /// Create a lightweight container for the DOM elements.
                                 ///NOTE: The fragment is discarded when attached to the DOM tree and only its children remain.
@@ -1608,9 +1611,25 @@
                                 /// Create the short definition.
                                 child_el = document.createElement("div");
                                 child_el.textContent = lex_data.def.short;
+                                
+                                /// Create an invisible element used as buffer to prevent the description text from going onto it.
+                                ///NOTE: To see its use in action, click on "mouth" in Matthew 5:2.
+                                more_el = document.createElement("span");
+                                /// This element needs two classes: one to emulate the size of the more button, the other to hide it from view and make it float right.
+                                more_el.className = "more-button more-button-buffer";
+                                more_el.textContent = "[+] More"; /// TODO: Use language specific text.
+                                child_el.appendChild(more_el);
+                                
+                                /// Create the more button.
+                                more_el = document.createElement("div");
+                                more_el.className = "more-button";
+                                more_el.textContent = "[+] More"; /// TODO: Use language specific text.
+                                child_el.appendChild(more_el);
+                                
                                 parent_el.appendChild(child_el);
                                 html.appendChild(parent_el);
-                                ///TODO: Add a way to get more details.
+                                
+                                
                             } else {
                                 ///TODO: In the future, there could be other information, like notes.
                                 html = "<div class=lex-body><em>" + BF.lang.italics_explanation + "</em></div>";

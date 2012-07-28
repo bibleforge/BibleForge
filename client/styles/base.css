@@ -270,11 +270,15 @@ body {
     -o-transition:      all .3s;
 }
 
-.lang:hover {
+.lang:hover, .more-button:hover {
     color: rgba(0,0,0,.6);
 }
 
-.lang:active, .activeLang {
+.more-button:hover {
+    background: rgba(0,0,200,.08);
+}
+
+.lang:active, .activeLang, .more-button:active {
     background: rgba(0,0,255,.12);
     color: rgba(0,0,0,.6);
 }
@@ -645,6 +649,7 @@ label {
     width:  300px;
     height: 125px;
 }
+
 .callout .inside {
     overflow-x: hidden;
     height: 100%;
@@ -710,6 +715,7 @@ label {
     top: -11px;
 }
 
+
 .lex-title {
     /* Push the text over a little so that diacritics are not cut off. */
     margin-left: 7px;
@@ -758,6 +764,45 @@ label {
     -webkit-transition: opacity .3s ease;
     /* Transition for Opera 10.5+ */
     -o-transition:      opacity .3s ease;
+}
+
+/*NOTE See above for .more-button-buffer:hover and .more-button-buffer:active. */
+.more-button {
+    position: absolute;
+    bottom: 0;
+    right:  0;
+    
+    border-top:  1px solid #aaa;
+    border-left: 1px solid #aaa;
+    border-radius: 5px 0 0 0;
+    
+    padding: 4px;
+    
+    font-size: 12px;
+    /* This is the same as .lang. */
+    background: rgba(0,0,200,.05);
+    color: rgba(0,0,0,.2);
+    
+    cursor: pointer;
+    
+    /* Apply transitions to all changes. */
+    /* Transition for Mozilla (Firefox 4.0+) */
+    /*TODO: This code is used so often, it should be placed in a separate class. */
+    -moz-transition:    all .3s;
+    /* Transition for WebKit */
+    -webkit-transition: all .3s;
+    /* Transition for Opera 10.5+ */
+    -o-transition:      all .3s;
+}
+
+
+/* This is an invisible element that is used to prevent real text from going over the more button. */
+.more-button-buffer {
+    position: static;
+    visibility: hidden;
+    float: right;
+    /* NOTE: Because this element is not positioned absolutely, it is moved over to the left slightly (due to padding in the parent element), */
+    /*       but this extra padding adds extra buffer between the button and the text, so the padding attribute does not need to be changed here. */
 }
 
 
