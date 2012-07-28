@@ -361,7 +361,7 @@
                         old_item = cur_item;
                     
                     /// Check to make sure that the menu is still being displayed.
-                    /// Although this function should be detached when the menu is removed from view, it is possible for that to fail.  It happend once, but does not appear to be repeatable.
+                    /// Although this function should be detached when the menu is removed from view, it is possible for that to fail.  It happened once, but does not appear to be repeatable.
                     if (menu_container.parentNode.style.display === "block") {
                         /// Up
                         if (e.keyCode === 38) {
@@ -1310,19 +1310,40 @@
                             return Boolean(document.getElementById(point_to.id));
                         },
                         /**
-                         * Write HTML to the callout and prevent the loading notifier from loading, if it has not already appeared.
+                         * Write HTML to the callout.
+                         *
+                         * Also prevent the loading notifier from loading, if it has not already appeared
+                         * and resize the callout if needed.
                          *
                          * @param html (string OR DOM element) The HTML or DOM element display in the callout.
                          */
                         replace_HTML: function (html)
                         {
+                            var diff;
+                            
                             /// Prevent the loading graphic from loading if it has not loaded yet.
                             window.clearTimeout(loading_timer);
+                            /// Write the HTML, either via a string or DOM element.
                             if (typeof html === "string") {
                                 inside.innerHTML = html;
                             } else {
                                 inside.innerHTML = "";
                                 inside.appendChild(html);
+                            }
+                            
+                            /// Determine if the callout needs to be resized to fit all of the content.
+                            
+                            diff = inside.scrollHeight - inside.offsetHeight;
+                            if (diff > 0) {
+                                /// If the pointer is pointing down, the top position must also be changed.
+                                if (pointer.className === "pointer-down") {
+                                    this.move(-diff);
+                                }
+                                
+                                /// Because of the padding, .clientHeight and .clientOffsetHeight do not return the right value,
+                                /// so to calculate the new height correctly, we calculate the visible area of the "inner" element,
+                                /// which is the same as the height of the callout minus the padding.
+                                callout.style.height = (inside.getClientRects()[0].height + diff) + "px";
                             }
                         },
                         
