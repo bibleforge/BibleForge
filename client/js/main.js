@@ -2351,6 +2351,22 @@
                             verse_html = data.v,
                             word_ids   = data.i;
                         
+                        function prevent_further_queries()
+                        {
+                            if (direction === BF.consts.additional) {
+                                /// The user has reached the bottom by scrolling down (either RETURNED_SEARCH or RETURNED_VERSES_PREVIOUS), so we need to hide the loading graphic.
+                                /// This is cause by scrolling to Revelation 22:21 or end of search or there were no results.
+                                content_manager.reached_bottom();
+                                bottomLoader.style.visibility = "hidden";
+                            }
+                            ///BUG: there can be no results if looking up beyond rev 22.21 (e.g., rev 23). FIX: Prevent looking up past 66022021
+                            if (direction === BF.consts.previous || initial_query) {
+                                /// The user has reached the top of the page by scrolling up (either Genesis 1:1 or there were no search results), so we need to hide the loading graphic
+                                content_manager.reached_top();
+                                topLoader.style.visibility    = "hidden";
+                            }
+                        }
+                        
                         /// Were there any verses returned?
                         if (verse_ids && verse_ids.length) {
                             write_verses(type, direction, verse_ids, verse_html, paragraphs, in_paragraphs, options.verse_range);
@@ -2406,11 +2422,11 @@
                                     content_manager.add_content_if_needed(BF.consts.additional);
                                 } else {
                                     /// Since the last verse is Revelation 22:21, there is no need to look for more.
-                                    content_manager.reached_bottom();
-                                    bottomLoader.style.visibility = "hidden";
+                                    prevent_further_queries();
                                 }
                             }
                             
+                            ///NOTE: Since top_verse needs to be stored and previous queries may need to be run, make sure to include initial queries here.
                             if (direction === BF.consts.previous || initial_query) {
                                 /// The first verse ID need to be store so that the server knowns where to start future previous queries.
                                 options.verse_range.top_verse = verse_ids[0];
@@ -2428,27 +2444,13 @@
                                     content_manager.add_content_if_needed(BF.consts.previous);
                                 } else {
                                     /// Since the first verse is Genesis 1:1, there is no need to look for more.
-                                    content_manager.reached_top();
-                                    topLoader.style.visibility = "hidden";
+                                    prevent_further_queries();
                                 }
                             }
                         } else {
                             /// Since total could be undefined, make sure the total is 0.
                             total = 0;
-                            
-                            ///TODO: Make a separate function for this.
-                            if (direction === BF.consts.additional) {
-                                /// The user has reached the bottom by scrolling down (either RETURNED_SEARCH or RETURNED_VERSES_PREVIOUS), so we need to hide the loading graphic.
-                                /// This is cause by scrolling to Revelation 22:21 or end of search or there were no results.
-                                content_manager.reached_bottom();
-                                bottomLoader.style.visibility = "hidden";
-                            }
-                            ///BUG: there can be no results if looking up beyond rev 22.21 (e.g., rev 23). FIX: Prevent looking up past 66022021
-                            if (direction === BF.consts.previous || initial_query) {
-                                /// The user has reached the top of the page by scrolling up (either Genesis 1:1 or there were no search results), so we need to hide the loading graphic
-                                content_manager.reached_top();
-                                topLoader.style.visibility    = "hidden";
-                            }
+                            prevent_further_queries();
                         }
                         
                         /// Is this is the first results of a query?
@@ -3447,7 +3449,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?17183367", {
+                BF.include("/js/secondary.js?17184841", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
