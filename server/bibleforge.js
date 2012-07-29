@@ -505,7 +505,9 @@ BF.grammatical_search = function (data, callback)
         query_arr = BF.parse_json(data.q);
     
     /// If query_arr is not an array, return an empty result.
-    if (!(query_arr instanceof Array)) {
+    /// If the first element is not a string or the second or third element is not an array, return an empty result.
+    ///NOTE: This assumes only one grammatical word being searched for, which is currently the limit.
+    if (!(query_arr instanceof Array) || typeof query_arr[0] !== "string" || !(query_arr[1] instanceof Array) || !(query_arr[2] instanceof Array)) {
         callback({});
         return;
     }
