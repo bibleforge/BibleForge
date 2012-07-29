@@ -375,7 +375,6 @@ BF.standard_search = function (data, callback)
     /// SPH_MATCH_ALL should be the fastest and needs no sorting.
     
     /// Is there more than one word?
-    ///FIXME: These could be one word with a hyphen (e.g., -bad).  However, this search would cause an error, currently.
     if (terms.indexOf(" ") >= 0) {
         /// Are there more than 10 search terms in the query, or does the query contains double quotes (")?
         ///NOTE: Could use the more accurate (/([a-z-]+[^a-z-]+){11}/.test(terms)) to find word count, but it is slower.
