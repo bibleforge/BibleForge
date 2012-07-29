@@ -1617,13 +1617,13 @@
                                 more_el = document.createElement("span");
                                 /// This element needs two classes: one to emulate the size of the more button, the other to hide it from view and make it float right.
                                 more_el.className = "more-button more-button-buffer";
-                                more_el.textContent = "[+] More"; /// TODO: Use language specific text.
+                                more_el.textContent = "[+] " + BF.lang.more;
                                 child_el.appendChild(more_el);
                                 
                                 /// Create the more button.
                                 more_el = document.createElement("div");
                                 more_el.className = "more-button";
-                                more_el.textContent = "[+] More"; /// TODO: Use language specific text.
+                                more_el.textContent = "[+] " + BF.lang.more;
                                 child_el.appendChild(more_el);
                                 
                                 parent_el.appendChild(child_el);

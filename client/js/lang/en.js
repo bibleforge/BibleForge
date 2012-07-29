@@ -117,6 +117,7 @@
         modern:            "Modern",                                              /// The short name for the modern pronunciation displayed on the menu
         modern_pronun:     "Modern Pronunciation",                                /// The long name for the modern pronunciation displayed in a tooltip
         modern_ipa:        "Modern IPA",                                          /// The name for the modern IPA pronunciation displayed on the menu and tooltip
+        more:              "More",                                                /// The text for the "[+] More" button on callouts
         next:              "Next",                                                /// The next chapter link in the non-JavaScript version
         no_results1:       "Your search\u200A\u2014\u200A",                       /// Displayed when preforming a search that returns no results (before the search terms)
         no_results2:       "\u200A\u2014\u200Adid not return any results.",       /// Displayed when preforming a search that returns no results (after the search terms)
