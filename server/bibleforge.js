@@ -504,6 +504,12 @@ BF.grammatical_search = function (data, callback)
         ///TODO: Make this an object instead.
         query_arr = BF.parse_json(data.q);
     
+    /// If query_arr is not an array, return an empty result.
+    if (!(query_arr instanceof Array)) {
+        callback({});
+        return;
+    }
+    
     html_table = "`bible_" + lang.id + "_html`";
     morphological_table = "`morphological_" + lang.id + "`";
     ///NOTE: Currently, the first query does not specifiy a verse.
