@@ -106,10 +106,10 @@
         chapter:           "Chapter",                                             /// Chapter headings
         configure:         "Configure",                                           /// Context menu item
         done:              "Finiſh",                                              /// The button that closes panels
-        found_plural:      " verſes found for ",                                  /// On the info bar when searching (multiple results)
-        found_singular:    " verſe found for ",                                   /// On the info bar when searching (one result)
+        found_plural:      " verſes found for ",                                  /// On the info bar when searching (multiple results) (uncapitalized)
+        found_singular:    " verſe found for ",                                   /// On the info bar when searching (one result) (uncapitalized)
         help:              "Succor",                                              /// Context menu item
-        "in":              "in",                                                  /// Used in the meta description in the non-JavaScript version to indicate the language being used.
+        "in":              "in",                                                  /// Used in the meta description in the non-JavaScript version to indicate the language being used (uncapitalized)
         ///NOTE: This key must be the same as the value in the settings.
         in_paragraphs:     "Paragraphs",                                          /// In the View configuration panel
         ///FIXME: Not all italic words are implied; some are questionable.
@@ -129,8 +129,8 @@
         ///NOTE: This key must be the same as the value in the settings.
         red_letters:       "Red Letters",                                         /// In the View configuration panel
         results_for:       "Results for",                                         /// Used in the meta description of searches in the non-JavaScript version to indicate the results for the query.
-        subscription:      "subscription",                                        /// Used instead of 255 for subscripts to Paul's epistles
-        title:             "title",                                               /// Used instead of 0 for Psalm title verse references
+        subscription:      "subscription",                                        /// Used instead of 255 for subscripts to Paul's epistles (uncapitalized)
+        title:             "title",                                               /// Used instead of 0 for Psalm title verse references (uncapitalized)
         translit:          "Tranſliteration",                                     /// The short name for the SBL transliteration display on the menu
         translit_long:     "Society of Biblical Languages Tranſliteration",       /// The long name for the SBL transliteration display on a tooltip
         view:              "View",                                                /// The title of a configuration panel
