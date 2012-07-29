@@ -2351,6 +2351,9 @@
                             verse_html = data.v,
                             word_ids   = data.i;
                         
+                        /**
+                         * Tell the content manager not to look up more results based on the current direction of the query.
+                         */
                         function prevent_further_queries()
                         {
                             if (direction === BF.consts.additional) {
