@@ -158,26 +158,45 @@ exports.db = function (config)
              *
              * @example var sql = "SELECT * FROM `table` WHERE field = \"" + db.escape("\"; DROP TABLE table;") + "\"";
              * @param   str (string) The string to escape.
+             * @return  A string or UNDEFINED if str is not a string.
              */
             escape: function (str)
             {
-                /// Because question marks (?) are a special symbol to db-mysql, they must be escaped too.
-                return db.escape(str).replace(/\?/g, "\\?");
+                if (typeof str === "string") {
+                    /// Because question marks (?) are a special symbol to db-mysql, they must be escaped too.
+                    return db.escape(str).replace(/\?/g, "\\?");
+                }
+                ///NOTE: Non-strings will return undefined.
             },
+            /**
+             * Escape a sphinx query argument.
+             *
+             * @example var sql = "SELECT * FROM `table` WHERE query = \"" + db.escape_sphinx("fake query;limit=99999") + ";ranker=none\"";
+             * @param   str (string) The string to escape.
+             * @return  A string or UNDEFINED if str is not a string.
+             */
             escape_sphinx: function (str)
             {
-                /// Because question marks (?) are a special symbol to db-mysql, they must be escaped too.
-                return db.escape(str).replace(/\?/g, "\\?").replace(/;/g, "\\\\;");
+                if (typeof str === "string") {
+                    /// Because question marks (?) are a special symbol to db-mysql, they must be escaped too.
+                    /// Semicolons are special symbols in SphinxQL and need to be escaped.
+                    return db.escape(str).replace(/\?/g, "\\?").replace(/;/g, "\\\\;");
+                }
+                ///NOTE: Non-strings will return undefined.
             },
             /**
              * Escape a table or field name.
              *
              * @example var sql = "SELECT * FROM " + db.name("table name");
              * @param   str (string) The string to escape.
+             * @return  A string or UNDEFINED if str is not a string.
              */
             name: function (str)
             {
-                return db.name(str);
+                if (typeof str === "string") {
+                    return db.name(str);
+                }
+                ///NOTE: Non-strings will return undefined.
             },
             /**
              * Execute a query.
