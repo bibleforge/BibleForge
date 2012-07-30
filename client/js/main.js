@@ -2454,7 +2454,7 @@
                             /// Standard searches should always return BF.lang.minimum_desired_verses number of verses unless it reaches the end of the results.
                             /// Grammatical searches should always return BF.lang.minimum_desired_verses number words unless it reaches the end of the results.
                             /// However, mixed searches might not return BF.lang.minimum_desired_verses number of verses/words, even at the end of the results (at least in theory).
-                            if ((options.type === BF.consts.standard_search & total < BF.lang.minimum_desired_verses) || (options.type === BF.consts.grammatical_search & word_ids.length < BF.lang.minimum_desired_verses)) {
+                            if ((options.type === BF.consts.standard_search && total < BF.lang.minimum_desired_verses) || (options.type === BF.consts.grammatical_search && word_ids.length < BF.lang.minimum_desired_verses)) {
                                 prevent_further_queries();
                             }
                         } else {
