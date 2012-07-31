@@ -124,13 +124,7 @@ body {
     
     font-size: 13px;
     
-    /*NOTE: IE has its own DropShadow filter that could be used. */
-    /* Mozilla 3.6- */
-    -moz-box-shadow:    0px 3px 6px rgba(0,0,0,.08);
-    /* WebKit 522 (Chrome,Safari 3) */
-    -webkit-box-shadow: 0px 3px 6px rgba(0,0,0,.08);
-    /* Opera 10.5/Mozilla 4.0/WebKit */
-    box-shadow:         0px 3px 6px rgba(0,0,0,.08);
+    box-shadow: 0 3px 6px rgba(0,0,0,.08);
 }
 
 .infoLeft {
@@ -177,15 +171,8 @@ body {
     border-radius:      15px;
     
     /* Add slight gradient shadow to the top of the input box. */
-    /*NOTE: IE has its own DropShadow filter that could be used. */
-    /* Opera 10.5/Mozilla 4.0 */
-    box-shadow:         inset 0px 2px 3px rgba(0,0,0,.16);
-    /* Mozilla 3.6- */
-    -moz-box-shadow:    inset 0px 2px 3px rgba(0,0,0,.16);
-    /* WebKit 522 (Chrome, Safari 3) */
-    /*BUG: The inset shadow does not stay inside of the rounded corners.  (See Chromium issue 29427.) */
-    /* -webkit-box-shadow: inset 0px 2px 3px rgba(0,0,0,.16); */
-    
+    box-shadow: inset 0 2px 3px rgba(0,0,0,.16);
+        
     /* The margin balances moves the input box over a little so as not to cover the wrench icon. */
     margin: 2px 30px;
     
@@ -387,13 +374,7 @@ body {
     
     /* This shadow is slightly dimmer than the panel because it is supposed to look higher up. */
     /*TODO: The direction of the shadow could be set dynamically based on where it is on the page. */
-    /*NOTE: IE has its own DropShadow filter that could be used. */
-    /* Mozilla 3.5- */
-    -moz-box-shadow:    2px 2px 3px rgba(0,0,0,.2);
-    /* WebKit 522 (Chrome, Safari 3) */
-    -webkit-box-shadow: 2px 2px 3px rgba(0,0,0,.2);
-    /* Opera 10.5/Mozilla 4.0/WebKit */
-    box-shadow:         2px 2px 3px rgba(0,0,0,.2);
+    box-shadow: 2px 2px 3px rgba(0,0,0,.2);
 }
 
 .contextMenu div {
@@ -479,14 +460,8 @@ body {
     /* Rounded corners for Opera 10.5+, IE 9+, WebKit 532.5+ (Chrome 4, Safari 5), Gecko 2 (Mozilla 4.0) */
     border-radius:      9px;
     
-    /* Add both a drop shadow and an inset shadow to give a slightly rounded effect.
-    /*NOTE: IE has its own DropShadow filter that could be used. */
-    /* Mozilla 3.6- */
-    -moz-box-shadow:    3px 3px 6px rgba(0,0,0,.2), inset -1px 0 2px rgba(0,0,0,.2);
-    /* WebKit 522 (Chrome, Safari 3) */
-    -webkit-box-shadow: 3px 3px 6px rgba(0,0,0,.2), inset -1px 0 2px rgba(0,0,0,.2);
-    /* Opera 10.5/Mozilla 4.0/WebKit */
-    box-shadow:         3px 3px 6px rgba(0,0,0,.2), inset -1px 0 2px rgba(0,0,0,.2);
+    /* Add both a drop shadow and an inset shadow to give a slightly rounded effect. */
+    box-shadow: 3px 3px 6px rgba(0,0,0,.2), inset -1px 0 2px rgba(0,0,0,.2);
     
     /* Just below the topBar (and context menu) but above callouts. */
     z-index: 999990;
@@ -538,10 +513,7 @@ button {
     
     background-color: rgba(221,238,246,.3);
     
-    /* Opera 10.5/Mozilla 4.0 */
-    box-shadow:         inset 0 1px 3px rgba(255,255,255,.5), inset 0 -15px 1px rgba(203,230,242,.3), 0 0 3px rgba(142,193,218,.3);
-    -webkit-box-shadow: inset 0 1px 3px rgba(255,255,255,.5), inset 0 -15px 1px rgba(203,230,242,.3), 0 0 3px rgba(142,193,218,.3);
-    -moz-box-shadow:    inset 0 1px 3px rgba(255,255,255,.5), inset 0 -15px 1px rgba(203,230,242,.3), 0 0 3px rgba(142,193,218,.3);
+    box-shadow: inset 0 1px 3px rgba(255,255,255,.5), inset 0 -15px 1px rgba(203,230,242,.3), 0 0 3px rgba(142,193,218,.3);
     
     color:       #3985A8;
     text-shadow: 0 1px #FFF;
@@ -619,13 +591,8 @@ label {
 }
 
 .callout {
-    /* Rounded corners for Mozilla 3.6- */
-    -moz-border-radius: 9px;
     border-radius:      9px;
-    -moz-box-shadow:    3px 3px 6px rgba(0,0,0,.2), inset -1px 0 2px rgba(0,0,0,.2);
-    -webkit-box-shadow: 3px 3px 6px rgba(0,0,0,.2), inset -1px 0 2px rgba(0,0,0,.2);
-    -ms-box-shadow:     3px 3px 6px rgba(0,0,0,.2), inset -1px 0 2px rgba(0,0,0,.2);
-    box-shadow:         3px 3px 6px rgba(0,0,0,.2), inset -1px 0 2px rgba(0,0,0,.2);
+    box-shadow: 3px 3px 6px rgba(0,0,0,.2), inset -1px 0 2px rgba(0,0,0,.2);
     background: #FFF;
     /* Transparent background for Firefox 3.5- */
     background: rgba(255, 255, 255, .95);
@@ -655,10 +622,7 @@ label {
     height: 100%;
 }
 .callout .pointer-down {
-    -moz-box-shadow:    6px 4px 6px -3px rgba(0,0,0,.2);
-    -webkit-box-shadow: 6px 4px 6px -3px rgba(0,0,0,.2);
-    -ms-box-shadow:     6px 4px 6px -3px rgba(0,0,0,.2);
-    box-shadow:         6px 4px 6px -3px rgba(0,0,0,.2);
+    box-shadow: 6px 4px 6px -3px rgba(0,0,0,.2);
     -moz-transform:    rotate(45deg);
     -webkit-transform: rotate(45deg);
     -o-transform:      rotate(45deg);
@@ -685,10 +649,7 @@ label {
     bottom: -11px;
 }
 .callout .pointer-up {
-    -moz-box-shadow:    -1px -3px 6px -3px rgba(0,0,0,.2);
-    -webkit-box-shadow: -1px -3px 6px -3px rgba(0,0,0,.2);
-    -ms-box-shadow:     -1px -3px 6px -3px rgba(0,0,0,.2);
-    box-shadow:         -1px -3px 6px -3px rgba(0,0,0,.2);
+    box-shadow: -1px -3px 6px -3px rgba(0,0,0,.2);
     -moz-transform:    rotate(45deg);
     -webkit-transform: rotate(45deg);
     -o-transform:      rotate(45deg);
