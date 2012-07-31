@@ -2909,7 +2909,8 @@
                     {
                         /// Store the text inside the curly brackets.
                         ///NOTE: If we use the g flag, there could be more than one, but currently this is not allowed.
-                        options.extra_highlighting = arguments[1];
+                        /// Since the highlighting terms can be entered in by the user, we cannot assume they are already in the correct format, so they need to be prepared (e.g., convert hyphenated words to quoted words).
+                        options.extra_highlighting = BF.lang.prepare_query(arguments[1]).trim();
                         
                         /// Replace the matching string with a space because it could appear between two words (i.e., "for {{God}} so" would turn into "for so").
                         return " ";
