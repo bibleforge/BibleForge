@@ -1175,6 +1175,7 @@ h2 {
 @font-face {
     font-family: 'IM Fell DW Pica';
     src: local('IM Fell DW Pica');
+    src: local('IM FELL English PRO');
     src: url('../fonts/imfepirm28p.eot');
     src: url('../fonts/imfepirm28p.eot?#iefix') format('embedded-opentype'),
          url('../fonts/imfepirm28p.woff')       format('woff'),
@@ -1186,7 +1187,10 @@ h2 {
 
 @font-face {
     font-family: 'IM Fell DW Pica';
+    src: local('IM Fell DW Pica Italic');
+    src: local('IM FELL English PRO, Italic');
     src: local('IM Fell DW Pica');
+    src: local('IM FELL English PRO');
     src: url('../fonts/imfepiit28p.eot');
     src: url('../fonts/imfepiit28p.eot?#iefix') format('embedded-opentype'),
          url('../fonts/imfepiit28p.woff')       format('woff'),
