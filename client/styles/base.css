@@ -530,7 +530,7 @@ legend {
  *
  * @note This does not work in IE.
  */
-button:active {
+.button:active {
     /*TODO: Determine if it would be better just to change the text shadow color.  (Opera already moves the text.) */
     padding: 6px 13px 4px 15px;
     
