@@ -521,7 +521,7 @@
                 is_open = true;
                 
                 done_button.innerHTML = BF.lang.done;
-                done_button.className = "done_button";
+                done_button.className = "button done_button";
                 /// An anonymous function must be used because we do not want to send the event object to close_panel().
                 done_button.onclick   = function ()
                 {

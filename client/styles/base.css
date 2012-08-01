@@ -495,14 +495,14 @@ legend {
     float: right;
 }
 
-button {
+.button {
     border: 1px solid #8EC1DA;
     
     border-radius: 4px;
     
-    background-color: rgba(221,238,246,.3);
+    background-color: rgba(0,0,200,.05);
     
-    box-shadow: inset 0 1px 3px rgba(255,255,255,.5), inset 0 -15px 1px rgba(203,230,242,.3), 0 0 3px rgba(142,193,218,.3);
+    box-shadow: inset 0 1px 3px rgba(255,255,255,.5), inset 0 -15px 3px rgba(0,0,200,.05);
     
     color:       #3985A8;
     text-shadow: 0 1px #FFF;
@@ -512,15 +512,15 @@ button {
 
     /* Fade the background color on mouse down. */
     /* Transition for Mozilla (Firefox 4.0+) */
-    -moz-transition:    background-color .1s;
+    -moz-transition:    background-color .2s;
     /* Transition for WebKit */
-    -webkit-transition: background-color .1s;
+    -webkit-transition: background-color .2s;
     /* Transition for Opera 10.5+ */
-    -o-transition:      background-color .1s;
+    -o-transition:      background-color .2s;
 }
 
-button:hover {
-    background-color: rgba(221,238,246,.6);
+.button:hover {
+    background-color: rgba(0,0,200,.07);
 }
 
 /**
@@ -532,7 +532,7 @@ button:active {
     /*TODO: Determine if it would be better just to change the text shadow color.  (Opera already moves the text.) */
     padding: 6px 13px 4px 15px;
     
-    background-color: #E1E1FF;
+    background-color: rgba(0,0,200,.1);
 }
 
 .scrolls {
