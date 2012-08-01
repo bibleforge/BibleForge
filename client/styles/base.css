@@ -509,6 +509,8 @@ legend {
     
     padding: 5px 14px;
     outline: 0;
+    
+    cursor: pointer;
 
     /* Fade the background color on mouse down. */
     /* Transition for Mozilla (Firefox 4.0+) */
