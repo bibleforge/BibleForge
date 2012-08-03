@@ -1821,7 +1821,7 @@
              */
             function change_langEl_text(lang_id)
             {
-                langEl.value = lang_id;
+                langEl.textContent = lang_id;
                 context.qEl.style.paddingLeft = (langEl.offsetWidth + 3) + "px";
             }
             

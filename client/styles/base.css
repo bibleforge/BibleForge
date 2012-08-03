@@ -56,7 +56,7 @@ html {
     text-rendering: optimizeLegibility;
 }
 
-input, .callout {
+input, .callout, .lang {
     /*NOTE: Input fields do not inherit from the HTML element. */
     /*      If a font-family is not specified, it will use a system default. */
     /*      On Windows, that font is "MS Shell Dlg," which is actually "Microsoft Sans Serif." */
@@ -239,6 +239,8 @@ body {
     height: 22px;
     
     padding-right: 4px;
+    
+    font-size: 13px;
     
     /* Hide by default so that the default language name can be added first. */
     visibility: hidden;
