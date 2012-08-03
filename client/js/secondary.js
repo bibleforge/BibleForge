@@ -1889,7 +1889,7 @@
                         activate_new_lang = function ()
                         {
                             BF.lang = BF.langs[lang_id];
-                            change_langEl_text(BF.lang.short_name);
+                            //change_langEl_text(BF.lang.short_name);
                             
                             /// Make the cursor turn into a hand when hovering over words if there is lexical data available.
                             BF.toggleCSS(page, "linked", BF.lang.linked_to_orig ? 1 : 0);
@@ -1969,6 +1969,7 @@
                         } else {
                             /// If the language code has not been downloaded yet, download it now and activate the language after the code has loaded.
                             ///NOTE: The last modified time is added (if available) to prevent browsers from caching an outdated file.
+                            langEl.innerHTML = "<img src=\"/images/crown_of_thorns.png\" class=crown_loader>";
                             BF.include("/js/lang/" + lang_id + ".js?" + (BF.langs[lang_id].modified || ""), {}, activate_new_lang);
                         }
                     } else {
