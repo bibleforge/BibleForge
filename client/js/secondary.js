@@ -1812,7 +1812,8 @@
          */
         (function ()
         {
-            var langEl = context.langEl;
+            var crown_loader_timeout,
+                langEl = context.langEl;
             
             /**
              * Change the text in the button and adjust the padding.
@@ -1821,6 +1822,9 @@
              */
             function change_langEl_text(lang_id)
             {
+                /// If the language file loads quickly enough, there is no need to display a loader.
+                window.clearTimeout(crown_loader_timeout);
+                
                 langEl.textContent = lang_id;
                 context.qEl.style.paddingLeft = (langEl.offsetWidth + 3) + "px";
             }
@@ -1889,7 +1893,7 @@
                         activate_new_lang = function ()
                         {
                             BF.lang = BF.langs[lang_id];
-                            //change_langEl_text(BF.lang.short_name);
+                            change_langEl_text(BF.lang.short_name);
                             
                             /// Make the cursor turn into a hand when hovering over words if there is lexical data available.
                             BF.toggleCSS(page, "linked", BF.lang.linked_to_orig ? 1 : 0);
@@ -1968,8 +1972,14 @@
                             activate_new_lang();
                         } else {
                             /// If the language code has not been downloaded yet, download it now and activate the language after the code has loaded.
+                            
+                            /// If the language data does not download quickly enough, display a loader graphic.
+                            ///NOTE: This timeout will be canceled in change_langEl_text() if the data loads quickly enough.
+                            crown_loader_timeout = window.setTimeout(function ()
+                            {
+                                langEl.innerHTML = "<div class=crown_loader></div>";
+                            }, 175);
                             ///NOTE: The last modified time is added (if available) to prevent browsers from caching an outdated file.
-                            langEl.innerHTML = "<div class=crown_loader></div>";
                             BF.include("/js/lang/" + lang_id + ".js?" + (BF.langs[lang_id].modified || ""), {}, activate_new_lang);
                         }
                     } else {
