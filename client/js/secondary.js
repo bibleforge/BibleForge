@@ -1871,9 +1871,20 @@
                         ///NOTE: If the query input box is blank, use the last query made by the user.
                         if (!BF.langs[lang_id].loaded && (context.settings.user.last_query.type === BF.consts.verse_lookup && (qEl_str === "" || qEl_str === context.settings.user.last_query.real_query))) {
                             /// Because we needs to know the name of the book, it must first download the selected language and then open a new tab.
-                            ///TODO: Notify the user if downloading takes too long.
                             ///NOTE: The last modified time is added (if available) to prevent browsers from caching an outdated file.
-                            BF.include("/js/lang/" + lang_id + ".js?" + (BF.langs[lang_id].modified || ""), {}, activate_new_lang);
+                            BF.include("/js/lang/" + lang_id + ".js?" + (BF.langs[lang_id].modified || ""), {}, function ()
+                            {
+                                /// This is to set the name back because the crown of throns loader could be present.
+                                change_langEl_text(BF.lang.short_name);
+                                activate_new_lang();
+                            });
+                            
+                            /// If the language data does not download quickly enough, display a loader graphic.
+                            ///NOTE: This timeout will be canceled in change_langEl_text() if the data loads quickly enough.
+                            crown_loader_timeout = window.setTimeout(function ()
+                            {
+                                langEl.innerHTML = "<div class=crown_loader></div>";
+                            }, 175);
                         } else {
                             activate_new_lang();
                         }
@@ -1973,6 +1984,8 @@
                             activate_new_lang();
                         } else {
                             /// If the language code has not been downloaded yet, download it now and activate the language after the code has loaded.
+                            ///NOTE: The last modified time is added (if available) to prevent browsers from caching an outdated file.
+                            BF.include("/js/lang/" + lang_id + ".js?" + (BF.langs[lang_id].modified || ""), {}, activate_new_lang);
                             
                             /// If the language data does not download quickly enough, display a loader graphic.
                             ///NOTE: This timeout will be canceled in change_langEl_text() if the data loads quickly enough.
@@ -1980,8 +1993,6 @@
                             {
                                 langEl.innerHTML = "<div class=crown_loader></div>";
                             }, 175);
-                            ///NOTE: The last modified time is added (if available) to prevent browsers from caching an outdated file.
-                            BF.include("/js/lang/" + lang_id + ".js?" + (BF.langs[lang_id].modified || ""), {}, activate_new_lang);
                         }
                     } else {
                         if (typeof callback === "function") {
