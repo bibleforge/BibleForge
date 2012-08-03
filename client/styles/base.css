@@ -269,10 +269,13 @@ body {
 
 
 .crown_loader {
+    width:  20px;
+    height: 20px;
+    /*background: no-repeat url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAB6klEQVQ4y63UT2gOYBwH8I8125IWZTG01laK/NvBgSL/SrPFQRJ3J3GVq1AO2kJuu6AUKUSx3BYOFE2Rg+Fgm3+RSK9Zr8v3rbd5Z+/id3l6nt/z+z6/P9/vQ3XWgPXY7z/ZAbxGER/RM12ApahBC9pxMGAnsDz77ziDNrRi1lSgx3A/QGNZ36I5/pll/l9Zn+MkOisBlgJeoBF1KGAowcWyFhSwMnH9eDVZxi0Jasz+AgbKKjiHtajHKTwti/2MDZVA21NyHS5iHBvjWzihoh78yKNz8Qj7KoEeSqY/cRfnsXiS3i9CB66W9f5sJdoUMYyXOWtGbRWMuZXyC+grHXbiDY5jQcDXVAE2A0eSaTd2hm5NtQFqwSWMJmATHk4BWgxIbXo6GgZ01+AyRrA5Q4BlmF9FtjfC1zasznBnl5w9efVeeNiQ8v5m9Vkf4xk+4M7ES6dTUiEybJ8C9DYO413iroeOf/B0HCswGB4+wJIKgPPwNRLemmx3V3q5NS+WbCCqKvFyF3qzPxrAkjRHsG2yHg1Gy6KUMdxMS0raf5KSt+ReLz6hqRLoqshzCF9Ck2KI3RXqrctQiil5GO9xZSqaNOZz2JuBFbAjvo5M+Rr2pOQ52D7dj7sP38r+0P4yPv+TdeW7q0YQfgPSYoXEqqa2UAAAAABJRU5ErkJggg==);
+    */
+    background: no-repeat url("/images/crown_of_thorns.png");
     opacity: .2;
-    
-    margin-top: -1px;
-    
+        
     -webkit-animation-name: rotate;
        -moz-animation-name: rotate;
     -webkit-animation-duration: 2s;
@@ -1236,6 +1239,8 @@ h2 {
 
 /* Center the crown of thorns loader. */
 .moz .crown_loader {
-    -moz-transform-origin: 52.5%;
-    margin-top: 0!important;
+    /*-moz-transform-origin: 52% 48%;*/
+    -moz-transform-origin: 53%;
+    position: relative;
+    top: -1px;
 }

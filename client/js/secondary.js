@@ -1969,7 +1969,7 @@
                         } else {
                             /// If the language code has not been downloaded yet, download it now and activate the language after the code has loaded.
                             ///NOTE: The last modified time is added (if available) to prevent browsers from caching an outdated file.
-                            langEl.innerHTML = "<img src=\"/images/crown_of_thorns.png\" class=crown_loader>";
+                            langEl.innerHTML = "<div class=crown_loader></div>";
                             BF.include("/js/lang/" + lang_id + ".js?" + (BF.langs[lang_id].modified || ""), {}, activate_new_lang);
                         }
                     } else {
