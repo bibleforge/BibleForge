@@ -1853,10 +1853,9 @@
                         activate_new_lang = function ()
                         {
                             /// If the user has typed something into the query box, use that; otherwise, use the last query.
-                            ///NOTE: Because the placeholder explanation is currently in the element's value, we must check for that.
                             var query_str;
                             
-                            if (context.settings.user.last_query.type === BF.consts.verse_lookup && context.settings.user.position.b && (qEl_str === "" || qEl_str === context.settings.user.last_query.real_query)) {
+                            if (context.settings.user.last_query.type === BF.consts.verse_lookup && (qEl_str === "" || qEl_str === context.settings.user.last_query.real_query)) {
                                 query_str = BF.langs[lang_id].books_short[context.settings.user.position.b] + " " + context.settings.user.position.c + ":" + context.settings.user.position.v;
                             } else if (qEl_str_trim !== "") {
                                 query_str = qEl_str;
@@ -1867,8 +1866,10 @@
                             window.open("/" + lang_id + "/" + window.encodeURIComponent(query_str) + "/", "_blank");
                         };
                         
-                        /// Has the language code already been downloaded?
-                        if (!BF.langs[lang_id].loaded && (context.settings.user.position.b && (qEl_str === "" || qEl_str === context.settings.user.last_query.real_query))) {
+                        /// If the language code already not already been downloaded, it will need to be download if
+                        /// the query that will be sent to the new tab is the same as the last query and that query was a verse lookup.
+                        ///NOTE: If the query input box is blank, use the last query made by the user.
+                        if (!BF.langs[lang_id].loaded && (context.settings.user.last_query.type === BF.consts.verse_lookup && (qEl_str === "" || qEl_str === context.settings.user.last_query.real_query))) {
                             /// Because we needs to know the name of the book, it must first download the selected language and then open a new tab.
                             ///TODO: Notify the user if downloading takes too long.
                             ///NOTE: The last modified time is added (if available) to prevent browsers from caching an outdated file.
