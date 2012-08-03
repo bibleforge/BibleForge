@@ -267,6 +267,33 @@ body {
     color: rgba(0,0,0,.6);
 }
 
+
+.crown_loader {
+    opacity: .2;
+    
+    margin-top: -1px;
+    
+    -webkit-animation-name: rotate;
+       -moz-animation-name: rotate;
+    -webkit-animation-duration: 2s;
+       -moz-animation-duration: 2s;
+    -webkit-animation-iteration-count: infinite;
+       -moz-animation-iteration-count: infinite;
+    -webkit-animation-timing-function: linear;
+       -moz-animation-timing-function: linear;
+}
+
+/* This makes the crown of thorns spin. */
+@-webkit-keyframes rotate {
+    from {-webkit-transform: rotate(0deg);}
+    to   {-webkit-transform: rotate(360deg);}
+}
+@-moz-keyframes rotate {
+    from {-moz-transform: rotate(0deg);}
+    to   {-moz-transform: rotate(360deg);}
+}
+
+
 .inputIcon {
     /* Move the icon over the right end of the input box. */
     margin-left: -55px;
@@ -1201,4 +1228,14 @@ h2 {
 /* Make the drop caps aligned with the second line of text. */
 .ie .first_verse:first-letter, .ie .first_paragraph:first-letter {
     margin-top: 5px;
+}
+
+/************************/
+/* Mozilla specific CSS */
+/************************/
+
+/* Center the crown of thorns loader. */
+.moz .crown_loader {
+    -moz-transform-origin: 52.5%;
+    margin-top: 0!important;
 }

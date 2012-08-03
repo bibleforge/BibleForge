@@ -98,6 +98,10 @@
     ///NOTE: Since the user agent string can be modified by the user, it is not bulletproof.
     BF.is_WebKit = Boolean(window.chrome) || window.navigator.userAgent.indexOf("WebKit/") >= 0;
     
+    ///NOTE: Since the user agent string can be modified by the user, it is not bulletproof.
+    ///TODO: Test for more Mozilla-base browsers (like SeaMonkey).
+    BF.is_Mozilla = window.navigator.userAgent.indexOf("Firefox/") >= 0;
+    
     /// Create the object in which the following functions store key presses into.
     BF.keys_pressed = {};
     
@@ -3535,6 +3539,11 @@
     if (window.opera) {
         /// Add "opera" to the <html> element's class to allow for Opera specific CSS.
         BF.toggleCSS(document.getElementsByTagName("html")[0], "opera", true);
+    }
+    
+    if (BF.is_Mozilla) {
+        /// Add "moz" to the <html> element's class to allow for Mozilla specific CSS.
+        document.getElementsByTagName("html")[0].classList.add("moz");
     }
     
     /**
