@@ -1344,6 +1344,10 @@
                                 /// so to calculate the new height correctly, we calculate the visible area of the "inner" element,
                                 /// which is the same as the height of the callout minus the padding.
                                 callout.style.height = (inside.getClientRects()[0].height + diff) + "px";
+                                
+                                /// Because when the size changes, it could go off the top of the page, make sure to re-align it.
+                                /// E.g., Go to Jeremiah 33 and click on "Chaldeans."
+                                this.align_callout();
                             }
                         },
                         
