@@ -1332,7 +1332,7 @@
                             }
                             
                             /// Determine if the callout needs to be resized to fit all of the content.
-                            
+                            /// E.g., go to Jeremiah 33 and click on "he" in the first verse.
                             diff = inside.scrollHeight - inside.offsetHeight;
                             if (diff > 0) {
                                 /// If the pointer is pointing down, the top position must also be changed.
@@ -1346,7 +1346,7 @@
                                 callout.style.height = (inside.getClientRects()[0].height + diff) + "px";
                                 
                                 /// Because when the size changes, it could go off the top of the page, make sure to re-align it.
-                                /// E.g., Go to Jeremiah 33 and click on "Chaldeans."
+                                /// E.g., go to Jeremiah 33 and click on "Chaldeans."
                                 this.align_callout();
                             }
                         },
