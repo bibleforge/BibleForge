@@ -705,7 +705,7 @@ label {
 }
 
 .lex-orig_word, .hebrew_title {
-    font-family: 'BFHebrew', 'Palatino Linotype', Palatino, TexGyrePagella, 'TeX Gyre Pagella', 'URWPalladioL', 'Book Antiqua', 'Times new Roman', Times, serif;
+    font-family: 'Ezra SIL SR', 'BFHebrew', 'Palatino Linotype', Palatino, TexGyrePagella, 'TeX Gyre Pagella', 'URWPalladioL', 'Book Antiqua', 'Times new Roman', Times, serif;
     font-size: 30px;
     /* The vertical alignment is required simply to match up with .lex-pronun. */
     vertical-align: super;
@@ -1078,7 +1078,7 @@ h2 {
 /* Fonts for IE */
 @font-face {
     font-family: 'TeX Gyre Pagella';
-    src: url('../fonts/texgyrepagella-regular.eot');
+    src: url('/fonts/texgyrepagella-regular.eot');
 }
 
 /* Fonts for Mozilla/Opera/Webkit */
@@ -1086,14 +1086,14 @@ h2 {
     font-family: 'TeX Gyre Pagella';
     src: local('TeX Gyre Pagella Regular'),
          local('TeXGyrePagella-Regular'),
-         url('../fonts/texgyrepagella-regular.otf') format('opentype');
+         url('/fonts/texgyrepagella-regular.otf') format('opentype');
 }
 
 @font-face {
     font-family: 'TeX Gyre Pagella';
     src: local('TeX Gyre Pagella Italic'),
          local('TeXGyrePagella-Italic'),
-         url('../fonts/texgyrepagella-italic.otf') format('opentype');
+         url('/fonts/texgyrepagella-italic.otf') format('opentype');
     font-style: italic;
 }
 
@@ -1101,7 +1101,7 @@ h2 {
     font-family: 'TeX Gyre Pagella';
     src: local('TeX Gyre Pagella Bold'),
          local('TeXGyrePagella-Bold'),
-         url('../fonts/texgyrepagella-bold.otf') format('opentype');
+         url('/fonts/texgyrepagella-bold.otf') format('opentype');
     font-weight: bold;
 }
 
@@ -1109,7 +1109,7 @@ h2 {
     font-family: 'TeX Gyre Pagella';
     src: local('TeX Gyre Pagella Bold Italic'),
          local('TeXGyrePagella-BoldItalic'),
-         url('../fonts/texgyrepagella-bolditalic.otf') format('opentype');
+         url('/fonts/texgyrepagella-bolditalic.otf') format('opentype');
     font-weight: bold;
     font-style:  italic;
 }
@@ -1119,49 +1119,44 @@ h2 {
     font-family: 'Bitstream Vera Sans Webfont';
     src: local('Verdana'),
          local('Bitstream Vera Sans'),
-         url('../fonts/Vera.woff') format('woff');
+         url('/fonts/Vera.woff') format('woff');
 }
 @font-face {
     font-family: 'Bitstream Vera Sans Webfont';
     src: local('Verdana'),
          local('Bitstream Vera Sans'),
-         url('../fonts/VeraIt.woff') format('woff');
+         url('/fonts/VeraIt.woff') format('woff');
     font-style: italic;
 }
 @font-face {
     font-family: 'Bitstream Vera Sans Webfont';
     src: local('Verdana'),
          local('Bitstream Vera Sans'),
-         url('../fonts/VeraBd.woff') format('woff');
+         url('/fonts/VeraBd.woff') format('woff');
     font-weight: bold;
 }
 @font-face {
     font-family: 'Bitstream Vera Sans Webfont';
     src: local('Verdana'),
          local('Bitstream Vera Sans'),
-         url('../fonts/VeraBI.woff') format('woff');
+         url('/fonts/VeraBI.woff') format('woff');
     font-weight: bold;
     font-style:  italic;
 }
 
 @font-face {
     font-family: 'BFHebrew';
-    src: url('../fonts/BFHebrew.eot');
-    src: url('../fonts/BFHebrew.eot?#iefix') format('embedded-opentype'),
-         url('../fonts/BFHebrew.ttf')        format('truetype'),
-         url('../fonts/BFHebrew.woff')       format('woff');
+    src: local('Ezra SIL SR'),
+         url('/fonts/BFHebrew.woff') format('woff');
     font-weight: normal;
     font-style:  normal;
 }
 
 @font-face {
     font-family: 'IM Fell DW Pica';
-    src: local('IM Fell DW Pica');
-    src: local('IM FELL English PRO');
-    src: url('../fonts/imfepirm28p.eot');
-    src: url('../fonts/imfepirm28p.eot?#iefix') format('embedded-opentype'),
-         url('../fonts/imfepirm28p.woff')       format('woff'),
-         url('../fonts/imfepirm28p.ttf')        format('truetype');
+    src: local('IM Fell DW Pica'),
+         local('IM FELL English PRO'),
+         url('/fonts/imfepirm28p.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 
@@ -1169,14 +1164,11 @@ h2 {
 
 @font-face {
     font-family: 'IM Fell DW Pica';
-    src: local('IM Fell DW Pica Italic');
-    src: local('IM FELL English PRO, Italic');
-    src: local('IM Fell DW Pica');
-    src: local('IM FELL English PRO');
-    src: url('../fonts/imfepiit28p.eot');
-    src: url('../fonts/imfepiit28p.eot?#iefix') format('embedded-opentype'),
-         url('../fonts/imfepiit28p.woff')       format('woff'),
-         url('../fonts/imfepiit28p.ttf')        format('truetype');
+    src: local('IM Fell DW Pica Italic'),
+         local('IM FELL English PRO, Italic'),
+         local('IM Fell DW Pica'),
+         local('IM FELL English PRO'),
+         url('/fonts/imfepiit28p.woff') format('woff');
     font-weight: normal;
     font-style: italic;
 }
