@@ -47,7 +47,7 @@ html, body {
 html {
     overflow-y:  scroll;
     overflow-x:  hidden;
-    font-family: Verdana, 'BibleForge Sans', 'Bitstream Vera Sans', 'DejaVu Sans', Arial, sans-serif;
+    font-family: Verdana, 'Bitstream Vera Sans', 'Bitstream Vera Sans Webfont', 'DejaVu Sans', sans-serif;
     font-size:   15px;
     
     /* Improve the text rendering and enable support for ligatures and kerning in Mozilla. */
@@ -61,7 +61,7 @@ input, .callout, .lang {
     /*      If a font-family is not specified, it will use a system default. */
     /*      On Windows, that font is "MS Shell Dlg," which is actually "Microsoft Sans Serif." */
     /*TODO: Make/find a good replacement font for Arial. */
-    font-family: Arial, 'Bitstream Vera Sans', 'DejaVu Sans', sans-serif;
+    font-family: Arial, 'Bitstream Vera Sans', 'Bitstream Vera Sans Webfont', 'DejaVu Sans', sans-serif;
 }
 
 body {
@@ -712,7 +712,7 @@ label {
 }
 
 .lex-pronun {
-    font-family: Verdana, 'BibleForge Sans', 'Bitstream Vera Sans', 'DejaVu Sans', Arial, sans-serif;
+    font-family: Verdana, 'Bitstream Vera Sans', 'Bitstream Vera Sans Webfont', 'DejaVu Sans', sans-serif;
     font-size: 14px;
     white-space: nowrap;
     /* Because this element can wrap if the word is long and the line height is rather large due to the large original word one the line above, */
@@ -1114,35 +1114,32 @@ h2 {
     font-style:  italic;
 }
 
-
+/*NOTE: If no local() fonts are supplied, Mozilla will always download the web font if it detects an element with this CSS. */
 @font-face {
-    font-family: 'Bitstream Vera Sans';
-    src: local('Bitstream Vera Sans'),
-         local('BitstreamVeraSans'),
-         url('../fonts/Vera.ttf') format('truetype');
+    font-family: 'Bitstream Vera Sans Webfont';
+    src: local('Verdana'),
+         local('Bitstream Vera Sans'),
+         url('../fonts/Vera.woff') format('woff');
 }
-
 @font-face {
-    font-family: 'Bitstream Vera Sans';
-    src: local('Bitstream Vera Sans Oblique'),
-         local('BitstreamVeraSans-Oblique'),
-         url('../fonts/VeraIt.ttf') format('truetype');
+    font-family: 'Bitstream Vera Sans Webfont';
+    src: local('Verdana'),
+         local('Bitstream Vera Sans'),
+         url('../fonts/VeraIt.woff') format('woff');
     font-style: italic;
 }
-
 @font-face {
-    font-family: 'Bitstream Vera Sans';
-    src: local('Bitstream Vera Sans Bold'),
-         local('BitstreamVeraSans-Bold'),
-         url('../fonts/VeraBd.ttf') format('truetype');
+    font-family: 'Bitstream Vera Sans Webfont';
+    src: local('Verdana'),
+         local('Bitstream Vera Sans'),
+         url('../fonts/VeraBd.woff') format('woff');
     font-weight: bold;
 }
-
 @font-face {
-    font-family: 'Bitstream Vera Sans';
-    src: local('Bitstream Vera Sans Bold Oblique'),
-         local('BitstreamVeraSans-BoldOblique'),
-         url('../fonts/VeraBI.ttf') format('truetype');
+    font-family: 'Bitstream Vera Sans Webfont';
+    src: local('Verdana'),
+         local('Bitstream Vera Sans'),
+         url('../fonts/VeraBI.woff') format('woff');
     font-weight: bold;
     font-style:  italic;
 }
