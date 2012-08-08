@@ -770,10 +770,9 @@ BF.lexical_lookup = function (data, callback)
                 /**
                  * Create the non-JavaScript version and send the results to the client.
                  *
-                 * @param  url        
-                 * @param  data       
-                 * @param  connection 
-                 * @return NULL
+                 * @param  url        (string) The URL from which to create the query.
+                 * @param  data       (object) The GET/POST data as an object.
+                 * @param  connection (object) The connection object though which data may be sent back to the client.
                  */
                 return function create_simple_page(url, data, connection)
                 {
@@ -861,7 +860,7 @@ BF.lexical_lookup = function (data, callback)
                     * Create the page based on the retrieved HTML and send it to the client.
                     *
                     * @param html (string) The HTML of the non-JavaScript version.
-                    * @note  The callback function could be called synchronously or asynchronously. 
+                    * @note  The callback function could be called synchronously or asynchronously.
                     */
                     get_simple_html(function (html)
                     {

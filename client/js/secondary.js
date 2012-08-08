@@ -390,8 +390,8 @@
                                     menu_container.childNodes[cur_item].click();
                                 } else {
                                     /// Simulate a mouse click.
-                                    fake_event = document.createEvent("MouseEvents"); 
-                                    fake_event.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null); 
+                                    fake_event = document.createEvent("MouseEvents");
+                                    fake_event.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
                                     menu_container.childNodes[cur_item].dispatchEvent(fake_event);
                                 }
                             }
@@ -1159,7 +1159,7 @@
                                 if (split_info.mouse_x >= point_to_rects[i].left && split_info.mouse_x <= point_to_rects[i].right && split_info.mouse_y >= point_to_rects[i].top && split_info.mouse_y <= point_to_rects[i].bottom) {
                                     which_rect = i;
                                     split_info.which_rect = i;
-                                    break;   
+                                    break;
                                 }
                             }
                             /// If the user clicked on the word before it wrapped and then the view was resized so that it now wraps, it will not find a matching rectangle.
@@ -1534,7 +1534,7 @@
                         
                         return function display_callout(callout, data)
                         {
-                            /// data Object structure: 
+                            /// data Object structure:
                             /// word      (string)  The original Greek, Hebrew, or Aramaic word, in Unicode.
                             /// pronun    (string)  A JSON string containing the pronunciation of the word (same as data.pronun below except for the actual word, not the base form).
                             /// strongs   (integer) The designated Strong's number for that word.
@@ -1924,7 +1924,7 @@
                                  * Reload the text in the new language.
                                  *
                                  * @note The is called via setTimeout to let the effects of switching the language to take place and to isolate some of the variables used for convenience.
-                                 */ 
+                                 */
                                 window.setTimeout(function ()
                                 {
                                     var position,      /// The object that indicates the actual position on the page

@@ -441,7 +441,7 @@
                     ///     iti
                     ///     ous
                     ///     ive
-                    ///     ize 
+                    ///     ize
                     ///
                     /// The following suffix must also be preceded by an "s" or "t" as well as the other requirements:
                     ///     ion
