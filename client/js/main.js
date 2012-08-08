@@ -491,7 +491,7 @@
                         
                         if (timeout) {
                             /// Begin the timeout timer to ensure that the download does not freeze.
-                            ///NOTE: ajax_timeout is cleared if the query completes before the timeout is fired (successfully or unsuccessfully). 
+                            ///NOTE: ajax_timeout is cleared if the query completes before the timeout is fired (successfully or unsuccessfully).
                             ajax_timeout = window.setTimeout(function ()
                             {
                                 ajax_obj.abort();
@@ -887,7 +887,7 @@
          * @note  The reason for the str parameter is that some fonts will only load if certain a character set is used (e.g., Hebrew or Greek letters).
          */
         return function preload_font(className, str)
-        {   
+        {
             /// Delay the function to make sure that there is a pause between each call to make sure that multiple calls will all take place.
             window.setTimeout(function ()
             {
@@ -1930,7 +1930,7 @@
                         
                         looking_up_verse_range = false;
                         
-                        /// Store the state in the settings so that if the user comes back later, we can take them back to where they left off. 
+                        /// Store the state in the settings so that if the user comes back later, we can take them back to where they left off.
                         settings.user.position = verse1;
                         
                         /// Is it already queued to save the state?
@@ -3440,7 +3440,7 @@
                             ///NOTE: In Chromium, holding Alt brings the new tab to the forefront but Ctrl opens it in the background.
                             window.open("/" + BF.lang.id + "/" + window.encodeURIComponent(query) + "/", "_blank");
                         } else {
-                            /// Look up the clicked verse.  
+                            /// Look up the clicked verse.
                             ///TODO: Keep the highlighting.
                             qEl.value = query;
                             run_new_query(query);
