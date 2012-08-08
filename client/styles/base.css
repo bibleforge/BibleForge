@@ -1,4 +1,4 @@
-/**
+ /**
  * BibleForge
  *
  * @date    10-30-08
@@ -705,7 +705,8 @@ label {
 }
 
 .lex-orig_word, .hebrew_title {
-    font-family: 'BF_Hebrew', 'Palatino Linotype', Palatino, TexGyrePagella, 'TeX Gyre Pagella', 'URWPalladioL', 'Book Antiqua', 'Times new Roman', Times, serif;
+    /* Palatino Linotype (or similar fonts) are used for Greek and BF_Hebrew for Hebrew, but BF_Hebrew must be behind Palatino because Ezra SIL SR (which can be used in place of BFHebrew) also has some Greek letters, which will interfere with Palatino. */
+    font-family: 'Palatino Linotype', Palatino, TexGyrePagella, 'TeX Gyre Pagella', 'URWPalladioL', BF_Hebrew, 'Book Antiqua', 'Times new Roman', Times, serif;
     font-size: 30px;
     /* The vertical alignment is required simply to match up with .lex-pronun. */
     vertical-align: super;
@@ -1003,7 +1004,7 @@ h2 {
        -moz-font-feature-settings: "dlig" 1, "ss01" 1, "liga", "clig", "hlig";
     /* This is just to be future comaptible since browsers do not currently use this. */
             font-feature-settings: "dlig" 1, "ss01" 1, "liga", "clig", "hlig";
-    font-family: 'BF_IM_FELL', 'Palatino Linotype', Palatino, TexGyrePagella, 'TeX Gyre Pagella', 'URWPalladioL', 'Book Antiqua', 'Times new Roman', Times, serif!important;
+    font-family: BF_IM_FELL, 'Palatino Linotype', Palatino, TexGyrePagella, 'TeX Gyre Pagella', 'URWPalladioL', 'Book Antiqua', 'Times new Roman', Times, serif!important;
 }
 
 .lang_en_em, .lang_en_em .d {
