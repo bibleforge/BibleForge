@@ -206,8 +206,8 @@ body {
 /**
  * Keep the placeholder text grayed out. */
  */
-/* NOTE: Webkit does not need this because the placeholder text does not change colors on focus. */
-/* NOTE: Webkit's placeholder property is "::-webkit-input-placeholder" (note the double colons as well as different text). */
+/* NOTE: WebKit does not need this because the placeholder text does not change colors on focus. */
+/* NOTE: WebKit's placeholder property is "::-webkit-input-placeholder" (note the double colons as well as different text). */
 /*       IE 10 might use ":-ms-input-placeholder". */
 .queryInput:-moz-placeholder {
     color: #A7A7A7;
@@ -991,14 +991,16 @@ h2 {
     /* Enable advanced OpenType typographic features. */
     /* dlig = Discretionary Ligatures (combine certain characters, e.g., "ct") */
     /* ss01 = Stylistic Set 1 (e.g., long s (ſ)) */
+    /* liga = Common ligatures (e.g., ſt) */
     /* clig = Common ligatures (e.g., "fi") */
-    /* hlig = Historical ligatures (e.g., ſl)*/
+    /* hlig = Historical ligatures (e.g., ſl) */
+    /*NOTE: WebKit needs liga, but Mozilla does not. */
     /*NOTE: It would be nice to use lnum (Lining Figures), but it does not appear to work. */
     /*BUG Automatic conversion of short s's to long s's is not always correct. */
     /*    For example, Colossians is sometimes spelled "Coloſsians" and other times "Coloſſians." */
     /*    One true error is 2 Samuel 19:16 where "wass" is rendered "waß"; whereas the KJV 1611 has "wass," surprisingly. */
-    -webkit-font-feature-settings: "dlig" 1, "ss01" 1, "clig", "hlig";
-       -moz-font-feature-settings: "dlig" 1, "ss01" 1, "clig", "hlig";
+    -webkit-font-feature-settings: "dlig" 1, "ss01" 1, "liga", "clig", "hlig";
+       -moz-font-feature-settings: "dlig" 1, "ss01" 1, "liga", "clig", "hlig";
     /* This is just to be future comaptible since browsers do not currently use this. */
             font-feature-settings: "dlig" 1, "ss01" 1, "liga", "clig", "hlig";
     font-family: 'IM Fell DW Pica', 'Palatino Linotype', Palatino, TexGyrePagella, 'TeX Gyre Pagella', 'URWPalladioL', 'Book Antiqua', 'Times new Roman', Times, serif!important;
@@ -1075,7 +1077,7 @@ h2 {
     background: #469;
 }
 
-/* Fonts for Mozilla/Opera/Webkit/IE9+ */
+/* Fonts for Mozilla/Opera/WebKit/IE9+ */
 /*NOTE: If no local() fonts are supplied, Mozilla will always download the web font if it detects an element with this CSS. */
 @font-face {
     font-family: 'TeX Gyre Pagella';
