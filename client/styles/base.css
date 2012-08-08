@@ -1148,15 +1148,11 @@ h2 {
 @font-face {
     font-family: 'IM Fell DW Pica';
     src: local('IM Fell DW Pica'),
-         local('IM FELL English PRO'),
          url('/fonts/imfepirm28p.woff') format('woff');
 }
 @font-face {
     font-family: 'IM Fell DW Pica';
-    src: local('IM Fell DW Pica Italic'),
-         local('IM FELL English PRO, Italic'),
-         local('IM Fell DW Pica'),
-         local('IM FELL English PRO'),
+    src: local('IM Fell DW Pica'),
          url('/fonts/imfepiit28p.woff') format('woff');
     font-style: italic;
 }
