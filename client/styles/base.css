@@ -1075,46 +1075,41 @@ h2 {
     background: #469;
 }
 
-/* Fonts for IE */
+/* Fonts for Mozilla/Opera/Webkit/IE9+ */
+/*NOTE: If no local() fonts are supplied, Mozilla will always download the web font if it detects an element with this CSS. */
 @font-face {
     font-family: 'TeX Gyre Pagella';
-    src: url('/fonts/texgyrepagella-regular.eot');
+    src: local('Palatino Linotype'),
+         local('Palatino'),
+         local('TeX Gyre Pagella'),
+         url('/fonts/texgyrepagella-regular.woff') format('woff');
 }
-
-/* Fonts for Mozilla/Opera/Webkit */
 @font-face {
     font-family: 'TeX Gyre Pagella';
-    src: local('TeX Gyre Pagella Regular'),
-         local('TeXGyrePagella-Regular'),
-         url('/fonts/texgyrepagella-regular.otf') format('opentype');
-}
-
-@font-face {
-    font-family: 'TeX Gyre Pagella';
-    src: local('TeX Gyre Pagella Italic'),
-         local('TeXGyrePagella-Italic'),
-         url('/fonts/texgyrepagella-italic.otf') format('opentype');
+    src: local('Palatino Linotype'),
+         local('Palatino'),
+         local('TeX Gyre Pagella'),
+         url('/fonts/texgyrepagella-italic.woff') format('woff');
     font-style: italic;
 }
-
 @font-face {
     font-family: 'TeX Gyre Pagella';
-    src: local('TeX Gyre Pagella Bold'),
-         local('TeXGyrePagella-Bold'),
-         url('/fonts/texgyrepagella-bold.otf') format('opentype');
+    src: local('Palatino Linotype'),
+         local('Palatino'),
+         local('TeX Gyre Pagella'),
+         url('/fonts/texgyrepagella-bold.woff') format('woff');
     font-weight: bold;
 }
-
 @font-face {
     font-family: 'TeX Gyre Pagella';
-    src: local('TeX Gyre Pagella Bold Italic'),
-         local('TeXGyrePagella-BoldItalic'),
-         url('/fonts/texgyrepagella-bolditalic.otf') format('opentype');
+    src: local('Palatino Linotype'),
+         local('Palatino'),
+         local('TeX Gyre Pagella'),
+         url('/fonts/texgyrepagella-bolditalic.woff') format('woff');
     font-weight: bold;
     font-style:  italic;
 }
 
-/*NOTE: If no local() fonts are supplied, Mozilla will always download the web font if it detects an element with this CSS. */
 @font-face {
     font-family: 'Bitstream Vera Sans Webfont';
     src: local('Verdana'),
