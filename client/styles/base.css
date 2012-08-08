@@ -1143,8 +1143,6 @@ h2 {
     font-family: 'BFHebrew';
     src: local('Ezra SIL SR'),
          url('/fonts/BFHebrew.woff') format('woff');
-    font-weight: normal;
-    font-style:  normal;
 }
 
 @font-face {
@@ -1152,11 +1150,7 @@ h2 {
     src: local('IM Fell DW Pica'),
          local('IM FELL English PRO'),
          url('/fonts/imfepirm28p.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-
 }
-
 @font-face {
     font-family: 'IM Fell DW Pica';
     src: local('IM Fell DW Pica Italic'),
@@ -1164,7 +1158,6 @@ h2 {
          local('IM Fell DW Pica'),
          local('IM FELL English PRO'),
          url('/fonts/imfepiit28p.woff') format('woff');
-    font-weight: normal;
     font-style: italic;
 }
 
