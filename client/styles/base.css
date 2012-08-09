@@ -1167,7 +1167,7 @@ h2 {
 /* Make the drop caps aligned with the second line of text. */
 .webkit .first_verse:first-letter, .webkit .first_paragraph:first-letter {
     margin-bottom: 0;
-    margin-top:    5px;
+    margin-top:    9px;
     padding: 1px;
 }
 
