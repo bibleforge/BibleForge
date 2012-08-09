@@ -1017,14 +1017,13 @@
              * @param  e (object) (optional) The event object optionally sent by the browser.
              * @note   Called when the user clicks on the wrench button.
              * @return NULL
-             * @bug    Opera does not send the onclick event from the label to the button.
-             * @bug    Opera miscalculates the position of the lang button (it does not take into account the fixed position of the topBar).
              */
             wrench_button.onclick = function (e)
             {
                 show_context_menu(function ()
                 {
                     var wrench_pos = BF.get_position(wrench_button);
+                    
                     return {x: wrench_pos.left, y: wrench_pos.top + wrench_button.offsetHeight};
                 }, [
                         {
@@ -2065,6 +2064,12 @@
                     show_context_menu(function ()
                     {
                         var langEl_pos = BF.get_position(langEl);
+                        
+                        /// Work around an Opera bug where it treats the language button as being absolutely positioned, not fixed.
+                        if (window.opera) {
+                            langEl_pos.top -= window.pageYOffset;
+                        }
+                        
                         return {x: langEl_pos.left, y: langEl_pos.top + langEl.offsetHeight};
                     }, lang_menu, BF.lang.id,
                         function open()
