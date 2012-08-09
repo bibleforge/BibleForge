@@ -271,7 +271,7 @@ body {
 .crown_loader {
     width:  20px;
     height: 20px;
-    
+    /* The Crown of Thorns icon */
     background: no-repeat url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAQAAAAngNWGAAABcUlEQVQoFQXB72uMARwA8M+ee1ArOsW80FxKNsSQ215IGGuje2E6L5Q/QuydvPFqr3aSvJkiSl6cInWXVqg1P+buhXdWU+KNZlzHSZlnX58PAABscx8AAACA1BsrwoLNAEACOKPHuDENbUV95nwypqwPAKAu80tLuG0Nrsp0fBNemABgqxWXUbFgRggNdTWUhL0AjPuNjcIJPNGNvDCAuisAjPqhIjxHai047YFwR9NFgNR74YMRZwEAO7wSlvWQYtZX7xTMSAFAl0VN68xr6GdSZr+ckAAAeOinYYSD7LJqJ0INAECXJYMIj3NazivYZ70R3f4CAA44qVfREGzSkanZAAA4LjEthEESLCv7I7Rdd0oOJDgis8dHl8wDnLOEAaEf3NCLcAGPXANgu1Ul3PXaTV+Ee6bNYbfMMABl34VnmkLTMUOeCouq/mkDKaiqOmRUR8FbLzGr5Ja8KYcBAIAtPguhpQgAAACQU3FUHgDgP8wYe6XaJYMMAAAAAElFTkSuQmCC);
     opacity: .2;
         
@@ -724,7 +724,7 @@ label {
 }
 
 .dropdown {
-    /* The drop down arrow. */
+    /* The drop down arrow (triangle) */
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAGCAQAAAC/O6xzAAAAXklEQVQI12Ng4GJIZXjP8B8JTmYQY2BgY9BmWMjwFS54lMEHqJSBCUgYMSyBShxnCGTgZ2BmYABJcAMlFjN8AaoMZBBgYGGAApAOPYYSBnegSrggRIINKMQB0c7AAAAMyxgJkjHDSAAAAABJRU5ErkJggg==);
     background-repeat: no-repeat;
     /* Move the arrow all the way to the right, and center it vertically. */
