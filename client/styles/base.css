@@ -238,7 +238,8 @@ body {
     top: 4px;
     height: 22px;
     
-    padding-right: 4px;
+    /* The extra right padding is for the drop down arrow (see .lang:after). */
+    padding-right: 14px;
     
     font-size: 13px;
     
@@ -258,14 +259,39 @@ body {
     color: rgba(0,0,0,.6);
 }
 
-.more-button:hover {
-    background: rgba(0,0,200,.08);
+/*BUG Opera does not properly render the arrow. It flickers when the mouse hovers over it. */
+.lang:after {
+    opacity: .15;
+    
+    width:  11px;
+    height: 6px;
+    
+    /* This is necessary (for some reason) to make the element visible. */
+    content: "";
+    
+    position: absolute;
+    top: 40%;
+    right: 1px;
+    
+    -moz-transition:    opacity .3s;
+    /*BUG This does not work at least in Chrome 22. */
+    -webkit-transition: opacity .3s;
+    -o-transition:      opacity .3s;
+}
+
+.lang:hover:after, .lang:active:after, .activeLang:after {
+    opacity: .4;
 }
 
 .lang:active, .activeLang, .more-button:active {
     background: rgba(0,0,255,.12);
     color: rgba(0,0,0,.6);
 }
+
+.more-button:hover {
+    background: rgba(0,0,200,.08);
+}
+
 
 
 .crown_loader {
@@ -723,10 +749,13 @@ label {
     padding-bottom: 3px;
 }
 
-.dropdown {
+.dropdown, .lang:after {
     /* The drop down arrow (triangle) */
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAGCAQAAAC/O6xzAAAAXklEQVQI12Ng4GJIZXjP8B8JTmYQY2BgY9BmWMjwFS54lMEHqJSBCUgYMSyBShxnCGTgZ2BmYABJcAMlFjN8AaoMZBBgYGGAApAOPYYSBnegSrggRIINKMQB0c7AAAAMyxgJkjHDSAAAAABJRU5ErkJggg==);
     background-repeat: no-repeat;
+}
+
+.dropdown {
     /* Move the arrow all the way to the right, and center it vertically. */
     background-position: 100%;
     /* Add some extra space to the right for the drop down arrow. */
