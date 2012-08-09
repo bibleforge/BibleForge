@@ -536,11 +536,11 @@
             function filter_terms_for_highlighter(search_terms)
             {
                 var arr_len,
-                    final_search_arr    = [],
+                    final_search_arr = [],
                     i,
                     initial_search_arr,
                     j,
-                    new_arr_len         = 0;
+                    new_arr_len = 0;
                 
                 /// Remove punctuation and break up the query string into individual parts to filter out duplicates.
                 /// E.g., 'in "and the earths "earths | in | earth. | "in the beginning God"' =>
@@ -956,7 +956,7 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                         case "freez":
                         case "froz[ei]":
                         case "frozen":
-                            ///NOTE: This word actually only occurs once (as "forzen").
+                            ///NOTE: This word actually only occurs once (as "frozen").
                             stemmed_word = "fr(?:ee|o)z[ei]n?";
                             break;
                         case "gav[ei]":
