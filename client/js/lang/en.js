@@ -78,7 +78,7 @@
         divisions: {
             ///NOTE: Currently, only the division between the Old and New Testaments is needed.
             /// Calculated via find_beginning_of_nt.js.
-            nt: 621740
+            nt: 621719
         },
         
         /// Book names
