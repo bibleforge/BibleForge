@@ -1106,10 +1106,7 @@
              * The closure for creating callouts.
              */
             create_callout = (function ()
-            {
-                var pointer_length   = 12, /// Essentially from the tip of the pointer to the callout
-                    pointer_distance = 28; /// The optimal distance from the left of the callout to the middle of the pointer.
-                
+            {                
                 /**
                  * Align the callout with the word it is pointing to.
                  *
@@ -1121,6 +1118,7 @@
                  * @param split_info (object)  An object containing information about where the user originally clicked and possibly which part of the word the user clicked.
                  *                             Object structure: {mouse_x: number, mouse_y: number, which_rect: number}
                  * @param preference (object)  An object containing information about where the user would prefer the callout to be (e.g., above or below the word).  Not currently used.
+                 * @note  For now at least, this function is placed outside of the callout object so that it does not have to be created each time a callout is made.
                  */
                 function align_callout(callout, pointer, point_to, pos, split_info, preference)
                 {
@@ -1134,8 +1132,10 @@
                         /// Get the rectangles that represent the object.
                         ///NOTE: If a word is wrapped (specifically a hyphenated word), there will be multiple rectangles.
                         point_to_rects = point_to.getClientRects(),
+                        pointer_length   = 12, /// Essentially from the tip of the pointer to the callout
+                        pointer_distance = 28, /// The optimal distance from the left of the callout to the middle of the pointer.
                         which_rect = 0;
-                    
+
                     /// Does the word wrap? (See Judges 1:11 "Kirjath-sepher").
                     if (point_to_rects.length > 1) {
                         /// Did it already figure out which part of the word was clicked on?
