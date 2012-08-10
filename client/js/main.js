@@ -1309,7 +1309,8 @@
                 properties: {
                     ///TODO: Determine if these should be read only or a get/set function.
                     line_height: 19,
-                    topBar_height: topLoader.offsetHeight
+                    topBar_height: topLoader.offsetHeight,
+                    viewport_height: doc_docEl.clientHeight
                 }
             };
             
@@ -1374,7 +1375,7 @@
                             if (scroll_pos > 0) {
                                 /// Calculate how many pixels (if any) need to be added in order to be able to scroll to the specified position.
                                 /// If the scroll position is near the bottom (e.g., Revelation 22:21 or Proverbs 28:28) there needs to be extra space on the bottom.
-                                pixels_needed = doc_docEl.clientHeight - (document.body.clientHeight - scroll_pos);
+                                pixels_needed = system.properties.viewport_height - (document.body.clientHeight - scroll_pos);
                                 if (pixels_needed > 0) {
                                     padding_el = document.createElement("div");
                                     
@@ -1386,7 +1387,7 @@
                                     padding_interval = window.setInterval(function ()
                                     {
                                         ///TODO: Document what scrollHeight, pageYOffset, and clientHeight actually measure.
-                                        if (doc_docEl.scrollHeight - (window.pageYOffset + doc_docEl.clientHeight) > pixels_needed + extra_padding) {
+                                        if (doc_docEl.scrollHeight - (window.pageYOffset + system.properties.viewport_height) > pixels_needed + extra_padding) {
                                             viewPort.removeChild(padding_el);
                                             window.clearInterval(padding_interval);
                                         }
@@ -1436,7 +1437,7 @@
                             ///NOTE: Mozilla also has scrollMaxY, which is slightly different from document.documentElement.scrollHeight (document.body.scrollHeight should work too).
                             
                             /// Is the object in the remove zone, and is its height less than the remaining space to scroll to prevent jumping?
-                            if (child_height + buffer_rem < window.pageYOffset && child_height < doc_docEl.scrollHeight - window.pageYOffset - doc_docEl.clientHeight) {
+                            if (child_height + buffer_rem < window.pageYOffset && child_height < doc_docEl.scrollHeight - window.pageYOffset - system.properties.viewport_height) {
                                 /// Store the content in the cache, and then add 1 to the outer counter variable so that we know how much cache we have.
                                 cached_verses_top[cached_count_top] = child.innerHTML;
                                 cached_count_top += 1;
@@ -1476,7 +1477,7 @@
                             }
                             
                             /// Is the element is in the remove zone?
-                            if (child.offsetTop > window.pageYOffset + doc_docEl.clientHeight + buffer_rem) {
+                            if (child.offsetTop > window.pageYOffset + system.properties.viewport_height + buffer_rem) {
                                 /// Store the content in the cache, and then add 1 to the outer counter variable so that we know how much cache we have.
                                 cached_verses_bottom[cached_count_bottom] = child.innerHTML;
                                 cached_count_bottom += 1;
@@ -1726,7 +1727,7 @@
                         }
                         
                         /// Is the user scrolling close to the bottom of the page?
-                        if (child.offsetTop + child.clientHeight < window.pageYOffset + doc_docEl.clientHeight + buffer_add) {
+                        if (child.offsetTop + child.clientHeight < window.pageYOffset + system.properties.viewport_height + buffer_add) {
                             /// Can the content be grabbed from cache?
                             if (cached_count_bottom > 0) {
                                 newEl = document.createElement("div");
@@ -1859,7 +1860,7 @@
                         /// If a verse was found, check for the bottom verse.
                         ///NOTE: Check a few pixels (14) above what is actually in view so that it finds the verse that is actually readable.
                         ///NOTE: These are combined into one if statement to prevent code duplication.
-                        if (verse1 === false || (verse2 = get_verse_at_position(window.pageYOffset + doc_docEl.clientHeight - 14, false, page)) === false) {
+                        if (verse1 === false || (verse2 = get_verse_at_position(window.pageYOffset + system.properties.viewport_height - 14, false, page)) === false) {
                             looking_up_verse_range = false;
                             
                             /// Since the entire verse range could not be found, remove stored verses.
@@ -2008,6 +2009,8 @@
                 {
                     add_content_if_needed(BF.consts.additional);
                     add_content_if_needed(BF.consts.previous);
+                    
+                    system.properties.viewport_height = doc_docEl.clientHeight;
                     
                     update_verse_range();
                 }, false);
