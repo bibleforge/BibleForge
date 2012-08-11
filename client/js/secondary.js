@@ -1172,7 +1172,7 @@
                     middle_x           = point_to_rects[which_rect].left + window.pageXOffset + (point_to_rects[which_rect].width / 2);
                     point_to_offsetTop = point_to_rects[which_rect].top  + window.pageYOffset;
                     
-                    ///NOTE: Currently, the user cannot drag the callouts, so there are no user preferences when it comes to indidual callouts.
+                    ///NOTE: Currently, the user cannot drag the callouts, so there are no user preferences when it comes to individual callouts.
                     if (!preference) {
                         /// Try to put the callout above the word.
                         if (callout_offsetHeight + pointer_length < point_to_offsetTop - context.system.properties.topBar_height - window.pageYOffset) {
@@ -1274,7 +1274,21 @@
                          */
                         align_callout: function ()
                         {
-                            align_callout(callout, pointer, point_to, pos, split_info);
+                            var left,
+                                top,
+                                width;
+                            
+                            if (this.showing_details) {
+                                top = (context.system.properties.topBar_height + 10);
+                                callout.style.top    = top + "px";
+                                callout.style.height = ((context.system.properties.viewport.height - top) * 0.85) + "px";
+                                width = (context.system.properties.viewport.width > 800 ? 800 : context.system.properties.viewport.width) * 0.85;
+                                left = (context.system.properties.viewport.width / 2) - (width / 2)
+                                callout.style.left   = left + "px";
+                                callout.style.width  = width + "px";
+                            } else {
+                                align_callout(callout, pointer, point_to, pos, split_info);
+                            }
                         },
                         /**
                          * Delete the callout and stop the query, if it has not already.
@@ -1349,9 +1363,22 @@
                                 this.align_callout();
                             }
                         },
+                        /**
+                         * Show details about the word
+                         *
+                         * @param data (object) An object containing the details of the word.
+                         */
+                        show_details: function (data)
+                        {
+                            pointer.style.display = "none";
+                            callout.style.position = "fixed";
+                            this.showing_details = true;
+                            this.align_callout();
+                        },
                         
                         /// Properties
-                        just_created: true
+                        just_created: true,
+                        showing_details: false
                     };
                     
                     callout_obj.align_callout();
@@ -1628,6 +1655,11 @@
                                 more_el.className = "more-button";
                                 more_el.textContent = "[+] " + BF.lang.more;
                                 child_el.appendChild(more_el);
+                                
+                                more_el.onclick = function ()
+                                {
+                                    callout.show_details(data);
+                                };
                                 
                                 parent_el.appendChild(child_el);
                                 html.appendChild(parent_el);
