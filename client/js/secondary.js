@@ -1274,17 +1274,18 @@
                          */
                         align_callout: function ()
                         {
-                            var left,
-                                top,
+                            var top,
                                 width;
                             
                             if (this.showing_details) {
+                                /// Place the callout just below the bottom of the top bar.
                                 top = (context.system.properties.topBar_height + 10);
+                                /// Since 800 pixels is the max width of the scroll, make sure to make the callout no bigger.
+                                width = (context.system.properties.viewport.width > 800 ? 800 : context.system.properties.viewport.width) * 0.85;
+                                
                                 callout.style.top    = top + "px";
                                 callout.style.height = ((context.system.properties.viewport.height - top) * 0.85) + "px";
-                                width = (context.system.properties.viewport.width > 800 ? 800 : context.system.properties.viewport.width) * 0.85;
-                                left = (context.system.properties.viewport.width / 2) - (width / 2)
-                                callout.style.left   = left + "px";
+                                callout.style.left   = (context.system.properties.viewport.width / 2) - (width / 2) + "px";
                                 callout.style.width  = width + "px";
                             } else {
                                 align_callout(callout, pointer, point_to, pos, split_info);
