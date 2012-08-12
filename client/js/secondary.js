@@ -117,8 +117,6 @@
                     ///NOTE: Times must have a unit in Mozilla (i.e., "0" will cause the transition to fail, but "0s" will work).
                     el.style[transition_name] = parse_transition(el.style[transition_name]).concat((data.css_prop || data.prop) + " " + (data.duration || "1s") + " " + (data.timing || "ease") + " " + (data.delay || "0s")).join(",");
                     
-                    console.log(el.style[transition_name])
-                    
                     el.addEventListener(transition_name_end, func);
                     
                     el.style[data.prop] = data.end_val;
@@ -1400,6 +1398,7 @@
                                 if (smooth) {
                                     BF.transition(callout, [
                                         ///NOTE: This is not the best place to calculate start_val. This only works when assuming it used to have position absolute.
+                                        ///NOTE: Could use transform: translate(x, y) to possibly optimize the transition.
                                         {prop: "top",    duration: "300ms", end_val: top    + "px", start_val: (callout.offsetTop  - window.pageYOffset) + "px"},
                                         {prop: "height", duration: "300ms", end_val: height + "px"},
                                         {prop: "left",   duration: "300ms", end_val: left   + "px", start_val: (callout.offsetLeft - window.pageXOffset) + "px"},
@@ -1503,6 +1502,30 @@
                             /// Currently, they are too slow.
                             //BF.transition(context.page, {prop: "opacity", duration: "300ms", end_val: "0.3"});
                             //BF.transition(context.page, {prop: "color", duration: "300ms", end_val: "#BBB"});
+                            //BF.transition(context.page, {prop: "WebkitFilter", css_prop: "-webkit-filter", duration: "300ms", end_val: "opacity(30%)", start_val: "opacity(99%)"});
+                            //BF.transition(context.page, {prop: "WebkitFilter", css_prop: "-webkit-filter", duration: "300ms", end_val: "brightness(70%)", start_val: "brightness(0%)"});
+                            //BF.transition(context.page, {prop: "WebkitFilter", css_prop: "-webkit-filter", duration: "300ms", end_val: "invert(70%)", start_val: "invert(0%)"});
+                            //BF.transition(context.page, {prop: "opacity", duration: "300ms", end_val: "0.3", timing: "steps(2, end)"});
+                            //BF.transition(context.page, {prop: "color", duration: "300ms", end_val: "#BBB", timing: "steps(2, end)", delay: "310ms"});
+                            /*
+                            window.setTimeout(function ()
+                            {
+                                //BF.transition(context.page, {prop: "opacity", duration: "100ms", end_val: "0.3", timing: "steps(2, end)"});
+                                BF.transition(context.page, {prop: "color", duration: "270ms", end_val: "#BBB", timing: "steps(2, end)"});
+                            }, 50);
+                            */
+                            /*
+                            window.setTimeout(function ()
+                            {
+                                //BF.transition(context.page, {prop: "opacity", duration: "100ms", end_val: "0.3", timing: "steps(2, end)"});
+                                BF.transition(context.page, {prop: "color", duration: "250ms", end_val: "#BBB", timing: "steps(3, end)"});
+                            }, 370);
+                            */
+                            window.setTimeout(function ()
+                            {
+                                BF.transition(context.page, {prop: "opacity", duration: "250ms", end_val: "0.3", timing: "steps(3, end)"});
+                                //BF.transition(context.page, {prop: "color", duration: "250ms", end_val: "#BBB", timing: "steps(3, end)"});
+                            }, 370);
                             callout.style.position = "fixed";
                             this.showing_details = true;
                             this.align_callout(true);
