@@ -114,7 +114,10 @@
                     };
                     
                     /// Set the style now, after a delay, so that it dose not try to transition to the start value.
-                    el.style[transition_name] = parse_transition(el.style[transition_name]).concat((data.css_prop || data.prop) + " " + (data.duration || "1s") + " " + (data.timing || "ease") + " " + (data.delay || "0")).join(",");
+                    ///NOTE: Times must have a unit in Mozilla (i.e., "0" will cause the transition to fail, but "0s" will work).
+                    el.style[transition_name] = parse_transition(el.style[transition_name]).concat((data.css_prop || data.prop) + " " + (data.duration || "1s") + " " + (data.timing || "ease") + " " + (data.delay || "0s")).join(",");
+                    
+                    console.log(el.style[transition_name])
                     
                     el.addEventListener(transition_name_end, func);
                     
