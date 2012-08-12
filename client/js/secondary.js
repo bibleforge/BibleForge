@@ -50,6 +50,112 @@
             show_context_menu,
             show_panel;
         
+        BF.transition = (function ()
+        {
+            function parse_transition(str)
+            {
+                if (typeof str === "undefined" || str.trim() === "") {
+                    return [];
+                }
+                
+                return str.split(/\s*,\s*/g);
+            }
+            
+            function preform_transition(el, data, on_finish)
+            {
+                var transition_name,
+                    transition_name_end;
+                
+                if (typeof data.start_val !== "undefined") {
+                    el.style[data.prop] = data.start_val;
+                }
+                
+                if (typeof el.style.transition === "string") {
+                    /// Mozilla 16+ and IE 10+ use the unprefixed version.
+                    transition_name     = "transition";
+                    ///NOTE: The suffix "end" is lower case in the offical form only.
+                    transition_name_end = "transitionend";
+                } else if (typeof el.style.mozTransition === "string") {
+                    /// Mozilla 4-15 use the prefixed version.
+                    transition_name     = "mozTransition";
+                    transition_name_end = "mozTransitionEnd";
+                } else if (typeof el.style.webkitTransition === "string") {
+                    transition_name     = "webkitTransition";
+                    transition_name_end = "webkitTransitionEnd";
+                }
+                ///NOTE: Checking for oTransition does not work.
+                
+                window.setTimeout(function ()
+                {
+                    var func = function (e)
+                    {
+                        var i,
+                            transition_arr;
+                        
+                        ///NOTE: If transition_name remains undefined, it will have no adverse effects. The style will just take place without a transition.
+                        
+                        if (e.propertyName === (data.css_prop|| data.prop)) {
+                            el.removeEventListener(transition_name_end, func);
+                            
+                            transition_arr = parse_transition(el.style[transition_name]);
+                            
+                            for (i = transition_arr.length - 1; i >= 0; i -= 1) {
+                                if (transition_arr[i].indexOf((data.css_prop || data.prop)) === 0) {
+                                    transition_arr.remove(i);
+                                }
+                            }
+                            
+                            el.style[transition_name] = transition_arr.join(",");
+                            
+                            if (typeof on_finish === "function") {
+                                on_finish(data);
+                            }
+                        }
+                    };
+                    
+                    /// Set the style now, after a delay, so that it dose not try to transition to the start value.
+                    el.style[transition_name] = parse_transition(el.style[transition_name]).concat((data.css_prop || data.prop) + " " + (data.duration || "1s") + " " + (data.timing || "ease") + " " + (data.delay || "0")).join(",");
+                    
+                    el.addEventListener(transition_name_end, func);
+                    
+                    el.style[data.prop] = data.end_val;
+                    
+                    /// If transitions are not working, call the ontransitionend function immediately.
+                    if (typeof transition_name === "undefined" && typeof on_finish === "function") {
+                        /// Make sure to send the correct propertyName.
+                        func({propertyName: (data.css_prop || data.prop)});
+                    }
+                }, 0);
+            };
+            
+            return function transition(el, data, on_finish)
+            {
+                var check_finished,
+                    data_count,
+                    transitions_completed = 0,
+                    i;
+                
+                if (Array.isArray(data)) {
+                    if (typeof on_finish === "function") {
+                        check_finished = function ()
+                        {
+                            transitions_completed += 1;
+                            if (transitions_completed === data_count) {
+                                on_finish(data);
+                            }
+                        };
+                    }
+                    
+                    data_count = data.length;
+                    for (i = 0; i < data_count; i += 1) {
+                        preform_transition(el, data[i], check_finished);
+                    }
+                } else {
+                    preform_transition(el, data, on_finish);
+                }
+            };
+        }());
+        
         /// TODO: Reevaluate combining show_context_menu() and show_panel() into a single function that takes the open and close functions as parameters and creates the respective functions.
         /**
          * Create the show_context_menu() function with closure.
