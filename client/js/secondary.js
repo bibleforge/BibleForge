@@ -1378,9 +1378,11 @@
                         /**
                          * Using outer variables, call the aligning function.
                          */
-                        align_callout: function ()
+                        align_callout: function (smooth)
                         {
-                            var top,
+                            var height,
+                                left,
+                                top,
                                 width;
                             
                             if (this.showing_details) {
@@ -1388,11 +1390,22 @@
                                 top = (context.system.properties.topBar_height + 10);
                                 /// Since 800 pixels is the max width of the scroll, make sure to make the callout no bigger.
                                 width = (context.system.properties.viewport.width > 800 ? 800 : context.system.properties.viewport.width) * 0.85;
+                                left = (context.system.properties.viewport.width / 2) - (width / 2);
+                                height = ((context.system.properties.viewport.height - top) * 0.85);
                                 
-                                callout.style.top    = top + "px";
-                                callout.style.height = ((context.system.properties.viewport.height - top) * 0.85) + "px";
-                                callout.style.left   = (context.system.properties.viewport.width / 2) - (width / 2) + "px";
-                                callout.style.width  = width + "px";
+                                if (smooth) {
+                                    BF.transition(callout, [
+                                        {prop: "top",    duration: "300ms", end_val: top + "px", start_val: (callout.offsetTop - window.pageYOffset) + "px"},
+                                        {prop: "height", duration: "300ms", end_val: height + "px"},
+                                        {prop: "left",   duration: "300ms", end_val: left + "px", start_val: (callout.offsetLeft - window.pageXOffset) + "px"},
+                                        {prop: "width",  duration: "300ms", end_val: width + "px"}
+                                    ]);
+                                } else {
+                                    callout.style.top = top + "px";
+                                    callout.style.height = height + "px";
+                                    callout.style.left = left + "px";
+                                    callout.style.width = width + "px";
+                                }
                             } else {
                                 align_callout(callout, pointer, point_to, pos, split_info);
                             }
@@ -1477,15 +1490,21 @@
                          */
                         show_details: function (data)
                         {
-                            pointer.style.display = "none";
+                            BF.transition(pointer, {prop: "opacity", duration: "300ms", start_val: "1", end_val: "0"}, function ()
+                            {
+                                pointer.style.display = "none";
+                            });
+                            /// Possible background transitions.
+                            /// Currently, they are too slow.
+                            //BF.transition(context.page, {prop: "opacity", duration: "300ms", end_val: "0.3"});
+                            //BF.transition(context.page, {prop: "color", duration: "300ms", end_val: "#BBB"});
                             callout.style.position = "fixed";
                             this.showing_details = true;
-                            this.align_callout();
+                            this.align_callout(true);
                         },
                         
                         /// Properties
                         just_created: true,
-                        showing_details: false
                     };
                     
                     callout_obj.align_callout();
