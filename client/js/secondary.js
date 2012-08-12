@@ -1387,24 +1387,26 @@
                             
                             if (this.showing_details) {
                                 /// Place the callout just below the bottom of the top bar.
-                                top = (context.system.properties.topBar_height + 10);
+                                top    = (context.system.properties.topBar_height + 10);
+                                height = ((context.system.properties.viewport.height - top) * 0.85);
                                 /// Since 800 pixels is the max width of the scroll, make sure to make the callout no bigger.
                                 width = (context.system.properties.viewport.width > 800 ? 800 : context.system.properties.viewport.width) * 0.85;
-                                left = (context.system.properties.viewport.width / 2) - (width / 2);
-                                height = ((context.system.properties.viewport.height - top) * 0.85);
+                                left  = (context.system.properties.viewport.width / 2) - (width / 2);
+                                
                                 
                                 if (smooth) {
                                     BF.transition(callout, [
-                                        {prop: "top",    duration: "300ms", end_val: top + "px", start_val: (callout.offsetTop - window.pageYOffset) + "px"},
+                                        ///NOTE: This is not the best place to calculate start_val. This only works when assuming it used to have position absolute.
+                                        {prop: "top",    duration: "300ms", end_val: top    + "px", start_val: (callout.offsetTop  - window.pageYOffset) + "px"},
                                         {prop: "height", duration: "300ms", end_val: height + "px"},
-                                        {prop: "left",   duration: "300ms", end_val: left + "px", start_val: (callout.offsetLeft - window.pageXOffset) + "px"},
-                                        {prop: "width",  duration: "300ms", end_val: width + "px"}
+                                        {prop: "left",   duration: "300ms", end_val: left   + "px", start_val: (callout.offsetLeft - window.pageXOffset) + "px"},
+                                        {prop: "width",  duration: "300ms", end_val: width  + "px"}
                                     ]);
                                 } else {
-                                    callout.style.top = top + "px";
+                                    callout.style.top    = top    + "px";
                                     callout.style.height = height + "px";
-                                    callout.style.left = left + "px";
-                                    callout.style.width = width + "px";
+                                    callout.style.left   = left   + "px";
+                                    callout.style.width  = width  + "px";
                                 }
                             } else {
                                 align_callout(callout, pointer, point_to, pos, split_info);
