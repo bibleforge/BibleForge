@@ -1386,6 +1386,7 @@
                                 top,
                                 width;
                             
+                            /// If the callout is showing details, it should be made to fill most of the screen.
                             if (this.showing_details) {
                                 /// Place the callout just below the bottom of the top bar.
                                 top    = (context.system.properties.topBar_height + 10);
@@ -1395,7 +1396,7 @@
                                 width = (context.system.properties.viewport.width > 800 ? 800 : context.system.properties.viewport.width) * 0.85;
                                 left  = (context.system.properties.viewport.width / 2) - (width / 2);
                                 
-                                
+                                /// This is used the first time to transition from small to large.
                                 if (smooth) {
                                     BF.transition(callout, [
                                         ///NOTE: This is not the best place to calculate start_val. This only works when assuming it used to have position absolute.
@@ -1407,12 +1408,14 @@
                                         {prop: "width",  duration: "300ms", end_val: width  + "px"}
                                     ], transition_callback);
                                 } else {
+                                    /// When the screen changes size after the callout is already large, just resize the callout as quickly as possible.
                                     callout.style.top    = top    + "px";
                                     callout.style.height = height + "px";
                                     callout.style.left   = left   + "px";
                                     callout.style.width  = width  + "px";
                                 }
                             } else {
+                                /// Align the callout to a specific word.
                                 align_callout(callout, pointer, point_to, pos, split_info);
                             }
                         },
@@ -1496,18 +1499,28 @@
                          */
                         show_details: function (data)
                         {
-                            BF.transition(pointer, {prop: "opacity", duration: "300ms", start_val: "1", end_val: "0"}, function ()
+                            /// Fade out the pointer.
+                            BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: "0"}, function ()
                             {
+                                /// Hide the pointer after transitioning.
                                 pointer.style.display = "none";
                             });
                             
+                            /// Small callouts are absolutely positioned.
                             if (callout.style.position !== "fixed") {
                                 callout.style.position = "fixed";
+                                /// Due to switching between absolute and fixed positioning, the callout's position must be recalculated
+                                /// in order for it to appear in the correct spot on the screen.
+                                /// Furthermore, this must be done before the callout's begins to transiting from small to large;
+                                /// otherwise, it would try to animate from the wrong position.
                                 callout.style.top  = (callout.offsetTop  - window.pageYOffset) + "px";
                                 callout.style.left = (callout.offsetLeft - window.pageXOffset) + "px";
                             }
                             
+                            ///NOTE: This is used by align_callout() to know how the callout should be aligned.
                             this.showing_details = true;
+                            
+                            /// Resize the callout to take up more of the screen.
                             this.align_callout(true, function transition_callback()
                             {
                                 /// Wait until after the callout moves to fade out the background.
