@@ -1506,7 +1506,8 @@
                                 pointer.style.display = "none";
                             });
                             
-                            /// Small callouts are absolutely positioned.
+                            ///NOTE: Small callouts are absolutely positioned, so if transitioning from small to larger (which should be the case),
+                            ///      it will need to be repositioned.
                             if (callout.style.position !== "fixed") {
                                 callout.style.position = "fixed";
                                 /// Due to switching between absolute and fixed positioning, the callout's position must be recalculated
