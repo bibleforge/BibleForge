@@ -1399,9 +1399,10 @@
                                     BF.transition(callout, [
                                         ///NOTE: This is not the best place to calculate start_val. This only works when assuming it used to have position absolute.
                                         ///NOTE: Could use transform: translate(x, y) to possibly optimize the transition.
-                                        {prop: "top",    duration: "300ms", end_val: top    + "px", start_val: (callout.offsetTop  - window.pageYOffset) + "px"},
+                                        ///      The easiest way to do that would be to set the top and left to 0 and translate from there.
+                                        {prop: "top",    duration: "300ms", end_val: top    + "px"},
                                         {prop: "height", duration: "300ms", end_val: height + "px"},
-                                        {prop: "left",   duration: "300ms", end_val: left   + "px", start_val: (callout.offsetLeft - window.pageXOffset) + "px"},
+                                        {prop: "left",   duration: "300ms", end_val: left   + "px"},
                                         {prop: "width",  duration: "300ms", end_val: width  + "px"}
                                     ]);
                                 } else {
@@ -1498,35 +1499,20 @@
                             {
                                 pointer.style.display = "none";
                             });
-                            /// Possible background transitions.
-                            /// Currently, they are too slow.
-                            //BF.transition(context.page, {prop: "opacity", duration: "300ms", end_val: "0.3"});
-                            //BF.transition(context.page, {prop: "color", duration: "300ms", end_val: "#BBB"});
-                            //BF.transition(context.page, {prop: "WebkitFilter", css_prop: "-webkit-filter", duration: "300ms", end_val: "opacity(30%)", start_val: "opacity(99%)"});
-                            //BF.transition(context.page, {prop: "WebkitFilter", css_prop: "-webkit-filter", duration: "300ms", end_val: "brightness(70%)", start_val: "brightness(0%)"});
-                            //BF.transition(context.page, {prop: "WebkitFilter", css_prop: "-webkit-filter", duration: "300ms", end_val: "invert(70%)", start_val: "invert(0%)"});
-                            //BF.transition(context.page, {prop: "opacity", duration: "300ms", end_val: "0.3", timing: "steps(2, end)"});
-                            //BF.transition(context.page, {prop: "color", duration: "300ms", end_val: "#BBB", timing: "steps(2, end)", delay: "310ms"});
-                            /*
-                            window.setTimeout(function ()
-                            {
-                                //BF.transition(context.page, {prop: "opacity", duration: "100ms", end_val: "0.3", timing: "steps(2, end)"});
-                                BF.transition(context.page, {prop: "color", duration: "270ms", end_val: "#BBB", timing: "steps(2, end)"});
-                            }, 50);
-                            */
-                            /*
-                            window.setTimeout(function ()
-                            {
-                                //BF.transition(context.page, {prop: "opacity", duration: "100ms", end_val: "0.3", timing: "steps(2, end)"});
-                                BF.transition(context.page, {prop: "color", duration: "250ms", end_val: "#BBB", timing: "steps(3, end)"});
-                            }, 370);
-                            */
+                            /// Wait until after the callout moves to fade out the background.
+                            /// If this fades while the callout moves, the animation is far too choppy (at least on low-end machines).
+                            ///NOTE: It might be ideal to run this code as a callback to the callout transition.
                             window.setTimeout(function ()
                             {
                                 BF.transition(context.page, {prop: "opacity", duration: "250ms", end_val: "0.3", timing: "steps(3, end)"});
-                                //BF.transition(context.page, {prop: "color", duration: "250ms", end_val: "#BBB", timing: "steps(3, end)"});
                             }, 370);
-                            callout.style.position = "fixed";
+                            
+                            if (callout.style.position !== "fixed") {
+                                callout.style.position = "fixed";
+                                callout.style.top  = (callout.offsetTop  - window.pageYOffset) + "px";
+                                callout.style.left = (callout.offsetLeft - window.pageXOffset) + "px";
+                            }
+                            
                             this.showing_details = true;
                             this.align_callout(true);
                         },
