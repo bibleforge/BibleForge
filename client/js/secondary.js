@@ -1379,7 +1379,7 @@
                         /**
                          * Using outer variables, call the aligning function.
                          */
-                        align_callout: function (smooth)
+                        align_callout: function (smooth, transition_callback)
                         {
                             var height,
                                 left,
@@ -1391,6 +1391,7 @@
                                 top    = (context.system.properties.topBar_height + 10);
                                 height = ((context.system.properties.viewport.height - top) * 0.85);
                                 /// Since 800 pixels is the max width of the scroll, make sure to make the callout no bigger.
+                                ///NOTE: It might be good to have this number set in a variable.
                                 width = (context.system.properties.viewport.width > 800 ? 800 : context.system.properties.viewport.width) * 0.85;
                                 left  = (context.system.properties.viewport.width / 2) - (width / 2);
                                 
@@ -1404,7 +1405,7 @@
                                         {prop: "height", duration: "300ms", end_val: height + "px"},
                                         {prop: "left",   duration: "300ms", end_val: left   + "px"},
                                         {prop: "width",  duration: "300ms", end_val: width  + "px"}
-                                    ]);
+                                    ], transition_callback);
                                 } else {
                                     callout.style.top    = top    + "px";
                                     callout.style.height = height + "px";
@@ -1499,13 +1500,6 @@
                             {
                                 pointer.style.display = "none";
                             });
-                            /// Wait until after the callout moves to fade out the background.
-                            /// If this fades while the callout moves, the animation is far too choppy (at least on low-end machines).
-                            ///NOTE: It might be ideal to run this code as a callback to the callout transition.
-                            window.setTimeout(function ()
-                            {
-                                BF.transition(context.page, {prop: "opacity", duration: "250ms", end_val: "0.3", timing: "steps(3, end)"});
-                            }, 370);
                             
                             if (callout.style.position !== "fixed") {
                                 callout.style.position = "fixed";
@@ -1514,7 +1508,12 @@
                             }
                             
                             this.showing_details = true;
-                            this.align_callout(true);
+                            this.align_callout(true, function transition_callback()
+                            {
+                                /// Wait until after the callout moves to fade out the background.
+                                /// If this fades while the callout moves, the animation is far too choppy (at least on low-end machines).
+                                BF.transition(context.page, {prop: "opacity", duration: "250ms", end_val: "0.3", timing: "steps(3, end)"});
+                            });
                         },
                         
                         /// Properties
