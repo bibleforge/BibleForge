@@ -663,6 +663,9 @@ label {
     max-height: 90%;
     width:  300px;
     height: 125px;
+    
+    /* Make sure the callout appears above the semi-transparent element used to fade out the text. */
+    z-index: 99;
 }
 
 .callout .inside {

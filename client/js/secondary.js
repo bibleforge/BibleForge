@@ -1499,6 +1499,21 @@
                          */
                         show_details: function (data)
                         {
+                            /// Create a blank element used to fade out the text.
+                            var el = document.createElement("div");
+                            el.style.position = "fixed";
+                            ///NOTE: Could set this to the position of the top bar if it updated when/if the top bar changes sizes (which it cannot do currently).
+                            ///      Could also make it's width the same dimensions as the scroll element.
+                            el.style.top    = 0;
+                            el.style.bottom = 0;
+                            el.style.left   = 0;
+                            el.style.right  = 0;
+                            /// Allow mouse clicks to go through it.
+                            el.style.pointerEvents = "none";
+                            document.body.insertBefore(el, null);
+                            /// There is a short delay to let the callout start moving.
+                            BF.transition(el, {prop: "backgroundColor", css_prop: "background-color", duration: "300ms", end_val: "rgba(255,255,255,.7)", start_val: "rgba(255,255,255,.01)", timing: "steps(3, end)", delay: "50ms"});
+                            
                             /// Fade out the pointer.
                             BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: "0"}, function ()
                             {
@@ -1522,12 +1537,7 @@
                             this.showing_details = true;
                             
                             /// Resize the callout to take up more of the screen.
-                            this.align_callout(true, function transition_callback()
-                            {
-                                /// Wait until after the callout moves to fade out the background.
-                                /// If this fades while the callout moves, the animation is far too choppy (at least on low-end machines).
-                                BF.transition(context.page, {prop: "opacity", duration: "250ms", end_val: "0.3", timing: "steps(3, end)"});
-                            });
+                            this.align_callout(true);
                         },
                         
                         /// Properties
