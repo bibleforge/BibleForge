@@ -91,7 +91,6 @@ body {
     /* Opera 11.10 */
     background:      -o-linear-gradient(rgba(255,255,255,.98), rgba(255,255,255,.93) 25%, rgba(255,255,255,.87));
     /* IE 10 */
-    background:     -ms-linear-gradient(rgba(255,255,255,.98), rgba(255,255,255,.93) 25%, rgba(255,255,255,.87));
     background:         linear-gradient(rgba(255,255,255,.98), rgba(255,255,255,.93) 25%, rgba(255,255,255,.87));
     width:  100%;
     height: 100%;
@@ -139,7 +138,6 @@ body {
     /* Opera 11.10 */
     background:      -o-radial-gradient(center center , ellipse farthest-corner, #FFFFE2 70%, rgba(255,255,226,0) 100%);
     /* IE 10 */
-    background:     -ms-radial-gradient(center center , ellipse farthest-corner, #FFFFE2 70%, rgba(255,255,226,0) 100%);
     background:         radial-gradient(center center , ellipse farthest-corner, #FFFFE2 70%, rgba(255,255,226,0) 100%);
 }
 
@@ -496,7 +494,6 @@ body {
     /* Opera 11.10 */
     background:      -o-linear-gradient(bottom, rgba(240,240,240,.98), rgba(255,255,255,.98) 60px);
     /* IE 10 */
-    background:     -ms-linear-gradient(bottom, rgba(240,240,240,.98), rgba(255,255,255,.98) 60px);
     background:         linear-gradient(bottom, rgba(240,240,240,.98), rgba(255,255,255,.98) 60px);
     border:     #A3A3A3 1px solid;
     /* Add enough padding to the top to push the contents past the top bar. */
@@ -651,7 +648,6 @@ label {
     /* Opera 11.10 */
     background:      -o-linear-gradient(bottom, rgba(240,240,240,.97), rgba(255,255,255,.97) 60px);
     /* IE 10 */
-    background:     -ms-linear-gradient(bottom, rgba(240,240,240,.97), rgba(255,255,255,.97) 60px);
     background:         linear-gradient(bottom, rgba(240,240,240,.97), rgba(255,255,255,.97) 60px);
     position: absolute;
     border: #ccc solid 1px;
@@ -695,7 +691,6 @@ label {
     /* Opera 11.10 */
     background:      -o-linear-gradient(left top, rgba(255,255,255,0) 41%, rgba(240,240,240,.97) 41%);
     /* IE 10 */
-    background:     -ms-linear-gradient(left top, rgba(255,255,255,0) 41%, rgba(240,240,240,.97) 41%);
     background:         linear-gradient(left top, rgba(255,255,255,0) 41%, rgba(240,240,240,.97) 41%);
     bottom: -11px;
 }
@@ -722,7 +717,6 @@ label {
     /* Opera 11.10 */
     background:      -o-linear-gradient(right bottom, rgba(255,255,255,0) 45%, rgba(255,255,255,.95) 45%);
     /* IE 10 */
-    background:     -ms-linear-gradient(right bottom, rgba(255,255,255,0) 45%, rgba(255,255,255,.95) 45%);
     background:         linear-gradient(right bottom, rgba(255,255,255,0) 45%, rgba(255,255,255,.95) 45%);
     top: -11px;
 }
