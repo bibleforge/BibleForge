@@ -127,7 +127,7 @@
                         func({propertyName: (data.css_prop || data.prop)});
                     }
                 }, 0);
-            };
+            }
             
             return function transition(el, data, on_finish)
             {
