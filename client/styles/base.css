@@ -1115,25 +1115,25 @@ h2 {
 }
 @font-face {
     font-family: 'TeX Gyre Pagella';
-    src: local('Palatino Linotype'),
-         local('Palatino'),
-         local('TeX Gyre Pagella'),
+    src: local('Palatino Linotype, Italc'),
+         local('Palatino, Italc'),
+         local('TeX Gyre Pagella, Italc'),
          url('/fonts/texgyrepagella-italic.woff') format('woff');
     font-style: italic;
 }
 @font-face {
     font-family: 'TeX Gyre Pagella';
-    src: local('Palatino Linotype'),
-         local('Palatino'),
-         local('TeX Gyre Pagella'),
+    src: local('Palatino Linotype, Bold'),
+         local('Palatino, Bold'),
+         local('TeX Gyre Pagella, Bold'),
          url('/fonts/texgyrepagella-bold.woff') format('woff');
     font-weight: bold;
 }
 @font-face {
     font-family: 'TeX Gyre Pagella';
-    src: local('Palatino Linotype'),
-         local('Palatino'),
-         local('TeX Gyre Pagella'),
+    src: local('Palatino Linotype, Bold Italic'),
+         local('Palatino, Bold Italic'),
+         local('TeX Gyre Pagella, Bold Italic'),
          url('/fonts/texgyrepagella-bolditalic.woff') format('woff');
     font-weight: bold;
     font-style:  italic;
@@ -1147,22 +1147,22 @@ h2 {
 }
 @font-face {
     font-family: 'Bitstream Vera Sans Webfont';
-    src: local('Verdana'),
-         local('Bitstream Vera Sans'),
+    src: local('Verdana, Italc'),
+         local('Bitstream Vera Sans, Italc'),
          url('/fonts/VeraIt.woff') format('woff');
     font-style: italic;
 }
 @font-face {
     font-family: 'Bitstream Vera Sans Webfont';
-    src: local('Verdana'),
-         local('Bitstream Vera Sans'),
+    src: local('Verdana, Bold'),
+         local('Bitstream Vera Sans, Bold'),
          url('/fonts/VeraBd.woff') format('woff');
     font-weight: bold;
 }
 @font-face {
     font-family: 'Bitstream Vera Sans Webfont';
-    src: local('Verdana'),
-         local('Bitstream Vera Sans'),
+    src: local('Verdana, Bold Italic'),
+         local('Bitstream Vera Sans, Bold Italic'),
          url('/fonts/VeraBI.woff') format('woff');
     font-weight: bold;
     font-style:  italic;
@@ -1181,7 +1181,7 @@ h2 {
 }
 @font-face {
     font-family: 'BF_IM_FELL';
-    src: local('IM Fell DW Pica'),
+    src: local('IM Fell DW Pica, Italic'),
          url('/fonts/imfepiit28p.woff') format('woff');
     font-style: italic;
 }
