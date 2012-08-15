@@ -1533,12 +1533,18 @@
                                 callout.style.left = (callout.offsetLeft - window.pageXOffset) + "px";
                             }
                             
+                            /// Tell the callout to transition to a larger font size for certain words.
+                            window.setTimeout(function ()
+                            {
+                                callout.classList.add("large_callout");
+                            }, 0);
+                            
                             /// While the callout is transitioning, switch the CSS to hide certain content and show others.
                             /// E.g., the "more" button is hidden when showing details.
                             window.setTimeout(function ()
                             {
-                                callout.classList.add("detailed");
-                            }, 250);
+                                callout.classList.add("detailed_callout");
+                            }, 200);
                             
                             ///NOTE: This is used by align_callout() to know how the callout should be aligned.
                             this.showing_details = true;

@@ -722,7 +722,7 @@ label {
 }
 
 /* Hide certain callout content when showing details (such as the "more" button). */
-.detailed .simple_only {
+.detailed_callout .simple_only {
     display: none;
 }
 
@@ -732,7 +732,7 @@ label {
 }
 
 /* Display detailed callout content when showing details. */
-.detailed .detailed_only {
+.detailed_callout .detailed_only {
     display: block;
 }
 
@@ -748,7 +748,22 @@ label {
     font-size: 30px;
     /* The vertical alignment is required simply to match up with .lex-pronun. */
     vertical-align: super;
+    
+    
+    /* Transition the font size when expanding the callout for more details. */
+    /* Transition for Mozilla (Firefox 4.0+) */
+    -moz-transition:    font-size 150ms ease 150ms;
+    /* Transition for WebKit */
+    -webkit-transition: font-size .3s linear;
+    /* Transition for Opera 10.5+ */
+    -o-transition:      font-size .3s linear;
 }
+
+/* Zoom the font in when transitioning to show more details. */
+.large_callout .lex-orig_word {
+    font-size: 55px;
+}
+
 
 .lex-pronun {
     font-family: 'Bitstream Vera Sans Webfont', 'DejaVu Sans', sans-serif;
@@ -759,7 +774,21 @@ label {
     vertical-align: super;
     /* This pushes down the context menu and drop down arrow slightly. */
     padding-bottom: 3px;
+    
+    /* Transition the font size when expanding the callout for more details. */
+    /* Transition for Mozilla (Firefox 4.0+) */
+    -moz-transition:    font-size 200ms ease 10ms;
+    /* Transition for WebKit */
+    -webkit-transition: font-size 200ms ease 10ms;
+    /* Transition for Opera 10.5+ */
+    -o-transition:      font-size 200ms ease 10ms;
 }
+
+/* Zoom the font in when transitioning to show more details. */
+.large_callout .lex-pronun {
+    font-size: 16px;
+}
+
 
 .dropdown, .lang:after {
     /* The drop down arrow (triangle) */
