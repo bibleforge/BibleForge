@@ -1515,7 +1515,7 @@
                             BF.transition(el, {prop: "backgroundColor", css_prop: "background-color", duration: "250ms", start_val: "rgba(255,255,255,.01)", end_val: "rgba(255,255,255,.7)", timing: "steps(3, start)", delay: "50ms"});
                             
                             /// Fade out the pointer.
-                            BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: "0"}, function ()
+                            BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: "0", timing: "steps(3, end)"}, function ()
                             {
                                 /// Hide the pointer after transitioning.
                                 pointer.style.display = "none";
