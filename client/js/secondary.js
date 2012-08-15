@@ -1512,7 +1512,7 @@
                             el.style.pointerEvents = "none";
                             document.body.insertBefore(el, null);
                             /// There is a short delay to let the callout start moving.
-                            BF.transition(el, {prop: "backgroundColor", css_prop: "background-color", duration: "300ms", end_val: "rgba(255,255,255,.7)", start_val: "rgba(255,255,255,.01)", timing: "steps(3, end)", delay: "50ms"});
+                            BF.transition(el, {prop: "backgroundColor", css_prop: "background-color", duration: "250ms", start_val: "rgba(255,255,255,.01)", end_val: "rgba(255,255,255,.7)", timing: "steps(3, start)", delay: "50ms"});
                             
                             /// Fade out the pointer.
                             BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: "0"}, function ()
