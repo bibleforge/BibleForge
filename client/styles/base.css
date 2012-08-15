@@ -721,6 +721,21 @@ label {
     top: -11px;
 }
 
+/* Hide certain callout content when showing details (such as the "more" button). */
+.detailed .simple_only {
+    display: none;
+}
+
+/* Hide detailed callout content by default. */
+.detailed_only {
+    display: none;
+}
+
+/* Display detailed callout content when showing details. */
+.detailed .detailed_only {
+    display: block;
+}
+
 
 .lex-title {
     /* Push the text over a little so that diacritics are not cut off. */
