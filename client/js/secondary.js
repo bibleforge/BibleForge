@@ -1533,6 +1533,13 @@
                                 callout.style.left = (callout.offsetLeft - window.pageXOffset) + "px";
                             }
                             
+                            /// While the callout is transitioning, switch the CSS to hide certain content and show others.
+                            /// E.g., the "more" button is hidden when showing details.
+                            window.setTimeout(function ()
+                            {
+                                callout.classList.add("detailed");
+                            }, 250);
+                            
                             ///NOTE: This is used by align_callout() to know how the callout should be aligned.
                             this.showing_details = true;
                             
