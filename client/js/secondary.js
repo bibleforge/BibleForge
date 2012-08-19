@@ -1411,8 +1411,11 @@
                         },
                         /**
                          * Using outer variables, call the aligning function.
+                         *
+                         * @param smooth              (boolean)  (optional) Whether or not to transition the alignment. This is used only when transitioning between small and large callout sizes.
+                         * @param transition_callback (function) (optional) A callback after the smooth transition completes.  Requires the smooth parameter to be TRUE.
                          */
-                        align_callout: function (smooth, transition_callback)
+                        align: function (smooth, transition_callback)
                         {
                             var height,
                                 left,
@@ -1563,18 +1566,18 @@
                                 callout.classList.add("detailed_callout");
                             }, 200);
                             
-                            ///NOTE: This is used by align_callout() to know how the callout should be aligned.
+                            ///NOTE: This is used by .align() to know how the callout should be aligned.
                             this.showing_details = true;
                             
                             /// Resize the callout to take up more of the screen.
-                            this.align_callout(true);
+                            this.align(true);
                         },
                         
                         /// Properties
                         just_created: true,
                     };
                     
-                    callout_obj.align_callout();
+                    callout_obj.align();
                     
                     /// Prevent the callout from being destroyed by the document.onclick function that will fire momentarily.
                     window.setTimeout(function ()
@@ -2028,7 +2031,7 @@
                     ///      To do this, we could expose the callout's pos variable (perhaps via a get() function).
                     for (i = callouts.length - 1; i >= 0; i -= 1) {
                         if (callouts[i].point_to_el_exists()) {
-                            callouts[i].align_callout();
+                            callouts[i].align();
                         }
                     }
                 }, false);
