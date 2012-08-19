@@ -1270,7 +1270,8 @@
                          */
                         trigger: function (name, e)
                         {
-                            var func_arr_len,
+                            var allow_default = true,
+                                func_arr_len,
                                 i,
                                 stop_propagation;
                             
@@ -1283,10 +1284,18 @@
                                     e = {};
                                 }
                                 
-                                ///NOTE: If an attached function runs this function, it will stop calling other functions.
+                                /// If an attached function runs this function, it will stop calling other functions.
                                 e.stopPropagation = function ()
                                 {
                                     stop_propagation = true;
+                                };
+                                
+                                /// If an attached function runs this function, it will tell the triggering function to stop execution;
+                                /// however, there is no garentee that this will be obeyed since not all events are cancelable.
+                                /// In fact, currently, only destoryCallout is cancelable.
+                                e.preventDefault = function ()
+                                {
+                                    allow_default = false;
                                 };
                                 
                                 for (i = 0; i < func_arr_len; i += 1) {
@@ -1303,6 +1312,8 @@
                                     }
                                 }
                             }
+                            
+                            return allow_default;
                         }
                     };
                 }()),
