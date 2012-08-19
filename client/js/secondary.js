@@ -1224,10 +1224,9 @@
                  *                             Object structure: {left: number, top: number}
                  * @param split_info (object)  An object containing information about where the user originally clicked and possibly which part of the word the user clicked.
                  *                             Object structure: {mouse_x: number, mouse_y: number, which_rect: number}
-                 * @param preference (object)  An object containing information about where the user would prefer the callout to be (e.g., above or below the word).  Not currently used.
                  * @note  For now at least, this function is placed outside of the callout object so that it does not have to be created each time a callout is made.
                  */
-                function align_callout(callout, pointer, point_to, pos, split_info, preference)
+                function align_callout(callout, pointer, point_to, pos, split_info)
                 {
                     ///TODO: Store the callout offset info in the object.
                     var callout_offsetHeight = callout.offsetHeight,
@@ -1279,31 +1278,28 @@
                     middle_x           = point_to_rects[which_rect].left + window.pageXOffset + (point_to_rects[which_rect].width / 2);
                     point_to_offsetTop = point_to_rects[which_rect].top  + window.pageYOffset;
                     
-                    ///NOTE: Currently, the user cannot drag the callouts, so there are no user preferences when it comes to individual callouts.
-                    if (!preference) {
-                        /// Try to put the callout above the word.
-                        if (callout_offsetHeight + pointer_length < point_to_offsetTop - context.system.properties.topBar_height - window.pageYOffset) {
-                            pos.top = point_to_offsetTop - callout_offsetHeight - pointer_length;
-                            pointer.className = "pointer-down";
-                        /// Else, put the callout below the word.
-                        } else {
-                            pos.top = point_to_offsetTop + point_to_rects[which_rect].height + pointer_length;
-                            pointer.className = "pointer-up";
-                        }
-                        callout.style.top = pos.top + "px";
-                        
-                        distance_from_right = window.innerWidth - middle_x;
-                        /// Can the pointer fit on the far left?
-                        if (distance_from_right > callout_offsetWidth) {
-                            pos.left = middle_x - pointer_distance;
-                        } else {
-                            /// If the pointer will move off of callout on the right side (distance_from_right < 50),
-                            /// the callout needs to be moved to the left a little further (pushing the callout off the page a little).
-                            pos.left = (window.innerWidth - callout_offsetWidth - pointer_distance + 8) + (distance_from_right < 50 ? 50 - (distance_from_right) : 0);
-                        }
-                        callout.style.left = pos.left + "px";
-                        pointer.style.left = (middle_x - pos.left - pointer_length) + "px";
+                    /// Try to put the callout above the word.
+                    if (callout_offsetHeight + pointer_length < point_to_offsetTop - context.system.properties.topBar_height - window.pageYOffset) {
+                        pos.top = point_to_offsetTop - callout_offsetHeight - pointer_length;
+                        pointer.className = "pointer-down";
+                    /// Else, put the callout below the word.
+                    } else {
+                        pos.top = point_to_offsetTop + point_to_rects[which_rect].height + pointer_length;
+                        pointer.className = "pointer-up";
                     }
+                    callout.style.top = pos.top + "px";
+                    
+                    distance_from_right = window.innerWidth - middle_x;
+                    /// Can the pointer fit on the far left?
+                    if (distance_from_right > callout_offsetWidth) {
+                        pos.left = middle_x - pointer_distance;
+                    } else {
+                        /// If the pointer will move off of callout on the right side (distance_from_right < 50),
+                        /// the callout needs to be moved to the left a little further (pushing the callout off the page a little).
+                        pos.left = (window.innerWidth - callout_offsetWidth - pointer_distance + 8) + (distance_from_right < 50 ? 50 - (distance_from_right) : 0);
+                    }
+                    callout.style.left = pos.left + "px";
+                    pointer.style.left = (middle_x - pos.left - pointer_length) + "px";
                 }
                 
                 /**
