@@ -1377,6 +1377,39 @@
                     callout_obj = {
                         /// Methods
                         /**
+                         * Adjust the size of a callout as needed.
+                         *
+                         * Small callouts should not scroll, so they may need to be resized to fit the content.
+                         *
+                         * @note Called after replacing the HTML and changing the pronunciation style.
+                         */
+                        adjust_size: function ()
+                        {
+                            var diff;
+                            
+                            /// Is the callout small?  Only small callouts should be resized.
+                            if (!this.showing_details) {
+                                /// Determine if the callout needs to be resized to fit all of the content.
+                                /// E.g., go to Jeremiah 33 and click on "he" in the first verse.
+                                diff = inside.scrollHeight - inside.offsetHeight;
+                                if (diff > 0) {
+                                    /// If the pointer is pointing down, the top position must also be changed.
+                                    if (pointer.className === "pointer-down") {
+                                        this.move(-diff);
+                                    }
+                                    
+                                    /// Because of the padding, .clientHeight and .clientOffsetHeight do not return the right value,
+                                    /// so to calculate the new height correctly, we calculate the visible area of the "inner" element,
+                                    /// which is the same as the height of the callout minus the padding.
+                                    callout.style.height = (inside.getClientRects()[0].height + diff) + "px";
+                                    
+                                    /// Because when the size changes, it could go off the top of the page, make sure to re-align it.
+                                    /// E.g., go to Jeremiah 33 and click on "Chaldeans."
+                                    this.align();
+                                }
+                            }
+                        },
+                        /**
                          * Using outer variables, call the aligning function.
                          */
                         align_callout: function (smooth, transition_callback)
@@ -1461,8 +1494,6 @@
                          */
                         replace_HTML: function (html)
                         {
-                            var diff;
-                            
                             /// Prevent the loading graphic from loading if it has not loaded yet.
                             window.clearTimeout(loading_timer);
                             /// Write the HTML, either via a string or DOM element.
@@ -1473,24 +1504,8 @@
                                 inside.appendChild(html);
                             }
                             
-                            /// Determine if the callout needs to be resized to fit all of the content.
-                            /// E.g., go to Jeremiah 33 and click on "he" in the first verse.
-                            diff = inside.scrollHeight - inside.offsetHeight;
-                            if (diff > 0) {
-                                /// If the pointer is pointing down, the top position must also be changed.
-                                if (pointer.className === "pointer-down") {
-                                    this.move(-diff);
-                                }
-                                
-                                /// Because of the padding, .clientHeight and .clientOffsetHeight do not return the right value,
-                                /// so to calculate the new height correctly, we calculate the visible area of the "inner" element,
-                                /// which is the same as the height of the callout minus the padding.
-                                callout.style.height = (inside.getClientRects()[0].height + diff) + "px";
-                                
-                                /// Because when the size changes, it could go off the top of the page, make sure to re-align it.
-                                /// E.g., go to Jeremiah 33 and click on "Chaldeans."
-                                this.align_callout();
-                            }
+                            /// Make sure that the content fits without scrolling.
+                            this.adjust_size();
                         },
                         /**
                          * Show details about the word
