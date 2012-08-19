@@ -1936,11 +1936,11 @@
                         return;
                     }
                     
-                    /// Remove unpinned callous and non-new callouts.
+                    /// Remove callous and non-new callouts.
                     ///NOTE: When a callout is created, this function (i.e., the onclick event) will fire, thus potentially removing the callout immediately;
                     ///      therefore, use just_created to see if the callout was recently created and should be left alone.
                     for (i = callouts.length - 1; i >= 0; i -= 1) {
-                        if (!callouts[i].just_created && !callouts[i].pinned) {
+                        if (!callouts[i].just_created) {
                             callouts[i].destroy();
                             callouts.remove(i);
                         }
@@ -1956,7 +1956,6 @@
                  * @param e (event object) The keyboard event object.
                  * @note  This does not fire when closing menus in Chromium (which is the desired effect), but it does in Firefox (but Firefox seems to work probably when this function is attached once per callout.
                  * @todo  This closes all callouts when pressing escape, but it probably should just close the one that the user is interacting with.
-                 * @note  It might be best to close a pinned callout with escape if the user is interacting with it.
                  */
                 document.addEventListener("keydown", function (e)
                 {
