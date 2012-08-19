@@ -1514,6 +1514,8 @@
                             /// There is a short delay to let the callout start moving.
                             BF.transition(el, {prop: "backgroundColor", css_prop: "background-color", duration: "250ms", start_val: "rgba(255,255,255,.01)", end_val: "rgba(255,255,255,.7)", timing: "steps(3, start)", delay: "50ms"});
                             
+                            /// Make sure the callout appears above the semi-transparent element used to fade out the text.
+                            callout.style.zIndex = 99;
                             /// Fade out the pointer.
                             BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: "0", timing: "steps(3, end)"}, function ()
                             {
