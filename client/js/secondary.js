@@ -1819,6 +1819,12 @@
                                 {
                                     /// Store the user's pronunciation preference in the settings.
                                     context.settings.user.pronun_type = val;
+                                    
+                                    /// Sometimes the pronunciation box breaks the line and other times it does not, so the size of the content may change;
+                                    /// therefore we need to make sure that the content fits without scrolling.
+                                    /// For example, go to Matthew 1:11 and click the word "Babylon" (first make sure that Biblical IPA pronunciation selected beforehand),
+                                    /// and then change the pronunciation to Biblical, and observe how the pronunciation text wraps.
+                                    callout.adjust_size();
                                 });
                                 /// Since the drop down box already has a style ("dropdown") concatenate "lex-pronun" to the end.
                                 BF.toggleCSS(child_el, "lex-pronun", 1);
