@@ -1311,14 +1311,31 @@
                  *                              Object structure: {mouse_x: number, mouse_y: number, which_rect: number}
                  * @return A object that manages the callout.
                  */
-                return function create_callout(point_to, ajax, split_info) {
+                return function create_callout(point_to, ajax, split_info)
+                {
                     var callout = document.createElement("div"),
                         inside  = document.createElement("div"),
                         pointer = document.createElement("div"),
+                        transparent_el = document.createElement("div"),
                         
                         callout_obj,
                         loading_timer,
                         pos = {};
+                    
+                    /// Create a blank element used to fade out the text.
+                    transparent_el.style.display = "none";
+                    transparent_el.style.backgroundColor = "rgba(255,255,255,0)";
+                    transparent_el.style.position = "fixed";
+                    ///NOTE: Could set this to the position of the top bar if it updated when/if the top bar changes sizes (which it cannot do currently).
+                    ///      Could also make it's width the same dimensions as the scroll element.
+                    transparent_el.style.top    = 0;
+                    transparent_el.style.bottom = 0;
+                    transparent_el.style.left   = 0;
+                    transparent_el.style.right  = 0;
+                    /// Allow mouse clicks to go through it.
+                    transparent_el.style.pointerEvents = "none";
+                    transparent_el.style.zIndex = 10;
+                    document.body.insertBefore(transparent_el, null);
                     
                     callout.className = "callout";
                     inside.className  = "inside";
@@ -1360,7 +1377,7 @@
                         }, 0);
                     }, 500);
                     
-                    /// Because non-pinned callouts are closed when the user clicks off,
+                    /// Because callouts are closed when the user clicks off,
                     /// we notify the document.onclick() function that a callout was clicked on so it will ignore the click.
                     callout.addEventListener("click", function ()
                     {
@@ -1513,20 +1530,13 @@
                          */
                         show_details: function (data)
                         {
-                            /// Create a blank element used to fade out the text.
-                            var el = document.createElement("div");
-                            el.style.position = "fixed";
-                            ///NOTE: Could set this to the position of the top bar if it updated when/if the top bar changes sizes (which it cannot do currently).
-                            ///      Could also make it's width the same dimensions as the scroll element.
-                            el.style.top    = 0;
-                            el.style.bottom = 0;
-                            el.style.left   = 0;
-                            el.style.right  = 0;
-                            /// Allow mouse clicks to go through it.
-                            el.style.pointerEvents = "none";
-                            document.body.insertBefore(el, null);
+                            var that = this;
+                            
+                            /// Make sure that the element is visible.
+                            transparent_el.style.display = "block";
+                            /// Fade in the transparent element.
                             /// There is a short delay to let the callout start moving.
-                            BF.transition(el, {prop: "backgroundColor", css_prop: "background-color", duration: "250ms", start_val: "rgba(255,255,255,.01)", end_val: "rgba(255,255,255,.7)", timing: "steps(3, start)", delay: "50ms"});
+                            BF.transition(transparent_el, {prop: "backgroundColor", css_prop: "background-color", duration: "250ms", end_val: "rgba(255,255,255,.7)", timing: "steps(3, start)", delay: "50ms"});
                             
                             /// Make sure the callout appears above the semi-transparent element used to fade out the text.
                             callout.style.zIndex = 99;
@@ -1567,6 +1577,73 @@
                             
                             /// Resize the callout to take up more of the screen.
                             this.align(true);
+                            
+                            
+                            context.system.event.attach("cancleCallouts", function (e)
+                            {
+                                that.hide_details(e);
+                                
+                                e.preventDefault();
+                            }, true);
+                        },
+                        hide_details: function (e)
+                        {
+                            var that = this;
+                            
+                            BF.transition(transparent_el, {prop: "backgroundColor", css_prop: "background-color", duration: "250ms", end_val: "rgba(255,255,255,.0)", timing: "steps(3, start)", delay: "50ms"}, function ()
+                            {
+                                transparent_el.style.display = "none";
+                                
+                                /// Make the callout on the same level as other callouts.
+                                /// Since we do not want the callout to de displayed below the transparent element,
+                                /// we must change the z-index here, after has completely faded away.
+                                callout.style.zIndex = 0;
+                            });
+                            
+                            ///NOTE: Small callouts are absolutely positioned, so if transitioning from small to larger (which should be the case),
+                            ///      it will need to be repositioned.
+                            if (callout.style.position !== "absolute") {
+                                callout.style.position = "absolute";
+                                /// Due to switching between absolute and fixed positioning, the callout's position must be recalculated
+                                /// in order for it to appear in the correct spot on the screen.
+                                /// Furthermore, this must be done before the callout's begins to transiting from small to large;
+                                /// otherwise, it would try to animate from the wrong position.
+                                callout.style.top  = (callout.offsetTop  + window.pageYOffset) + "px";
+                                callout.style.left = (callout.offsetLeft + window.pageXOffset) + "px";
+                            }
+                            
+                            this.showing_details = false;
+                            
+                            /// Resize the callout to take up more of the screen.
+                            //this.align(true);
+                            
+                            /// Fade in the pointer.
+                            pointer.style.display = "block";
+                            BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: "1", timing: "steps(3, end)"});
+                            ///TODO: Make pos.top change when content added (but not actual pos)
+                            BF.transition(callout, [
+                                ///NOTE: Could use transform: translate(x, y) to possibly optimize the transition.
+                                {prop: "top",    duration: "300ms", end_val: pos.top    + "px"},
+                                {prop: "height", duration: "300ms", end_val: 125 + "px"},
+                                {prop: "left",   duration: "300ms", end_val: pos.left   + "px"},
+                                {prop: "width",  duration: "300ms", end_val: 300  + "px"}
+                            ], function ()
+                            {
+                                that.adjust_size();
+                            });
+                            
+                            /// While the callout is transitioning, switch the CSS to hide certain content and show others.
+                            /// E.g., the "more" button is hidden when showing details.
+                            window.setTimeout(function ()
+                            {
+                                callout.classList.remove("detailed_callout");
+                            }, 200);
+                            
+                            /// Tell the callout to transition to a small font size for certain words.
+                            window.setTimeout(function ()
+                            {
+                                callout.classList.remove("large_callout");
+                            }, 0);
                         },
                         
                         /// Properties
@@ -1936,13 +2013,16 @@
                         return;
                     }
                     
-                    /// Remove callous and non-new callouts.
-                    ///NOTE: When a callout is created, this function (i.e., the onclick event) will fire, thus potentially removing the callout immediately;
-                    ///      therefore, use just_created to see if the callout was recently created and should be left alone.
-                    for (i = callouts.length - 1; i >= 0; i -= 1) {
-                        if (!callouts[i].just_created) {
-                            callouts[i].destroy();
-                            callouts.remove(i);
+                    
+                    if (context.system.event.trigger("cancleCallouts")) {
+                        /// Remove callous and non-new callouts.
+                        ///NOTE: When a callout is created, this function (i.e., the onclick event) will fire, thus potentially removing the callout immediately;
+                        ///      therefore, use just_created to see if the callout was recently created and should be left alone.
+                        for (i = callouts.length - 1; i >= 0; i -= 1) {
+                            if (!callouts[i].just_created) {
+                                callouts[i].destroy();
+                                callouts.remove(i);
+                            }
                         }
                     }
                 };
@@ -1977,14 +2057,17 @@
                     var i;
                     
                     for (i = callouts.length - 1; i >= 0; i -= 1) {
-                        /// When contentRemovedAbove is triggered, the element that the callout is pointing to may have been removed.
-                        /// If so, remove the callout.
-                        ///NOTE: contentAddedAbove has a positive e.amount; whereas, contentRemovedAbove has a negative e.amount.
-                        if (e.amount >= 0 || callouts[i].point_to_el_exists()) {
-                            callouts[i].move(e.amount);
-                        } else {
-                            callouts[i].destroy();
-                            callouts.remove(i);
+                        /// Is the callout small?  Only small callouts need to be moved since detailed callouts have fixed position.
+                        if (!callouts[i].showing_details) {
+                            /// When contentRemovedAbove is triggered, the element that the callout is pointing to may have been removed.
+                            /// If so, remove the callout.
+                            ///NOTE: contentAddedAbove has a positive e.amount; whereas, contentRemovedAbove has a negative e.amount.
+                            if (e.amount >= 0 || callouts[i].point_to_el_exists()) {
+                                callouts[i].move(e.amount);
+                            } else {
+                                callouts[i].destroy();
+                                callouts.remove(i);
+                            }
                         }
                     }
                 });
@@ -2014,7 +2097,9 @@
                     var i;
                     
                     for (i = callouts.length - 1; i >= 0; i -= 1) {
-                        if (!callouts[i].point_to_el_exists()) {
+                        /// Since detailed callouts do not point to an element anymore, ignore them.
+                        /// Other callouts might need to be removed.
+                        if (!callouts[i].showing_details && !callouts[i].point_to_el_exists()) {
                             callouts[i].destroy();
                             callouts.remove(i);
                         }
@@ -2031,9 +2116,7 @@
                     ///TODO: If there are a lot of callouts that are not visible, it might be a good idea to make them invisible and not re-align them.
                     ///      To do this, we could expose the callout's pos variable (perhaps via a get() function).
                     for (i = callouts.length - 1; i >= 0; i -= 1) {
-                        if (callouts[i].point_to_el_exists()) {
-                            callouts[i].align();
-                        }
+                        callouts[i].align();
                     }
                 }, false);
             }());
