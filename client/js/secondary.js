@@ -1437,15 +1437,15 @@
                                         ///NOTE: Could use transform: translate(x, y) to possibly optimize the transition.
                                         ///      The easiest way to do that would be to set the top and left to 0 and translate from there.
                                         {prop: "top",    duration: "300ms", end_val: top    + "px"},
-                                        {prop: "height", duration: "300ms", end_val: height + "px"},
                                         {prop: "left",   duration: "300ms", end_val: left   + "px"},
+                                        {prop: "height", duration: "300ms", end_val: height + "px"},
                                         {prop: "width",  duration: "300ms", end_val: width  + "px"}
                                     ], transition_callback);
                                 } else {
                                     /// When the screen changes size after the callout is already large, just resize the callout as quickly as possible.
                                     callout.style.top    = top    + "px";
-                                    callout.style.height = height + "px";
                                     callout.style.left   = left   + "px";
+                                    callout.style.height = height + "px";
                                     callout.style.width  = width  + "px";
                                 }
                             } else {
@@ -1520,6 +1520,14 @@
                         show_details: function (data)
                         {
                             var that = this;
+                            
+                            /// Get the current width and height of the element so that when it can return to its original size later.
+                            ///NOTE: The offset and client widths and heights are incorrect, so we must use the CSS style (which includes units).
+                            pos.css_height = window.getComputedStyle(callout).height;
+                            pos.css_width  = window.getComputedStyle(callout).width;
+                            
+                            pos.h = callout.style.height;
+                            pos.w = callout.style.width;
                             
                             /// Create a blank element used to fade out the text.
                             transparent_el = document.createElement("div");
@@ -1615,21 +1623,19 @@
                                 callout.style.left = (callout.offsetLeft + window.pageXOffset) + "px";
                             }
                             
-                            this.showing_details = false;
-                            
-                            /// Resize the callout to take up more of the screen.
-                            //this.align(true);
-                            
                             /// Fade in the pointer.
                             pointer.style.display = "block";
                             BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: "1", timing: "steps(3, end)"});
-                            ///TODO: Make pos.top change when content added (but not actual pos)
+                            /// Resize the callout to take up more of the screen.
                             BF.transition(callout, [
                                 ///NOTE: Could use transform: translate(x, y) to possibly optimize the transition.
+                                ///NOTE: It tries to use the previous height and width of the callout before it enlarged,
+                                ///      and if that does not work, it uses the defaults.
+                                ///      E.g., 
                                 {prop: "top",    duration: "300ms", end_val: pos.top    + "px"},
-                                {prop: "height", duration: "300ms", end_val: 125 + "px"},
                                 {prop: "left",   duration: "300ms", end_val: pos.left   + "px"},
-                                {prop: "width",  duration: "300ms", end_val: 300  + "px"}
+                                {prop: "height", duration: "300ms", end_val: (pos.css_height || "125px")},
+                                {prop: "width",  duration: "300ms", end_val: (pos.css_width  || "300px")}
                             ], function ()
                             {
                                 that.adjust_size();
@@ -1647,6 +1653,8 @@
                             {
                                 callout.classList.remove("large_callout");
                             }, 0);
+                            
+                            this.showing_details = false;
                         },
                         
                         /// Properties
