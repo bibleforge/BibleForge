@@ -1486,7 +1486,11 @@
                         move: function (y)
                         {
                             pos.top += y;
-                            callout.style.top = pos.top + "px";
+                            /// Is the callout small?  Only small callouts need to be moved since detailed callouts have fixed position,
+                            /// but when the large callouts transition to small ones, they need to know the correct position to return to.
+                            if (!this.showing_details) {
+                                callout.style.top = pos.top + "px";
+                            }
                         },
                         /**
                          * Determine if the element that the callout is pointing to still exists.
@@ -2057,17 +2061,16 @@
                     var i;
                     
                     for (i = callouts.length - 1; i >= 0; i -= 1) {
-                        /// Is the callout small?  Only small callouts need to be moved since detailed callouts have fixed position.
-                        if (!callouts[i].showing_details) {
-                            /// When contentRemovedAbove is triggered, the element that the callout is pointing to may have been removed.
-                            /// If so, remove the callout.
-                            ///NOTE: contentAddedAbove has a positive e.amount; whereas, contentRemovedAbove has a negative e.amount.
-                            if (e.amount >= 0 || callouts[i].point_to_el_exists()) {
-                                callouts[i].move(e.amount);
-                            } else {
-                                callouts[i].destroy();
-                                callouts.remove(i);
-                            }
+                        /// When contentRemovedAbove is triggered, the element that the callout is pointing to may have been removed.
+                        /// If so, remove the callout.
+                        ///NOTE: contentAddedAbove has a positive e.amount; whereas, contentRemovedAbove has a negative e.amount.
+                        ///NOTE: Only small callouts actually need to be moved because large callouts (showing details) have fixed positioning;
+                        ///      however, when they change back to small callouts, they need to know the correct position.
+                        if (e.amount >= 0 || callouts[i].point_to_el_exists()) {
+                            callouts[i].move(e.amount);
+                        } else {
+                            callouts[i].destroy();
+                            callouts.remove(i);
                         }
                     }
                 });
