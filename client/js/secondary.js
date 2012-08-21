@@ -1316,26 +1316,11 @@
                     var callout = document.createElement("div"),
                         inside  = document.createElement("div"),
                         pointer = document.createElement("div"),
-                        transparent_el = document.createElement("div"),
+                        transparent_el,
                         
                         callout_obj,
                         loading_timer,
                         pos = {};
-                    
-                    /// Create a blank element used to fade out the text.
-                    transparent_el.style.display = "none";
-                    transparent_el.style.backgroundColor = "rgba(255,255,255,0)";
-                    transparent_el.style.position = "fixed";
-                    ///NOTE: Could set this to the position of the top bar if it updated when/if the top bar changes sizes (which it cannot do currently).
-                    ///      Could also make it's width the same dimensions as the scroll element.
-                    transparent_el.style.top    = 0;
-                    transparent_el.style.bottom = 0;
-                    transparent_el.style.left   = 0;
-                    transparent_el.style.right  = 0;
-                    /// Allow mouse clicks to go through it.
-                    transparent_el.style.pointerEvents = "none";
-                    transparent_el.style.zIndex = 10;
-                    document.body.insertBefore(transparent_el, null);
                     
                     callout.className = "callout";
                     inside.className  = "inside";
@@ -1536,8 +1521,20 @@
                         {
                             var that = this;
                             
-                            /// Make sure that the element is visible.
-                            transparent_el.style.display = "block";
+                            /// Create a blank element used to fade out the text.
+                            transparent_el = document.createElement("div");
+                            transparent_el.style.backgroundColor = "rgba(255,255,255,0)";
+                            transparent_el.style.position = "fixed";
+                            ///NOTE: Could set this to the position of the top bar if it updated when/if the top bar changes sizes (which it cannot do currently).
+                            ///      Could also make it's width the same dimensions as the scroll element.
+                            transparent_el.style.top    = 0;
+                            transparent_el.style.bottom = 0;
+                            transparent_el.style.left   = 0;
+                            transparent_el.style.right  = 0;
+                            /// Allow mouse clicks to go through it.
+                            transparent_el.style.pointerEvents = "none";
+                            transparent_el.style.zIndex = 10;
+                            document.body.insertBefore(transparent_el, null);
                             /// Fade in the transparent element.
                             /// There is a short delay to let the callout start moving.
                             BF.transition(transparent_el, {prop: "backgroundColor", css_prop: "background-color", duration: "250ms", end_val: "rgba(255,255,255,.7)", timing: "steps(3, start)", delay: "50ms"});
@@ -1596,7 +1593,9 @@
                             
                             BF.transition(transparent_el, {prop: "backgroundColor", css_prop: "background-color", duration: "250ms", end_val: "rgba(255,255,255,.0)", timing: "steps(3, start)", delay: "50ms"}, function ()
                             {
-                                transparent_el.style.display = "none";
+                                /// Remove from DOM and destroy the temporary transparent element.
+                                document.body.removeChild(transparent_el);
+                                transparent_el = null;
                                 
                                 /// Make the callout on the same level as other callouts.
                                 /// Since we do not want the callout to de displayed below the transparent element,
