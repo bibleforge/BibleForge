@@ -1206,8 +1206,9 @@
          */
         (function ()
         {
-            var create_callout,
-                callout_clicked = false;
+            var callout_clicked = false,
+                create_callout,
+                hide_callout_details;
             
             /**
              * The closure for creating callouts.
@@ -1521,6 +1522,19 @@
                         {
                             var that = this;
                             
+                            if (hide_callout_details) {
+                                hide_callout_details();
+                            }
+                            
+                            hide_callout_details = function ()
+                            {
+                                that.hide_details();
+                                
+                                hide_callout_details = null;
+                                
+                                return true;
+                            }
+                            
                             /// Get the current width and height of the element so that when it can return to its original size later.
                             ///NOTE: The offset and client widths and heights are incorrect, so we must use the CSS style (which includes units).
                             pos.css_height = window.getComputedStyle(callout).height;
@@ -1586,16 +1600,8 @@
                             
                             /// Resize the callout to take up more of the screen.
                             this.align(true);
-                            
-                            
-                            context.system.event.attach("cancleCallouts", function (e)
-                            {
-                                that.hide_details(e);
-                                
-                                e.preventDefault();
-                            }, true);
                         },
-                        hide_details: function (e)
+                        hide_details: function ()
                         {
                             var that = this;
                             
@@ -1631,7 +1637,7 @@
                                 ///NOTE: Could use transform: translate(x, y) to possibly optimize the transition.
                                 ///NOTE: It tries to use the previous height and width of the callout before it enlarged,
                                 ///      and if that does not work, it uses the defaults.
-                                ///      E.g., 
+                                ///      E.g., go to Ezekiel 18:5 and click the word "which." Then click more, and then click off of the callout.
                                 {prop: "top",    duration: "300ms", end_val: pos.top    + "px"},
                                 {prop: "left",   duration: "300ms", end_val: pos.left   + "px"},
                                 {prop: "height", duration: "300ms", end_val: (pos.css_height || "125px")},
@@ -1681,7 +1687,10 @@
              * @example create_drop_down_box(options_from_pronun({}));
              * @param   options  (array)    An array of objects defining the drop down options.
              *                              Array structure:
-             *                              [{display: "The text to display when selected", details: "The HTML to display when the drop down menu is displayed", title: "The option's tooltip (optional)"}, ...]
+             *                              [{display: "The text to display when selected",
+             *                                details: "The HTML to display when the drop down menu is displayed",
+             *                                title: "The option's tooltip (optional)"},
+             *                               ...]
              * @param   select   (integer)  The option that should be selected by default
              * @param   onchange (function) The function trigged whenever a selection is made by the user.
              * @return  A DOM element representing the drop down box.
@@ -2025,7 +2034,9 @@
                     }
                     
                     
-                    if (context.system.event.trigger("cancleCallouts")) {
+                    if (hide_callout_details) {
+                        hide_callout_details();
+                    } else {
                         /// Remove callous and non-new callouts.
                         ///NOTE: When a callout is created, this function (i.e., the onclick event) will fire, thus potentially removing the callout immediately;
                         ///      therefore, use just_created to see if the callout was recently created and should be left alone.
