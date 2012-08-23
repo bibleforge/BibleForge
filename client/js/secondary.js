@@ -1518,7 +1518,7 @@
                          *
                          * @param data (object) An object containing the details of the word.
                          */
-                        show_details: function (data)
+                        show_details: function ()
                         {
                             var that = this;
                             
@@ -1533,7 +1533,7 @@
                                 hide_callout_details = null;
                                 
                                 return true;
-                            }
+                            };
                             
                             /// Get the current width and height of the element so that when it can return to its original size later.
                             ///NOTE: The offset and client widths and heights are incorrect, so we must use the CSS style (which includes units).
@@ -1953,7 +1953,7 @@
                                 
                                 more_el.onclick = function ()
                                 {
-                                    callout.show_details(data);
+                                    callout.show_details();
                                 };
                                 
                                 parent_el.appendChild(child_el);
