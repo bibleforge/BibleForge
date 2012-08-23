@@ -1382,7 +1382,7 @@
                          *
                          * @note Called after replacing the HTML and changing the pronunciation style.
                          */
-                        adjust_size: function ()
+                        adjust_height: function ()
                         {
                             var diff;
                             
@@ -1511,7 +1511,7 @@
                             }
                             
                             /// Make sure that the content fits without scrolling.
-                            this.adjust_size();
+                            this.adjust_height();
                         },
                         /**
                          * Show details about the word
@@ -1644,7 +1644,7 @@
                                 {prop: "width",  duration: "300ms", end_val: (pos.css_width  || "300px")}
                             ], function ()
                             {
-                                that.adjust_size();
+                                that.adjust_height();
                             });
                             
                             /// While the callout is transitioning, switch the CSS to hide certain content and show others.
@@ -1915,9 +1915,9 @@
                                     
                                     /// Sometimes the pronunciation box breaks the line and other times it does not, so the size of the content may change;
                                     /// therefore we need to make sure that the content fits without scrolling.
-                                    /// For example, go to Matthew 1:11 and click the word "Babylon" (first make sure that Biblical IPA pronunciation selected beforehand),
+                                    /// For example, go to Matthew 1:11, and click the word "Babylon" (first make sure that Biblical IPA pronunciation selected beforehand),
                                     /// and then change the pronunciation to Biblical, and observe how the pronunciation text wraps.
-                                    callout.adjust_size();
+                                    callout.adjust_height();
                                 });
                                 /// Since the drop down box already has a style ("dropdown") concatenate "lex-pronun" to the end.
                                 BF.toggleCSS(child_el, "lex-pronun", 1);
