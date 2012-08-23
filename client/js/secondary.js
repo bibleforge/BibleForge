@@ -1564,7 +1564,7 @@
                             /// Make sure the callout appears above the semi-transparent element used to fade out the text.
                             callout.style.zIndex = 99;
                             /// Fade out the pointer.
-                            BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: "0", timing: "steps(3, end)"}, function ()
+                            BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 0}, function ()
                             {
                                 /// Hide the pointer after transitioning.
                                 pointer.style.display = "none";
@@ -1631,7 +1631,7 @@
                             
                             /// Fade in the pointer.
                             pointer.style.display = "block";
-                            BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: "1", timing: "steps(3, end)"});
+                            BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 1});
                             /// Resize the callout to take up more of the screen.
                             BF.transition(callout, [
                                 ///NOTE: Could use transform: translate(x, y) to possibly optimize the transition.
