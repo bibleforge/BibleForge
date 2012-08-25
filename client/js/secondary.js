@@ -157,6 +157,92 @@
             };
         }());
         
+        BF.make_expandable = function (data)
+        {
+            var container = document.createElement("div"),
+                details_el,
+                summary_el,
+                state;
+            
+            if (data.summary_el) {
+                summary_el = data.summary_el;
+            } else {
+                summary_el = document.createElement("div");
+                summary_el.textContent = data.summary_text;
+            }
+            
+            summary_el.style.cursor = "pointer";
+            
+            if (data.details_el) {
+                details_el = data.details_el;
+            } else {
+                details_el = document.createElement("div");
+                details_el.textContent = data.details_text;
+            }
+            
+            summary_el.addEventListener("click", function ()
+            {
+                var full_height;
+                //console.log("here");
+                //details_el.classList.toggle("expander_visible");
+                if (state) {
+                    //full_height = window.getComputedStyle(details_el).height;
+                    //debugger;
+                    details_el.style.height = window.getComputedStyle(details_el).height;
+                    //details_el.style.overflowY = "hidden";
+                    //details_el.style.display = "block";
+                    //var n = document.createTextNode(' ');
+                    //details_el.appendChild(n);
+                    //details_el.removeChild(n);
+                    //details_el.style.height = details_el.style.height;
+                    /// Firefox needs a pause here; otherwise there is no transition.
+                    window.setTimeout(function ()
+                    {
+                    //details_el.style.height = 0;
+                        //BF.transition(details_el, {prop: "height", start_val: full_height, end_val: 0, duration: "300ms"})
+                        BF.transition(details_el, {prop: "height", end_val: 0, duration: "170ms"});
+                        state = 0;
+                    }, 30);
+                } else {
+                    //details_el.style.removeProperty("overflow-y");
+                    details_el.style.removeProperty("height");
+                    //debugger;
+                    full_height = window.getComputedStyle(details_el).height;
+                    
+                    //full_height = details_el.offsetHeight;
+                    //details_el.style.overflowY = "hidden";
+                    details_el.style.height = 0;
+                    
+                    BF.transition(details_el, {prop: "height", end_val: full_height, duration: "300ms"}, function ()
+                    {
+                        if (state) {
+                            /// Make the element be able to change it's height naturally now that it is displayed.
+                            /// I.e., if something effects the height now (like wrapping), it will change the element's height.
+                            //debugger;
+                            //details_el.style.removeProperty("overflow-y");
+                            details_el.style.removeProperty("height");
+                        }
+                    });
+                    
+                    state = 1;
+                }
+            }, false);
+            
+            details_el.style.overflowY = "hidden";
+            if (data.open) {
+                //details_el.classList.add("expander_visible");
+                state = 1;
+            } else {
+                
+                details_el.style.height = 0;
+            }
+            
+            container.appendChild(summary_el);
+            container.appendChild(details_el);
+            
+            return container;
+        };
+    
         /// TODO: Reevaluate combining show_context_menu() and show_panel() into a single function that takes the open and close functions as parameters and creates the respective functions.
         /**
          * Create the show_context_menu() function with closure.
