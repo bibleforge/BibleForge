@@ -66,34 +66,6 @@
         previous:   2
     };
     
-    /// ***********************
-    /// * Start of prototypes *
-    /// ***********************
-    
-    /**
-     * Remove an element or a range of elements from an array.
-     *
-     * @example [0,1,2,3].remove( 1);     /// Converts array to [0,2,3]
-     * @example [0,1,2,3].remove(-2);     /// Converts array to [0,1,3]
-     * @example [0,1,2,3].remove( 1,  2); /// Converts array to [0,3]
-     * @example [0,1,2,3].remove(-2, -1); /// Converts array to [0,1]
-     * @param   from (integer)            The index to remove, or, if two parameters are given, the index to begin removing from.
-     * @param   to   (integer) (optional) The index to remove to.
-     * @return  An integer representing the length of the new array.
-     * @note    This mutates the array; it does not return an array.
-     * @see     http://ejohn.org/blog/javascript-array-remove/
-     */
-    Array.prototype.remove = function(from, to)
-    {
-        var rest = this.slice((to || from) + 1 || this.length);
-        this.length = from < 0 ? this.length + from : from;
-        return this.push.apply(this, rest);
-    };
-    
-    /// *********************
-    /// * End of prototypes *
-    /// *********************
-    
     /// Detect WebKit based browsers.
     ///NOTE: Since the user agent string can be modified by the user, it is not bulletproof.
     BF.is_WebKit = Boolean(window.chrome) || window.navigator.userAgent.indexOf("WebKit/") >= 0;
@@ -215,6 +187,27 @@
     
     
     /// Declare helper function(s) attached to the global BibleForge object (BF).
+    
+    /**
+     * Remove an element or a range of elements from an array.
+     *
+     * @example BF.remove([0,1,2,3],  1);     /// Converts array to [0,2,3]
+     * @example BF.remove([0,1,2,3], -2);     /// Converts array to [0,1,3]
+     * @example BF.remove([0,1,2,3]   1,  2); /// Converts array to [0,3]
+     * @example BF.remove([0,1,2,3], -2, -1); /// Converts array to [0,1]
+     * @param   arr  (array)              The array to mutate.
+     * @param   from (integer)            The index to remove, or, if two parameters are given, the index to begin removing from.
+     * @param   to   (integer) (optional) The index to remove to.
+     * @return  An integer representing the length of the new array.
+     * @note    This mutates the array; it does not return an array.
+     * @see     http://ejohn.org/blog/javascript-array-remove/
+     */
+    BF.remove = function(arr, from, to)
+    {
+        var rest = arr.slice((to || from) + 1 || arr.length);
+        arr.length = from < 0 ? arr.length + from : from;
+        return arr.push.apply(arr, rest);
+    };
     
     /**
      * Safely parse JSON.
@@ -419,7 +412,7 @@
                     
                     for (i = func_arr.length - 1; i >= 0; i -= 1) {
                         if (func_arr[i] === func) {
-                            func_arr.remove(i);
+                            BF.remove(func_arr, i);
                             /// Since a function can (or at least should) only be cued once, it does not need to keep looping.
                             return;
                         }
@@ -1254,7 +1247,7 @@
                                 for (i = func_list[name].length - 1; i >= 0; i -= 1) {
                                     ///NOTE: Both func and once must match.
                                     if (func_list[name][i].func === func && func_list[name][i].once === once) {
-                                        func_list[name].remove(i);
+                                        BF.remove(func_list[name], i);
                                         /// Since only one event should be removed at a time, we can end now.
                                         return;
                                     }
@@ -1294,7 +1287,7 @@
                                     
                                     /// Is this function only supposed to be executed once?
                                     if (func_list[name][i].once) {
-                                        func_list[name].remove(i);
+                                        BF.remove(func_list[name], i);
                                     }
                                     
                                     /// Was e.stopPropagation() called?
@@ -3322,7 +3315,7 @@
                             /// E.g., "/en/" turns into ["en", ""], so make it just ["en"].
                             ///NOTE: split_query[1] could be undefined (e.g., "/en" becomes ["en"]).
                             if (typeof split_query[1] === "string" && split_query[1].trim() === "") {
-                                split_query.remove(1);
+                                BF.remove(split_query, 1);
                             }
                             
                             if (split_query.length === 2) {
@@ -3473,7 +3466,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?19360820", {
+                BF.include("/js/secondary.js?19534105", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,

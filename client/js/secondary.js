@@ -101,7 +101,7 @@
                             
                             for (i = transition_arr.length - 1; i >= 0; i -= 1) {
                                 if (transition_arr[i].indexOf((data.css_prop || data.prop)) === 0) {
-                                    transition_arr.remove(i);
+                                    BF.remove(transition_arr, i);
                                 }
                             }
                             
@@ -2043,7 +2043,7 @@
                         for (i = callouts.length - 1; i >= 0; i -= 1) {
                             if (!callouts[i].just_created) {
                                 callouts[i].destroy();
-                                callouts.remove(i);
+                                BF.remove(callouts, i);
                             }
                         }
                     }
@@ -2088,7 +2088,7 @@
                             callouts[i].move(e.amount);
                         } else {
                             callouts[i].destroy();
-                            callouts.remove(i);
+                            BF.remove(callouts, i);
                         }
                     }
                 });
@@ -2122,7 +2122,7 @@
                         /// Other callouts might need to be removed.
                         if (!callouts[i].showing_details && !callouts[i].point_to_el_exists()) {
                             callouts[i].destroy();
-                            callouts.remove(i);
+                            BF.remove(callouts, i);
                         }
                     }
                 });
