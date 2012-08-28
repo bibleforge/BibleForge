@@ -2109,9 +2109,10 @@
                 {
                     var i;
                     
-                    /// Are there no callouts or is the Ctrl key pressed?
+                    /// Are there no callouts, is the Ctrl key pressed, or is the left button not pressed?
                     ///NOTE: The Ctrl key is used as a way to open multiple callouts (like selecting multiple files in a file browser).
-                    if (i > 0 || e.ctrlKey) {
+                    ///TODO: Detecting left mouse click may not be cross-browser compatible (test with IE 10). (Could use e.which or e.buttons.)
+                    if (i > 0 || e.ctrlKey || e.button !== 0) {
                         return;
                     }
                     
