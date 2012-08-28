@@ -3442,7 +3442,6 @@
                             window.open("/" + BF.lang.id + "/" + window.encodeURIComponent(query) + "/", "_blank");
                         } else {
                             /// Look up the clicked verse.
-                            ///TODO: Keep the highlighting.
                             qEl.value = query;
                             run_new_query(query);
                         }
