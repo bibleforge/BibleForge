@@ -1124,7 +1124,6 @@
                 /// The entered_text property stores what the user last typed in to the query box, even if the user never actually submitted the query.
                 settings.add_property(settings.user, "entered_text", undefined);
                 
-                
                 /// Load user settings (if any).
                 /// Does the browser support localStorage? (All modern browsers should.)
                 ///NOTE: BibleForge does not prune unused settings from the localStorage (extension loaded later might use seemingly unused settings).
@@ -3384,7 +3383,7 @@
                 window.setTimeout(function ()
                 {
                     BF.history.attach(on_state_change);
-                }, 0);
+                }, 500);
             }());
             
             /// Set some default language specific text.
