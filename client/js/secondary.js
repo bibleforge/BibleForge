@@ -157,83 +157,85 @@
             };
         }());
         
+        /**
+         * @todo Document.
+         */
         BF.make_expandable = function (data)
         {
-            var container = document.createElement("div"),
-                details_el,
-                summary_el,
-                state;
+            var container  = document.createElement("div"),
+                details_el = document.createElement("div"),
+                open,
+                summary_el = document.createElement("div");
+            
+            /// Add the elements or text.
             
             if (data.summary_el) {
-                summary_el = data.summary_el;
+                summary_el.appendChild(data.summary_el);
             } else {
-                summary_el = document.createElement("div");
                 summary_el.textContent = data.summary_text;
             }
             
+            /// Indicate to the user that the summary is clickable.
             summary_el.style.cursor = "pointer";
             
             if (data.details_el) {
-                details_el = data.details_el;
+                details_el.appendChild(data.details_el);
             } else {
-                details_el = document.createElement("div");
                 details_el.textContent = data.details_text;
             }
             
+            /**
+             * @todo Make keyboard accessible.
+             */
             summary_el.addEventListener("click", function ()
             {
-                var full_height;
-                //console.log("here");
-                //details_el.classList.toggle("expander_visible");
-                if (state) {
-                    //full_height = window.getComputedStyle(details_el).height;
-                    //debugger;
+                var full_height,
+                    initial_height;
+                
+                if (open) {
                     details_el.style.height = window.getComputedStyle(details_el).height;
-                    //details_el.style.overflowY = "hidden";
-                    //details_el.style.display = "block";
-                    //var n = document.createTextNode(' ');
-                    //details_el.appendChild(n);
-                    //details_el.removeChild(n);
-                    //details_el.style.height = details_el.style.height;
                     /// Firefox needs a pause here; otherwise there is no transition.
                     window.setTimeout(function ()
                     {
-                    //details_el.style.height = 0;
-                        //BF.transition(details_el, {prop: "height", start_val: full_height, end_val: 0, duration: "300ms"})
                         BF.transition(details_el, {prop: "height", end_val: 0, duration: "170ms"});
-                        state = 0;
+                        open = false;
                     }, 30);
                 } else {
-                    //details_el.style.removeProperty("overflow-y");
+                    /// Store the current height (it could be transitioning) to reset it to that momentarily.
+                    initial_height = window.getComputedStyle(details_el).height;
+                    /// We need to figure out the actual height of the element so that we know what to set the height to.
+                    /// We can do this by removing the height property from the CSS because that will make the element display its natural height.
+                    /// This is will by pass any CSS transition since the CSS is being removed.
                     details_el.style.removeProperty("height");
-                    //debugger;
                     full_height = window.getComputedStyle(details_el).height;
+                    /// Reset the element back to its last height.
+                    details_el.style.height = initial_height;
                     
-                    //full_height = details_el.offsetHeight;
-                    //details_el.style.overflowY = "hidden";
-                    details_el.style.height = 0;
-                    
+                    /// Now we can make the element transition to the desired height.
                     BF.transition(details_el, {prop: "height", end_val: full_height, duration: "300ms"}, function ()
                     {
-                        if (state) {
-                            /// Make the element be able to change it's height naturally now that it is displayed.
-                            /// I.e., if something effects the height now (like wrapping), it will change the element's height.
-                            //debugger;
-                            //details_el.style.removeProperty("overflow-y");
+                        /// The callback only fires after the transitioning stops completely, and since the user could have clicked to hide the details while the details were transitioning,
+                        /// we need to check whether or not the details are expanded now.
+                        if (open) {
+                            /// If we leave the height property set, the element cannot expand it's height naturally,
+                            /// but we can make the element be able to change it's height naturally by removing the CSS height property.
+                            /// When the height property is removed, if something effects the height now (like text wrapping when resized), it will change the element's height.
                             details_el.style.removeProperty("height");
                         }
                     });
                     
-                    state = 1;
+                    open = true;
                 }
             }, false);
             
+            /// Make the element by able to have its height change without displaying the content or a scroll bar.
             details_el.style.overflowY = "hidden";
+            
+            /// Set the default state.
+            
             if (data.open) {
-                //details_el.classList.add("expander_visible");
-                state = 1;
+                open = true;
             } else {
-                
                 details_el.style.height = 0;
             }
             
