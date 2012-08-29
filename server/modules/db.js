@@ -52,18 +52,12 @@ exports.db = function (config)
                     charset:  "utf8", /// With this, we do not need to send "SET NAMES utf8;" when the connection is made.
                     user:     config.user,
                     password: config.pass,
-                    database: config.base,
-                    ///NOTE: Even though this initial command is not required, sending a command on connection turns out to be useful.
-                    ///      Occasionally, the database appears to have connected properly when, in actuality, it has not.
-                    ///      This commonly occurs when bibleforge.js starts up before or as the database starts up.
-                    ///      Even though bibleforge.js waits for the database to start up, sometimes the database sends false positives, indicating that it has connected when it really has not.
-                    ///      Sending the initial command will produce an error if the database has not connected properly.
-                    ///      This error will be caught by bibleforge.js's onuncaughtException event, and bibleforge.js will attempt to reconnect to the database.
-                    initCommand: "SET NAMES utf8"
+                    database: config.base
                     /// Other options:
                     ///     compress        (default: FALSE)
-                    ///     reconnect       (default: TRUE)
+                    ///     initCommand     (default: undefined)
                     ///     readTimeout     (default: 0)
+                    ///     reconnect       (default: TRUE)
                     ///     sslVerifyServer (default: FALSE)
                     ///     timeout         (default: 0)
                     ///     writeTimeout    (default: 0)
@@ -143,13 +137,12 @@ exports.db = function (config)
             db.connect(function (err)
             {
                 /// If an error occurred, try again shortly.
-                if (err) {
+                ///NOTE: Since sometimes connect() returns a false positive, use isConnected() to double check the connection.
+                if (err || !db.isConnected()) {
                     console.error(err);
                     setTimeout(connect, 50);
                 } else {
                     /// If a connection is made, prevent queries form being stored and flush any that have already been stored.
-                    ///NOTE: Sometimes this gives false positives.
-                    ///TODO: Look in to using isConnected(), to determine if it really connected to the database.
                     connected = true;
                     queue.flush();
                 }
