@@ -26,7 +26,7 @@
  */
 
 /*TODO: Completely document the CSS. */
-/*TODO: Re-order (as well as maybe group) the styles alphabetically. */
+/*TODO: Re-order (as well as maybe group) the styles alphabetically or in a logical order. */
 
 /* Normalize Mozilla button styles. */
 /* Also, remove the ugly dashed border on the text of buttons in Mozilla when clicked. */
@@ -132,13 +132,13 @@ body {
     
     /* Add a slight radial blur to make sure the text is always readable.*/
     /* Firefox 3.6+ */
-    background:    -moz-radial-gradient(center center , ellipse farthest-corner, #FFFFE2 70%, rgba(255,255,226,0) 100%);
+    background:    -moz-radial-gradient(center center, ellipse farthest-corner, #FFFFE2 70%, rgba(255,255,226,0) 100%);
     /* Chrome/Safari 5.1+ */
-    background: -webkit-radial-gradient(center center , ellipse farthest-corner, #FFFFE2 70%, rgba(255,255,226,0) 100%);
+    background: -webkit-radial-gradient(center center, ellipse farthest-corner, #FFFFE2 70%, rgba(255,255,226,0) 100%);
     /* Opera 11.10 */
-    background:      -o-radial-gradient(center center , ellipse farthest-corner, #FFFFE2 70%, rgba(255,255,226,0) 100%);
+    background:      -o-radial-gradient(center center, ellipse farthest-corner, #FFFFE2 70%, rgba(255,255,226,0) 100%);
     /* IE 10 */
-    background:         radial-gradient(center center , ellipse farthest-corner, #FFFFE2 70%, rgba(255,255,226,0) 100%);
+    background:         radial-gradient(center center, ellipse farthest-corner, #FFFFE2 70%, rgba(255,255,226,0) 100%);
 }
 
 .queryInput {
@@ -176,11 +176,11 @@ body {
     
     /* Apply transitions to all changes (in particular, background-color, border-color, and color). */
     /* Transition for Mozilla (Firefox 4.0+) */
-    -moz-transition:    all .3s;
+       -moz-transition: all .3s;
     /* Transition for WebKit */
     -webkit-transition: all .3s;
     /* Transition for Opera 10.5+ */
-    -o-transition:      all .3s;
+            transition: all .3s;
 }
 
 /**
@@ -246,11 +246,11 @@ body {
     
     /* Apply transitions to all changes. */
     /* Transition for Mozilla (Firefox 4.0+) */
-    -moz-transition:    all .3s;
+       -moz-transition: all .3s;
     /* Transition for WebKit */
     -webkit-transition: all .3s;
     /* Transition for Opera 10.5+ */
-    -o-transition:      all .3s;
+            transition: all .3s;
 }
 
 .lang:hover, .more-button:hover {
@@ -271,10 +271,10 @@ body {
     top: 40%;
     right: 1px;
     
-    -moz-transition:    opacity .3s;
+       -moz-transition: opacity .3s;
     /*BUG This does not work at least in Chrome 22. */
     -webkit-transition: opacity .3s;
-    -o-transition:      opacity .3s;
+            transition: opacity .3s;
 }
 
 .lang:hover:after, .lang:active:after, .activeLang:after {
@@ -291,25 +291,30 @@ body {
 }
 
 
-
 .crown_loader {
     width:  20px;
     height: 20px;
     /* The Crown of Thorns icon */
     background: no-repeat url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAQAAAAngNWGAAABcUlEQVQoFQXB72uMARwA8M+ee1ArOsW80FxKNsSQ215IGGuje2E6L5Q/QuydvPFqr3aSvJkiSl6cInWXVqg1P+buhXdWU+KNZlzHSZlnX58PAABscx8AAACA1BsrwoLNAEACOKPHuDENbUV95nwypqwPAKAu80tLuG0Nrsp0fBNemABgqxWXUbFgRggNdTWUhL0AjPuNjcIJPNGNvDCAuisAjPqhIjxHai047YFwR9NFgNR74YMRZwEAO7wSlvWQYtZX7xTMSAFAl0VN68xr6GdSZr+ckAAAeOinYYSD7LJqJ0INAECXJYMIj3NazivYZ70R3f4CAA44qVfREGzSkanZAAA4LjEthEESLCv7I7Rdd0oOJDgis8dHl8wDnLOEAaEf3NCLcAGPXANgu1Ul3PXaTV+Ee6bNYbfMMABl34VnmkLTMUOeCouq/mkDKaiqOmRUR8FbLzGr5Ja8KYcBAIAtPguhpQgAAACQU3FUHgDgP8wYe6XaJYMMAAAAAElFTkSuQmCC);
     opacity: .2;
-        
+    
+    /* Prepare to make the graphic spin. */
+    /*NOTE: Mozilla has some issues that are fixed by the Mozilla specific code at the bottom. */
     -webkit-animation-name: rotate;
        -moz-animation-name: rotate;
+            animation-name: rotate;
     -webkit-animation-duration: 2s;
        -moz-animation-duration: 2s;
+            animation-duration: 2s;
     -webkit-animation-iteration-count: infinite;
        -moz-animation-iteration-count: infinite;
+            animation-iteration-count: infinite;
     -webkit-animation-timing-function: linear;
        -moz-animation-timing-function: linear;
+            animation-timing-function: linear;
 }
 
-/* This makes the crown of thorns spin. */
+/* Make the Crown of Thorns spin. */
 @-webkit-keyframes rotate {
     from {-webkit-transform: rotate(0deg);}
     to   {-webkit-transform: rotate(360deg);}
@@ -317,6 +322,10 @@ body {
 @-moz-keyframes rotate {
     from {-moz-transform: rotate(0deg);}
     to   {-moz-transform: rotate(360deg);}
+}
+@keyframes rotate {
+    from {transform: rotate(0deg);}
+    to   {transform: rotate(360deg);}
 }
 
 
@@ -333,11 +342,11 @@ body {
     
     /* Fade out slightly when the mouse cursor moves off. */
     /* Transition for Mozilla (Firefox 4.0+) */
-    -moz-transition:    opacity .3s ease;
+       -moz-transition: opacity .3s ease;
     /* Transition for WebKit */
     -webkit-transition: opacity .3s ease;
     /* Transition for Opera 10.5+ */
-    -o-transition:      opacity .3s ease;
+            transition: opacity .3s ease;
     opacity: .3;
     
     position: absolute;
@@ -374,22 +383,22 @@ body {
     
     /*TODO: Use fade class. */
     /* Transition for Mozilla (Firefox 4.0+) */
-    -moz-transition:    opacity 1s ease-in;
+       -moz-transition: opacity 1s ease-in;
     /* Transition for WebKit */
     -webkit-transition: opacity 1s ease-in;
     /* Transition for Opera 10.5+ */
-    -o-transition:      opacity 1s ease-in;
+            transition: opacity 1s ease-in;
 }
 
 
 .wrenchIcon {
     /* Darken the text so that it is more prominent. */
     /* Transition for Mozilla (Firefox 4.0+) */
-    -moz-transition:    opacity .6s ease;
+       -moz-transition: opacity .6s ease;
     /* Transition for WebKit */
     -webkit-transition: opacity .6s ease;
     /* Transition for Opera 10.5+ */
-    -o-transition:      opacity .6s ease;
+            transition: opacity .6s ease;
     
     /* Fade out slightly when the mouse cursor moves off. */
     opacity: .2;
@@ -411,11 +420,11 @@ body {
     z-index:    999999;
     
     /* Transition for Mozilla (Firefox 4.0+) */
-    -moz-transition:    opacity .2s ease-in;
+       -moz-transition: opacity .2s ease-in;
     /* Transition for WebKit */
     -webkit-transition: opacity .2s ease-in;
     /* Transition for Opera 10.5+ */
-    -o-transition:      opacity .2s ease-in;
+            transition: opacity .2s ease-in;
     
     /* Rounded corners for Opera 10.5+, IE 9+, WebKit 532.5+ (Chrome 4, Safari 5), Gecko 2 (Mozilla 4.0) */
     border-radius: 3px;
@@ -445,9 +454,9 @@ body {
     width:           100%;
     
     /* Make the background and font color fade when the mouse hovers/leaves. */
-    -moz-transition:    background .2s, color .2s;
+       -moz-transition: background .2s, color .2s;
     -webkit-transition: background .2s, color .2s;
-    -o-transition:      background .2s, color .2s;
+            transition: background .2s, color .2s;
 }
 
 /* The container for a (text) menu item. */
@@ -495,12 +504,12 @@ body {
     background:      -o-linear-gradient(bottom, rgba(240,240,240,.98), rgba(255,255,255,.98) 60px);
     /* IE 10 */
     background:         linear-gradient(bottom, rgba(240,240,240,.98), rgba(255,255,255,.98) 60px);
-    border:     #A3A3A3 1px solid;
+    border: #A3A3A3 1px solid;
     /* Add enough padding to the top to push the contents past the top bar. */
     /* Add extra padding on the sides so that the optional scroll bars will not cover up any of the content. */
-    padding:    60px 16px 16px 16px;
+    padding: 60px 16px 16px 16px;
     /* Add scroll bars when the contents extend past the height or width. */
-    overflow:   auto;
+    overflow: auto;
     
     /* Rounded corners for Opera 10.5+, IE 9+, WebKit 532.5+ (Chrome 4, Safari 5), Gecko 2 (Mozilla 4.0) */
     border-radius: 9px;
@@ -527,11 +536,11 @@ body {
 
 .slide {
     /* Transition for Mozilla (Firefox 4.0+) */
-    -moz-transition:    top .6s ease;
+       -moz-transition: top .6s ease;
     /* Transition for WebKit */
     -webkit-transition: top .6s ease;
     /* Transition for Opera 10.5+ */
-    -o-transition:      top .6s ease;
+            transition: top .6s ease;
 }
 
 
@@ -558,7 +567,8 @@ legend {
     
     box-shadow: inset 0 1px 3px rgba(255,255,255,.5), inset 0 -15px 3px rgba(0,0,200,.05);
     
-    color:       #3985A8;
+    color: #3985A8;
+    
     text-shadow: 0 1px #FFF;
     
     padding: 5px 14px;
@@ -568,11 +578,11 @@ legend {
 
     /* Fade the background color on mouse down. */
     /* Transition for Mozilla (Firefox 4.0+) */
-    -moz-transition:    background-color .2s;
+       -moz-transition: background-color .2s;
     /* Transition for WebKit */
     -webkit-transition: background-color .2s;
     /* Transition for Opera 10.5+ */
-    -o-transition:      background-color .2s;
+            transition: background-color .2s;
 }
 
 .button:hover {
@@ -638,6 +648,7 @@ label {
 .callout {
     border-radius: 9px;
     box-shadow: 3px 3px 6px rgba(0,0,0,.2), inset -1px 0 2px rgba(0,0,0,.2);
+    
     background: #FFF;
     /* Transparent background for Firefox 3.5- */
     background: rgba(255, 255, 255, .95);
@@ -649,6 +660,7 @@ label {
     background:      -o-linear-gradient(bottom, rgba(240,240,240,.97), rgba(255,255,255,.97) 60px);
     /* IE 10 */
     background:         linear-gradient(bottom, rgba(240,240,240,.97), rgba(255,255,255,.97) 60px);
+    
     position: absolute;
     border: #ccc solid 1px;
     /* There is no padding on the left so that the lexicon title's diacritics have enough room to be displayed. */
@@ -667,11 +679,9 @@ label {
 }
 .callout .pointer-down {
     box-shadow: 6px 4px 6px -3px rgba(0,0,0,.2);
-    -moz-transform:    rotate(45deg);
+            transform: rotate(45deg);
+       -moz-transform: rotate(45deg);
     -webkit-transform: rotate(45deg);
-    -o-transform:      rotate(45deg);
-    -ms-transform:     rotate(45deg);
-    transform:         rotate(45deg);
     position: absolute;
     width:  20px;
     height: 20px;
@@ -693,14 +703,16 @@ label {
 }
 .callout .pointer-up {
     box-shadow: -1px -3px 6px -3px rgba(0,0,0,.2);
-    -moz-transform:    rotate(45deg);
+            transform: rotate(45deg);
+       -moz-transform: rotate(45deg);
     -webkit-transform: rotate(45deg);
-    -o-transform:      rotate(45deg);
-    -ms-transform:     rotate(45deg);
-    transform:         rotate(45deg);
+    
     position: absolute;
+    top: -11px;
+    
     width:  20px;
     height: 20px;
+    
     border-top:  #ccc solid 1px;
     border-left: #ccc solid 1px;
     
@@ -715,7 +727,6 @@ label {
     background:      -o-linear-gradient(right bottom, rgba(255,255,255,0) 45%, rgba(255,255,255,.95) 45%);
     /* IE 10 */
     background:         linear-gradient(right bottom, rgba(255,255,255,0) 45%, rgba(255,255,255,.95) 45%);
-    top: -11px;
 }
 
 /* Hide certain callout content when showing details (such as the "more" button). */
@@ -746,14 +757,13 @@ label {
     /* The vertical alignment is required simply to match up with .lex-pronun. */
     vertical-align: super;
     
-    
     /* Transition the font size when expanding the callout for more details. */
     /* Transition for Mozilla (Firefox 4.0+) */
-    -moz-transition:    font-size 150ms ease 150ms;
+       -moz-transition: font-size 150ms ease 150ms;
     /* Transition for WebKit */
-    -webkit-transition: font-size .3s linear;
+    -webkit-transition: font-size 150ms ease 150ms;
     /* Transition for Opera 10.5+ */
-    -o-transition:      font-size .3s linear;
+            transition: font-size 150ms ease 150ms;
 }
 
 /* Zoom the font in when transitioning to show more details. */
@@ -774,11 +784,11 @@ label {
     
     /* Transition the font size when expanding the callout for more details. */
     /* Transition for Mozilla (Firefox 4.0+) */
-    -moz-transition:    font-size 200ms ease 10ms;
+       -moz-transition: font-size 200ms ease 10ms;
     /* Transition for WebKit */
     -webkit-transition: font-size 200ms ease 10ms;
     /* Transition for Opera 10.5+ */
-    -o-transition:      font-size 200ms ease 10ms;
+            transition: font-size 200ms ease 10ms;
 }
 
 /* Zoom the font in when transitioning to show more details. */
@@ -810,11 +820,11 @@ label {
 .fade {
     /* Fade out slightly when the mouse cursor moves off. */
     /* Transition for Mozilla (Firefox 4.0+) */
-    -moz-transition:    opacity .3s ease;
+       -moz-transition: opacity .3s ease;
     /* Transition for WebKit */
     -webkit-transition: opacity .3s ease;
     /* Transition for Opera 10.5+ */
-    -o-transition:      opacity .3s ease;
+            transition: opacity .3s ease;
 }
 
 /*NOTE See above for .more-button-buffer:hover and .more-button-buffer:active. */
@@ -846,11 +856,11 @@ label {
     
     /* Apply transitions to all changes. */
     /* Transition for Mozilla (Firefox 4.0+) */
-    -moz-transition:    background .2s, color .2s;
+       -moz-transition: background .2s, color .2s;
     /* Transition for WebKit */
     -webkit-transition: background .2s, color .2s;
     /* Transition for Opera 10.5+ */
-    -o-transition:      background .2s, color .2s;
+            transition: background .2s, color .2s;
 }
 
 .more-button:active {
