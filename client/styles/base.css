@@ -796,6 +796,13 @@ label {
     font-size: 16px;
 }
 
+.expandable {
+    margin-top: 7px;
+    /* Without this, the before pseudo element does not stay with the parent element when scrolling in WebKit. */
+    /* In Mozilla, the pseudo element sometimes stays with the element, but there is a long delay before it is redrawn. */
+    position: relative;
+}
+
 .expandable_summary {
     font-weight: bold;
     /* Push the text over to make way for the arrow. */
@@ -836,7 +843,7 @@ label {
     -webkit-transition: -webkit-transition 250ms;
 }
 
-/* The expander's summary's psuedo element when clicked. */
+/* The expander's summary's pseudo element when clicked. */
 .expandable_summary.expanded:before {
     /* Rotate the arrow to point down. */
     /*NOTE: If 0 degrees is used, it will visually jump; therefore, 1 degree is used. */
@@ -844,6 +851,33 @@ label {
        -moz-transform: rotate(-1deg);
     -webkit-transform: rotate(-1deg);
 }
+
+/* Set the number styles for list elements (specifically for long definitions). */
+ol {
+    margin: 0;
+    list-style-type: decimal;
+}
+
+ol ol {
+    list-style-type: lower-latin;
+}
+
+ol ol ol {
+    list-style-type: lower-roman;
+}
+
+ol ol ol ol {
+    list-style-type: upper-latin;
+}
+
+ol ol ol ol ol {
+    list-style-type: upper-roman;
+}
+
+ol ol ol ol ol ol {
+    list-style-type: decimal;
+}
+
 
 .dropdown {
     /* Move the arrow all the way to the right, and center it vertically. */

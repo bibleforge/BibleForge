@@ -198,7 +198,7 @@
                     /// Firefox needs a pause here; otherwise there is no transition.
                     window.setTimeout(function ()
                     {
-                        BF.transition(details_el, {prop: "height", end_val: 0, duration: "170ms"});
+                        BF.transition(details_el, {prop: "height", end_val: 0, duration: "270ms"});
                         open = false;
                         summary_el.classList.remove("expanded");
                     }, 30);
@@ -1936,6 +1936,26 @@
                             ];
                         }
                         
+                        function create_long_def(defs)
+                        {
+                            var li,
+                                ol = document.createElement("ol");
+                            
+                            defs.forEach(function (def)
+                            {
+                                if (typeof def === "string") {
+                                    li = document.createElement("li");
+                                    li.textContent = def;
+                                    ol.appendChild(li);
+                                } else {
+                                    /// It must be an array.
+                                    ol.appendChild(create_long_def(def));
+                                }
+                            });
+                            
+                            return ol;
+                        }
+                        
                         return function display_callout(callout, data)
                         {
                             /// data Object structure:
@@ -2011,6 +2031,7 @@
                                 /// Since the drop down box already has a style ("dropdown") concatenate "lex-pronun" to the end.
                                 BF.toggleCSS(child_el, "lex-pronun", 1);
                                 parent_el.appendChild(child_el);
+                                
                                 html.appendChild(parent_el);
                                 
                                 /// Create lex-body.
@@ -2040,12 +2061,31 @@
                                 more_el.textContent = "[+] " + BF.lang.more;
                                 child_el.appendChild(more_el);
                                 
+                                /**
+                                 * Switch to detailed mode.
+                                 */
                                 more_el.onclick = function ()
                                 {
                                     callout.show_details();
                                 };
                                 
                                 parent_el.appendChild(child_el);
+                                
+                                /// Add detailed information.
+                                
+                                /// Create long definition.
+                                /// Does a long definition exist?
+                                if (lex_data.def && lex_data.def.long) {
+                                    child_el = BF.make_expandable({
+                                        summary_text: "Detailed Definition",
+                                        details_el: create_long_def(lex_data.def.long),
+                                        open: true
+                                    });
+                                    child_el.className = "expandable detailed_only";
+                                    parent_el.appendChild(child_el)
+                                }
+                                
+                                /// Add all of the elements to the main fragment.
                                 html.appendChild(parent_el);
                                 
                                 
@@ -2054,6 +2094,7 @@
                                 html = "<div class=lex-body><em>" + BF.lang.italics_explanation + "</em></div>";
                             }
                             
+                            /// Add the HTML to the callout.
                             callout.replace_HTML(html);
                         };
                     }());
