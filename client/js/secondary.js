@@ -177,20 +177,21 @@
             
             /// Indicate to the user that the summary is clickable.
             summary_el.style.cursor = "pointer";
+            summary_el.className = "expandable_summary";
             
             if (data.details_el) {
                 details_el.appendChild(data.details_el);
             } else {
                 details_el.textContent = data.details_text;
             }
+            details_el.className = "expandable_details";
             
             /**
              * @todo Make keyboard accessible.
              */
             summary_el.addEventListener("click", function ()
             {
-                var full_height,
-                    initial_height;
+                var full_height;
                 
                 if (open) {
                     details_el.style.height = window.getComputedStyle(details_el).height;
@@ -199,17 +200,15 @@
                     {
                         BF.transition(details_el, {prop: "height", end_val: 0, duration: "170ms"});
                         open = false;
+                        summary_el.classList.remove("expanded");
                     }, 30);
                 } else {
-                    /// Store the current height (it could be transitioning) to reset it to that momentarily.
-                    initial_height = window.getComputedStyle(details_el).height;
-                    /// We need to figure out the actual height of the element so that we know what to set the height to.
+                    /// First, we need to figure out the actual height of the element so that we know what to set the height to.
                     /// We can do this by removing the height property from the CSS because that will make the element display its natural height.
                     /// This is will by pass any CSS transition since the CSS is being removed.
                     details_el.style.removeProperty("height");
                     full_height = window.getComputedStyle(details_el).height;
-                    /// Reset the element back to its last height.
-                    details_el.style.height = initial_height;
+                    details_el.style.height = 0;
                     
                     /// Now we can make the element transition to the desired height.
                     BF.transition(details_el, {prop: "height", end_val: full_height, duration: "300ms"}, function ()
@@ -225,6 +224,7 @@
                     });
                     
                     open = true;
+                    summary_el.classList.add("expanded");
                 }
             }, false);
             
@@ -235,6 +235,7 @@
             
             if (data.open) {
                 open = true;
+                summary_el.classList.add("expanded");
             } else {
                 details_el.style.height = 0;
             }
