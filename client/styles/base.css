@@ -61,7 +61,7 @@ input, .callout, .lang {
     /*      If a font-family is not specified, it will use a system default. */
     /*      On Windows, that font is "MS Shell Dlg," which is actually "Microsoft Sans Serif." */
     /*TODO: Make/find a good replacement font for Arial. */
-    font-family: Arial, 'Bitstream Vera Sans Webfont', 'DejaVu Sans', sans-serif;
+    font-family: Arial, 'DejaVu Sans', sans-serif;
 }
 
 body {
