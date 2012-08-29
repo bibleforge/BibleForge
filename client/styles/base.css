@@ -796,11 +796,53 @@ label {
     font-size: 16px;
 }
 
+.expandable_summary {
+    font-weight: bold;
+    /* Push the text over to make way for the arrow. */
+    padding-left: 10px;
+}
 
-.dropdown, .lang:after {
+.dropdown, .lang:after, .expandable_summary:before {
     /* The drop down arrow (triangle) */
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAGCAQAAAC/O6xzAAAAXklEQVQI12Ng4GJIZXjP8B8JTmYQY2BgY9BmWMjwFS54lMEHqJSBCUgYMSyBShxnCGTgZ2BmYABJcAMlFjN8AaoMZBBgYGGAApAOPYYSBnegSrggRIINKMQB0c7AAAAMyxgJkjHDSAAAAABJRU5ErkJggg==);
     background-repeat: no-repeat;
+}
+
+.expandable_summary:before {
+    /* This is necessary (for some reason) to make the element visible. */
+    content: "";
+    
+    /* This is needed to be able to change the width and height. */
+    position: absolute;
+    
+    width:  11px;
+    height: 6px;
+    
+    /* Reposition the arrow to align with the left. */
+    margin-top: 8px;
+    margin-left: -12px;
+    
+    /* The default position for the arrow is rotated to the right. */
+            transform: rotate(-90deg);
+       -moz-transform: rotate(-90deg);
+    -webkit-transform: rotate(-90deg);
+    /* This is used to center the rotation of the arrow to make it rotate properly. */
+            transform-origin: 6px 1px;
+       -moz-transform-origin: 6px 1px;
+    -webkit-transform-origin: 6px 1px;
+    
+            transition:          transform 250ms;
+       -moz-transition:     -moz-transform 250ms;
+    -webkit-transition: -webkit-transition 250ms;
+}
+
+/* The expander's summary's psuedo element when clicked. */
+.expandable_summary.expanded:before {
+    /* Rotate the arrow to point down. */
+    /*NOTE: If 0 degrees is used, it will visually jump; therefore, 1 degree is used. */
+            transform: rotate(-1deg);
+       -moz-transform: rotate(-1deg);
+    -webkit-transform: rotate(-1deg);
 }
 
 .dropdown {
