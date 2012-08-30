@@ -201,6 +201,11 @@
                         BF.transition(details_el, {prop: "height", end_val: 0, duration: "270ms"});
                         open = false;
                         summary_el.classList.remove("expanded");
+                        
+                        /// Call the onstateChange callback, if any.
+                        if (typeof data.onstateChange === "function") {
+                            data.onstateChange(open);
+                        }
                     }, 30);
                 } else {
                     /// First, we need to figure out the actual height of the element so that we know what to set the height to.
@@ -225,6 +230,11 @@
                     
                     open = true;
                     summary_el.classList.add("expanded");
+                    
+                    /// Call the onstateChange callback, if any.
+                    if (typeof data.onstateChange === "function") {
+                        data.onstateChange(open);
+                    }
                 }
             }, false);
             
@@ -1874,6 +1884,9 @@
                     lex_cache = {},
                     remove;
                 
+                /// Create the user.expanad_def property to be able to save the settings when changed.
+                context.settings.add_property(context.settings.user, "expand_def", typeof context.settings.user.expanad_def === "undefined" ? true : context.settings.user.expanad_def);
+                
                 /// Since this is not styled by initially, it needs to be set now.
                 if (BF.lang.linked_to_orig) {
                     BF.toggleCSS(page, "linked", 1);
@@ -2079,7 +2092,11 @@
                                     child_el = BF.make_expandable({
                                         summary_text: "Detailed Definition",
                                         details_el: create_long_def(lex_data.def.long),
-                                        open: true
+                                        open: Boolean(context.settings.user.expand_def),
+                                        onstateChange: function (open)
+                                        {
+                                            context.settings.user.expand_def = open;
+                                        }
                                     });
                                     child_el.className = "expandable detailed_only";
                                     parent_el.appendChild(child_el);
