@@ -2444,15 +2444,18 @@
                                     options.verse_range.top_id = word_ids[0];
                                 }
                                 
-                                /// Are there still more verses to be retreved?
-                                if (verse_ids[0] > 1001001) {
-                                    /// Indicate to the user that more content may be loading, and check for more content.
-                                    ///TODO: Make a separate function for this.
-                                    topLoader.style.visibility = "visible";
-                                    content_manager.add_content_if_needed(BF.consts.previous);
-                                } else {
-                                    /// Since the first verse is Genesis 1:1, there is no need to look for more.
-                                    prevent_further_queries();
+                                /// Make sure the direction is previous (since it could be an intial query).
+                                if (direction === BF.consts.previous) {
+                                    /// Are there still more verses to be retreved?
+                                    if (verse_ids[0] > 1001001) {
+                                        /// Indicate to the user that more content may be loading, and check for more content.
+                                        ///TODO: Make a separate function for this.
+                                        topLoader.style.visibility = "visible";
+                                        content_manager.add_content_if_needed(BF.consts.previous);
+                                    } else {
+                                        /// Since the first verse is Genesis 1:1, there is no need to look for more.
+                                        prevent_further_queries();
+                                    }
                                 }
                             }
                             
