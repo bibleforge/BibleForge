@@ -1122,7 +1122,7 @@
                 settings.add_property(settings.user, "position", {});
                 
                 /// The entered_text property stores what the user last typed in to the query box, even if the user never actually submitted the query.
-                settings.add_property(settings.user, "entered_text", undefined);
+                settings.add_property(settings.user, "entered_text");
                 
                 /// Load user settings (if any).
                 /// Does the browser support localStorage? (All modern browsers should.)
