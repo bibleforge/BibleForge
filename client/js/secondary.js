@@ -2082,7 +2082,7 @@
                                         open: true
                                     });
                                     child_el.className = "expandable detailed_only";
-                                    parent_el.appendChild(child_el)
+                                    parent_el.appendChild(child_el);
                                 }
                                 
                                 /// Add all of the elements to the main fragment.
