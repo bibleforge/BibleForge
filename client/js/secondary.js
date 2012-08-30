@@ -1625,17 +1625,12 @@
                                 that.hide_details();
                                 
                                 hide_callout_details = null;
-                                
-                                return true;
                             };
                             
                             /// Get the current width and height of the element so that when it can return to its original size later.
                             ///NOTE: The offset and client widths and heights are incorrect, so we must use the CSS style (which includes units).
                             pos.css_height = window.getComputedStyle(callout).height;
                             pos.css_width  = window.getComputedStyle(callout).width;
-                            
-                            pos.h = callout.style.height;
-                            pos.w = callout.style.width;
                             
                             /// Create a blank element used to fade out the text.
                             transparent_el = document.createElement("div");
