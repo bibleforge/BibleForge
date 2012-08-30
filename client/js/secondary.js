@@ -1611,10 +1611,15 @@
                         {
                             var that = this;
                             
+                            /// If another callout is already larger, it must be shrunk first.
+                            /// If no callouts are larger, this variable will be falsey.
                             if (hide_callout_details) {
                                 hide_callout_details();
                             }
                             
+                            /**
+                             * Return this callout to its initial (smaller) state.
+                             */
                             hide_callout_details = function ()
                             {
                                 that.hide_details();

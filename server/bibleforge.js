@@ -677,7 +677,7 @@ BF.lexical_lookup = function (data, callback)
         }
         
         ///NOTE: Currently, only one results is requested, so it can simply send data[0].
-        ///      In the future, it should return multiple results for some words (e.g., hyphenated words).
+        ///      In the future, it should return multiple results for some words (e.g., hyphenated words, phrases translated as one word).
         
         callback(data[0]);
     });
