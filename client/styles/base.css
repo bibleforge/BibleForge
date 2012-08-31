@@ -202,7 +202,7 @@ body {
 }
 
 /**
- * Keep the placeholder text grayed out. */
+ * Keep the placeholder text grayed out.
  */
 /* NOTE: WebKit does not need this because the placeholder text does not change colors on focus. */
 /* NOTE: WebKit's placeholder property is "::-webkit-input-placeholder" (note the double colons as well as different text). */
