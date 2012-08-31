@@ -1280,8 +1280,9 @@ h2 {
 }
 @font-face {
     font-family: 'Bitstream Vera Sans Webfont';
-    src: local('Verdana, Italc'),
-         local('Bitstream Vera Sans, Italc'),
+    src: local('Verdana-Italic'),
+         local('Verdana Italic'),
+         local('Bitstream Vera Sans, Italic'),
          url('/fonts/VeraIt.woff') format('woff');
     font-style: italic;
 }
@@ -1309,12 +1310,14 @@ h2 {
 
 @font-face {
     font-family: 'BF_IM_FELL';
-    src: local('IM Fell DW Pica'),
+    src: local('IM FELL DW Pica Regular'),
+         local('IM_FELL_DW_Pica_Roman'),
          url('/fonts/imfepirm28p.woff') format('woff');
 }
 @font-face {
     font-family: 'BF_IM_FELL';
-    src: local('IM Fell DW Pica, Italic'),
+    src: local('IM FELL DW Pica Italic'),
+         local('IM_FELL_DW_Pica_Italic'),
          url('/fonts/imfepiit28p.woff') format('woff');
     font-style: italic;
 }
