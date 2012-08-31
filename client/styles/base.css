@@ -754,7 +754,7 @@ label {
     /* Palatino Linotype (or similar fonts) are used for Greek and BF_Hebrew for Hebrew. */
     /* If both fonts are installed on the computer, the Hebrew letters will fall back to BF_Hebrew, */
     /* but if they are not installed, this will not happen; therefore, a separate class is needed for the Hebrew text. */
-    font-family: 'Palatino Linotype', Palatino, TexGyrePagella, 'TeX Gyre Pagella', 'URWPalladioL', 'Book Antiqua', 'Times new Roman', Times, serif;
+    font-family: 'Palatino Linotype', Palatino, TexGyrePagella, 'TeX Gyre Pagella', 'TeX Gyre Pagella Webfont', 'URWPalladioL', 'Book Antiqua', 'Times new Roman', Times, serif;
     font-size: 30px;
     /* The vertical alignment is required simply to match up with .lex-pronun. */
     vertical-align: super;
@@ -1054,7 +1054,7 @@ ol ol ol ol ol ol {
 
 /* Serif fonts */
 .book, .chapter, .short_book, .first_verse:first-letter, .first_paragraph:first-letter, .d, .hebrew_title {
-    font-family: 'Palatino Linotype', Palatino, TexGyrePagella, 'TeX Gyre Pagella', 'URWPalladioL', 'Book Antiqua', 'Times new Roman', Times, serif;
+    font-family: 'TeX Gyre Pagella Webfont', 'Palatino Linotype', Palatino, TexGyrePagella, 'TeX Gyre Pagella', 'URWPalladioL', 'Book Antiqua', 'Times new Roman', Times, serif;
 }
 
 .book, .chapter, .short_book {
@@ -1163,7 +1163,7 @@ h2 {
        -moz-font-feature-settings: "dlig" 1, "ss01" 1, "liga", "clig", "hlig";
     /* This is just to be future comaptible since browsers do not currently use this. */
             font-feature-settings: "dlig" 1, "ss01" 1, "liga", "clig", "hlig";
-    font-family: BF_IM_FELL, 'Palatino Linotype', Palatino, TexGyrePagella, 'TeX Gyre Pagella', 'URWPalladioL', 'Book Antiqua', 'Times new Roman', Times, serif!important;
+    font-family: BF_IM_FELL, 'Palatino Linotype', Palatino, TexGyrePagella, 'TeX Gyre Pagella', 'TeX Gyre Pagella Webfont', URWPalladioL, 'Book Antiqua', 'Times new Roman', Times, serif!important;
 }
 
 .lang_en_em, .lang_en_em .d {
@@ -1240,33 +1240,41 @@ h2 {
 /* Fonts for Mozilla/Opera/WebKit/IE9+ */
 /*NOTE: If no local() fonts are supplied, Mozilla will always download the web font if it detects an element with this CSS. */
 @font-face {
-    font-family: 'TeX Gyre Pagella';
+    font-family: 'TeX Gyre Pagella Webfont';
     src: local('Palatino Linotype'),
+         local('PalatinoLinotype-Roman'),
          local('Palatino'),
          local('TeX Gyre Pagella'),
+         local('TeXGyrePagella-Regular'),
          url('/fonts/texgyrepagella-regular.woff') format('woff');
 }
 @font-face {
-    font-family: 'TeX Gyre Pagella';
-    src: local('Palatino Linotype, Italc'),
-         local('Palatino, Italc'),
-         local('TeX Gyre Pagella, Italc'),
+    font-family: 'TeX Gyre Pagella Webfont';
+    src: local('Palatino Linotype Italic'),
+         local('PalatinoLinotype-Italic'),
+         local('Palatino Italic'),
+         local('Palatino-Italic'),
+         local('TeXGyrePagella-Italic'),
          url('/fonts/texgyrepagella-italic.woff') format('woff');
     font-style: italic;
 }
 @font-face {
-    font-family: 'TeX Gyre Pagella';
-    src: local('Palatino Linotype, Bold'),
-         local('Palatino, Bold'),
-         local('TeX Gyre Pagella, Bold'),
-         url('/fonts/texgyrepagella-bold.woff') format('woff');
+    font-family: 'TeX Gyre Pagella Webfont';
+    src: local('Palatino Linotype Bold'),
+         local('PalatinoLinotype-Bold'),
+         local('Palatino Linotype, Bold'),
+         local('Palatino Bold'),
+         local('Palatino-Bold'),
+         local('TeXGyrePagella-Bold'),
+         url('/fonts/TeXGyrePagella-Bold.woff') format('woff');
     font-weight: bold;
 }
 @font-face {
-    font-family: 'TeX Gyre Pagella';
-    src: local('Palatino Linotype, Bold Italic'),
-         local('Palatino, Bold Italic'),
-         local('TeX Gyre Pagella, Bold Italic'),
+    font-family: 'TeX Gyre Pagella Webfont';
+    src: local('Palatino Linotype Bold Italic'),
+         local('PalatinoLinotype-BoldItalic'),
+         local('Palatino-BoldItalic'),
+         local('TeXGyrePagella-BoldItalic'),
          url('/fonts/texgyrepagella-bolditalic.woff') format('woff');
     font-weight: bold;
     font-style:  italic;
