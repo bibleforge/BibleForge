@@ -75,13 +75,13 @@
                     transition_name     = "transition";
                     ///NOTE: The suffix "end" is lower case in the offical form only.
                     transition_name_end = "transitionend";
-                } else if (typeof el.style.mozTransition === "string") {
+                } else if (typeof el.style.MozTransition === "string") {
                     /// Mozilla 4-15 use the prefixed version.
-                    transition_name     = "mozTransition";
-                    transition_name_end = "mozTransitionEnd";
-                } else if (typeof el.style.webkitTransition === "string") {
-                    transition_name     = "webkitTransition";
-                    transition_name_end = "webkitTransitionEnd";
+                    transition_name     = "MozTransition";
+                    transition_name_end = "MozTransitionEnd";
+                } else if (typeof el.style.WebkitTransition === "string") {
+                    transition_name     = "WebkitTransition";
+                    transition_name_end = "WebkitTransitionEnd";
                 }
                 ///NOTE: Checking for oTransition does not work.
                 
