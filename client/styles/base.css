@@ -1246,7 +1246,7 @@ h2 {
          local('Palatino'),
          local('TeX Gyre Pagella'),
          local('TeXGyrePagella-Regular'),
-         url('/fonts/texgyrepagella-regular.woff') format('woff');
+         url('/fonts/TeXGyrePagella-Regular.woff') format('woff');
 }
 @font-face {
     font-family: 'TeX Gyre Pagella Webfont';
@@ -1255,7 +1255,7 @@ h2 {
          local('Palatino Italic'),
          local('Palatino-Italic'),
          local('TeXGyrePagella-Italic'),
-         url('/fonts/texgyrepagella-italic.woff') format('woff');
+         url('/fonts/TeXGyrePagella-Italic.woff') format('woff');
     font-style: italic;
 }
 @font-face {
@@ -1275,7 +1275,7 @@ h2 {
          local('PalatinoLinotype-BoldItalic'),
          local('Palatino-BoldItalic'),
          local('TeXGyrePagella-BoldItalic'),
-         url('/fonts/texgyrepagella-bolditalic.woff') format('woff');
+         url('/fonts/TeXGyrePagella-BoldItalic.woff') format('woff');
     font-weight: bold;
     font-style:  italic;
 }
@@ -1284,28 +1284,34 @@ h2 {
     font-family: 'Bitstream Vera Sans Webfont';
     src: local('Verdana'),
          local('Bitstream Vera Sans'),
-         url('/fonts/Vera.woff') format('woff');
+         local('BitstreamVeraSans-Roman'),
+         url('/fonts/BitstreamVeraSans-Roman.woff') format('woff');
 }
 @font-face {
     font-family: 'Bitstream Vera Sans Webfont';
-    src: local('Verdana-Italic'),
-         local('Verdana Italic'),
-         local('Bitstream Vera Sans, Italic'),
-         url('/fonts/VeraIt.woff') format('woff');
+    src: local('Verdana Italic'),
+         local('Verdana-Italic'),
+         local('Bitstream Vera Sans Oblique'),
+         local('BitstreamVeraSans-Oblique'),
+         url('/fonts/BitstreamVeraSans-Oblique.woff') format('woff');
     font-style: italic;
 }
 @font-face {
     font-family: 'Bitstream Vera Sans Webfont';
-    src: local('Verdana, Bold'),
-         local('Bitstream Vera Sans, Bold'),
-         url('/fonts/VeraBd.woff') format('woff');
+    src: local('Verdana Bold'),
+         local('Verdana-Bold'),
+         local('Bitstream Vera Sans Bold'),
+         local('BitstreamVeraSans-Bold'),
+         url('/fonts/BitstreamVeraSans-Bold.woff') format('woff');
     font-weight: bold;
 }
 @font-face {
     font-family: 'Bitstream Vera Sans Webfont';
-    src: local('Verdana, Bold Italic'),
-         local('Bitstream Vera Sans, Bold Italic'),
-         url('/fonts/VeraBI.woff') format('woff');
+    src: local('Verdana Bold Italic'),
+         local('Verdana-BoldItalic'),
+         local('Bitstream Vera Sans Bold Oblique'),
+         local('BitstreamVeraSans-BoldOblique'),
+         url('/fonts/BitstreamVeraSans-BoldOblique.woff') format('woff');
     font-weight: bold;
     font-style:  italic;
 }
@@ -1313,20 +1319,20 @@ h2 {
 @font-face {
     font-family: 'BF_Hebrew';
     src: local('Ezra SIL SR'),
-         url('/fonts/BFHebrew.woff') format('woff');
+         url('/fonts/BF_Hebrew.woff') format('woff');
 }
 
 @font-face {
     font-family: 'BF_IM_FELL';
     src: local('IM FELL DW Pica Regular'),
          local('IM_FELL_DW_Pica_Roman'),
-         url('/fonts/imfepirm28p.woff') format('woff');
+         url('/fonts/IM_FELL_DW_Pica_Roman.woff') format('woff');
 }
 @font-face {
     font-family: 'BF_IM_FELL';
     src: local('IM FELL DW Pica Italic'),
          local('IM_FELL_DW_Pica_Italic'),
-         url('/fonts/imfepiit28p.woff') format('woff');
+         url('/fonts/IM_FELL_DW_Pica_Italic.woff') format('woff');
     font-style: italic;
 }
 
