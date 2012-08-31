@@ -47,7 +47,7 @@ html, body {
 html {
     overflow-y:  scroll;
     overflow-x:  hidden;
-    font-family: 'Bitstream Vera Sans Webfont', 'DejaVu Sans', sans-serif;
+    font-family: Verdana, 'Bitstream Vera Sans', 'Bitstream Vera Sans Webfont', 'DejaVu Sans', sans-serif;
     font-size:   15px;
     
     /* Improve the text rendering and enable support for ligatures and kerning in Mozilla. */
@@ -779,7 +779,7 @@ label {
 
 
 .lex-pronun {
-    font-family: 'Bitstream Vera Sans Webfont', 'DejaVu Sans', sans-serif;
+    font-family: Verdana, 'Bitstream Vera Sans', 'Bitstream Vera Sans Webfont', 'DejaVu Sans', sans-serif;
     font-size: 14px;
     white-space: nowrap;
     /* Because this element can wrap if the word is long and the line height is rather large due to the large original word one the line above, */
