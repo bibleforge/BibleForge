@@ -750,9 +750,11 @@ label {
     margin-left: 7px;
 }
 
-.lex-orig_word, .hebrew_title {
-    /* Palatino Linotype (or similar fonts) are used for Greek and BF_Hebrew for Hebrew, but BF_Hebrew must be behind Palatino because Ezra SIL SR (which can be used in place of BFHebrew) also has some Greek letters, which will interfere with Palatino. */
-    font-family: 'Palatino Linotype', Palatino, TexGyrePagella, 'TeX Gyre Pagella', 'URWPalladioL', BF_Hebrew, 'Book Antiqua', 'Times new Roman', Times, serif;
+.lex-orig_word {
+    /* Palatino Linotype (or similar fonts) are used for Greek and BF_Hebrew for Hebrew. */
+    /* If both fonts are installed on the computer, the Hebrew letters will fall back to BF_Hebrew, */
+    /* but if they are not installed, this will not happen; therefore, a separate class is needed for the Hebrew text. */
+    font-family: 'Palatino Linotype', Palatino, TexGyrePagella, 'TeX Gyre Pagella', 'URWPalladioL', 'Book Antiqua', 'Times new Roman', Times, serif;
     font-size: 30px;
     /* The vertical alignment is required simply to match up with .lex-pronun. */
     vertical-align: super;
@@ -764,6 +766,10 @@ label {
     -webkit-transition: font-size 150ms ease 150ms;
     /* Transition for Opera 10.5+ */
             transition: font-size 150ms ease 150ms;
+}
+
+.hebrew {
+    font-family: "Ezra SIL SR", BF_Hebrew;
 }
 
 /* Zoom the font in when transitioning to show more details. */
@@ -1047,7 +1053,7 @@ ol ol ol ol ol ol {
 }
 
 /* Serif fonts */
-.book, .chapter, .short_book, .first_verse:first-letter, .first_paragraph:first-letter, .d {
+.book, .chapter, .short_book, .first_verse:first-letter, .first_paragraph:first-letter, .d, .hebrew_title {
     font-family: 'Palatino Linotype', Palatino, TexGyrePagella, 'TeX Gyre Pagella', 'URWPalladioL', 'Book Antiqua', 'Times new Roman', Times, serif;
 }
 

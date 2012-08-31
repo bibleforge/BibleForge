@@ -1969,7 +1969,7 @@
                             return ol;
                         }
                         
-                        return function display_callout(callout, data)
+                        return function display_callout(callout, data, id)
                         {
                             /// data Object structure:
                             /// word      (string)  The original Greek, Hebrew, or Aramaic word, in Unicode.
@@ -2025,6 +2025,9 @@
                                 /// Create lex-orig_word.
                                 child_el = document.createElement("span");
                                 child_el.className = "lex-orig_word";
+                                if (id < BF.lang.divisions.nt) {
+                                    child_el.classList.add("hebrew");
+                                }
                                 child_el.textContent = data.word;
                                 parent_el.appendChild(child_el);
                                 /// Add a space between the word and pronunciation drop down box to separate the two elements.
@@ -2136,7 +2139,7 @@
                                 /// Delay the code so that the remained of the code will execute first and prepare the callout variable.
                                 window.setTimeout(function ()
                                 {
-                                    display_callout(callout, lex_cache[clicked_el.id]);
+                                    display_callout(callout, lex_cache[clicked_el.id], Number(clicked_el.id));
                                 }, 0);
                             } else {
                                 ajax.query("GET", "/api", "t=" + BF.consts.lexical_lookup + "&q=" + clicked_el.id, function success(data)
@@ -2145,7 +2148,7 @@
                                     /// Temporarily cache the data so that it does not have to re-queried.
                                     ///NOTE: The cache is cleared before each query.
                                     lex_cache[clicked_el.id] = data;
-                                    display_callout(callout, data);
+                                    display_callout(callout, data, Number(clicked_el.id));
                                 });
                             }
                             

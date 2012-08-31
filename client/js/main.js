@@ -2216,7 +2216,7 @@
                                 if (verse_obj.b === 19 && verse_obj.c === 119 && verse_obj.v % 8 === 1) {
                                     /// Determine which stanza this is.
                                     which_hebrew_letter = Math.floor(verse_obj.v / 8);
-                                    hebrew_heading = "<div class=hebrew_title id=" + verse_id + ">" + aleph_beth[which_hebrew_letter] + " " + BF.lang.hebrew_alphabet[which_hebrew_letter] + "</div>";
+                                    hebrew_heading = "<div class=hebrew_title id=" + verse_id + "><span class=hebrew>" + aleph_beth[which_hebrew_letter] + "</span> " + BF.lang.hebrew_alphabet[which_hebrew_letter] + "</div>";
                                 } else {
                                     hebrew_heading = "";
                                 }
@@ -3465,7 +3465,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?20051954", {
+                BF.include("/js/secondary.js?20058252", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
