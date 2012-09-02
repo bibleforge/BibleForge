@@ -610,7 +610,10 @@
                             return;
                         }
                         
+                        /// Stop other event hooks from being triggered (such as closing callouts).
+                        ///NOTE: e.stopPropagation() does not work because other events are also attached to the document object.
                         e.stopPropagation();
+                        
                         /// Chromium somtimes does not have preventDefault().
                         if (typeof e.preventDefault === "function") {
                             e.preventDefault();
@@ -620,7 +623,9 @@
                 };
                 
                 /// This will be detached by close_menu().
-                document.addEventListener("keydown", key_handler, false);
+                ///NOTE: Settings useCapture to true allows this event to be triggered before bubbling events,
+                ///      which allows stopImmediatePropagation() to prevent all other events, even those added earlier (such as closing the callouts).
+                document.addEventListener("keydown", key_handler, true);
                 
                 /// A delay is needed in order for the CSS transition to occur.
                 window.setTimeout(function ()
@@ -2172,7 +2177,7 @@
                 {
                     var i;
                     
-                    /// Are there no callouts, is the Ctrl key pressed, or is the left button or escape key not pressed?
+                    /// Are there no callouts, is the Ctrl key pressed, or is the left button not pressed?
                     ///NOTE: The Ctrl key is used as a way to open multiple callouts (like selecting multiple files in a file browser).
                     ///TODO: Detecting left mouse click may not be cross-browser compatible (test with IE 10). (Could use e.which or e.buttons.)
                     if (i > 0 || e.ctrlKey || (e.button !== 0 && e.keyCode !== 27)) {
@@ -2215,8 +2220,6 @@
                     /// keyCode 27 is the escape key.
                     if (e.keyCode === 27) {
                         remove(e);
-                        /// Stop other events from intercepting the escape key since it did its job.
-                        e.stopPropagation();
                     }
                 }, false);
                 
