@@ -2171,10 +2171,10 @@
                 {
                     var i;
                     
-                    /// Are there no callouts, is the Ctrl key pressed, or is the left button not pressed?
+                    /// Are there no callouts, is the Ctrl key pressed, or is the left button or escape key not pressed?
                     ///NOTE: The Ctrl key is used as a way to open multiple callouts (like selecting multiple files in a file browser).
                     ///TODO: Detecting left mouse click may not be cross-browser compatible (test with IE 10). (Could use e.which or e.buttons.)
-                    if (i > 0 || e.ctrlKey || e.button !== 0) {
+                    if (i > 0 || e.ctrlKey || (e.button !== 0 && e.keyCode !== 27)) {
                         return;
                     }
                     
@@ -2183,7 +2183,6 @@
                         callout_clicked = false;
                         return;
                     }
-                    
                     
                     if (hide_callout_details) {
                         hide_callout_details();
@@ -2215,6 +2214,8 @@
                     /// keyCode 27 is the escape key.
                     if (e.keyCode === 27) {
                         remove(e);
+                        /// Stop other events from intercepting the escape key since it did its job.
+                        e.stopPropagation();
                     }
                 }, false);
                 
