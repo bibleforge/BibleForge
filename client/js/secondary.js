@@ -79,9 +79,10 @@
                     /// Mozilla 4-15 use the prefixed version.
                     transition_name     = "MozTransition";
                     transition_name_end = "MozTransitionEnd";
-                } else if (typeof el.style.WebkitTransition === "string") {
-                    transition_name     = "WebkitTransition";
-                    transition_name_end = "WebkitTransitionEnd";
+                /// Even though WebKit seems to have WebkitTransitionEnd, it apparently needs to use webkitTransitionEnd (notice the case difference).
+                } else if (typeof el.style.webkitTransition === "string") {
+                    transition_name     = "webkitTransition";
+                    transition_name_end = "webkitTransitionEnd";
                 }
                 ///NOTE: Checking for oTransition does not work.
                 
