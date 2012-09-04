@@ -2481,7 +2481,7 @@
                             {
                                 var link;
                                 
-                                /// After the langauge specific JavaScript has been download, check to see if langauge specific CSS is also needed.
+                                /// After the language specific JavaScript has been download, check to see if language specific CSS is also needed.
                                 
                                 /// Does this language need special CSS?
                                 if (BF.langs[lang_id].has_css) {
@@ -2490,7 +2490,7 @@
                                     link.href = "/styles/lang/" + lang_id + ".css?" + (BF.langs[lang_id].css_modified || "");
                                     link.rel = "stylesheet";
                                     
-                                    /// Because the CSS could contain fonts and other important rules, we must wait until the CSS has downloaded before intiating the langauge.
+                                    /// Because the CSS could contain fonts and other important rules, we must wait until the CSS has downloaded before initiating the language.
                                     ///TODO: Determine if any onerror needs to be listened to in order to handle errors.
                                     link.addEventListener("load", function ()
                                     {
@@ -2500,7 +2500,7 @@
                                     
                                     document.getElementsByTagName("head")[0].appendChild(link);
                                 } else {
-                                    /// If this langauge does not need special CSS, intiate the language immediaately.
+                                    /// If this language does not need special CSS, initiate the language immediately.
                                     activate_new_lang();
                                 }
                             });

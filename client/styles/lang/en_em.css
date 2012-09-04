@@ -42,6 +42,7 @@
     /*BUG Automatic conversion of short s"s to long s"s is not always correct. */
     /*    For example, Colossians is sometimes spelled "Coloſsians" and other times "Coloſſians." */
     /*    One true error is 2 Samuel 19:16 where "wass" is rendered "waß"; whereas the KJV 1611 has "wass," surprisingly. */
+    /*    However, now with the embedded pared down font, "wass" is rendered "waſs," which is at least closer and legitimate. */
     -webkit-font-feature-settings: "dlig" 1, "ss01" 1, "liga", "clig", "hlig";
        -moz-font-feature-settings: "dlig" 1, "ss01" 1, "liga", "clig", "hlig";
     /* This is just to be future comaptible since browsers do not currently use this. */
