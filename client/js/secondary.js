@@ -2477,7 +2477,33 @@
                         } else {
                             /// If the language code has not been downloaded yet, download it now and activate the language after the code has loaded.
                             ///NOTE: The last modified time is added (if available) to prevent browsers from caching an outdated file.
-                            BF.include("/js/lang/" + lang_id + ".js?" + (BF.langs[lang_id].modified || ""), {}, activate_new_lang);
+                            BF.include("/js/lang/" + lang_id + ".js?" + (BF.langs[lang_id].modified || ""), {}, function ()
+                            {
+                                var link;
+                                
+                                /// After the langauge specific JavaScript has been download, check to see if langauge specific CSS is also needed.
+                                
+                                /// Does this language need special CSS?
+                                if (BF.langs[lang_id].has_css) {
+                                    link = document.createElement("link");
+                                    /// Since style sheets are cached for a long period of time, we can use css_modified to create a unique URL to esentially invalidate the cache.
+                                    link.href = "/styles/lang/" + lang_id + ".css?" + (BF.langs[lang_id].css_modified || "");
+                                    link.rel = "stylesheet";
+                                    
+                                    /// Because the CSS could contain fonts and other important rules, we must wait until the CSS has downloaded before intiating the langauge.
+                                    ///TODO: Determine if any onerror needs to be listened to in order to handle errors.
+                                    link.addEventListener("load", function ()
+                                    {
+                                        /// After the CSS loads, preform the initial query.
+                                        activate_new_lang();
+                                    });
+                                    
+                                    document.getElementsByTagName("head")[0].appendChild(link);
+                                } else {
+                                    /// If this langauge does not need special CSS, intiate the language immediaately.
+                                    activate_new_lang();
+                                }
+                            });
                             
                             /// If the language data does not download quickly enough, display a loader graphic.
                             ///NOTE: This timeout will be canceled in change_langEl_text() if the data loads quickly enough.

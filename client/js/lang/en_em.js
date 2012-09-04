@@ -64,6 +64,10 @@
         short_name: "1611",
         id:         "en_em",
         
+        /// Indicate whether or not this version needs a special CSS file.
+        has_css: true,
+        
+        /// Currently, this version does not have lexically linked words.
         linked_to_orig: false,
         
         /// Information about this particular Bible translation needed by the server.
