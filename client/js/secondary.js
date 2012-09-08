@@ -316,7 +316,7 @@
                         
                         /// Release control of the keyboard.
                         context.system.keyboard_busy = false;
-                        document.removeEventListener("keydown", key_handler, false);
+                        document.removeEventListener("keydown", key_handler, true);
                         
                         /// A delay is needed so that if there is a callback, it will run after the menu has been visually removed from the page.
                         window.setTimeout(function ()
