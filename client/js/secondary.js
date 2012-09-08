@@ -1674,7 +1674,6 @@
                                 window.setTimeout(function ()
                                 {
                                     that.transitioning = false;
-                                    console.log("done opening")
                                 }, 50);
                             }, 1000);
                             
@@ -1703,7 +1702,6 @@
                             /// There is a short delay to let the callout start moving.
                             BF.transition(transparent_el, {prop: "backgroundColor", css_prop: "background-color", duration: "250ms", end_val: "rgba(255,255,255,.7)", timing: "steps(3, start)", delay: "50ms"}, function ()
                             {
-                                console.log("1 opening");
                                 that.transition_cue.remove();
                             });
                             
@@ -1716,7 +1714,6 @@
                             {
                                 /// Hide the pointer after transitioning.
                                 pointer.style.display = "none";
-                                console.log("2 opening");
                                 that.transition_cue.remove();
                             });
                             
@@ -1737,7 +1734,6 @@
                             window.setTimeout(function ()
                             {
                                 callout.classList.add("large_callout");
-                                console.log("3 opening");
                                 that.transition_cue.remove();
                             }, 0);
                             
@@ -1747,7 +1743,6 @@
                             window.setTimeout(function ()
                             {
                                 callout.classList.add("detailed_callout");
-                                console.log("4 opening");
                                 that.transition_cue.remove();
                             }, 200);
                             
@@ -1774,7 +1769,6 @@
                                     that.adjust_height();
                                     
                                     that.transitioning = false;
-                                    console.log("done closing")
                                     
                                     if (typeof callback === "function") {
                                         callback();
@@ -1793,7 +1787,6 @@
                                 /// Since we do not want the callout to de displayed below the transparent element,
                                 /// we must change the z-index here, after has completely faded away.
                                 callout.style.zIndex = 0;
-                                console.log(1)
                                 that.transition_cue.remove();
                             });
                             
@@ -1814,7 +1807,6 @@
                             this.transition_cue.add();
                             BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 1}, function ()
                             {
-                                console.log(2)
                                 that.transition_cue.remove();
                             });
                             
@@ -1831,7 +1823,6 @@
                                 {prop: "width",  duration: "300ms", end_val: (pos.css_width  || "300px")}
                             ], function ()
                             {
-                                console.log(3)
                                 that.transition_cue.remove();
                             });
                             
@@ -1841,7 +1832,6 @@
                             window.setTimeout(function ()
                             {
                                 callout.classList.remove("detailed_callout");
-                                console.log(4)
                                 that.transition_cue.remove();
                             }, 200);
                             
@@ -1850,7 +1840,6 @@
                             window.setTimeout(function ()
                             {
                                 callout.classList.remove("large_callout");
-                                console.log(5)
                                 that.transition_cue.remove();
                             }, 0);
                             
