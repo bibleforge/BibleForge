@@ -71,11 +71,9 @@
                     return [];
                 }
                 
-                console.log(str, str.split(/\s*,\s*/g));
-                
                 return str.split(/\s*,\s*/g);
             }
-            {prop: "top",    duration: "300ms", end_val: top    + "px"},
+            
             /**
              * Initiate the transition.
              *
