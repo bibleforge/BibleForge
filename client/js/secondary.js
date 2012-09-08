@@ -237,7 +237,7 @@
          * @note   The element that is created contains two <div> tags: the first for the summary, and the second for the details.
          * @return The new expandable element.
          */
-        BF.make_expandable = function (data)
+        BF.create_expander = function (data)
         {
             var container  = document.createElement("div"),
                 details_el = document.createElement("div"),
@@ -2321,7 +2321,7 @@
                                 /// Create long definition.
                                 /// Does a long definition exist?
                                 if (lex_data.def && lex_data.def.long) {
-                                    child_el = BF.make_expandable({
+                                    child_el = BF.create_expander({
                                         summary_text: "Detailed Definition",
                                         details_el: create_long_def(lex_data.def.long),
                                         open: Boolean(context.settings.user.expand_def),
