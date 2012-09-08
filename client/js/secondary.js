@@ -1712,7 +1712,7 @@
                             
                             this.transition_cue.add();
                             /// Fade out the pointer.
-                            BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 0, start_val: 1}, function ()
+                            BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 0}, function ()
                             {
                                 /// Hide the pointer after transitioning.
                                 pointer.style.display = "none";
@@ -1812,7 +1812,7 @@
                             /// Fade in the pointer.
                             pointer.style.display = "block";
                             this.transition_cue.add();
-                            BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 1, start_val: 0}, function ()
+                            BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 1}, function ()
                             {
                                 console.log(2)
                                 that.transition_cue.remove();
