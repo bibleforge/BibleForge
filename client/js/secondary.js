@@ -185,9 +185,7 @@
             return function transition(el, data, on_finish)
             {
                 var check_finished,
-                    ///TODO: Simplify to use just one counting variable.
-                    data_count,
-                    transitions_completed = 0,
+                    transitions_to_complete,
                     i;
                 
                 if (Array.isArray(data)) {
@@ -197,15 +195,15 @@
                          */
                         check_finished = function ()
                         {
-                            transitions_completed += 1;
-                            if (transitions_completed === data_count) {
+                            transitions_to_complete -= 1;
+                            if (transitions_to_complete === 0) {
                                 on_finish(data);
                             }
                         };
                     }
                     
-                    data_count = data.length;
-                    for (i = 0; i < data_count; i += 1) {
+                    transitions_to_complete = data.length;
+                    for (i = 0; i < transitions_to_complete; i += 1) {
                         preform_transition(el, data[i], check_finished);
                     }
                 } else {
