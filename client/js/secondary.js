@@ -112,7 +112,8 @@
                                 on_finish(data);
                             }
                         }
-                    };
+                    },
+                        no_transition;
                     
                     /// Set the style now, after a delay, so that it dose not try to transition to the start value.
                     ///NOTE: Times must have a unit in Mozilla (i.e., "0" will cause the transition to fail, but "0s" will work).
@@ -120,10 +121,14 @@
                     
                     el.addEventListener(transition_name_end, func);
                     
-                    el.style[data.prop] = data.end_val;
+                    if (el.style[data.prop] !== data.end_val) {
+                        el.style[data.prop] = data.end_val;
+                    } else {
+                        no_transition = true;
+                    }
                     
                     /// If transitions are not working, call the ontransitionend function immediately.
-                    if (typeof transition_name === "undefined" && typeof on_finish === "function") {
+                    if ((no_transition || typeof transition_name === "undefined") && typeof on_finish === "function") {
                         /// Make sure to send the correct propertyName.
                         func({propertyName: (data.css_prop || data.prop)});
                     }
@@ -1627,21 +1632,51 @@
                         {
                             var that = this;
                             
+                            if (this.transitioning) {
+                                return;
+                            }
+                            
                             /// If another callout is already larger, it must be shrunk first.
                             /// If no callouts are larger, this variable will be falsey.
                             if (hide_callout_details) {
-                                hide_callout_details();
+                                /**
+                                 * Open the callout after the other one shrink.
+                                 *
+                                 * @note Because it needs to use the same context (i.e., the "this" variable; a.k.a. "that"), we need to wrap show_details in another function.
+                                 */
+                                hide_callout_details(function ()
+                                {
+                                    that.show_details();
+                                });
+                                
+                                /// Stop the current function and wait for the other callout to shrink.
+                                return;
                             }
+                            
+                            this.transitioning = true;
                             
                             /**
                              * Return this callout to its initial (smaller) state.
                              */
-                            hide_callout_details = function ()
+                            hide_callout_details = function (callback)
                             {
-                                that.hide_details();
-                                
-                                hide_callout_details = null;
+                                that.hide_details(function ()
+                                {
+                                    hide_callout_details = null;
+                                    if (typeof callback === "function") {
+                                        callback();
+                                    }
+                                });
                             };
+                            
+                            this.transition_cue.initialize(function ()
+                            {
+                                window.setTimeout(function ()
+                                {
+                                    that.transitioning = false;
+                                    console.log("done opening")
+                                }, 50);
+                            }, 1000);
                             
                             /// Get the current width and height of the element so that when it can return to its original size later.
                             ///NOTE: The offset and client widths and heights are incorrect, so we must use the CSS style (which includes units).
@@ -1662,17 +1697,27 @@
                             transparent_el.style.pointerEvents = "none";
                             transparent_el.style.zIndex = 10;
                             document.body.insertBefore(transparent_el, null);
+                            
+                            this.transition_cue.add();
                             /// Fade in the transparent element.
                             /// There is a short delay to let the callout start moving.
-                            BF.transition(transparent_el, {prop: "backgroundColor", css_prop: "background-color", duration: "250ms", end_val: "rgba(255,255,255,.7)", timing: "steps(3, start)", delay: "50ms"});
+                            BF.transition(transparent_el, {prop: "backgroundColor", css_prop: "background-color", duration: "250ms", end_val: "rgba(255,255,255,.7)", timing: "steps(3, start)", delay: "50ms"}, function ()
+                            {
+                                console.log("1 opening");
+                                that.transition_cue.remove();
+                            });
                             
                             /// Make sure the callout appears above the semi-transparent element used to fade out the text.
                             callout.style.zIndex = 99;
+                            
+                            this.transition_cue.add();
                             /// Fade out the pointer.
-                            BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 0}, function ()
+                            BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 0, start_val: 1}, function ()
                             {
                                 /// Hide the pointer after transitioning.
                                 pointer.style.display = "none";
+                                console.log("2 opening");
+                                that.transition_cue.remove();
                             });
                             
                             ///NOTE: Small callouts are absolutely positioned, so if transitioning from small to larger (which should be the case),
@@ -1687,17 +1732,23 @@
                                 callout.style.left = (callout.offsetLeft - window.pageXOffset) + "px";
                             }
                             
+                            this.transition_cue.add();
                             /// Tell the callout to transition to a larger font size for certain words.
                             window.setTimeout(function ()
                             {
                                 callout.classList.add("large_callout");
+                                console.log("3 opening");
+                                that.transition_cue.remove();
                             }, 0);
                             
+                            this.transition_cue.add();
                             /// While the callout is transitioning, switch the CSS to hide certain content and show others.
                             /// E.g., the "more" button is hidden when showing details.
                             window.setTimeout(function ()
                             {
                                 callout.classList.add("detailed_callout");
+                                console.log("4 opening");
+                                that.transition_cue.remove();
                             }, 200);
                             
                             ///NOTE: This is used by .align() to know how the callout should be aligned.
@@ -1706,10 +1757,32 @@
                             /// Resize the callout to take up more of the screen.
                             this.align(true);
                         },
-                        hide_details: function ()
+                        hide_details: function (callback)
                         {
                             var that = this;
                             
+                            if (this.transitioning) {
+                                return;
+                            }
+                            
+                            this.transitioning = true;
+                            
+                            this.transition_cue.initialize(function ()
+                            {
+                                window.setTimeout(function ()
+                                {
+                                    that.adjust_height();
+                                    
+                                    that.transitioning = false;
+                                    console.log("done closing")
+                                    
+                                    if (typeof callback === "function") {
+                                        callback();
+                                    }
+                                }, 50);
+                            }, 1000);
+                            
+                            this.transition_cue.add();
                             BF.transition(transparent_el, {prop: "backgroundColor", css_prop: "background-color", duration: "250ms", end_val: "rgba(255,255,255,.0)", timing: "steps(3, start)", delay: "50ms"}, function ()
                             {
                                 /// Remove from DOM and destroy the temporary transparent element.
@@ -1720,6 +1793,8 @@
                                 /// Since we do not want the callout to de displayed below the transparent element,
                                 /// we must change the z-index here, after has completely faded away.
                                 callout.style.zIndex = 0;
+                                console.log(1)
+                                that.transition_cue.remove();
                             });
                             
                             ///NOTE: Small callouts are absolutely positioned, so if transitioning from small to larger (which should be the case),
@@ -1736,37 +1811,86 @@
                             
                             /// Fade in the pointer.
                             pointer.style.display = "block";
-                            BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 1});
+                            this.transition_cue.add();
+                            BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 1, start_val: 0}, function ()
+                            {
+                                console.log(2)
+                                that.transition_cue.remove();
+                            });
+                            
                             /// Resize the callout to take up more of the screen.
+                            this.transition_cue.add();
                             BF.transition(callout, [
                                 ///NOTE: Could use transform: translate(x, y) to possibly optimize the transition.
                                 ///NOTE: It tries to use the previous height and width of the callout before it enlarged,
                                 ///      and if that does not work, it uses the defaults.
                                 ///      E.g., go to Ezekiel 18:5 and click the word "which." Then click more, and then click off of the callout.
-                                {prop: "top",    duration: "300ms", end_val: pos.top    + "px"},
-                                {prop: "left",   duration: "300ms", end_val: pos.left   + "px"},
+                                {prop: "top",    duration: "300ms", end_val: pos.top  + "px"},
+                                {prop: "left",   duration: "300ms", end_val: pos.left + "px"},
                                 {prop: "height", duration: "300ms", end_val: (pos.css_height || "125px")},
                                 {prop: "width",  duration: "300ms", end_val: (pos.css_width  || "300px")}
                             ], function ()
                             {
-                                that.adjust_height();
+                                console.log(3)
+                                that.transition_cue.remove();
                             });
                             
+                            this.transition_cue.add();
                             /// While the callout is transitioning, switch the CSS to hide certain content and show others.
                             /// E.g., the "more" button is hidden when showing details.
                             window.setTimeout(function ()
                             {
                                 callout.classList.remove("detailed_callout");
+                                console.log(4)
+                                that.transition_cue.remove();
                             }, 200);
                             
+                            this.transition_cue.add();
                             /// Tell the callout to transition to a small font size for certain words.
                             window.setTimeout(function ()
                             {
                                 callout.classList.remove("large_callout");
+                                console.log(5)
+                                that.transition_cue.remove();
                             }, 0);
                             
                             this.showing_details = false;
                         },
+                        transition_cue: (function ()
+                        {
+                            var callback,
+                                cue,
+                                failsafe_timeout;
+                            
+                            return {
+                                add: function ()
+                                {
+                                    cue += 1;
+                                },
+                                initialize: function (func, failsafe)
+                                {
+                                    callback = func;
+                                    cue = 0;
+                                    
+                                    if (typeof failsafe === "number" && failsafe > 0) {
+                                        failsafe_timeout = window.setTimeout(function ()
+                                        {
+                                            callback();
+                                            callback = null;
+                                        }, failsafe);
+                                    }
+                                },
+                                remove: function ()
+                                {
+                                    cue -= 1;
+                                    if (cue <= 0 && typeof callback === "function") {
+                                        window.clearTimeout(failsafe_timeout);
+                                        callback();
+                                        callback = null;
+                                    }
+                                }
+                            };
+                        }()),
                         
                         /// Properties
                         just_created: true,
@@ -2212,8 +2336,7 @@
                  * Possibly remove callouts when a user presses escape.
                  *
                  * @param e (event object) The keyboard event object.
-                 * @note  This does not fire when closing menus in Chromium (which is the desired effect), but it does in Firefox (but Firefox seems to work probably when this function is attached once per callout.
-                 * @todo  This closes all callouts when pressing escape, but it probably should just close the one that the user is interacting with.
+                 * @note  This closes all callouts when pressing escape.
                  */
                 document.addEventListener("keydown", function (e)
                 {
