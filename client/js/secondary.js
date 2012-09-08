@@ -1632,6 +1632,7 @@
                         {
                             var that = this;
                             
+                            /// Ignore all other requests while this (or another) callout is transitioning.
                             if (this.transitioning) {
                                 return;
                             }
@@ -1653,16 +1654,25 @@
                                 return;
                             }
                             
+                            /// The "transitioning" property is used to prevent other callouts from being enlarged or this one from shrinking until after the transition has completed..
+                            ///NOTE: It needs to be set down here (after checking for hide_callout_details() because hide_callout_details() also sets "transitioning" to TRUE.
                             this.transitioning = true;
                             
                             /**
                              * Return this callout to its initial (smaller) state.
+                             *
+                             * @note This function is called by the remove() function below before attempting to remove callouts.
+                             * @note This function can be called by another callout that wants to be enlarged.
                              */
                             hide_callout_details = function (callback)
                             {
+                                /// First, shrink this callout.
                                 that.hide_details(function ()
                                 {
+                                    /// After the callout has shrunk, remove this function.
                                     hide_callout_details = null;
+                                    
+                                    /// Possibly call a callout (e.g., enlarge another callout).
                                     if (typeof callback === "function") {
                                         callback();
                                     }
@@ -1671,6 +1681,7 @@
                             
                             this.transition_cue.initialize(function ()
                             {
+                                ///NOTE: A short delay after the transition completes is to make sure that the browser has time to update the screen.
                                 window.setTimeout(function ()
                                 {
                                     that.transitioning = false;
@@ -1756,21 +1767,29 @@
                         {
                             var that = this;
                             
+                            /// Ignore all other requests while this (or another) callout is transitioning.
                             if (this.transitioning) {
                                 return;
                             }
                             
+                            /// The "transitioning" property is used to prevent other callouts from being enlarged or this one from shrinking until after the transition has completed..
                             this.transitioning = true;
                             
                             this.transition_cue.initialize(function ()
                             {
+                                ///NOTE: A short delay after the transition completes is to make sure that the browser has time to update the screen.
                                 window.setTimeout(function ()
                                 {
+                                    /// Because some things in the callout may have been changed by the user, check the height after transitioning back to a small callout.
+                                    /// E.g., Go to Matthew 1:11, click "Babylon," click "[+] more," change the pronuncation key to "(Modern)," then click off of the callout.
                                     that.adjust_height();
                                     
+                                    /// Realign the callout in case the user scrolled, and therefore the callout may not be entirely viewable. 
                                     that.align();
+                                    
                                     that.transitioning = false;
                                     
+                                    /// Possibly call a callout (e.g., enlarge another callout).
                                     if (typeof callback === "function") {
                                         callback();
                                     }
@@ -1811,8 +1830,8 @@
                                 that.transition_cue.remove();
                             });
                             
-                            /// Resize the callout to take up more of the screen.
                             this.transition_cue.add();
+                            /// Resize the callout to take up more of the screen.
                             BF.transition(callout, [
                                 ///NOTE: Could use transform: translate(x, y) to possibly optimize the transition.
                                 ///NOTE: It tries to use the previous height and width of the callout before it enlarged,
@@ -1853,16 +1872,28 @@
                                 failsafe_timeout;
                             
                             return {
+                                /**
+                                 * Increment the cue.
+                                 */
                                 add: function ()
                                 {
                                     cue += 1;
                                 },
+                                /**
+                                 * Initialize a new cue.
+                                 *
+                                 * @param func     (function)          A callback function to be called when the cue reaches zero.
+                                 * @param failsale (number) (optional) How long to wait before triggering the callback in case some of the cue fails to be removed.
+                                 *                                     If less than zero or not a number, no failsafe will be initialized.
+                                 */
                                 initialize: function (func, failsafe)
                                 {
                                     callback = func;
                                     cue = 0;
                                     
                                     if (typeof failsafe === "number" && failsafe > 0 && typeof callback === "function") {
+                                        /// Since CSS transitions sometimes fail to trigger ontransitionend, a failsafe can be useful in catching those errors.
+                                        ///NOTE: If ontransitionend does not end, multiple event functions could be stored and therefore cause strange behavior.
                                         failsafe_timeout = window.setTimeout(function ()
                                         {
                                             callback();
@@ -1870,10 +1901,16 @@
                                         }, failsafe);
                                     }
                                 },
+                                /**
+                                 * Decrement the cue.
+                                 *
+                                 * When the cue reaches zero, execute the callback, if any.
+                                 */
                                 remove: function ()
                                 {
                                     cue -= 1;
                                     if (cue <= 0 && typeof callback === "function") {
+                                        /// Remove the failsafe, if any.
                                         window.clearTimeout(failsafe_timeout);
                                         callback();
                                         callback = null;
