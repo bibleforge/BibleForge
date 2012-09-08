@@ -50,17 +50,51 @@
             show_context_menu,
             show_panel;
         
+        /**
+         * Create the transition() function and its closure.
+         *
+         * @return The transition function.
+         */
         BF.transition = (function ()
         {
+            /**
+             * Parse the CSS transition string to enumerate the comma concatenated styles.
+             *
+             * @example parse_transition(""); /// Returns []
+             * @example parse_transition("top 300ms ease 0s, left 300ms ease 0s, height 300ms ease 0s"); /// Returns ["top 300ms ease 0s", "left 300ms ease 0s", "height 300ms ease 0s"]
+             * @param   str (string) The CSS transition string to parse.
+             * @return  An array of styles (if any).
+             */
             function parse_transition(str)
             {
                 if (typeof str === "undefined" || str.trim() === "") {
                     return [];
                 }
                 
+                console.log(str, str.split(/\s*,\s*/g));
+                
                 return str.split(/\s*,\s*/g);
             }
-            
+            {prop: "top",    duration: "300ms", end_val: top    + "px"},
+            /**
+             * Initiate the transition.
+             *
+             * @param el   (DOM element) The element to transition.
+             * @param data (object) An object describing the transition.
+             *                      Object structure:
+             *                      {prop:      "(string) The property to transition in the JavaScript naming convention (possibly the same as CSS)",
+             *                       css_prop:  "(string) The property to transition in the CSS naming convention (if different from 'prop') (optional)",
+             *                       duration:  "(string) The length of time the transition should take (in CSS notation) (optional) (default: '1s')",
+             *                       start_val: "(string) The value to begin with before the transition begins (optional)",
+             *                       end_val:   "(string) The final value the transition should end at",
+             *                       timing:    "(string) The CSS timing function to use (optional) (default: 'ease')",
+             *                       delay:     "(string) The length of time to pass before the transition starts (optional) (default: '0s')"}
+             * @param on_finish (function) (optional) The function to call after the transition completes.
+             * @note  If the CSS property is different from the JavaScript property (e.g., "background-color" (CSS) vs. "backgroundColor" (JavaScript)), make sure to include css_prop.
+             * @note  Make sure to use the most specific CSS property available.
+             *        E.g., changing the background color with {prop: "background", end_val: "red"} will not work because it will be interrupted as background-color.
+             *        So the proper way would be {prop: "backgroundColor", css_prop: "background-color", end_val: "red"}.
+             */
             function preform_transition(el, data, on_finish)
             {
                 var transition_name,
@@ -88,6 +122,12 @@
                 
                 window.setTimeout(function ()
                 {
+                    /**
+                     * Remove the transition style from the element and execute the callback (if any).
+                     *
+                     * @param e (object) An object containing which CSS property completed (via the "propertyName" property).
+                     * @note  The data object is sent to the callback.
+                     */
                     var func = function (e)
                     {
                         var i,
@@ -135,15 +175,28 @@
                 }, 0);
             }
             
+            /**
+             * Transition an element's CSS.
+             *
+             * @example BF.transition(element, {prop: "height", end_val: "100px", duration: "300ms"}, function callback() {})
+             * @example BF.transition(element, [{prop: "top", duration: "300ms", end_val: "0"}, {prop: "fontSize", css_prop: "font-size", duration: "300ms", end_val: "30px"}, {prop: "height", duration: "300ms", start_val: "100%", end_val: "12em", delay: "1s"}, {prop: "width", end_val: "200px", timing: "steps(3, start)"}]);
+             * @param   el        (DOM element)         The element to transition.
+             * @param   data      (array || object)     An object describing the transition or an array of objects (See preform_transition() for more details.)
+             * @param   on_finish (function) (optional) The function to call after the transition completes.
+             */
             return function transition(el, data, on_finish)
             {
                 var check_finished,
+                    ///TODO: Simplify to use just one counting variable.
                     data_count,
                     transitions_completed = 0,
                     i;
                 
                 if (Array.isArray(data)) {
                     if (typeof on_finish === "function") {
+                        /**
+                         * Keep track of how many transitions have completed, and execute the callback after the last transition completes.
+                         */
                         check_finished = function ()
                         {
                             transitions_completed += 1;
@@ -158,13 +211,31 @@
                         preform_transition(el, data[i], check_finished);
                     }
                 } else {
+                    /// If only one property is to be transitioned, just send it directly to preform_transition().
                     preform_transition(el, data, on_finish);
                 }
             };
         }());
         
         /**
-         * @todo Document.
+         * Create an element that can expand and collapse.
+         *
+         * This is similar to HTML5's <details><summary>...</summary>...</details> but cross browser and better looking.
+         *
+         * @param  data (object) An object describing the elements to make expandable.
+         *                       Object structure:
+         *                       {summary_el:    (DOM element) The DOM element to use for the summary,
+         *                        summary_text: "(string) Text to place in the summary element (only used if "summary_el" is falsey) (optional)",
+         *                        details_el:    (DOM element) The DOM element to use for the details,
+         *                        details_text: "(string) Text to place in the details element (only used if "details_el" is falsey) (optional)",
+         *                        open:          (boolean) Set TRUE to make it open initially (optional) (default: FALSE),
+         *                        onstateChange: (function) function (open)
+         *                                       {
+         *                                           /// Callback function when opening or closing.
+         *                                           /// The "open" variable is a boolean indicating the current state
+         *                                       }}
+         * @note   The element that is created contains two <div> tags: the first for the summary, and the second for the details.
+         * @return The new expandable element.
          */
         BF.make_expandable = function (data)
         {
@@ -193,6 +264,8 @@
             details_el.className = "expandable_details";
             
             /**
+             * Expand or collapse the element.
+             *
              * @todo Make keyboard accessible.
              */
             summary_el.addEventListener("click", function ()
@@ -248,7 +321,6 @@
             details_el.style.overflowY = "hidden";
             
             /// Set the default state.
-            
             if (data.open) {
                 open = true;
                 summary_el.classList.add("expanded");
