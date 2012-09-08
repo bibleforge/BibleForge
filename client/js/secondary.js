@@ -1768,6 +1768,7 @@
                                 {
                                     that.adjust_height();
                                     
+                                    that.align();
                                     that.transitioning = false;
                                     
                                     if (typeof callback === "function") {
@@ -1802,9 +1803,9 @@
                                 callout.style.left = (callout.offsetLeft + window.pageXOffset) + "px";
                             }
                             
+                            this.transition_cue.add();
                             /// Fade in the pointer.
                             pointer.style.display = "block";
-                            this.transition_cue.add();
                             BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 1}, function ()
                             {
                                 that.transition_cue.remove();
@@ -1861,7 +1862,7 @@
                                     callback = func;
                                     cue = 0;
                                     
-                                    if (typeof failsafe === "number" && failsafe > 0) {
+                                    if (typeof failsafe === "number" && failsafe > 0 && typeof callback === "function") {
                                         failsafe_timeout = window.setTimeout(function ()
                                         {
                                             callback();
