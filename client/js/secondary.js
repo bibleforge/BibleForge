@@ -120,37 +120,50 @@
                 
                 window.setTimeout(function ()
                 {
-                    /**
-                     * Remove the transition style from the element and execute the callback (if any).
-                     *
-                     * @param e (object) An object containing which CSS property completed (via the "propertyName" property).
-                     * @note  The data object is sent to the callback.
-                     */
-                    var func = function (e)
-                    {
-                        var i,
-                            transition_arr;
-                        
-                        ///NOTE: If transition_name remains undefined, it will have no adverse effects. The style will just take place without a transition.
-                        
-                        if (e.propertyName === (data.css_prop|| data.prop)) {
-                            el.removeEventListener(transition_name_end, func);
+                    var failsafe_timeout,
+                        /**
+                         * Remove the transition style from the element and execute the callback (if any).
+                         *
+                         * @param e (object) An object containing which CSS property completed (via the "propertyName" property).
+                         * @note  The data object is sent to the callback.
+                         */
+                        func = function (e)
+                        {
+                            var i,
+                                transition_arr;
                             
-                            transition_arr = parse_transition(el.style[transition_name]);
+                            /// Clear any failsafe timeout.
+                            window.clearTimeout(failsafe_timeout);
                             
-                            for (i = transition_arr.length - 1; i >= 0; i -= 1) {
-                                if (transition_arr[i].indexOf((data.css_prop || data.prop)) === 0) {
-                                    BF.remove(transition_arr, i);
+                            ///NOTE: If transition_name remains undefined, it will have no adverse effects. The style will just take place without a transition.
+                            
+                            /// Is the current property that just finished transitioning the same one as this one?
+                            if (e.propertyName === (data.css_prop || data.prop)) {
+                                /// If so, stop listening.
+                                el.removeEventListener(transition_name_end, func);
+                                
+                                /// Now, we need to remove the transition CSS from the element so that future changes to that property will not cause a transition.
+                                /// To do that, we have to find the different CSS properties that are set to transition and then remove the correct one.
+                                
+                                transition_arr = parse_transition(el.style[transition_name]);
+                                
+                                for (i = transition_arr.length - 1; i >= 0; i -= 1) {
+                                    /// Do the properties match?
+                                    /// The space (" ") is used to make sure to match the entire property, not just part of it:
+                                    /// e.g., "background 1s ease" would match "background-color 1s ease" without the space.
+                                    if (transition_arr[i].indexOf((data.css_prop || data.prop) + " ") === 0) {
+                                        BF.remove(transition_arr, i);
+                                    }
+                                }
+                                
+                                /// Put the remaining styles back.
+                                el.style[transition_name] = transition_arr.join(",");
+                                
+                                if (typeof on_finish === "function") {
+                                    on_finish(data);
                                 }
                             }
-                            
-                            el.style[transition_name] = transition_arr.join(",");
-                            
-                            if (typeof on_finish === "function") {
-                                on_finish(data);
-                            }
-                        }
-                    },
+                        },
                         no_transition;
                     
                     /// Set the style now, after a delay, so that it dose not try to transition to the start value.
@@ -163,6 +176,13 @@
                         el.style[data.prop] = data.end_val;
                     } else {
                         no_transition = true;
+                    }
+                    
+                    if (data.failsafe && typeof data.failsafe === "number") {
+                        failsafe_timeout = window.setTimeout(function ()
+                        {
+                            func({propertyName: (data.css_prop || data.prop)});
+                        }, data.failsafe);
                     }
                     
                     /// If transitions are not working, call the ontransitionend function immediately.
@@ -1619,10 +1639,10 @@
                                         ///NOTE: This is not the best place to calculate start_val. This only works when assuming it used to have position absolute.
                                         ///NOTE: Could use transform: translate(x, y) to possibly optimize the transition.
                                         ///      The easiest way to do that would be to set the top and left to 0 and translate from there.
-                                        {prop: "top",    duration: "300ms", end_val: top    + "px"},
-                                        {prop: "left",   duration: "300ms", end_val: left   + "px"},
-                                        {prop: "height", duration: "300ms", end_val: height + "px"},
-                                        {prop: "width",  duration: "300ms", end_val: width  + "px"}
+                                        {prop: "top",    duration: "300ms", end_val: top    + "px", failsafe: 500},
+                                        {prop: "left",   duration: "300ms", end_val: left   + "px", failsafe: 500},
+                                        {prop: "height", duration: "300ms", end_val: height + "px", failsafe: 500},
+                                        {prop: "width",  duration: "300ms", end_val: width  + "px", failsafe: 500}
                                     ], transition_callback);
                                 } else {
                                     /// When the screen changes size after the callout is already large, just resize the callout as quickly as possible.
@@ -1783,7 +1803,7 @@
                             this.transition_cue.add();
                             /// Fade in the transparent element.
                             /// There is a short delay to let the callout start moving.
-                            BF.transition(transparent_el, {prop: "backgroundColor", css_prop: "background-color", duration: "250ms", end_val: "rgba(255,255,255,.7)", timing: "steps(3, start)", delay: "50ms"}, function ()
+                            BF.transition(transparent_el, {prop: "backgroundColor", css_prop: "background-color", duration: "250ms", end_val: "rgba(255,255,255,.7)", timing: "steps(3, start)", delay: "50ms", failsafe: 500}, function ()
                             {
                                 that.transition_cue.remove();
                             });
@@ -1793,7 +1813,7 @@
                             
                             this.transition_cue.add();
                             /// Fade out the pointer.
-                            BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 0}, function ()
+                            BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 0, failsafe: 500}, function ()
                             {
                                 /// Hide the pointer after transitioning.
                                 pointer.style.display = "none";
@@ -1869,7 +1889,7 @@
                             }, 1000);
                             
                             this.transition_cue.add();
-                            BF.transition(transparent_el, {prop: "backgroundColor", css_prop: "background-color", duration: "250ms", end_val: "rgba(255,255,255,.0)", timing: "steps(3, start)", delay: "50ms"}, function ()
+                            BF.transition(transparent_el, {prop: "backgroundColor", css_prop: "background-color", duration: "250ms", end_val: "rgba(255,255,255,.0)", timing: "steps(3, start)", delay: "50ms", failsafe: 500}, function ()
                             {
                                 /// Remove from DOM and destroy the temporary transparent element.
                                 document.body.removeChild(transparent_el);
@@ -1897,7 +1917,7 @@
                             this.transition_cue.add();
                             /// Fade in the pointer.
                             pointer.style.display = "block";
-                            BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 1}, function ()
+                            BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 1, failsafe: 500}, function ()
                             {
                                 that.transition_cue.remove();
                             });
@@ -1909,10 +1929,10 @@
                                 ///NOTE: It tries to use the previous height and width of the callout before it enlarged,
                                 ///      and if that does not work, it uses the defaults.
                                 ///      E.g., go to Ezekiel 18:5 and click the word "which." Then click more, and then click off of the callout.
-                                {prop: "top",    duration: "300ms", end_val: pos.top  + "px"},
-                                {prop: "left",   duration: "300ms", end_val: pos.left + "px"},
-                                {prop: "height", duration: "300ms", end_val: (pos.css_height || "125px")},
-                                {prop: "width",  duration: "300ms", end_val: (pos.css_width  || "300px")}
+                                {prop: "top",    duration: "300ms", end_val: pos.top  + "px",             failsafe: 500},
+                                {prop: "left",   duration: "300ms", end_val: pos.left + "px",             failsafe: 500},
+                                {prop: "height", duration: "300ms", end_val: (pos.css_height || "125px"), failsafe: 500},
+                                {prop: "width",  duration: "300ms", end_val: (pos.css_width  || "300px"), failsafe: 500}
                             ], function ()
                             {
                                 that.transition_cue.remove();
@@ -1940,8 +1960,7 @@
                         transition_cue: (function ()
                         {
                             var callback,
-                                cue,
-                                failsafe_timeout;
+                                cue;
                             
                             return {
                                 /**
@@ -1954,24 +1973,12 @@
                                 /**
                                  * Initialize a new cue.
                                  *
-                                 * @param func     (function)          A callback function to be called when the cue reaches zero.
-                                 * @param failsale (number) (optional) How long to wait before triggering the callback in case some of the cue fails to be removed.
-                                 *                                     If less than zero or not a number, no failsafe will be initialized.
+                                 * @param func (function) A callback function to be called when the cue reaches zero.
                                  */
-                                initialize: function (func, failsafe)
+                                initialize: function (func)
                                 {
                                     callback = func;
                                     cue = 0;
-                                    
-                                    if (typeof failsafe === "number" && failsafe > 0 && typeof callback === "function") {
-                                        /// Since CSS transitions sometimes fail to trigger ontransitionend, a failsafe can be useful in catching those errors.
-                                        ///NOTE: If ontransitionend does not end, multiple event functions could be stored and therefore cause strange behavior.
-                                        failsafe_timeout = window.setTimeout(function ()
-                                        {
-                                            callback();
-                                            callback = null;
-                                        }, failsafe);
-                                    }
                                 },
                                 /**
                                  * Decrement the cue.
@@ -1982,8 +1989,6 @@
                                 {
                                     cue -= 1;
                                     if (cue <= 0 && typeof callback === "function") {
-                                        /// Remove the failsafe, if any.
-                                        window.clearTimeout(failsafe_timeout);
                                         callback();
                                         callback = null;
                                     }
