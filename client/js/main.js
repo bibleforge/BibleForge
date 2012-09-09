@@ -755,44 +755,6 @@
         }
     };
     
-    /**
-     * Add or remove a CSS class name.
-     *
-     * @example BF.toggleCSS(page, "hidden_cursor", 1); /// Add "hidden_cursor" to page's list of classes (if not already present).
-     * @example BF.toggleCSS(page, "hidden_cursor", 0); /// Remove "hidden_cursor" from page's list of classes (if already present).
-     * @example BF.toggleCSS(page, "hidden_cursor"); /// Add/remove (depending on if it is already present) "hidden_cursor" to/from page's list of classes.
-     * @param   el        (DOM element)        The element to modify.
-     * @param   className (string)             The class to add/remove.
-     * @param   force     (integer) (optional) Whether or not to force the toggle on (1) or off (0).
-     * @return  NULL
-     * @todo    Consider using HTML5's classList DOMTokenList, which is in all of the major browsers except IE.
-     */
-    BF.toggleCSS = function (el, className, force)
-    {
-        var class_arr = el.className.split(" "),
-            found = false,
-            i,
-            new_class = "";
-        
-        for (i = class_arr.length - 1; i >= 0; i -= 1) {
-            if (class_arr[i] === className) {
-                found = true;
-                if (force === 1) {
-                    new_class = class_arr[i] + " " + new_class;
-                }
-            } else {
-                new_class = class_arr[i] + " " + new_class;
-            }
-        }
-        
-        /// If the class name was not found and the class name must be added, add it to the end.
-        if (!found && force !== 0) {
-            new_class = className + " " + new_class;
-        }
-        
-        el.className = new_class.trim();
-    };
-    
     
     /**
      * Determine whether or not a psalm has a title.
@@ -3465,7 +3427,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?20757817", {
+                BF.include("/js/secondary.js?20819587", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
@@ -3534,12 +3496,12 @@
     
     if (BF.is_WebKit) {
         /// Add "webkit" to the <html> element's class to allow for WebKit specific CSS.
-        BF.toggleCSS(document.getElementsByTagName("html")[0], "webkit", true);
+        document.getElementsByTagName("html")[0].classList.add("webkit");
     }
     
     if (window.opera) {
         /// Add "opera" to the <html> element's class to allow for Opera specific CSS.
-        BF.toggleCSS(document.getElementsByTagName("html")[0], "opera", true);
+        document.getElementsByTagName("html")[0].classList.add("opera");
     }
     
     if (BF.is_Mozilla) {
@@ -3628,9 +3590,9 @@
             return output;
         };
         
-        @if (@_jscript_version >= 9)
+        @if (@_jscript_version >= 10)
             /// Add "ie" to the <html> element's class to allow for IE specific CSS.
-            BF.toggleCSS(document.getElementsByTagName("html")[0], "ie", true);
+            document.getElementsByTagName("html")[0].classList.add("ie");
         @end
     @*/
     

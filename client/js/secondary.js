@@ -436,9 +436,9 @@
                 {
                     if (old_item !== cur_item) {
                         if (old_item > -1) {
-                            BF.toggleCSS(menu_container.childNodes[old_item], "menu_item_selected", 0);
+                            menu_container.childNodes[old_item].classList.remove("menu_item_selected");
                         }
-                        BF.toggleCSS(menu_container.childNodes[cur_item], "menu_item_selected", 1);
+                        menu_container.childNodes[cur_item].classList.add("menu_item_selected");
                     }
                 }
                 
@@ -509,7 +509,7 @@
                     }
                     /// Should there be a line break before this item?
                     if (menu_items[i].line) {
-                        BF.toggleCSS(menu_item, "menu_item_line", 1);
+                        menu_item.classList.add("menu_item_line");
                     }
                     
                     /// Add a title if present.
@@ -893,16 +893,20 @@
                      * Trick WebKit into updating the cursor.
                      *
                      * @param  el        (DOM element) The element which cursor is changing
-                     * @param  className (string)      The class name to toggle
-                     * @param  force     (integer)     Whether or not to force the toggle on (1) or off (0).
+                     * @param  className (string)      The class name to add or remove
+                     * @param  add       (boolean)     Whether to add or remove the class.
                      * @return NULL
                      * @bug    This does not work with at least Chromium 15 on mousedown.
                      */
-                    return function (el, className, force)
+                    return function (el, className, add)
                     {
                         window.setTimeout(function ()
                         {
-                            BF.toggleCSS(el, className, force);
+                            if (add) {
+                                el.classList.add(className);
+                            } else {
+                                el.classList.remove(className);
+                            }
                             
                             ///NOTE: Because WebKit thinks the cursor moved, it will call the onmousemove event, which will reset the cursor.
                             ///      So, we need to ignore the next onmousemove event.
@@ -928,10 +932,10 @@
                     if (BF.is_WebKit) {
                         ///NOTE: For a yet unknown reason, when being called onmousedown, this must be called twice.
                         ///      Actually, this used to work, but in Chrome 15 it does not seem to.
-                        webkit_cursor_hack(page, hidden_css, 0);
-                        webkit_cursor_hack(page, hidden_css, 0);
+                        webkit_cursor_hack(page, hidden_css, false);
+                        webkit_cursor_hack(page, hidden_css, false);
                     } else {
-                        BF.toggleCSS(page, hidden_css, 0);
+                        page.classList.remove(hidden_css);
                     }
                     
                     is_cursor_visible = true;
@@ -954,10 +958,10 @@
                     ///NOTE: WebKit can use an almost completely transparent PNG.
                     ///      Opera (at least 10.53) has no alternate cursor support whatsoever.
                     if (BF.is_WebKit) {
-                        webkit_cursor_hack(page, hidden_css, 1);
+                        webkit_cursor_hack(page, hidden_css, true);
                     } else {
-                        /// Mozilla/IE9
-                        BF.toggleCSS(page, hidden_css, 1);
+                        /// Mozilla/IE10(?)
+                        page.classList.add(hidden_css);
                     }
                     
                     is_cursor_visible = false;
@@ -1334,12 +1338,12 @@
                     function open()
                     {
                         /// Because the context menu is open, keep the icon dark.
-                        BF.toggleCSS(wrench_button, "activeWrenchIcon", 1);
+                        wrench_button.classList.add("activeWrenchIcon");
                     },
                     function close()
                     {
                         /// When the menu closes, the wrench button should be lighter.
-                        BF.toggleCSS(wrench_button, "activeWrenchIcon", 0);
+                        wrench_button.classList.remove("activeWrenchIcon");
                     }
                 );
                 
@@ -2114,7 +2118,7 @@
                 
                 /// Since this is not styled by initially, it needs to be set now.
                 if (BF.lang.linked_to_orig) {
-                    BF.toggleCSS(page, "linked", 1);
+                    page.classList.add("linked");
                 }
                 
                 /// Initialize the settings.user.pronun_type setting.
@@ -2270,7 +2274,7 @@
                                     callout.adjust_height();
                                 });
                                 /// Since the drop down box already has a style ("dropdown") concatenate "lex-pronun" to the end.
-                                BF.toggleCSS(child_el, "lex-pronun", 1);
+                                child_el.classList.add("lex-pronun");
                                 parent_el.appendChild(child_el);
                                 
                                 html.appendChild(parent_el);
@@ -2618,9 +2622,13 @@
                             change_langEl_text(BF.lang.short_name);
                             
                             /// Make the cursor turn into a hand when hovering over words if there is lexical data available.
-                            BF.toggleCSS(page, "linked", BF.lang.linked_to_orig ? 1 : 0);
-                            BF.toggleCSS(page, "lang_" + prev_lang,  0);
-                            BF.toggleCSS(page, "lang_" + lang_id,    1);
+                            if (BF.lang.linked_to_orig) {
+                                page.classList.add("linked");
+                            } else {
+                                page.classList.remove("linked");
+                            }
+                            page.classList.remove("lang_" + prev_lang);
+                            page.classList.add("lang_" + lang_id);
                             
                             context.system.event.trigger("languageChange", {prev_lang: prev_lang});
                             
@@ -2741,7 +2749,7 @@
             
             /// Make the necessary changes to load the default language when the page first loads.
             change_langEl_text(BF.lang.short_name);
-            BF.toggleCSS(page, "lang_" + BF.lang.id, 1);
+            page.classList.add("lang_" + BF.lang.id);
             
             /// The language button is hidden until the current language name is displayed.
             langEl.style.visibility = "visible";
@@ -2808,12 +2816,12 @@
                         function open()
                         {
                             /// Because the menu is open, keep the button dark.
-                            BF.toggleCSS(langEl, "activeLang", 1);
+                            langEl.classList.add("activeLang");
                         },
                         function close()
                         {
                             /// When the menu closes, the button should be lighter.
-                            BF.toggleCSS(langEl, "activeLang", 0);
+                            langEl.classList.remove("activeLang");
                         }
                     );
                     
