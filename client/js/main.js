@@ -2131,8 +2131,7 @@
                      */
                     function write_verses(type, direction, verse_ids, verse_html, paragraphs, in_paragraphs, verse_range)
                     {
-                        var aleph_beth = ["\u05d0", "\u05d1", "\u05d2", "\u05d3", "\u05d4", "\u05d5", "\u05d6", "\u05d7", "\u05d8", "\u05d9", "\u05db", "\u05dc", "\u05de", "\u05e0", "\u05e1", "\u05e2", "\u05e4", "\u05e6", "\u05e7", "\u05e8", "\u05e9", "\u05ea"],
-                            end_paragraph_HTML   = "",
+                        var end_paragraph_HTML   = "",
                             first_paragraph_HTML = "",
                             i,
                             hebrew_heading,
@@ -2178,7 +2177,7 @@
                                 if (verse_obj.b === 19 && verse_obj.c === 119 && verse_obj.v % 8 === 1) {
                                     /// Determine which stanza this is.
                                     which_hebrew_letter = Math.floor(verse_obj.v / 8);
-                                    hebrew_heading = "<div class=hebrew_title id=" + verse_id + "><span class=hebrew>" + aleph_beth[which_hebrew_letter] + "</span> " + BF.lang.hebrew_alphabet[which_hebrew_letter] + "</div>";
+                                    hebrew_heading = "<div class=hebrew_title id=" + verse_id + "><span class=hebrew>" + ["\u05d0", "\u05d1", "\u05d2", "\u05d3", "\u05d4", "\u05d5", "\u05d6", "\u05d7", "\u05d8", "\u05d9", "\u05db", "\u05dc", "\u05de", "\u05e0", "\u05e1", "\u05e2", "\u05e4", "\u05e6", "\u05e7", "\u05e8", "\u05e9", "\u05ea"][which_hebrew_letter] + "</span> " + BF.lang.hebrew_alphabet[which_hebrew_letter] + "</div>";
                                 } else {
                                     hebrew_heading = "";
                                 }
