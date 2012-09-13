@@ -3426,7 +3426,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?20823178", {
+                BF.include("/js/secondary.js?21176090", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,

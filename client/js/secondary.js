@@ -2183,6 +2183,11 @@
                             ];
                         }
                         
+                        /**
+                         * Convert an array of definitions into HTML.
+                         *
+                         * @param defs (array) The array to be converted to an HTML list.
+                         */
                         function create_long_def(defs)
                         {
                             var li,
@@ -2190,12 +2195,13 @@
                             
                             defs.forEach(function (def)
                             {
+                                /// If it is a string, add the element.
                                 if (typeof def === "string") {
                                     li = document.createElement("li");
                                     li.textContent = def;
                                     ol.appendChild(li);
                                 } else {
-                                    /// It must be an array.
+                                    /// If it is not a string, it must be an array, so recursively call the function.
                                     ol.appendChild(create_long_def(def));
                                 }
                             });
@@ -2203,6 +2209,13 @@
                             return ol;
                         }
                         
+                        /**
+                         * Add content to the callout.
+                         *
+                         * @param callout (object) The callout object
+                         * @param data    (object) An object containing info to be placed into the callout
+                         * @param id      (number) The word ID (used to determine which Testament this word is from)
+                         */
                         return function display_callout(callout, data, id)
                         {
                             /// data Object structure:
