@@ -1538,7 +1538,7 @@
                 /**
                  * Find a verse element that is within a certain Y coordinate on the screen.
                  *
-                 * @example verse = get_verse_at_position(window.pageYOffset + topBar_height + 8,  true,  page); /// Could return {b: 1, c: 1, v: 1} for Genesis 1:1.
+                 * @example verse = get_verse_at_position(window.pageYOffset + topBar_height + 8, true, page); /// Could return {b: 1, c: 1, v: 1} for Genesis 1:1.
                  * @param   the_pos        (number)  The vertical position on the page.
                  * @param   looking_upward (boolean) Whether the verses at the top or bottom of the page.
                  * @param   parent_el      (element) The HTML element that ultimately contains the verse.
