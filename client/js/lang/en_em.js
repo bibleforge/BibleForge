@@ -66,6 +66,7 @@
         
         /// Indicate whether or not this version needs a special CSS file.
         has_css: true,
+        css_modified: 21245399,
         
         /// Currently, this version does not have lexically linked words.
         linked_to_orig: false,
