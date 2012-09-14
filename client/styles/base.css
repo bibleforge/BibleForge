@@ -768,7 +768,8 @@ label {
             transition: font-size 150ms ease 150ms;
 }
 
-.hebrew {
+/* The first letter of Psalm 119 titles is a Hebrew letter. */
+.hebrew, .psalm_119_heading:first-letter {
     font-family: "Ezra SIL SR", BF_Hebrew;
 }
 
@@ -1053,7 +1054,7 @@ ol ol ol ol ol ol {
 }
 
 /* Serif fonts */
-.book, .chapter, .short_book, .first_verse:first-letter, .first_paragraph:first-letter, .d, .hebrew_title {
+.book, .chapter, .short_book, .first_verse:first-letter, .first_paragraph:first-letter, .d, .psalm_119_heading {
     font-family: 'TeX Gyre Pagella Webfont', 'Palatino Linotype', Palatino, TexGyrePagella, 'TeX Gyre Pagella', 'URWPalladioL', 'Book Antiqua', 'Times new Roman', Times, serif;
 }
 
@@ -1063,7 +1064,7 @@ ol ol ol ol ol ol {
     font-size: 23px;
 }
 
-.chapter, .short_book, .hebrew_title {
+.chapter, .short_book, .psalm_119_heading {
     padding:     13px 0 13px 0;
     margin:      0;
     line-height: 31px;
@@ -1119,9 +1120,14 @@ h2 {
 }
 
 
-.hebrew_title {
+.psalm_119_heading {
     text-align: center;
     font-size: 23px;
+}
+
+.psalm_119_heading:first-letter {
+    /* For some reason, the Hebrew letter creates a line height issues that can be solved by completely removing the line height from it. */
+    line-height: 0;
 }
 
 /* Style the previous and next links for the non-JavaScript version. */

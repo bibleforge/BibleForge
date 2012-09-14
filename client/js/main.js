@@ -49,7 +49,7 @@
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (1611)",
-            modified:  20413230
+            modified:  21265161
         };
     }
     
@@ -1639,7 +1639,7 @@
                     case "short_book":
                     case "psalm_title":
                     case "subscription":
-                    case "hebrew_title":
+                    case "psalm_119_heading":
                         /// Found the verse, so calculate the verseID and call the success function.
                         verse_id = window.parseInt(el.id, 10);
                         
@@ -2177,7 +2177,7 @@
                                 if (verse_obj.b === 19 && verse_obj.c === 119 && verse_obj.v % 8 === 1) {
                                     /// Determine which stanza this is.
                                     which_hebrew_letter = Math.floor(verse_obj.v / 8);
-                                    hebrew_heading = "<div class=hebrew_title id=" + verse_id + "><span class=hebrew>" + ["\u05d0", "\u05d1", "\u05d2", "\u05d3", "\u05d4", "\u05d5", "\u05d6", "\u05d7", "\u05d8", "\u05d9", "\u05db", "\u05dc", "\u05de", "\u05e0", "\u05e1", "\u05e2", "\u05e4", "\u05e6", "\u05e7", "\u05e8", "\u05e9", "\u05ea"][which_hebrew_letter] + "</span> " + BF.lang.hebrew_alphabet[which_hebrew_letter] + "</div>";
+                                    hebrew_heading = "<div class=psalm_119_heading id=" + verse_id + ">" + ["\u05d0", "\u05d1", "\u05d2", "\u05d3", "\u05d4", "\u05d5", "\u05d6", "\u05d7", "\u05d8", "\u05d9", "\u05db", "\u05dc", "\u05de", "\u05e0", "\u05e1", "\u05e2", "\u05e4", "\u05e6", "\u05e7", "\u05e8", "\u05e9", "\u05ea"][which_hebrew_letter] + " " + BF.lang.hebrew_alphabet[which_hebrew_letter] + "</div>";
                                 } else {
                                     hebrew_heading = "";
                                 }
