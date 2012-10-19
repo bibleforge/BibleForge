@@ -3232,12 +3232,12 @@
                                 /// Fill in the last query that the user typed in, which is not necessary the same as what the user lasted queried.
                                 qEl.value = settings.user.entered_text;
                                 /// Clear the placeholder text to allow for the user to clear the query box so that he is not distracted.
-                                qEl.placeholder = "";
+                                qEl.removeAttribute("placeholder");
                             } else if (!is_default) {
                                 /// As long as it is not the default query, use the query the user entered in.
                                 qEl.value = raw_query;
                                 /// Clear the placeholder text to allow for the user to clear the query box so that he is not distracted.
-                                qEl.placeholder = "";
+                                qEl.removeAttribute("placeholder");
                             }
                         }
                     }
@@ -3419,7 +3419,7 @@
             qEl.onchange = function ()
             {
                 settings.user.entered_text = qEl.value;
-                this.placeholder = "";
+                this.removeAttribute("placeholder");
             };
             
             /// After a short delay, lazily load extra, nonessential (or at least not immediately essential) code, like the wrench menu.
