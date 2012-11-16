@@ -1038,21 +1038,49 @@
             };
             
             
-            page.onmousemove = function ()
+            (function ()
             {
-                ///NOTE: Because WebKit must be tricked into thinking that the mouse cursor moved in order for it to update the cursor, the onmousemove event
-                ///      can be triggered too many times.  Therefore, WebKit needs to ignore the onmousemove event occationally.
-                if (webkit_ignore_event_once) {
-                    webkit_ignore_event_once = false;
-                    return;
-                }
+                /// This variable is used to stop immeidate propagation (instead of using e.stopImmediatePropagation()) because we only want to stop
+                /// window.onmousemove(), not all other onmousemove events.
+                var stop_immediate_propagation;
                 
-                if (!is_cursor_visible) {
-                    show_cursor();
-                }
-                hide_cursor_delayed();
-            };
-            
+                /**
+                 * Trigger cursor hiding.
+                 */
+                page.addEventListener("mousemove", function (e)
+                {
+                    ///NOTE: Because WebKit must be tricked into thinking that the mouse cursor moved in order for it to update the cursor, the onmousemove event
+                    ///      can be triggered too many times.  Therefore, WebKit needs to ignore the onmousemove event occationally.
+                    if (webkit_ignore_event_once) {
+                        webkit_ignore_event_once = false;
+                        return;
+                    }
+                    
+                    if (!is_cursor_visible) {
+                        show_cursor();
+                    }
+                    hide_cursor_delayed();
+                    
+                    /// Tell window.onmousemove() that we don't want it to fire like normal because the cursor is over the text.
+                    stop_immediate_propagation = true;
+                });
+                
+                /**
+                 * Show the cursor when the mouse moves on other parts of the screen.
+                 *
+                 * @note This is useful, for example, if the user changes tabs when the cursor is over the text area because page.onmouseout() does not get called.
+                 */
+                window.addEventListener("mousemove", function (e)
+                {
+                    ///NOTE: If the mouse is also over the text area, stop_immediate_propagation will be set to TRUE.
+                    if (stop_immediate_propagation) {
+                        stop_immediate_propagation = false;
+                    } else {
+                        /// If the mouse is off of the text area, show the cursor.
+                        show_cursor();
+                    }
+                });
+            }());
             
             /**
              * Possibly hide the cursor on resize.
