@@ -2735,10 +2735,10 @@
                                     link.rel = "stylesheet";
                                     
                                     /// Because the CSS could contain fonts and other important rules, we must wait until the CSS has downloaded before initiating the language.
-                                    ///TODO: Determine if any onerror needs to be listened to in order to handle errors.
+                                    ///TODO: Determine if any onerror event needs to be listened to in order to handle errors.
                                     link.addEventListener("load", function ()
                                     {
-                                        /// After the CSS loads, preform the initial query.
+                                        /// After the CSS has loaded, initiate the language.
                                         activate_new_lang();
                                     });
                                     
