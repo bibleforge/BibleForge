@@ -2721,7 +2721,7 @@
                         } else {
                             /// If the language code has not been downloaded yet, download it now and activate the language after the code has loaded.
                             ///NOTE: The last modified time is added (if available) to prevent browsers from caching an outdated file.
-                            BF.include("/js/lang/" + lang_id + ".js?" + (BF.langs[lang_id].modified || ""), {}, function ()
+                            BF.include("/js/lang/" + lang_id + ".js?" + (BF.langs[lang_id].modified || ""), {}, function onload()
                             {
                                 var link;
                                 
