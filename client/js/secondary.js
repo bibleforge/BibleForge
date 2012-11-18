@@ -2857,7 +2857,8 @@
                             langEl_pos.top -= window.pageYOffset;
                         }
                         
-                        return {x: langEl_pos.left, y: langEl_pos.top + langEl.offsetHeight};
+                        /// The -1 moves it up slightly so that the top border of the menu is inline with the bottom border of the query box.
+                        return {x: langEl_pos.left, y: langEl_pos.top + langEl.offsetHeight - 1};
                     }, lang_menu, BF.lang.id,
                         function open()
                         {
