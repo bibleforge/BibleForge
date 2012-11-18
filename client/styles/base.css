@@ -1337,6 +1337,7 @@ h2 {
 /* Make the drop caps aligned with the second line of text. */
 .ie .first_verse:first-letter, .ie .first_paragraph:first-letter {
     margin-top: 5px;
+    margin-bottom: 0;
 }
 
 /************************/
