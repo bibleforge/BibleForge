@@ -636,21 +636,17 @@
         
         return (function ()
         {
-            /// Stores files that have already been loaded so that they do not have to be downloaded more than once.
-            ///TODO: Use the data in this variable and maybe make a way to ignore the cache is needed.
-            var files = {};
-            
             return function (path, context, callback, timeout, retry)
             {
                 var ajax = new BF.Create_easy_ajax();
                 
                 ajax.query("GET", path, "", function (response)
                 {
-                    files[path] = evaler(response);
+                    var res = evaler(response);
                     
                     /// If the eval'ed code is a function, send it the context.
-                    if (typeof files[path] === "function") {
-                        files[path](context);
+                    if (typeof res === "function") {
+                        res(context);
                     }
                     if (typeof callback === "function") {
                         callback();
