@@ -631,7 +631,11 @@
          */
         function evaler(code)
         {
-            return eval(code);
+            /// Since the eval'ed code has access to the variables in this closure, we need to clear out the code variable both as a security caution and
+            /// to prevent memory leaks.  The following code does just that: (code = "").
+            ///NOTE: One issue that still remains to be fixed is that an eval'ed function can overwrite the evaler() function.
+            ///      Also, the BF object should be more locked down, possibly by using Object.freeze() on it.
+            return eval(code + (code = ""));
         }
         
         return (function ()
@@ -3422,7 +3426,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?27062136", {
+                BF.include("/js/secondary.js?27068512", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
