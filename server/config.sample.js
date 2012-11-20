@@ -41,9 +41,10 @@ exports.config = {
         pass: "password",   /// The user's password
         port: 3306,         /// The port to connect to (must be an integer) (optional: default 3306)
         ///NOTE: If connecting via a file socket, remove the "host" and "port" properties.
+        ///      If not using a Unix socket file, remove the following line.
         sock: "mysqld.sock" /// The Unix socket file
     },
     use_ssl: false, /// Whether or not to use SSL (partially implemented)
-    port: 7777,     /// The port for the BibleForge server to listen to.  This is the port that HTTP server forwards requests to, no the port of the HTTP server.
+    port: 7777,     /// The port for the BibleForge server to listen to.  This is the port that HTTP server forwards requests to, not the port of the HTTP server.
     static_path: "../client/" /// The folder containing files sent to the client.  The server also includes some of them.
 };
