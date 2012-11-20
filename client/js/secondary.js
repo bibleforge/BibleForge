@@ -1047,7 +1047,7 @@
                 /**
                  * Trigger cursor hiding.
                  */
-                page.addEventListener("mousemove", function (e)
+                page.addEventListener("mousemove", function ()
                 {
                     ///NOTE: Because WebKit must be tricked into thinking that the mouse cursor moved in order for it to update the cursor, the onmousemove event
                     ///      can be triggered too many times.  Therefore, WebKit needs to ignore the onmousemove event occationally.
@@ -1070,7 +1070,7 @@
                  *
                  * @note This is useful, for example, if the user changes tabs when the cursor is over the text area because page.onmouseout() does not get called.
                  */
-                window.addEventListener("mousemove", function (e)
+                window.addEventListener("mousemove", function ()
                 {
                     ///NOTE: If the mouse is also over the text area, stop_immediate_propagation will be set to TRUE.
                     if (stop_immediate_propagation) {
