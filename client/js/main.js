@@ -49,7 +49,7 @@
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (1611)",
-            modified:  21265161
+            modified:  27139211
         };
     }
     
@@ -621,22 +621,25 @@
      */
     BF.include = (function ()
     {
+        /// Store the "this" variable to let the other functions access it.
+        var that = this;
         /**
          * Eval code in a neutral scope.
          *
          * @param  code (string) The string to eval.
          * @return The result of the eval'ed code.
          * @note   Called when the Ajax request returns successfully.
-         * @note   This is used to prevent included code from having access to the variables inside of the function's scope.
+         * @note   This function is used to prevent included code from having access to the variables inside of the function's scope.
          */
-        function evaler(code)
+        this.evaler = function (code)
         {
             /// Since the eval'ed code has access to the variables in this closure, we need to clear out the code variable both as a security caution and
             /// to prevent memory leaks.  The following code does just that: (code = "").
-            ///NOTE: One issue that still remains to be fixed is that an eval'ed function can overwrite the evaler() function.
-            ///      Also, the BF object should be more locked down, possibly by using Object.freeze() on it.
             return eval(code + (code = ""));
-        }
+        };
+        
+        /// Prevent any eval'ed code from being able to modify the evaler() function.
+        Object.freeze(this);
         
         return (function ()
         {
@@ -646,7 +649,8 @@
                 
                 ajax.query("GET", path, "", function (response)
                 {
-                    var res = evaler(response);
+                    /// Evaluate the code in a safe environment.
+                    var res = that.evaler(response);
                     
                     /// If the eval'ed code is a function, send it the context.
                     if (typeof res === "function") {
@@ -658,7 +662,9 @@
                 }, null, timeout, retry);
             };
         }());
-    }());
+    ///NOTE: Since this anonymous function would have an undefined "this" variable, we need to use the call() function to specify an empty "this" object.
+    ///      The "this" object is used to "secure" the code from the eval'ed code using Object.freeze().
+    }).call({});
     
     /**
      * Gets the distance of an object from the top of the scroll.
@@ -3426,7 +3432,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?27068512", {
+                BF.include("/js/secondary.js?27130047", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,

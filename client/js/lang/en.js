@@ -40,7 +40,9 @@
     "use strict";
     
     /// In the eval context, "this" is undefined, so it needs to get the global object manually.
-    if (that === undefined) {
+    /// Because this file is included immediately via <script> tags, it is not eval'ed.
+    ///NOTE: Object.isFrozen() is needed for eval'ed code because the "this" object is the one from the evaler() function.
+    if (typeof that === "undefined" || Object.isFrozen(that)) {
         /// Since only the browser might load the code via eval(), use the "window" object.
         that = window;
     }
