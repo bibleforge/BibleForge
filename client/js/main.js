@@ -623,6 +623,7 @@
     {
         /// Store the "this" variable to let the other functions access it.
         var that = this;
+        
         /**
          * Eval code in a neutral scope.
          *
@@ -641,27 +642,22 @@
         /// Prevent any eval'ed code from being able to modify the evaler() function.
         Object.freeze(this);
         
-        return (function ()
+        return function (path, context, callback, timeout, retry)
         {
-            return function (path, context, callback, timeout, retry)
+            (new BF.Create_easy_ajax()).query("GET", path, "", function (response)
             {
-                var ajax = new BF.Create_easy_ajax();
+                /// Evaluate the code in a safe environment.
+                var res = that.evaler(response);
                 
-                ajax.query("GET", path, "", function (response)
-                {
-                    /// Evaluate the code in a safe environment.
-                    var res = that.evaler(response);
-                    
-                    /// If the eval'ed code is a function, send it the context.
-                    if (typeof res === "function") {
-                        res(context);
-                    }
-                    if (typeof callback === "function") {
-                        callback();
-                    }
-                }, null, timeout, retry);
-            };
-        }());
+                /// If the eval'ed code is a function, send it the context.
+                if (typeof res === "function") {
+                    res(context);
+                }
+                if (typeof callback === "function") {
+                    callback();
+                }
+            }, null, timeout, retry);
+        };
     ///NOTE: Since this anonymous function would have an undefined "this" variable, we need to use the call() function to specify an empty "this" object.
     ///      The "this" object is used to "secure" the code from the eval'ed code using Object.freeze().
     }).call({});
