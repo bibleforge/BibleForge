@@ -193,7 +193,7 @@
      *
      * @example BF.remove([0,1,2,3],  1);     /// Converts array to [0,2,3]
      * @example BF.remove([0,1,2,3], -2);     /// Converts array to [0,1,3]
-     * @example BF.remove([0,1,2,3]   1,  2); /// Converts array to [0,3]
+     * @example BF.remove([0,1,2,3],  1,  2); /// Converts array to [0,3]
      * @example BF.remove([0,1,2,3], -2, -1); /// Converts array to [0,1]
      * @param   arr  (array)              The array to mutate.
      * @param   from (integer)            The index to remove, or, if two parameters are given, the index to begin removing from.
