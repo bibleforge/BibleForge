@@ -866,17 +866,22 @@ BF.lexical_lookup = function (data, callback)
                     {
                         var b,
                             c,
+                            lang_css_html = "", /// If there is no language specific CSS, a blank string is needed.
                             verseID = lang.determine_reference(query);
                         
                         /// Add the full URL to the page to redirect capable browsers to the full-featured page.
-                        ///NOTE: A regular expresion is used because this string occurs twice.
+                        ///NOTE: A regular expression is used because this string occurs twice.
                         html = html.replace(/__FULL_URI__/g, full_featured_uri);
                         /// Add the query string to the query box.
                         html = html.replace("__QUERY__", BF.escape_html(query));
                         /// Add the language ID to the scroll's class to allow the CSS to change based on language.
                         html = html.replace("__LANG__", lang.id);
                         
-                        ///TODO: Modify the classnames so that it displays the right style for each language.
+                        /// Add the a <link> tag for the language specific CSS, if any.
+                        if (lang.has_css) {
+                            lang_css_html = "<link rel=stylesheet href=\"/styles/lang/" + lang.id + ".css?" + (lang.css_modified || "") + "\">"
+                        }
+                        html = html.replace("__LANG_CSS__", lang_css_html);
                         
                         /// Is it a verse lookup?
                         if (verseID) {
