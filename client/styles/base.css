@@ -41,7 +41,9 @@ html, body {
     padding: 0;
     border: 0;
     width: 100%;
+    /* System/user settings are not be the same for every user, so the background and text color must be explicitly set. */
     background: #FFF;
+    color: #000;
 }
 
 html {
