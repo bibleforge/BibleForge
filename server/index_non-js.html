@@ -51,15 +51,20 @@ This is a non-JavaScript version of the HTML.  See index.html for more info abou
     <!-- The Froyo browser on Android 2.2 needs scaling disabled in order for fixed positioning to work. -->
     <!-- TODO: The correct header should probably be sent dynamically from the server. -->
     <meta name=viewport content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
-    <!-- Redirect unsupported browsers and those with JavaScript turned off to a non-JS version. -->
     <!-- Tell Googlebot (and maybe other bots) to retry the same address with "?_escaped_fragment_=" at the end. -->
     <!-- Then the server can create a page for Googlebot to index. -->
     <meta name="fragment" content="!">
+    <!-- Redirect supported browsers to the full version. -->
+    <!-- Redirect non IE browsers. -->
     <!--[if !IE]> -->
         <script>
-            window.location.replace("__FULL_URI__");
+            /// Do not redirect Android browsers.
+            if (window.navigator.userAgent.indexOf("Mobile Safari/") === 0 || window.navigator.userAgent.indexOf("Android") === 0) {
+                window.location.replace("__FULL_URI__");
+            }
         </script>
     <!-- <![endif]-->
+    <!-- Redirect IE 10+. -->
     <!--[if gte IE 10]>
         <script>
             window.location.replace("__FULL_URI__");

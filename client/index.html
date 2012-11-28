@@ -69,12 +69,21 @@ no other style sheets are used.  It is planned to allow users to add their own c
     <!-- TODO: The correct header should probably be sent dynamically from the server. -->
     <meta name=viewport content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
     <!-- Redirect unsupported browsers and those with JavaScript turned off to a non-JS version. -->
+    <!-- Redirect browsers with JavaScript disabled. -->
     <noscript>
         <meta http-equiv=refresh content="0;URL=!">
     </noscript>
+    <!-- Redirect IE 9-. -->
     <!--[if lt IE 10]>
         <meta http-equiv=refresh content="0;URL=!">
     <![endif]-->
+    <script>
+    /// Redirect the default Android browser.
+    if (window.navigator.userAgent.indexOf("Mobile Safari/") >= 0 && window.navigator.userAgent.indexOf("Android") >= 0) {
+        ///NOTE: URL's should with a slash (/), but in case they do not, add the slash.
+        window.location.replace(window.location + (window.location.toString().slice(-1). === "/" ? "" : "/") + "!");
+    }
+    </script>
     <!-- Tell Googlebot (and maybe other bots) to retry the same address with "?_escaped_fragment_=" at the end. -->
     <!-- Then the server can create a page for Googlebot to index. -->
     <meta name="fragment" content="!">
@@ -102,6 +111,6 @@ no other style sheets are used.  It is planned to allow users to add their own c
     ><div class=loaders></div
 ></div
 ><script src="/js/lang/en.js?27139217"></script
-><script src="/js/main.js?27140339"></script
+><script src="/js/main.js?27755589"></script
 ></body
 ></html>
