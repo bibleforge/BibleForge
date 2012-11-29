@@ -1137,6 +1137,7 @@ h2 {
     text-decoration: none;
     color: #000;
     opacity: .5;
+    margin: 10px 0;
 }
 .static_link:hover {
     opacity: 1;
