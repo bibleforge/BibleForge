@@ -59,6 +59,18 @@
     background:         radial-gradient(ellipse farthest-corner, #000 70%, rgba(0,0,0,0) 100%);
 }
 
+.night .queryInput {
+    background: rgba(0,0,0,.2);
+    color: rgba(130,130,130,.6);
+    border-color: rgba(130,130,130,.6);
+}
+
+.night .queryInput:focus {
+    background: #000;
+    color: #828282;
+    border-color: #828282;
+}
+
 .night .callout {
     background: rgba(0,0,0,.9);
     border-color: #828282;
