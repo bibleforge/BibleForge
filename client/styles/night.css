@@ -85,7 +85,8 @@
     border-right-color: rgba(130,130,130,.6);
 }
 
-.night .lang:hover {
+/* NOTE: The activeLang class is used to keep the language button highlighted while the context menu is open. */
+.night .lang:hover, .night .activeLang {
     color: #828282;
     border-right-color: #828282;
 }
