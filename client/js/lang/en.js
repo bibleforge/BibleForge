@@ -107,6 +107,7 @@
         blog:              "Blog",                                                /// Context menu item
         chapter:           "Chapter",                                             /// Chapter headings
         configure:         "Configure",                                           /// Context menu item
+        detailed_def:      "Detailed Definition",                                 /// Longer, more detailed definitions caption (in larger callout)
         done:              "Done",                                                /// The button that closes panels
         found_plural:      " verses found for ",                                  /// On the info bar when searching (multiple results) (uncapitalized)
         found_singular:    " verse found for ",                                   /// On the info bar when searching (one result) (uncapitalized)

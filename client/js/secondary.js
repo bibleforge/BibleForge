@@ -2368,8 +2368,7 @@
                                 /// Does a long definition exist?
                                 if (lex_data.def && lex_data.def.long) {
                                     child_el = BF.create_expander({
-                                        ///TODO: Use language specific code.
-                                        summary_text: "Detailed Definition",
+                                        summary_text:  BF.lang.detailed_def,
                                         details_el:    create_long_def(lex_data.def.long),
                                         open:          Boolean(context.settings.user.expand_def),
                                         onstateChange: function (open)
