@@ -49,7 +49,7 @@
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (1611)",
-            modified:  27139211
+            modified:  27875896
         };
     }
     
@@ -1069,6 +1069,17 @@
                     BF.changeCSS(".q", "color: " + (values.new_val ? "#D00;" : "#000;"));
                 });
                 
+                /**
+                 * Enable/disable night mode.
+                 *
+                 * @param values (object) The current (and previous) settings of the night mode option.
+                 */
+                settings.add_property(settings.view, "night_mode", false, function (values)
+                {
+                    ///TODO
+                    //values.new_val
+                });
+                
                 settings.add_property(settings.user, "last_query", {});
                 
                 settings.add_property(settings.user, "position", {});
@@ -1142,6 +1153,10 @@
                             {
                                 type:     "checkbox",
                                 settings: "in_paragraphs"
+                            },
+                            {
+                                type:     "checkbox",
+                                settings: "night_mode"
                             }
                         ]
                     }
@@ -3439,7 +3454,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?27130047", {
+                BF.include("/js/secondary.js?27875233", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
