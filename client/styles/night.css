@@ -58,3 +58,40 @@
     /* IE 10, Firefox 16+, Opera 12.10+ */
     background:         radial-gradient(ellipse farthest-corner, #000 70%, rgba(0,0,0,0) 100%);
 }
+
+.night .callout {
+    background: rgba(0,0,0,.9);
+    border-color: #828282;
+}
+
+.night .callout .pointer-down {
+    /* Chrome/Safari 5.1+ */
+    background: -webkit-linear-gradient(left top,        rgba(0,0,0,0) 41%, rgba(0,0,0,.9) 41%);
+    /* IE 10, Firefox 16+, Opera 12.10+ */
+    background:         linear-gradient(to right bottom, rgba(0,0,0,0) 41%, rgba(0,0,0,.9) 41%);
+    border-color: #828282;
+}
+
+.night .callout .pointer-up {
+    /* Chrome/Safari 5.1+ */
+    background: -webkit-linear-gradient(right bottom, rgba(0,0,0,0) 45%, rgba(0,0,0,.97) 45%);
+    /* IE 10, Firefox 16+, Opera 12.10+ */
+    background:         linear-gradient(to left top,  rgba(0,0,0,0) 45%, rgba(0,0,0,.97) 45%);
+    border-color: #828282;
+}
+
+.night .transparent_el {
+    background: #000;
+}
+
+.night .more-button {
+    border-color: rgba(130,130,130,.4);
+    color: rgba(130,130,130,.6);
+    background: rgba(0,0,0,0);
+}
+
+.night .more-button:hover {
+    border-color: #828282;
+    color: #828282;
+    background: rgba(0,0,0,1);
+}

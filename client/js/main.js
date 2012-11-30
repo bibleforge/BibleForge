@@ -1085,7 +1085,7 @@
                         if (values.new_val) {
                             if (!css_added) {
                                 link_tag = document.createElement("link");
-                                link_tag.href = "/styles/night.css?27932007";
+                                link_tag.href = "/styles/night.css?27936325";
                                 link_tag.rel  = "stylesheet";
                                 document.getElementsByTagName("head")[0].appendChild(link_tag);
                                 css_added = true;
@@ -3471,7 +3471,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?27905966", {
+                BF.include("/js/secondary.js?27936503", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,

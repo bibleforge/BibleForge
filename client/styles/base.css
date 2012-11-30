@@ -901,6 +901,11 @@ ol ol ol ol ol ol {
     margin-left: 4px;
 }
 
+/* The element that causes the text to fade out when a large callout is shown. */
+.transparent_el {
+    background: #FFF;
+}
+
 /* The class allows for simple fade ins and outs with JavaScript. */
 .fade {
     /* Fade out slightly when the mouse cursor moves off. */

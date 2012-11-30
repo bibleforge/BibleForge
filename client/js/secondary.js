@@ -1815,7 +1815,8 @@
                             
                             /// Create a blank element used to fade out the text.
                             transparent_el = document.createElement("div");
-                            transparent_el.style.backgroundColor = "rgba(255,255,255,0)";
+                            transparent_el.className = "transparent_el";
+                            transparent_el.style.opacity = 0;
                             transparent_el.style.position = "fixed";
                             ///NOTE: Could set this to the position of the top bar if it updated when/if the top bar changes sizes (which it cannot do currently).
                             ///      Could also make it's width the same dimensions as the scroll element.
@@ -1831,7 +1832,7 @@
                             this.transition_cue.add();
                             /// Fade in the transparent element.
                             /// There is a short delay to let the callout start moving.
-                            BF.transition(transparent_el, {prop: "backgroundColor", css_prop: "background-color", duration: "250ms", end_val: "rgba(255,255,255,.7)", timing: "steps(3, start)", delay: "50ms", failsafe: 500}, function ()
+                            BF.transition(transparent_el, {prop: "opacity", duration: "250ms", end_val: .7, timing: "steps(3, start)", delay: "50ms", failsafe: 500}, function ()
                             {
                                 that.transition_cue.remove();
                             });
@@ -1917,7 +1918,7 @@
                             }, 1000);
                             
                             this.transition_cue.add();
-                            BF.transition(transparent_el, {prop: "backgroundColor", css_prop: "background-color", duration: "250ms", end_val: "rgba(255,255,255,.0)", timing: "steps(3, start)", delay: "50ms", failsafe: 500}, function ()
+                            BF.transition(transparent_el, {prop: "opacity", duration: "250ms", end_val: "0", timing: "steps(3, start)", delay: "50ms", failsafe: 500}, function ()
                             {
                                 /// Remove from DOM and destroy the temporary transparent element.
                                 document.body.removeChild(transparent_el);
