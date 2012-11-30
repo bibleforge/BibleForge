@@ -121,3 +121,12 @@
     color: #828282;
     background: rgba(0,0,0,1);
 }
+
+.night .contextMenu {
+    background: rgba(0,0,0,.6)
+}
+
+.night .menu_item_selected {
+    background: #828282;
+    color: #000;
+}
