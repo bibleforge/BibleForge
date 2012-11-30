@@ -65,6 +65,10 @@
     border-color: rgba(130,130,130,.6);
 }
 
+.night .queryInput:hover {
+    border-color: rgba(130,130,130,.85);
+}
+
 .night .queryInput:focus {
     background: #000;
     color: #828282;
@@ -74,6 +78,16 @@
 .night .callout {
     background: rgba(0,0,0,.9);
     border-color: #828282;
+}
+
+.night .lang {
+    color: rgba(130,130,130,.6);
+    border-right-color: rgba(130,130,130,.6);
+}
+
+.night .lang:hover {
+    color: #828282;
+    border-right-color: #828282;
 }
 
 .night .callout .pointer-down {
