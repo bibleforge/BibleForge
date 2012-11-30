@@ -876,17 +876,6 @@ ol ol ol ol ol ol {
     background: #FFF;
 }
 
-/* The class allows for simple fade ins and outs with JavaScript. */
-.fade {
-    /* Fade out slightly when the mouse cursor moves off. */
-    /* Transition for Mozilla (Firefox 4.0+) */
-       -moz-transition: opacity .3s ease;
-    /* Transition for WebKit */
-    -webkit-transition: opacity .3s ease;
-    /* Transition for Opera 10.5+ */
-            transition: opacity .3s ease;
-}
-
 /*NOTE See above for .more-button-buffer:hover and .more-button-buffer:active. */
 .more-button {
     position: absolute;
@@ -938,6 +927,18 @@ ol ol ol ol ol ol {
     float: right;
     /* NOTE: Because this element is not positioned absolutely, it is moved over to the left slightly (due to padding in the parent element), */
     /*       but this extra padding adds extra buffer between the button and the text, so the padding attribute does not need to be changed here. */
+}
+
+
+/* The class allows for simple fade ins and outs with JavaScript. */
+.fade {
+    /* Fade out slightly when the mouse cursor moves off. */
+    /* Transition for Mozilla (Firefox 4.0+) */
+       -moz-transition: opacity .3s ease;
+    /* Transition for WebKit */
+    -webkit-transition: opacity .3s ease;
+    /* Transition for Opera 10.5+ */
+            transition: opacity .3s ease;
 }
 
 
