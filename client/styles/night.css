@@ -1,0 +1,60 @@
+ /**
+ * BibleForge
+ *
+ * @date    11-30-12
+ * @version alpha (α)
+ * @link    http://BibleForge.com
+ * @license GNU Affero General Public License 3.0 (AGPL-3.0)
+ * @author  BibleForge <info@bibleforge.com>
+ */
+
+/**
+ * Copyright (C) 2012
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see http://www.opensource.org/licenses/AGPL-3.0.
+ */
+
+/* NOTE: Both the <BODY> and <HTML> tags have a background color. */
+/*       Also, if the <HTML> tag's background is not set, parts of the viewport may appear white. */
+/* NOTE: Since the <HTML> tag has the class, the class name must come after its tag name. */
+.night body, html.night {
+    background: #121212;
+    color: #828282;
+}
+
+.night .q {
+    color: #F33;
+}
+
+.night .searchBars {
+    /* Transparent Black background for Firefox 3.5-/Opera 10 */
+    background: rgba(0,0,0,.79);
+    /* Chrome/Safari 5.1+ */
+    background: -webkit-linear-gradient(rgba(0,0,0,.93), rgba(0,0,0,.86) 25%, rgba(0,0,0,.7));
+    /* IE 10, Firefox 16+, Opera 12.10+ */
+    background:         linear-gradient(rgba(0,0,0,.93), rgba(0,0,0,.86) 25%, rgba(0,0,0,.7));
+}
+
+.night .infoBars {
+    background: rgba(0,0,0,0.65);
+    border-color: #000;
+}
+
+.night .infoLeft {
+    /* Add a slight radial blur to make sure the text is always readable.*/
+    /* Chrome/Safari 5.1+ */
+    background: -webkit-radial-gradient(ellipse farthest-corner, #000 70%, rgba(0,0,0,0) 100%);
+    /* IE 10, Firefox 16+, Opera 12.10+ */
+    background:         radial-gradient(ellipse farthest-corner, #000 70%, rgba(0,0,0,0) 100%);
+}
