@@ -75,11 +75,6 @@
     border-color: #828282;
 }
 
-.night .callout {
-    background: rgba(0,0,0,.9);
-    border-color: #828282;
-}
-
 .night .lang {
     color: rgba(130,130,130,.6);
     border-right-color: rgba(130,130,130,.6);
@@ -89,6 +84,12 @@
 .night .lang:hover, .night .activeLang {
     color: #828282;
     border-right-color: #828282;
+}
+
+
+.night .callout, .night .panel {
+    background: rgba(0,0,0,.9);
+    border-color: #828282;
 }
 
 .night .callout .pointer-down {
@@ -117,11 +118,23 @@
     background: rgba(0,0,0,0);
 }
 
-.night .more-button:hover {
+.night .button {
+    border-color: rgba(130,130,130,.55);
+    color: rgba(130,130,130,.7);
+    background: rgba(0,0,0,0);
+}
+
+.night .more-button:hover, .night .button:hover {
     border-color: #828282;
     color: #828282;
     background: rgba(0,0,0,1);
 }
+
+.night .button {
+    box-shadow:  none;
+    text-shadow: none;
+}
+
 
 .night .contextMenu {
     background: rgba(0,0,0,.6)
@@ -130,4 +143,8 @@
 .night .menu_item_selected {
     background: #828282;
     color: #000;
+}
+
+.night .panel a {
+    color: #EEE;
 }
