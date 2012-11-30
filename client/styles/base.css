@@ -86,13 +86,9 @@ body {
     background: #FFF;
     /* Transparent white background for Firefox 3.5-/Opera 10 */
     background: rgba(255,255,255,.9);
-    /* Firefox 3.6+ */
-    background:    -moz-linear-gradient(rgba(255,255,255,.98), rgba(255,255,255,.93) 25%, rgba(255,255,255,.87));
     /* Chrome/Safari 5.1+ */
     background: -webkit-linear-gradient(rgba(255,255,255,.98), rgba(255,255,255,.93) 25%, rgba(255,255,255,.87));
-    /* Opera 11.10 */
-    background:      -o-linear-gradient(rgba(255,255,255,.98), rgba(255,255,255,.93) 25%, rgba(255,255,255,.87));
-    /* IE 10 */
+    /* IE 10, Firefox 16+, Opera 12.10+ */
     background:         linear-gradient(rgba(255,255,255,.98), rgba(255,255,255,.93) 25%, rgba(255,255,255,.87));
     width:  100%;
     height: 100%;
@@ -133,14 +129,10 @@ body {
     float: left;
     
     /* Add a slight radial blur to make sure the text is always readable.*/
-    /* Firefox 3.6+ */
-    background:    -moz-radial-gradient(center center, ellipse farthest-corner, #FFFFE2 70%, rgba(255,255,226,0) 100%);
     /* Chrome/Safari 5.1+ */
-    background: -webkit-radial-gradient(center center, ellipse farthest-corner, #FFFFE2 70%, rgba(255,255,226,0) 100%);
-    /* Opera 11.10 */
-    background:      -o-radial-gradient(center center, ellipse farthest-corner, #FFFFE2 70%, rgba(255,255,226,0) 100%);
-    /* IE 10 */
-    background:         radial-gradient(center center, ellipse farthest-corner, #FFFFE2 70%, rgba(255,255,226,0) 100%);
+    background: -webkit-radial-gradient(ellipse farthest-corner, #FFFFE2 70%, rgba(255,255,226,0) 100%);
+    /* IE 10, Firefox 16+, Opera 12.10+ */
+    background:         radial-gradient(ellipse farthest-corner, #FFFFE2 70%, rgba(255,255,226,0) 100%);
 }
 
 .queryInput {
@@ -498,14 +490,10 @@ body {
     background: #FFF;
     /* Transparent white background for Mozilla/Opera 10/WebKit */
     background: rgba(255,255,255,.97);
-    /* Firefox 3.6+ */
-    background:    -moz-linear-gradient(bottom, rgba(240,240,240,.98), rgba(255,255,255,.98) 60px);
     /* Chrome/Safari 5.1+ */
     background: -webkit-linear-gradient(bottom, rgba(240,240,240,.98), rgba(255,255,255,.98) 60px);
-    /* Opera 11.10 */
-    background:      -o-linear-gradient(bottom, rgba(240,240,240,.98), rgba(255,255,255,.98) 60px);
-    /* IE 10 */
-    background:         linear-gradient(bottom, rgba(240,240,240,.98), rgba(255,255,255,.98) 60px);
+    /* IE 10, Firefox 16+, Opera 12.10+ */
+    background:         linear-gradient(to top, rgba(240,240,240,.98), rgba(255,255,255,.98) 60px);
     border: #A3A3A3 1px solid;
     /* Add enough padding to the top to push the contents past the top bar. */
     /* Add extra padding on the sides so that the optional scroll bars will not cover up any of the content. */
@@ -654,14 +642,10 @@ label {
     background: #FFF;
     /* Transparent background for Firefox 3.5- */
     background: rgba(255, 255, 255, .95);
-    /* Firefox 3.6+ */
-    background:    -moz-linear-gradient(bottom, rgba(240,240,240,.97), rgba(255,255,255,.97) 60px);
     /* Chrome/Safari 5.1+ */
     background: -webkit-linear-gradient(bottom, rgba(240,240,240,.97), rgba(255,255,255,.97) 60px);
-    /* Opera 11.10 */
-    background:      -o-linear-gradient(bottom, rgba(240,240,240,.97), rgba(255,255,255,.97) 60px);
-    /* IE 10 */
-    background:         linear-gradient(bottom, rgba(240,240,240,.97), rgba(255,255,255,.97) 60px);
+    /* IE 10, Firefox 16+, Opera 12.10+ */
+    background:         linear-gradient(to top, rgba(240,240,240,.97), rgba(255,255,255,.97) 60px);
     
     position: absolute;
     border: #ccc solid 1px;
@@ -690,17 +674,10 @@ label {
     border-bottom: #ccc solid 1px;
     border-right:  #ccc solid 1px;
     
-    /* IE9- */
-    /* This isn't perfect, but it's something. */
-    background: #FFF;
-    /* Firefox 3.6+ */
-    background:    -moz-linear-gradient(left top, rgba(255,255,255,0) 41%, rgba(240,240,240,.97) 41%);
     /* Chrome/Safari 5.1+ */
-    background: -webkit-linear-gradient(left top, rgba(255,255,255,0) 41%, rgba(240,240,240,.97) 41%);
-    /* Opera 11.10 */
-    background:      -o-linear-gradient(left top, rgba(255,255,255,0) 41%, rgba(240,240,240,.97) 41%);
-    /* IE 10 */
-    background:         linear-gradient(left top, rgba(255,255,255,0) 41%, rgba(240,240,240,.97) 41%);
+    background: -webkit-linear-gradient(left top,        rgba(255,255,255,0) 41%, rgba(240,240,240,.97) 41%);
+    /* IE 10, Firefox 16+, Opera 12.10+ */
+    background:         linear-gradient(to right bottom, rgba(255,255,255,0) 41%, rgba(240,240,240,.97) 41%);
     bottom: -11px;
 }
 .callout .pointer-up {
@@ -718,17 +695,10 @@ label {
     border-top:  #ccc solid 1px;
     border-left: #ccc solid 1px;
     
-    /* IE6-9 */
-    /* This isn't perfect, but it's something. */
-    background: #FFF;
-    /* Firefox 3.6+ */
-    background:    -moz-linear-gradient(right bottom, rgba(255,255,255,0) 45%, rgba(255,255,255,.95) 45%);
     /* Chrome/Safari 5.1+ */
     background: -webkit-linear-gradient(right bottom, rgba(255,255,255,0) 45%, rgba(255,255,255,.95) 45%);
-    /* Opera 11.10 */
-    background:      -o-linear-gradient(right bottom, rgba(255,255,255,0) 45%, rgba(255,255,255,.95) 45%);
-    /* IE 10 */
-    background:         linear-gradient(right bottom, rgba(255,255,255,0) 45%, rgba(255,255,255,.95) 45%);
+    /* IE 10, Firefox 16+, Opera 12.10+ */
+    background:         linear-gradient(to left top,  rgba(255,255,255,0) 45%, rgba(255,255,255,.95) 45%);
 }
 
 /* Hide certain callout content when showing details (such as the "more" button). */
