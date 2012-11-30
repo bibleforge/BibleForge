@@ -947,19 +947,7 @@
                 /// Create settings object.
                 settings = {
                     user: {},
-                    view: {
-                        ///NOTE: This array is used by secondary.js to create the configuration pane.
-                        options:  [
-                            {
-                                type:     "checkbox",
-                                settings: "red_letters"
-                            },
-                            {
-                                type:     "checkbox",
-                                settings: "in_paragraphs"
-                            }
-                        ]
-                    }
+                    view: {}
                 };
                 
                 Object.defineProperty(settings, "add_property", {
@@ -1135,6 +1123,29 @@
                         }
                     }(BF.parse_json(window.localStorage.getItem("settings")), settings));
                 }
+                
+                /// Create the configuration menu options.
+                ///NOTE: This is done after loading saved settings to prevent the possibility of them overwritting them.
+                Object.defineProperty(settings.view, "options", {
+                    /// Make sure it cannot be deleted (or the type changed).
+                    configurable: false,
+                    /// Make sure it will not be listed when using JSON.stringify().
+                    enumerable:   false,
+                    /// More options may need to be added by code that loads later.
+                    writable:     true,
+                    ///NOTE: This array is used by secondary.js to create the configuration pane.
+                    value: [
+                            {
+                                type:     "checkbox",
+                                settings: "red_letters"
+                            },
+                            {
+                                type:     "checkbox",
+                                settings: "in_paragraphs"
+                            }
+                        ]
+                    }
+                );
             }());
             
             
