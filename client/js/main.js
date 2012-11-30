@@ -1074,11 +1074,28 @@
                  *
                  * @param values (object) The current (and previous) settings of the night mode option.
                  */
-                settings.add_property(settings.view, "night_mode", false, function (values)
+                settings.add_property(settings.view, "night_mode", false, (function ()
                 {
-                    ///TODO
-                    //values.new_val
-                });
+                    var css_added;
+                    
+                    return function (values)
+                    {
+                        var link_tag;
+                        
+                        if (values.new_val) {
+                            if (!css_added) {
+                                link_tag = document.createElement("link");
+                                link_tag.href = "/styles/night.css?27932007";
+                                link_tag.rel  = "stylesheet";
+                                document.getElementsByTagName("head")[0].appendChild(link_tag);
+                                css_added = true;
+                            }
+                            document.getElementsByTagName("html")[0].classList.add("night");
+                        } else {
+                            document.getElementsByTagName("html")[0].classList.remove("night");
+                        }
+                    }
+                }()));
                 
                 settings.add_property(settings.user, "last_query", {});
                 
