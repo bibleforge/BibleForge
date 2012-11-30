@@ -132,7 +132,7 @@
                             var i,
                                 transition_arr;
                             
-                            /// Clear any failsafe timeout.
+                            /// Clear any failsafe timeout since the transition finished properly.
                             window.clearTimeout(failsafe_timeout);
                             
                             ///NOTE: If transition_name remains undefined, it will have no adverse effects. The style will just take place without a transition.
@@ -1986,6 +1986,12 @@
                             
                             this.showing_details = false;
                         },
+                        /**
+                         * Handel sets of CSS transition.
+                         *
+                         * This object is used to keep track of the progress a series of CSS transition.
+                         * This is used to be able to trigger a callback after all of the transitions are completed.
+                         */
                         transition_cue: (function ()
                         {
                             var callback,
