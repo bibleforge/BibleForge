@@ -370,8 +370,8 @@ body {
 .inputIcon:active {
     /* This is a simple way of moving the icon over slightly when clicked. */
     border-left: 1px solid transparent;
-    /* Highlight the icon even more. */
-    opacity: .9;
+    /* Keep the icon highlighted even in the mouse moves off. */
+    opacity: .6;
 }
 
 
