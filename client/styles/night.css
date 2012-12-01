@@ -172,6 +172,10 @@
     opacity: .9!important;
 }
 
+.night .menu_item_line div {
+    border-top: 1px solid #828282;
+}
+
 .night ::-moz-selection {
     background: #828282;
     color: #000;
