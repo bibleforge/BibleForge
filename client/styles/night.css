@@ -151,3 +151,26 @@
 .night .panel a {
     color: #EEE;
 }
+
+.night ::-moz-selection {
+    background: #828282;
+    color: #000;
+}
+.night ::selection {
+    background: #828282;
+    color: #000;
+}
+
+.night .q::-moz-selection {
+    color: #A00;
+}
+.night .q::selection {
+    color: #A00;
+}
+
+.night .menu_item_selected ::-moz-selection, .night .panel a::-moz-selection {
+    color: #EEE;
+}
+.night .menu_item_selected ::selection, .night .panel a::selection {
+    color: #EEE;
+}
