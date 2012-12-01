@@ -227,11 +227,13 @@ body {
     /* Align the element inside of queryInput. */
     position: absolute;
     margin: 0 0 0 31px;
-    top: 4px;
+    top: 3px;
     height: 22px;
     
     /* The extra right padding is for the drop down arrow (see .lang:after). */
     padding-right: 14px;
+    /* Center the text vertically. */
+    padding-top: 2px;
     
     font-size: 13px;
     
@@ -262,7 +264,7 @@ body {
     content: "";
     
     position: absolute;
-    top: 40%;
+    top: 45%;
     right: 1px;
     
        -moz-transition: opacity .3s;
