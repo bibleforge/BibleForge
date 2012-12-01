@@ -1,4 +1,4 @@
- /**
+/**
  * BibleForge
  *
  * @date    11-30-12
@@ -65,7 +65,7 @@
 .night .queryInput {
     background: rgba(0,0,0,.2);
     color: rgba(130,130,130,.7);
-    border-color: rgba(130,130,130,.6);
+    border-color: rgba(130,130,130,.5);
 }
 
 .night .queryInput:hover {
@@ -80,7 +80,7 @@
 
 .night .lang {
     color: rgba(130,130,130,.7);
-    border-right-color: rgba(130,130,130,.6);
+    border-right-color: rgba(130,130,130,.55);
 }
 
 /* NOTE: The activeLang class is used to keep the language button highlighted while the context menu is open. */
@@ -140,7 +140,7 @@
 
 
 .night .contextMenu {
-    background: rgba(0,0,0,.6)
+    background: rgba(0,0,0,.7);
 }
 
 .night .menu_item_selected {

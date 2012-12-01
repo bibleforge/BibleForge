@@ -1053,7 +1053,7 @@
                         if (values.new_val) {
                             if (!css_added) {
                                 link_tag = document.createElement("link");
-                                link_tag.href = "/styles/night.css?27994453";
+                                link_tag.href = "/styles/night.css?27994476";
                                 link_tag.rel  = "stylesheet";
                                 document.getElementsByTagName("head")[0].appendChild(link_tag);
                                 css_added = true;
