@@ -330,8 +330,6 @@ body {
     margin-left: -55px;
     /* Aligns the image in a somewhat cross-browser way. */
     vertical-align: bottom;
-    /* Add padding so that the user does not have to click exactly on the icon to hit it. */
-    padding: 6px 9px 4px 0;
     
     /* Remove the hideous selection rectangle when clicked. */
     outline: 0;
@@ -346,6 +344,14 @@ body {
     opacity: .3;
     
     position: absolute;
+    
+    /* Buttons do not automatically get a hand cursor. */
+    cursor: pointer;
+    
+    width: 25px;
+    height: 26px;
+    border: 0;
+    background: no-repeat left 60% url(data:image/gif;base64,R0lGODlhEAAQAPIHAAIFARweHDU3NFlbWHJ0cZ2fnNDTz/3//CH5BAAKAAAALAAAAAAQABAAAANDeLpnAyAQRgsYxhQBDD2WxxDABxTfIUxMmRYBY7jfTNGU3YrUMPQ4xYwnhPAsKNmJBIEkF05ZqkmcGlOMwBW74FSxCQA7);
 }
 
 /**
