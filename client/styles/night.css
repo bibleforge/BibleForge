@@ -157,6 +157,21 @@
     opacity: .4;
 }
 
+.night .dropdown, .night .lang:after, .night .expandable_summary:before {
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAGCAQAAAC/O6xzAAAAAXNSR0IArs4c6QAAAF9JREFUCNdj6OLqSu163/UfCU7uEmPoYuvS7lrY9RUueLTLp4uLoYsJqN6oawlU4nhXYBd/FzMDA0iCGyixuOsLUGVgl0AXCwMEgHXodZV0uQNVwgShEmxAIQ6wdiAAAAUwNSUbjgKTAAAAAElFTkSuQmCC);
+}
+
+.lang:active, .activeLang, .more-button:active {
+    background: rgba(0,0,0,.2);
+}
+
+.night .lang:after {
+    opacity: .5;
+}
+.night .lang:hover:after, .activeLang:after {
+    opacity: .9!important;
+}
+
 .night ::-moz-selection {
     background: #828282;
     color: #000;
