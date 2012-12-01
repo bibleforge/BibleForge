@@ -1105,6 +1105,8 @@ h2 {
 
 /* Quotations of Jesus */
 .q {
+    -webkit-transition: color 1s;
+            transition: color 1s;
     color: #D00;
 }
 /* Override for black letters. */
