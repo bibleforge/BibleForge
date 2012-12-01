@@ -1329,7 +1329,7 @@ h2 {
 
 /* Center the crown of thorns loader. */
 .moz .crown_loader {
-    -moz-transform-origin: 53%;
+    -moz-transform-origin: 50.5%;
     position: relative;
     top: -1px;
 }
