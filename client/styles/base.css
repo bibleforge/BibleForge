@@ -370,7 +370,7 @@ body {
 .wrenchPadding {
     position: absolute;
     /* Add padding around wrench with extra padding below and on the right. */
-    padding: 1px 6px 4px 1px;
+    padding: 1px 6px 8px 1px;
     
     /* Use the hand cursor for the padded area, just like the button. */
     cursor: pointer;
@@ -401,6 +401,14 @@ body {
     
     /* Remove the hideous selection rectangle when clicked. */
     outline: 0;
+    
+    /* Buttons do not automatically get a hand cursor. */
+    cursor: pointer;
+    
+    border: 0;
+    width: 24px;
+    height: 24px;
+    background: center no-repeat url(data:image/gif;base64,R0lGODdhEAAQAMIIAAEDADAyL05OSWlpYYyLg7GwqNjVyP/97iwAAAAAEAAQAAADQ3i6OwBhsGnCe2Qy+4LRS3EBn5JNxCgchgBo6ThwFDc+61LdY6m4vEeBAbwMBBHfoYgBLW8njUPmPNwk1SkAW31yqwkAOw==);
 }
 
 
