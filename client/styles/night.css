@@ -165,6 +165,11 @@
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAGCAQAAAC/O6xzAAAAAXNSR0IArs4c6QAAAF9JREFUCNdj6OLqSu163/UfCU7uEmPoYuvS7lrY9RUueLTLp4uLoYsJqN6oawlU4nhXYBd/FzMDA0iCGyixuOsLUGVgl0AXCwMEgHXodZV0uQNVwgShEmxAIQ6wdiAAAAUwNSUbjgKTAAAAAElFTkSuQmCC);
 }
 
+.night .wrenchIcon {
+    background-image: url(data:image/gif;base64,R0lGODdhEAAQAMIIAAMDAyoqKk9PT3R0dJeXl7Gxsc7Ozv39/SwAAAAAEAAQAAADQwi6S3eGsBnMe2My+0zQi3Adn5JNw1gAQXFo6UhwFDc+61LdY6m4vIeAAbwQChEfoIgBLW8njUPmBNwk1ekBW31yqwkAOw==);
+    opacity: .25;
+}
+
 .lang:active, .activeLang, .more-button:active {
     background: rgba(0,0,0,.2);
 }
