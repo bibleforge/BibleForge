@@ -719,44 +719,7 @@
         
         return num;
     };
-    
-    
-    /**
-     * Change an existing CSS rule.
-     *
-     * @example BF.changeCSS(".q", "color: #000;")); /// Changes the ".q" rule (i.e., the "q" class) to have a text color of black.
-     * @param   selector   (string)             The name of the rule to replace.
-     * @param   new_CSS    (string)             The CSS to use for the specified selector.
-     * @param   insert     (boolean) (optional) Whether or not to insert a new css rule or change an existing one.
-     * @param   change_all (boolean) (optional) Whether or not to check every rule.  If falsey, it will stop after finding one rule that matches selector.
-     * @return  NULL.  Possibly changes the CSS.
-     * @note    Called when the user changes the red_letters setting.
-     */
-    BF.changeCSS = function (selector, new_CSS, insert, change_all)
-    {
-        var CSS_rules,
-            i,
-            ///TODO: Determine if it should loop through all styles sheets.
-            style_sheet = document.styleSheets[0];
         
-        /// Should it add a new rule to the CSS?
-        if (insert) {
-            /// Mozilla/WebKit/Opera/IE9
-            style_sheet.insertRule(selector + "{" + new_CSS + "}", 0);
-        } else {
-            CSS_rules = style_sheet.cssRules;
-            for (i = CSS_rules.length - 1; i >= 0; i -= 1) {
-                if (CSS_rules[i].selectorText === selector) {
-                    CSS_rules[i].style.cssText = new_CSS;
-                    /// Should it stop after changing the first so that it does not need to loop through all of the rules.
-                    if (!change_all) {
-                        return;
-                    }
-                }
-            }
-        }
-    };
-    
     
     /**
      * Determine whether or not a psalm has a title.
@@ -1066,7 +1029,12 @@
                 {
                     /// Alternate between red and black letters.
                     ///TODO: Add other options, such as custom color, and (in the future) highlighting of other people's words (e.g., highlight the words of Paul in blue).
-                    BF.changeCSS(".q", "color: " + (values.new_val ? "#D00;" : "#000;"));
+                    if (values.new_val) {
+                        ///NOTE: Since red letter is probably most common, add a class if red letters is turned off (which should make parsing CSS a bit faster).
+                        page.classList.remove("black_letter");
+                    } else {
+                        page.classList.add("black_letter");
+                    }
                 });
                 
                 /**

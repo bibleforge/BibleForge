@@ -1091,6 +1091,10 @@ h2 {
 .q {
     color: #D00;
 }
+/* Override for black letters. */
+.black_letter .q {
+    color: #000;
+}
 
 
 .no_results {

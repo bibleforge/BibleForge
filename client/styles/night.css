@@ -36,6 +36,9 @@
 .night .q {
     color: #F33;
 }
+.night .black_letter .q {
+    color: #828282;
+}
 
 .night .searchBars {
     /* Transparent Black background for Firefox 3.5-/Opera 10 */
