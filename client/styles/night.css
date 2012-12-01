@@ -25,6 +25,9 @@
  * along with this program.  If not, see http://www.opensource.org/licenses/AGPL-3.0.
  */
 
+/* NOTE: It might be nice to apply transitions to all of these elements (without the .night) in order to fade in and out of Night Mode; */
+/*       however, currently gradients do not transition (although the spec says they should), so it doesn't really work right now. */
+
 /* NOTE: Both the <BODY> and <HTML> tags have a background color. */
 /*       Also, if the <HTML> tag's background is not set, parts of the viewport may appear white. */
 /* NOTE: Since the <HTML> tag has the class, the class name must come after its tag name. */
