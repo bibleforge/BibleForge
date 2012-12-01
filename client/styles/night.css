@@ -152,6 +152,11 @@
     color: #EEE;
 }
 
+.night .crown_loader {
+    background: no-repeat url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAQAAAAngNWGAAAAAXNSR0IArs4c6QAAAXZJREFUKM+F0rtLFQAUB+CfXnWQCIMeQxQEYQ8IJcqgpTIiC4cM2/oferuIDU5tRkUNikWBNBT0IEWEmtKgLtSW4GSbWVLpZNevIeLSvYJnO4fvwDmHk1SF7R5lrVDnnWVM27Q6OGOzLh0+Gteq2bAlHbrtqoRjSn5ZwJD6RJ+SRV/xxtUy22rZlcSAaRPggzGjiU7sK8MuS4kNOJ54rjHRhJbEmN4yPOm7AbxO1GlIEqeN4L6ii+VNP+GzE85WTL7TJOZt/ptOGTdkIlH3H6tJ3FZ0z6zGuKGkVQG1VUd77Kf2BPtjjxXNCUarYI05bQmeRcG0YX3eq7euio54oceChiQ2WlQyan0FOqbWIGj7V+qw6BVuOqWQJGoT1zFpxqVy7zlziRbsThK3bEtwPvFUfxnusKIz8cCUO77goUFvE3uVtJdht28YV0TRUYe8xIwnfvtRud8BvS6YdzdJ9OCyfoddW/0vt5gFCw6u9eMFA45oqqz/ATzLTtJ03pdKAAAAAElFTkSuQmCC);
+    opacity: .4;
+}
+
 .night ::-moz-selection {
     background: #828282;
     color: #000;
