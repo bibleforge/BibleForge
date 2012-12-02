@@ -215,3 +215,22 @@
 .night .menu_item_selected ::selection, .night .panel a::selection {
     color: #EEE;
 }
+
+
+/* NOTE: If ::-webkit-scrollbar is not present, the other styles will not work. */
+.night ::-webkit-scrollbar {
+    width: 8px;
+    background: #000;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+}
+
+.night ::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background: rgba(130,130,130,.3);
+    /* Do not let the thumb get too small. */
+    min-height: 35px;
+}
+
+.night ::-webkit-scrollbar-thumb:hover {
+    background: rgba(130,130,130,.5);
+}

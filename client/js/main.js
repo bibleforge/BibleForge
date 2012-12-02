@@ -1046,22 +1046,49 @@
                 {
                     var css_added;
                     
+                    /**
+                     * WebKit scrollbar styles do not apply to scrollbars already visible, so they need to be hidden briefly.
+                     */
+                    function webkit_scrollbar_hack()
+                    {
+                        document.getElementsByTagName("html")[0].style.overflowY = "hidden";
+                        /// Since hiding the scrollbar moves the page, we need to push the page back to the left half of the scrollbar width.
+                        ///NOTE: The query box, however, does not get pushed back.
+                        document.getElementsByTagName("html")[0].style.marginLeft = "-4px";
+                        window.setTimeout(function ()
+                        {
+                            document.getElementsByTagName("html")[0].style.overflowY = "scroll";
+                            document.getElementsByTagName("html")[0].style.marginLeft = "0";
+                        }, 0);
+                    }
+                    
                     return function (values)
                     {
                         var link_tag;
                         
                         if (values.new_val) {
                             if (!css_added) {
+                                
                                 link_tag = document.createElement("link");
-                                link_tag.href = "/styles/night.css?28069658";
+                                link_tag.href = "/styles/night.css?28077649";
                                 link_tag.rel  = "stylesheet";
+                                if (BF.is_WebKit) {
+                                    link_tag.onload = webkit_scrollbar_hack;
+                                }
                                 ///TODO: Add a wait cursor
                                 document.getElementsByTagName("head")[0].appendChild(link_tag);
                                 css_added = true;
+                            } else {
+                                if (BF.is_WebKit) {
+                                    webkit_scrollbar_hack();
+                                }
                             }
                             document.getElementsByTagName("html")[0].classList.add("night");
                         } else {
                             document.getElementsByTagName("html")[0].classList.remove("night");
+                            if (BF.is_WebKit) {
+                                webkit_scrollbar_hack();
+                            }
                         }
                     }
                 }()));
