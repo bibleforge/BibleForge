@@ -1317,7 +1317,7 @@ div ::-webkit-scrollbar-thumb {
     border-radius: 4px;
     background: rgba(130,130,130,.3);
     /* Do not let the thumb get too small. */
-    min-height: 35px;
+    min-height: 25px;
 }
 
 div ::-webkit-scrollbar-thumb:hover {
