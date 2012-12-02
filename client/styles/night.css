@@ -197,7 +197,8 @@
     color: #000;
 }
 .night ::selection {
-    background: #828282;
+    /* Because WebKit handles selection background color differently, it needs to be lighter. */
+    background: rgba(130,130,130,.5);
     color: #000;
 }
 
