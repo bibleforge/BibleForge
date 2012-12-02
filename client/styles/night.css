@@ -215,28 +215,3 @@
 .night .menu_item_selected ::selection, .night .panel a::selection {
     color: #EEE;
 }
-
-
-/* Scroll bar colors (WebKit only). */
-/* NOTE: For an unknown reason, this is needed in order for the ::-webkit-scrollbar-* properties to work. */
-html {
-	overflow-y: auto;
-}
-
-/* NOTE: If ::-webkit-scrollbar is not present, the other styles will not work. */
-::-webkit-scrollbar {
-    width: 8px;
-    background: #000;
-}
-
-
-::-webkit-scrollbar-thumb {
-    border-radius: 4px;
-    background: rgba(130,130,130,.3);
-    /* Do not let the thumb get too small. */
-    min-height: 35px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: rgba(130,130,130,.5);
-}
