@@ -1469,7 +1469,7 @@
                         pointer_length   = 12, /// Essentially from the tip of the pointer to the callout
                         pointer_distance = 28, /// The optimal distance from the left of the callout to the middle of the pointer.
                         which_rect = 0;
-
+                    
                     /// Does the word wrap? (See Judges 1:11 "Kirjath-sepher").
                     if (point_to_rects.length > 1) {
                         /// Did it already figure out which part of the word was clicked on?
@@ -1500,6 +1500,11 @@
                             /// Store which_rect so that it does not try to find it again in vain.
                             split_info.which_rect = which_rect;
                         }
+                    } else if (point_to_rects.length < 1) {
+                        /// If the element gets removed from the page, it will have a length of 0.
+                        /// In this case, we can do nothing and the callout should be removed shortly.
+                        /// This can occur if a callout is opened and then a new query is sent (common when using the back/forward buttons).
+                        return;
                     }
                     
                     ///NOTE: Since getClientRects() does not take into account the page offset, we need to add it in.
@@ -1686,10 +1691,27 @@
                          */
                         destroy: function ()
                         {
+                            /**
+                             * Actually remove the callout from the HTML tree.
+                             *
+                             * @note This is a separate function to prevent code reduplication.
+                             */
+                            function remove_this_callout()
+                            {
+                                document.body.removeChild(callout);
+                            }
+                            
                             /// In case the data is still loading, try to abort the request.
                             ajax.abort();
                             
-                            document.body.removeChild(callout);
+                            /// Is the callout large?  If so, it will need to be closed and then removed.
+                            if (hide_callout_details) {
+                                hide_callout_details(remove_this_callout);
+                                /// Hide the callout now and remove it after the transitioning is complete.
+                                callout.style.display = "none";
+                            } else {
+                                remove_this_callout();
+                            }
                         },
                         /**
                          * Move the callout up or down.
