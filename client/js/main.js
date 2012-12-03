@@ -1059,7 +1059,7 @@
                         {
                             document.getElementsByTagName("html")[0].style.overflowY = "scroll";
                             document.getElementsByTagName("html")[0].style.marginLeft = "0";
-                        }, 0);
+                        }, 10);
                     }
                     
                     return function (values)
