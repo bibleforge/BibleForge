@@ -192,6 +192,12 @@
     border-top: 1px solid #828282;
 }
 
+
+/* WebKit's default font color is too bright, so it needs to be lightened. */
+.queryInput::-webkit-input-placeholder {
+    color: rgba(130,130,130,.65);
+}
+
 .night ::-moz-selection {
     background: #828282;
     color: #000;
