@@ -1704,13 +1704,21 @@
                             /// In case the data is still loading, try to abort the request.
                             ajax.abort();
                             
-                            /// Is the callout large?  If so, it will need to be closed and then removed.
-                            if (hide_callout_details) {
-                                hide_callout_details(remove_this_callout);
-                                /// Hide the callout now and remove it after the transitioning is complete.
-                                callout.style.display = "none";
+                            /// If the callout is transitioning, the hide_callout_details() function will refuse to remove the callout to prevent the user from accidentally closing it too fast.
+                            /// For example, if the user double clicked the "More" button, it might trigger the hide_callout_details() function.
+                            /// Therefore, we need to wait until it is done transitioning, which should be momentarily.
+                            ///NOTE: The callout_obj variable must be used, not the "this" object.
+                            if (callout_obj.transitioning) {
+                                window.setTimeout(callout_obj.destroy, 50);
                             } else {
-                                remove_this_callout();
+                                /// Is the callout large?  If so, it will need to be closed and then removed.
+                                if (hide_callout_details) {
+                                    hide_callout_details(remove_this_callout);
+                                    /// Hide the callout now and remove it after the transitioning is complete.
+                                    callout.style.display = "none";
+                                } else {
+                                    remove_this_callout();
+                                }
                             }
                         },
                         /**
@@ -1818,7 +1826,7 @@
                                 });
                             };
                             
-                            this.transition_cue.initialize(function ()
+                            this.transition_cue.initialize(function on_transition_end()
                             {
                                 ///NOTE: A short delay after the transition completes is to make sure that the browser has time to update the screen.
                                 window.setTimeout(function ()
