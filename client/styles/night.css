@@ -223,6 +223,10 @@
 }
 
 
+/***********************/
+/* WebKit specific CSS */
+/***********************/
+
 /* Set the style for the main scrollbar. */
 /* NOTE: Other scrollbars (like in <div> tags) do not need to be styled because they are transparent and the background color shows through. */
 html.night > ::-webkit-scrollbar {

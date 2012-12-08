@@ -1300,13 +1300,8 @@ h2 {
 }
 
 
-/* HTML scrollbar styles (WebKit only). */
-/* NOTE: The scroll bar settings only apply to scroll bars that appear after the styles are applied; */
-/*       therefore, the main scroll bar needs to be hidden as the page and CSS load. */
-html {
-	overflow-y: auto;
-}
 
+/* HTML scrollbar styles (WebKit only) */
 /* NOTE: If ::-webkit-scrollbar is not present, the other styles will not work. */
 html > ::-webkit-scrollbar {
     width: 8px;
@@ -1346,7 +1341,6 @@ div ::-webkit-scrollbar-thumb:hover {
 }
 
 
-
 /*******************************/
 /* WebKit & Opera specific CSS */
 /*******************************/
@@ -1366,7 +1360,6 @@ div ::-webkit-scrollbar-thumb:hover {
     /* NOTE: Because the font size changes via a CSS transition, the line-height also must transition as well. See above for the declaration. */
     line-height: 150%;
 }
-
 
 /***************************/
 /* Just Opera specific CSS */
