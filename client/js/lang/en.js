@@ -1977,11 +1977,14 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                         terms = terms.substring(1);
                     }
                     
-                    /// Does the rest of the string have a hyphen in it?  If so, remove hyphens; if not, just return the original string.
-                    if (terms.indexOf("-") > -1) {
+                    /// Does the rest of the string have a hyphen in it not followed by a number?  If so, remove hyphens; if not, just return the original string.
+                    ///NOTE: The reason for testing to see if there is a number is to leave verse ranges as is.
+                    ///      E.g., '1:1-2' will not be changed, but 'Bethlehem-judah' will become '"Bethlehem judah"'.
+                    if (/-(?!\d)/.test(terms)) {
                         /// Replace all hyphens with spaces and trim any possible space that might have been created.
                         /// In case a hyphen was surrounded by spaces, remove any spaces as well.
-                        terms = terms.replace(/\s*-+\s*/g, " ").trim();
+                        terms = terms.replace(/\s*-+(?!\d)\s*/g, " ").trim();
+                        
                         /// Was this word not wrapped in double quotes.  If not, then it needs to be now in order to force the words to be found in order.
                         if (terms[0] !== '"') {
                             terms = '"' + terms + '"';
