@@ -1952,7 +1952,14 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                 verse   = "001";
                 
                 /// Finally, we need to determine the chapter and/or verse reference is they are supplied.
-                ///TODO: Explain regex and give examples.
+                /// Create an array containing the starting chapter and verse (if any).
+                /// Examples:
+                ///    "Romans"        => ["Romans"]
+                ///    "Romans 3"      => ["Romans", "3", undefined, ""]
+                ///    "Romans 3:"     => ["Romans", "3", "",  ""]
+                ///    "Romans 3:9"    => ["Romans", "3", "9", ""]
+                ///    "Romans 3:9-"   => ["Romans", "3", "9", ""]
+                ///    "Romans 3:9-18" => ["Romans", "3", "9", ""]
                 cv = ref.split(/\s*([0-9]{1,3})(?:[:.;,\s]([0-9]{0,3})[\-0-9]*)?(?:[\d\W]+)?$/);
                 
                 if (cv.length > 1) {
