@@ -680,7 +680,7 @@ label {
     overflow-x: hidden;
     height: 100%;
 }
-.callout .pointer-down {
+.pointer-down {
     box-shadow: 6px 4px 6px -3px rgba(0,0,0,.2);
             transform: rotate(45deg);
        -moz-transform: rotate(45deg);
@@ -697,7 +697,7 @@ label {
     background:         linear-gradient(to right bottom, rgba(255,255,255,0) 41%, rgba(240,240,240,.97) 41%);
     bottom: -11px;
 }
-.callout .pointer-up {
+.pointer-up {
     box-shadow: -1px -3px 6px -3px rgba(0,0,0,.2);
             transform: rotate(45deg);
        -moz-transform: rotate(45deg);
