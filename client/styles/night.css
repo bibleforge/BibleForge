@@ -192,6 +192,11 @@
     border-top: 1px solid #828282;
 }
 
+/* Remove shadows to speed up painting. */
+.night .infoBars, .night .queryInput, .night .contextMenu, .night .panel, .night .button, .night .callout, .night .pointer-down, .night .pointer-up, .night .more-button {
+    box-shadow:  none;
+    text-shadow: none;
+}
 
 /* WebKit's default font color is too bright, so it needs to be lightened. */
 .queryInput::-webkit-input-placeholder {
