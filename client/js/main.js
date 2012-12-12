@@ -1070,7 +1070,7 @@
                             if (!css_added) {
                                 
                                 link_tag = document.createElement("link");
-                                link_tag.href = "/styles/night.css?28887095";
+                                link_tag.href = "/styles/night.css?28960236";
                                 link_tag.rel  = "stylesheet";
                                 if (BF.is_WebKit) {
                                     link_tag.onload = webkit_scrollbar_hack;
@@ -3467,7 +3467,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?28194376", {
+                BF.include("/js/secondary.js?28960052", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,

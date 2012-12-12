@@ -1591,7 +1591,7 @@
                         inside.appendChild(loader);
                         /// Change the opacity after a delay to make it fade in (if the browser supports CSS transitions; otherwise the change is instant).
                         loading_timer = window.setTimeout(function () {
-                            loader.style.opacity = ".99";
+                            loader.style.opacity = ".6";
                         }, 0);
                     }, 500);
                     

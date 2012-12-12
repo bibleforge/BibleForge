@@ -94,23 +94,23 @@
 
 
 .night .callout, .night .panel {
-    background: rgba(0,0,0,.9);
+    background: rgba(18,18,18,.95);
     border-color: #828282;
 }
 
 .night .callout .pointer-down {
     /* Chrome/Safari 5.1+ */
-    background: -webkit-linear-gradient(left top,        rgba(0,0,0,0) 41%, rgba(0,0,0,.9) 41%);
+    background: -webkit-linear-gradient(left top,        rgba(0,0,0,0) 41%, rgba(18,18,18,.98) 41%);
     /* IE 10, Firefox 16+, Opera 12.10+ */
-    background:         linear-gradient(to right bottom, rgba(0,0,0,0) 41%, rgba(0,0,0,.9) 41%);
+    background:         linear-gradient(to right bottom, rgba(0,0,0,0) 41%, rgba(18,18,18,.98) 41%);
     border-color: #828282;
 }
 
 .night .callout .pointer-up {
     /* Chrome/Safari 5.1+ */
-    background: -webkit-linear-gradient(right bottom, rgba(0,0,0,0) 45%, rgba(0,0,0,.97) 45%);
+    background: -webkit-linear-gradient(right bottom, rgba(0,0,0,0) 45%, rgba(18,18,18,.97) 45%);
     /* IE 10, Firefox 16+, Opera 12.10+ */
-    background:         linear-gradient(to left top,  rgba(0,0,0,0) 45%, rgba(0,0,0,.97) 45%);
+    background:         linear-gradient(to left top,  rgba(0,0,0,0) 45%, rgba(18,18,18,.97) 45%);
     border-color: #828282;
 }
 
