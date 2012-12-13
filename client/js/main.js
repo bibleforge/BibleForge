@@ -1068,7 +1068,7 @@
                             if (!css_added) {
                                 
                                 link_tag = document.createElement("link");
-                                link_tag.href = "/styles/night.css?28965438";
+                                link_tag.href = "/styles/night.css?29048937";
                                 link_tag.rel  = "stylesheet";
                                 if (BF.is_WebKit) {
                                     link_tag.onload = webkit_scrollbar_hack;
