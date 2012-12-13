@@ -549,9 +549,7 @@
                         
                         if (method.toLowerCase() === "get") {
                             /// GET requests need the message appended to the path.
-                            ///NOTE: Could check to see if the path or message already have question mark (?).
-                            ///TODO: Check to see if the message is to long and switch to POST.
-                            ajax.open(method, path + "?" + message);
+                            ajax.open(method, path + (message ? "?" + message : ""));
                         } else {
                             /// POST requests send the message later on (with .send()).
                             ajax.open(method, path);
