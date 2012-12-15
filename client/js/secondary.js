@@ -1846,7 +1846,6 @@
                             transparent_el.style.opacity = 0;
                             transparent_el.style.position = "fixed";
                             ///NOTE: Could set this to the position of the top bar if it updated when/if the top bar changes sizes (which it cannot do currently).
-                            ///      Could also make it's width the same dimensions as the scroll element.
                             transparent_el.style.top    = 0;
                             transparent_el.style.bottom = 0;
                             transparent_el.style.left   = 0;
