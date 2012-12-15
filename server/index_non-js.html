@@ -40,17 +40,14 @@ This is a non-JavaScript version of the HTML.  See index.html for more info abou
 
 -->
     <title>__TITLE__</title>
-    <link rel=stylesheet href="/styles/base.css?28887210">
+    <link rel=stylesheet href="/styles/base.css?29192732">
     __LANG_CSS__
     <link rel="icon" type="image/png" href="/images/favicon.png">
     <!-- This graphic is used by handhelds and tablets for a bookmark icon. -->
     <!-- NOTE: May want to use the precomposed option (apple-touch-icon-precomposed). -->
     <link rel="apple-touch-icon" href="/images/scroll_210.png">
     <meta name=description content="BibleForge: The free, open source Bible Study web app. __DESC__">
-    <!-- Safari on the iPhone or iPad requires that the viewport width be set. -->
-    <!-- The Froyo browser on Android 2.2 needs scaling disabled in order for fixed positioning to work. -->
-    <!-- TODO: The correct header should probably be sent dynamically from the server. -->
-    <meta name=viewport content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <!-- NOTE: Viewport properties are set in the CSS because the viewport meta tag does not support using a percentage for the width property. -->
     <!-- Tell Googlebot (and maybe other bots) to retry the same address with "?_escaped_fragment_=" at the end. -->
     <!-- Then the server can create a page for Googlebot to index. -->
     <meta name="fragment" content="!">

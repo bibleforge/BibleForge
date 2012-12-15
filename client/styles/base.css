@@ -1341,6 +1341,30 @@ div ::-webkit-scrollbar-thumb:hover {
 }
 
 
+/* Set viewport width for modile devices. */
+/*NOTE: This needs to be tested on more devices and may need multiple media queries to display properly across devices. */
+@-o-viewport {
+  width: 67%;
+  user-zoom: fixed;
+}
+@-ms-viewport {
+  width: 67%;
+  user-zoom: fixed;
+}
+@-moz-viewport {
+  width: 67%;
+  user-zoom: fixed;
+}
+@-webkit-viewport {
+  width: 67%;
+  user-zoom: fixed;
+}
+@viewport {
+  width: 67%;
+  user-zoom: fixed;
+}
+
+
 /*******************************/
 /* WebKit & Opera specific CSS */
 /*******************************/
@@ -1393,6 +1417,7 @@ div ::-webkit-scrollbar-thumb:hover {
     margin-top: 5px;
     margin-bottom: 0;
 }
+
 
 /************************/
 /* Mozilla specific CSS */
