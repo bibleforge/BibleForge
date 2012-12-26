@@ -3177,8 +3177,8 @@
                 keyCode = e.keyCode;
                 
                 /// Is there an input box selected?  If so, this function should not be executed.
-                ///NOTE: If an <input> button is selected, the enter and space bar keys still works like normal, but other key strokes are caught.
-                if ((activeEl.tagName === "INPUT" && ((activeEl.type !== "submit" && activeEl.type !== "button") || keyCode === 13 || keyCode === 32)) || activeEl.tagName === "BUTTON" || activeEl.tagName === "TEXTAREA" || system.keyboard_busy) {
+                ///NOTE: If an <input> or <button> is selected, the enter and space bar keys still works like normal, but other key strokes are caught.
+                if (((activeEl.tagName === "INPUT" || activeEl.tagName === "BUTTON") && ((activeEl.type !== "submit" && activeEl.type !== "button") || keyCode === 13 || keyCode === 32)) || activeEl.tagName === "TEXTAREA" || system.keyboard_busy) {
                     return;
                 }
                 
