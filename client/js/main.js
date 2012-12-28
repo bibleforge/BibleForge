@@ -2344,17 +2344,27 @@
                             initial_query = options.initial_query,
                             type          = options.type,
                             
+                            /// The variables will be used to store properties from the data returned from the server. The full names just make them easier to understand.
+                            total,
+                            paragraphs,
+                            verse_ids,
+                            verse_html,
+                            word_ids;
+                        
+                        /// Check to make sure the data returned from the server returned properly.
+                        if (data) {
                             /// Data object structure:
                             /// i Word IDs      (array)  (optional) An array of integers containing word IDs indicating which words should be highlighted in grammatical searches
                             /// n Verse Numbers (array)             An array of integers containing verse IDs for each verse returned
                             /// p Paragraphs    (array)  (optional) An array of 1's and 0's corresponding to n array indicating which verses are at the beginning of a paragraph
                             /// t Total         (number)            The total number of verses returned
                             /// v Verse HTML    (array)             An array containing the HTML of the verses returned
-                            total      = data.t,
-                            paragraphs = data.p,
-                            verse_ids  = data.n,
-                            verse_html = data.v,
+                            total      = data.t;
+                            paragraphs = data.p;
+                            verse_ids  = data.n;
+                            verse_html = data.v;
                             word_ids   = data.i;
+                        }
                         
                         /**
                          * Tell the content manager not to look up more results based on the current direction of the query.
