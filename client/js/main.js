@@ -26,10 +26,10 @@
  */
 
 /// Declare globals for JSHint.
-/*global BF */
+// global BF
 
 /// Set JSHint options.
-/*jshint forin:true, noarg:true, noempty:true, eqeqeq:true, evil:true, bitwise:true, strict:true, undef:true, curly:true, immed:true, latedef:true, newcap:true, nonew:true, plusplus:true, es5:true, onevar:true, browser:true */
+// jshint forin:true, noarg:true, noempty:true, eqeqeq:true, evil:true, bitwise:true, strict:true, undef:true, curly:true, immed:true, latedef:true, newcap:true, nonew:true, plusplus:true, es5:true, onevar:true, browser:true
 
 (function ()
 {
@@ -49,7 +49,7 @@
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (1611)",
-            modified:  31079547
+            modified:  31083929
         };
     }
     
@@ -3475,7 +3475,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?31079528", {
+                BF.include("/js/secondary.js?31083968", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
