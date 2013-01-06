@@ -29,7 +29,7 @@
 // global BF
 
 /// Set JSHint options.
-// jshint forin:true, noarg:true, noempty:true, eqeqeq:true, evil:true, bitwise:true, strict:true, undef:true, curly:true, immed:true, latedef:true, newcap:true, nonew:true, plusplus:true, es5:true, onevar:true, quotmark:double, browser:true
+// jshint bitwise:true, curly:true, eqeqeq:true, forin:true, immed:true, latedef:true, newcap:true, noarg:true, noempty:true, nonew:true, onevar:true, plusplus:true, quotmark:double, strict:true, undef:true, es5:true, evil:true, browser:true
 
 (function ()
 {
@@ -49,7 +49,7 @@
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (1611)",
-            modified:  31091044
+            modified:  31092552
         };
     }
     
@@ -3475,7 +3475,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?31090749", {
+                BF.include("/js/secondary.js?31092533", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,

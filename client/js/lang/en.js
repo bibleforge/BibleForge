@@ -26,7 +26,7 @@
  */
 
 /// Set JSHint options.
-// jshint forin:true, noarg:true, noempty:true, eqeqeq:true, bitwise:true, strict:true, undef:true, curly:true, immed:true, latedef:true, newcap:true, nonew:true, plusplus:true, es5:true, onevar:true, quotmark:double, browser:true
+// jshint bitwise:true, curly:true, eqeqeq:true, forin:true, immed:true, latedef:true, newcap:true, noarg:true, noempty:true, nonew:true, onevar:true, plusplus:true, quotmark:double, strict:true, undef:true, es5:true, browser:true
 
 /**
  * Create the BibleForge language specific object for the English language.
