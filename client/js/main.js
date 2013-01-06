@@ -9,7 +9,7 @@
  */
 
 /**
- * Copyright (C) 2012
+ * Copyright (C) 2013
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -49,7 +49,7 @@
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (1611)",
-            modified:  28584540
+            modified:  31079547
         };
     }
     
@@ -1068,7 +1068,7 @@
                             if (!css_added) {
                                 
                                 link_tag = document.createElement("link");
-                                link_tag.href = "/styles/night.css?29048937";
+                                link_tag.href = "/styles/night.css?31079560";
                                 link_tag.rel  = "stylesheet";
                                 if (BF.is_WebKit) {
                                     link_tag.onload = webkit_scrollbar_hack;
@@ -3475,7 +3475,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?29057247", {
+                BF.include("/js/secondary.js?31079528", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
