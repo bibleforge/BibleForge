@@ -29,7 +29,7 @@
 // global BF
 
 /// Set JSHint options.
-// jshint forin:true, noarg:true, noempty:true, eqeqeq:true, evil:true, bitwise:true, strict:true, undef:true, curly:true, immed:true, latedef:true, newcap:true, nonew:true, plusplus:true, es5:true, onevar:true, browser:true
+// jshint forin:true, noarg:true, noempty:true, eqeqeq:true, evil:true, bitwise:true, strict:true, undef:true, curly:true, immed:true, latedef:true, newcap:true, nonew:true, plusplus:true, es5:true, onevar:true, quotmark:double, browser:true
 
 (function ()
 {
@@ -49,7 +49,7 @@
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (1611)",
-            modified:  31083929
+            modified:  31091044
         };
     }
     
@@ -1375,7 +1375,7 @@
                                 if (pixels_needed > 0) {
                                     padding_el = document.createElement("div");
                                     
-                                    padding_el.style.height = (pixels_needed + extra_padding) + 'px';
+                                    padding_el.style.height = (pixels_needed + extra_padding) + "px";
                                     viewPort.insertBefore(padding_el, null);
                                     
                                     /// Create a timer to check to see if the padding is no longer needed.
@@ -2200,7 +2200,7 @@
                         
                         if (in_paragraphs) {
                             start_paragraph_HTML = "<div class=paragraph>";
-                            first_paragraph_HTML = '<div class="paragraph first_paragraph">';
+                            first_paragraph_HTML = "<div class=\"paragraph first_paragraph\">";
                             end_paragraph_HTML   = "</div>";
                         }
                         
@@ -2813,7 +2813,7 @@
                         /// If grammar_search_term is "go", grammar_json will equal '["go",['.
                         ///NOTE: .replace(/(["'])/g, "\\$1") adds slashes to sanitize the data.  (It is essentially the same as addslashes() in PHP.)
                         ///TODO: Determine if the entire query should be passed through encodeURIComponent().  It would make the text much longer.
-                        grammar_json = '["' + window.encodeURIComponent(grammar_search_term.replace(/(["'])/g, "\\$1")) + '",[';
+                        grammar_json = "[\"" + window.encodeURIComponent(grammar_search_term.replace(/(["'])/g, "\\$1")) + "\",[";
                         
                         /// Isolate the grammatical attributes (e.g., in "go AS IMPERATIVE, -SINGULAR", grammar_attributes = "IMPERATIVE, -SINGULAR").
                         grammar_attributes = search_terms.slice(split_pos + BF.lang.grammar_marker_len);
@@ -3475,7 +3475,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?31083968", {
+                BF.include("/js/secondary.js?31090749", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,

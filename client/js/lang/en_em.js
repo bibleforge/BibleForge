@@ -26,7 +26,7 @@
  */
 
 /// Set JSHint options.
-// jshint forin:true, noarg:true, noempty:true, eqeqeq:true, bitwise:true, strict:true, undef:true, curly:true, immed:true, latedef:true, newcap:true, nonew:true, plusplus:true, es5:true, onevar:true, browser:true
+// jshint forin:true, noarg:true, noempty:true, eqeqeq:true, bitwise:true, strict:true, undef:true, curly:true, immed:true, latedef:true, newcap:true, nonew:true, plusplus:true, es5:true, onevar:true, quotmark:double, browser:true
 
 /**
  * Create the BibleForge language specific object for Early Modern English.
@@ -103,48 +103,48 @@
         
         ///TODO: Determine if texts should be categorized.
         /// Miscellaneous Text
-        about:             "About",                                               /// Context menu item
-        app_name:          "BibleForge",                                          /// The name of the application
-        biblical:          "Biblical",                                            /// The short name for the Biblical reconstructed pronunciation displayed on the menu
-        biblical_pronun:   "Biblical Reconſtructed Pronunciation",                /// The long name for the Biblical reconstructed pronunciation displayed in a tooltip
-        biblical_ipa:      "Biblical IPA",                                        /// The short name for the Biblical reconstructed IPA pronunciation displayed on the menu
-        biblical_ipa_long: "Biblical Reconſtructed IPA",                          /// The long name for the Biblical reconstructed IPA pronunciation displayed in a tooltip
-        blog:              "Weblog",                                              /// Context menu item
-        chapter:           "Chapter",                                             /// Chapter headings
-        configure:         "Configure",                                           /// Context menu item
-        detailed_def:      "Detailed Definition",                                 /// Longer, more detailed definitions caption (in larger callout)
-        done:              "Finiſh",                                              /// The button that closes panels
-        found_plural:      " verſes found for ",                                  /// On the info bar when searching (multiple results) (uncapitalized)
-        found_singular:    " verſe found for ",                                   /// On the info bar when searching (one result) (uncapitalized)
-        help:              "Succor",                                              /// Context menu item
-        "in":              "in",                                                  /// Used in the meta description in the non-JavaScript version to indicate the language being used (uncapitalized)
+        about:             "About",                                                /// Context menu item
+        app_name:          "BibleForge",                                           /// The name of the application
+        biblical:          "Biblical",                                             /// The short name for the Biblical reconstructed pronunciation displayed on the menu
+        biblical_pronun:   "Biblical Reconſtructed Pronunciation",                 /// The long name for the Biblical reconstructed pronunciation displayed in a tooltip
+        biblical_ipa:      "Biblical IPA",                                         /// The short name for the Biblical reconstructed IPA pronunciation displayed on the menu
+        biblical_ipa_long: "Biblical Reconſtructed IPA",                           /// The long name for the Biblical reconstructed IPA pronunciation displayed in a tooltip
+        blog:              "Weblog",                                               /// Context menu item
+        chapter:           "Chapter",                                              /// Chapter headings
+        configure:         "Configure",                                            /// Context menu item
+        detailed_def:      "Detailed Definition",                                  /// Longer, more detailed definitions caption (in larger callout)
+        done:              "Finiſh",                                               /// The button that closes panels
+        found_plural:      " verſes found for ",                                   /// On the info bar when searching (multiple results) (uncapitalized)
+        found_singular:    " verſe found for ",                                    /// On the info bar when searching (one result) (uncapitalized)
+        help:              "Succor",                                               /// Context menu item
+        "in":              "in",                                                   /// Used in the meta description in the non-JavaScript version to indicate the language being used (uncapitalized)
         ///NOTE: This key must be the same as the value in the settings.
-        in_paragraphs:     "Paragraphs",                                          /// In the View configuration panel
+        in_paragraphs:     "Paragraphs",                                           /// In the View configuration panel
         ///FIXME: Not all italic words are implied; some are questionable.
         italics_explanation: "This word is implied by context or required in order to translate properly; it was not translated directly from a word in the original languages.", /// When clicking on an italic word
-        modern:            "Modern",                                              /// The short name for the modern pronunciation displayed on the menu
-        modern_pronun:     "Modern Pronunciation",                                /// The long name for the modern pronunciation displayed in a tooltip
-        modern_ipa:        "Modern IPA",                                          /// The name for the modern IPA pronunciation displayed on the menu and tooltip
-        more:              "More",                                                /// The text for the "[+] More" button on callouts
-        next:              "Next",                                                /// The next chapter link in the non-JavaScript version
-        night_mode:        "Night Mode",                                          /// In the View configuration panel
-        no_results1:       "Your search\u200A\u2014\u200A",                       /// Displayed when preforming a search that returns no results (before the search terms).
-        no_results2:       "\u200A\u2014\u200Adid not return any results.",       /// Displayed when preforming a search that returns no results (after the search terms).
-        previous:          "Previous",                                            /// The previous chapter link in the non-JavaScript version
-        psalm:             "Psalme",                                              /// The title of chapters in the book of Psalms
-        query_explanation: 'Keyword or Reference: "God ſo loued" or Romans 3:23', /// In a blank query input box before a search has been preformed
-        query_button_title:"Click here (or preſſe Enter)",                        /// The text displayed when hovering over the magnifying glass (query button).
-        query_button_alt:  "Goe",                                                 /// The text to display for the magnifying glass (query button) if images are disabled.
+        modern:            "Modern",                                               /// The short name for the modern pronunciation displayed on the menu
+        modern_pronun:     "Modern Pronunciation",                                 /// The long name for the modern pronunciation displayed in a tooltip
+        modern_ipa:        "Modern IPA",                                           /// The name for the modern IPA pronunciation displayed on the menu and tooltip
+        more:              "More",                                                 /// The text for the "[+] More" button on callouts
+        next:              "Next",                                                 /// The next chapter link in the non-JavaScript version
+        night_mode:        "Night Mode",                                           /// In the View configuration panel
+        no_results1:       "Your search\u200A\u2014\u200A",                        /// Displayed when preforming a search that returns no results (before the search terms).
+        no_results2:       "\u200A\u2014\u200Adid not return any results.",        /// Displayed when preforming a search that returns no results (after the search terms).
+        previous:          "Previous",                                             /// The previous chapter link in the non-JavaScript version
+        psalm:             "Psalme",                                               /// The title of chapters in the book of Psalms
+        query_explanation: "Keyword or Reference: \"God ſo loued\" or Romans 3:23",/// In a blank query input box before a search has been preformed
+        query_button_title:"Click here (or preſſe Enter)",                         /// The text displayed when hovering over the magnifying glass (query button).
+        query_button_alt:  "Goe",                                                  /// The text to display for the magnifying glass (query button) if images are disabled.
         ///NOTE: This key must be the same as the value in the settings.
-        red_letters:       "Red Letters",                                         /// In the View configuration panel
-        results_for:       "Results for",                                         /// Used in the meta description of searches in the non-JavaScript version to indicate the results for the query.
-        subscription:      "subscription",                                        /// Used instead of 255 for subscripts to Paul's epistles (uncapitalized)
-        title:             "title",                                               /// Used instead of 0 for Psalm title verse references (uncapitalized)
-        translit:          "Tranſliteration",                                     /// The short name for the SBL transliteration display on the menu
-        translit_long:     "Society of Biblical Languages Tranſliteration",       /// The long name for the SBL transliteration display on a tooltip
-        view:              "View",                                                /// The title of a configuration panel
+        red_letters:       "Red Letters",                                          /// In the View configuration panel
+        results_for:       "Results for",                                          /// Used in the meta description of searches in the non-JavaScript version to indicate the results for the query.
+        subscription:      "subscription",                                         /// Used instead of 255 for subscripts to Paul's epistles (uncapitalized)
+        title:             "title",                                                /// Used instead of 0 for Psalm title verse references (uncapitalized)
+        translit:          "Tranſliteration",                                      /// The short name for the SBL transliteration display on the menu
+        translit_long:     "Society of Biblical Languages Tranſliteration",        /// The long name for the SBL transliteration display on a tooltip
+        view:              "View",                                                 /// The title of a configuration panel
         ///TODO: Determine if the app_name should be dynamically appended to the string below or if it should be done in the build system
-        wrench_title:      "Cuſtomiſe & Configure BibleForge",                    /// The text displayed when hovering over the wrench menu
+        wrench_title:      "Cuſtomiſe & Configure BibleForge",                     /// The text displayed when hovering over the wrench menu
         
         /// ****************************************
         /// * Start of Language Specific Functions *
@@ -2017,7 +2017,7 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
             ///NOTE: .replace(/([0-9]+)[:.;,\s]title/ig, "$1:0")        replaces Psalm title references into an acceptable format (e.g., "Psalm 3:title" becomes "Psalm 3:0").
             ///NOTE: .replace(/([:.;,\s])subscript(?:ion)?/ig, "$1255") replaces the word "subscription" with the verse number (255) used internally by BibleForge for Pauline subscriptions (e.g., "Philemon subscription" becomes "Philemon 255").
             ///NOTE: "$1255" replaces the text with the first placeholder followed by the literal "255" (without quotes).
-            return query.replace(" IN RED", " AS RED").replace(/\s+/g, " ").replace(/\sAND\s/g, " & ").replace(/\sOR\s/g, " | ").replace(/(?:\s-|\s*\bNOT)\s/g, " -").replace(/ſ/g, "s").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/\u2011/g, "-").replace(/[\u00AD\u2012-\u2015]/g, "").replace(/([0-9]+)[:.;,\s]title/ig, "$1:0").replace(/([:.;,\s])subscript(?:ion)?/ig, "$1255")
+            return query.replace(" IN RED", " AS RED").replace(/\s+/g, " ").replace(/\sAND\s/g, " & ").replace(/\sOR\s/g, " | ").replace(/(?:\s-|\s*\bNOT)\s/g, " -").replace(/ſ/g, "s").replace(/[‘’]/g, "'").replace(/[“”]/g, "\"").replace(/\u2011/g, "-").replace(/[\u00AD\u2012-\u2015]/g, "").replace(/([0-9]+)[:.;,\s]title/ig, "$1:0").replace(/([:.;,\s])subscript(?:ion)?/ig, "$1255")
                 /// In order to handle hyphenated words correctly, we treat them as a quoted phrase.
                 /// So we need to wrap hyphenated words in quotes (if they are not in a quotation already) and replace the hyphens with spaces.
                .replace(/"[^"]+"?|[^"\s]+/g, function (terms)
@@ -2042,8 +2042,8 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                         terms = terms.replace(/\s*-+(?!\d|$)\s*/g, " ").trim();
                         
                         /// Was this word not wrapped in double quotes.  If not, then it needs to be now in order to force the words to be found in order.
-                        if (terms[0] !== '"') {
-                            terms = '"' + terms + '"';
+                        if (terms[0] !== "\"") {
+                            terms = "\"" + terms + "\"";
                         }
                     }
                     

@@ -26,7 +26,7 @@
  */
 
 /// Set JSHint options.
-// jshint forin:true, noarg:true, noempty:true, eqeqeq:true, bitwise:true, strict:true, undef:true, curly:true, immed:true, latedef:true, newcap:true, nonew:true, plusplus:true, es5:true, onevar:true, node:true
+// jshint forin:true, noarg:true, noempty:true, eqeqeq:true, bitwise:true, strict:true, undef:true, curly:true, immed:true, latedef:true, newcap:true, nonew:true, plusplus:true, es5:true, onevar:true, quotmark:double, node:true
 
 "use strict";
 
@@ -378,7 +378,7 @@ BF.standard_search = function (data, callback)
     if (terms.indexOf(" ") >= 0) {
         /// Are there more than 10 search terms in the query, or does the query contains double quotes (")?
         ///NOTE: Could use the more accurate (/([a-z-]+[^a-z-]+){11}/.test(terms)) to find word count, but it is slower.
-        if (terms.indexOf('"') >= 0 || terms.split(" ").length > 9) {
+        if (terms.indexOf("\"") >= 0 || terms.split(" ").length > 9) {
             /// By default, other modes stop at 10, but SPH_MATCH_EXTENDED does more (256?).
             /// Phrases (words in quotes) require SPH_MATCH_EXTENDED mode.
             ///NOTE: SPH_MATCH_BOOLEAN is supposed to find more than 10 words too but doesn't seem to.
@@ -432,7 +432,7 @@ BF.standard_search = function (data, callback)
         ///NOTE: The first column is currently ignored.
         query += "\" UNION SELECT 0, VARIABLE_VALUE FROM INFORMATION_SCHEMA.SESSION_STATUS WHERE VARIABLE_NAME = 'sphinx_total_found'";
     } else {
-        query += '"';
+        query += "\"";
     }
     
     /// Run the Sphinx search and return both the verse IDs and the HTML.
@@ -572,7 +572,7 @@ BF.grammatical_search = function (data, callback)
         ///NOTE: The first two columns are currently ignored.
         query += "\" UNION SELECT 0, 0, VARIABLE_VALUE FROM INFORMATION_SCHEMA.SESSION_STATUS WHERE VARIABLE_NAME = 'sphinx_total_found'";
     } else {
-        query += '"';
+        query += "\"";
     }
     
     /// Run the Sphinx search, and return both the verse IDs and the HTML.
@@ -931,7 +931,7 @@ BF.lexical_lookup = function (data, callback)
                                             }
                                             
                                             ///NOTE: Psalms uses a special name (i.e., "psalm" instead of "chapter").
-                                            res += '<a class="static_link prev" href="/' + lang.id + "/" + lang.books_short[prev_b] + "%20" + prev_c + "/!" + '">&lt; ' + lang.previous + ' ' + (prev_b === 19 ? lang.psalm : lang.chapter) + "</a>";
+                                            res += "<a class=\"static_link prev\" href=\"/" + lang.id + "/" + lang.books_short[prev_b] + "%20" + prev_c + "/!" + "\">&lt; " + lang.previous + " " + (prev_b === 19 ? lang.psalm : lang.chapter) + "</a>";
                                         }
                                         
                                         /// Is this not Revelation 22? (Revelation 22 does not need a next link.)
@@ -948,7 +948,7 @@ BF.lexical_lookup = function (data, callback)
                                             }
                                             
                                             ///NOTE: Psalms uses a special name (i.e., "psalm" instead of "chapter").
-                                            res += '<a class="static_link next" href="/' + lang.id + "/" + lang.books_short[next_b] + "%20" + next_c + "/!" + '">' + lang.next + ' ' + (next_b === 19 ? lang.psalm : lang.chapter) + " &gt;</a>";
+                                            res += "<a class=\"static_link next\" href=\"/" + lang.id + "/" + lang.books_short[next_b] + "%20" + next_c + "/!" + "\">" + lang.next + " " + (next_b === 19 ? lang.psalm : lang.chapter) + " &gt;</a>";
                                         }
                                         
                                         return res;
