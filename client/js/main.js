@@ -1088,7 +1088,7 @@
                                 webkit_scrollbar_hack();
                             }
                         }
-                    }
+                    };
                 }()));
                 
                 settings.add_property(settings.user, "last_query", {});

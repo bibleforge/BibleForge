@@ -1858,7 +1858,7 @@
                             this.transition_cue.add();
                             /// Fade in the transparent element.
                             /// There is a short delay to let the callout start moving.
-                            BF.transition(transparent_el, {prop: "opacity", duration: "250ms", end_val: .7, timing: "steps(3, start)", delay: "50ms", failsafe: 500}, function ()
+                            BF.transition(transparent_el, {prop: "opacity", duration: "250ms", end_val: 0.7, timing: "steps(3, start)", delay: "50ms", failsafe: 500}, function ()
                             {
                                 that.transition_cue.remove();
                             });
