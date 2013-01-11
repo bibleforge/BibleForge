@@ -1538,13 +1538,14 @@
                 /**
                  * Create the callout element and attach it to a word.
                  *
+                 * @param  id         (number)  The word ID
                  * @param  point_to   (element) The element the callout should point to.
                  * @param  ajax       (object)  The ajax object created by BF.Create_easy_ajax().
                  * @param  split_info (object)  An object containing information about where the user originally clicked and possibly which part of the word the user clicked.
                  *                              Object structure: {mouse_x: number, mouse_y: number, which_rect: number}
                  * @return A object that manages the callout.
                  */
-                return function create_callout(point_to, ajax, split_info)
+                return function create_callout(id, point_to, ajax, split_info)
                 {
                     var callout = document.createElement("div"),
                         inside  = document.createElement("div"),
@@ -2058,7 +2059,8 @@
                         }()),
                         
                         /// Properties
-                        just_created: true,
+                        id: id,
+                        just_created: true
                     };
                     
                     callout_obj.align();
@@ -2275,9 +2277,8 @@
                          *
                          * @param callout (object) The callout object
                          * @param data    (object) An object containing info to be placed into the callout
-                         * @param id      (number) The word ID (used to determine which Testament this word is from)
                          */
-                        return function display_callout(callout, data, id)
+                        return function display_callout(callout, data)
                         {
                             /// data Object structure:
                             /// word      (string)  The original Greek, Hebrew, or Aramaic word, in Unicode.
@@ -2333,7 +2334,7 @@
                                 /// Create lex-orig_word.
                                 child_el = document.createElement("span");
                                 child_el.className = "lex-orig_word";
-                                if (id < BF.lang.divisions.nt) {
+                                if (callout.id < BF.lang.divisions.nt) {
                                     child_el.classList.add("hebrew");
                                 }
                                 child_el.textContent = data.word;
@@ -2447,7 +2448,7 @@
                                 /// Delay the code so that the remained of the code will execute first and prepare the callout variable.
                                 window.setTimeout(function ()
                                 {
-                                    display_callout(callout, lex_cache[clicked_el.id], Number(clicked_el.id));
+                                    display_callout(callout, lex_cache[clicked_el.id]);
                                 }, 0);
                             } else {
                                 ajax.query("GET", "/api", "t=" + BF.consts.lexical_lookup + "&q=" + clicked_el.id, function success(data)
@@ -2456,11 +2457,12 @@
                                     /// Temporarily cache the data so that it does not have to re-queried.
                                     ///NOTE: The cache is cleared before each query.
                                     lex_cache[clicked_el.id] = data;
-                                    display_callout(callout, data, Number(clicked_el.id));
+                                    display_callout(callout, data);
                                 });
                             }
                             
-                            callout = create_callout(clicked_el, ajax, {mouse_x: e.clientX, mouse_y: e.clientY});
+                            /// Create the callout variable here while waiting for the code above to be called.
+                            callout = create_callout(Number(clicked_el.id), clicked_el, ajax, {mouse_x: e.clientX, mouse_y: e.clientY});
                             callouts[callouts.length] = callout;
                         }
                     }, false);
