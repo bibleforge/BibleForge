@@ -2682,7 +2682,7 @@
                             var query_str;
                             
                             if (context.settings.user.last_query.type === BF.consts.verse_lookup && (qEl_str === "" || qEl_str === context.settings.user.last_query.real_query)) {
-                                query_str = BF.langs[lang_id].books_short[context.settings.user.position.b] + " " + context.settings.user.position.c + ":" + context.settings.user.position.v;
+                                query_str = BF.langs[lang_id].books_short[context.settings.user.position.b] + " " + context.settings.user.position.c + ":" + context.settings.user.position.full_verse;
                             } else if (qEl_str_trim !== "") {
                                 query_str = qEl_str;
                             } else {
@@ -2753,7 +2753,7 @@
                                  */
                                 window.setTimeout(function ()
                                 {
-                                    var position,      /// The object that indicates the actual position on the page
+                                    var position,      /// The object that indicates the actual position on the page (i.e., context.settings.user.position)
                                         query_info = context.settings.user.last_query,
                                         query_str,     /// The actual text used for the query
                                         query_url_str; /// The text that appears in the URL when history.pushState() is applied
@@ -2773,7 +2773,7 @@
                                         if (query_info.type === BF.consts.verse_lookup) {
                                             /// Because the book names are not the same in each language, recreate the verse and store it in the URL
                                             /// so that if the page is refreshed, it will be able to load the correct verse.
-                                            query_url_str = BF.langs[lang_id].books_short[context.settings.user.position.b] + " " + context.settings.user.position.c + ":" + context.settings.user.position.v;
+                                            query_url_str = BF.langs[lang_id].books_short[position.b] + " " + position.c + ":" + position.full_verse;
                                         }
                                         
                                         /// If the last query was the default query (query_info.is_default) use the default query (i.e., Genesis 1:1).
