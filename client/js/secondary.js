@@ -1780,6 +1780,32 @@
                         {
                             var that = this;
                             
+                            /**
+                             * Determine the verse reference of a word that is on the page.
+                             *
+                             * @param id (string || number) The word ID to lookup.
+                             * @note  If there is no element on the page that matches this ID, then and empty string ("") is returned.
+                             * @note  If a verse reference is needed even if the word is not present, a new API would need to be created.
+                             */
+                            function get_ref_from_word_id(id)
+                            {
+                                var bcv,
+                                    el  = document.getElementById(id),
+                                    ref = "";
+                                
+                                /// Is the word on the page?
+                                if (el) {
+                                    bcv = BF.get_b_c_v(window.parseInt(el.parentNode.id));
+                                    /// Was the verse data calculated correctly?
+                                    if (bcv) {
+                                        ///NOTE: In the future, the chapter and verse separator may need to be language specific.
+                                        ref = BF.lang.books_short[bcv.b] + " " + bcv.c + ":" + bcv.v;
+                                    }
+                                }
+                                
+                                return ref;
+                            }
+                            
                             /// Ignore all other requests while this (or another) callout is transitioning.
                             if (this.transitioning) {
                                 return;
@@ -1809,6 +1835,7 @@
                             /**
                              * Return this callout to its initial (smaller) state.
                              *
+                             * @note This variable was declared at the outset of the callout closure to allow other functions to call it.
                              * @note This function is called by the remove() function below before attempting to remove callouts.
                              * @note This function can be called by another callout that wants to be enlarged.
                              */
@@ -1910,6 +1937,10 @@
                             
                             /// Resize the callout to take up more of the screen.
                             this.align(true);
+                            
+                            /// Change the URL to allow linking to this specific resource.
+                            ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
+                            BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(get_ref_from_word_id(this.id)) + "/" + this.id  + "/");
                         },
                         hide_details: function (callback)
                         {
