@@ -768,6 +768,23 @@
     };
     
     
+    /**
+     * Get the full verse reference (i.e., "title" (for Psalm titles), "subscription" (for Pauline subscriptions), or a number (for everything else)).
+     *
+     * @example BF.get_full_verse(0);       /// "title"
+     * @example BF.get_full_verse(0, TRUE); /// 1
+     * @example BF.get_full_verse(1);       /// 1
+     * @example BF.get_full_verse(2);       /// 2
+     * @example BF.get_full_verse(255)      /// "subscription"
+     * @param   v               (number)  The verse to examine
+     * @param   passover_titles (boolean) Whether to convert Psalm titles to 1 or to "title".
+     */
+    BF.get_full_verse = function (v, passover_titles)
+    {
+        return v === 0 ? (passover_titles ? 1 : BF.lang.title) : (v === 255 ? BF.lang.subscription : v);
+    };
+    
+    
     /// Determine if CSS transitions are supported by the browser.
     ///NOTE: All of these variables currently require vendor specific prefixes.
     BF.cssTransitions = typeof document.body.style.webkitTransition !== "undefined" || typeof document.body.style.MozTransition !== "undefined" || typeof document.body.style.OTransition !== "undefined";
@@ -1872,8 +1889,8 @@
                         
                         /// The titles in the book of Psalms are referenced as verse zero (cf. Psalm 3).
                         /// The subscriptions at the end of Paul's epistles are referenced as verse 255 (cf. Romans 16).
-                        verse1.full_verse = (verse1.v === 0 ? (query_type === BF.consts.verse_lookup ? 1 : BF.lang.title) : (verse1.v === 255 ? BF.lang.subscription : verse1.v));
-                        verse2.full_verse = (verse2.v === 0 ? (query_type === BF.consts.verse_lookup ? 1 : BF.lang.title) : (verse2.v === 255 ? BF.lang.subscription : verse2.v));
+                        verse1.full_verse = BF.get_full_verse(verse1.v, query_type === BF.consts.verse_lookup);
+                        verse2.full_verse = BF.get_full_verse(verse2.v, query_type === BF.consts.verse_lookup)
                         
                         /// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
                         ///NOTE: verse2.full_book is set here even though it is not always needed now,
@@ -2275,13 +2292,9 @@
                                 
                             /// Searching
                             } else {
-                                if (verse_obj.v === 0) {
-                                    /// Change verse 0 to indicate a Psalm title (e.g., change "Psalm 3:0" to "Psalm 3:title").
-                                    verse_obj.v = BF.lang.title;
-                                } else if (verse_obj.v === 255) {
-                                    /// Change verse 255 to indicate a Pauline subscription (e.g., change "Romans 16:255" to "Romans 16:subscription").
-                                    verse_obj.v = BF.lang.subscription;
-                                }
+                                /// Change verse 0 to indicate a Psalm title (e.g., change "Psalm 3:0" to "Psalm 3:title"),
+                                /// and change verse 255 to indicate a Pauline subscription (e.g., change "Romans 16:255" to "Romans 16:subscription").
+                                verse_obj.v = BF.get_full_verse(verse_obj.v);
                                 
                                 /// Is this verse from a different book than the last verse?
                                 ///NOTE: This assumes that searches are always additional (which is correct, currently).
@@ -3475,7 +3488,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?31539659", {
+                BF.include("/js/secondary.js?31555308", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,

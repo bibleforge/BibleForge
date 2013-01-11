@@ -1799,7 +1799,7 @@
                                     /// Was the verse data calculated correctly?
                                     if (bcv) {
                                         ///NOTE: In the future, the chapter and verse separator may need to be language specific.
-                                        ref = BF.lang.books_short[bcv.b] + " " + bcv.c + ":" + bcv.v;
+                                        ref = BF.lang.books_short[bcv.b] + " " + bcv.c + ":" + BF.get_full_verse(bcv.v);
                                     }
                                 }
                                 
