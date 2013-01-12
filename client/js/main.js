@@ -776,8 +776,9 @@
      * @example BF.get_full_verse(1);       /// 1
      * @example BF.get_full_verse(2);       /// 2
      * @example BF.get_full_verse(255)      /// "subscription"
-     * @param   v               (number)  The verse to examine
-     * @param   passover_titles (boolean) Whether to convert Psalm titles to 1 or to "title".
+     * @param   v               (number)             The verse to examine
+     * @param   passover_titles (boolean) (optional) Whether to convert Psalm titles to 1 or to "title"
+     * @return  A number or a string representing a verse
      */
     BF.get_full_verse = function (v, passover_titles)
     {
@@ -785,6 +786,16 @@
     };
     
     
+    /**
+     * Create a properly formated verse reference from numbers.
+     *
+     * @example BF.create_ref({b:  1, c:  1, v:   1});          /// "Genesis 1:1"
+     * @example BF.create_ref({b: 19, c:  3, v:   0}, "en_em"); /// "Psalmes 3:title"
+     * @example BF.create_ref({b: 45, c: 16, v: 255}, "en");    /// "Romans 16:subscription"
+     * @param   bcv     (object)            An object containing the book, chapter, and verse to be converted: {b: book, c: chapter, v: verse}
+     * @param   lang_id (string) (optional) The ID for a language (default: current language)
+     * @return  A string repersenting a verse reference or a blank string ("") if there was a problem
+     */
     BF.create_ref = function (bcv, lang_id)
     {
         var ref = "";
@@ -1906,6 +1917,8 @@
                         
                         /// The titles in the book of Psalms are referenced as verse zero (cf. Psalm 3).
                         /// The subscriptions at the end of Paul's epistles are referenced as verse 255 (cf. Romans 16).
+                        ///NOTE: If the query was a verse lookup, we do not display "title" for Psalm titles; instead we just show "1."
+                        ///      I.e., Psalm 3:title is displayed as Psalm 3:1.
                         verse1.full_verse = BF.get_full_verse(verse1.v, query_type === BF.consts.verse_lookup);
                         verse2.full_verse = BF.get_full_verse(verse2.v, query_type === BF.consts.verse_lookup);
                         
@@ -3508,7 +3521,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?31616374", {
+                BF.include("/js/secondary.js?31617490", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,

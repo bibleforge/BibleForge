@@ -357,9 +357,10 @@
         /**
          * Determine the verse reference of a word that is on the page.
          *
-         * @param id (string || number) The word ID to lookup.
-         * @note  If there is no element on the page that matches this ID, then and empty string ("") is returned.
-         * @note  If a verse reference is needed even if the word is not present, a new API would need to be created.
+         * @param  id (string || number) The word ID to lookup.
+         * @return A string representing a verse reference or a blank string ("") if there was a problem
+         * @note   If there is no element on the page that matches this ID, then and empty string ("") is returned.
+         * @note   If a verse reference is needed even if the word is not present, a new API would need to be created.
          */
         BF.get_ref_from_word_id = function (id)
         {
@@ -382,6 +383,8 @@
         
         /**
          * Get any and all terms from the last query that are highlighted.
+         *
+         * @return A string containing terms or a blank string ("") if none
          */
         BF.get_highlighted_terms = function ()
         {
