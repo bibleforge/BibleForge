@@ -1959,8 +1959,8 @@
                         
                         /// Is the new verse range the same as the old one?
                         /// If they are the same, updating it would just waste time.
-                        ///TODO: Could use top_verse and bottom_verse to compare too, but since they are objects, there is no good way to do that.
-                        if (document.title !== new_title) {
+                        ///NOTE: Comparing serveral object properties is a lot faster accessing the DOM to compare document.title with new_title.
+                        if (!content_manager.top_verse || !content_manager.bottom_verse || content_manager.top_verse.b !== verse1.b || content_manager.top_verse.c !== verse1.c || content_manager.top_verse.v !== verse1.v || content_manager.bottom_verse.b !== verse2.b || content_manager.bottom_verse.c !== verse2.c || content_manager.bottom_verse.v !== verse2.v) {
                             document.title = new_title;
                             
                             /// Display the verse range on the page if looking up verses.
