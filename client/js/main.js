@@ -2761,11 +2761,13 @@
                         /// Store the user's position so that it can be retrieved when the user comes back later.
                         ///NOTE: Simply modifying the object (i.e., settings.user.last_query.lang_id = "...") does not trigger the setter callback.
                         settings.user.last_query = {
-                            lang_id:    BF.lang.id,
-                            is_default: options.is_default,
-                            raw_query:  options.raw_query,
-                            real_query: options.is_default ? "" : options.raw_query,
-                            type:       options.type
+                            extra_highlighting: options.extra_highlighting,
+                            lang_id:            BF.lang.id,
+                            is_default:         options.is_default,
+                            prepared_query:     options.prepared_query,
+                            raw_query:          options.raw_query,
+                            real_query:         options.is_default ? "" : options.raw_query,
+                            type:               options.type
                         };
                     },
                     
