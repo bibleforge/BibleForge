@@ -1778,7 +1778,8 @@
                          */
                         show_details: function ()
                         {
-                            var that = this;
+                            var highlight_terms,
+                                that = this;
                             
                             /**
                              * Determine the verse reference of a word that is on the page.
@@ -1804,6 +1805,26 @@
                                 }
                                 
                                 return ref;
+                            }
+                            
+                            /**
+                             * Get any and all terms from the last query that are highlighted.
+                             */
+                            function get_highlighted_terms()
+                            {
+                                var terms = "";
+                                
+                                /// If the last query was a search, the search terms need to be highlighted.
+                                if (context.settings.user.last_query.type !== BF.consts.verse_lookup) {
+                                    terms = context.settings.user.last_query.prepared_query;
+                                }
+                                
+                                /// If the user/query specified additional terms to be highlighted, add those as well.
+                                if (context.settings.user.last_query.extra_highlighting) {
+                                    terms += " " + context.settings.user.last_query.extra_highlighting;
+                                }
+                                
+                                return terms.trim();
                             }
                             
                             /// Ignore all other requests while this (or another) callout is transitioning.
@@ -1940,7 +1961,10 @@
                             
                             /// Change the URL to allow linking to this specific resource.
                             ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
-                            BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(get_ref_from_word_id(this.id)) + "/" + this.id  + "/");
+                            
+                            highlight_terms = get_highlighted_terms();
+                            
+                            BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(get_ref_from_word_id(this.id) + (highlight_terms ? " {{" + highlight_terms + "}}" : "")) + "/" + this.id  + "/");
                         },
                         hide_details: function (callback)
                         {
