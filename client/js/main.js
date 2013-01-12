@@ -1890,7 +1890,7 @@
                         /// The titles in the book of Psalms are referenced as verse zero (cf. Psalm 3).
                         /// The subscriptions at the end of Paul's epistles are referenced as verse 255 (cf. Romans 16).
                         verse1.full_verse = BF.get_full_verse(verse1.v, query_type === BF.consts.verse_lookup);
-                        verse2.full_verse = BF.get_full_verse(verse2.v, query_type === BF.consts.verse_lookup)
+                        verse2.full_verse = BF.get_full_verse(verse2.v, query_type === BF.consts.verse_lookup);
                         
                         /// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
                         ///NOTE: verse2.full_book is set here even though it is not always needed now,
@@ -2406,7 +2406,7 @@
                                 ///TODO: Determine if these variables should be isolated.
                                 (function ()
                                 {
-                                    /// In order to display the text as fast as possible, highlight the text is on the scroll.
+                                    /// In order to display the text as fast as possible, we add the text to the scroll and then highlight it later.
                                     ///NOTE: Because the highlighter is called via setTimeout, it is possible that the user might begin another query before the highlighter function runs.
                                     ///      This is especially true when using the back and forward buttons.
                                     ///      If the highlighter function attempts to run after another query has started, then the highlighter function with either throw an error when trying to highlight a word that is no longer present
