@@ -50,6 +50,10 @@
             show_context_menu,
             show_panel;
         
+        /// **************************
+        /// * Start of BF extentions *
+        /// **************************
+        
         /**
          * Create the transition() function and its closure.
          *
@@ -349,6 +353,57 @@
             
             return container;
         };
+        
+        /**
+         * Determine the verse reference of a word that is on the page.
+         *
+         * @param id (string || number) The word ID to lookup.
+         * @note  If there is no element on the page that matches this ID, then and empty string ("") is returned.
+         * @note  If a verse reference is needed even if the word is not present, a new API would need to be created.
+         */
+        BF.get_ref_from_word_id = function (id)
+        {
+            var bcv,
+                el  = document.getElementById(id),
+                ref = "";
+            
+            /// Is the word on the page?
+            if (el) {
+                bcv = BF.get_b_c_v(window.parseInt(el.parentNode.id));
+                /// Was the verse data calculated correctly?
+                if (bcv) {
+                    ///NOTE: In the future, the chapter and verse separator may need to be language specific.
+                    ref = BF.lang.books_short[bcv.b] + " " + bcv.c + ":" + BF.get_full_verse(bcv.v);
+                }
+            }
+            
+            return ref;
+        };
+        
+        /**
+         * Get any and all terms from the last query that are highlighted.
+         */
+        BF.get_highlighted_terms = function ()
+        {
+            var terms = "";
+            
+            /// If the last query was a search, the search terms need to be highlighted.
+            if (context.settings.user.last_query.type !== BF.consts.verse_lookup) {
+                terms = context.settings.user.last_query.prepared_query;
+            }
+            
+            /// If the user/query specified additional terms to be highlighted, add those as well.
+            if (context.settings.user.last_query.extra_highlighting) {
+                terms += " " + context.settings.user.last_query.extra_highlighting;
+            }
+            
+            return terms.trim();
+        };
+        
+        /// ************************
+        /// * End of BF extentions *
+        /// ************************
+        
     
         /// TODO: Reevaluate combining show_context_menu() and show_panel() into a single function that takes the open and close functions as parameters and creates the respective functions.
         /**
@@ -1781,52 +1836,6 @@
                             var highlight_terms,
                                 that = this;
                             
-                            /**
-                             * Determine the verse reference of a word that is on the page.
-                             *
-                             * @param id (string || number) The word ID to lookup.
-                             * @note  If there is no element on the page that matches this ID, then and empty string ("") is returned.
-                             * @note  If a verse reference is needed even if the word is not present, a new API would need to be created.
-                             */
-                            function get_ref_from_word_id(id)
-                            {
-                                var bcv,
-                                    el  = document.getElementById(id),
-                                    ref = "";
-                                
-                                /// Is the word on the page?
-                                if (el) {
-                                    bcv = BF.get_b_c_v(window.parseInt(el.parentNode.id));
-                                    /// Was the verse data calculated correctly?
-                                    if (bcv) {
-                                        ///NOTE: In the future, the chapter and verse separator may need to be language specific.
-                                        ref = BF.lang.books_short[bcv.b] + " " + bcv.c + ":" + BF.get_full_verse(bcv.v);
-                                    }
-                                }
-                                
-                                return ref;
-                            }
-                            
-                            /**
-                             * Get any and all terms from the last query that are highlighted.
-                             */
-                            function get_highlighted_terms()
-                            {
-                                var terms = "";
-                                
-                                /// If the last query was a search, the search terms need to be highlighted.
-                                if (context.settings.user.last_query.type !== BF.consts.verse_lookup) {
-                                    terms = context.settings.user.last_query.prepared_query;
-                                }
-                                
-                                /// If the user/query specified additional terms to be highlighted, add those as well.
-                                if (context.settings.user.last_query.extra_highlighting) {
-                                    terms += " " + context.settings.user.last_query.extra_highlighting;
-                                }
-                                
-                                return terms.trim();
-                            }
-                            
                             /// Ignore all other requests while this (or another) callout is transitioning.
                             if (this.transitioning) {
                                 return;
@@ -1962,9 +1971,9 @@
                             /// Change the URL to allow linking to this specific resource.
                             ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
                             
-                            highlight_terms = get_highlighted_terms();
+                            highlight_terms = BF.get_highlighted_terms();
                             
-                            BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(get_ref_from_word_id(this.id) + (highlight_terms ? " {{" + highlight_terms + "}}" : "")) + "/" + this.id  + "/");
+                            BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(BF.get_ref_from_word_id(this.id) + (highlight_terms ? " {{" + highlight_terms + "}}" : "")) + "/" + this.id  + "/");
                         },
                         hide_details: function (callback)
                         {
