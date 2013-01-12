@@ -2730,7 +2730,8 @@
                                 query_str = context.settings.user.last_query.real_query;
                             }
                             
-                            window.open("/" + lang_id + "/" + window.encodeURIComponent(query_str) + "/", "_blank");
+                            /// If the user is holding down a special key, open a new window with the current query and the new language.
+                            window.open("/" + lang_id + "/" + window.encodeURIComponent(query_str + (context.settings.user.last_query.extra_highlighting ? " {{" + context.settings.user.last_query.extra_highlighting + "}}" : "")) + "/", "_blank");
                         };
                         
                         /// If the language code already not already been downloaded, it will need to be download if
@@ -2833,7 +2834,7 @@
                                     }
                                     
                                     ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
-                                    BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(query_url_str) + "/");
+                                    BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(query_url_str + (context.settings.user.last_query.extra_highlighting ? " {{" + context.settings.user.last_query.extra_highlighting + "}}" : "")) + "/");
                                     
                                     ///NOTE: If the user has not typed in a new query or the query was automated (i.e., query_info.is_default), keep the current position.
                                     ///NOTE: query_str may be blank; in such cases, the position object will be used to create the proper query.
