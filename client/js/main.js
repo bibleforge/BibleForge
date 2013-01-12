@@ -289,7 +289,8 @@
                 /**
                  * Get the current history state.
                  *
-                 * @note If the current state is NULL (or falsey) an empty object will be returned.
+                 * @note   If the current state is NULL (or falsey) an empty object will be returned.
+                 * @return An object representing the current state.
                  */
                 getState: function ()
                 {
