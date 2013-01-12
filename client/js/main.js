@@ -793,7 +793,7 @@
             lang_id = BF.lang.id;
         }
         
-        if (bcv && BF.langs[lang_id].books_short[bcv.b]) {
+        if (bcv && BF.langs[lang_id] && BF.langs[lang_id].books_short[bcv.b]) {
             ///NOTE: In the future, the chapter and verse separator may need to be language specific.
             ref = BF.langs[lang_id].books_short[bcv.b] + " " + bcv.c + ":" + BF.get_full_verse(bcv.v);
         }
