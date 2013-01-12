@@ -2556,6 +2556,7 @@
                                 /// Is it a search?
                                 if (type !== BF.consts.verse_lookup) {
                                     ///TODO: It should try to spell check (using the right language) and make suggestions (like did you mean "Godhead" if they enter "Trinity").
+                                    /// Since no results were found, display a disappointing message.
                                     no_results = document.createElement("div");
                                     no_results.className = "no_results";
                                     no_results.appendChild(document.createTextNode(BF.lang.no_results1));
@@ -2564,7 +2565,6 @@
                                     no_results.appendChild(b_tag);
                                     no_results.appendChild(document.createTextNode(BF.lang.no_results2));
                                     page.appendChild(no_results);
-                                    ///TODO: Add suggestions.
                                 } else {
                                     /// Verse lookups should never return an empty result on the initial query; therefore, something went wrong.
                                     ///FIXME: Make this language specific.
