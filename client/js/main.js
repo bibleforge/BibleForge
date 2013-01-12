@@ -785,6 +785,23 @@
     };
     
     
+    BF.create_ref = function (bcv, lang_id)
+    {
+        var ref = "";
+        
+        if (!lang_id) {
+            lang_id = BF.lang.id;
+        }
+        
+        if (bcv && BF.langs[lang_id].books_short[bcv.b]) {
+            ///NOTE: In the future, the chapter and verse separator may need to be language specific.
+            ref = BF.langs[lang_id].books_short[bcv.b] + " " + bcv.c + ":" + BF.get_full_verse(bcv.v);
+        }
+        
+        return ref;
+    };
+    
+    
     /// Determine if CSS transitions are supported by the browser.
     ///NOTE: All of these variables currently require vendor specific prefixes.
     BF.cssTransitions = typeof document.body.style.webkitTransition !== "undefined" || typeof document.body.style.MozTransition !== "undefined" || typeof document.body.style.OTransition !== "undefined";
@@ -1907,7 +1924,7 @@
                         if (verse1.b === verse2.b) {
                             /// Are the chapters the same?
                             if (verse1.c === verse2.c) {
-                                /// Are the verses the same?
+                                /// Are the verses different?
                                 if (verse1.v !== verse2.v) {
                                     ref_range += "\u2013" + verse2.full_verse;
                                 }
@@ -3374,6 +3391,7 @@
                     
                     /// If the default query is empty, lookup Genesis 1:1.
                     if (!raw_query) {
+                        ///NOTE: Could use BF.create_ref().
                         raw_query = BF.lang.books_short[1] + " 1:1";
                         is_default = true;
                     }
@@ -3448,7 +3466,7 @@
                     clicked_parent = clicked_el.parentNode;
                     if (clicked_parent && clicked_parent.className === "search_verse") {
                         bcv = BF.get_b_c_v(window.parseInt(clicked_parent.id, 10));
-                        query = BF.lang.books_short[bcv.b] + " " + bcv.c + ":" + bcv.v;
+                        query = BF.create_ref(bcv);
                         
                         /// Prepare to highlight the search terms on the verse lookup.
                         ///TODO: Figure out how to highlight grammatical (as well as mixed) searches.
@@ -3490,7 +3508,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?31611085", {
+                BF.include("/js/secondary.js?31615994", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,

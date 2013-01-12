@@ -373,7 +373,7 @@
                 /// Was the verse data calculated correctly?
                 if (bcv) {
                     ///NOTE: In the future, the chapter and verse separator may need to be language specific.
-                    ref = BF.lang.books_short[bcv.b] + " " + bcv.c + ":" + BF.get_full_verse(bcv.v);
+                    ref = BF.create_ref(bcv);
                 }
             }
             
@@ -2715,7 +2715,7 @@
                             var query_str;
                             
                             if (context.settings.user.last_query.type === BF.consts.verse_lookup && (qEl_str === "" || qEl_str === context.settings.user.last_query.real_query)) {
-                                query_str = BF.langs[lang_id].books_short[context.settings.user.position.b] + " " + context.settings.user.position.c + ":" + context.settings.user.position.full_verse;
+                                query_str = BF.create_ref(context.settings.user.position, lang_id);
                             } else if (qEl_str_trim !== "") {
                                 query_str = qEl_str;
                             } else {
@@ -2806,12 +2806,13 @@
                                         if (query_info.type === BF.consts.verse_lookup) {
                                             /// Because the book names are not the same in each language, recreate the verse and store it in the URL
                                             /// so that if the page is refreshed, it will be able to load the correct verse.
-                                            query_url_str = BF.langs[lang_id].books_short[position.b] + " " + position.c + ":" + position.full_verse;
+                                            query_url_str = BF.create_ref(position, lang_id);
                                         }
                                         
                                         /// If the last query was the default query (query_info.is_default) use the default query (i.e., Genesis 1:1).
                                         if (query_info.is_default) {
                                             /// Use Genesis 1:1 as the query, but do not store it in the URL since it is the default query.
+                                            ///NOTE: Could use BF.create_ref().
                                             query_str = BF.lang.books_short[1] + " 1:1";
                                         } else {
                                             query_str = qEl_str;
