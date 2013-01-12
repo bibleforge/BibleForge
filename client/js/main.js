@@ -3011,9 +3011,13 @@
                     verse_id = Number(BF.lang.determine_reference(query));
                     
                     if (!ignore_state) {
+                        /// If the query is a verse lookup (e.g., verse_id is a number) then determine the proper verse reference (e.g., turn "1cor" into "1 Corinthians 1:1").
+                        ///NOTE: Providing one URL for various verse spellings should improve SEO.
+                        ///NOTE: If the user enters in a URL manually into the browser, it will not replace it with the proper verse reference.
+                        ///NOTE: This must be done now, because the verse_id variable may change later based on the position object.
+                        ///NOTE: Another reason this needs to be called now is because later the function may exit before querying the server and simply scroll to the verse.
                         ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
-                        ///NOTE: This needs to be called before the function returns if instead of querying it just scrolls to the verse.
-                        BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(raw_query) + "/", position ? {position: position} : undefined);
+                        BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(verse_id ? BF.create_ref(BF.get_b_c_v(verse_id)) + (options.extra_highlighting ? " {{" + options.extra_highlighting + "}}" : "") : raw_query) + "/", position ? {position: position} : undefined);
                     }
                     
                     /// After saving the state above, make sure that position is an object to make checking for its properties easier.
