@@ -1977,7 +1977,8 @@
                         },
                         hide_details: function (callback)
                         {
-                            var that = this;
+                            var highlight_terms,
+                                that = this;
                             
                             /// Ignore all other requests while this (or another) callout is transitioning.
                             if (this.transitioning) {
@@ -2076,6 +2077,10 @@
                             }, 0);
                             
                             this.showing_details = false;
+                            
+                            /// Change state now that the callout is not maximized to point to the top verse.
+                            highlight_terms = BF.get_highlighted_terms();
+                            BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(BF.create_ref(context.content_manager.top_verse) + (highlight_terms ? " {{" + highlight_terms + "}}" : "")) + "/");
                         },
                         /**
                          * Handel sets of CSS transition.
