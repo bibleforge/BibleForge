@@ -2421,8 +2421,8 @@
                                 content_manager.reached_bottom();
                                 bottomLoader.style.visibility = "hidden";
                             }
-                            ///BUG: there can be no results if looking up beyond rev 22.21 (e.g., rev 23). FIX: Prevent looking up past 66022021
-                            if (direction === BF.consts.previous || initial_query) {
+                            
+                            if (direction === BF.consts.previous) {
                                 /// The user has reached the top of the page by scrolling up (either Genesis 1:1 or there were no search results), so we need to hide the loading graphic
                                 content_manager.reached_top();
                                 topLoader.style.visibility    = "hidden";
