@@ -260,7 +260,7 @@
                 var event = {state: e.state},
                     func_arr_len = func_arr.length,
                     i,
-                    stop_propagation = false;
+                    stop_propagation;
                 
                 /**
                  * Prevent propogation to other attached functions.
@@ -2417,7 +2417,7 @@
                         {
                             if (direction === BF.consts.additional) {
                                 /// The user has reached the bottom by scrolling down (either RETURNED_SEARCH or RETURNED_VERSES_PREVIOUS), so we need to hide the loading graphic.
-                                /// This is cause by scrolling to Revelation 22:21 or end of search or there were no results.
+                                /// This is caused by scrolling to Revelation 22:21 or end of search or there were no results.
                                 content_manager.reached_bottom();
                                 bottomLoader.style.visibility = "hidden";
                             }
@@ -2468,11 +2468,11 @@
                             }
                             
                             if (direction === BF.consts.additional) {
-                                /// The last verse ID need to be store so that the server knowns where to start future queries.
+                                /// The last verse ID needs to be store so that the server knows where to start future queries.
                                 options.verse_range.bottom_verse = verse_ids[verse_ids.length - 1];
                                 
                                 if (word_ids) {
-                                    /// The last word ID also need to be stored for future grammatical (and in the future, mixed) searches.
+                                    /// The last word ID also needs to be stored for future grammatical (and in the future, mixed) searches.
                                     options.verse_range.bottom_id = word_ids[word_ids.length - 1];
                                 }
                                 
@@ -2490,11 +2490,11 @@
                             
                             ///NOTE: Since top_verse needs to be stored and previous queries may need to be run, make sure to include initial queries here.
                             if (direction === BF.consts.previous || initial_query) {
-                                /// The first verse ID need to be store so that the server knowns where to start future previous queries.
+                                /// The first verse ID needs to be stored so that the server knows where to start future previous queries.
                                 options.verse_range.top_verse = verse_ids[0];
                                 
                                 if (word_ids) {
-                                    /// The first word ID also need to be stored for future previous grammatical (and in the future, mixed) searches.
+                                    /// The first word ID also needs to be stored for future previous grammatical (and in the future, mixed) searches.
                                     options.verse_range.top_id = word_ids[0];
                                 }
                                 
@@ -2696,7 +2696,7 @@
                                     
                                     ajax.query("GET", "/api", create_query_message(options), function success(data)
                                     {
-                                        ///NOTE: direction and in_paragraphs need to be set again because they could have been changed by another query in the mean time.
+                                        ///NOTE: The direction and in_paragraphs variables need to be set again because they could have been changed by another query in the mean time.
                                         ///      options.verse and options.start_at could also be changed but they are not needed in handle_new_verses().
                                         ///      options.verse is used in handle_new_verses() for initial queries, but it will not be changed until after the initial query loads.
                                         ///TODO: Determine if there is a better way to store variables that change, like direction, in_paragraphs, verse, and start_at.
