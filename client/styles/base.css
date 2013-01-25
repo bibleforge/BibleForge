@@ -853,6 +853,7 @@ label {
 ol {
     margin: 0;
     list-style-type: decimal;
+    padding-left: 2em;
 }
 
 ol ol {
