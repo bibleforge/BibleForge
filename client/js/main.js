@@ -3382,21 +3382,24 @@
                             /// window.location.pathname should always start with a slash (/); substr(1) removes it.
                             /// Since there should only be two parameters, anything after the second slash is ignored by limiting split() to two results.
                             ///TODO: Check if IE 10 has the leading slash (see http://trac.osgeo.org/openlayers/ticket/3478).
-                            split_query = window.location.pathname.substr(1).split("/", 2).map(window.decodeURIComponent);
+                            split_query = window.location.pathname.substr(1).split("/").map(window.decodeURIComponent);
                             
-                            /// If the second parameter is empty, remove it.
+                            /// If the last parameter is empty (""), remove it.
                             /// E.g., "/en/" turns into ["en", ""], so make it just ["en"].
-                            ///NOTE: split_query[1] could be undefined (e.g., "/en" becomes ["en"]).
-                            if (typeof split_query[1] === "string" && split_query[1].trim() === "") {
-                                BF.remove(split_query, 1);
+                            /// The reaon for removing the last empty element is to make it easier to determine if the URL contains both a language ID and a query.
+                            if (split_query.length && split_query[split_query.length - 1].trim() === "") {
+                                split_query.pop();
                             }
                             
-                            if (split_query.length === 2) {
+                            /// Does if have at least both a language ID and a query?
+                            ///NOTE: There could be more than 2 parameters if there is a word ID at then end (e.g., /en/Matthew 1/621719/).
+                            if (split_query.length >= 2) {
                                 /// If the language has already been loaded, there is no need to change the language.
                                 lang_id   = split_query[0];
                                 raw_query = split_query[1];
                                 using_url = true;
                             } else {
+                                ///NOTE: If only one parameter is found, it could be either a language ID or a query.
                                 /// Is the parameter a valid language ID?
                                 if (BF.langs[split_query[0]]) {
                                     lang_id = split_query[0];
