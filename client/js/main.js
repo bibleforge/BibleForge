@@ -3365,7 +3365,20 @@
                             raw_query = e.state.query;
                         } else {
                             /// Try to load a query from the URL.
-                            /// URL structure: /[lang/][query/]
+                            /// URL structure:
+                            ///     /[lang/][query/]
+                            /// or
+                            ///     /lang/query/word_id/
+                            ///
+                            /// Examples:
+                            ///     /
+                            ///     /en/
+                            ///     /en/Genesis 1/
+                            ///     /Genesis 1/
+                            ///     /en_em/love/
+                            ///     /love/
+                            ///     /en/Matthew 1/621719/
+                            ///
                             /// window.location.pathname should always start with a slash (/); substr(1) removes it.
                             /// Since there should only be two parameters, anything after the second slash is ignored by limiting split() to two results.
                             ///TODO: Check if IE 10 has the leading slash (see http://trac.osgeo.org/openlayers/ticket/3478).
