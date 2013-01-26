@@ -2140,6 +2140,7 @@
                          *
                          * This object is used to keep track of the progress a series of CSS transition.
                          * This is used to be able to trigger a callback after all of the transitions are completed.
+                         * TODO: Move this to its own module. Perhaps BF.create_transition_cue().
                          */
                         transition_cue: (function ()
                         {
@@ -2558,11 +2559,28 @@
                     }());
                     
                     ///TODO: Document.
-                    ///TODO: Do not create two callouts with the same ID.
                     BF.show_callout = function (id, clicked_el, mouse_xy, detailed, ignore_state)
                     {
                         var ajax = new BF.Create_easy_ajax(),
-                            callout;
+                            callout,
+                            i;
+                        
+                        id = Number(id);
+                        
+                        /// First, check to see if the callout already exists so that it does not create two.
+                        for (i = callouts.length - 1; i >= 0; i -= 1) {
+                            if (callouts[i].id === id) {
+                                /// Is the callout supposed to be maximized and it is not?
+                                if (detailed && !callouts[i].showing_details) {
+                                    callouts[i].show_details(ignore_state);
+                                /// Is the callout not supposed to be maximized and it is?
+                                } else if (!detailed && callouts[i].showing_details) {
+                                    callouts[i].hide_details(null, ignore_state);
+                                }
+                                /// If the callout already exists, do not create another one.
+                                return;
+                            }
+                        }
                         
                         /// Has this data already been cached?
                         if (lex_cache[id]) {
