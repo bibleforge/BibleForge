@@ -1984,12 +1984,11 @@
                             this.align(true);
                             
                             if (!ignore_state) {
-                                /// Change the URL to allow linking to this specific resource.
-                                ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
-                                
                                 highlight_terms = BF.get_highlighted_terms();
-                                
-                                BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(BF.get_ref_from_word_id(this.id) + (highlight_terms ? " {{" + highlight_terms + "}}" : "")) + "/" + this.id  + "/");
+                                /// Change the URL to allow linking to this specific resource.
+                                /// In order to prevent the page from jumping up and down when the history changes (e.g., the back button is pressed) save the top verse as the actual position.
+                                ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
+                                BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(BF.get_ref_from_word_id(this.id) + (highlight_terms ? " {{" + highlight_terms + "}}" : "")) + "/" + this.id  + "/", {position: context.content_manager.top_verse});
                             }
                         },
                         hide_details: function (callback, ignore_state)
