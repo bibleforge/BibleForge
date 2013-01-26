@@ -1790,6 +1790,16 @@
                                 }
                             }
                         },
+                        find_point_to_el: function ()
+                        {
+                            /// Does the point_to element still exist and is still attached to the DOM?
+                            if (point_to && point_to.parentNode) {
+                                return point_to;
+                            }
+                            
+                            /// Try looking for a new point_to element.
+                            return document.getElementById(this.id);
+                        },
                         /**
                          * Move the callout up or down.
                          *
