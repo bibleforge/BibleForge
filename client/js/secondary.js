@@ -1817,14 +1817,12 @@
                         /**
                          * Determine if the element that the callout is pointing to still exists.
                          *
-                         * @return boolean
+                         * @return Boolean
                          * @note   The element the callout is pointing to could be removed when verses are cached.
                          */
                         point_to_el_exists: function ()
                         {
-                            ///NOTE: Right now, all words have unique id. If this is not true in the future,
-                            ///      we could loop through .parentNode until reaching document or NULL.
-                            return Boolean(document.getElementById(point_to.id));
+                            return !point_to ? false : Boolean(point_to.parentNode);
                         },
                         /**
                          * Write HTML to the callout.
