@@ -1502,20 +1502,20 @@
             create_callout = (function ()
             {                
                 /**
-                 * Align the callout with the word it is pointing to.
+                 * Determine where the callout should be positioned in order to be able to point to the correct word.
                  *
                  * @param callout    (element) The DOM element representing the callout.
                  * @param pointer    (element) The triangular pointer element.
                  * @param point_to   (element) The element the callout should point to.
-                 * @param pos        (object)  An object containing position of the callout so that this information can be retreaved quickly without accessing the DOM.
+                 * @param pos        (object)  An object containing position of the callout so that this information can be retrieved quickly without accessing the DOM.
                  *                             Object structure: {left: number, top: number}
                  * @param split_info (object)  An object containing information about where the user originally clicked and possibly which part of the word the user clicked.
                  *                             Object structure: {mouse_x: number, mouse_y: number, which_rect: number}
                  * @note  For now at least, this function is placed outside of the callout object so that it does not have to be created each time a callout is made.
                  */
-                function align_callout(callout, pointer, point_to, pos, split_info)
+                function calculate_pos(callout, pointer, point_to, pos, split_info)
                 {
-                    ///TODO: Store the callout offset info in the object.
+                    ///FIXME: callout.offsetHeight probably only works with position absolute, which is now not always the case.
                     var callout_offsetHeight = callout.offsetHeight,
                         callout_offsetWidth  = callout.offsetWidth,
                         distance_from_right, /// The distance (in pixels) from the right edge of the viewport to middle_x
@@ -1527,6 +1527,7 @@
                         point_to_rects = point_to.getClientRects(),
                         pointer_length   = 12, /// Essentially from the tip of the pointer to the callout
                         pointer_distance = 28, /// The optimal distance from the left of the callout to the middle of the pointer.
+                        res = {},
                         which_rect = 0;
                     
                     /// Does the word wrap? (See Judges 1:11 "Kirjath-sepher").
@@ -1572,26 +1573,28 @@
                     
                     /// Try to put the callout above the word.
                     if (callout_offsetHeight + pointer_length < point_to_offsetTop - context.system.properties.topBar_height - window.pageYOffset) {
-                        pos.top = point_to_offsetTop - callout_offsetHeight - pointer_length;
-                        pointer.className = "pointer-down";
+                        res.top = point_to_offsetTop - callout_offsetHeight - pointer_length;
+                        res.pointerClassName = "pointer-down";
                     /// Else, put the callout below the word.
                     } else {
-                        pos.top = point_to_offsetTop + point_to_rects[which_rect].height + pointer_length;
-                        pointer.className = "pointer-up";
+                        res.top = point_to_offsetTop + point_to_rects[which_rect].height + pointer_length;
+                        res.pointerClassName = "pointer-up";
                     }
-                    callout.style.top = pos.top + "px";
+                    //callout.style.top = pos.top + "px";
                     
                     distance_from_right = window.innerWidth - middle_x;
                     /// Can the pointer fit on the far left?
                     if (distance_from_right > callout_offsetWidth) {
-                        pos.left = middle_x - pointer_distance;
+                        res.left = middle_x - pointer_distance;
                     } else {
                         /// If the pointer will move off of callout on the right side (distance_from_right < 50),
                         /// the callout needs to be moved to the left a little further (pushing the callout off the page a little).
-                        pos.left = (window.innerWidth - callout_offsetWidth - pointer_distance + 8) + (distance_from_right < 50 ? 50 - (distance_from_right) : 0);
+                        res.left = (window.innerWidth - callout_offsetWidth - pointer_distance + 8) + (distance_from_right < 50 ? 50 - (distance_from_right) : 0);
                     }
-                    callout.style.left = pos.left + "px";
-                    pointer.style.left = (middle_x - pos.left - pointer_length) + "px";
+                    //callout.style.left = pos.left + "px";
+                    res.pointer_left = (middle_x - res.left - pointer_length);
+                    
+                    return res;
                 }
                 
                 /**
@@ -1710,6 +1713,7 @@
                         {
                             var height,
                                 left,
+                                new_pos,
                                 top,
                                 width;
                             
@@ -1743,7 +1747,13 @@
                                 }
                             } else {
                                 /// Align the callout to a specific word.
-                                align_callout(callout, pointer, point_to, pos, split_info);
+                                new_pos = calculate_pos(callout, pointer, point_to, pos, split_info);
+                                pos.top  = new_pos.top;
+                                pos.left = new_pos.left;
+                                callout.style.top  = pos.top  + "px";
+                                callout.style.left = pos.left + "px";
+                                pointer.className = new_pos.pointerClassName;
+                                pointer.style.left = new_pos.pointer_left + "px";
                             }
                         },
                         /**
