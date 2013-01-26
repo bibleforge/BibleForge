@@ -2144,8 +2144,20 @@
                          */
                         transition_cue: (function ()
                         {
+                            ///FIXME: This needs to get generated each time too.
                             var callback,
-                                cue;
+                                cue,
+                                failsafe_timeout;
+                            
+                            function done()
+                            {
+                                window.clearTimeout(failsafe_timeout);
+                                
+                                if (typeof callback === "function") {
+                                    callback();
+                                    callback = null;
+                                }
+                            }
                             
                             return {
                                 /**
@@ -2158,13 +2170,18 @@
                                 /**
                                  * Initialize a new cue.
                                  *
-                                 * @param func (function) A callback function to be called when the cue reaches zero.
-                                 * @todo  Add a second parameter for a fallback (the code already expects this).
+                                 * @param func     (function)          A callback function to be called when the cue reaches zero.
+                                 * @param failsafe (number) (optional) How long to wait before triggering 
                                  */
-                                initialize: function (func)
+                                initialize: function (func, failsafe)
                                 {
                                     callback = func;
                                     cue = 0;
+                                    
+                                    failsafe = Number(failsafe);
+                                    if (failsafe > 0) {
+                                        failsafe_timeout = window.setTimeout(done, failsafe);
+                                    }
                                 },
                                 /**
                                  * Decrement the cue.
@@ -2174,9 +2191,8 @@
                                 remove: function ()
                                 {
                                     cue -= 1;
-                                    if (cue <= 0 && typeof callback === "function") {
-                                        callback();
-                                        callback = null;
+                                    if (cue <= 0) {
+                                        done();
                                     }
                                 }
                             };
