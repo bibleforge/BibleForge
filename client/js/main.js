@@ -3340,11 +3340,14 @@
                             }
                         }
                         
-                        ///TODO: Document.
+                        /// Is there a word ID?  If so, we need to show a maximized callout.
                         if (split_query && split_query[2]) {
+                            /// Since BF.show_callout() is created by secondary.js (since it is often not needed immediately), check to see if it exists.
                             if (BF.show_callout) {
                                 BF.show_callout(split_query[2], document.getElementById(split_query[2]), {}, true, true);
                             } else {
+                                /// If BF.show_callout() has not yet been created, secondary.js must not have loaded yet,
+                                /// so we need to wait for that to load and they try again.
                                 system.event.attach("secondaryLoaded", function ()
                                 {
                                     BF.show_callout(split_query[2], document.getElementById(split_query[2]), {}, true, true);
