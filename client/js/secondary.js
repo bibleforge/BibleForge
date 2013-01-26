@@ -190,7 +190,8 @@
                     }
                     
                     /// If transitions are not working, call the ontransitionend function immediately.
-                    if ((no_transition || typeof transition_name === "undefined") && typeof on_finish === "function") {
+                    ///NOTE: Even if there is no on_finish() function, it is still necessary to run func() in order to (possibly) remove the CSS transition.
+                    if ((no_transition || typeof transition_name === "undefined")) {
                         /// Make sure to send the correct propertyName.
                         func({propertyName: (data.css_prop || data.prop)});
                     }
