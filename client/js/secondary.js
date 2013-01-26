@@ -1607,7 +1607,7 @@
                  *                              Object structure: {mouse_x: number, mouse_y: number, which_rect: number}
                  * @return A object that manages the callout.
                  */
-                return function create_callout(id, point_to, ajax, split_info)
+                return function create_callout(id, point_to, ajax, split_info, detailed, ignore_state)
                 {
                     var callout = document.createElement("div"),
                         inside  = document.createElement("div"),
@@ -1845,7 +1845,7 @@
                          *
                          * @param data (object) An object containing the details of the word.
                          */
-                        show_details: function ()
+                        show_details: function (ignore_state)
                         {
                             var highlight_terms,
                                 that = this;
@@ -1982,17 +1982,21 @@
                             /// Resize the callout to take up more of the screen.
                             this.align(true);
                             
-                            /// Change the URL to allow linking to this specific resource.
-                            ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
-                            
-                            highlight_terms = BF.get_highlighted_terms();
-                            
-                            BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(BF.get_ref_from_word_id(this.id) + (highlight_terms ? " {{" + highlight_terms + "}}" : "")) + "/" + this.id  + "/");
+                            if (!ignore_state) {
+                                /// Change the URL to allow linking to this specific resource.
+                                ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
+                                
+                                highlight_terms = BF.get_highlighted_terms();
+                                
+                                BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(BF.get_ref_from_word_id(this.id) + (highlight_terms ? " {{" + highlight_terms + "}}" : "")) + "/" + this.id  + "/");
+                            }
                         },
                         hide_details: function (callback)
                         {
                             var highlight_terms,
-                                that = this;
+                                new_pos,
+                                that = this,
+                                url_component;
                             
                             /// Ignore all other requests while this (or another) callout is transitioning.
                             if (this.transitioning) {
@@ -2001,6 +2005,17 @@
                             
                             /// The "transitioning" property is used to prevent other callouts from being enlarged or this one from shrinking until after the transition has completed..
                             this.transitioning = true;
+                            
+                            /// Was the callout never aligned to a word?
+                            ///NOTE: This happens when the callout stated out maximized.
+                            if (typeof pos.top === "undefined" || typeof pos.left === "undefined") {
+                                ///TODO: Get pointer if it doesn't exist. (This should be checked for before the prior IF statement to ensure it gets checked.)
+                                if (point_to) {
+                                    new_pos = calculate_pos(callout, pointer, point_to, pos, split_info);
+                                    pos.top = new_pos.top;
+                                    pos.left = new_pos.left;
+                                }
+                            }
                             
                             this.transition_cue.initialize(function ()
                             {
@@ -2057,21 +2072,33 @@
                                 that.transition_cue.remove();
                             });
                             
-                            this.transition_cue.add();
-                            /// Resize the callout to take up more of the screen.
-                            BF.transition(callout, [
-                                ///NOTE: Could use transform: translate(x, y) to possibly optimize the transition.
-                                ///NOTE: It tries to use the previous height and width of the callout before it enlarged,
-                                ///      and if that does not work, it uses the defaults.
-                                ///      E.g., go to Ezekiel 18:5 and click the word "which." Then click more, and then click off of the callout.
-                                {prop: "top",    duration: "300ms", end_val: pos.top  + "px",             failsafe: 500},
-                                {prop: "left",   duration: "300ms", end_val: pos.left + "px",             failsafe: 500},
-                                {prop: "height", duration: "300ms", end_val: (pos.css_height || "125px"), failsafe: 500},
-                                {prop: "width",  duration: "300ms", end_val: (pos.css_width  || "300px"), failsafe: 500}
-                            ], function ()
-                            {
-                                that.transition_cue.remove();
-                            });
+                            ///FIXME: Prevent other transitions.
+                            if (typeof pos.top === "undefined" || typeof pos.left === "undefined") {
+                                this.transition_cue.add();
+                                BF.transition(callout, {prop: "opacity", duration: "300ms", start_val: 1, end_val: 0, failsafe: 500}, function ()
+                                {
+                                    that.transition_cue.remove();
+                                    BF.remove_callout(that.id);
+                                });
+                            } else {
+                            
+                                this.transition_cue.add();
+                                
+                                /// Resize the callout to take up more of the screen.
+                                BF.transition(callout, [
+                                    ///NOTE: Could use transform: translate(x, y) to possibly optimize the transition.
+                                    ///NOTE: It tries to use the previous height and width of the callout before it enlarged,
+                                    ///      and if that does not work, it uses the defaults.
+                                    ///      E.g., go to Ezekiel 18:5 and click the word "which." Then click more, and then click off of the callout.
+                                    {prop: "top",    duration: "300ms", end_val: pos.top  + "px",             failsafe: 5000},
+                                    {prop: "left",   duration: "300ms", end_val: pos.left + "px",             failsafe: 5000},
+                                    {prop: "height", duration: "300ms", end_val: (pos.css_height || "125px"), failsafe: 5000},
+                                    {prop: "width",  duration: "300ms", end_val: (pos.css_width  || "300px"), failsafe: 5000}
+                                ], function ()
+                                {
+                                    that.transition_cue.remove();
+                                });
+                            }
                             
                             this.transition_cue.add();
                             /// While the callout is transitioning, switch the CSS to hide certain content and show others.
@@ -2094,7 +2121,16 @@
                             
                             /// Change state now that the callout is not maximized to point to the top verse.
                             highlight_terms = BF.get_highlighted_terms();
-                            BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(BF.create_ref(context.content_manager.top_verse) + (highlight_terms ? " {{" + highlight_terms + "}}" : "")) + "/");
+                            
+                            if (context.settings.user.last_query.type === BF.consts.verse_lookup) {
+                                /// If the last query was a lookup, use the current verse as verse reference for the URL plus any highlighted terms.
+                                url_component = BF.create_ref(context.content_manager.top_verse) + (highlight_terms ? " {{" + highlight_terms + "}}" : "");
+                            } else {
+                                /// If the last query was a search, just put the search terms back in the URL.
+                                url_component = context.settings.user.last_query.raw_query;
+                            }
+                            
+                            BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(url_component) + "/");
                         },
                         /**
                          * Handel sets of CSS transition.
@@ -2119,6 +2155,7 @@
                                  * Initialize a new cue.
                                  *
                                  * @param func (function) A callback function to be called when the cue reaches zero.
+                                 * @todo  Add a second parameter for a fallback (the code already expects this).
                                  */
                                 initialize: function (func)
                                 {
@@ -2146,6 +2183,12 @@
                         just_created: true
                     };
                     
+                    /// Is the callout supposed to start maximized?
+                    if (detailed) {
+                        callout_obj.show_details(ignore_state);
+                    }
+                    
+                    /// Make the callout show up in the correct location.
                     callout_obj.align();
                     
                     /// Prevent the callout from being destroyed by the document.onclick function that will fire momentarily.
