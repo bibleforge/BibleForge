@@ -3339,6 +3339,18 @@
                                 qEl.removeAttribute("placeholder");
                             }
                         }
+                        
+                        ///TODO: Document.
+                        if (split_query && split_query[2]) {
+                            if (BF.show_callout) {
+                                BF.show_callout(split_query[2], document.getElementById(split_query[2]), {}, true, true);
+                            } else {
+                                system.event.attach("secondaryLoaded", function ()
+                                {
+                                    BF.show_callout(split_query[2], document.getElementById(split_query[2]), {}, true, true);
+                                }, true);
+                            }
+                        }
                     }
                     
                     /// Is the page loading for the first time and the user did not specify a query in the URL? (E.g., the user loaded "bibleforge.com" and not something like "bibleforge.com/en/gen".)
