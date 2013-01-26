@@ -1896,7 +1896,7 @@
                                     if (typeof callback === "function") {
                                         callback();
                                     }
-                                });
+                                }, ignore_state);
                             };
                             
                             this.transition_cue.initialize(function on_transition_end()
@@ -1992,7 +1992,7 @@
                                 BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(BF.get_ref_from_word_id(this.id) + (highlight_terms ? " {{" + highlight_terms + "}}" : "")) + "/" + this.id  + "/");
                             }
                         },
-                        hide_details: function (callback)
+                        hide_details: function (callback, ignore_state)
                         {
                             var highlight_terms,
                                 new_pos,
@@ -2120,18 +2120,20 @@
                             
                             this.showing_details = false;
                             
-                            /// Change state now that the callout is not maximized to point to the top verse.
-                            highlight_terms = BF.get_highlighted_terms();
-                            
-                            if (context.settings.user.last_query.type === BF.consts.verse_lookup) {
-                                /// If the last query was a lookup, use the current verse as verse reference for the URL plus any highlighted terms.
-                                url_component = BF.create_ref(context.content_manager.top_verse) + (highlight_terms ? " {{" + highlight_terms + "}}" : "");
-                            } else {
-                                /// If the last query was a search, just put the search terms back in the URL.
-                                url_component = context.settings.user.last_query.raw_query;
+                            if (!ignore_state) {
+                                /// Change state now that the callout is not maximized to point to the top verse.
+                                highlight_terms = BF.get_highlighted_terms();
+                                
+                                if (context.settings.user.last_query.type === BF.consts.verse_lookup) {
+                                    /// If the last query was a lookup, use the current verse as verse reference for the URL plus any highlighted terms.
+                                    url_component = BF.create_ref(context.content_manager.top_verse) + (highlight_terms ? " {{" + highlight_terms + "}}" : "");
+                                } else {
+                                    /// If the last query was a search, just put the search terms back in the URL.
+                                    url_component = context.settings.user.last_query.raw_query;
+                                }
+                                
+                                BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(url_component) + "/");
                             }
-                            
-                            BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(url_component) + "/");
                         },
                         /**
                          * Handel sets of CSS transition.
