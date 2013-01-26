@@ -2550,7 +2550,19 @@
                         }
                     }, false);
                 }());
-                ///TODO: Instead of attaching functions here and looping through an array of callouts, it probably should attach a separate function inside the callout closure.
+                
+                BF.remove_callout = function (id)
+                {
+                    var i;
+                    
+                    for (i = callouts.length - 1; i >= 0; i -= 1) {
+                        if (callouts[i].id === id) {
+                            callouts[i].destroy();
+                            BF.remove(callouts, i);
+                            return;
+                        }
+                    }
+                };
                 
                 /**
                  * Possibly remove callouts when a user clicks the page.
