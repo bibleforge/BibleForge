@@ -2511,6 +2511,36 @@
                         };
                     }());
                     
+                    ///TODO: Document.
+                    ///TODO: Do not create two callouts with the same ID.
+                    BF.show_callout = function (id, clicked_el, mouse_xy, detailed, ignore_state)
+                    {
+                        var ajax = new BF.Create_easy_ajax(),
+                            callout;
+                        
+                        /// Has this data already been cached?
+                        if (lex_cache[id]) {
+                            /// Delay the code so that the remained of the code will execute first and prepare the callout variable.
+                            window.setTimeout(function ()
+                            {
+                                display_callout(callout, lex_cache[id]);
+                            }, 0);
+                        } else {
+                            ajax.query("GET", "/api", "t=" + BF.consts.lexical_lookup + "&q=" + id, function success(data)
+                            {
+                                data = BF.parse_json(data);
+                                /// Temporarily cache the data so that it does not have to re-queried.
+                                ///NOTE: The cache is cleared before each query.
+                                lex_cache[id] = data;
+                                display_callout(callout, data);
+                            });
+                        }
+                        
+                        /// Create the callout variable here while waiting for the code above to be called.
+                        callout = create_callout(id, clicked_el, ajax, mouse_xy, detailed, ignore_state);
+                        callouts[callouts.length] = callout;
+                    };
+                    
                     /**
                      * Create a callout if a word with lexical information was clicked on.
                      *
@@ -2518,35 +2548,13 @@
                      */
                     page.addEventListener("click", function(e)
                     {
-                        var ajax = new BF.Create_easy_ajax(),
-                            callout,
-                            ///NOTE: IE/Chromium/Safari/Opera use srcElement, Firefox uses originalTarget.
-                            clicked_el = e.srcElement || e.originalTarget;
+                        ///NOTE: IE/Chromium/Safari/Opera use srcElement, Firefox uses originalTarget.
+                        var clicked_el = e.srcElement || e.originalTarget;
                         
                         /// Does this language support lexical lookups, and did the user click on a word?
                         ///NOTE: All words in the text are wrapped in <a> tags.
                         if (BF.lang.linked_to_orig && clicked_el && clicked_el.tagName === "A") {
-                            /// Has this data already been cached?
-                            if (lex_cache[clicked_el.id]) {
-                                /// Delay the code so that the remained of the code will execute first and prepare the callout variable.
-                                window.setTimeout(function ()
-                                {
-                                    display_callout(callout, lex_cache[clicked_el.id]);
-                                }, 0);
-                            } else {
-                                ajax.query("GET", "/api", "t=" + BF.consts.lexical_lookup + "&q=" + clicked_el.id, function success(data)
-                                {
-                                    data = BF.parse_json(data);
-                                    /// Temporarily cache the data so that it does not have to re-queried.
-                                    ///NOTE: The cache is cleared before each query.
-                                    lex_cache[clicked_el.id] = data;
-                                    display_callout(callout, data);
-                                });
-                            }
-                            
-                            /// Create the callout variable here while waiting for the code above to be called.
-                            callout = create_callout(Number(clicked_el.id), clicked_el, ajax, {mouse_x: e.clientX, mouse_y: e.clientY});
-                            callouts[callouts.length] = callout;
+                            BF.show_callout(Number(clicked_el.id), clicked_el, {mouse_x: e.clientX, mouse_y: e.clientY});
                         }
                     }, false);
                 }());
