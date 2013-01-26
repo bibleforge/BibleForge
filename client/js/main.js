@@ -3340,26 +3340,32 @@
                             }
                         }
                         
-                        /// Is there a word ID?  If so, we need to show a maximized callout.
-                        if (split_query && split_query[2]) {
-                            /// Since BF.show_callout() is created by secondary.js (since it is often not needed immediately), check to see if it exists.
-                            if (BF.show_callout) {
-                                BF.show_callout(split_query[2], document.getElementById(split_query[2]), {}, true, true);
-                            } else {
-                                /// If BF.show_callout() has not yet been created, secondary.js must not have loaded yet,
-                                /// so we need to wait for that to load and they try again.
-                                system.event.attach("secondaryLoaded", function ()
-                                {
+                        ///NOTE: Showing/hiding callouts must be delayed shortly to let BibleForge first find the correct verse.
+                        ///      Sometimes, pressing backward/forward will cause the page to momentarily jump (which is quickly fixed by BibleForge).
+                        ///TODO: Determine if there needs to be a way to cancel this timeout if needed.
+                        window.setTimeout(function ()
+                        {
+                            /// Is there a word ID?  If so, we need to show a maximized callout.
+                            if (split_query && split_query[2]) {
+                                /// Since BF.show_callout() is created by secondary.js (since it is often not needed immediately), check to see if it exists.
+                                if (BF.show_callout) {
                                     BF.show_callout(split_query[2], document.getElementById(split_query[2]), {}, true, true);
-                                }, true);
+                                } else {
+                                    /// If BF.show_callout() has not yet been created, secondary.js must not have loaded yet,
+                                    /// so we need to wait for that to load and they try again.
+                                    system.event.attach("secondaryLoaded", function ()
+                                    {
+                                        BF.show_callout(split_query[2], document.getElementById(split_query[2]), {}, true, true);
+                                    }, true);
+                                }
+                            } else {
+                                /// Possibly shrink any maximized callouts.
+                                if (BF.hide_callout_details) {
+                                    /// Since the state has already changed, set ignore_state to TRUE to make sure not to change again.
+                                    BF.hide_callout_details(null, true);
+                                }
                             }
-                        } else {
-                            /// Possbily shrink any maximixed callouts.
-                            if (BF.hide_callout_details) {
-                                /// Since the state has already changed, set ignore_state to TRUE to make sure not to change again.
-                                BF.hide_callout_details(null, true);
-                            }
-                        }
+                        }, 0);
                     }
                     
                     /// Is the page loading for the first time and the user did not specify a query in the URL? (E.g., the user loaded "bibleforge.com" and not something like "bibleforge.com/en/gen".)
@@ -3563,7 +3569,7 @@
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?32823067", {
+                BF.include("/js/secondary.js?32825073", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
