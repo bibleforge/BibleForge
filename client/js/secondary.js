@@ -1218,7 +1218,7 @@
             show_configure_panel = (function ()
             {
                 ///FIXME: Make it so that this text can be updated onLanguageChange.
-                var panel_element   = document.createElement("div");
+                var panel_element = document.createElement("div");
                 
                 /**
                  * Create a DOM element to display the configuration menu.
@@ -1716,6 +1716,10 @@
                                 top,
                                 width;
                             
+                            if (!callout || !pointer) {
+                                return;
+                            }
+                            
                             /// If the callout is showing details, it should be made to fill most of the screen.
                             if (this.showing_details) {
                                 /// Place the callout just below the bottom of the top bar.
@@ -1747,12 +1751,14 @@
                             } else {
                                 /// Align the callout to a specific word.
                                 new_pos = calculate_pos(callout, pointer, point_to, pos, split_info);
-                                pos.top  = new_pos.top;
-                                pos.left = new_pos.left;
-                                callout.style.top  = pos.top  + "px";
-                                callout.style.left = pos.left + "px";
-                                pointer.className = new_pos.pointerClassName;
-                                pointer.style.left = new_pos.pointer_left + "px";
+                                if (new_pos) {
+                                    pos.top  = new_pos.top;
+                                    pos.left = new_pos.left;
+                                    callout.style.top  = pos.top  + "px";
+                                    callout.style.left = pos.left + "px";
+                                    pointer.className = new_pos.pointerClassName;
+                                    pointer.style.left = new_pos.pointer_left + "px";
+                                }
                             }
                         },
                         /**
@@ -2002,7 +2008,8 @@
                         },
                         hide_details: function (callback, ignore_state)
                         {
-                            var highlight_terms,
+                            var has_point_to,
+                                highlight_terms,
                                 new_pos,
                                 that = this,
                                 url_component;
@@ -2015,118 +2022,131 @@
                             /// The "transitioning" property is used to prevent other callouts from being enlarged or this one from shrinking until after the transition has completed..
                             this.transitioning = true;
                             
+                            has_point_to = this.point_to_el_exists();
+                            if (!has_point_to) {
+                                point_to = this.find_point_to_el();
+                                has_point_to = Boolean(point_to);
+                            }
                             /// Was the callout never aligned to a word?
                             ///NOTE: This happens when the callout stated out maximized.
-                            if (typeof pos.top === "undefined" || typeof pos.left === "undefined") {
-                                ///TODO: Get pointer if it doesn't exist. (This should be checked for before the prior IF statement to ensure it gets checked.)
-                                if (point_to) {
-                                    new_pos = calculate_pos(callout, pointer, point_to, pos, split_info);
+                            if ((typeof pos.top === "undefined" || typeof pos.left === "undefined") && has_point_to) {
+                                new_pos = calculate_pos(callout, pointer, point_to, pos, split_info);
+                                if (new_pos) {
                                     pos.top = new_pos.top;
                                     pos.left = new_pos.left;
                                 }
                             }
                             
-                            this.transition_cue.initialize(function ()
-                            {
-                                ///NOTE: A short delay after the transition completes is to make sure that the browser has time to update the screen.
+                            ///FIXME: This does not work.
+                            if (has_point_to) {
+                                this.transition_cue.initialize(function ()
+                                {
+                                    ///NOTE: A short delay after the transition completes is to make sure that the browser has time to update the screen.
+                                    window.setTimeout(function ()
+                                    {
+                                        /// Set this first in case the following functions throw an error.
+                                        that.transitioning = false;
+                                        
+                                        /// Because some things in the callout may have been changed by the user, check the height after transitioning back to a small callout.
+                                        /// E.g., Go to Matthew 1:11, click "Babylon," click "[+] more," change the pronunciation key to "(Modern)," then click off of the callout.
+                                        that.adjust_height();
+                                        
+                                        /// Realign the callout in case the user scrolled, and therefore the callout may not be entirely viewable. 
+                                        that.align();
+                                        
+                                        /// Possibly call a callout (e.g., enlarge another callout).
+                                        if (typeof callback === "function") {
+                                            callback();
+                                        }
+                                    }, 50);
+                                }, 1000);
+                                
+                                this.transition_cue.add();
+                                BF.transition(transparent_el, {prop: "opacity", duration: "250ms", end_val: "0", timing: "steps(3, start)", delay: "50ms", failsafe: 500}, function ()
+                                {
+                                    /// Remove from DOM and destroy the temporary transparent element.
+                                    document.body.removeChild(transparent_el);
+                                    transparent_el = null;
+                                    
+                                    /// Make the callout on the same level as other callouts.
+                                    /// Since we do not want the callout to displayed below the transparent element,
+                                    /// we must change the z-index here, after has completely faded away.
+                                    callout.style.zIndex = 0;
+                                    that.transition_cue.remove();
+                                });
+                                
+                                ///NOTE: Small callouts are absolutely positioned, so if transitioning from small to larger (which should be the case),
+                                ///      it will need to be repositioned.
+                                if (callout.style.position !== "absolute") {
+                                    callout.style.position = "absolute";
+                                    /// Due to switching between absolute and fixed positioning, the callout's position must be recalculated
+                                    /// in order for it to appear in the correct spot on the screen.
+                                    /// Furthermore, this must be done before the callout's begins to transiting from small to large;
+                                    /// otherwise, it would try to animate from the wrong position.
+                                    callout.style.top  = (callout.offsetTop  + window.pageYOffset) + "px";
+                                    callout.style.left = (callout.offsetLeft + window.pageXOffset) + "px";
+                                }
+                                
+                                this.transition_cue.add();
+                                /// Fade in the pointer.
+                                pointer.style.display = "block";
+                                BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 1, failsafe: 500}, function ()
+                                {
+                                    that.transition_cue.remove();
+                                });
+                                
+                                ///FIXME: Prevent other transitions.
+                                if (typeof pos.top === "undefined" || typeof pos.left === "undefined") {
+                                    this.transition_cue.add();
+                                    BF.transition(callout, {prop: "opacity", duration: "300ms", start_val: 1, end_val: 0, failsafe: 500}, function ()
+                                    {
+                                        that.transition_cue.remove();
+                                        BF.remove_callout(that.id);
+                                    });
+                                } else {
+                                
+                                    this.transition_cue.add();
+                                    
+                                    /// Resize the callout to take up more of the screen.
+                                    BF.transition(callout, [
+                                        ///NOTE: Could use transform: translate(x, y) to possibly optimize the transition.
+                                        ///NOTE: It tries to use the previous height and width of the callout before it enlarged,
+                                        ///      and if that does not work, it uses the defaults.
+                                        ///      E.g., go to Ezekiel 18:5 and click the word "which." Then click more, and then click off of the callout.
+                                        {prop: "top",    duration: "300ms", end_val: pos.top  + "px",             failsafe: 5000},
+                                        {prop: "left",   duration: "300ms", end_val: pos.left + "px",             failsafe: 5000},
+                                        {prop: "height", duration: "300ms", end_val: (pos.css_height || "125px"), failsafe: 5000},
+                                        {prop: "width",  duration: "300ms", end_val: (pos.css_width  || "300px"), failsafe: 5000}
+                                    ], function ()
+                                    {
+                                        that.transition_cue.remove();
+                                    });
+                                }
+                                
+                                this.transition_cue.add();
+                                /// While the callout is transitioning, switch the CSS to hide certain content and show others.
+                                /// E.g., the "more" button is hidden when showing details.
                                 window.setTimeout(function ()
                                 {
-                                    /// Because some things in the callout may have been changed by the user, check the height after transitioning back to a small callout.
-                                    /// E.g., Go to Matthew 1:11, click "Babylon," click "[+] more," change the pronuncation key to "(Modern)," then click off of the callout.
-                                    that.adjust_height();
-                                    
-                                    /// Realign the callout in case the user scrolled, and therefore the callout may not be entirely viewable. 
-                                    that.align();
-                                    
-                                    that.transitioning = false;
-                                    
-                                    /// Possibly call a callout (e.g., enlarge another callout).
-                                    if (typeof callback === "function") {
-                                        callback();
-                                    }
-                                }, 50);
-                            }, 1000);
-                            
-                            this.transition_cue.add();
-                            BF.transition(transparent_el, {prop: "opacity", duration: "250ms", end_val: "0", timing: "steps(3, start)", delay: "50ms", failsafe: 500}, function ()
-                            {
+                                    callout.classList.remove("detailed_callout");
+                                    that.transition_cue.remove();
+                                }, 200);
+                                
+                                this.transition_cue.add();
+                                /// Tell the callout to transition to a small font size for certain words.
+                                window.setTimeout(function ()
+                                {
+                                    callout.classList.remove("large_callout");
+                                    that.transition_cue.remove();
+                                }, 0);
+                                
+                                this.showing_details = false;
+                            } else {
                                 /// Remove from DOM and destroy the temporary transparent element.
                                 document.body.removeChild(transparent_el);
                                 transparent_el = null;
-                                
-                                /// Make the callout on the same level as other callouts.
-                                /// Since we do not want the callout to de displayed below the transparent element,
-                                /// we must change the z-index here, after has completely faded away.
-                                callout.style.zIndex = 0;
-                                that.transition_cue.remove();
-                            });
-                            
-                            ///NOTE: Small callouts are absolutely positioned, so if transitioning from small to larger (which should be the case),
-                            ///      it will need to be repositioned.
-                            if (callout.style.position !== "absolute") {
-                                callout.style.position = "absolute";
-                                /// Due to switching between absolute and fixed positioning, the callout's position must be recalculated
-                                /// in order for it to appear in the correct spot on the screen.
-                                /// Furthermore, this must be done before the callout's begins to transiting from small to large;
-                                /// otherwise, it would try to animate from the wrong position.
-                                callout.style.top  = (callout.offsetTop  + window.pageYOffset) + "px";
-                                callout.style.left = (callout.offsetLeft + window.pageXOffset) + "px";
+                                BF.remove_callout(this.id);
                             }
-                            
-                            this.transition_cue.add();
-                            /// Fade in the pointer.
-                            pointer.style.display = "block";
-                            BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 1, failsafe: 500}, function ()
-                            {
-                                that.transition_cue.remove();
-                            });
-                            
-                            ///FIXME: Prevent other transitions.
-                            if (typeof pos.top === "undefined" || typeof pos.left === "undefined") {
-                                this.transition_cue.add();
-                                BF.transition(callout, {prop: "opacity", duration: "300ms", start_val: 1, end_val: 0, failsafe: 500}, function ()
-                                {
-                                    that.transition_cue.remove();
-                                    BF.remove_callout(that.id);
-                                });
-                            } else {
-                            
-                                this.transition_cue.add();
-                                
-                                /// Resize the callout to take up more of the screen.
-                                BF.transition(callout, [
-                                    ///NOTE: Could use transform: translate(x, y) to possibly optimize the transition.
-                                    ///NOTE: It tries to use the previous height and width of the callout before it enlarged,
-                                    ///      and if that does not work, it uses the defaults.
-                                    ///      E.g., go to Ezekiel 18:5 and click the word "which." Then click more, and then click off of the callout.
-                                    {prop: "top",    duration: "300ms", end_val: pos.top  + "px",             failsafe: 5000},
-                                    {prop: "left",   duration: "300ms", end_val: pos.left + "px",             failsafe: 5000},
-                                    {prop: "height", duration: "300ms", end_val: (pos.css_height || "125px"), failsafe: 5000},
-                                    {prop: "width",  duration: "300ms", end_val: (pos.css_width  || "300px"), failsafe: 5000}
-                                ], function ()
-                                {
-                                    that.transition_cue.remove();
-                                });
-                            }
-                            
-                            this.transition_cue.add();
-                            /// While the callout is transitioning, switch the CSS to hide certain content and show others.
-                            /// E.g., the "more" button is hidden when showing details.
-                            window.setTimeout(function ()
-                            {
-                                callout.classList.remove("detailed_callout");
-                                that.transition_cue.remove();
-                            }, 200);
-                            
-                            this.transition_cue.add();
-                            /// Tell the callout to transition to a small font size for certain words.
-                            window.setTimeout(function ()
-                            {
-                                callout.classList.remove("large_callout");
-                                that.transition_cue.remove();
-                            }, 0);
-                            
-                            this.showing_details = false;
                             
                             if (!ignore_state) {
                                 /// Change state now that the callout is not maximized to point to the top verse.
