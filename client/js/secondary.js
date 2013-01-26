@@ -1882,6 +1882,7 @@
                              * @note This variable was declared at the outset of the callout closure to allow other functions to call it.
                              * @note This function is called by the remove() function below before attempting to remove callouts.
                              * @note This function can be called by another callout that wants to be enlarged.
+                             * @todo Make a BF.callout_manager object that can handle this type of thing.
                              */
                             hide_callout_details = function (callback)
                             {
@@ -2640,8 +2641,10 @@
                         return;
                     }
                     
+                    /// Is there a maximized callout?
                     if (hide_callout_details) {
                         hide_callout_details();
+                        /// If so, just close it; don't remove anything.
                     } else {
                         /// Remove callous and non-new callouts.
                         ///NOTE: When a callout is created, this function (i.e., the onclick event) will fire, thus potentially removing the callout immediately;
@@ -2804,7 +2807,7 @@
                                 query_str = context.settings.user.last_query.real_query;
                             }
                             
-                            /// If the user is holding down a special key, open a new window with the current query and the new language.
+                            /// Since the user is holding down a special key, open a new window with the current query and the new language.
                             window.open("/" + lang_id + "/" + window.encodeURIComponent(query_str + (context.settings.user.last_query.extra_highlighting ? " {{" + context.settings.user.last_query.extra_highlighting + "}}" : "")) + "/", "_blank");
                         };
                         
