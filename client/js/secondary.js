@@ -1878,11 +1878,12 @@
                             /**
                              * Return this callout to its initial (smaller) state.
                              *
-                             * @note This variable was declared at the outset of the callout closure to allow other functions to call it.
-                             * @note This function is called by the remove() function below before attempting to remove callouts.
-                             * @note This function can be called by another callout that wants to be enlarged.
-                             * @todo Make a BF.callout_manager object that can handle this type of thing.
-                             * @todo Document.
+                             * @param callback     (function) (optional) A function to call after the callout's details are hidden.
+                             * @param ignore_state (boolean)  (optional) Whether or not to push the history's state.
+                             * @note  This variable was declared at the outset of the callout closure to allow other functions to call it.
+                             * @note  This function is called by the remove() function below before attempting to remove callouts.
+                             * @note  This function can be called by another callout that wants to be enlarged.
+                             * @todo  Make a BF.callout_manager object that can handle this type of thing.
                              */
                             BF.hide_callout_details = function (callback, ignore_state)
                             {
@@ -2557,7 +2558,16 @@
                         };
                     }());
                     
-                    ///TODO: Document.
+                    /**
+                     * Create a new callout (if one does not already exist).
+                     *
+                     * @param id (number || string) The word ID to lookup.
+                     * @param clicked_el (DOM element) The element in DOM that the callout should point to. This is also used to determine the verse reference
+                     * @param mouse_xy (object) The X/Y position of the mouse when clicking the element. This is used to determine which part of a word was clicked on when a hyphenated word is clicked
+                     * @param detailed (boolean) Whether or not to start the callout maximized (or change it into maximized mode if the callout is already visible)
+                     * @param ignore_state (boolean) Whether or not to push the history's state when changing the callout to and from maximized mode.
+                     * @todo  Changed "detailed" to "maximized."
+                     */
                     BF.show_callout = function (id, clicked_el, mouse_xy, detailed, ignore_state)
                     {
                         var ajax = new BF.Create_easy_ajax(),
