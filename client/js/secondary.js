@@ -1493,8 +1493,7 @@
         (function ()
         {
             var callout_clicked = false,
-                create_callout,
-                hide_callout_details;
+                create_callout;
             
             /**
              * The closure for creating callouts.
@@ -1774,17 +1773,17 @@
                             /// In case the data is still loading, try to abort the request.
                             ajax.abort();
                             
-                            /// If the callout is transitioning, the hide_callout_details() function will refuse to remove the callout to prevent the user from accidentally closing it too fast.
-                            /// For example, if the user double clicked the "More" button, it might trigger the hide_callout_details() function.
+                            /// If the callout is transitioning, the BF.hide_callout_details() function will refuse to remove the callout to prevent the user from accidentally closing it too fast.
+                            /// For example, if the user double clicked the "More" button, it might trigger the BF.hide_callout_details() function.
                             /// Therefore, we need to wait until it is done transitioning, which should be momentarily.
                             ///NOTE: The callout_obj variable must be used, not the "this" object.
                             if (callout_obj.transitioning) {
                                 window.setTimeout(callout_obj.destroy, 50);
                             } else {
-                                /// Is the callout large?  If so, it will need to be closed and then removed.
-                                if (hide_callout_details) {
-                                    hide_callout_details(remove_this_callout);
-                                    /// Hide the callout now and remove it after the transitioning is complete.
+                                /// Is the callout maximized?  If so, it will need to be shrunk and then removed.
+                                if (BF.hide_callout_details) {
+                                    BF.hide_callout_details(remove_this_callout);
+                                    /// Hide the callout now, and remove it after the transitioning is complete (via remove_this_callout()).
                                     callout.style.display = "none";
                                 } else {
                                     remove_this_callout();
@@ -1857,13 +1856,13 @@
                             
                             /// If another callout is already larger, it must be shrunk first.
                             /// If no callouts are larger, this variable will be falsey.
-                            if (hide_callout_details) {
+                            if (BF.hide_callout_details) {
                                 /**
                                  * Open the callout after the other one shrink.
                                  *
                                  * @note Because it needs to use the same context (i.e., the "this" variable; a.k.a. "that"), we need to wrap show_details in another function.
                                  */
-                                hide_callout_details(function ()
+                                BF.hide_callout_details(function ()
                                 {
                                     that.show_details();
                                 });
@@ -1873,7 +1872,7 @@
                             }
                             
                             /// The "transitioning" property is used to prevent other callouts from being enlarged or this one from shrinking until after the transition has completed..
-                            ///NOTE: It needs to be set down here (after checking for hide_callout_details() because hide_callout_details() also sets "transitioning" to TRUE.
+                            ///NOTE: It needs to be set down here (after checking for BF.hide_callout_details() because BF.hide_callout_details() also sets "transitioning" to TRUE.
                             this.transitioning = true;
                             
                             /**
@@ -1883,16 +1882,17 @@
                              * @note This function is called by the remove() function below before attempting to remove callouts.
                              * @note This function can be called by another callout that wants to be enlarged.
                              * @todo Make a BF.callout_manager object that can handle this type of thing.
+                             * @todo Document.
                              */
-                            hide_callout_details = function (callback)
+                            BF.hide_callout_details = function (callback, ignore_state)
                             {
                                 /// First, shrink this callout.
                                 that.hide_details(function ()
                                 {
                                     /// After the callout has shrunk, remove this function.
-                                    hide_callout_details = null;
+                                    BF.hide_callout_details = null;
                                     
-                                    /// Possibly call a callout (e.g., enlarge another callout).
+                                    /// Possibly call a callout (e.g., maximize another callout).
                                     if (typeof callback === "function") {
                                         callback();
                                     }
@@ -2642,11 +2642,11 @@
                     }
                     
                     /// Is there a maximized callout?
-                    if (hide_callout_details) {
-                        hide_callout_details();
+                    if (BF.hide_callout_details) {
                         /// If so, just close it; don't remove anything.
+                        BF.hide_callout_details();
                     } else {
-                        /// Remove callous and non-new callouts.
+                        /// If there is no maximzed callout, remove non-new callouts.
                         ///NOTE: When a callout is created, this function (i.e., the onclick event) will fire, thus potentially removing the callout immediately;
                         ///      therefore, use just_created to see if the callout was recently created and should be left alone.
                         for (i = callouts.length - 1; i >= 0; i -= 1) {
