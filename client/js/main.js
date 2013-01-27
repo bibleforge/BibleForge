@@ -49,7 +49,7 @@
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (1611)",
-            modified:  31092552
+            modified:  32941455
         };
     }
     
@@ -2567,8 +2567,7 @@
                                     page.appendChild(no_results);
                                 } else {
                                     /// Verse lookups should never return an empty result on the initial query; therefore, something went wrong.
-                                    ///FIXME: Make this language specific.
-                                    page.textContent = "An error occurred. Please try again.";
+                                    page.textContent = BF.lang.err_unknown;
                                 }
                             }
                         }

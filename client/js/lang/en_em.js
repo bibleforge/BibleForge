@@ -114,6 +114,7 @@
         configure:         "Configure",                                            /// Context menu item
         detailed_def:      "Detailed Definition",                                  /// Longer, more detailed definitions caption (in larger callout)
         done:              "Finiſh",                                               /// The button that closes panels
+        err_unknown:       "An errour occurred. Pleaſe try againe.",               /// A query returned an error for an unspecified reason.
         found_plural:      " verſes found for ",                                   /// On the info bar when searching (multiple results) (uncapitalized)
         found_singular:    " verſe found for ",                                    /// On the info bar when searching (one result) (uncapitalized)
         help:              "Succor",                                               /// Context menu item
