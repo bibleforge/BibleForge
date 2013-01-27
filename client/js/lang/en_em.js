@@ -114,7 +114,7 @@
         configure:         "Configure",                                            /// Context menu item
         detailed_def:      "Detailed Definition",                                  /// Longer, more detailed definitions caption (in larger callout)
         done:              "Finiſh",                                               /// The button that closes panels
-        err_unknown:       "An errour occurred. Pleaſe try againe.",               /// A query returned an error for an unspecified reason.
+        err_unknown:       "An errour occurred. Please try againe.",               /// A query returned an error for an unspecified reason. (This does not need a long s because it is displayed on the scroll.)
         found_plural:      " verſes found for ",                                   /// On the info bar when searching (multiple results) (uncapitalized)
         found_singular:    " verſe found for ",                                    /// On the info bar when searching (one result) (uncapitalized)
         help:              "Succor",                                               /// Context menu item
@@ -130,16 +130,16 @@
         next:              "Next",                                                 /// The next chapter link in the non-JavaScript version
         night_mode:        "Night Mode",                                           /// In the View configuration panel
         no_results1:       "Your search\u200A\u2014\u200A",                        /// Displayed when preforming a search that returns no results (before the search terms).
-        no_results2:       "\u200A\u2014\u200Adid not return any results.",        /// Displayed when preforming a search that returns no results (after the search terms).
+        no_results2:       "\u200A\u2014\u200Adid not returne any results.",        /// Displayed when preforming a search that returns no results (after the search terms).
         previous:          "Previous",                                             /// The previous chapter link in the non-JavaScript version
-        psalm:             "Psalme",                                               /// The title of chapters in the book of Psalms
+        psalm:             "Psalme",                                               /// The title of chapters in the book of Psalms (This does not need a long s because it is displayed on the scroll.)
         query_explanation: "Keyword or Reference: \"God ſo loued\" or Romans 3:23",/// In a blank query input box before a search has been preformed
         query_button_title:"Click here (or preſſe Enter)",                         /// The text displayed when hovering over the magnifying glass (query button).
         query_button_alt:  "Goe",                                                  /// The text to display for the magnifying glass (query button) if images are disabled.
         ///NOTE: This key must be the same as the value in the settings.
         red_letters:       "Red Letters",                                          /// In the View configuration panel
-        results_for:       "Results for",                                          /// Used in the meta description of searches in the non-JavaScript version to indicate the results for the query.
-        subscription:      "subscription",                                         /// Used instead of 255 for subscripts to Paul's epistles (uncapitalized)
+        results_for:       "Reſults for",                                          /// Used in the meta description of searches in the non-JavaScript version to indicate the results for the query.
+        subscription:      "subſcription",                                         /// Used instead of 255 for subscripts to Paul's epistles (uncapitalized)
         title:             "title",                                                /// Used instead of 0 for Psalm title verse references (uncapitalized)
         translit:          "Tranſliteration",                                      /// The short name for the SBL transliteration display on the menu
         translit_long:     "Society of Biblical Languages Tranſliteration",        /// The long name for the SBL transliteration display on a tooltip
