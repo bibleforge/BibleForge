@@ -117,7 +117,7 @@
         err_unknown:       "An errour occurred. Please try againe.",               /// A query returned an error for an unspecified reason. (This does not need a long s because it is displayed on the scroll.)
         found_plural:      " verſes found for ",                                   /// On the info bar when searching (multiple results) (uncapitalized)
         found_singular:    " verſe found for ",                                    /// On the info bar when searching (one result) (uncapitalized)
-        help:              "Succor",                                               /// Context menu item
+        help:              "Succour",                                              /// Context menu item
         "in":              "in",                                                   /// Used in the meta description in the non-JavaScript version to indicate the language being used (uncapitalized)
         ///NOTE: This key must be the same as the value in the settings.
         in_paragraphs:     "Paragraphs",                                           /// In the View configuration panel
@@ -129,9 +129,9 @@
         more:              "More",                                                 /// The text for the "[+] More" button on callouts
         next:              "Next",                                                 /// The next chapter link in the non-JavaScript version
         night_mode:        "Night Mode",                                           /// In the View configuration panel
-        no_results1:       "Your search\u200A\u2014\u200A",                        /// Displayed when preforming a search that returns no results (before the search terms).
-        no_results2:       "\u200A\u2014\u200Adid not returne any results.",        /// Displayed when preforming a search that returns no results (after the search terms).
-        previous:          "Previous",                                             /// The previous chapter link in the non-JavaScript version
+        no_results1:       "Your search\u200A\u2014\u200A",                        /// Displayed when preforming a search that returns no results (before the search terms) (This does not need a long s because it is displayed on the scroll.)
+        no_results2:       "\u200A\u2014\u200Adid not returne any results.",       /// Displayed when preforming a search that returns no results (after the search terms) (This does not need a long s because it is displayed on the scroll.)
+        previous:          "Preuious",                                             /// The previous chapter link in the non-JavaScript version
         psalm:             "Psalme",                                               /// The title of chapters in the book of Psalms (This does not need a long s because it is displayed on the scroll.)
         query_explanation: "Keyword or Reference: \"God ſo loued\" or Romans 3:23",/// In a blank query input box before a search has been preformed
         query_button_title:"Click here (or preſſe Enter)",                         /// The text displayed when hovering over the magnifying glass (query button).
@@ -143,7 +143,7 @@
         title:             "title",                                                /// Used instead of 0 for Psalm title verse references (uncapitalized)
         translit:          "Tranſliteration",                                      /// The short name for the SBL transliteration display on the menu
         translit_long:     "Society of Biblical Languages Tranſliteration",        /// The long name for the SBL transliteration display on a tooltip
-        view:              "View",                                                 /// The title of a configuration panel
+        view:              "Uiew",                                                 /// The title of a configuration panel
         ///TODO: Determine if the app_name should be dynamically appended to the string below or if it should be done in the build system
         wrench_title:      "Cuſtomiſe & Configure BibleForge",                     /// The text displayed when hovering over the wrench menu
         
