@@ -31,7 +31,10 @@
 /// Set JSHint options.
 // jshint bitwise:true, curly:true, eqeqeq:true, forin:true, immed:true, latedef:true, newcap:true, noarg:true, noempty:true, nonew:true, onevar:true, plusplus:true, quotmark:double, strict:true, undef:true, es5:true, evil:true, browser:true
 
-(function ()
+/**
+ * After the HTML has loaded, start BibleForge.
+ */
+document.addEventListener("DOMContentLoaded", function ()
 {
     "use strict";
     
@@ -1391,7 +1394,7 @@
                      * @param  x                 (number)  (optional) The X position to scroll to (i.e, horizontal position) (If left undefined or not a Number, it will maintain the current X position.)
                      * @param  trigger_scrolling (boolean) (optional) Whether or not to allow the onscroll event from attempting to lookup more verses
                      * @return NULL. Scrolls the view.
-                     * @note   The y value is first because x value is rarely used.
+                     * @note   The Y value is the first parameter because x value is rarely (not yet) used.
                      * @note   Called by remove_excess_content_top(), add_content_top_if_needed(), scroll_to_verse(), write_verses(), handle_new_verses() and occasionally (IE only) by remove_excess_content_bottom() and add_content_bottom_if_needed().
                      */
                     scroll_view_to = function (y, x, trigger_scrolling)
@@ -2523,11 +2526,6 @@
                                 /// Because the verse the user is looking for is not at the beginning of a paragraph
                                 /// the text needs to be scrolled so that the verse is at the top.
                                 content_manager.scroll_to_verse(BF.get_b_c_v(options.verse));
-                            } else {
-                                /// If the user had scrolled down the page and then pressed the refresh button,
-                                /// the page will keep scrolling down as content is loaded, so to prevent this, force the window to scroll to the top of the page.
-                                ///FIXME: This does not always prevent the issue (especially in Chromium).  Perhaps this should also be called via setTimeout().
-                                content_manager.scroll_view_to(0);
                             }
                             
                             /// Since the first query is done, set the initial_query property to FALSE.
@@ -3734,6 +3732,31 @@
     /// * End of browser specific code *
     /// ********************************
     
-    /// Initialize BibleForge.
-    BF.create_viewport(document.getElementById("viewPort0"), document.documentElement);
-}());
+    /**
+     * Prime the browser and initialize BibleForge.
+     */
+    (function ()
+    {
+        /// If the user presses the refresh button, the browser will try to scroll back to the user's last scroll position.
+        /// Howver, since BibleForge does not display all of the text on the screen at the same time, this causes lots of problems.
+        /// To prevent the browser from altering the starting scroll position, we have to manually scroll the browser.
+        /// This is done by creating an element slightly larger than the viewport and scrolling up and down one pixel.
+        var big_el = document.createElement("div"),
+            doc_docEl = document.documentElement;
+        
+        /// Make the elememt slightly larger than the viewport so that we can scroll.
+        big_el.style.height = (doc_docEl.scrollHeight + 1) + "px";
+        
+        /// Prevent the browser from jumping if the user pressed refresh.
+        document.body.appendChild(big_el);
+        window.scrollTo(1, 0);
+        window.scrollTo(0, 0);
+        document.body.removeChild(big_el);
+        
+        /// Remove the element since it is no longer needed.
+        big_el = undefined;
+        
+        /// Initialize BibleForge.
+        BF.create_viewport(document.getElementById("viewPort0"), doc_docEl);
+    }());
+});
