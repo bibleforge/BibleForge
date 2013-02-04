@@ -1387,31 +1387,29 @@
                     /**
                      * Scroll the page to a specific point.
                      *
-                     * @param  y (number)             The Y position to scroll to (i.e, vertical position).
-                     * @param  x (number)  (optional) The X position to scroll to (i.e, horizontal position).  If left undefined, it will maintain the current Y position.
+                     * @param  y                 (number)             The Y position to scroll to (i.e, vertical position)
+                     * @param  x                 (number)  (optional) The X position to scroll to (i.e, horizontal position) (If left undefined or not a Number, it will maintain the current X position.)
+                     * @param  trigger_scrolling (boolean) (optional) Whether or not to allow the onscroll event from attempting to lookup more verses
                      * @return NULL. Scrolls the view.
                      * @note   The y value is first because x value is rarely used.
                      * @note   Called by remove_excess_content_top(), add_content_top_if_needed(), scroll_to_verse(), write_verses(), handle_new_verses() and occasionally (IE only) by remove_excess_content_bottom() and add_content_bottom_if_needed().
                      */
-                    scroll_view_to = function (y, x)
+                    scroll_view_to = function (y, x, trigger_scrolling)
                     {
                         var padding_el,
                             padding_interval,
                             pixels_needed;
                         
-                        if (typeof x === "undefined") {
+                        if (typeof x !== "number") {
                             /// Preserve the current x position by default.
                             x = window.pageXOffset;
                         }
                         
-                        /// Set the new scroll position
-                        scroll_pos = y;
-                        
                         /// Is the scroll position not the top of the page.
-                        if (scroll_pos > 0) {
+                        if (y > 0) {
                             /// Calculate how many pixels (if any) need to be added in order to be able to scroll to the specified position.
                             /// If the scroll position is near the bottom (e.g., Revelation 22:21 or Proverbs 28:28) there needs to be extra space on the bottom.
-                            pixels_needed = system.properties.viewport.height - (document.body.clientHeight - scroll_pos);
+                            pixels_needed = system.properties.viewport.height - (document.body.clientHeight - y);
                             if (pixels_needed > 0) {
                                 padding_el = document.createElement("div");
                                 
@@ -1429,6 +1427,11 @@
                                     }
                                 }, 1000);
                             }
+                        }
+                        
+                        /// Set the new scroll position to prevent the onscroll event from looking up more verses.
+                        if (!trigger_scrolling) {
+                            scroll_pos = y;
                         }
                         
                         window.scrollTo(x, y);
@@ -2156,7 +2159,7 @@
                         
                         /// Calculate the verse's Y coordinate.
                         ///NOTE: "- topBar_height" subtracts off the height of the top bar.
-                        scroll_view_to(BF.get_position(verse_el).top - system.properties.topBar_height);
+                        scroll_view_to(BF.get_position(verse_el).top - system.properties.topBar_height, null, true);
                         
                         return true;
                     },
