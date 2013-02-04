@@ -1387,19 +1387,15 @@
                     /**
                      * Scroll the page to a specific point.
                      *
-                     * @param  y            (number)             The Y position to scroll to (i.e, vertical position).
-                     * @param  x            (number)  (optional) The X position to scroll to (i.e, horizontal position).  If left undefined, it will maintain the current Y position.
-                     * @param  smooth       (boolean) (optional) Whether or not to scroll smoothly.  By default, or if falsey, it will scroll instantaneously.
-                     * @param  allow_lookup (boolean) (optional) Whether or not to allow BibleForge to trigger the onscroll event and possibly look up additional verses.
-                     * @return NULL
+                     * @param  y (number)             The Y position to scroll to (i.e, vertical position).
+                     * @param  x (number)  (optional) The X position to scroll to (i.e, horizontal position).  If left undefined, it will maintain the current Y position.
+                     * @return NULL. Scrolls the view.
                      * @note   The y value is first because x value is rarely used.
                      * @note   Called by remove_excess_content_top(), add_content_top_if_needed(), scroll_to_verse(), write_verses(), handle_new_verses() and occasionally (IE only) by remove_excess_content_bottom() and add_content_bottom_if_needed().
                      */
-                    scroll_view_to = function (y, x, smooth, allow_lookup)
+                    scroll_view_to = function (y, x)
                     {
-                        /// A small amount of extra padding is added just to ensure that the padding element will be large enough.
-                        var extra_padding = 10,
-                            padding_el,
+                        var padding_el,
                             padding_interval,
                             pixels_needed;
                         
@@ -1408,37 +1404,34 @@
                             x = window.pageXOffset;
                         }
                         
-                        if (!smooth) {
-                            if (!allow_lookup) {
-                                scroll_pos = y;
+                        /// Set the new scroll position
+                        scroll_pos = y;
+                        
+                        /// Is the scroll position not the top of the page.
+                        if (scroll_pos > 0) {
+                            /// Calculate how many pixels (if any) need to be added in order to be able to scroll to the specified position.
+                            /// If the scroll position is near the bottom (e.g., Revelation 22:21 or Proverbs 28:28) there needs to be extra space on the bottom.
+                            pixels_needed = system.properties.viewport.height - (document.body.clientHeight - scroll_pos);
+                            if (pixels_needed > 0) {
+                                padding_el = document.createElement("div");
+                                
+                                padding_el.style.height = pixels_needed + "px";
+                                /// Insert a blank element at the very end of the scroll to allow the user to be able to scroll down to the desired verse.
+                                viewPort.insertBefore(padding_el, null);
+                                
+                                /// Create a timer to check to see if the padding is no longer needed.
+                                padding_interval = window.setInterval(function ()
+                                {
+                                    /// If the user scrolls up or more text was loaded, the padding element can be removed.
+                                    if (doc_docEl.scrollHeight - (window.pageYOffset + system.properties.viewport.height) > pixels_needed) {
+                                        viewPort.removeChild(padding_el);
+                                        window.clearInterval(padding_interval);
+                                    }
+                                }, 1000);
                             }
-                            
-                            /// Is the scroll position not the top of the page.
-                            if (scroll_pos > 0) {
-                                /// Calculate how many pixels (if any) need to be added in order to be able to scroll to the specified position.
-                                /// If the scroll position is near the bottom (e.g., Revelation 22:21 or Proverbs 28:28) there needs to be extra space on the bottom.
-                                pixels_needed = system.properties.viewport.height - (document.body.clientHeight - scroll_pos);
-                                if (pixels_needed > 0) {
-                                    padding_el = document.createElement("div");
-                                    
-                                    padding_el.style.height = (pixels_needed + extra_padding) + "px";
-                                    viewPort.insertBefore(padding_el, null);
-                                    
-                                    /// Create a timer to check to see if the padding is no longer needed.
-                                    ///NOTE: The padding element should be removed when more text loaded or the user scrolls up.
-                                    padding_interval = window.setInterval(function ()
-                                    {
-                                        ///TODO: Document what scrollHeight, pageYOffset, and clientHeight actually measure.
-                                        if (doc_docEl.scrollHeight - (window.pageYOffset + system.properties.viewport.height) > pixels_needed + extra_padding) {
-                                            viewPort.removeChild(padding_el);
-                                            window.clearInterval(padding_interval);
-                                        }
-                                    }, 1000);
-                                }
-                            }
-                            
-                            window.scrollTo(x, y);
                         }
+                        
+                        window.scrollTo(x, y);
                     };
                     
                     (function ()
@@ -2125,15 +2118,12 @@
                      * Scrolls that page to make the specified verse at the top of the viewable area.
                      *
                      * @example content_manager.scroll_to_verse({b: 45, c: 1, v: 14}); /// Scrolls to Romans 1:14 if that verse element is in the DOM.
-                     * @param   verse_obj    (object)             An object containing the book, chapter, and verse references: {b: book, c: chapter, v: verse}
-                     * @param   smooth       (boolean) (optional) Whether to transition to the verse or instantly jump to it
-                     * @param   allow_lookup (boolean) (optional) Whether or not to allow BibleForge to trigger the onscroll event and possibly look up additional verses.
+                     * @param   verse_obj (object) An object containing the book, chapter, and verse references: {b: book, c: chapter, v: verse}
                      * @return  Returns TRUE on success and FALSE if the verse cannot be found on the scroll.
                      * @note    Called by handle_new_verses() after the first Ajax request of a particular verse lookup.
                      * @note    Also called when scrolling via the page up and page down buttons.
-                     * @todo    Determine if there needs to be an option to override looking for Psalm titles and chapter headings.
                      */
-                    scroll_to_verse: function (verse_obj, smooth, allow_lookup)
+                    scroll_to_verse: function (verse_obj)
                     {
                         ///FIXME: This will not get the correct element if the verse is verse 1 (i.e., is at the beginning of a chapter or book).
                         var verse_el,
@@ -2166,7 +2156,7 @@
                         
                         /// Calculate the verse's Y coordinate.
                         ///NOTE: "- topBar_height" subtracts off the height of the top bar.
-                        scroll_view_to(BF.get_position(verse_el).top - system.properties.topBar_height, null, smooth, allow_lookup);
+                        scroll_view_to(BF.get_position(verse_el).top - system.properties.topBar_height);
                         
                         return true;
                     },
@@ -3047,7 +3037,7 @@
                         ///TODO: The second parameter (smooth) should (probably) be TRUE, but it is not implemented yet.
                         ///TODO: If the user is already at that verse, nothing happens, so there may need to be some visual confirmation.
                         ///NOTE: If just the highlighting changes, the page does not need to reload.
-                        if (options.extra_highlighting === query_manager.extra_highlighting && query_manager.lang_id === BF.lang.id && content_manager.scroll_to_verse(BF.get_b_c_v(verse_id), false, true)) {
+                        if (options.extra_highlighting === query_manager.extra_highlighting && query_manager.lang_id === BF.lang.id && content_manager.scroll_to_verse(BF.get_b_c_v(verse_id))) {
                             ///NOTE: Since the verse had already been loaded, and therefore no query needs to be made, store the query info now.
                             query_manager.store_query_options(options);
                             return;
@@ -3296,7 +3286,7 @@
                         ///TODO:  Determine if this should skip a chapter if it is just a verse or two away.
                         ///TODO:  Determine if it should do something different when the chapter has not been loaded (like preform a lookup and then scroll).
                         ///FIXME: This does not work in Opera.
-                        if (content_manager.top_verse && content_manager.scroll_to_verse({b: new_book, c: new_chap, v: 1}, false, true)) {
+                        if (content_manager.top_verse && content_manager.scroll_to_verse({b: new_book, c: new_chap, v: 1})) {
                             /// Since it scrolled to the verses successfully, prevent the key press from scrolling the page like normal.
                             e.preventDefault();
                         }
