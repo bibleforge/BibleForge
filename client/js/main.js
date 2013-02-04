@@ -1399,7 +1399,7 @@
                             padding_interval,
                             pixels_needed;
                         
-                        if (typeof x === "undefined" || x === null) {
+                        if (typeof x === "undefined") {
                             /// Preserve the current x position by default.
                             x = window.pageXOffset;
                         }
@@ -1500,8 +1500,8 @@
                         /**
                          * Remove content from below the screen and store in cache.
                          *
-                         * @return  NULL.  Removes content from the page if required.
-                         * @note    Called by scrolling() via setTimeout().  May call itself, too.
+                         * @return NULL.  Removes content from the page if required.
+                         * @note   Called by scrolling() via setTimeout().  May call itself, too.
                          */
                         function remove_excess_content_bottom()
                         {
@@ -1576,7 +1576,6 @@
                                 }
                                 scroll_check_count = 0;
                                 
-                                
                                 scrolling_down = (new_scroll_pos > scroll_pos);
                                 
                                 /// This keeps track of the current scroll position so we can tell the direction of the scroll.
@@ -1617,9 +1616,9 @@
                  * Find a verse element that is within a certain Y coordinate on the screen.
                  *
                  * @example verse = get_verse_at_position(window.pageYOffset + topBar_height + 8, true, page); /// Could return {b: 1, c: 1, v: 1} for Genesis 1:1.
-                 * @param   the_pos        (number)  The vertical position on the page.
-                 * @param   looking_upward (boolean) Whether the verses at the top or bottom of the page.
-                 * @param   parent_el      (element) The HTML element that ultimately contains the verse.
+                 * @param   the_pos        (number)      The vertical position on the page.
+                 * @param   looking_upward (boolean)     Whether the verses at the top or bottom of the page.
+                 * @param   parent_el      (DOM element) The HTML element that ultimately contains the verse.
                  * @return  Returns an object containing the book, chapter, and verse of the verse element.  Format {b: BB, c: CCC, v: VVV}.
                  * @note    Called by update_verse_range() and itself.
                  */
@@ -2150,6 +2149,7 @@
                             verse_el = document.getElementById(verse_id + "_verse");
                         }
                         
+                        /// Does the verse not exist?
                         if (!verse_el) {
                             return false;
                         }
