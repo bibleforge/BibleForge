@@ -1920,7 +1920,7 @@ document.addEventListener("DOMContentLoaded", function ()
                         verse1.full_book = (verse1.b === 19 ? BF.lang.psalm : BF.lang.books_short[verse1.b]);
                         verse2.full_book = (verse2.b === 19 ? BF.lang.psalm : BF.lang.books_short[verse2.b]);
                         
-                        /// Beging creating the verse range text.  (The first book, chapter, and verse is always present).
+                        /// Begin creating the verse range text.  (The first book, chapter, and verse is always present).
                         ref_range = verse1.full_book + " " + (BF.lang.chapter_count[verse1.b] === 1 ? "" : verse1.c + ":") + verse1.full_verse;
                         
                         ///NOTE: \u2013 is Unicode for the en dash (–) (HTML: &ndash;).
@@ -3731,16 +3731,16 @@ document.addEventListener("DOMContentLoaded", function ()
     (function ()
     {
         /// If the user presses the refresh button, the browser will try to scroll back to the user's last scroll position.
-        /// Howver, since BibleForge does not display all of the text on the screen at the same time, this causes lots of problems.
+        /// However, since BibleForge does not display all of the text on the screen at the same time, this causes lots of problems.
         /// To prevent the browser from altering the starting scroll position, we have to manually scroll the browser.
         /// This is done by creating an element slightly larger than the viewport and scrolling up and down one pixel.
-        var big_el = document.createElement("div"),
+        var big_el    = document.createElement("div"),
             doc_docEl = document.documentElement;
         
         /// Make the elememt slightly larger than the viewport so that we can scroll.
         big_el.style.height = (doc_docEl.scrollHeight + 1) + "px";
         
-        /// Prevent the browser from jumping if the user pressed refresh.
+        /// Prevent the browser from jumping if the user pressed refresh by scrolling the view now.
         document.body.appendChild(big_el);
         window.scrollTo(1, 0);
         window.scrollTo(0, 0);
