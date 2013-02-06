@@ -3323,6 +3323,14 @@ document.addEventListener("DOMContentLoaded", function ()
                     {
                         run_new_query(raw_query, is_default, true, position);
                         
+                        /// If the user typed in a URL that does not match the standard form, rewrite the URL.
+                        /// E.g., the user entered in "http://bibleforge.com/en/gen"; turn that into "http://bibleforge.com/en/Genesis 1:1/".
+                        ///NOTE: This only rewrites the URL if the query does not match.  It does not rewrite if the URL if the language is missing but the query string is correct.
+                        ///NOTE: The URL must be rewritten; otherwise, if the user reloads the page, the URL will not match the actual query, and the position will not be saved.
+                        if (raw_query && settings.user.last_query.type === BF.consts.verse_lookup && raw_query !== settings.user.last_query.real_query) {
+                            BF.history.replaceState("/" + settings.user.last_query.lang_id + "/" + window.encodeURIComponent(settings.user.last_query.raw_query) + "/", position ? {position: position} : undefined);
+                        }
+                        
                         /// Only change the text in the query input if the user has not started typing and the user actually typed in the query.
                         if (!e.initial_page_load || qEl.value === "") {
                             if (e.initial_page_load && !using_url && typeof settings.user.entered_text !== "undefined") {
@@ -3498,7 +3506,7 @@ document.addEventListener("DOMContentLoaded", function ()
                 queryButton.title = BF.lang.query_button_title;
                 queryButton.alt   = BF.lang.query_button_alt;
                 
-                /// If the placeholder still exists (i.e., the user has not typed anything) set it to the new langauge's.
+                /// If the placeholder still exists (i.e., the user has not typed anything) set it to the new language's.
                 if (qEl.placeholder) {
                     qEl.placeholder = BF.lang.query_explanation;
                 }
