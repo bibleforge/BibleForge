@@ -1391,22 +1391,15 @@ document.addEventListener("DOMContentLoaded", function ()
                      * Scroll the page to a specific point.
                      *
                      * @param  y                 (number)             The Y position to scroll to (i.e, vertical position)
-                     * @param  x                 (number)  (optional) The X position to scroll to (i.e, horizontal position) (If left undefined or not a Number, it will maintain the current X position.)
                      * @param  trigger_scrolling (boolean) (optional) Whether or not to allow the onscroll event from attempting to lookup more verses
                      * @return NULL. Scrolls the view.
-                     * @note   The Y value is the first parameter because x value is rarely (not yet) used.
                      * @note   Called by remove_excess_content_top(), add_content_top_if_needed(), scroll_to_verse(), write_verses(), handle_new_verses() and occasionally (IE only) by remove_excess_content_bottom() and add_content_bottom_if_needed().
                      */
-                    scroll_view_to = function (y, x, trigger_scrolling)
+                    scroll_view_to = function (y, trigger_scrolling)
                     {
                         var padding_el,
                             padding_interval,
                             pixels_needed;
-                        
-                        if (typeof x !== "number") {
-                            /// Preserve the current x position by default.
-                            x = window.pageXOffset;
-                        }
                         
                         /// Is the scroll position not the top of the page.
                         if (y > 0) {
@@ -1437,7 +1430,7 @@ document.addEventListener("DOMContentLoaded", function ()
                             scroll_pos = y;
                         }
                         
-                        window.scrollTo(x, y);
+                        window.scrollTo(window.pageXOffset, y);
                     };
                     
                     (function ()
@@ -2162,7 +2155,7 @@ document.addEventListener("DOMContentLoaded", function ()
                         
                         /// Calculate the verse's Y coordinate.
                         ///NOTE: "- topBar_height" subtracts off the height of the top bar.
-                        scroll_view_to(BF.get_position(verse_el).top - system.properties.topBar_height, null, true);
+                        scroll_view_to(BF.get_position(verse_el).top - system.properties.topBar_height, true);
                         
                         return true;
                     },
