@@ -3298,6 +3298,13 @@ document.addEventListener("DOMContentLoaded", function ()
             
             (function ()
             {
+                /**
+                 * Handle change in the browser state.
+                 *
+                 * @param e (object) An object representing the state
+                 * @note  The e object also expects the custom property "initial_page_load" when the page is first loaded.
+                 * @note  This function is called manually when the page first loads and on popstate.
+                 */
                 function on_state_change(e)
                 {
                     var is_default = false,
