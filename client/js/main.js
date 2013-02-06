@@ -2993,6 +2993,14 @@ document.addEventListener("DOMContentLoaded", function ()
                     /// If the query is a verse reference, a number is returned, if it is a search, then FALSE is returned.
                     verse_id = Number(BF.lang.determine_reference(query));
                     
+                    /// Is the query a verse lookup?
+                    if (verse_id) {
+                        /// In order to keep a consistent URL for a verse (for better SEO among other reasons), change the query into a standard form.
+                        /// E.g., The query "gen" becomes "Genesis 1:1".
+                        ///NOTE: If this is not stored in raw_query, if the page is reloaded, the client will not detect that this is the same query and it will ignore the previous position.
+                        options.raw_query = BF.create_ref(BF.get_b_c_v(verse_id));
+                    }
+                    
                     if (!ignore_state) {
                         /// If the query is a verse lookup (e.g., verse_id is a number) then determine the proper verse reference (e.g., turn "1cor" into "1 Corinthians 1:1").
                         ///NOTE: Providing one URL for various verse spellings should improve SEO.
@@ -3000,7 +3008,7 @@ document.addEventListener("DOMContentLoaded", function ()
                         ///NOTE: This must be done now, because the verse_id variable may change later based on the position object.
                         ///NOTE: Another reason this needs to be called now is because later the function may exit before querying the server and simply scroll to the verse.
                         ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
-                        BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(verse_id ? BF.create_ref(BF.get_b_c_v(verse_id)) + (options.extra_highlighting ? " {{" + options.extra_highlighting + "}}" : "") : raw_query) + "/", position ? {position: position} : undefined);
+                        BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(verse_id ? options.raw_query + (options.extra_highlighting ? " {{" + options.extra_highlighting + "}}" : "") : raw_query) + "/", position ? {position: position} : undefined);
                     }
                     
                     /// After saving the state above, make sure that position is an object to make checking for its properties easier.
@@ -3425,7 +3433,7 @@ document.addEventListener("DOMContentLoaded", function ()
                         
                         /// Get the last position the user was at (if available).
                         /// On initial page loads, if a language is specified but no query or the query and language is the same as the last query made, try to load the last position as well.
-                        position = e.state ? e.state.position : e.initial_page_load && (!raw_query || (raw_query === settings.user.last_query.real_query && lang_id === settings.user.last_query.lang_id)) ? settings.user.position : undefined;
+                        position = e.state ? e.state.position : e.initial_page_load && (!raw_query || (raw_query === settings.user.last_query.raw_query && lang_id === settings.user.last_query.lang_id)) ? settings.user.position : undefined;
                     }
                     
                     /// If the requested language is the same as the current one, there is no need to change it.
