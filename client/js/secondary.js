@@ -45,8 +45,7 @@
      */
     return function (context)
     {
-        var create_drop_down_box,
-            page = context.page,
+        var page = context.page,
             show_context_menu,
             show_panel;
         
@@ -1164,6 +1163,11 @@
         /// * End of Mouse Hiding Closure *
         /// *******************************
         
+        
+        /// *******************************
+        /// * Start of Wrench Button/Menu *
+        /// *******************************
+        
         /**
          * Add the rest of the BibleForge user interface (currently, just the wrench menu).
          *
@@ -1456,6 +1460,9 @@
             };
         }());
         
+        /// *******************************
+        /// * Start of Wrench Button/Menu *
+        /// *******************************
         
         /**
          * Snap mouse wheel scrolling.
@@ -1487,1342 +1494,1352 @@
             window.addEventListener("DOMMouseScroll", mousewheel_scroller, false);
         }());
         
-        /**
-         * Create the lexical data lookup functions.
-         */
+        /// ****************************
+        /// * Start of Callout Manager *
+        /// ****************************
+        
+        BF.callout_manager = {};
+        
         (function ()
         {
-            var callout_clicked = false,
-                create_callout;
+            var callout_maker,
+                callouts = {},
+                lex_cache = {},
+                maximized_callout;
             
-            /**
-             * The closure for creating callouts.
-             */
-            create_callout = (function ()
-            {                
-                /**
-                 * Determine where the callout should be positioned in order to be able to point to the correct word.
-                 *
-                 * @param callout    (element) The DOM element representing the callout.
-                 * @param pointer    (element) The triangular pointer element.
-                 * @param point_to   (element) The element the callout should point to.
-                 * @param pos        (object)  An object containing position of the callout so that this information can be retrieved quickly without accessing the DOM.
-                 *                             Object structure: {left: number, top: number}
-                 * @param split_info (object)  An object containing information about where the user originally clicked and possibly which part of the word the user clicked.
-                 *                             Object structure: {mouse_x: number, mouse_y: number, which_rect: number}
-                 * @note  For now at least, this function is placed outside of the callout object so that it does not have to be created each time a callout is made.
-                 */
-                function calculate_pos(callout, pointer, point_to, pos, split_info)
+            /// Create the user.expanad_def property to be able to save the settings when changed.
+            context.settings.add_property(context.settings.user, "expand_def", typeof context.settings.user.expanad_def === "undefined" ? true : context.settings.user.expanad_def);
+            
+            /// Since this is not styled by initially, it needs to be set now.
+            if (BF.lang.linked_to_orig) {
+                /// Show a hand cursor over words.
+                page.classList.add("linked");
+            }
+            
+            function walk_callouts(callback)
+            {
+                Object.keys(callouts).forEach(function (i)
                 {
-                    ///FIXME: callout.offsetHeight probably only works with position absolute, which is now not always the case.
-                    var callout_offsetHeight = callout.offsetHeight,
-                        callout_offsetWidth  = callout.offsetWidth,
-                        distance_from_right, /// The distance (in pixels) from the right edge of the viewport to middle_x
-                        i,
-                        middle_x, /// The middle (horizontally) of the word being pointed to.
-                        point_to_offsetTop,
-                        /// Get the rectangles that represent the object.
-                        ///NOTE: If a word is wrapped (specifically a hyphenated word), there will be multiple rectangles.
-                        point_to_rects = point_to.getClientRects(),
-                        pointer_length   = 12, /// Essentially from the tip of the pointer to the callout
-                        pointer_distance = 28, /// The optimal distance from the left of the callout to the middle of the pointer.
-                        res = {},
-                        which_rect = 0;
-                    
-                    /// Does the word wrap? (See Judges 1:11 "Kirjath-sepher").
-                    if (point_to_rects.length > 1) {
-                        /// Did it already figure out which part of the word was clicked on?
-                        if (split_info.which_rect) {
-                            /// Does the rectangle that the user first clicked exist?
-                            ///NOTE: For example, if the viewport is very small, the word "Jonath-elem-rechokim" in Psalm 56:title may wrap twice times, and if the user clicked on the third part,
-                            ///      and then the user resized the viewport so that now it only wraps once, there will be just two rectangles, not three.
-                            ///      So in this case, when the viewport is resized, it will select the second section.
-                            if (split_info.which_rect < point_to_rects.length) {
-                                /// Since the rectangle exists, use that.
-                                which_rect = split_info.which_rect;
-                            } else {
-                                /// Since the rectangle does not exist, use the last one.
-                                which_rect = point_to_rects.length - 1;
-                            }
-                        } else {
-                            /// Loop through each rectangle, and try to find which part the use clicked on.
-                            for (i = point_to_rects.length - 1; i >= 0; i -= 1) {
-                                /// Did the user click on this rectangle?
-                                if (split_info.mouse_x >= point_to_rects[i].left && split_info.mouse_x <= point_to_rects[i].right && split_info.mouse_y >= point_to_rects[i].top && split_info.mouse_y <= point_to_rects[i].bottom) {
-                                    which_rect = i;
-                                    split_info.which_rect = i;
-                                    break;
-                                }
-                            }
-                            /// If the user clicked on the word before it wrapped and then the view was resized so that it now wraps, it will not find a matching rectangle.
-                            /// If it cannot find the part of the word that it should point to, it will default to the first rectangle because which_rect defaults to 0.
-                            /// Store which_rect so that it does not try to find it again in vain.
-                            split_info.which_rect = which_rect;
-                        }
-                    } else if (point_to_rects.length < 1) {
-                        /// If the element gets removed from the page, it will have a length of 0.
-                        /// In this case, we can do nothing and the callout should be removed shortly.
-                        /// This can occur if a callout is opened and then a new query is sent (common when using the back/forward buttons).
-                        return;
-                    }
-                    
-                    ///NOTE: Since getClientRects() does not take into account the page offset, we need to add it in.
-                    middle_x           = point_to_rects[which_rect].left + window.pageXOffset + (point_to_rects[which_rect].width / 2);
-                    point_to_offsetTop = point_to_rects[which_rect].top  + window.pageYOffset;
-                    
-                    /// Try to put the callout above the word.
-                    if (callout_offsetHeight + pointer_length < point_to_offsetTop - context.system.properties.topBar_height - window.pageYOffset) {
-                        res.top = point_to_offsetTop - callout_offsetHeight - pointer_length;
-                        res.pointerClassName = "pointer-down";
-                    /// Else, put the callout below the word.
-                    } else {
-                        res.top = point_to_offsetTop + point_to_rects[which_rect].height + pointer_length;
-                        res.pointerClassName = "pointer-up";
-                    }
-                    //callout.style.top = pos.top + "px";
-                    
-                    distance_from_right = window.innerWidth - middle_x;
-                    /// Can the pointer fit on the far left?
-                    if (distance_from_right > callout_offsetWidth) {
-                        res.left = middle_x - pointer_distance;
-                    } else {
-                        /// If the pointer will move off of callout on the right side (distance_from_right < 50),
-                        /// the callout needs to be moved to the left a little further (pushing the callout off the page a little).
-                        res.left = (window.innerWidth - callout_offsetWidth - pointer_distance + 8) + (distance_from_right < 50 ? 50 - (distance_from_right) : 0);
-                    }
-                    //callout.style.left = pos.left + "px";
-                    res.pointer_left = (middle_x - res.left - pointer_length);
-                    
-                    return res;
-                }
+                    callback(callouts[i], i);
+                });
+            }
+            
+            callout_maker = (function ()
+            {
+                /**
+                 * The closure for creating callouts.
+                 */
+                var create_callout,
+                    display_callout;
                 
-                /**
-                 * Create the callout element and attach it to a word.
-                 *
-                 * @param  id         (number)  The word ID
-                 * @param  point_to   (element) The element the callout should point to.
-                 * @param  ajax       (object)  The ajax object created by BF.Create_easy_ajax().
-                 * @param  split_info (object)  An object containing information about where the user originally clicked and possibly which part of the word the user clicked.
-                 *                              Object structure: {mouse_x: number, mouse_y: number, which_rect: number}
-                 * @return A object that manages the callout.
-                 */
-                return function create_callout(id, point_to, ajax, split_info, detailed, ignore_state)
-                {
-                    var callout = document.createElement("div"),
-                        inside  = document.createElement("div"),
-                        pointer = document.createElement("div"),
-                        transparent_el,
+                create_callout = (function ()
+                {                
+                    /**
+                     * Determine where the callout should be positioned in order to be able to point to the correct word.
+                     *
+                     * @param callout    (element) The DOM element representing the callout.
+                     * @param pointer    (element) The triangular pointer element.
+                     * @param point_to   (element) The element the callout should point to.
+                     * @param pos        (object)  An object containing position of the callout so that this information can be retrieved quickly without accessing the DOM.
+                     *                             Object structure: {left: number, top: number}
+                     * @param split_info (object)  An object containing information about where the user originally clicked and possibly which part of the word the user clicked.
+                     *                             Object structure: {mouse_x: number, mouse_y: number, which_rect: number}
+                     * @note  For now at least, this function is placed outside of the callout object so that it does not have to be created each time a callout is made.
+                     */
+                    function calculate_pos(callout, pointer, point_to, pos, split_info)
+                    {
+                        ///FIXME: callout.offsetHeight probably only works with position absolute, which is now not always the case.
+                        var callout_offsetHeight = callout.offsetHeight,
+                            callout_offsetWidth  = callout.offsetWidth,
+                            distance_from_right, /// The distance (in pixels) from the right edge of the viewport to middle_x
+                            i,
+                            middle_x, /// The middle (horizontally) of the word being pointed to.
+                            point_to_offsetTop,
+                            /// Get the rectangles that represent the object.
+                            ///NOTE: If a word is wrapped (specifically a hyphenated word), there will be multiple rectangles.
+                            point_to_rects = point_to.getClientRects(),
+                            pointer_length   = 12, /// Essentially from the tip of the pointer to the callout
+                            pointer_distance = 28, /// The optimal distance from the left of the callout to the middle of the pointer.
+                            res = {},
+                            which_rect = 0;
                         
-                        callout_obj,
-                        loading_timer,
-                        pos = {};
-                    
-                    callout.className = "callout";
-                    inside.className  = "inside";
-                    
-                    /// Prevent the page from scrolling when scrolling the content in the callout.
-                    /// WebKit/Opera/IE9(?)
-                    inside.addEventListener("mousewheel", function (e)
-                    {
-                        e.stopPropagation();
-                    }, false);
-                    /// Mozilla
-                    inside.addEventListener("DOMMouseScroll", function (e)
-                    {
-                        e.stopPropagation();
-                    }, false);
-                    
-                    callout.appendChild(inside);
-                    callout.appendChild(pointer);
+                        /// Does the word wrap? (See Judges 1:11 "Kirjath-sepher").
+                        if (point_to_rects.length > 1) {
+                            /// Did it already figure out which part of the word was clicked on?
+                            if (split_info.which_rect) {
+                                /// Does the rectangle that the user first clicked exist?
+                                ///NOTE: For example, if the viewport is very small, the word "Jonath-elem-rechokim" in Psalm 56:title may wrap twice times, and if the user clicked on the third part,
+                                ///      and then the user resized the viewport so that now it only wraps once, there will be just two rectangles, not three.
+                                ///      So in this case, when the viewport is resized, it will select the second section.
+                                if (split_info.which_rect < point_to_rects.length) {
+                                    /// Since the rectangle exists, use that.
+                                    which_rect = split_info.which_rect;
+                                } else {
+                                    /// Since the rectangle does not exist, use the last one.
+                                    which_rect = point_to_rects.length - 1;
+                                }
+                            } else {
+                                /// Loop through each rectangle, and try to find which part the use clicked on.
+                                for (i = point_to_rects.length - 1; i >= 0; i -= 1) {
+                                    /// Did the user click on this rectangle?
+                                    if (split_info.mouse_x >= point_to_rects[i].left && split_info.mouse_x <= point_to_rects[i].right && split_info.mouse_y >= point_to_rects[i].top && split_info.mouse_y <= point_to_rects[i].bottom) {
+                                        which_rect = i;
+                                        split_info.which_rect = i;
+                                        break;
+                                    }
+                                }
+                                /// If the user clicked on the word before it wrapped and then the view was resized so that it now wraps, it will not find a matching rectangle.
+                                /// If it cannot find the part of the word that it should point to, it will default to the first rectangle because which_rect defaults to 0.
+                                /// Store which_rect so that it does not try to find it again in vain.
+                                split_info.which_rect = which_rect;
+                            }
+                        } else if (point_to_rects.length < 1) {
+                            /// If the element gets removed from the page, it will have a length of 0.
+                            /// In this case, we can do nothing and the callout should be removed shortly.
+                            /// This can occur if a callout is opened and then a new query is sent (common when using the back/forward buttons).
+                            return;
+                        }
+                        
+                        ///NOTE: Since getClientRects() does not take into account the page offset, we need to add it in.
+                        middle_x           = point_to_rects[which_rect].left + window.pageXOffset + (point_to_rects[which_rect].width / 2);
+                        point_to_offsetTop = point_to_rects[which_rect].top  + window.pageYOffset;
+                        
+                        /// Try to put the callout above the word.
+                        if (callout_offsetHeight + pointer_length < point_to_offsetTop - context.system.properties.topBar_height - window.pageYOffset) {
+                            res.top = point_to_offsetTop - callout_offsetHeight - pointer_length;
+                            res.pointerClassName = "pointer-down";
+                        /// Else, put the callout below the word.
+                        } else {
+                            res.top = point_to_offsetTop + point_to_rects[which_rect].height + pointer_length;
+                            res.pointerClassName = "pointer-up";
+                        }
+                        //callout.style.top = pos.top + "px";
+                        
+                        distance_from_right = window.innerWidth - middle_x;
+                        /// Can the pointer fit on the far left?
+                        if (distance_from_right > callout_offsetWidth) {
+                            res.left = middle_x - pointer_distance;
+                        } else {
+                            /// If the pointer will move off of callout on the right side (distance_from_right < 50),
+                            /// the callout needs to be moved to the left a little further (pushing the callout off the page a little).
+                            res.left = (window.innerWidth - callout_offsetWidth - pointer_distance + 8) + (distance_from_right < 50 ? 50 - (distance_from_right) : 0);
+                        }
+                        //callout.style.left = pos.left + "px";
+                        res.pointer_left = (middle_x - res.left - pointer_length);
+                        
+                        return res;
+                    }
                     
                     /**
-                     * Add a loading indicator if the content does not load very quickly.
+                     * Create the callout element and attach it to a word.
                      *
-                     * @note Delay the creation of the loading graphic because the data could load quickly enough as to make it unnecessary.
+                     * @param  id         (number)  The word ID
+                     * @param  point_to   (element) The element the callout should point to.
+                     * @param  ajax       (object)  The ajax object created by BF.Create_easy_ajax().
+                     * @param  split_info (object)  An object containing information about where the user originally clicked and possibly which part of the word the user clicked.
+                     *                              Object structure: {mouse_x: number, mouse_y: number, which_rect: number}
+                     * @return A object that manages the callout.
                      */
-                    loading_timer = window.setTimeout(function ()
+                    return function create_callout(id, point_to, ajax, split_info, detailed, ignore_state)
                     {
-                        var loader = document.createElement("div");
+                        var callout = document.createElement("div"),
+                            inside  = document.createElement("div"),
+                            pointer = document.createElement("div"),
+                            transparent_el,
+                            
+                            callout_obj,
+                            loading_timer,
+                            pos = {};
                         
-                        loader.style.opacity = "0";
-                        loader.className = "loaders fade";
-                        /// By default, loaders are invisible.
-                        loader.style.visibility = "visible";
-                        /// Center the graphic vertically.
-                        loader.style.height = "100%";
-                        inside.appendChild(loader);
-                        /// Change the opacity after a delay to make it fade in (if the browser supports CSS transitions; otherwise the change is instant).
-                        loading_timer = window.setTimeout(function () {
-                            loader.style.opacity = ".6";
-                        }, 0);
-                    }, 500);
-                    
-                    /// Because callouts are closed when the user clicks off,
-                    /// we notify the document.onclick() function that a callout was clicked on so it will ignore the click.
-                    callout.addEventListener("click", function ()
-                    {
-                        callout_clicked = true;
-                    }, false);
-                    
-                    /// The element must be in the DOM tree in order for it to have a height and width.
-                    document.body.appendChild(callout);
-                    
-                    callout_obj = {
-                        /// Methods
-                        /**
-                         * Adjust the size of a callout as needed.
-                         *
-                         * Small callouts should not scroll, so they may need to be resized to fit the content.
-                         *
-                         * @note Called after replacing the HTML and changing the pronunciation style.
-                         */
-                        adjust_height: function ()
+                        callout.className = "callout";
+                        inside.className  = "inside";
+                        
+                        /// Prevent the page from scrolling when scrolling the content in the callout.
+                        /// WebKit/Opera/IE9(?)
+                        inside.addEventListener("mousewheel", function (e)
                         {
-                            var diff;
+                            e.stopPropagation();
+                        }, false);
+                        /// Mozilla
+                        inside.addEventListener("DOMMouseScroll", function (e)
+                        {
+                            e.stopPropagation();
+                        }, false);
+                        
+                        callout.appendChild(inside);
+                        callout.appendChild(pointer);
+                        
+                        /**
+                         * Add a loading indicator if the content does not load very quickly.
+                         *
+                         * @note Delay the creation of the loading graphic because the data could load quickly enough as to make it unnecessary.
+                         */
+                        loading_timer = window.setTimeout(function ()
+                        {
+                            var loader = document.createElement("div");
                             
-                            /// Is the callout small?  Only small callouts should be resized.
-                            if (!this.showing_details) {
-                                /// Determine if the callout needs to be resized to fit all of the content.
-                                /// E.g., go to Jeremiah 33 and click on "he" in the first verse.
-                                diff = inside.scrollHeight - inside.offsetHeight;
-                                if (diff > 0) {
-                                    /// If the pointer is pointing down, the top position must also be changed.
-                                    if (pointer.className === "pointer-down") {
-                                        this.move(-diff);
+                            loader.style.opacity = "0";
+                            loader.className = "loaders fade";
+                            /// By default, loaders are invisible.
+                            loader.style.visibility = "visible";
+                            /// Center the graphic vertically.
+                            loader.style.height = "100%";
+                            inside.appendChild(loader);
+                            /// Change the opacity after a delay to make it fade in (if the browser supports CSS transitions; otherwise the change is instant).
+                            loading_timer = window.setTimeout(function () {
+                                loader.style.opacity = ".6";
+                            }, 0);
+                        }, 500);
+                        
+                        /// Because callouts are closed when the user clicks off,
+                        /// we notify the document.onclick() function that a callout was clicked on so it will ignore the click.
+                        callout.addEventListener("click", function ()
+                        {
+                            BF.callout_manager.callout_clicked = true;
+                        }, false);
+                        
+                        /// The element must be in the DOM tree in order for it to have a height and width.
+                        document.body.appendChild(callout);
+                        
+                        callout_obj = {
+                            /// Methods
+                            /**
+                             * Adjust the size of a callout as needed.
+                             *
+                             * Small callouts should not scroll, so they may need to be resized to fit the content.
+                             *
+                             * @note Called after replacing the HTML and changing the pronunciation style.
+                             */
+                            adjust_height: function ()
+                            {
+                                var diff;
+                                
+                                /// Is the callout small?  Only small callouts should be resized.
+                                if (!this.showing_details) {
+                                    /// Determine if the callout needs to be resized to fit all of the content.
+                                    /// E.g., go to Jeremiah 33 and click on "he" in the first verse.
+                                    diff = inside.scrollHeight - inside.offsetHeight;
+                                    if (diff > 0) {
+                                        /// If the pointer is pointing down, the top position must also be changed.
+                                        if (pointer.className === "pointer-down") {
+                                            this.move(-diff);
+                                        }
+                                        
+                                        /// Because of the padding, .clientHeight and .clientOffsetHeight do not return the right value,
+                                        /// so to calculate the new height correctly, we calculate the visible area of the "inner" element,
+                                        /// which is the same as the height of the callout minus the padding.
+                                        callout.style.height = (inside.getClientRects()[0].height + diff) + "px";
+                                        
+                                        /// Because when the size changes, it could go off the top of the page, make sure to re-align it.
+                                        /// E.g., go to Jeremiah 33 and click on "Chaldeans."
+                                        this.align();
                                     }
-                                    
-                                    /// Because of the padding, .clientHeight and .clientOffsetHeight do not return the right value,
-                                    /// so to calculate the new height correctly, we calculate the visible area of the "inner" element,
-                                    /// which is the same as the height of the callout minus the padding.
-                                    callout.style.height = (inside.getClientRects()[0].height + diff) + "px";
-                                    
-                                    /// Because when the size changes, it could go off the top of the page, make sure to re-align it.
-                                    /// E.g., go to Jeremiah 33 and click on "Chaldeans."
-                                    this.align();
                                 }
-                            }
-                        },
-                        /**
-                         * Using outer variables, call the aligning function.
-                         *
-                         * @param smooth              (boolean)  (optional) Whether or not to transition the alignment. This is used only when transitioning between small and large callout sizes.
-                         * @param transition_callback (function) (optional) A callback after the smooth transition completes.  Requires the smooth parameter to be TRUE.
-                         */
-                        align: function (smooth, transition_callback)
-                        {
-                            var height,
-                                left,
-                                new_pos,
-                                top,
-                                width;
-                            
-                            if (!callout || !pointer) {
-                                return;
-                            }
-                            
-                            /// If the callout is showing details, it should be made to fill most of the screen.
-                            if (this.showing_details) {
-                                /// Place the callout just below the bottom of the top bar.
-                                top    = (context.system.properties.topBar_height + 10);
-                                height = ((context.system.properties.viewport.height - top) * 0.85);
-                                /// Since 800 pixels is the max width of the scroll, make sure to make the callout no bigger.
-                                ///NOTE: It might be good to have this number set in a variable.
-                                width = (context.system.properties.viewport.width > 800 ? 800 : context.system.properties.viewport.width) * 0.85;
-                                left  = (context.system.properties.viewport.width / 2) - (width / 2);
-                                
-                                /// This is used the first time to transition from small to large.
-                                if (smooth) {
-                                    BF.transition(callout, [
-                                        ///NOTE: This is not the best place to calculate start_val. This only works when assuming it used to have position absolute.
-                                        ///NOTE: Could use transform: translate(x, y) to possibly optimize the transition.
-                                        ///      The easiest way to do that would be to set the top and left to 0 and translate from there.
-                                        {prop: "top",    duration: "300ms", end_val: top    + "px", failsafe: 500},
-                                        {prop: "left",   duration: "300ms", end_val: left   + "px", failsafe: 500},
-                                        {prop: "height", duration: "300ms", end_val: height + "px", failsafe: 500},
-                                        {prop: "width",  duration: "300ms", end_val: width  + "px", failsafe: 500}
-                                    ], transition_callback);
-                                } else {
-                                    /// When the screen changes size after the callout is already large, just resize the callout as quickly as possible.
-                                    callout.style.top    = top    + "px";
-                                    callout.style.left   = left   + "px";
-                                    callout.style.height = height + "px";
-                                    callout.style.width  = width  + "px";
-                                }
-                            } else {
-                                /// Align the callout to a specific word.
-                                new_pos = calculate_pos(callout, pointer, point_to, pos, split_info);
-                                if (new_pos) {
-                                    pos.top  = new_pos.top;
-                                    pos.left = new_pos.left;
-                                    callout.style.top  = pos.top  + "px";
-                                    callout.style.left = pos.left + "px";
-                                    pointer.className = new_pos.pointerClassName;
-                                    pointer.style.left = new_pos.pointer_left + "px";
-                                }
-                            }
-                        },
-                        /**
-                         * Delete the callout and stop the query, if it has not already.
-                         */
-                        destroy: function ()
-                        {
+                            },
                             /**
-                             * Actually remove the callout from the HTML tree.
+                             * Using outer variables, call the aligning function.
                              *
-                             * @note This is a separate function to prevent code reduplication.
+                             * @param smooth              (boolean)  (optional) Whether or not to transition the alignment. This is used only when transitioning between small and large callout sizes.
+                             * @param transition_callback (function) (optional) A callback after the smooth transition completes.  Requires the smooth parameter to be TRUE.
                              */
-                            function remove_this_callout()
+                            align: function (smooth, transition_callback)
                             {
-                                document.body.removeChild(callout);
-                            }
-                            
-                            /// In case the data is still loading, try to abort the request.
-                            ajax.abort();
-                            
-                            /// If the callout is transitioning, the BF.hide_callout_details() function will refuse to remove the callout to prevent the user from accidentally closing it too fast.
-                            /// For example, if the user double clicked the "More" button, it might trigger the BF.hide_callout_details() function.
-                            /// Therefore, we need to wait until it is done transitioning, which should be momentarily.
-                            ///NOTE: The callout_obj variable must be used, not the "this" object.
-                            if (callout_obj.transitioning) {
-                                window.setTimeout(callout_obj.destroy, 50);
-                            } else {
-                                /// Is the callout maximized?  If so, it will need to be shrunk and then removed.
-                                if (BF.hide_callout_details) {
-                                    BF.hide_callout_details(remove_this_callout);
-                                    /// Hide the callout now, and remove it after the transitioning is complete (via remove_this_callout()).
-                                    callout.style.display = "none";
-                                } else {
-                                    remove_this_callout();
+                                var height,
+                                    left,
+                                    new_pos,
+                                    top,
+                                    width;
+                                
+                                if (!callout || !pointer) {
+                                    return;
                                 }
-                            }
-                        },
-                        find_point_to_el: function ()
-                        {
-                            /// Does the point_to element still exist and is still attached to the DOM?
-                            if (point_to && point_to.parentNode) {
-                                return point_to;
-                            }
-                            
-                            /// Try looking for a new point_to element.
-                            return document.getElementById(this.id);
-                        },
-                        /**
-                         * Move the callout up or down.
-                         *
-                         * @param y (number) The amount to move vertically.
-                         */
-                        move: function (y)
-                        {
-                            pos.top += y;
-                            /// Is the callout small?  Only small callouts need to be moved since detailed callouts have fixed position,
-                            /// but when the large callouts transition to small ones, they need to know the correct position to return to.
-                            if (!this.showing_details) {
-                                callout.style.top = pos.top + "px";
-                            }
-                        },
-                        /**
-                         * Determine if the element that the callout is pointing to still exists.
-                         *
-                         * @return Boolean
-                         * @note   The element the callout is pointing to could be removed when verses are cached.
-                         */
-                        point_to_el_exists: function ()
-                        {
-                            return !point_to ? false : Boolean(point_to.parentNode);
-                        },
-                        /**
-                         * Write HTML to the callout.
-                         *
-                         * Also prevent the loading notifier from loading, if it has not already appeared
-                         * and resize the callout if needed.
-                         *
-                         * @param html (string OR DOM element) The HTML or DOM element display in the callout.
-                         */
-                        replace_HTML: function (html)
-                        {
-                            /// Prevent the loading graphic from loading if it has not loaded yet.
-                            window.clearTimeout(loading_timer);
-                            /// Write the HTML, either via a string or DOM element.
-                            if (typeof html === "string") {
-                                inside.innerHTML = html;
-                            } else {
-                                inside.innerHTML = "";
-                                inside.appendChild(html);
-                            }
-                            
-                            /// Make sure that the content fits without scrolling.
-                            this.adjust_height();
-                        },
-                        /**
-                         * Show details about the word
-                         *
-                         * @param data (object) An object containing the details of the word.
-                         */
-                        show_details: function (ignore_state)
-                        {
-                            var highlight_terms,
-                                that = this;
-                            
-                            /// Ignore all other requests while this (or another) callout is transitioning.
-                            if (this.transitioning) {
-                                return;
-                            }
-                            
-                            /// If another callout is already larger, it must be shrunk first.
-                            /// If no callouts are larger, this variable will be falsey.
-                            if (BF.hide_callout_details) {
+                                
+                                /// If the callout is showing details, it should be made to fill most of the screen.
+                                if (this.showing_details) {
+                                    /// Place the callout just below the bottom of the top bar.
+                                    top    = (context.system.properties.topBar_height + 10);
+                                    height = ((context.system.properties.viewport.height - top) * 0.85);
+                                    /// Since 800 pixels is the max width of the scroll, make sure to make the callout no bigger.
+                                    ///NOTE: It might be good to have this number set in a variable.
+                                    width = (context.system.properties.viewport.width > 800 ? 800 : context.system.properties.viewport.width) * 0.85;
+                                    left  = (context.system.properties.viewport.width / 2) - (width / 2);
+                                    
+                                    /// This is used the first time to transition from small to large.
+                                    if (smooth) {
+                                        BF.transition(callout, [
+                                            ///NOTE: This is not the best place to calculate start_val. This only works when assuming it used to have position absolute.
+                                            ///NOTE: Could use transform: translate(x, y) to possibly optimize the transition.
+                                            ///      The easiest way to do that would be to set the top and left to 0 and translate from there.
+                                            {prop: "top",    duration: "300ms", end_val: top    + "px", failsafe: 500},
+                                            {prop: "left",   duration: "300ms", end_val: left   + "px", failsafe: 500},
+                                            {prop: "height", duration: "300ms", end_val: height + "px", failsafe: 500},
+                                            {prop: "width",  duration: "300ms", end_val: width  + "px", failsafe: 500}
+                                        ], transition_callback);
+                                    } else {
+                                        /// When the screen changes size after the callout is already large, just resize the callout as quickly as possible.
+                                        callout.style.top    = top    + "px";
+                                        callout.style.left   = left   + "px";
+                                        callout.style.height = height + "px";
+                                        callout.style.width  = width  + "px";
+                                    }
+                                } else {
+                                    /// Align the callout to a specific word.
+                                    new_pos = calculate_pos(callout, pointer, point_to, pos, split_info);
+                                    if (new_pos) {
+                                        pos.top  = new_pos.top;
+                                        pos.left = new_pos.left;
+                                        callout.style.top  = pos.top  + "px";
+                                        callout.style.left = pos.left + "px";
+                                        pointer.className = new_pos.pointerClassName;
+                                        pointer.style.left = new_pos.pointer_left + "px";
+                                    }
+                                }
+                            },
+                            /**
+                             * Delete the callout and stop the query, if it has not already.
+                             */
+                            remove: function (callback)
+                            {
                                 /**
-                                 * Open the callout after the other one shrink.
+                                 * Actually remove the callout from the HTML tree.
                                  *
-                                 * @note Because it needs to use the same context (i.e., the "this" variable; a.k.a. "that"), we need to wrap show_details in another function.
+                                 * @note This is a separate function to prevent code reduplication.
                                  */
-                                BF.hide_callout_details(function ()
+                                function remove_this_callout()
                                 {
-                                    that.show_details();
-                                });
-                                
-                                /// Stop the current function and wait for the other callout to shrink.
-                                return;
-                            }
-                            
-                            /// The "transitioning" property is used to prevent other callouts from being enlarged or this one from shrinking until after the transition has completed..
-                            ///NOTE: It needs to be set down here (after checking for BF.hide_callout_details() because BF.hide_callout_details() also sets "transitioning" to TRUE.
-                            this.transitioning = true;
-                            
-                            /**
-                             * Return this callout to its initial (smaller) state.
-                             *
-                             * @param callback     (function) (optional) A function to call after the callout's details are hidden.
-                             * @param ignore_state (boolean)  (optional) Whether or not to push the history's state.
-                             * @note  This variable was declared at the outset of the callout closure to allow other functions to call it.
-                             * @note  This function is called by the remove() function below before attempting to remove callouts.
-                             * @note  This function can be called by another callout that wants to be enlarged.
-                             * @todo  Make a BF.callout_manager object that can handle this type of thing.
-                             */
-                            BF.hide_callout_details = function (callback, ignore_state)
-                            {
-                                /// First, shrink this callout.
-                                that.hide_details(function ()
-                                {
-                                    /// After the callout has shrunk, remove this function.
-                                    BF.hide_callout_details = null;
-                                    
-                                    /// Possibly call a callout (e.g., maximize another callout).
+                                    document.body.removeChild(callout);
+                                    callout = null;
                                     if (typeof callback === "function") {
                                         callback();
                                     }
-                                }, ignore_state);
-                            };
-                            
-                            this.transition_cue.initialize(function on_transition_end()
-                            {
-                                ///NOTE: A short delay after the transition completes is to make sure that the browser has time to update the screen.
-                                window.setTimeout(function ()
-                                {
-                                    that.transitioning = false;
-                                }, 50);
-                            }, 1000);
-                            
-                            /// Get the current width and height of the element so that when it can return to its original size later.
-                            ///NOTE: The offset and client widths and heights are incorrect, so we must use the CSS style (which includes units).
-                            pos.css_height = window.getComputedStyle(callout).height;
-                            pos.css_width  = window.getComputedStyle(callout).width;
-                            
-                            /// Create a blank element used to fade out the text.
-                            transparent_el = document.createElement("div");
-                            transparent_el.className = "transparent_el";
-                            transparent_el.style.opacity = 0;
-                            transparent_el.style.position = "fixed";
-                            ///NOTE: Could set this to the position of the top bar if it updated when/if the top bar changes sizes (which it cannot do currently).
-                            transparent_el.style.top    = 0;
-                            transparent_el.style.bottom = 0;
-                            transparent_el.style.left   = 0;
-                            transparent_el.style.right  = 0;
-                            /// Allow mouse clicks to go through it.
-                            transparent_el.style.pointerEvents = "none";
-                            transparent_el.style.zIndex = 10;
-                            document.body.insertBefore(transparent_el, null);
-                            
-                            this.transition_cue.add();
-                            /// Fade in the transparent element.
-                            /// There is a short delay to let the callout start moving.
-                            BF.transition(transparent_el, {prop: "opacity", duration: "250ms", end_val: 0.7, timing: "steps(3, start)", delay: "50ms", failsafe: 500}, function ()
-                            {
-                                that.transition_cue.remove();
-                            });
-                            
-                            /// Make sure the callout appears above the semi-transparent element used to fade out the text.
-                            callout.style.zIndex = 99;
-                            
-                            this.transition_cue.add();
-                            /// Fade out the pointer.
-                            BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 0, failsafe: 500}, function ()
-                            {
-                                /// Hide the pointer after transitioning.
-                                pointer.style.display = "none";
-                                that.transition_cue.remove();
-                            });
-                            
-                            ///NOTE: Small callouts are absolutely positioned, so if transitioning from small to larger (which should be the case),
-                            ///      it will need to be repositioned.
-                            if (callout.style.position !== "fixed") {
-                                callout.style.position = "fixed";
-                                /// Due to switching between absolute and fixed positioning, the callout's position must be recalculated
-                                /// in order for it to appear in the correct spot on the screen.
-                                /// Furthermore, this must be done before the callout's begins to transiting from small to large;
-                                /// otherwise, it would try to animate from the wrong position.
-                                callout.style.top  = (callout.offsetTop  - window.pageYOffset) + "px";
-                                callout.style.left = (callout.offsetLeft - window.pageXOffset) + "px";
-                            }
-                            
-                            this.transition_cue.add();
-                            /// Tell the callout to transition to a larger font size for certain words.
-                            window.setTimeout(function ()
-                            {
-                                callout.classList.add("large_callout");
-                                that.transition_cue.remove();
-                            }, 0);
-                            
-                            this.transition_cue.add();
-                            /// While the callout is transitioning, switch the CSS to hide certain content and show others.
-                            /// E.g., the "more" button is hidden when showing details.
-                            window.setTimeout(function ()
-                            {
-                                callout.classList.add("detailed_callout");
-                                that.transition_cue.remove();
-                            }, 200);
-                            
-                            ///NOTE: This is used by .align() to know how the callout should be aligned.
-                            this.showing_details = true;
-                            
-                            /// Resize the callout to take up more of the screen.
-                            this.align(true);
-                            
-                            if (!ignore_state) {
-                                highlight_terms = BF.get_highlighted_terms();
-                                /// Change the URL to allow linking to this specific resource.
-                                /// In order to prevent the page from jumping up and down when the history changes (e.g., the back button is pressed) save the top verse as the actual position.
-                                ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
-                                BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(BF.get_ref_from_word_id(this.id) + (highlight_terms ? " {{" + highlight_terms + "}}" : "")) + "/" + this.id  + "/", {position: context.content_manager.top_verse});
-                            }
-                        },
-                        hide_details: function (callback, ignore_state)
-                        {
-                            var has_point_to,
-                                highlight_terms,
-                                new_pos,
-                                that = this,
-                                url_component;
-                            
-                            /// Ignore all other requests while this (or another) callout is transitioning.
-                            if (this.transitioning) {
-                                return;
-                            }
-                            
-                            /// The "transitioning" property is used to prevent other callouts from being enlarged or this one from shrinking until after the transition has completed..
-                            this.transitioning = true;
-                            
-                            has_point_to = this.point_to_el_exists();
-                            if (!has_point_to) {
-                                point_to = this.find_point_to_el();
-                                has_point_to = Boolean(point_to);
-                            }
-                            /// Was the callout never aligned to a word?
-                            ///NOTE: This happens when the callout stated out maximized.
-                            if ((typeof pos.top === "undefined" || typeof pos.left === "undefined") && has_point_to) {
-                                new_pos = calculate_pos(callout, pointer, point_to, pos, split_info);
-                                if (new_pos) {
-                                    pos.top = new_pos.top;
-                                    pos.left = new_pos.left;
                                 }
-                            }
-                            
-                            ///FIXME: This does not work.
-                            if (has_point_to) {
-                                this.transition_cue.initialize(function ()
+                                
+                                /// In case the data is still loading, try to abort the request.
+                                ajax.abort();
+                                
+                                /// If the callout is transitioning, the BF.hide_callout_details() function will refuse to remove the callout to prevent the user from accidentally closing it too fast.
+                                /// For example, if the user double clicked the "More" button, it might trigger the BF.hide_callout_details() function.
+                                /// Therefore, we need to wait until it is done transitioning, which should be momentarily.
+                                ///NOTE: The callout_obj variable must be used, not the "this" object.
+                                if (callout_obj.transitioning) {
+                                    window.setTimeout(callout_obj.remove, 50);
+                                } else {
+                                    /// Is the callout maximized?  If so, it will need to be shrunk and then removed.
+                                    if (BF.hide_callout_details) {
+                                        BF.hide_callout_details(remove_this_callout);
+                                        /// Hide the callout now, and remove it after the transitioning is complete (via remove_this_callout()).
+                                        callout.style.display = "none";
+                                    } else {
+                                        remove_this_callout();
+                                    }
+                                }
+                            },
+                            find_point_to_el: function ()
+                            {
+                                /// Does the point_to element still exist and is still attached to the DOM?
+                                if (point_to && point_to.parentNode) {
+                                    return point_to;
+                                }
+                                
+                                /// Try looking for a new point_to element.
+                                return document.getElementById(this.id);
+                            },
+                            /**
+                             * Move the callout up or down.
+                             *
+                             * @param y (number) The amount to move vertically.
+                             */
+                            move: function (y)
+                            {
+                                pos.top += y;
+                                /// Is the callout small?  Only small callouts need to be moved since detailed callouts have fixed position,
+                                /// but when the large callouts transition to small ones, they need to know the correct position to return to.
+                                if (!this.showing_details) {
+                                    callout.style.top = pos.top + "px";
+                                }
+                            },
+                            /**
+                             * Determine if the element that the callout is pointing to still exists.
+                             *
+                             * @return Boolean
+                             * @note   The element the callout is pointing to could be removed when verses are cached.
+                             */
+                            point_to_el_exists: function ()
+                            {
+                                ///NOTE: If the ID of words changes, this will not work.
+                                return !point_to ? false : Boolean(document.getElementById(id));
+                            },
+                            /**
+                             * Write HTML to the callout.
+                             *
+                             * Also prevent the loading notifier from loading, if it has not already appeared
+                             * and resize the callout if needed.
+                             *
+                             * @param html (string OR DOM element) The HTML or DOM element display in the callout.
+                             */
+                            replace_HTML: function (html)
+                            {
+                                /// Prevent the loading graphic from loading if it has not loaded yet.
+                                window.clearTimeout(loading_timer);
+                                /// Write the HTML, either via a string or DOM element.
+                                if (typeof html === "string") {
+                                    inside.innerHTML = html;
+                                } else {
+                                    inside.innerHTML = "";
+                                    inside.appendChild(html);
+                                }
+                                
+                                /// Make sure that the content fits without scrolling.
+                                this.adjust_height();
+                            },
+                            /**
+                             * Show details about the word
+                             *
+                             * @param data (object) An object containing the details of the word.
+                             */
+                            maximize: function (options)
+                            {
+                                var highlight_terms,
+                                    that = this;
+                                
+                                /// Ignore all other requests while this (or another) callout is transitioning.
+                                if (this.transitioning) {
+                                    return;
+                                }
+                                
+                                /// If another callout is already larger, it must be shrunk first.
+                                /// If no callouts are larger, this variable will be falsey.
+                                if (maximized_callout) {
+                                    /**
+                                     * Open the callout after the other one shrink.
+                                     *
+                                     * @note Because it needs to use the same context (i.e., the "this" variable; a.k.a. "that"), we need to wrap show_details in another function.
+                                     */
+                                    BF.callout_manager.shrink_maximized_callout(function ()
+                                    {
+                                        that.maximize(options);
+                                    });
+                                    
+                                    /// Stop the current function and wait for the other callout to shrink.
+                                    return;
+                                }
+                                
+                                if (!options) {
+                                    options = {};
+                                }
+                                
+                                /// The "transitioning" property is used to prevent other callouts from being enlarged or this one from shrinking until after the transition has completed..
+                                ///NOTE: It needs to be set down here (after checking for BF.hide_callout_details() because BF.hide_callout_details() also sets "transitioning" to TRUE.
+                                this.transitioning = true;
+                                
+                                this.transition_cue.initialize(function on_transition_end()
                                 {
                                     ///NOTE: A short delay after the transition completes is to make sure that the browser has time to update the screen.
                                     window.setTimeout(function ()
                                     {
-                                        /// Set this first in case the following functions throw an error.
                                         that.transitioning = false;
                                         
-                                        /// Because some things in the callout may have been changed by the user, check the height after transitioning back to a small callout.
-                                        /// E.g., Go to Matthew 1:11, click "Babylon," click "[+] more," change the pronunciation key to "(Modern)," then click off of the callout.
-                                        that.adjust_height();
-                                        
-                                        /// Realign the callout in case the user scrolled, and therefore the callout may not be entirely viewable. 
-                                        that.align();
-                                        
-                                        /// Possibly call a callout (e.g., enlarge another callout).
-                                        if (typeof callback === "function") {
-                                            callback();
+                                        if (options.callback) {
+                                            options.callback();
                                         }
                                     }, 50);
                                 }, 1000);
                                 
+                                /// Get the current width and height of the element so that when it can return to its original size later.
+                                ///NOTE: The offset and client widths and heights are incorrect, so we must use the CSS style (which includes units).
+                                pos.css_height = window.getComputedStyle(callout).height;
+                                pos.css_width  = window.getComputedStyle(callout).width;
+                                
+                                /// Create a blank element used to fade out the text.
+                                transparent_el = document.createElement("div");
+                                transparent_el.className = "transparent_el";
+                                transparent_el.style.opacity = 0;
+                                transparent_el.style.position = "fixed";
+                                ///NOTE: Could set this to the position of the top bar if it updated when/if the top bar changes sizes (which it cannot do currently).
+                                transparent_el.style.top    = 0;
+                                transparent_el.style.bottom = 0;
+                                transparent_el.style.left   = 0;
+                                transparent_el.style.right  = 0;
+                                /// Allow mouse clicks to go through it.
+                                transparent_el.style.pointerEvents = "none";
+                                transparent_el.style.zIndex = 10;
+                                document.body.insertBefore(transparent_el, null);
+                                
                                 this.transition_cue.add();
-                                BF.transition(transparent_el, {prop: "opacity", duration: "250ms", end_val: "0", timing: "steps(3, start)", delay: "50ms", failsafe: 500}, function ()
+                                /// Fade in the transparent element.
+                                /// There is a short delay to let the callout start moving.
+                                BF.transition(transparent_el, {prop: "opacity", duration: "250ms", end_val: 0.7, timing: "steps(3, start)", delay: "50ms", failsafe: 500}, function ()
                                 {
-                                    /// Remove from DOM and destroy the temporary transparent element.
-                                    document.body.removeChild(transparent_el);
-                                    transparent_el = null;
-                                    
-                                    /// Make the callout on the same level as other callouts.
-                                    /// Since we do not want the callout to displayed below the transparent element,
-                                    /// we must change the z-index here, after has completely faded away.
-                                    callout.style.zIndex = 0;
+                                    that.transition_cue.remove();
+                                });
+                                
+                                /// Make sure the callout appears above the semi-transparent element used to fade out the text.
+                                callout.style.zIndex = 99;
+                                
+                                this.transition_cue.add();
+                                /// Fade out the pointer.
+                                BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 0, failsafe: 500}, function ()
+                                {
+                                    /// Hide the pointer after transitioning.
+                                    pointer.style.display = "none";
                                     that.transition_cue.remove();
                                 });
                                 
                                 ///NOTE: Small callouts are absolutely positioned, so if transitioning from small to larger (which should be the case),
                                 ///      it will need to be repositioned.
-                                if (callout.style.position !== "absolute") {
-                                    callout.style.position = "absolute";
+                                if (callout.style.position !== "fixed") {
+                                    callout.style.position = "fixed";
                                     /// Due to switching between absolute and fixed positioning, the callout's position must be recalculated
                                     /// in order for it to appear in the correct spot on the screen.
                                     /// Furthermore, this must be done before the callout's begins to transiting from small to large;
                                     /// otherwise, it would try to animate from the wrong position.
-                                    callout.style.top  = (callout.offsetTop  + window.pageYOffset) + "px";
-                                    callout.style.left = (callout.offsetLeft + window.pageXOffset) + "px";
+                                    callout.style.top  = (callout.offsetTop  - window.pageYOffset) + "px";
+                                    callout.style.left = (callout.offsetLeft - window.pageXOffset) + "px";
                                 }
                                 
                                 this.transition_cue.add();
-                                /// Fade in the pointer.
-                                pointer.style.display = "block";
-                                BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 1, failsafe: 500}, function ()
+                                /// Tell the callout to transition to a larger font size for certain words.
+                                window.setTimeout(function ()
                                 {
+                                    callout.classList.add("large_callout");
                                     that.transition_cue.remove();
-                                });
-                                
-                                ///FIXME: Prevent other transitions.
-                                if (typeof pos.top === "undefined" || typeof pos.left === "undefined") {
-                                    this.transition_cue.add();
-                                    BF.transition(callout, {prop: "opacity", duration: "300ms", start_val: 1, end_val: 0, failsafe: 500}, function ()
-                                    {
-                                        that.transition_cue.remove();
-                                        BF.remove_callout(that.id);
-                                    });
-                                } else {
-                                
-                                    this.transition_cue.add();
-                                    
-                                    /// Resize the callout to take up more of the screen.
-                                    BF.transition(callout, [
-                                        ///NOTE: Could use transform: translate(x, y) to possibly optimize the transition.
-                                        ///NOTE: It tries to use the previous height and width of the callout before it enlarged,
-                                        ///      and if that does not work, it uses the defaults.
-                                        ///      E.g., go to Ezekiel 18:5 and click the word "which." Then click more, and then click off of the callout.
-                                        {prop: "top",    duration: "300ms", end_val: pos.top  + "px",             failsafe: 5000},
-                                        {prop: "left",   duration: "300ms", end_val: pos.left + "px",             failsafe: 5000},
-                                        {prop: "height", duration: "300ms", end_val: (pos.css_height || "125px"), failsafe: 5000},
-                                        {prop: "width",  duration: "300ms", end_val: (pos.css_width  || "300px"), failsafe: 5000}
-                                    ], function ()
-                                    {
-                                        that.transition_cue.remove();
-                                    });
-                                }
+                                }, 0);
                                 
                                 this.transition_cue.add();
                                 /// While the callout is transitioning, switch the CSS to hide certain content and show others.
                                 /// E.g., the "more" button is hidden when showing details.
                                 window.setTimeout(function ()
                                 {
-                                    callout.classList.remove("detailed_callout");
+                                    callout.classList.add("detailed_callout");
                                     that.transition_cue.remove();
                                 }, 200);
                                 
-                                this.transition_cue.add();
-                                /// Tell the callout to transition to a small font size for certain words.
-                                window.setTimeout(function ()
-                                {
-                                    callout.classList.remove("large_callout");
-                                    that.transition_cue.remove();
-                                }, 0);
+                                ///NOTE: This is used by .align() to know how the callout should be aligned.
+                                this.showing_details = true;
                                 
-                                this.showing_details = false;
-                            } else {
-                                /// Remove from DOM and destroy the temporary transparent element.
-                                document.body.removeChild(transparent_el);
-                                transparent_el = null;
-                                BF.remove_callout(this.id);
-                            }
-                            
-                            if (!ignore_state) {
-                                /// Change state now that the callout is not maximized to point to the top verse.
-                                highlight_terms = BF.get_highlighted_terms();
+                                /// Resize the callout to take up more of the screen.
+                                this.align(true);
                                 
-                                if (context.settings.user.last_query.type === BF.consts.verse_lookup) {
-                                    /// If the last query was a lookup, use the current verse as verse reference for the URL plus any highlighted terms.
-                                    url_component = BF.create_ref(context.content_manager.top_verse) + (highlight_terms ? " {{" + highlight_terms + "}}" : "");
-                                } else {
-                                    /// If the last query was a search, just put the search terms back in the URL.
-                                    url_component = context.settings.user.last_query.raw_query;
+                                if (!options.ignore_state) {
+                                    highlight_terms = BF.get_highlighted_terms();
+                                    /// Change the URL to allow linking to this specific resource.
+                                    /// In order to prevent the page from jumping up and down when the history changes (e.g., the back button is pressed) save the top verse as the actual position.
+                                    ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
+                                    BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(BF.get_ref_from_word_id(this.id) + (highlight_terms ? " {{" + highlight_terms + "}}" : "")) + "/" + this.id  + "/", {position: context.content_manager.top_verse});
                                 }
                                 
-                                BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(url_component) + "/");
-                            }
-                        },
-                        /**
-                         * Handel sets of CSS transition.
-                         *
-                         * This object is used to keep track of the progress a series of CSS transition.
-                         * This is used to be able to trigger a callback after all of the transitions are completed.
-                         * TODO: Move this to its own module. Perhaps BF.create_transition_cue().
-                         */
-                        transition_cue: (function ()
-                        {
-                            ///FIXME: This needs to get generated each time too.
-                            var callback,
-                                cue,
-                                failsafe_timeout;
-                            
-                            function done()
+                                maximized_callout = id;
+                            },
+                            shrink: function (callback, ignore_state)
                             {
-                                window.clearTimeout(failsafe_timeout);
+                                var has_point_to,
+                                    highlight_terms,
+                                    new_pos,
+                                    that = this,
+                                    url_component;
                                 
-                                if (typeof callback === "function") {
-                                    callback();
-                                    callback = null;
+                                /// Ignore all other requests while this (or another) callout is transitioning.
+                                if (this.transitioning) {
+                                    return;
                                 }
-                            }
-                            
-                            return {
-                                /**
-                                 * Increment the cue.
-                                 */
-                                add: function ()
-                                {
-                                    cue += 1;
-                                },
-                                /**
-                                 * Initialize a new cue.
-                                 *
-                                 * @param func     (function)          A callback function to be called when the cue reaches zero.
-                                 * @param failsafe (number) (optional) How long to wait before triggering 
-                                 */
-                                initialize: function (func, failsafe)
-                                {
-                                    callback = func;
-                                    cue = 0;
+                                
+                                /// The "transitioning" property is used to prevent other callouts from being enlarged or this one from shrinking until after the transition has completed..
+                                this.transitioning = true;
+                                
+                                has_point_to = this.point_to_el_exists();
+                                if (!has_point_to) {
+                                    point_to = this.find_point_to_el();
+                                    has_point_to = Boolean(point_to);
+                                }
+                                /// Was the callout never aligned to a word?
+                                ///NOTE: This happens when the callout stated out maximized.
+                                if ((typeof pos.top === "undefined" || typeof pos.left === "undefined") && has_point_to) {
+                                    new_pos = calculate_pos(callout, pointer, point_to, pos, split_info);
+                                    if (new_pos) {
+                                        pos.top = new_pos.top;
+                                        pos.left = new_pos.left;
+                                    }
+                                }
+                                
+                                ///FIXME: This does not work.
+                                if (has_point_to) {
+                                    this.transition_cue.initialize(function ()
+                                    {
+                                        ///NOTE: A short delay after the transition completes is to make sure that the browser has time to update the screen.
+                                        window.setTimeout(function ()
+                                        {
+                                            /// Set this first in case the following functions throw an error.
+                                            that.transitioning = false;
+                                            
+                                            /// Because some things in the callout may have been changed by the user, check the height after transitioning back to a small callout.
+                                            /// E.g., Go to Matthew 1:11, click "Babylon," click "[+] more," change the pronunciation key to "(Modern)," then click off of the callout.
+                                            that.adjust_height();
+                                            
+                                            /// Realign the callout in case the user scrolled, and therefore the callout may not be entirely viewable. 
+                                            that.align();
+                                            
+                                            maximized_callout = undefined;
+                                            
+                                            /// Possibly call a callout (e.g., enlarge another callout).
+                                            if (typeof callback === "function") {
+                                                callback();
+                                            }
+                                        }, 50);
+                                    }, 1000);
                                     
-                                    failsafe = Number(failsafe);
-                                    if (failsafe > 0) {
-                                        failsafe_timeout = window.setTimeout(done, failsafe);
+                                    this.transition_cue.add();
+                                    BF.transition(transparent_el, {prop: "opacity", duration: "250ms", end_val: "0", timing: "steps(3, start)", delay: "50ms", failsafe: 500}, function ()
+                                    {
+                                        /// Remove from DOM and destroy the temporary transparent element.
+                                        document.body.removeChild(transparent_el);
+                                        transparent_el = null;
+                                        
+                                        /// Make the callout on the same level as other callouts.
+                                        /// Since we do not want the callout to displayed below the transparent element,
+                                        /// we must change the z-index here, after has completely faded away.
+                                        callout.style.zIndex = 0;
+                                        that.transition_cue.remove();
+                                    });
+                                    
+                                    ///NOTE: Small callouts are absolutely positioned, so if transitioning from small to larger (which should be the case),
+                                    ///      it will need to be repositioned.
+                                    if (callout.style.position !== "absolute") {
+                                        callout.style.position = "absolute";
+                                        /// Due to switching between absolute and fixed positioning, the callout's position must be recalculated
+                                        /// in order for it to appear in the correct spot on the screen.
+                                        /// Furthermore, this must be done before the callout's begins to transiting from small to large;
+                                        /// otherwise, it would try to animate from the wrong position.
+                                        callout.style.top  = (callout.offsetTop  + window.pageYOffset) + "px";
+                                        callout.style.left = (callout.offsetLeft + window.pageXOffset) + "px";
                                     }
-                                },
-                                /**
-                                 * Decrement the cue.
-                                 *
-                                 * When the cue reaches zero, execute the callback, if any.
-                                 */
-                                remove: function ()
+                                    
+                                    this.transition_cue.add();
+                                    /// Fade in the pointer.
+                                    pointer.style.display = "block";
+                                    BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 1, failsafe: 500}, function ()
+                                    {
+                                        that.transition_cue.remove();
+                                    });
+                                    
+                                    ///FIXME: Prevent other transitions.
+                                    if (typeof pos.top === "undefined" || typeof pos.left === "undefined") {
+                                        this.transition_cue.add();
+                                        BF.transition(callout, {prop: "opacity", duration: "300ms", start_val: 1, end_val: 0, failsafe: 500}, function ()
+                                        {
+                                            that.transition_cue.remove();
+                                            BF.remove_callout(that.id);
+                                        });
+                                    } else {
+                                    
+                                        this.transition_cue.add();
+                                        
+                                        /// Resize the callout to take up more of the screen.
+                                        BF.transition(callout, [
+                                            ///NOTE: Could use transform: translate(x, y) to possibly optimize the transition.
+                                            ///NOTE: It tries to use the previous height and width of the callout before it enlarged,
+                                            ///      and if that does not work, it uses the defaults.
+                                            ///      E.g., go to Ezekiel 18:5 and click the word "which." Then click more, and then click off of the callout.
+                                            {prop: "top",    duration: "300ms", end_val: pos.top  + "px",             failsafe: 5000},
+                                            {prop: "left",   duration: "300ms", end_val: pos.left + "px",             failsafe: 5000},
+                                            {prop: "height", duration: "300ms", end_val: (pos.css_height || "125px"), failsafe: 5000},
+                                            {prop: "width",  duration: "300ms", end_val: (pos.css_width  || "300px"), failsafe: 5000}
+                                        ], function ()
+                                        {
+                                            that.transition_cue.remove();
+                                        });
+                                    }
+                                    
+                                    this.transition_cue.add();
+                                    /// While the callout is transitioning, switch the CSS to hide certain content and show others.
+                                    /// E.g., the "more" button is hidden when showing details.
+                                    window.setTimeout(function ()
+                                    {
+                                        callout.classList.remove("detailed_callout");
+                                        that.transition_cue.remove();
+                                    }, 200);
+                                    
+                                    this.transition_cue.add();
+                                    /// Tell the callout to transition to a small font size for certain words.
+                                    window.setTimeout(function ()
+                                    {
+                                        callout.classList.remove("large_callout");
+                                        that.transition_cue.remove();
+                                    }, 0);
+                                    
+                                    this.showing_details = false;
+                                } else {
+                                    /// Remove from DOM and destroy the temporary transparent element.
+                                    document.body.removeChild(transparent_el);
+                                    transparent_el = null;
+                                    BF.remove_callout(this.id);
+                                }
+                                
+                                if (!ignore_state) {
+                                    /// Change state now that the callout is not maximized to point to the top verse.
+                                    highlight_terms = BF.get_highlighted_terms();
+                                    
+                                    if (context.settings.user.last_query.type === BF.consts.verse_lookup) {
+                                        /// If the last query was a lookup, use the current verse as verse reference for the URL plus any highlighted terms.
+                                        url_component = BF.create_ref(context.content_manager.top_verse) + (highlight_terms ? " {{" + highlight_terms + "}}" : "");
+                                    } else {
+                                        /// If the last query was a search, just put the search terms back in the URL.
+                                        url_component = context.settings.user.last_query.raw_query;
+                                    }
+                                    
+                                    BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(url_component) + "/");
+                                }
+                            },
+                            /**
+                             * Handel sets of CSS transition.
+                             *
+                             * This object is used to keep track of the progress a series of CSS transition.
+                             * This is used to be able to trigger a callback after all of the transitions are completed.
+                             * TODO: Move this to its own module. Perhaps BF.create_transition_cue().
+                             */
+                            transition_cue: (function ()
+                            {
+                                ///FIXME: This needs to get generated each time too.
+                                var callback,
+                                    cue,
+                                    failsafe_timeout;
+                                
+                                function done()
                                 {
-                                    cue -= 1;
-                                    if (cue <= 0) {
-                                        done();
+                                    window.clearTimeout(failsafe_timeout);
+                                    
+                                    if (typeof callback === "function") {
+                                        callback();
+                                        callback = null;
                                     }
+                                }
+                                
+                                return {
+                                    /**
+                                     * Increment the cue.
+                                     */
+                                    add: function ()
+                                    {
+                                        cue += 1;
+                                    },
+                                    /**
+                                     * Initialize a new cue.
+                                     *
+                                     * @param func     (function)          A callback function to be called when the cue reaches zero.
+                                     * @param failsafe (number) (optional) How long to wait before triggering 
+                                     */
+                                    initialize: function (func, failsafe)
+                                    {
+                                        callback = func;
+                                        cue = 0;
+                                        
+                                        failsafe = Number(failsafe);
+                                        if (failsafe > 0) {
+                                            failsafe_timeout = window.setTimeout(done, failsafe);
+                                        }
+                                    },
+                                    /**
+                                     * Decrement the cue.
+                                     *
+                                     * When the cue reaches zero, execute the callback, if any.
+                                     */
+                                    remove: function ()
+                                    {
+                                        cue -= 1;
+                                        if (cue <= 0) {
+                                            done();
+                                        }
+                                    }
+                                };
+                            }()),
+                            
+                            /// Properties
+                            id: id,
+                            just_created: true
+                        };
+                        
+                        /// Is the callout supposed to start maximized?
+                        if (detailed) {
+                            callout_obj.maximize({ignore_state: ignore_state});
+                        }
+                        
+                        /// Make the callout show up in the correct location.
+                        callout_obj.align();
+                        
+                        /// Prevent the callout from being destroyed by the document.onclick function that will fire momentarily.
+                        window.setTimeout(function ()
+                        {
+                            callout_obj.just_created = false;
+                        }, 200);
+                        
+                        return callout_obj;
+                    };
+                }());
+            
+                /**
+                 * Take the lexical data and turn it into HTML to be displayed in the callout.
+                 *
+                 * @param data (object) An object describing the lexical information of a word.
+                 */
+                display_callout = (function ()
+                {
+                
+                    /**
+                     * Create a simple drop down box element.
+                     *
+                     * @example create_drop_down_box([{display: "Option 1", details: "Option 1: The first option"}, {display: "Option 2", details: "Option 2: The second option"}]);
+                     * @example create_drop_down_box(options_from_pronun({}));
+                     * @param   options  (array)    An array of objects defining the drop down options.
+                     *                              Array structure:
+                     *                              [{display: "The text to display when selected",
+                     *                                details: "The HTML to display when the drop down menu is displayed",
+                     *                                title: "The option's tooltip (optional)"},
+                     *                               ...]
+                     * @param   select   (integer)  The option that should be selected by default
+                     * @param   onchange (function) The function triggered whenever a selection is made by the user.
+                     * @return  A DOM element representing the drop down box.
+                     */
+                    var create_drop_down_box = function (options, select, onchange)
+                    {
+                        var el = document.createElement("span"),
+                            i,
+                            menu_items = [];
+                        
+                        /**
+                         * Create the function that fires when a menu item is selected.
+                         *
+                         * @param  which (integer) The option that is selected.
+                         * @return A function that triggers the onchange callback.
+                         * @note   Since functions should not be created in loops, this function must be declared before the loop.
+                         */
+                        function make_onclick(which)
+                        {
+                            /**
+                             * Trigger the onchange callback
+                             *
+                             * @param e (event object) The onclick mouse event.
+                             */
+                            return function (e)
+                            {
+                                /// Change the text in the drop down box.
+                                el.textContent = options[which].display;
+                                /// Remember which option was last chosen.
+                                select = which;
+                                /// Do not let this mouse event cascade and cause other events to fire (like closing a lexical callout).
+                                e.stopPropagation();
+                                
+                                if (typeof onchange === "function") {
+                                    onchange(which);
                                 }
                             };
-                        }()),
+                        }
                         
-                        /// Properties
-                        id: id,
-                        just_created: true
+                        /// Create the menu items to sent to show_context_menu().
+                        for (i = options.length - 1; i >= 0; i -= 1) {
+                            menu_items[i] = {
+                                id:    i,
+                                html:  options[i].details,
+                                title: options[i].title,
+                                link:  make_onclick(i)
+                            };
+                        }
+                        
+                        el.className = "dropdown";
+                        
+                        /// Display the default text (if it exists).
+                        el.textContent = options[select] ? options[select].display : options[0].display;
+                        
+                        /**
+                         * Open the drop down menu
+                         *
+                         * @param  e (event object) The onclick mouse event.
+                         * @return FALSE to prevent the default action.
+                         * @todo   Determine if sending FALSE is necessary.
+                         */
+                        el.onclick = function (e)
+                        {
+                            show_context_menu(function ()
+                            {
+                                /// Calculate the proper location for the drop down menu.
+                                ///NOTE: Because the callout itself can have a scroll bar, we must calculate the actual position on the viewport and then add in the scroll position of the entire scroll (window.pageYOffset).
+                                ///NOTE: Because the white-space CSS style is set to "nowrap", the element will not separate; therefore, there will only be one rectangle.
+                                var el_pos = el.getClientRects()[0];
+                                
+                                /// Is the element still on the page; if not return undefined.
+                                if (el_pos) {
+                                    return {x: el_pos.left, y: el_pos.bottom + window.pageYOffset, absolute: true};
+                                }
+                            }, menu_items, select);
+                            
+                            /// Prevent the event from trigger other events, like the callout onclick event.
+                            e.stopPropagation();
+                            e.preventDefault();
+                            return false;
+                        };
+                        
+                        return el;
                     };
-                    
-                    /// Is the callout supposed to start maximized?
-                    if (detailed) {
-                        callout_obj.show_details(ignore_state);
+            
+                    /**
+                     * Create an array of options for the simple drop down box from the lexical pronunciation object.
+                     *
+                     * @param   pronun (object) The pronun property returned form a lexical lookup.
+                     * @return  An array of objects conforming to the simple drop down box's structure.
+                     * @example create_drop_down_box(options_from_pronun({}));
+                     */
+                    function options_from_pronun(pronun)
+                    {
+                        /// Thin spaces (\u2009) are placed around the words to separate them slightly from the dividing symbols.
+                        ///NOTE: The "cell" class makes the <span> tags behave like <td> tags.
+                        return [
+                            /// Biblical Reconstructed Dictionary Pronunciation
+                            {
+                                display: "|\u2009" + pronun.dic + "\u2009|",
+                                details: "<span class=cell>" + pronun.dic + "</span><span class=cell>(" + BF.lang.biblical + ")</span>",
+                                title:   BF.lang.biblical_pronun
+                            },
+                            /// Biblical Reconstructed IPA
+                            {
+                                display: "/\u2009" + pronun.ipa + "\u2009/",
+                                details: "<span class=cell>" + pronun.ipa + "</span><span class=cell>(" + BF.lang.biblical_ipa + ")</span>",
+                                title:   BF.lang.biblical_ipa_long
+                            },
+                            /// Modern Dictionary Pronunciation
+                            {
+                                display: "|\u2009" + pronun.dic_mod + "\u2009|",
+                                details: "<span class=cell>" + pronun.dic_mod + "</span><span class=cell>(" + BF.lang.modern + ")</span>",
+                                title:   BF.lang.modern_pronun
+                            },
+                            /// Modern IPA
+                            {
+                                display: "/\u2009" + pronun.ipa_mod + "\u2009/",
+                                details: "<span class=cell>" + pronun.ipa_mod + "</span><span class=cell>(" + BF.lang.modern_ipa + ")</span>",
+                                title:   BF.lang.modern_ipa
+                            },
+                            /// Society of Biblical Languages Transliteration
+                            {
+                                display: "|\u2009" + pronun.sbl + "\u2009|",
+                                details: "<span class=cell>" + pronun.sbl + "</span><span class=cell>(" + BF.lang.translit + ")</span>",
+                                title:   BF.lang.translit_long
+                            }
+                        ];
                     }
                     
-                    /// Make the callout show up in the correct location.
-                    callout_obj.align();
-                    
-                    /// Prevent the callout from being destroyed by the document.onclick function that will fire momentarily.
-                    window.setTimeout(function ()
-                    {
-                        callout_obj.just_created = false;
-                    }, 200);
-                    
-                    return callout_obj;
-                };
-            }());
-            
-            
-            /**
-             * Create a simple drop down box element.
-             *
-             * @example create_drop_down_box([{display: "Option 1", details: "Option 1: The first option"}, {display: "Option 2", details: "Option 2: The second option"}]);
-             * @example create_drop_down_box(options_from_pronun({}));
-             * @param   options  (array)    An array of objects defining the drop down options.
-             *                              Array structure:
-             *                              [{display: "The text to display when selected",
-             *                                details: "The HTML to display when the drop down menu is displayed",
-             *                                title: "The option's tooltip (optional)"},
-             *                               ...]
-             * @param   select   (integer)  The option that should be selected by default
-             * @param   onchange (function) The function trigged whenever a selection is made by the user.
-             * @return  A DOM element representing the drop down box.
-             */
-            create_drop_down_box = function (options, select, onchange)
-            {
-                var el = document.createElement("span"),
-                    i,
-                    menu_items = [];
-                
-                /**
-                 * Create the function that fires when a menu item is selected.
-                 *
-                 * @param  which (integer) The option that is selected.
-                 * @return A function that triggers the onchange callback.
-                 * @note   Since functions should not be created in loops, this function must be declared before the loop.
-                 */
-                function make_onclick(which)
-                {
                     /**
-                     * Trigger the onchange callback
+                     * Convert an array of definitions into HTML.
                      *
-                     * @param e (event object) The onclick mouse event.
+                     * @param defs (array) The array to be converted to an HTML list.
                      */
-                    return function (e)
+                    function create_long_def(defs)
                     {
-                        /// Change the text in the drop down box.
-                        el.textContent = options[which].display;
-                        /// Remember which option was last chosen.
-                        select = which;
-                        /// Do not let this mouse event cascade and cause other events to fire (like closing a lexical callout).
-                        e.stopPropagation();
+                        var li,
+                            ol = document.createElement("ol");
                         
-                        if (typeof onchange === "function") {
-                            onchange(which);
-                        }
-                    };
-                }
-                
-                /// Create the menu items to sent to show_context_menu().
-                for (i = options.length - 1; i >= 0; i -= 1) {
-                    menu_items[i] = {
-                        id:    i,
-                        html:  options[i].details,
-                        title: options[i].title,
-                        link:  make_onclick(i)
-                    };
-                }
-                
-                el.className = "dropdown";
-                
-                /// Display the default text (if it exists).
-                el.textContent = options[select] ? options[select].display : options[0].display;
-                
-                /**
-                 * Open the drop down menu
-                 *
-                 * @param  e (event object) The onclick mouse event.
-                 * @return FALSE to prevent the default action.
-                 * @todo   Determine if sending FALSE is necessary.
-                 */
-                el.onclick = function (e)
-                {
-                    show_context_menu(function ()
-                    {
-                        /// Calculate the proper location for the drop down menu.
-                        ///NOTE: Because the callout itself can have a scroll bar, we must calculate the actual position on the viewport and then add in the scroll position of the entire scroll (window.pageYOffset).
-                        ///NOTE: Because the white-space CSS style is set to "nowrap", the element will not separate; therefore, there will only be one rectangle.
-                        var el_pos = el.getClientRects()[0];
-                        
-                        /// Is the element still on the page; if not return undefined.
-                        if (el_pos) {
-                            return {x: el_pos.left, y: el_pos.bottom + window.pageYOffset, absolute: true};
-                        }
-                    }, menu_items, select);
-                    
-                    /// Prevent the event from trigger other events, like the callout onclick event.
-                    e.stopPropagation();
-                    e.preventDefault();
-                    return false;
-                };
-                
-                return el;
-            };
-            
-            /**
-             * Create the callouts array and attach the event functions.
-             */
-            (function ()
-            {
-                var callouts  = [],
-                    lex_cache = {},
-                    remove;
-                
-                /// Create the user.expanad_def property to be able to save the settings when changed.
-                context.settings.add_property(context.settings.user, "expand_def", typeof context.settings.user.expanad_def === "undefined" ? true : context.settings.user.expanad_def);
-                
-                /// Since this is not styled by initially, it needs to be set now.
-                if (BF.lang.linked_to_orig) {
-                    page.classList.add("linked");
-                }
-                
-                /// Initialize the settings.user.pronun_type setting.
-                context.settings.add_property(context.settings.user, "pronun_type", 0);
-                
-                (function ()
-                {
-                    /**
-                     * Take the lexical data and turn it into HTML to be displayed in the callout.
-                     *
-                     * @param data (object) An object describing the lexical information of a word.
-                     */
-                    var display_callout = (function ()
-                    {
-                        /**
-                         * Create an array of options for the simple drop down box from the lexical pronunciation object.
-                         *
-                         * @param   pronun (object) The pronun property returned form a lexical lookup.
-                         * @return  An array of objects conforming to the simple drop down box's structure.
-                         * @example create_drop_down_box(options_from_pronun({}));
-                         */
-                        function options_from_pronun(pronun)
+                        defs.forEach(function (def)
                         {
-                            /// Thin spaces (\u2009) are placed around the words to separate them slightly from the dividing symbols.
-                            ///NOTE: The "cell" class makes the <span> tags behave like <td> tags.
-                            return [
-                                /// Biblical Reconstructed Dictionary Pronunciation
-                                {
-                                    display: "|\u2009" + pronun.dic + "\u2009|",
-                                    details: "<span class=cell>" + pronun.dic + "</span><span class=cell>(" + BF.lang.biblical + ")</span>",
-                                    title:   BF.lang.biblical_pronun
-                                },
-                                /// Biblical Reconstructed IPA
-                                {
-                                    display: "/\u2009" + pronun.ipa + "\u2009/",
-                                    details: "<span class=cell>" + pronun.ipa + "</span><span class=cell>(" + BF.lang.biblical_ipa + ")</span>",
-                                    title:   BF.lang.biblical_ipa_long
-                                },
-                                /// Modern Dictionary Pronunciation
-                                {
-                                    display: "|\u2009" + pronun.dic_mod + "\u2009|",
-                                    details: "<span class=cell>" + pronun.dic_mod + "</span><span class=cell>(" + BF.lang.modern + ")</span>",
-                                    title:   BF.lang.modern_pronun
-                                },
-                                /// Modern IPA
-                                {
-                                    display: "/\u2009" + pronun.ipa_mod + "\u2009/",
-                                    details: "<span class=cell>" + pronun.ipa_mod + "</span><span class=cell>(" + BF.lang.modern_ipa + ")</span>",
-                                    title:   BF.lang.modern_ipa
-                                },
-                                /// Society of Biblical Languages Transliteration
-                                {
-                                    display: "|\u2009" + pronun.sbl + "\u2009|",
-                                    details: "<span class=cell>" + pronun.sbl + "</span><span class=cell>(" + BF.lang.translit + ")</span>",
-                                    title:   BF.lang.translit_long
-                                }
-                            ];
-                        }
-                        
-                        /**
-                         * Convert an array of definitions into HTML.
-                         *
-                         * @param defs (array) The array to be converted to an HTML list.
-                         */
-                        function create_long_def(defs)
-                        {
-                            var li,
-                                ol = document.createElement("ol");
-                            
-                            defs.forEach(function (def)
-                            {
-                                /// If it is a string, add the element.
-                                if (typeof def === "string") {
-                                    li = document.createElement("li");
-                                    li.textContent = def;
-                                    ol.appendChild(li);
-                                } else {
-                                    /// If it is not a string, it must be an array, so recursively call the function.
-                                    ol.appendChild(create_long_def(def));
-                                }
-                            });
-                            
-                            return ol;
-                        }
-                        
-                        /**
-                         * Add content to the callout.
-                         *
-                         * @param callout (object) The callout object
-                         * @param data    (object) An object containing info to be placed into the callout
-                         */
-                        return function display_callout(callout, data)
-                        {
-                            /// data Object structure:
-                            /// word      (string)  The original Greek, Hebrew, or Aramaic word, in Unicode.
-                            /// pronun    (string)  A JSON string containing the pronunciation of the word (same as data.pronun below except for the actual word, not the base form).
-                            /// strongs   (integer) The designated Strong's number for that word.
-                            /// base_word (string)  The original Greek, Hebrew, or Aramaic base form of the word, in Unicode.
-                            /// data      (string)  A JSON object containing the lexical information about the word.
-                            ///                     Object structure:
-                            ///                     def: {lit:    "The literal definition of a word (especially a name)",
-                            ///                           long:  ["A multi-dimensional array of various possible definitions"],
-                            ///                           short:  "A short and simple definition"}
-                            ///                     deriv:  "Information about words this word is derived from",
-                            ///                     pronun: {ipa:     "IPA Biblical reconstructed pronunciation (base form)",
-                            ///                              ipa_mod: "IPA modern pronunciation (base form)",
-                            ///                              dic:     "Dictionary Biblical reconstructed pronunciation (base form)",
-                            ///                              dic_mod: "Dictionary modern pronunciation (base form)",
-                            ///                              sbl:     "The Society of Biblical Literature's phonemic transliteration"}
-                            ///                     see:    ["An array of Strong's numbers identifying additional words of interest."]
-                            ///                     comment: "A string containing additional useful information"
-                            /// usage     (string)  A list of ways the word is translated.
-                            ///NOTE: The usage data is planned to be completely redone and expanded.
-                            ///NOTE: Also, any number of the following:
-                            ///TODO: Document more fully.
-                            /// part_of_speech, declinability, case_5, number, gender, degree, tense, voice, mood, person, middle, transitivity, miscellaneous, noun_type, numerical, form, dialect, type, pronoun_type
-                            
-                            var child_el,
-                                html,
-                                lex_data,
-                                more_el,
-                                parent_el;
-                            
-                            /// Did the query return any results?
-                            if (data.word) {
-                                lex_data = JSON.parse(data.data);
-                                
-                                /// DOM Structure:
-                                ///   ┌─►lex-title
-                                ///   │   ├─►lex-orig_word
-                                ///   │   ├─►text node (space)
-                                ///   │   └─►pronunciation drop down box
-                                ///   └─►lex-body
-                                ///       ├─►literal definition (optional)
-                                ///       └─►short definition
-                                ///         └─►more-button-buffer
-                                ///         └─►more-button
-                                
-                                /// Create a lightweight container for the DOM elements.
-                                ///NOTE: The fragment is discarded when attached to the DOM tree and only its children remain.
-                                html = document.createDocumentFragment();
-                                /// Create lex-title.
-                                parent_el = document.createElement("div");
-                                parent_el.className = "lex-title";
-                                /// Create lex-orig_word.
-                                child_el = document.createElement("span");
-                                child_el.className = "lex-orig_word";
-                                if (callout.id < BF.lang.divisions.nt) {
-                                    child_el.classList.add("hebrew");
-                                }
-                                child_el.textContent = data.word;
-                                parent_el.appendChild(child_el);
-                                /// Add a space between the word and pronunciation drop down box to separate the two elements.
-                                parent_el.appendChild(document.createTextNode(" "));
-                                /// Create pronunciation drop down box.
-                                child_el = create_drop_down_box(options_from_pronun(JSON.parse(data.pronun)), context.settings.user.pronun_type, function onchange(val)
-                                {
-                                    /// Store the user's pronunciation preference in the settings.
-                                    context.settings.user.pronun_type = val;
-                                    
-                                    /// Sometimes the pronunciation box breaks the line and other times it does not, so the size of the content may change;
-                                    /// therefore we need to make sure that the content fits without scrolling.
-                                    /// For example, go to Matthew 1:11, and click the word "Babylon" (first make sure that Biblical IPA pronunciation selected beforehand),
-                                    /// and then change the pronunciation to Biblical, and observe how the pronunciation text wraps.
-                                    callout.adjust_height();
-                                });
-                                /// Since the drop down box already has a style ("dropdown") concatenate "lex-pronun" to the end.
-                                child_el.classList.add("lex-pronun");
-                                parent_el.appendChild(child_el);
-                                
-                                html.appendChild(parent_el);
-                                
-                                /// Create lex-body.
-                                parent_el = document.createElement("div");
-                                parent_el.className = "lex-body";
-                                if (lex_data.def.lit) {
-                                    /// Optionally, create the literal pronunciation.
-                                    child_el = document.createElement("div");
-                                    child_el.textContent = "“" + lex_data.def.lit + "”";
-                                    parent_el.appendChild(child_el);
-                                }
-                                /// Create the short definition.
-                                child_el = document.createElement("div");
-                                child_el.textContent = lex_data.def.short;
-                                
-                                /// Create an invisible element used as buffer to prevent the description text from going onto it.
-                                ///NOTE: To see its use in action, click on "mouth" in Matthew 5:2.
-                                more_el = document.createElement("span");
-                                /// This element needs two classes: one to emulate the size of the more button, the other to hide it from view and make it float right.
-                                more_el.className = "more-button more-button-buffer simple_only";
-                                more_el.textContent = "[+] " + BF.lang.more;
-                                child_el.appendChild(more_el);
-                                
-                                /// Create the more button.
-                                more_el = document.createElement("div");
-                                more_el.className = "more-button simple_only";
-                                more_el.textContent = "[+] " + BF.lang.more;
-                                child_el.appendChild(more_el);
-                                
-                                /**
-                                 * Switch to detailed mode.
-                                 */
-                                more_el.onclick = function ()
-                                {
-                                    callout.show_details();
-                                };
-                                
-                                parent_el.appendChild(child_el);
-                                
-                                /// Add detailed information.
-                                
-                                /// Create long definition.
-                                /// Does a long definition exist?
-                                if (lex_data.def && lex_data.def.long) {
-                                    child_el = BF.create_expander({
-                                        summary_text:  BF.lang.detailed_def,
-                                        details_el:    create_long_def(lex_data.def.long),
-                                        open:          Boolean(context.settings.user.expand_def),
-                                        onstateChange: function (open)
-                                        {
-                                            context.settings.user.expand_def = open;
-                                        }
-                                    });
-                                    child_el.className = "expandable detailed_only";
-                                    parent_el.appendChild(child_el);
-                                }
-                                
-                                /// Add all of the elements to the main fragment.
-                                html.appendChild(parent_el);
-                                
-                                
+                            /// If it is a string, add the element.
+                            if (typeof def === "string") {
+                                li = document.createElement("li");
+                                li.textContent = def;
+                                ol.appendChild(li);
                             } else {
-                                ///TODO: In the future, there could be other information, like notes.
-                                html = "<div class=lex-body><em>" + BF.lang.italics_explanation + "</em></div>";
+                                /// If it is not a string, it must be an array, so recursively call the function.
+                                ol.appendChild(create_long_def(def));
+                            }
+                        });
+                        
+                        return ol;
+                    }
+                    
+                    /**
+                     * Add content to the callout.
+                     *
+                     * @param callout (object) The callout object
+                     * @param data    (object) An object containing info to be placed into the callout
+                     */
+                    return function display_callout(callout, data)
+                    {
+                        /// data Object structure:
+                        /// word      (string)  The original Greek, Hebrew, or Aramaic word, in Unicode.
+                        /// pronun    (string)  A JSON string containing the pronunciation of the word (same as data.pronun below except for the actual word, not the base form).
+                        /// strongs   (integer) The designated Strong's number for that word.
+                        /// base_word (string)  The original Greek, Hebrew, or Aramaic base form of the word, in Unicode.
+                        /// data      (string)  A JSON object containing the lexical information about the word.
+                        ///                     Object structure:
+                        ///                     def: {lit:    "The literal definition of a word (especially a name)",
+                        ///                           long:  ["A multi-dimensional array of various possible definitions"],
+                        ///                           short:  "A short and simple definition"}
+                        ///                     deriv:  "Information about words this word is derived from",
+                        ///                     pronun: {ipa:     "IPA Biblical reconstructed pronunciation (base form)",
+                        ///                              ipa_mod: "IPA modern pronunciation (base form)",
+                        ///                              dic:     "Dictionary Biblical reconstructed pronunciation (base form)",
+                        ///                              dic_mod: "Dictionary modern pronunciation (base form)",
+                        ///                              sbl:     "The Society of Biblical Literature's phonemic transliteration"}
+                        ///                     see:    ["An array of Strong's numbers identifying additional words of interest."]
+                        ///                     comment: "A string containing additional useful information"
+                        /// usage     (string)  A list of ways the word is translated.
+                        ///NOTE: The usage data is planned to be completely redone and expanded.
+                        ///NOTE: Also, any number of the following:
+                        ///TODO: Document more fully.
+                        /// part_of_speech, declinability, case_5, number, gender, degree, tense, voice, mood, person, middle, transitivity, miscellaneous, noun_type, numerical, form, dialect, type, pronoun_type
+                        
+                        var child_el,
+                            html,
+                            lex_data,
+                            more_el,
+                            parent_el;
+                        
+                        /// Did the query return any results?
+                        if (data.word) {
+                            lex_data = JSON.parse(data.data);
+                            
+                            /// DOM Structure:
+                            ///   ┌─►lex-title
+                            ///   │   ├─►lex-orig_word
+                            ///   │   ├─►text node (space)
+                            ///   │   └─►pronunciation drop down box
+                            ///   └─►lex-body
+                            ///       ├─►literal definition (optional)
+                            ///       └─►short definition
+                            ///         └─►more-button-buffer
+                            ///         └─►more-button
+                            
+                            /// Create a lightweight container for the DOM elements.
+                            ///NOTE: The fragment is discarded when attached to the DOM tree and only its children remain.
+                            html = document.createDocumentFragment();
+                            /// Create lex-title.
+                            parent_el = document.createElement("div");
+                            parent_el.className = "lex-title";
+                            /// Create lex-orig_word.
+                            child_el = document.createElement("span");
+                            child_el.className = "lex-orig_word";
+                            if (callout.id < BF.lang.divisions.nt) {
+                                child_el.classList.add("hebrew");
+                            }
+                            child_el.textContent = data.word;
+                            parent_el.appendChild(child_el);
+                            /// Add a space between the word and pronunciation drop down box to separate the two elements.
+                            parent_el.appendChild(document.createTextNode(" "));
+                            /// Create pronunciation drop down box.
+                            child_el = create_drop_down_box(options_from_pronun(JSON.parse(data.pronun)), context.settings.user.pronun_type, function onchange(val)
+                            {
+                                /// Store the user's pronunciation preference in the settings.
+                                context.settings.user.pronun_type = val;
+                                
+                                /// Sometimes the pronunciation box breaks the line and other times it does not, so the size of the content may change;
+                                /// therefore we need to make sure that the content fits without scrolling.
+                                /// For example, go to Matthew 1:11, and click the word "Babylon" (first make sure that Biblical IPA pronunciation selected beforehand),
+                                /// and then change the pronunciation to Biblical, and observe how the pronunciation text wraps.
+                                callout.adjust_height();
+                            });
+                            /// Since the drop down box already has a style ("dropdown") concatenate "lex-pronun" to the end.
+                            child_el.classList.add("lex-pronun");
+                            parent_el.appendChild(child_el);
+                            
+                            html.appendChild(parent_el);
+                            
+                            /// Create lex-body.
+                            parent_el = document.createElement("div");
+                            parent_el.className = "lex-body";
+                            if (lex_data.def.lit) {
+                                /// Optionally, create the literal pronunciation.
+                                child_el = document.createElement("div");
+                                child_el.textContent = "“" + lex_data.def.lit + "”";
+                                parent_el.appendChild(child_el);
+                            }
+                            /// Create the short definition.
+                            child_el = document.createElement("div");
+                            child_el.textContent = lex_data.def.short;
+                            
+                            /// Create an invisible element used as buffer to prevent the description text from going onto it.
+                            ///NOTE: To see its use in action, click on "mouth" in Matthew 5:2.
+                            more_el = document.createElement("span");
+                            /// This element needs two classes: one to emulate the size of the more button, the other to hide it from view and make it float right.
+                            more_el.className = "more-button more-button-buffer simple_only";
+                            more_el.textContent = "[+] " + BF.lang.more;
+                            child_el.appendChild(more_el);
+                            
+                            /// Create the more button.
+                            more_el = document.createElement("div");
+                            more_el.className = "more-button simple_only";
+                            more_el.textContent = "[+] " + BF.lang.more;
+                            child_el.appendChild(more_el);
+                            
+                            /**
+                             * Switch to detailed mode.
+                             */
+                            more_el.onclick = function ()
+                            {
+                                callout.maximize();
+                            };
+                            
+                            parent_el.appendChild(child_el);
+                            
+                            /// Add detailed information.
+                            
+                            /// Create long definition.
+                            /// Does a long definition exist?
+                            if (lex_data.def && lex_data.def.long) {
+                                child_el = BF.create_expander({
+                                    summary_text:  BF.lang.detailed_def,
+                                    details_el:    create_long_def(lex_data.def.long),
+                                    open:          Boolean(context.settings.user.expand_def),
+                                    onstateChange: function (open)
+                                    {
+                                        context.settings.user.expand_def = open;
+                                    }
+                                });
+                                child_el.className = "expandable detailed_only";
+                                parent_el.appendChild(child_el);
                             }
                             
-                            /// Add the HTML to the callout.
-                            callout.replace_HTML(html);
-                        };
-                    }());
-                    
-                    /**
-                     * Create a new callout (if one does not already exist).
-                     *
-                     * @param id (number || string) The word ID to lookup.
-                     * @param clicked_el (DOM element) The element in DOM that the callout should point to. This is also used to determine the verse reference
-                     * @param mouse_xy (object) The X/Y position of the mouse when clicking the element. This is used to determine which part of a word was clicked on when a hyphenated word is clicked
-                     * @param detailed (boolean) Whether or not to start the callout maximized (or change it into maximized mode if the callout is already visible)
-                     * @param ignore_state (boolean) Whether or not to push the history's state when changing the callout to and from maximized mode.
-                     * @todo  Changed "detailed" to "maximized."
-                     */
-                    BF.show_callout = function (id, clicked_el, mouse_xy, detailed, ignore_state)
-                    {
-                        var ajax = new BF.Create_easy_ajax(),
-                            callout,
-                            i;
-                        
-                        id = Number(id);
-                        
-                        /// First, check to see if the callout already exists so that it does not create two.
-                        for (i = callouts.length - 1; i >= 0; i -= 1) {
-                            if (callouts[i].id === id) {
-                                /// Is the callout supposed to be maximized and it is not?
-                                if (detailed && !callouts[i].showing_details) {
-                                    callouts[i].show_details(ignore_state);
-                                /// Is the callout not supposed to be maximized and it is?
-                                } else if (!detailed && callouts[i].showing_details) {
-                                    callouts[i].hide_details(null, ignore_state);
-                                }
-                                /// If the callout already exists, do not create another one.
-                                return;
-                            }
-                        }
-                        
-                        /// Has this data already been cached?
-                        if (lex_cache[id]) {
-                            /// Delay the code so that the remained of the code will execute first and prepare the callout variable.
-                            window.setTimeout(function ()
-                            {
-                                display_callout(callout, lex_cache[id]);
-                            }, 0);
+                            /// Add all of the elements to the main fragment.
+                            html.appendChild(parent_el);
+                            
+                            
                         } else {
-                            ajax.query("GET", "/api", "t=" + BF.consts.lexical_lookup + "&q=" + id, function success(data)
-                            {
-                                data = BF.parse_json(data);
-                                /// Temporarily cache the data so that it does not have to re-queried.
-                                ///NOTE: The cache is cleared before each query.
-                                lex_cache[id] = data;
-                                display_callout(callout, data);
-                            });
+                            ///TODO: In the future, there could be other information, like notes.
+                            html = "<div class=lex-body><em>" + BF.lang.italics_explanation + "</em></div>";
                         }
                         
-                        /// Create the callout variable here while waiting for the code above to be called.
-                        callout = create_callout(id, clicked_el, ajax, mouse_xy, detailed, ignore_state);
-                        callouts[callouts.length] = callout;
+                        /// Add the HTML to the callout.
+                        callout.replace_HTML(html);
                     };
-                    
-                    /**
-                     * Create a callout if a word with lexical information was clicked on.
-                     *
-                     * @param e (event object) The mouse event object.
-                     */
-                    page.addEventListener("click", function(e)
-                    {
-                        ///NOTE: IE/Chromium/Safari/Opera use srcElement, Firefox uses originalTarget.
-                        var clicked_el = e.srcElement || e.originalTarget;
-                        
-                        /// Does this language support lexical lookups, and did the user click on a word?
-                        ///NOTE: All words in the text are wrapped in <a> tags.
-                        if (BF.lang.linked_to_orig && clicked_el && clicked_el.tagName === "A") {
-                            BF.show_callout(Number(clicked_el.id), clicked_el, {mouse_x: e.clientX, mouse_y: e.clientY});
-                        }
-                    }, false);
                 }());
                 
-                BF.remove_callout = function (id)
+                return function callout_maker(options)
                 {
-                    var i;
+                    var ajax = new BF.Create_easy_ajax(),
+                        callout;
                     
-                    for (i = callouts.length - 1; i >= 0; i -= 1) {
-                        if (callouts[i].id === id) {
-                            callouts[i].destroy();
-                            BF.remove(callouts, i);
-                            return;
-                        }
-                    }
-                };
-                
-                /**
-                 * Possibly remove callouts when a user clicks the page.
-                 *
-                 * Remove callouts if Ctrl is not held and not clicking on a callout.
-                 *
-                 * @param  e (event object) The mouse event object.
-                 * @return NULL
-                 */
-                remove = function (e)
-                {
-                    var i;
-                    
-                    /// Are there no callouts, is the Ctrl key pressed, or is the left button not pressed?
-                    ///NOTE: The Ctrl key is used as a way to open multiple callouts (like selecting multiple files in a file browser).
-                    ///TODO: Detecting left mouse click may not be cross-browser compatible (test with IE 10). (Could use e.which or e.buttons.)
-                    if (i > 0 || e.ctrlKey || (e.button !== 0 && e.keyCode !== 27)) {
-                        return;
-                    }
-                    
-                    /// Did the user click on a callout? If so, do not close any.
-                    if (callout_clicked) {
-                        callout_clicked = false;
-                        return;
-                    }
-                    
-                    /// Is there a maximized callout?
-                    if (BF.hide_callout_details) {
-                        /// If so, just close it; don't remove anything.
-                        BF.hide_callout_details();
+                    /// Has this data already been cached?
+                    if (lex_cache[options.id]) {
+                        /// Delay the code so that the remained of the code will execute first and prepare the callout variable.
+                        window.setTimeout(function ()
+                        {
+                            display_callout(callout, lex_cache[options.id]);
+                        }, 0);
                     } else {
-                        /// If there is no maximzed callout, remove non-new callouts.
-                        ///NOTE: When a callout is created, this function (i.e., the onclick event) will fire, thus potentially removing the callout immediately;
-                        ///      therefore, use just_created to see if the callout was recently created and should be left alone.
-                        for (i = callouts.length - 1; i >= 0; i -= 1) {
-                            if (!callouts[i].just_created) {
-                                callouts[i].destroy();
-                                BF.remove(callouts, i);
+                        ajax.query("GET", "/api", "t=" + BF.consts.lexical_lookup + "&q=" + Number(options.id), function success(data)
+                        {
+                            data = BF.parse_json(data);
+                            /// Temporarily cache the data so that it does not have to re-queried.
+                            ///NOTE: The cache is cleared before each query.
+                            lex_cache[options.id] = data;
+                            display_callout(callout, data);
+                        });
+                    }
+                        
+                    /// Create the callout variable here while waiting for the code above to be called.
+                    callout = create_callout(options.id, options.el, ajax, options.mouse_pos, options.maximized, options.ignore_state);
+                    return callout;
+                };
+            }());
+            
+            BF.callout_manager.clear_cache = function ()
+            {
+                lex_cache = {};
+            };
+            
+            BF.callout_manager.shrink_or_remove_callouts = function()
+            {
+                if (BF.callout_manager.has_maximized()) {
+                    BF.callout_manager.shrink_maximized_callout();
+                } else {
+                    BF.callout_manager.remove_callouts();
+                }
+            };
+            
+            BF.callout_manager.move_all = function (amount)
+            {
+                walk_callouts(function (callout)
+                {
+                    callout.move(amount);
+                });
+            };
+            
+            
+            BF.callout_manager.remove_unneeded = function ()
+            {
+                walk_callouts(function (callout, index)
+                {
+                    if (!callout.point_to_el_exists()) {
+                        callout.remove(function ()
+                        {
+                            /// Remove the callout object from memory.
+                            delete callouts[index];
+                        }, true);
+                    }
+                });
+            };
+            
+            BF.callout_manager.realign = function ()
+            {
+                walk_callouts(function (callout)
+                {
+                    callout.align();
+                });
+            };
+            
+            BF.callout_manager.show_callout = function (options)
+            {
+                /// Does the callout already exist?
+                if (callouts[options.id]) { 
+                    /// Prevent the callout from being removed.
+                    ///NOTE: This will prevent all callouts from being removed.
+                    BF.callout_manager.callout_clicked = true;
+                    /// Should the callout be maximized and it's not already?
+                    if (options.maximized && !callouts[options.id].maximized) {
+                        callouts[options.id].maximize(options);
+                    /// Should the callout not be maximized and it is already?
+                    } else if (!options.maximized && callouts[options.id].maximized) {
+                        callouts[options.id].shrink(options);
+                    } else if (typeof options.callback === "function") {
+                        /// Manually call the callback if there is nothing to do.
+                        options.callback();
+                    }
+                } else {
+                    callouts[options.id] = callout_maker(options);
+                }
+            };
+            
+            BF.callout_manager.shrink_maximized_callout = function (options)
+            {
+                if (maximized_callout) {
+                    callouts[maximized_callout].shrink(options);
+                } else if (options && typeof options.callback === "function") {
+                    /// False is sent to indicate that no callout was needed to be shrunk.
+                    options.callback(false);
+                }
+            };
+            
+            BF.callout_manager.remove_callouts = function (callback, asap, force)
+            {
+                var callout_arr = Object.keys(callouts);
+                
+                if (callout_arr.length === 0) {
+                    if (typeof callback === "function") {
+                        callback();
+                    }
+                } else {
+                    (function remove_callout(i)
+                    {
+                        function loop()
+                        {
+                            if (i > 0) {
+                                window.setTimeout(function ()
+                                {
+                                    remove_callout(i - 1);
+                                }, 0);
+                            } else if (force) {
+                                /// Try again to just In case any callouts were added while looping.
+                                BF.callout_manager.remove_callouts(callback, asap);
+                            } else {
+                                if (typeof callback === "function") {
+                                    callback();
+                                }
                             }
                         }
-                    }
-                };
-                
-                
-                document.addEventListener("click", remove, false);
-                
-                /**
-                 * Possibly remove callouts when a user presses escape.
-                 *
-                 * @param e (event object) The keyboard event object.
-                 * @note  This closes all callouts when pressing escape.
-                 */
-                document.addEventListener("keydown", function (e)
-                {
-                    /// keyCode 27 is the escape key.
-                    if (e.keyCode === 27) {
-                        remove(e);
-                    }
-                }, false);
-                
-                /**
-                 * Move callouts to compensate for additional or the absence of text.
-                 *
-                 * Also, remove callouts if the word they were attached to was removed.
-                 *
-                 * @param e (event object) An object containing the height dimension (in pixels) of the text that was removed (negative value) or added (positive value).
-                 */
-                context.system.event.attach(["contentAddedAbove", "contentRemovedAbove"], function (e)
-                {
-                    var i;
-                    
-                    for (i = callouts.length - 1; i >= 0; i -= 1) {
-                        /// When contentRemovedAbove is triggered, the element that the callout is pointing to may have been removed.
-                        /// If so, remove the callout.
-                        ///NOTE: contentAddedAbove has a positive e.amount; whereas, contentRemovedAbove has a negative e.amount.
-                        ///NOTE: Only small callouts actually need to be moved because large callouts (showing details) have fixed positioning;
-                        ///      however, when they change back to small callouts, they need to know the correct position.
-                        if (e.amount >= 0 || callouts[i].point_to_el_exists()) {
-                            callouts[i].move(e.amount);
+                        
+                        /// Does that callout exist?
+                        if (callout_arr[i] && callouts[callout_arr[i]] && (force || !callouts[callout_arr[i]].just_created)) {
+                            callouts[callout_arr[i]].remove(function ()
+                            {
+                                delete callouts[callout_arr[i]];
+                                loop();
+                            }, asap);
                         } else {
-                            callouts[i].destroy();
-                            BF.remove(callouts, i);
+                            /// If the callout does not exist, just try the next one.
+                            loop();
                         }
-                    }
-                });
-                
-                /**
-                 * When the text is removed, remove the callous too.
-                 */
-                context.system.event.attach("scrollCleared", function ()
-                {
-                    var i;
-                    
-                    for (i = callouts.length - 1; i >= 0; i -= 1) {
-                        callouts[i].destroy();
-                    }
-                    
-                    callouts = [];
-                    
-                    /// Clear lexical data cache to prevent it from building up too large.
-                    lex_cache = {};
-                });
-                
-                /**
-                 * Check to see if a word that a callout was connected to was removed.
-                 */
-                context.system.event.attach("contentRemovedBelow", function ()
-                {
-                    var i;
-                    
-                    for (i = callouts.length - 1; i >= 0; i -= 1) {
-                        /// Since detailed callouts do not point to an element anymore, ignore them.
-                        /// Other callouts might need to be removed.
-                        if (!callouts[i].showing_details && !callouts[i].point_to_el_exists()) {
-                            callouts[i].destroy();
-                            BF.remove(callouts, i);
-                        }
-                    }
-                });
-                
-                /**
-                 * Realign callouts.
-                 */
-                window.addEventListener("resize", function ()
-                {
-                    var i;
-                    
-                    ///TODO: If there are a lot of callouts that are not visible, it might be a good idea to make them invisible and not re-align them.
-                    ///      To do this, we could expose the callout's pos variable (perhaps via a get() function).
-                    for (i = callouts.length - 1; i >= 0; i -= 1) {
-                        callouts[i].align();
-                    }
-                }, false);
-            }());
+                        
+                    }(callout_arr.length - 1));
+                }
+            };
+            
+            BF.callout_manager.has_maximized = function ()
+            {
+                return Boolean(maximized_callout);
+            };
         }());
+        
+        /**
+         * Create a callout if a word with lexical information was clicked on.
+         *
+         * @param e (event object) The mouse event object.
+         */
+        page.addEventListener("click", function(e)
+        {
+            ///NOTE: IE/Chromium/Safari/Opera use srcElement, Firefox uses originalTarget.
+            var clicked_el = e.srcElement || e.originalTarget;
+            
+            /// Does this language support lexical lookups, and did the user click on a word?
+            ///NOTE: All words in the text are wrapped in <a> tags.
+            if (BF.lang.linked_to_orig && clicked_el && clicked_el.tagName === "A") {
+                BF.callout_manager.show_callout({id: Number(clicked_el.id), el: clicked_el, mouse_pos: {mouse_x: e.clientX, mouse_y: e.clientY}});
+            }
+        }, false);
+        
+        document.addEventListener("click", function (e)
+        {
+            if (BF.callout_manager.callout_clicked) {
+                ///TODO: Find a better way to handle this.
+                BF.callout_manager.callout_clicked = false;
+            } else if (e.button === 0 && !e.ctrlKey) {
+                BF.callout_manager.shrink_or_remove_callouts();
+            }
+        }, false);
+        
+        /**
+         * Possibly remove callouts when a user presses escape.
+         *
+         * @param e (event object) The keyboard event object.
+         * @note  This closes all callouts when pressing escape.
+         */
+        document.addEventListener("keydown", function (e)
+        {
+            /// keyCode 27 is the escape key.
+            if (e.keyCode === 27) {
+                BF.callout_manager.shrink_or_remove_callouts();
+            }
+        }, false);
+        
+        
+        context.system.event.attach("scrollCleared", function ()
+        {
+            BF.callout_manager.remove_callouts(null, true, true);
+            
+            BF.callout_manager.clear_cache();
+        });
+        
+        ///TODO: UPDATE docs
+        /**
+         * Move callouts to compensate for additional or the absence of text.
+         *
+         * Also, remove callouts if the word they were attached to was removed.
+         *
+         * @param e (event object) An object containing the height dimension (in pixels) of the text that was removed (negative value) or added (positive value).
+         */
+        context.system.event.attach(["contentAddedAbove", "contentRemovedAbove"], function (e)
+        {
+            if (e.amount !== 0) {
+                BF.callout_manager.move_all(e.amount);
+            }
+        });
+        
+        /// Check to see if a word that a callout was connected to was removed.
+        context.system.event.attach(["contentRemovedBelow", "contentRemovedAbove"], BF.callout_manager.remove_unneeded);
+        
+        /// Realign callouts when the viewport window because the text may wrap differently.
+        window.addEventListener("resize", BF.callout_manager.realign);
+        
+        
+        /// **************************
+        /// * End of Callout Manager *
+        /// **************************
+        
+        /// ****************************
+        /// * Start of Language Button *
+        /// ****************************
         
         /**
          * Display and manage the language selector button.
@@ -3146,6 +3163,10 @@
                 BF.preload_font("lex-orig_word", "\u05d0\u03b1");
             }, 250);
         }());
+        
+        /// **************************
+        /// * End of Language Button *
+        /// **************************
         
         window.setTimeout(function ()
         {

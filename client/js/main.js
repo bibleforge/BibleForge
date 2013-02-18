@@ -3354,21 +3354,21 @@ document.addEventListener("DOMContentLoaded", function ()
                             /// Is there a word ID?  If so, we need to show a maximized callout.
                             if (split_query && split_query[2]) {
                                 /// Since BF.show_callout() is created by secondary.js (since it is often not needed immediately), check to see if it exists.
-                                if (BF.show_callout) {
-                                    BF.show_callout(split_query[2], document.getElementById(split_query[2]), {}, true, true);
+                                if (BF.callout_manager) {
+                                    BF.callout_manager.show_callout({id: split_query[2], el: document.getElementById(split_query[2]), maximized: true, ignore_state: true});
                                 } else {
                                     /// If BF.show_callout() has not yet been created, secondary.js must not have loaded yet,
                                     /// so we need to wait for that to load and they try again.
                                     system.event.attach("secondaryLoaded", function ()
                                     {
-                                        BF.show_callout(split_query[2], document.getElementById(split_query[2]), {}, true, true);
+                                        BF.callout_manager.show_callout({id: split_query[2], el: document.getElementById(split_query[2]), maximized: true, ignore_state: true});
                                     }, true);
                                 }
                             } else {
                                 /// Possibly shrink any maximized callouts.
-                                if (BF.hide_callout_details) {
+                                if (BF.callout_manager) {
                                     /// Since the state has already changed, set ignore_state to TRUE to make sure not to change again.
-                                    BF.hide_callout_details(null, true);
+                                    BF.callout_manager.shrink_maximized_callout({ignore_state: true});
                                 }
                             }
                         }, 0);
@@ -3575,7 +3575,7 @@ document.addEventListener("DOMContentLoaded", function ()
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?32858150", {
+                BF.include("/js/secondary.js?34843189", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
