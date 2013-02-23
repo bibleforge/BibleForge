@@ -2771,10 +2771,14 @@
                         function loop()
                         {
                             if (i > 0) {
-                                window.setTimeout(function ()
-                                {
+                                if (asap) {
                                     remove_callout(i - 1);
-                                }, 0);
+                                } else {
+                                    window.setTimeout(function ()
+                                    {
+                                        remove_callout(i - 1);
+                                    }, 0);
+                                }
                             } else if (force) {
                                 /// Try again to just In case any callouts were added while looping.
                                 BF.callout_manager.remove_callouts(callback, asap);
