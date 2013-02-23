@@ -98,7 +98,13 @@
              */
             function preform_transition(el, data, on_finish)
             {
-                var transition_name,
+                var ended,
+                    failsafe_timeout,
+                    on_transition_end,
+                    start_timeout,
+                    started,
+                    terminate,
+                    transition_name,
                     transition_name_end;
                 
                 if (typeof data.start_val !== "undefined") {
@@ -120,60 +126,68 @@
                     transition_name_end = "webkitTransitionEnd";
                 }
                 ///NOTE: Checking for oTransition does not work.
+                ///NOTE: If transition_name remains undefined, it will have no adverse effects. The style will just take place without a transition.
                 
-                window.setTimeout(function ()
+                /**
+                 * Remove the transition style from the element and execute the callback (if any).
+                 *
+                 * @param e (object) An object containing which CSS property completed (via the "propertyName" property).
+                 * @note  The data object is sent to the callback.
+                 * @note  Called either when the animation finishes or when the failsafe triggers.
+                 */
+                on_transition_end = function (e)
                 {
-                    var failsafe_timeout,
-                        /**
-                         * Remove the transition style from the element and execute the callback (if any).
-                         *
-                         * @param e (object) An object containing which CSS property completed (via the "propertyName" property).
-                         * @note  The data object is sent to the callback.
-                         */
-                        func = function (e)
-                        {
-                            var i,
-                                transition_arr;
-                            
-                            /// Clear any failsafe timeout since the transition finished properly.
-                            window.clearTimeout(failsafe_timeout);
-                            
-                            ///NOTE: If transition_name remains undefined, it will have no adverse effects. The style will just take place without a transition.
-                            
-                            /// Is the current property that just finished transitioning the same one as this one?
-                            if (e.propertyName === (data.css_prop || data.prop)) {
-                                /// If so, stop listening.
-                                el.removeEventListener(transition_name_end, func);
-                                
-                                /// Now, we need to remove the transition CSS from the element so that future changes to that property will not cause a transition.
-                                /// To do that, we have to find the different CSS properties that are set to transition and then remove the correct one.
-                                
-                                transition_arr = parse_transition(el.style[transition_name]);
-                                
-                                for (i = transition_arr.length - 1; i >= 0; i -= 1) {
-                                    /// Do the properties match?
-                                    /// The space (" ") is used to make sure to match the entire property, not just part of it:
-                                    /// e.g., "background 1s ease" would match "background-color 1s ease" without the space.
-                                    if (transition_arr[i].indexOf((data.css_prop || data.prop) + " ") === 0) {
-                                        BF.remove(transition_arr, i);
-                                    }
-                                }
-                                
-                                /// Put the remaining styles back.
-                                el.style[transition_name] = transition_arr.join(",");
-                                
-                                if (typeof on_finish === "function") {
-                                    on_finish(data);
-                                }
+                    var i,
+                        transition_arr;
+                    
+                    /// Prevent terminate() from calling this function and triggering the callback twice.
+                    ended = true;
+                    
+                    /// Clear any failsafe timeout since the transition finished properly.
+                    window.clearTimeout(failsafe_timeout);
+                    
+                    /// Is the current property that just finished transitioning the same one as this one?
+                    if (e.propertyName === (data.css_prop || data.prop)) {
+                        /// If so, stop listening.
+                        el.removeEventListener(transition_name_end, on_transition_end);
+                        
+                        /// Now, we need to remove the transition CSS from the element so that future changes to that property will not cause a transition.
+                        /// To do that, we have to find the different CSS properties that are set to transition and then remove the correct one.
+                        
+                        /// First, get all of the transitions atached to the element.
+                        transition_arr = parse_transition(el.style[transition_name]);
+                        
+                        /// Then remove the matching transition.
+                        for (i = transition_arr.length - 1; i >= 0; i -= 1) {
+                            /// Do the properties match?
+                            /// The space (" ") is used to make sure to match the entire property, not just part of it:
+                            /// e.g., "background 1s ease" would match "background-color 1s ease" without the space.
+                            if (transition_arr[i].indexOf((data.css_prop || data.prop) + " ") === 0) {
+                                BF.remove(transition_arr, i);
                             }
-                        },
-                        no_transition;
+                        }
+                        
+                        /// Finally, put the remaining styles back.
+                        el.style[transition_name] = transition_arr.join(",");
+                        
+                        if (typeof on_finish === "function") {
+                            on_finish(data);
+                        }
+                    }
+                };
+                
+                start_timeout = window.setTimeout(function ()
+                {
+                    var no_transition;
+                    
+                    /// Prevent terminate() from calling this function and setting the end value twice.
+                    started = true;
                     
                     /// Set the style now, after a delay, so that it dose not try to transition to the start value.
                     ///NOTE: Times must have a unit in Mozilla (i.e., "0" will cause the transition to fail, but "0s" will work).
                     el.style[transition_name] = parse_transition(el.style[transition_name]).concat((data.css_prop || data.prop) + " " + (data.duration || "1s") + " " + (data.timing || "ease") + " " + (data.delay || "0s")).join(",");
                     
-                    el.addEventListener(transition_name_end, func);
+                    el.addEventListener(transition_name_end, on_transition_end);
                     
                     if (el.style[data.prop] !== data.end_val) {
                         el.style[data.prop] = data.end_val;
@@ -184,7 +198,7 @@
                     if (data.failsafe && typeof data.failsafe === "number") {
                         failsafe_timeout = window.setTimeout(function ()
                         {
-                            func({propertyName: (data.css_prop || data.prop)});
+                            on_transition_end({propertyName: (data.css_prop || data.prop)});
                         }, data.failsafe);
                     }
                     
@@ -192,9 +206,27 @@
                     ///NOTE: Even if there is no on_finish() function, it is still necessary to run func() in order to (possibly) remove the CSS transition.
                     if ((no_transition || typeof transition_name === "undefined")) {
                         /// Make sure to send the correct propertyName.
-                        func({propertyName: (data.css_prop || data.prop)});
+                        on_transition_end({propertyName: (data.css_prop || data.prop)});
                     }
                 }, 0);
+                
+                /**
+                 * Terminate the CSS transition.
+                 */
+                terminate = function ()
+                {
+                    /// If this function is called really quickly, it is possible that the transition hasn't event started at all.
+                    /// So, we need to stop if from starting, set the ending value, and trigger the 
+                    if (!started) {
+                        window.setTimeout(start_timeout);
+                        el.style[data.prop] = data.end_val;
+                    }
+                    if (!ended) {
+                        on_transition_end({propertyName: (data.css_prop || data.prop)});
+                    }
+                };
+                
+                return terminate;
             }
             
             /**
@@ -209,8 +241,9 @@
             return function transition(el, data, on_finish)
             {
                 var check_finished,
-                    transitions_to_complete,
-                    i;
+                    i,
+                    terminate_arr = [],
+                    transitions_to_complete;
                 
                 if (Array.isArray(data)) {
                     if (typeof on_finish === "function") {
@@ -228,11 +261,23 @@
                     
                     transitions_to_complete = data.length;
                     for (i = 0; i < transitions_to_complete; i += 1) {
-                        preform_transition(el, data[i], check_finished);
+                        /// Collect the terminate functions so that they can all be called later, if necessary.
+                        terminate_arr[terminate_arr.length] = preform_transition(el, data[i], check_finished);
                     }
+                    
+                    /**
+                     * Terminate all transitions.
+                     */
+                    return function terminate_all()
+                    {
+                        terminate_arr.forEach(function (terminate)
+                        {
+                            terminate();
+                        });
+                    };
                 } else {
                     /// If only one property is to be transitioned, just send it directly to preform_transition().
-                    preform_transition(el, data, on_finish);
+                    return preform_transition(el, data, on_finish);
                 }
             };
         }());
