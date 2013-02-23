@@ -1960,10 +1960,10 @@
                                      *
                                      * @note Because it needs to use the same context (i.e., the "this" variable; a.k.a. "that"), we need to wrap show_details in another function.
                                      */
-                                    BF.callout_manager.shrink_maximized_callout(function ()
+                                    BF.callout_manager.shrink_maximized_callout({callback: function ()
                                     {
                                         that.maximize(options);
-                                    });
+                                    }});
                                     
                                     /// Stop the current function and wait for the other callout to shrink.
                                     return;
@@ -2075,13 +2075,17 @@
                                 
                                 maximized_callout = id;
                             },
-                            shrink: function (callback, ignore_state)
+                            shrink: function (options)
                             {
                                 var has_point_to,
                                     highlight_terms,
                                     new_pos,
                                     that = this,
                                     url_component;
+                                
+                                if (!options) {
+                                    options = {};
+                                }
                                 
                                 /// Ignore all other requests while this (or another) callout is transitioning.
                                 if (this.transitioning) {
@@ -2126,8 +2130,8 @@
                                             maximized_callout = undefined;
                                             
                                             /// Possibly call a callout (e.g., enlarge another callout).
-                                            if (typeof callback === "function") {
-                                                callback();
+                                            if (typeof options.callback === "function") {
+                                                options.callback();
                                             }
                                         }, 50);
                                     }, 1000);
@@ -2219,7 +2223,7 @@
                                     BF.remove_callout(this.id);
                                 }
                                 
-                                if (!ignore_state) {
+                                if (!options.ignore_state) {
                                     /// Change state now that the callout is not maximized to point to the top verse.
                                     highlight_terms = BF.get_highlighted_terms();
                                     
