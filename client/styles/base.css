@@ -202,6 +202,7 @@ body {
 /*       However, in Night Mode, WebKit's font color is too bright, so it is lightened in night.css.
 /* NOTE: WebKit's placeholder property is "::-webkit-input-placeholder" (note the double colons as well as different text). */
 /* NOTE: IE 10 might use ":-ms-input-placeholder". */
+/* NOTE: Different browsers use different styles by default to style the placeholder text. Some set the opacity; some set a semi-opaque color. */
 .queryInput:-moz-placeholder {
     color: #A7A7A7;
 }
