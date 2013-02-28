@@ -308,9 +308,27 @@
             }
             
             cue = {
-                add: function (terminator)
+                add: function (options)
                 {
-                    terminate_arr[count] = terminator;
+                    var timeout;
+                    
+                    if (options.sync) {
+                        timeout = window.setTimeout(function ()
+                        {
+                            options.sync();
+                            delete options.sync;
+                        }, options.delay);
+                        
+                        options.terminator = function ()
+                        {
+                            if (options.sync) {
+                                window.clearTimeout(timeout);
+                                options.sync();
+                            }
+                        };
+                    }
+                    
+                    terminate_arr[count] = options.terminator;
                     count += 1;
                 },
                 remove: function ()
@@ -326,15 +344,9 @@
                 {
                     terminate_arr.forEach(function (method)
                     {
-                        if (typeof method === "function") {
-                            method();
-                        } else {
-                            /// Even if method is Undefined, it should not cause any problem to attempt to clear the timeout.
-                            window.clearTimeout(method);
-                        }
+                        method();
                     });
-                    
-                    done();
+                    ///NOTE: Terminating all of the functions should trigger done().
                 }
             };
             
@@ -2076,21 +2088,21 @@
                                 
                                 /// Fade in the transparent element.
                                 /// There is a short delay to let the callout start moving.
-                                cue.add(BF.transition(transparent_el, {prop: "opacity", duration: "250ms", end_val: 0.7, timing: "steps(3, start)", delay: "50ms", failsafe: 500}, function ()
+                                cue.add({terminator: BF.transition(transparent_el, {prop: "opacity", duration: "250ms", end_val: 0.7, timing: "steps(3, start)", delay: "50ms", failsafe: 500}, function ()
                                 {
                                     cue.remove();
-                                }));
+                                })});
                                 
                                 /// Make sure the callout appears above the semi-transparent element used to fade out the text.
                                 callout.style.zIndex = 99;
                                 
                                 /// Fade out the pointer.
-                                cue.add(BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 0, failsafe: 500}, function ()
+                                cue.add({terminator: BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 0, failsafe: 500}, function ()
                                 {
                                     /// Hide the pointer after transitioning.
                                     pointer.style.display = "none";
                                     cue.remove();
-                                }));
+                                })});
                                 
                                 ///NOTE: Small callouts are absolutely positioned, so if transitioning from small to larger (which should be the case),
                                 ///      it will need to be repositioned.
@@ -2105,19 +2117,25 @@
                                 }
                                 
                                 /// Tell the callout to transition to a larger font size for certain words.
-                                cue.add(window.setTimeout(function ()
-                                {
-                                    callout.classList.add("large_callout");
-                                    cue.remove();
-                                }, 0));
+                                cue.add({
+                                    sync: function ()
+                                    {
+                                        callout.classList.add("large_callout");
+                                        cue.remove();
+                                    },
+                                    delay: 0
+                                });
                                 
                                 /// While the callout is transitioning, switch the CSS to hide certain content and show others.
                                 /// E.g., the "more" button is hidden when showing details.
-                                cue.add(window.setTimeout(function ()
-                                {
-                                    callout.classList.add("detailed_callout");
-                                    cue.remove();
-                                }, 200));
+                                cue.add({
+                                    sync: function ()
+                                    {
+                                        callout.classList.add("detailed_callout");
+                                        cue.remove();
+                                    },
+                                    delay: 200
+                                });
                                 
                                 ///NOTE: This is used by .align() to know how the callout should be aligned.
                                 this.showing_details = true;
@@ -2198,7 +2216,7 @@
                                         }, 50);
                                     }, 1000);
                                     
-                                    cue.add(BF.transition(transparent_el, {prop: "opacity", duration: "250ms", end_val: "0", timing: "steps(3, start)", delay: "50ms", failsafe: 500}, function ()
+                                    cue.add({terminator: BF.transition(transparent_el, {prop: "opacity", duration: "250ms", end_val: "0", timing: "steps(3, start)", delay: "50ms", failsafe: 500}, function ()
                                     {
                                         /// Remove from DOM and destroy the temporary transparent element.
                                         document.body.removeChild(transparent_el);
@@ -2209,7 +2227,7 @@
                                         /// we must change the z-index here, after has completely faded away.
                                         callout.style.zIndex = 0;
                                         cue.remove();
-                                    }));
+                                    })});
                                     
                                     ///NOTE: Small callouts are absolutely positioned, so if transitioning from small to larger (which should be the case),
                                     ///      it will need to be repositioned.
@@ -2225,18 +2243,19 @@
                                     
                                     pointer.style.display = "block";
                                     /// Fade in the pointer.
-                                    cue.add(BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 1, failsafe: 500}, function ()
+                                    cue.add({terminator: BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 1, failsafe: 500}, function ()
                                     {
                                         cue.remove();
-                                    }));
+                                    })});
                                     
                                     ///FIXME: Prevent other transitions.
                                     if (typeof pos.top === "undefined" || typeof pos.left === "undefined") {
-                                        cue.add(BF.transition(callout, {prop: "opacity", duration: "300ms", start_val: 1, end_val: 0, failsafe: 500}, function ()
-                                        {
-                                            cue.remove();
-                                            BF.remove_callout(that.id);
-                                        }));
+                                        cue.add({terminator: BF.transition(callout, {prop: "opacity", duration: "300ms", start_val: 1, end_val: 0, failsafe: 500}, function ()
+                                            {
+                                                cue.remove();
+                                                BF.remove_callout(that.id);
+                                            })
+                                        });
                                     } else {
                                         /// Resize the callout to take up more of the screen.
                                         cue.add(BF.transition(callout, [
@@ -2256,18 +2275,24 @@
                                     
                                     /// While the callout is transitioning, switch the CSS to hide certain content and show others.
                                     /// E.g., the "more" button is hidden when showing details.
-                                    cue.add(window.setTimeout(function ()
-                                    {
-                                        callout.classList.remove("detailed_callout");
-                                        cue.remove();
-                                    }, 200));
+                                    cue.add({
+                                        sync: function ()
+                                        {
+                                            callout.classList.remove("detailed_callout");
+                                            cue.remove();
+                                        },
+                                        delay: 200
+                                    });
                                     
                                     /// Tell the callout to transition to a small font size for certain words.
-                                    cue.add(window.setTimeout(function ()
-                                    {
-                                        callout.classList.remove("large_callout");
-                                        cue.remove();
-                                    }, 0));
+                                    cue.add({
+                                        sync: function ()
+                                        {
+                                            callout.classList.remove("large_callout");
+                                            cue.remove();
+                                        },
+                                        delay: 0
+                                    });
                                     
                                     this.showing_details = false;
                                 } else {
