@@ -282,6 +282,69 @@
             };
         }());
         
+        
+        /**
+         * Handel sets of transitions as a unit.
+         */
+        BF.create_transition_cue = function (callback, failsafe)
+        {
+            var count = 0,
+                cue,
+                failsafe_timeout,
+                terminate_arr = [];
+            
+            function done()
+            {
+                window.clearTimeout(failsafe_timeout);
+                /// Clear the array to possibly help garbage collection.
+                terminate_arr = [];
+                /// Just in case another .remove() function gets called, it should not trigger this function.
+                count = 0;
+                
+                if (typeof callback === "function") {
+                    callback();
+                    callback = null;
+                }
+            }
+            
+            cue = {
+                add: function (terminator)
+                {
+                    terminate_arr[count] = terminator;
+                    count += 1;
+                },
+                remove: function ()
+                {
+                    count -= 1;
+                    
+                    ///NOTE: If .remove() is fired too many times, it will not trigger the done() function more than once.
+                    if (count === 0) {
+                        done();
+                    }
+                },
+                terminate: function ()
+                {
+                    terminate_arr.forEach(function (method)
+                    {
+                        if (typeof method === "function") {
+                            method();
+                        } else {
+                            /// Even if method is Undefined, it should not cause any problem to attempt to clear the timeout.
+                            window.clearTimeout(method);
+                        }
+                    });
+                    
+                    done();
+                }
+            };
+            
+            if (typeof failsafe === "number") {
+                failsafe_timeout = window.setTimeout(cue.terminate, failsafe);
+            }
+            
+            return cue;
+        };
+        
         /**
          * Create an element that can expand and collapse.
          *
@@ -1944,7 +2007,8 @@
                              */
                             maximize: function (options)
                             {
-                                var highlight_terms,
+                                var cue,
+                                    highlight_terms,
                                     that = this;
                                 
                                 /// Ignore all other requests while this (or another) callout is transitioning.
@@ -1977,7 +2041,7 @@
                                 ///NOTE: It needs to be set down here (after checking for BF.hide_callout_details() because BF.hide_callout_details() also sets "transitioning" to TRUE.
                                 this.transitioning = true;
                                 
-                                this.transition_cue.initialize(function on_transition_end()
+                                cue = BF.create_transition_cue(function on_transition_end()
                                 {
                                     ///NOTE: A short delay after the transition completes is to make sure that the browser has time to update the screen.
                                     window.setTimeout(function ()
@@ -2010,25 +2074,23 @@
                                 transparent_el.style.zIndex = 10;
                                 document.body.insertBefore(transparent_el, null);
                                 
-                                this.transition_cue.add();
                                 /// Fade in the transparent element.
                                 /// There is a short delay to let the callout start moving.
-                                BF.transition(transparent_el, {prop: "opacity", duration: "250ms", end_val: 0.7, timing: "steps(3, start)", delay: "50ms", failsafe: 500}, function ()
+                                cue.add(BF.transition(transparent_el, {prop: "opacity", duration: "250ms", end_val: 0.7, timing: "steps(3, start)", delay: "50ms", failsafe: 500}, function ()
                                 {
-                                    that.transition_cue.remove();
-                                });
+                                    cue.remove();
+                                }));
                                 
                                 /// Make sure the callout appears above the semi-transparent element used to fade out the text.
                                 callout.style.zIndex = 99;
                                 
-                                this.transition_cue.add();
                                 /// Fade out the pointer.
-                                BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 0, failsafe: 500}, function ()
+                                cue.add(BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 0, failsafe: 500}, function ()
                                 {
                                     /// Hide the pointer after transitioning.
                                     pointer.style.display = "none";
-                                    that.transition_cue.remove();
-                                });
+                                    cue.remove();
+                                }));
                                 
                                 ///NOTE: Small callouts are absolutely positioned, so if transitioning from small to larger (which should be the case),
                                 ///      it will need to be repositioned.
@@ -2042,22 +2104,20 @@
                                     callout.style.left = (callout.offsetLeft - window.pageXOffset) + "px";
                                 }
                                 
-                                this.transition_cue.add();
                                 /// Tell the callout to transition to a larger font size for certain words.
-                                window.setTimeout(function ()
+                                cue.add(window.setTimeout(function ()
                                 {
                                     callout.classList.add("large_callout");
-                                    that.transition_cue.remove();
-                                }, 0);
+                                    cue.remove();
+                                }, 0));
                                 
-                                this.transition_cue.add();
                                 /// While the callout is transitioning, switch the CSS to hide certain content and show others.
                                 /// E.g., the "more" button is hidden when showing details.
-                                window.setTimeout(function ()
+                                cue.add(window.setTimeout(function ()
                                 {
                                     callout.classList.add("detailed_callout");
-                                    that.transition_cue.remove();
-                                }, 200);
+                                    cue.remove();
+                                }, 200));
                                 
                                 ///NOTE: This is used by .align() to know how the callout should be aligned.
                                 this.showing_details = true;
@@ -2077,7 +2137,8 @@
                             },
                             shrink: function (options)
                             {
-                                var has_point_to,
+                                var cue,
+                                    has_point_to,
                                     highlight_terms,
                                     new_pos,
                                     that = this,
@@ -2112,7 +2173,7 @@
                                 
                                 ///FIXME: This does not work.
                                 if (has_point_to) {
-                                    this.transition_cue.initialize(function ()
+                                    cue = BF.create_transition_cue(function ()
                                     {
                                         ///NOTE: A short delay after the transition completes is to make sure that the browser has time to update the screen.
                                         window.setTimeout(function ()
@@ -2127,6 +2188,7 @@
                                             /// Realign the callout in case the user scrolled, and therefore the callout may not be entirely viewable. 
                                             that.align();
                                             
+                                            ///NOTE: maximized_callout is from the outer closure and used to identify and interact with the currently maximized callout.
                                             maximized_callout = undefined;
                                             
                                             /// Possibly call a callout (e.g., enlarge another callout).
@@ -2136,8 +2198,7 @@
                                         }, 50);
                                     }, 1000);
                                     
-                                    this.transition_cue.add();
-                                    BF.transition(transparent_el, {prop: "opacity", duration: "250ms", end_val: "0", timing: "steps(3, start)", delay: "50ms", failsafe: 500}, function ()
+                                    cue.add(BF.transition(transparent_el, {prop: "opacity", duration: "250ms", end_val: "0", timing: "steps(3, start)", delay: "50ms", failsafe: 500}, function ()
                                     {
                                         /// Remove from DOM and destroy the temporary transparent element.
                                         document.body.removeChild(transparent_el);
@@ -2147,8 +2208,8 @@
                                         /// Since we do not want the callout to displayed below the transparent element,
                                         /// we must change the z-index here, after has completely faded away.
                                         callout.style.zIndex = 0;
-                                        that.transition_cue.remove();
-                                    });
+                                        cue.remove();
+                                    }));
                                     
                                     ///NOTE: Small callouts are absolutely positioned, so if transitioning from small to larger (which should be the case),
                                     ///      it will need to be repositioned.
@@ -2162,28 +2223,23 @@
                                         callout.style.left = (callout.offsetLeft + window.pageXOffset) + "px";
                                     }
                                     
-                                    this.transition_cue.add();
-                                    /// Fade in the pointer.
                                     pointer.style.display = "block";
-                                    BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 1, failsafe: 500}, function ()
+                                    /// Fade in the pointer.
+                                    cue.add(BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 1, failsafe: 500}, function ()
                                     {
-                                        that.transition_cue.remove();
-                                    });
+                                        cue.remove();
+                                    }));
                                     
                                     ///FIXME: Prevent other transitions.
                                     if (typeof pos.top === "undefined" || typeof pos.left === "undefined") {
-                                        this.transition_cue.add();
-                                        BF.transition(callout, {prop: "opacity", duration: "300ms", start_val: 1, end_val: 0, failsafe: 500}, function ()
+                                        cue.add(BF.transition(callout, {prop: "opacity", duration: "300ms", start_val: 1, end_val: 0, failsafe: 500}, function ()
                                         {
-                                            that.transition_cue.remove();
+                                            cue.remove();
                                             BF.remove_callout(that.id);
-                                        });
+                                        }));
                                     } else {
-                                    
-                                        this.transition_cue.add();
-                                        
                                         /// Resize the callout to take up more of the screen.
-                                        BF.transition(callout, [
+                                        cue.add(BF.transition(callout, [
                                             ///NOTE: Could use transform: translate(x, y) to possibly optimize the transition.
                                             ///NOTE: It tries to use the previous height and width of the callout before it enlarged,
                                             ///      and if that does not work, it uses the defaults.
@@ -2194,29 +2250,28 @@
                                             {prop: "width",  duration: "300ms", end_val: (pos.css_width  || "300px"), failsafe: 5000}
                                         ], function ()
                                         {
-                                            that.transition_cue.remove();
-                                        });
+                                            cue.remove();
+                                        }));
                                     }
                                     
-                                    this.transition_cue.add();
                                     /// While the callout is transitioning, switch the CSS to hide certain content and show others.
                                     /// E.g., the "more" button is hidden when showing details.
-                                    window.setTimeout(function ()
+                                    cue.add(window.setTimeout(function ()
                                     {
                                         callout.classList.remove("detailed_callout");
-                                        that.transition_cue.remove();
-                                    }, 200);
+                                        cue.remove();
+                                    }, 200));
                                     
-                                    this.transition_cue.add();
                                     /// Tell the callout to transition to a small font size for certain words.
-                                    window.setTimeout(function ()
+                                    cue.add(window.setTimeout(function ()
                                     {
                                         callout.classList.remove("large_callout");
-                                        that.transition_cue.remove();
-                                    }, 0);
+                                        cue.remove();
+                                    }, 0));
                                     
                                     this.showing_details = false;
                                 } else {
+                                    ///FIXME: Use cue.terminate().
                                     /// Remove from DOM and destroy the temporary transparent element.
                                     document.body.removeChild(transparent_el);
                                     transparent_el = null;
@@ -2238,68 +2293,7 @@
                                     BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(url_component) + "/");
                                 }
                             },
-                            /**
-                             * Handel sets of CSS transition.
-                             *
-                             * This object is used to keep track of the progress a series of CSS transition.
-                             * This is used to be able to trigger a callback after all of the transitions are completed.
-                             * TODO: Move this to its own module. Perhaps BF.create_transition_cue().
-                             */
-                            transition_cue: (function ()
-                            {
-                                ///FIXME: This needs to get generated each time too.
-                                var callback,
-                                    cue,
-                                    failsafe_timeout;
-                                
-                                function done()
-                                {
-                                    window.clearTimeout(failsafe_timeout);
-                                    
-                                    if (typeof callback === "function") {
-                                        callback();
-                                        callback = null;
-                                    }
-                                }
-                                
-                                return {
-                                    /**
-                                     * Increment the cue.
-                                     */
-                                    add: function ()
-                                    {
-                                        cue += 1;
-                                    },
-                                    /**
-                                     * Initialize a new cue.
-                                     *
-                                     * @param func     (function)          A callback function to be called when the cue reaches zero.
-                                     * @param failsafe (number) (optional) How long to wait before triggering 
-                                     */
-                                    initialize: function (func, failsafe)
-                                    {
-                                        callback = func;
-                                        cue = 0;
-                                        
-                                        failsafe = Number(failsafe);
-                                        if (failsafe > 0) {
-                                            failsafe_timeout = window.setTimeout(done, failsafe);
-                                        }
-                                    },
-                                    /**
-                                     * Decrement the cue.
-                                     *
-                                     * When the cue reaches zero, execute the callback, if any.
-                                     */
-                                    remove: function ()
-                                    {
-                                        cue -= 1;
-                                        if (cue <= 0) {
-                                            done();
-                                        }
-                                    }
-                                };
-                            }()),
+
                             
                             /// Properties
                             id: id,
