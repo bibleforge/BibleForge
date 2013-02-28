@@ -298,8 +298,14 @@
                 window.clearTimeout(failsafe_timeout);
                 /// Clear the array to possibly help garbage collection.
                 terminate_arr = [];
-                /// Just in case another .remove() function gets called, it should not trigger this function.
-                count = 0;
+                
+                /// Make sure it is easy to detect when a cue is done.
+                cue.done = true;
+                
+                /// These functions should never be allowed to fire after a transition is completed, so let's enforce that.
+                delete cue.add;
+                delete cue.remove;
+                delete cue.terminate;
                 
                 if (typeof callback === "function") {
                     callback();
@@ -1649,7 +1655,8 @@
                 /**
                  * The closure for creating callouts.
                  */
-                var create_callout,
+                var cue,
+                    create_callout,
                     display_callout;
                 
                 create_callout = (function ()
@@ -1733,7 +1740,6 @@
                             res.top = point_to_offsetTop + point_to_rects[which_rect].height + pointer_length;
                             res.pointerClassName = "pointer-up";
                         }
-                        //callout.style.top = pos.top + "px";
                         
                         distance_from_right = window.innerWidth - middle_x;
                         /// Can the pointer fit on the far left?
@@ -1744,7 +1750,7 @@
                             /// the callout needs to be moved to the left a little further (pushing the callout off the page a little).
                             res.left = (window.innerWidth - callout_offsetWidth - pointer_distance + 8) + (distance_from_right < 50 ? 50 - (distance_from_right) : 0);
                         }
-                        //callout.style.left = pos.left + "px";
+                        
                         res.pointer_left = (middle_x - res.left - pointer_length);
                         
                         return res;
@@ -2019,8 +2025,7 @@
                              */
                             maximize: function (options)
                             {
-                                var cue,
-                                    highlight_terms,
+                                var highlight_terms,
                                     that = this;
                                 
                                 /// Ignore all other requests while this (or another) callout is transitioning.
@@ -2155,8 +2160,7 @@
                             },
                             shrink: function (options)
                             {
-                                var cue,
-                                    has_point_to,
+                                var has_point_to,
                                     highlight_terms,
                                     new_pos,
                                     that = this,
