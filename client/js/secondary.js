@@ -172,6 +172,9 @@
                         
                         if (typeof on_finish === "function") {
                             on_finish(data);
+                            /// Prevent this from triggering again.
+                            ///NOTE: If the transition is terminated, this function might try to be triggered twice.
+                            on_finish = null;
                         }
                     }
                 };
