@@ -2319,6 +2319,11 @@
                                     BF.remove_callout(this.id);
                                 }
                                 
+                                if (options.asap) {
+                                    debugger;
+                                    cue.terminate();
+                                }
+                                
                                 if (!options.ignore_state) {
                                     /// Change state now that the callout is not maximized to point to the top verse.
                                     highlight_terms = BF.get_highlighted_terms();
