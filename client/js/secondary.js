@@ -2187,7 +2187,8 @@
                             },
                             shrink: function (options)
                             {
-                                var has_point_to,
+                                var can_shrink = this.point_to_el_exists() && typeof pos.top === "number" && typeof pos.left === "number",
+                                    has_point_to,
                                     highlight_terms,
                                     new_pos,
                                     that = this,
@@ -2205,23 +2206,7 @@
                                 /// The "transitioning" property is used to prevent other callouts from being enlarged or this one from shrinking until after the transition has completed..
                                 this.transitioning = true;
                                 
-                                has_point_to = this.point_to_el_exists();
-                                if (!has_point_to) {
-                                    point_to = this.find_point_to_el();
-                                    has_point_to = Boolean(point_to);
-                                }
-                                /// Was the callout never aligned to a word?
-                                ///NOTE: This happens when the callout stated out maximized.
-                                if ((typeof pos.top === "undefined" || typeof pos.left === "undefined") && has_point_to) {
-                                    new_pos = calculate_pos(callout, pointer, point_to, pos, split_info);
-                                    if (new_pos) {
-                                        pos.top = new_pos.top;
-                                        pos.left = new_pos.left;
-                                    }
-                                }
-                                
-                                ///FIXME: This does not work.
-                                if (has_point_to) {
+                                if (can_shrink) {
                                     cue = BF.create_transition_cue(function ()
                                     {
                                         /// Set this first in case the following functions throw an error.
@@ -2324,12 +2309,14 @@
                                     });
                                 } else {
                                     ///FIXME: Use cue.terminate().
-                                    alert("FIXME: Use cue.terminate().")
+                                    //alert("FIXME: Use cue.terminate().")
                                     /// Remove from DOM and destroy the temporary transparent element.
                                     document.body.removeChild(transparent_el);
                                     transparent_el = null;
-                                    BF.remove_callout(this.id);
                                     this.maximized = false;
+                                    this.transitioning = false;
+                                    maximized_callout = undefined;
+                                    BF.callout_manager.remove_a_callout(this.id, null, true);
                                 }
                                 
                                 if (options.asap) {
@@ -2770,6 +2757,19 @@
                         }, true);
                     }
                 });
+            };
+            
+            BF.callout_manager.remove_a_callout = function (id, callback, asap)
+            {
+                callouts[id].remove(function ()
+                {
+                    /// Remove the callout object from memory.
+                    delete callouts[id];
+                    
+                    if (typeof callback === "function") {
+                        callback();
+                    }
+                }, asap);
             };
             
             BF.callout_manager.realign = function ()
