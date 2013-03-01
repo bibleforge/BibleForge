@@ -374,7 +374,7 @@
                         if (typeof terminate_arr[i] === "function") {
                             terminate_arr[i]();
                         }
-                    };
+                    }
                     ///NOTE: Terminating all of the functions should trigger done().
                 }
             };
@@ -1864,7 +1864,7 @@
                                 var diff;
                                 
                                 /// Is the callout small?  Only small callouts should be resized.
-                                if (!this.showing_details) {
+                                if (!this.maximized) {
                                     /// Determine if the callout needs to be resized to fit all of the content.
                                     /// E.g., go to Jeremiah 33 and click on "he" in the first verse.
                                     diff = inside.scrollHeight - inside.offsetHeight;
@@ -1904,7 +1904,7 @@
                                 }
                                 
                                 /// If the callout is showing details, it should be made to fill most of the screen.
-                                if (this.showing_details) {
+                                if (this.maximized) {
                                     /// Place the callout just below the bottom of the top bar.
                                     top    = (context.system.properties.topBar_height + 10);
                                     height = ((context.system.properties.viewport.height - top) * 0.85);
@@ -1947,7 +1947,7 @@
                             /**
                              * Delete the callout and stop the query, if it has not already.
                              */
-                            remove: function (callback)
+                            remove: function (callback, asap)
                             {
                                 /**
                                  * Actually remove the callout from the HTML tree.
@@ -1970,18 +1970,24 @@
                                 /// For example, if the user double clicked the "More" button, it might trigger the BF.hide_callout_details() function.
                                 /// Therefore, we need to wait until it is done transitioning, which should be momentarily.
                                 ///NOTE: The callout_obj variable must be used, not the "this" object.
-                                if (callout_obj.transitioning) {
-                                    window.setTimeout(callout_obj.remove, 50);
-                                } else {
-                                    /// Is the callout maximized?  If so, it will need to be shrunk and then removed.
-                                    if (BF.hide_callout_details) {
-                                        BF.hide_callout_details(remove_this_callout);
-                                        /// Hide the callout now, and remove it after the transitioning is complete (via remove_this_callout()).
-                                        callout.style.display = "none";
+                                if (this.transitioning) {
+                                    if (asap) {
+                                        cue.terminate();
                                     } else {
-                                        remove_this_callout();
+                                        window.setTimeout(function ()
+                                        {
+                                            callout_obj.remove(callback, asap);
+                                        }, 50);
+                                        return;
                                     }
                                 }
+                                
+                                /// Is the callout maximized?  If so, it will need to be shrunk immediately and then removed.
+                                if (this.maximized) {
+                                    this.shrink({asap: true});
+                                }
+                                
+                                remove_this_callout();
                             },
                             find_point_to_el: function ()
                             {
@@ -2003,7 +2009,7 @@
                                 pos.top += y;
                                 /// Is the callout small?  Only small callouts need to be moved since detailed callouts have fixed position,
                                 /// but when the large callouts transition to small ones, they need to know the correct position to return to.
-                                if (!this.showing_details) {
+                                if (!this.maximized) {
                                     callout.style.top = pos.top + "px";
                                 }
                             },
@@ -2164,7 +2170,7 @@
                                 });
                                 
                                 ///NOTE: This is used by .align() to know how the callout should be aligned.
-                                this.showing_details = true;
+                                this.maximized = true;
                                 
                                 /// Resize the callout to take up more of the screen.
                                 this.align(true);
@@ -2218,27 +2224,26 @@
                                 if (has_point_to) {
                                     cue = BF.create_transition_cue(function ()
                                     {
-                                        ///NOTE: A short delay after the transition completes is to make sure that the browser has time to update the screen.
-                                        window.setTimeout(function ()
-                                        {
-                                            /// Set this first in case the following functions throw an error.
-                                            that.transitioning = false;
-                                            
-                                            /// Because some things in the callout may have been changed by the user, check the height after transitioning back to a small callout.
-                                            /// E.g., Go to Matthew 1:11, click "Babylon," click "[+] more," change the pronunciation key to "(Modern)," then click off of the callout.
-                                            that.adjust_height();
-                                            
-                                            /// Realign the callout in case the user scrolled, and therefore the callout may not be entirely viewable. 
-                                            that.align();
-                                            
-                                            ///NOTE: maximized_callout is from the outer closure and used to identify and interact with the currently maximized callout.
-                                            maximized_callout = undefined;
-                                            
-                                            /// Possibly call a callout (e.g., enlarge another callout).
-                                            if (typeof options.callback === "function") {
-                                                options.callback();
-                                            }
-                                        }, 50);
+                                        /// Set this first in case the following functions throw an error.
+                                        that.transitioning = false;
+                                        
+                                        ///NOTE: This must be set before realigning the callout.
+                                        that.maximized = false;
+                                        
+                                        /// Because some things in the callout may have been changed by the user, check the height after transitioning back to a small callout.
+                                        /// E.g., Go to Matthew 1:11, click "Babylon," click "[+] more," change the pronunciation key to "(Modern)," then click off of the callout.
+                                        that.adjust_height();
+                                        
+                                        /// Realign the callout in case the user scrolled, and therefore the callout may not be entirely viewable. 
+                                        that.align();
+                                        
+                                        ///NOTE: maximized_callout is from the outer closure and used to identify and interact with the currently maximized callout.
+                                        maximized_callout = undefined;
+                                        
+                                        /// Possibly call a callout (e.g., enlarge another callout).
+                                        if (typeof options.callback === "function") {
+                                            options.callback();
+                                        }
                                     }, 1000);
                                     
                                     cue.add({id: 0, terminator: BF.transition(transparent_el, {prop: "opacity", duration: "250ms", end_val: "0", timing: "steps(3, start)", delay: "50ms", failsafe: 500}, function ()
@@ -2317,14 +2322,14 @@
                                         },
                                         delay: 0
                                     });
-                                    
-                                    this.showing_details = false;
                                 } else {
                                     ///FIXME: Use cue.terminate().
+                                    alert("FIXME: Use cue.terminate().")
                                     /// Remove from DOM and destroy the temporary transparent element.
                                     document.body.removeChild(transparent_el);
                                     transparent_el = null;
                                     BF.remove_callout(this.id);
+                                    this.maximized = false;
                                 }
                                 
                                 if (options.asap) {
