@@ -1695,10 +1695,10 @@
                      * @param split_info (object)  An object containing information about where the user originally clicked and possibly which part of the word the user clicked.
                      *                             Object structure: {mouse_x: number, mouse_y: number, which_rect: number}
                      * @note  For now at least, this function is placed outside of the callout object so that it does not have to be created each time a callout is made.
+                     * @note  This function will not calculate the proper position if the callout is maximized.
                      */
                     function calculate_pos(callout, pointer, point_to, pos, split_info)
                     {
-                        ///FIXME: callout.offsetHeight probably only works with position absolute, which is now not always the case.
                         var callout_offsetHeight = callout.offsetHeight,
                             callout_offsetWidth  = callout.offsetWidth,
                             distance_from_right, /// The distance (in pixels) from the right edge of the viewport to middle_x
