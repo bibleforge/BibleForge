@@ -2206,44 +2206,48 @@
                                 /// The "transitioning" property is used to prevent other callouts from being enlarged or this one from shrinking until after the transition has completed..
                                 this.transitioning = true;
                                 
-                                if (can_shrink) {
-                                    cue = BF.create_transition_cue(function ()
-                                    {
-                                        /// Set this first in case the following functions throw an error.
-                                        that.transitioning = false;
-                                        
-                                        ///NOTE: This must be set before realigning the callout.
-                                        that.maximized = false;
-                                        
+                                cue = BF.create_transition_cue(function ()
+                                {
+                                    /// Set this first in case the following functions throw an error.
+                                    that.transitioning = false;
+                                    
+                                    ///NOTE: This must be set before realigning the callout.
+                                    that.maximized = false;
+                                    
+                                    ///NOTE: maximized_callout is from the outer closure and used to identify and interact with the currently maximized callout.
+                                    maximized_callout = undefined;
+                                    
+                                    if (can_shrink) {
                                         /// Because some things in the callout may have been changed by the user, check the height after transitioning back to a small callout.
                                         /// E.g., Go to Matthew 1:11, click "Babylon," click "[+] more," change the pronunciation key to "(Modern)," then click off of the callout.
                                         that.adjust_height();
                                         
                                         /// Realign the callout in case the user scrolled, and therefore the callout may not be entirely viewable. 
                                         that.align();
-                                        
-                                        ///NOTE: maximized_callout is from the outer closure and used to identify and interact with the currently maximized callout.
-                                        maximized_callout = undefined;
-                                        
-                                        /// Possibly call a callout (e.g., enlarge another callout).
-                                        if (typeof options.callback === "function") {
-                                            options.callback();
-                                        }
-                                    }, 1000);
+                                    } else {
+                                        BF.callout_manager.remove_a_callout(that.id);
+                                    }
                                     
-                                    cue.add({id: 0, terminator: BF.transition(transparent_el, {prop: "opacity", duration: "250ms", end_val: "0", timing: "steps(3, start)", delay: "50ms", failsafe: 500}, function ()
-                                    {
-                                        /// Remove from DOM and destroy the temporary transparent element.
-                                        document.body.removeChild(transparent_el);
-                                        transparent_el = null;
-                                        
-                                        /// Make the callout on the same level as other callouts.
-                                        /// Since we do not want the callout to displayed below the transparent element,
-                                        /// we must change the z-index here, after has completely faded away.
-                                        callout.style.zIndex = 0;
-                                        cue.async_remove(0);
-                                    })});
+                                    /// Possibly call a callout (e.g., enlarge another callout).
+                                    if (typeof options.callback === "function") {
+                                        options.callback();
+                                    }
+                                }, 1000);
+                                
+                                cue.add({id: 0, terminator: BF.transition(transparent_el, {prop: "opacity", duration: "250ms", end_val: "0", timing: "steps(3, start)", delay: "50ms", failsafe: 500}, function ()
+                                {
+                                    /// Remove from DOM and destroy the temporary transparent element.
+                                    document.body.removeChild(transparent_el);
+                                    transparent_el = null;
                                     
+                                    /// Make the callout on the same level as other callouts.
+                                    /// Since we do not want the callout to displayed below the transparent element,
+                                    /// we must change the z-index here, after has completely faded away.
+                                    callout.style.zIndex = 0;
+                                    cue.async_remove(0);
+                                })});
+                                
+                                if (can_shrink) {
                                     ///NOTE: Small callouts are absolutely positioned, so if transitioning from small to larger (which should be the case),
                                     ///      it will need to be repositioned.
                                     if (callout.style.position !== "absolute") {
@@ -2256,6 +2260,7 @@
                                         callout.style.left = (callout.offsetLeft + window.pageXOffset) + "px";
                                     }
                                     
+                                    /// Make the pointer visible again.
                                     pointer.style.display = "block";
                                     /// Fade in the pointer.
                                     cue.add({id: 1, terminator: BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 1, failsafe: 500}, function ()
@@ -2263,31 +2268,20 @@
                                         cue.async_remove(1);
                                     })});
                                     
-                                    ///FIXME: Prevent other transitions.
-                                    if (typeof pos.top === "undefined" || typeof pos.left === "undefined") {
-                                        cue.add({id: 2, terminator: BF.transition(callout, {prop: "opacity", duration: "300ms", start_val: 1, end_val: 0, failsafe: 500}, function ()
-                                            {
-                                                console.log("FIXME: Use ASAP to remove.")
-                                                cue.async_remove(2);
-                                                BF.remove_callout(that.id);
-                                            })
-                                        });
-                                    } else {
-                                        /// Resize the callout to take up more of the screen.
-                                        cue.add({id: 3, terminator: BF.transition(callout, [
-                                            ///NOTE: Could use transform: translate(x, y) to possibly optimize the transition.
-                                            ///NOTE: It tries to use the previous height and width of the callout before it enlarged,
-                                            ///      and if that does not work, it uses the defaults.
-                                            ///      E.g., go to Ezekiel 18:5 and click the word "which." Then click more, and then click off of the callout.
-                                            {prop: "top",    duration: "300ms", end_val: pos.top  + "px",             failsafe: 5000},
-                                            {prop: "left",   duration: "300ms", end_val: pos.left + "px",             failsafe: 5000},
-                                            {prop: "height", duration: "300ms", end_val: (pos.css_height || "125px"), failsafe: 5000},
-                                            {prop: "width",  duration: "300ms", end_val: (pos.css_width  || "300px"), failsafe: 5000}
-                                        ], function ()
-                                        {
-                                            cue.async_remove(3);
-                                        })});
-                                    }
+                                    /// Resize the callout to take up more of the screen.
+                                    cue.add({id: 2, terminator: BF.transition(callout, [
+                                        ///NOTE: Could use transform: translate(x, y) to possibly optimize the transition.
+                                        ///NOTE: It tries to use the previous height and width of the callout before it enlarged,
+                                        ///      and if that does not work, it uses the defaults.
+                                        ///      E.g., go to Ezekiel 18:5 and click the word "which." Then click more, and then click off of the callout.
+                                        {prop: "top",    duration: "300ms", end_val: pos.top  + "px",             failsafe: 5000},
+                                        {prop: "left",   duration: "300ms", end_val: pos.left + "px",             failsafe: 5000},
+                                        {prop: "height", duration: "300ms", end_val: (pos.css_height || "125px"), failsafe: 5000},
+                                        {prop: "width",  duration: "300ms", end_val: (pos.css_width  || "300px"), failsafe: 5000}
+                                    ], function ()
+                                    {
+                                        cue.async_remove(2);
+                                    })});
                                     
                                     /// While the callout is transitioning, switch the CSS to hide certain content and show others.
                                     /// E.g., the "more" button is hidden when showing details.
@@ -2308,15 +2302,13 @@
                                         delay: 0
                                     });
                                 } else {
-                                    ///FIXME: Use cue.terminate().
-                                    //alert("FIXME: Use cue.terminate().")
-                                    /// Remove from DOM and destroy the temporary transparent element.
-                                    document.body.removeChild(transparent_el);
-                                    transparent_el = null;
-                                    this.maximized = false;
-                                    this.transitioning = false;
-                                    maximized_callout = undefined;
-                                    BF.callout_manager.remove_a_callout(this.id, null, true);
+                                    /// Fade out the callout since it is not properly connected to a word and therefore cannot be shrunk properly.
+                                    ///NOTE: This situation occurs if a page loads with maximized callout: e.g., http://bibleforge.com/en/Genesis%201%3A1/1/
+                                    ///      This could also occur if the word that the callout is attached to is removed.
+                                    cue.add({id: 1, terminator: BF.transition(callout, {prop: "opacity", duration: "300ms", end_val: 0, failsafe: 500}, function ()
+                                    {
+                                        cue.async_remove(1);
+                                    })});
                                 }
                                 
                                 if (options.asap) {
