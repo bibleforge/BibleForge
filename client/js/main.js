@@ -3368,7 +3368,7 @@ document.addEventListener("DOMContentLoaded", function ()
                                 /// Possibly shrink any maximized callouts.
                                 if (BF.callout_manager) {
                                     /// Since the state has already changed, set ignore_state to TRUE to make sure not to change again.
-                                    BF.callout_manager.shrink_maximized_callout({ignore_state: true, asap: true});
+                                    BF.callout_manager.shrink_maximized_callout({ignore_state: true});
                                 }
                             }
                         }, 0);
@@ -3575,7 +3575,7 @@ document.addEventListener("DOMContentLoaded", function ()
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?35752449", {
+                BF.include("/js/secondary.js?35760764", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,

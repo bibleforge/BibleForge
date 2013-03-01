@@ -326,25 +326,28 @@
             cue = {
                 add: function (options)
                 {
-                    var timeout;
+                    var timeout,
+                        sync_wrapper;
                     
                     if (options.sync) {
-                        timeout = (function (which)
+                        sync_wrapper = (function (which)
                         {
-                            return window.setTimeout(function ()
+                            return function ()
                             {
                                 options.sync();
                                 delete options.sync;
                                 delete terminate_arr[which];
                                 remove();
-                            }, options.delay);
+                            };
                         }(count));
+                        
+                        timeout = window.setTimeout(sync_wrapper, options.delay);
                         
                         options.terminator = function ()
                         {
                             if (options.sync) {
                                 window.clearTimeout(timeout);
-                                options.sync();
+                                sync_wrapper();
                             }
                         };
                     } else {
@@ -361,12 +364,14 @@
                 },
                 terminate: function ()
                 {
-                    terminate_arr.forEach(function (method)
-                    {
-                        if (typeof method === "function") {
-                            method();
+                    var i;
+                    
+                    ///NOTE: Each terminate function in the array should remove itself from terminate_arr.
+                    for (i = terminate_arr.length - 1; i >= 0; i -= 1) {
+                        if (typeof terminate_arr[i] === "function") {
+                            terminate_arr[i]();
                         }
-                    });
+                    };
                     ///NOTE: Terminating all of the functions should trigger done().
                 }
             };
@@ -2320,7 +2325,6 @@
                                 }
                                 
                                 if (options.asap) {
-                                    debugger;
                                     cue.terminate();
                                 }
                                 
@@ -2340,7 +2344,6 @@
                                 }
                             },
 
-                            
                             /// Properties
                             id: id,
                             just_created: true
