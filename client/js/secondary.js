@@ -288,7 +288,8 @@
          */
         BF.create_transition_cue = function (callback, failsafe)
         {
-            var count = 0,
+            var async_remove_tracker = {},
+                count = 0,
                 cue,
                 failsafe_timeout,
                 terminate_arr = [];
@@ -313,17 +314,31 @@
                 }
             }
             
+            function remove()
+            {
+                count -= 1;
+                
+                if (count === 0) {
+                    done();
+                }
+            }
+            
             cue = {
                 add: function (options)
                 {
                     var timeout;
                     
                     if (options.sync) {
-                        timeout = window.setTimeout(function ()
+                        timeout = (function (which)
                         {
-                            options.sync();
-                            delete options.sync;
-                        }, options.delay);
+                            return window.setTimeout(function ()
+                            {
+                                options.sync();
+                                delete options.sync;
+                                delete terminate_arr[which];
+                                remove();
+                            }, options.delay);
+                        }(count));
                         
                         options.terminator = function ()
                         {
@@ -332,25 +347,25 @@
                                 options.sync();
                             }
                         };
+                    } else {
+                        async_remove_tracker[options.id] = count;
                     }
                     
                     terminate_arr[count] = options.terminator;
                     count += 1;
                 },
-                remove: function ()
+                async_remove: function (id)
                 {
-                    count -= 1;
-                    
-                    ///NOTE: If .remove() is fired too many times, it will not trigger the done() function more than once.
-                    if (count === 0) {
-                        done();
-                    }
+                    delete terminate_arr[async_remove_tracker[id]];
+                    remove();
                 },
                 terminate: function ()
                 {
                     terminate_arr.forEach(function (method)
                     {
-                        method();
+                        if (typeof method === "function") {
+                            method();
+                        }
                     });
                     ///NOTE: Terminating all of the functions should trigger done().
                 }
@@ -2093,20 +2108,20 @@
                                 
                                 /// Fade in the transparent element.
                                 /// There is a short delay to let the callout start moving.
-                                cue.add({terminator: BF.transition(transparent_el, {prop: "opacity", duration: "250ms", end_val: 0.7, timing: "steps(3, start)", delay: "50ms", failsafe: 500}, function ()
+                                cue.add({id: 0, terminator: BF.transition(transparent_el, {prop: "opacity", duration: "250ms", end_val: 0.7, timing: "steps(3, start)", delay: "50ms", failsafe: 500}, function ()
                                 {
-                                    cue.remove();
+                                    cue.async_remove(0);
                                 })});
                                 
                                 /// Make sure the callout appears above the semi-transparent element used to fade out the text.
                                 callout.style.zIndex = 99;
                                 
                                 /// Fade out the pointer.
-                                cue.add({terminator: BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 0, failsafe: 500}, function ()
+                                cue.add({id: 1, terminator: BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 0, failsafe: 500}, function ()
                                 {
                                     /// Hide the pointer after transitioning.
                                     pointer.style.display = "none";
-                                    cue.remove();
+                                    cue.async_remove(1);
                                 })});
                                 
                                 ///NOTE: Small callouts are absolutely positioned, so if transitioning from small to larger (which should be the case),
@@ -2126,7 +2141,6 @@
                                     sync: function ()
                                     {
                                         callout.classList.add("large_callout");
-                                        cue.remove();
                                     },
                                     delay: 0
                                 });
@@ -2137,7 +2151,6 @@
                                     sync: function ()
                                     {
                                         callout.classList.add("detailed_callout");
-                                        cue.remove();
                                     },
                                     delay: 200
                                 });
@@ -2220,7 +2233,7 @@
                                         }, 50);
                                     }, 1000);
                                     
-                                    cue.add({terminator: BF.transition(transparent_el, {prop: "opacity", duration: "250ms", end_val: "0", timing: "steps(3, start)", delay: "50ms", failsafe: 500}, function ()
+                                    cue.add({id: 0, terminator: BF.transition(transparent_el, {prop: "opacity", duration: "250ms", end_val: "0", timing: "steps(3, start)", delay: "50ms", failsafe: 500}, function ()
                                     {
                                         /// Remove from DOM and destroy the temporary transparent element.
                                         document.body.removeChild(transparent_el);
@@ -2230,7 +2243,7 @@
                                         /// Since we do not want the callout to displayed below the transparent element,
                                         /// we must change the z-index here, after has completely faded away.
                                         callout.style.zIndex = 0;
-                                        cue.remove();
+                                        cue.async_remove(0);
                                     })});
                                     
                                     ///NOTE: Small callouts are absolutely positioned, so if transitioning from small to larger (which should be the case),
@@ -2247,22 +2260,23 @@
                                     
                                     pointer.style.display = "block";
                                     /// Fade in the pointer.
-                                    cue.add({terminator: BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 1, failsafe: 500}, function ()
+                                    cue.add({id: 1, terminator: BF.transition(pointer, {prop: "opacity", duration: "300ms", end_val: 1, failsafe: 500}, function ()
                                     {
-                                        cue.remove();
+                                        cue.async_remove(1);
                                     })});
                                     
                                     ///FIXME: Prevent other transitions.
                                     if (typeof pos.top === "undefined" || typeof pos.left === "undefined") {
-                                        cue.add({terminator: BF.transition(callout, {prop: "opacity", duration: "300ms", start_val: 1, end_val: 0, failsafe: 500}, function ()
+                                        cue.add({id: 2, terminator: BF.transition(callout, {prop: "opacity", duration: "300ms", start_val: 1, end_val: 0, failsafe: 500}, function ()
                                             {
-                                                cue.remove();
+                                                console.log("FIXME: Use ASAP to remove.")
+                                                cue.async_remove(2);
                                                 BF.remove_callout(that.id);
                                             })
                                         });
                                     } else {
                                         /// Resize the callout to take up more of the screen.
-                                        cue.add(BF.transition(callout, [
+                                        cue.add({id: 3, terminator: BF.transition(callout, [
                                             ///NOTE: Could use transform: translate(x, y) to possibly optimize the transition.
                                             ///NOTE: It tries to use the previous height and width of the callout before it enlarged,
                                             ///      and if that does not work, it uses the defaults.
@@ -2273,8 +2287,8 @@
                                             {prop: "width",  duration: "300ms", end_val: (pos.css_width  || "300px"), failsafe: 5000}
                                         ], function ()
                                         {
-                                            cue.remove();
-                                        }));
+                                            cue.async_remove(3);
+                                        })});
                                     }
                                     
                                     /// While the callout is transitioning, switch the CSS to hide certain content and show others.
@@ -2283,7 +2297,6 @@
                                         sync: function ()
                                         {
                                             callout.classList.remove("detailed_callout");
-                                            cue.remove();
                                         },
                                         delay: 200
                                     });
@@ -2293,7 +2306,6 @@
                                         sync: function ()
                                         {
                                             callout.classList.remove("large_callout");
-                                            cue.remove();
                                         },
                                         delay: 0
                                     });
