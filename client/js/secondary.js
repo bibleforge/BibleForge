@@ -221,7 +221,7 @@
                     /// If this function is called really quickly, it is possible that the transition hasn't event started at all.
                     /// So, we need to stop if from starting, set the ending value, and trigger the 
                     if (!started) {
-                        window.setTimeout(start_timeout);
+                        window.clearTimeout(start_timeout);
                         el.style[data.prop] = data.end_val;
                     }
                     if (!ended) {
