@@ -1956,8 +1956,14 @@
                                  */
                                 function remove_this_callout()
                                 {
-                                    document.body.removeChild(callout);
-                                    callout = null;
+                                    ///NOTE: The .remove() function might be called multiple times.
+                                    ///      For example, the .shrink() function, which can be called below could also trigger the .remove() function
+                                    ///      if there is no word for the callout to be linked back to.
+                                    if (callout) {
+                                        document.body.removeChild(callout);
+                                        callout = null;
+                                    }
+                                    
                                     if (typeof callback === "function") {
                                         callback();
                                     }
