@@ -2188,9 +2188,7 @@
                             shrink: function (options)
                             {
                                 var can_shrink = this.point_to_el_exists() && typeof pos.top === "number" && typeof pos.left === "number",
-                                    has_point_to,
                                     highlight_terms,
-                                    new_pos,
                                     that = this,
                                     url_component;
                                 
