@@ -2811,27 +2811,31 @@
                     options = {};
                 }
                 
+                /// If there is nothing to remove, just trigger the callback.
                 if (callout_arr.length === 0) {
                     if (typeof callback === "function") {
                         callback();
                     }
                 } else {
+                    /// Since removing callouts may need to be done asynchronously, we need to create a callback loop.
+                    /// We use this closure to create the loop() function.
+                    /// If the callouts need to be removed asap, they can also be removed synchronously.
+                    /**
+                     * Remove callouts with a callback loop.
+                     *
+                     * @param i (number) The variable to increment.
+                     * @note  This function is called immediately to create a closure around loop().
+                     */
                     (function remove_callout(i)
                     {
+                        /**
+                         * Increment the loop.
+                         */
                         function loop()
                         {
+                            /// Is there still more to remove?
                             if (i > 0) {
-                                if (options.asap) {
-                                    remove_callout(i - 1);
-                                } else {
-                                    window.setTimeout(function ()
-                                    {
-                                        remove_callout(i - 1);
-                                    }, 0);
-                                }
-                            } else if (options.force) {
-                                /// Try again to just In case any callouts were added while looping.
-                                BF.callout_manager.remove_callouts(callback, options);
+                                remove_callout(i - 1);
                             } else {
                                 if (typeof callback === "function") {
                                     callback();
@@ -2839,18 +2843,20 @@
                             }
                         }
                         
-                        /// Does that callout exist?
-                        if (callout_arr[i] && callouts[callout_arr[i]] && (options.force || !callouts[callout_arr[i]].just_created)) {  
+                        /// If a callout was just created, don't remove it unless we really want to remove them all.
+                        ///NOTE: Clicking on a word both creates a callout and is closes other callouts.
+                        ///      We use .just_created to make sure we don't instantly close the one we just opened.
+                        if (callouts[callout_arr[i]] && (options.force || !callouts[callout_arr[i]].just_created)) {  
                             callouts[callout_arr[i]].remove(function ()
                             {
                                 delete callouts[callout_arr[i]];
                                 loop();
                             }, options);
                         } else {
-                            /// If the callout does not exist, just try the next one.
+                            /// If the callout was just created, just try the next one.
                             loop();
                         }
-                        
+                    /// Start the loop at the end since we are removing elements.
                     }(callout_arr.length - 1));
                 }
             };
