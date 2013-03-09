@@ -2094,15 +2094,11 @@
                                 
                                 cue = BF.create_transition_cue(function on_transition_end()
                                 {
-                                    ///NOTE: A short delay after the transition completes is to make sure that the browser has time to update the screen.
-                                    window.setTimeout(function ()
-                                    {
-                                        that.transitioning = false;
-                                        
-                                        if (options.callback) {
-                                            options.callback();
-                                        }
-                                    }, 50);
+                                    that.transitioning = false;
+                                    
+                                    if (options.callback) {
+                                        options.callback();
+                                    }
                                 }, 1000);
                                 
                                 /// Get the current width and height of the element so that when it can return to its original size later.
