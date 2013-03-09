@@ -1947,7 +1947,7 @@
                             /**
                              * Delete the callout and stop the query, if it has not already.
                              */
-                            remove: function (callback, asap)
+                            remove: function (callback, options)
                             {
                                 /**
                                  * Actually remove the callout from the HTML tree.
@@ -1971,12 +1971,12 @@
                                 /// Therefore, we need to wait until it is done transitioning, which should be momentarily.
                                 ///NOTE: The callout_obj variable must be used, not the "this" object.
                                 if (this.transitioning) {
-                                    if (asap) {
+                                    if (options && options.asap) {
                                         cue.terminate();
                                     } else {
                                         window.setTimeout(function ()
                                         {
-                                            callout_obj.remove(callback, asap);
+                                            callout_obj.remove(callback, options);
                                         }, 50);
                                         return;
                                     }
@@ -1984,9 +1984,8 @@
                                 
                                 /// Is the callout maximized?  If so, it will need to be shrunk immediately and then removed.
                                 if (this.maximized) {
-                                    this.shrink({asap: true});
+                                    this.shrink(options);
                                 }
-                                
                                 remove_this_callout();
                             },
                             find_point_to_el: function ()
@@ -2744,12 +2743,12 @@
                         {
                             /// Remove the callout object from memory.
                             delete callouts[index];
-                        }, true);
+                        }, {asap: true});
                     }
                 });
             };
             
-            BF.callout_manager.remove_a_callout = function (id, callback, asap)
+            BF.callout_manager.remove_a_callout = function (id, callback, options)
             {
                 callouts[id].remove(function ()
                 {
@@ -2759,7 +2758,7 @@
                     if (typeof callback === "function") {
                         callback();
                     }
-                }, asap);
+                }, options);
             };
             
             BF.callout_manager.realign = function ()
@@ -2802,9 +2801,13 @@
                 }
             };
             
-            BF.callout_manager.remove_callouts = function (callback, asap, force)
+            BF.callout_manager.remove_callouts = function (callback, options)
             {
                 var callout_arr = Object.keys(callouts);
+                
+                if (!options) {
+                    options = {};
+                }
                 
                 if (callout_arr.length === 0) {
                     if (typeof callback === "function") {
@@ -2816,7 +2819,7 @@
                         function loop()
                         {
                             if (i > 0) {
-                                if (asap) {
+                                if (options.asap) {
                                     remove_callout(i - 1);
                                 } else {
                                     window.setTimeout(function ()
@@ -2824,9 +2827,9 @@
                                         remove_callout(i - 1);
                                     }, 0);
                                 }
-                            } else if (force) {
+                            } else if (options.force) {
                                 /// Try again to just In case any callouts were added while looping.
-                                BF.callout_manager.remove_callouts(callback, asap);
+                                BF.callout_manager.remove_callouts(callback, options);
                             } else {
                                 if (typeof callback === "function") {
                                     callback();
@@ -2835,12 +2838,12 @@
                         }
                         
                         /// Does that callout exist?
-                        if (callout_arr[i] && callouts[callout_arr[i]] && (force || !callouts[callout_arr[i]].just_created)) {
+                        if (callout_arr[i] && callouts[callout_arr[i]] && (options.force || !callouts[callout_arr[i]].just_created)) {  
                             callouts[callout_arr[i]].remove(function ()
                             {
                                 delete callouts[callout_arr[i]];
                                 loop();
-                            }, asap);
+                            }, options);
                         } else {
                             /// If the callout does not exist, just try the next one.
                             loop();
@@ -2897,10 +2900,9 @@
             }
         }, false);
         
-        
         context.system.event.attach("scrollCleared", function ()
         {
-            BF.callout_manager.remove_callouts(null, true, true);
+            BF.callout_manager.remove_callouts(null, {asap: true, force: true, ignore_state: true});
             
             BF.callout_manager.clear_cache();
         });
