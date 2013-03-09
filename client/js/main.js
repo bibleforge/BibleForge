@@ -29,7 +29,7 @@
 /* global BF */
 
 /// Set JSHint options.
-// jshint bitwise:true, curly:true, eqeqeq:true, forin:true, immed:true, latedef:true, newcap:true, noarg:true, noempty:true, nonew:true, onevar:true, plusplus:true, quotmark:double, strict:true, undef:true, es5:true, evil:true, browser:true
+// jshint bitwise:true, curly:true, eqeqeq:true, forin:true, immed:true, latedef:true, newcap:true, noarg:true, noempty:true, nonew:true, onevar:true, plusplus:true, quotmark:double, strict:true, undef:true, unused:strict, es5:true, evil:true, browser:true
 
 /**
  * After the HTML has loaded, start BibleForge.
@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function ()
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (1611)",
-            modified:  33069161
+            modified:  36488397
         };
     }
     
@@ -3578,7 +3578,7 @@ document.addEventListener("DOMContentLoaded", function ()
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?36487461", {
+                BF.include("/js/secondary.js?36488246", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,

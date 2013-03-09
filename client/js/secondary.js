@@ -29,7 +29,7 @@
 /* global BF */
 
 /// Set JSHint options.
-// jshint bitwise:true, curly:true, eqeqeq:true, forin:true, immed:true, latedef:true, newcap:true, noarg:true, noempty:true, nonew:true, onevar:true, plusplus:true, quotmark:double, strict:true, undef:true, es5:true, browser:true
+// jshint bitwise:true, curly:true, eqeqeq:true, forin:true, immed:true, latedef:true, newcap:true, noarg:true, noempty:true, nonew:true, onevar:true, plusplus:true, quotmark:double, strict:true, undef:true, unused:strict, es5:true, browser:true
 
 (function ()
 {
@@ -1688,16 +1688,13 @@
                      * Determine where the callout should be positioned in order to be able to point to the correct word.
                      *
                      * @param callout    (element) The DOM element representing the callout.
-                     * @param pointer    (element) The triangular pointer element.
                      * @param point_to   (element) The element the callout should point to.
-                     * @param pos        (object)  An object containing position of the callout so that this information can be retrieved quickly without accessing the DOM.
-                     *                             Object structure: {left: number, top: number}
                      * @param split_info (object)  An object containing information about where the user originally clicked and possibly which part of the word the user clicked.
                      *                             Object structure: {mouse_x: number, mouse_y: number, which_rect: number}
                      * @note  For now at least, this function is placed outside of the callout object so that it does not have to be created each time a callout is made.
                      * @note  This function will not calculate the proper position if the callout is maximized.
                      */
-                    function calculate_pos(callout, pointer, point_to, pos, split_info)
+                    function calculate_pos(callout, point_to, split_info)
                     {
                         var callout_offsetHeight = callout.offsetHeight,
                             callout_offsetWidth  = callout.offsetWidth,
@@ -1933,7 +1930,7 @@
                                     }
                                 } else {
                                     /// Align the callout to a specific word.
-                                    new_pos = calculate_pos(callout, pointer, point_to, pos, split_info);
+                                    new_pos = calculate_pos(callout, point_to, split_info);
                                     if (new_pos) {
                                         pos.top  = new_pos.top;
                                         pos.left = new_pos.left;

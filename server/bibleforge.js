@@ -26,7 +26,7 @@
  */
 
 /// Set JSHint options.
-// jshint bitwise:true, curly:true, eqeqeq:true, forin:true, immed:true, latedef:true, newcap:true, noarg:true, noempty:true, nonew:true, onevar:true, plusplus:true, quotmark:double, strict:true, undef:true, es5:true, node:true
+// jshint bitwise:true, curly:true, eqeqeq:true, forin:true, immed:true, latedef:true, newcap:true, noarg:true, noempty:true, nonew:true, onevar:true, plusplus:true, quotmark:double, strict:true, undef:true, unused:strict, es5:true, node:true
 
 "use strict";
 
@@ -754,6 +754,10 @@ BF.lexical_lookup = function (data, callback)
                             /// Asynchronously read the file.
                             require("fs").readFile(__dirname + "/index_non-js.html", "utf8", function (err, data)
                             {
+                                if (err) {
+                                    ///TODO: Log errors.
+                                    console.error(err);
+                                }
                                 /// Is BibleForge configued to cache the results?
                                 ///NOTE: Production servers should use the cache.
                                 if (BF.config.cache_simple_html) {
