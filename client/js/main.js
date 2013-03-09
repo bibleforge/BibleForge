@@ -1332,6 +1332,9 @@ document.addEventListener("DOMContentLoaded", function ()
                                 };
                                 
                                 for (i = 0; i < func_arr_len; i += 1) {
+                                    ///NOTE: It would be a good idea to use a try/catch to prevent errors in events from preventing the code that called the
+                                    ///      event from firing.  However, there would need to be some sort of error handling. Sending a message back to the
+                                    ///      server would be a good feature.
                                     func_list[name][i].func(e);
                                     
                                     /// Is this function only supposed to be executed once?
