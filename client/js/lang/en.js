@@ -1497,7 +1497,8 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
              * Create regex array to search through the verses that will soon be returned by the server.
              *
              * @example BF.lang.prepare_highlighter(q_obj.value);
-             * @example BF.lang.prepare_highlighter("search terms");
+             * @example BF.lang.prepare_highlighter("search terms"); /// Returns [{regex: /=([0-9]+)>\(*(?:search|[^<]+-search)(?:e|l)?(?:a(?:l|n(?:ce|t)|te|ble)|e(?:n(?:ce|t)|r|ment)|i(?:c|ble|on|sm|t[iy]|ve|ze)|ment|ous?)?(?:ic(?:a(?:te|l)|it[iy])|a(?:tive|lize)|ful|ness|self)?(?:a(?:t(?:ion(?:al)?|or)|nci|l(?:l[iy]|i(?:sm|t[iy])))|tional|e(?:n(?:ci|til)|l[iy])|i(?:z(?:er|ation)|v(?:eness|it[iy]))|b(?:l[iy]|ilit[iy])|ous(?:l[iy]|ness)|fulness|log[iy])?(?:[bdfgmnprt]?(?:i?ng(?:ly)?|e?(?:d(?:ly)?|edst|st|th)|ly))?(?:e[sd]|s)?(?:['’](?:s['’]?)?)?[),.?!;:—]*[<-]/i, word_count: 1}, {regex: /=([0-9]+)>\(*(?:term|[^<]+-term)(?:e|l)?(?:a(?:l|n(?:ce|t)|te|ble)|e(?:n(?:ce|t)|r|ment)|i(?:c|ble|on|sm|t[iy]|ve|ze)|ment|ous?)?(?:ic(?:a(?:te|l)|it[iy])|a(?:tive|lize)|ful|ness|self)?(?:a(?:t(?:ion(?:al)?|or)|nci|l(?:l[iy]|i(?:sm|t[iy])))|tional|e(?:n(?:ci|til)|l[iy])|i(?:z(?:er|ation)|v(?:eness|it[iy]))|b(?:l[iy]|ilit[iy])|ous(?:l[iy]|ness)|fulness|log[iy])?(?:[bdfgmnprt]?(?:i?ng(?:ly)?|e?(?:d(?:ly)?|edst|st|th)|ly))?(?:e[sd]|s)?(?:['’](?:s['’]?)?)?[),.?!;:—]*[<-]/i, word_count: 1}]
+             * @example BF.lang.prepare_highlighter("\"in the\" begin*"); /// Returns [{regex: /=([0-9]+)>\(*(?:in|[^<]+-in)[),.?!;:—]*[<-][^<]*[^>]*=([0-9]+)>\(*(?:the|[^<]+-the)[),.?!;:—]*[<-]/i, word_count: 2}, {regex: /=([0-9]+)>\(*(?:begin[^<>]*|[^<]+-begin[^<>]*)[),.?!;:—]*[<-]/i, word_count: 1}]
              * @param   search_terms (string) The terms to look for.
              * @return  An array of regular expressions.
              * @note    Called by run_new_query().
