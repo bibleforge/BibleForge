@@ -1483,7 +1483,7 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                 }
                 /// Find most words based on stem morphology.
                 ///NOTE: [bdfgmnprt]? selects possible doubles.
-                return "=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")(?:e|l)?(?:a(?:l|n(?:ce|t)|te|ble)|e(?:n(?:ce|t)|r|ment)|i(?:c|ble|on|sm|t[iy]|ve|ze)|ment|ous?)?(?:ic(?:a(?:te|l)|it[iy])|a(?:tive|lize)|ful|ness|self)?(?:a(?:t(?:ion(?:al)?|or)|nci|l(?:l[iy]|i(?:sm|t[iy])))|tional|e(?:n(?:ci|til)|l[iy])|i(?:z(?:er|ation)|v(?:eness|it[iy]))|b(?:l[iy]|ilit[iy])|ous(?:l[iy]|ness)|fulness|log[iy])?(?:[bdfgmnprt]?(?:i?ng(?:ly)?|e?(?:d(?:ly)?|edst|st|th)|ly))?(?:e[sd]|s)?(?:'(?:s'?)?)?[),.?!;:]*[<-]";
+                return "=([0-9]+)>\\(*(?:" + stemmed_word + "|[^<]+-" + stemmed_word + ")(?:e|l)?(?:a(?:l|n(?:ce|t)|te|ble)|e(?:n(?:ce|t)|r|ment)|i(?:c|ble|on|sm|t[iy]|ve|ze)|ment|ous?)?(?:ic(?:a(?:te|l)|it[iy])|a(?:tive|lize)|ful|ness|self)?(?:a(?:t(?:ion(?:al)?|or)|nci|l(?:l[iy]|i(?:sm|t[iy])))|tional|e(?:n(?:ci|til)|l[iy])|i(?:z(?:er|ation)|v(?:eness|it[iy]))|b(?:l[iy]|ilit[iy])|ous(?:l[iy]|ness)|fulness|log[iy])?(?:[bdfgmnprt]?(?:i?ng(?:ly)?|e?(?:d(?:ly)?|edst|st|th)|ly))?(?:e[sd]|s)?(?:['’](?:s['’]?)?)?[),.?!;:]*[<-]";
             }
             
             /**
