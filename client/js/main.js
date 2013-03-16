@@ -194,22 +194,43 @@ document.addEventListener("DOMContentLoaded", function ()
     /**
      * Remove an element or a range of elements from an array.
      *
-     * @example BF.remove([0,1,2,3],  1);     /// Converts array to [0,2,3]
-     * @example BF.remove([0,1,2,3], -2);     /// Converts array to [0,1,3]
-     * @example BF.remove([0,1,2,3],  1,  2); /// Converts array to [0,3]
-     * @example BF.remove([0,1,2,3], -2, -1); /// Converts array to [0,1]
-     * @param   arr  (array)              The array to mutate.
-     * @param   from (integer)            The index to remove, or, if two parameters are given, the index to begin removing from.
-     * @param   to   (integer) (optional) The index to remove to.
-     * @return  An integer representing the length of the new array.
-     * @note    This mutates the array; it does not return an array.
-     * @see     http://ejohn.org/blog/javascript-array-remove/
+     * @example BF.remove([0,1,2,3],  1);       /// Converts array to [0,2,3]
+     * @example BF.remove([0,1,2,3],  1, true); /// Converts array to [0,3,2] (note the messed up order)
+     * @example BF.remove([0,1,2,3], -1);       /// Converts array to [0,1,2]
+     * @example BF.remove([0,1,2,3], -1, true); /// Converts array to [0,1,2]
+     * @param   arr (array)   The array to mutate.
+     * @param   i   (integer) The index to remove.
+     * @return  NULL. It mutates the array.
      */
-    BF.remove = function(arr, from, to)
+    BF.remove = function(arr, i, order_irrelevant)
     {
-        var rest = arr.slice((to || from) + 1 || arr.length);
-        arr.length = from < 0 ? arr.length + from : from;
-        return arr.push.apply(arr, rest);
+        var len;
+        
+        if (order_irrelevant) {
+            /// This method is much faster, but may mess up the order.
+            
+            len = arr.length;
+            /// Handle negative numbers.
+            if (i < 0) {
+                i = len + i;
+                /// Was the number too low? Then just remove the first element.
+                if (i < 0) {
+                    ///NOTE: This is for compatibility with the splice method.
+                    i = 0;
+                }
+            }
+            
+            /// If the last element is to be removed, then all we need to do is pop it off.
+            if (i === len - 1) {
+                arr.pop();
+            } else if (i < len && i > 0) {
+                /// This works by popping off the last array element and using that to replace the element to be removed.
+                arr[i] = arr.pop();
+            }
+        } else {
+            /// Use the orderly, but slower, splice method.
+            arr.splice(i, 1);
+        }
     };
     
     /**
