@@ -204,32 +204,34 @@ document.addEventListener("DOMContentLoaded", function ()
      */
     BF.remove = function(arr, i, order_irrelevant)
     {
-        var len;
+        var len = arr.length;
         
-        if (order_irrelevant) {
-            /// This method is much faster, but may mess up the order.
-            
-            len = arr.length;
-            /// Handle negative numbers.
-            if (i < 0) {
-                i = len + i;
-                /// Was the number too low? Then just remove the first element.
-                if (i < 0) {
-                    ///NOTE: This is for compatibility with the splice method.
-                    i = 0;
-                }
-            }
-            
-            /// If the last element is to be removed, then all we need to do is pop it off.
-            if (i === len - 1) {
-                arr.pop();
-            } else if (i < len && i > 0) {
+        /// Handle negative numbers.
+        if (i < 0) {
+            i = len + i;
+        }
+        
+        /// If the last element is to be removed, then all we need to do is pop it off.
+        ///NOTE: This is always the fastest method and it is orderly too.
+        if (i === len - 1) {
+            arr.pop();
+        /// Can use we the faster (but unorderly) remove method?
+        } else if (order_irrelevant || i === len - 2) {
+            if (i >= 0 && i < len) {
                 /// This works by popping off the last array element and using that to replace the element to be removed.
                 arr[i] = arr.pop();
             }
         } else {
-            /// Use the orderly, but slower, splice method.
-            arr.splice(i, 1);
+            /// The first element can be quickly shifted off.
+            if (i === 0) {
+                arr.shift();
+            /// Ignore numbers that are still negative.
+            ///NOTE: By default, if a number is below the total array count (e.g., BF.remove([0,1], -3)), splice() will remove the first element.
+            ///      This behavior is undesirable because it is unexpected.
+            } else if (i > 0) {
+                /// Use the orderly, but slower, splice method.
+                arr.splice(i, 1);
+            }
         }
     };
     
