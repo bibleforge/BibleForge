@@ -436,7 +436,7 @@ BF.standard_search = function (data, callback)
     }
     
     /// Run the Sphinx search and return both the verse IDs and the HTML.
-    BF.db.query(query, function (data)
+    BF.db.query(query, function (data, err)
     {
         var i,
             len,
@@ -447,6 +447,10 @@ BF.standard_search = function (data, callback)
         
         /// Was there no response from the database?  This could mean the database or Sphinx crashed.
         if (!data) {
+            ///TODO: Do better logging,
+            if (err) {
+                console.log(err);
+            }
             /// Send an empty response, and exit.
             callback({});
             return;
