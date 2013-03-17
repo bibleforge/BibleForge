@@ -110,7 +110,8 @@
         biblical_ipa:      "Biblical IPA",                                         /// The short name for the Biblical reconstructed IPA pronunciation displayed on the menu
         biblical_ipa_long: "Biblical Reconſtructed IPA",                           /// The long name for the Biblical reconstructed IPA pronunciation displayed in a tooltip
         blog:              "Weblog",                                               /// Context menu item
-        chapter:           "Chapter",                                              /// Chapter headings
+        chapter:           "Chapter {num}",                                        /// Chapter headings
+        chapter_psalm:     "Psalme {num}",                                          /// The title of chapters in the book of Psalms
         configure:         "Configure",                                            /// Context menu item
         detailed_def:      "Detailed Definition",                                  /// Longer, more detailed definitions caption (in larger callout)
         done:              "Finiſh",                                               /// The button that closes panels

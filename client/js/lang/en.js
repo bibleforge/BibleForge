@@ -105,7 +105,8 @@
         biblical_ipa:      "Biblical IPA",                                         /// The short name for the Biblical reconstructed IPA pronunciation displayed on the menu
         biblical_ipa_long: "Biblical Reconstructed IPA",                           /// The long name for the Biblical reconstructed IPA pronunciation displayed in a tooltip
         blog:              "Blog",                                                 /// Context menu item
-        chapter:           "Chapter",                                              /// Chapter headings
+        chapter:           "Chapter {num}",                                        /// Chapter headings
+        chapter_psalm:     "Psalm {num}",                                          /// The title of chapters in the book of Psalms
         configure:         "Configure",                                            /// Context menu item
         detailed_def:      "Detailed Definition",                                  /// Longer, more detailed definitions caption (in larger callout)
         done:              "Done",                                                 /// The button that closes panels
@@ -127,7 +128,7 @@
         no_results1:       "Your search\u200A\u2014\u200A",                        /// Displayed when preforming a search that returns no results (before the search terms)
         no_results2:       "\u200A\u2014\u200Adid not return any results.",        /// Displayed when preforming a search that returns no results (after the search terms) (uncapitalized)
         previous:          "Previous",                                             /// The previous chapter link in the non-JavaScript version
-        psalm:             "Psalm",                                                /// The title of chapters in the book of Psalms
+        psalm:             "Psalm",                                                /// How to reference Psalms in a reference
         query_explanation: "Keyword or Reference: \"God so loved\" or Romans 3:23",/// In a blank query input box before a search has been preformed
         query_button_title:"Click here (or press Enter)",                          /// The text displayed when hovering over the magnifying glass (query button)
         query_button_alt:  "Go",                                                   /// The text to display for the magnifying glass (query button) if images are disabled

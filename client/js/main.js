@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function ()
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (1611)",
-            modified:  37084266
+            modified: 37135471,
         };
     }
     
@@ -372,6 +372,24 @@ document.addEventListener("DOMContentLoaded", function ()
             replaceState: function () {}
         };
     }());
+    
+    
+    /**
+     * Insert data into a string.
+     *
+     * @example BF.insert({"a": "text", num: 10}, "This is some {a}; {num} is a number. Here's more {a}.") /// Returns "This is some text; 10 is a number. Here's more text."
+     * @param   obj      (object) An object representing the data to insert.
+     * @param   template (string) The template string using curly brackets with a name to indicate placeholders.
+     */
+    BF.insert = function (obj, template)
+    {
+        /// Match all matching curly brackets, and send them to the function.
+        return template.replace(/{([^{}]+)}/g, function (whole, inside)
+        {
+            var data = obj[inside];
+            return typeof data !== "undefined" ? data : whole;
+        });
+    };
     
     /**
      * Create an easy to use Ajax object.
@@ -2285,7 +2303,7 @@ document.addEventListener("DOMContentLoaded", function ()
                                 }
                                 
                                 /// Is this the first verse or the Psalm title?
-                                if (verse_obj.v < 2) {
+                                if (verse_obj.v < 2 && (!BF.lang.first_verse_normal || verse_obj.v === 0)) {
                                     ///TODO: Explain what this code is doing.
                                     if (i !== start_key) {
                                         html_str += end_paragraph_HTML;
@@ -2296,7 +2314,7 @@ document.addEventListener("DOMContentLoaded", function ()
                                     /// Display chapter/psalm number (but not on verse 1 of psalms that have titles).
                                     } else if (verse_obj.b !== 19 || verse_obj.v === 0 || !BF.psalm_has_title(verse_obj.c)) {
                                         /// Is this the book of Psalms?  (Psalms have a special name.)
-                                        html_str += "<h3 class=chapter id=" + verse_id + "_chapter>" + (verse_obj.b === 19 ? BF.lang.psalm : BF.lang.chapter) + " " + verse_obj.c + "</h3>";
+                                        html_str += "<h3 class=chapter id=" + verse_id + "_chapter>" + BF.insert({num: verse_obj.c}, (verse_obj.b === 19 ? BF.lang.chapter_psalm : BF.lang.chapter)) + "</h3>";
                                     }
                                     
                                     html_str += hebrew_heading;
