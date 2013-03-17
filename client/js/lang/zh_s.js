@@ -242,6 +242,9 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
             
             function add_regex(term)
             {
+                /// Convert the asterisks to a valid regex wildcard.
+                ///NOTE: Word breaks are found by looking for tag openings (<) or closings (>).
+                term = term.replace(/\*/g, "[^<>]*");
                 return "=([0-9]+)>[　「『（]?\\(*(?:" + term + "|[^<]+-" + term + ")[）；：，。？！」』]*[<-]";
             }
             
