@@ -164,8 +164,8 @@ BF.verse_lookup = function (data, callback)
 {
     var extra_fields,
         direction = data.d ? Number(data.d) : BF.consts.additional,
-        find_paragraph_start = Boolean(data.f),
-        in_paragraphs = data.p ? Boolean(data.p) : true,
+        find_paragraph_start = data.f === "1",
+        in_paragraphs = typeof data.p === "undefined" ? true : data.p === "1",
         /// Select the language object specified by the query or use the default.
         lang = BF.langs[data.l] || BF.langs.en,
         limit,
