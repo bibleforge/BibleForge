@@ -60,7 +60,13 @@ document.addEventListener("DOMContentLoaded", function ()
             full_name: "简体中文 (CKJV)",
             modified: 37196716,
         };
-    } 
+    }
+    if (!BF.lang.zh_t) {
+        BF.langs.zh_t = {
+            full_name: "繁體中文 (CKJV)",
+            modified: 37198880,
+        };
+    }
     
     BF.consts = {
         /// Query type "constants"
