@@ -239,7 +239,7 @@ document.addEventListener("DOMContentLoaded", function ()
      * Safely parse JSON.
      *
      * @param  str (string) The JSON encoded string to parse.
-     * @return The parsed JSON or NULL if the JSON is invalid.
+     * @return The parsed JSON or undefined if the JSON is invalid.
      */
     BF.parse_json = function (str)
     {
