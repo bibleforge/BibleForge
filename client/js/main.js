@@ -48,13 +48,19 @@ document.addEventListener("DOMContentLoaded", function ()
     
     ///NOTE: The elements in this object are overwritten if/when the code is actually downloaded.
     
-    ///TODO: These additions to the BF.langs object need to be created in the Forge.
+    /// Created in the Forge by create_load_languages.js.
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (1611)",
             modified: 37135471,
         };
     }
+    if (!BF.lang.zh_s) {
+        BF.langs.zh_s = {
+            full_name: "简体中文 (CKJV)",
+            modified: 37196716,
+        };
+    } 
     
     BF.consts = {
         /// Query type "constants"
