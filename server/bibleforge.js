@@ -173,6 +173,10 @@ BF.verse_lookup = function (data, callback)
         order_by,
         verse_id = Number(data.q);
     
+    if (in_paragraphs && lang.no_paragraphs) {
+        in_paragraphs = false;
+    }
+    
     /**
      * Send the query to the database.
      *

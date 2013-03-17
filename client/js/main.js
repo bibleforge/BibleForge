@@ -2695,7 +2695,7 @@ document.addEventListener("DOMContentLoaded", function ()
                                         return;
                                     }
                                     
-                                    in_paragraphs = settings.view.in_paragraphs;
+                                    in_paragraphs = settings.view.in_paragraphs && !BF.lang.no_paragraphs;
                                     
                                     if (options.type === BF.consts.verse_lookup || options.type === BF.consts.standard_search) {
                                         /// Determine which verse to start from for the next query.
@@ -2763,7 +2763,7 @@ document.addEventListener("DOMContentLoaded", function ()
                                     ///TODO: Determine if it should not store direction in the options because it changes between previous and additional searches.
                                     options.direction     = BF.consts.additional;
                                     /// Since this settings can be changed by the user at run time, it must be retrieved before each query.
-                                    options.in_paragraphs = settings.view.in_paragraphs;
+                                    options.in_paragraphs = settings.view.in_paragraphs && !BF.lang.no_paragraphs;
                                     /// Create an empty verse_range object, which will be filled in as verses are retrieved.
                                     options.verse_range   = {
                                         bottom_id:    0,
