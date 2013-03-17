@@ -2264,6 +2264,18 @@ document.addEventListener("DOMContentLoaded", function ()
                             verse_obj,
                             which_hebrew_letter;
                         
+                        /**
+                         * Compile the HTML for a normal verse.
+                         *
+                         * @return A string containing the verse encapsulated in HTML.
+                         * @note   This is a separate function because it can be called from two different places.
+                         */
+                        function get_normal_verse_html()
+                        {
+                            ///NOTE: The trailing space adds a space between verses in a paragraph and does not effect paragraph final verses.
+                            return "<div class=verse id=" + verse_id + "_verse><span class=verse_number>" + verse_obj.v + "&nbsp;</span>" + verse_html[i] + " </div>";
+                        }
+                        
                         ///NOTE: Currently only grammatical_search searches data at the word level, so it is the only type that might stop in the middle of a verse and find more words in the same verse as the user scrolls.
                         if (type === BF.consts.grammatical_search) {
                             if (direction === BF.consts.additional) {
@@ -2303,8 +2315,9 @@ document.addEventListener("DOMContentLoaded", function ()
                                 }
                                 
                                 /// Is this the first verse or the Psalm title?
-                                if (verse_obj.v < 2 && (!BF.lang.first_verse_normal || verse_obj.v === 0)) {
-                                    ///TODO: Explain what this code is doing.
+                                if (verse_obj.v < 2) {
+                                    /// Is this not the beginning of the text?
+                                    ///NOTE: The "start_key" variable is used for starting grammatical searches at the correct verse (since grammatical verses are word level, not verse level).
                                     if (i !== start_key) {
                                         html_str += end_paragraph_HTML;
                                     }
@@ -2322,6 +2335,8 @@ document.addEventListener("DOMContentLoaded", function ()
                                     /// Is this a Psalm title (i.e., verse 0)?  (Psalm titles are displayed specially.)
                                     if (verse_obj.v === 0) {
                                         html_str += "<div class=psalm_title id=" + verse_id + "_verse>" + verse_html[i] + "</div>";
+                                    } else if (BF.lang.first_verse_normal) {
+                                        html_str += get_normal_verse_html();
                                     } else {
                                         ///NOTE: The trailing space adds a space between verses in a paragraph and does not effect paragraph final verses.
                                         html_str += first_paragraph_HTML + "<div class=first_verse id=" + verse_id + "_verse>" + verse_html[i] + " </div>";
@@ -2349,8 +2364,8 @@ document.addEventListener("DOMContentLoaded", function ()
                                         }
                                         
                                         ///NOTE: The trailing space adds a space between verses in a paragraph and does not effect paragraph final verses.
-                                        ///TODO: Determine if "class=verse_number" is needed.
-                                        html_str += "<div class=verse id=" + verse_id + "_verse><span class=verse_number>" + verse_obj.v + "&nbsp;</span>" + verse_html[i] + " </div>";
+                                        //html_str += "<div class=verse id=" + verse_id + "_verse><span class=verse_number>" + verse_obj.v + "&nbsp;</span>" + verse_html[i] + " </div>";
+                                        html_str += get_normal_verse_html();
                                     }
                                 }
                                 
