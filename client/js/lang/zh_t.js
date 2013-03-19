@@ -77,7 +77,7 @@
         /**
          * Load additional data from the server.
          *
-         * @param callback (function) The function to call asnycronously after all of the data is loaded.
+         * @param callback (function) The function to call asynchronously after all of the data is loaded.
          * @note  This is called by BF.change_language in secondary.js.
          */
         load_dependencies: function (callback)
