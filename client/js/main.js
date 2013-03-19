@@ -3053,9 +3053,9 @@ document.addEventListener("DOMContentLoaded", function ()
                     
                     options.prepared_query = query;
                     
-                    /// ***********
+                    /// **********
                     /// * Step 2 *
-                    /// ***********
+                    /// **********
                     ///
                     /// Determine the type of query.
                     ///
@@ -3134,9 +3134,9 @@ document.addEventListener("DOMContentLoaded", function ()
                         }
                     }
                     
-                    /// ***********
+                    /// **********
                     /// * Step 3 *
-                    /// ***********
+                    /// **********
                     ///
                     /// Request results.
                     ///
@@ -3144,9 +3144,9 @@ document.addEventListener("DOMContentLoaded", function ()
                     /// Prepare the initial query, create functions to handle additional and previous queries.
                     query_manager.query(options);
                     
-                    /// ***********
+                    /// **********
                     /// * Step 4 *
-                    /// ***********
+                    /// **********
                     ///
                     /// Prepare for new results (clear page, prepare highlighter if applicable).
                     ///
