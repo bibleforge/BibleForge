@@ -3116,6 +3116,11 @@ document.addEventListener("DOMContentLoaded", function ()
                             return;
                         }
                     } else {
+                        /// Some languages need to preform additional transformations to search terms that should not be preformed on verse lookups.
+                        /// E.g., Chinese words need to be segmented, but if they are segmented too early, it could mess up a verse number or book name.
+                        if (BF.lang.prepare_search_terms && query) {
+                            query = BF.lang.prepare_search_terms(query);
+                        }
                         /// Break down the query string into separate components.
                         /// Mainly, this is used to determine the different parts of a grammatical search.
                         ///FIXME: Implement mixed searching (grammatical and standard together, e.g., "love AS NOUN & more").
@@ -3166,6 +3171,10 @@ document.addEventListener("DOMContentLoaded", function ()
                     
                     /// Was the query a search?  Searches need to have the highlight function prepared for the incoming results.
                     if (options.type !== BF.consts.verse_lookup || options.extra_highlighting) {
+                        /// Some languages need to preform additional transformations to search terms that need to be preformed on highlighted terms too.
+                        if (BF.lang.prepare_search_terms && options.extra_highlighting) {
+                            options.extra_highlighting = BF.lang.prepare_search_terms(options.extra_highlighting);
+                        }
                         /**
                          * Create the highlight function and closure and prepare the regular expression used to do the highlighting.
                          *
