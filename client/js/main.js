@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", function ()
     if (!BF.lang.zh_t) {
         BF.langs.zh_t = {
             full_name: "繁體中文 (CKJV)",
-            modified: 37309301,
+            modified: 37309366,
         };
     }
     
