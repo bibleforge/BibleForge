@@ -324,9 +324,9 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
          * Only a book is required or checked for validity.
          * The verse id format is [B]BCCCVVV (e.g., Genesis 1:1 == 1001001).
          *
-         * @example verse_id = determine_reference("创");                      /// Returns "10001001"
-         * @example verse_id = determine_reference("帖撒罗尼迦前书3：10");        /// Returns "52003010"
-         * @example verse_id = determine_reference("爱");                      /// Returns 0
+         * @example verse_id = determine_reference("创");               /// Returns "10001001"
+         * @example verse_id = determine_reference("帖撒罗尼迦前书3：10"); /// Returns "52003010"
+         * @example verse_id = determine_reference("爱");               /// Returns 0
          * @param   ref (string) The text that may or may not be a valid verse reference.
          * @return  The verse id of a reference (as a string) or the integer 0 if invalid.
          * @todo    Determine if this should return FALSE on invalid references.
@@ -357,7 +357,7 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
              * @example convert_numbers("六百七十")   /// Returns "670"
              * @example convert_numbers("六百七十八") /// Returns "678"
              * @example convert_numbers("六百零九")   /// Returns "609"
-             * @example convert_numbers("创世记五十：十五")   /// Returns "创世记50：15"
+             * @example convert_numbers("创世记五十：十五") /// Returns "创世记50：15"
              * @param   str (string) The text to convert.
              * @return  A string containing the converted numbers, if any
              * @note    This only converts numbers less than one thousand.
