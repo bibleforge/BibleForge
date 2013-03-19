@@ -3128,28 +3128,45 @@
                             ///NOTE: The last modified time is added (if available) to prevent browsers from caching an outdated file.
                             BF.include("/js/lang/" + lang_id + ".js?" + (BF.langs[lang_id].modified || ""), {}, function onload()
                             {
-                                var link;
+                                var cue,
+                                    link;
                                 
                                 /// After the language specific JavaScript has been download, check to see if language specific CSS is also needed.
                                 
-                                /// Does this language need special CSS?
-                                if (BF.langs[lang_id].has_css) {
-                                    link = document.createElement("link");
-                                    /// Since style sheets are cached for a long period of time, we can use css_modified to create a unique URL to esentially invalidate the cache.
-                                    link.href = "/styles/lang/" + lang_id + ".css?" + (BF.langs[lang_id].css_modified || "");
-                                    link.rel = "stylesheet";
+                                /// Does this language need additional files?
+                                if (BF.langs[lang_id].has_css || BF.langs[lang_id].load_dependencies) {
+                                    /// Create a cue since there may be more than one asynchronous task.
+                                    cue = BF.create_transition_cue(activate_new_lang);
                                     
-                                    /// Because the CSS could contain fonts and other important rules, we must wait until the CSS has downloaded before initiating the language.
-                                    ///TODO: Determine if any onerror event needs to be listened to in order to handle errors.
-                                    link.addEventListener("load", function ()
-                                    {
-                                        /// After the CSS has loaded, initiate the language.
-                                        activate_new_lang();
-                                    });
+                                    /// Does the language have additional files it needs to download before it is ready?
+                                    if (BF.langs[lang_id].load_dependencies) {
+                                        cue.add({id: 0});
+                                        BF.langs[lang_id].load_dependencies(function ()
+                                        {
+                                            cue.async_remove(0);
+                                        });
+                                    }
                                     
-                                    document.getElementsByTagName("head")[0].appendChild(link);
+                                    /// Does this language need special CSS?
+                                    ///NOTE: The CSS is loaded second just in case the onload event fires syncronously (though I'm not sure if this can happen).
+                                    if (BF.langs[lang_id].has_css) {
+                                        link = document.createElement("link");
+                                        /// Since style sheets are cached for a long period of time, we can use css_modified to create a unique URL to esentially invalidate the cache.
+                                        link.href = "/styles/lang/" + lang_id + ".css?" + (BF.langs[lang_id].css_modified || "");
+                                        link.rel = "stylesheet";
+                                        
+                                        cue.add({id: 1});
+                                        /// Because the CSS could contain fonts and other important rules, we must wait until the CSS has downloaded before initiating the language.
+                                        ///TODO: Determine if any onerror event needs to be listened to in order to handle errors.
+                                        link.addEventListener("load", function ()
+                                        {
+                                            cue.async_remove(1);
+                                        });
+                                        
+                                        document.getElementsByTagName("head")[0].appendChild(link);
+                                    }
                                 } else {
-                                    /// If this language does not need special CSS, initiate the language immediately.
+                                    /// If this language does not need special CSS or additional data to download, initiate the language immediately.
                                     activate_new_lang();
                                 }
                             });
