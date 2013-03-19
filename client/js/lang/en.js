@@ -57,6 +57,7 @@
     }
     
     /// Return the language variables and functions.
+    ///TODO: Document all possible properties from all languages.
     that.BF.langs.en = {
         /// Indicate that the code has been downloaded and parsed.
         loaded: true,
