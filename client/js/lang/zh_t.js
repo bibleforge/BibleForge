@@ -512,14 +512,14 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
             ///NOTE: /\s+-\s+/g ensures that filter_array() will filter out negative words like "this - that" (i.e., "that" does not need to be highlighted).
             ///NOTE: .replace(/[\u2011－]/g, "-")                              converts non-breaking and fullwidth hyphens into normal hyphens.
             ///NOTE: .replace(/[\u00AD\u2012-\u2015]/g, "")                    removes soft hyphens (\u00AD) and various types of dashes.
-            ///NOTE: .replace(/([0-9]+)[:.;,；。；，\s]title/ig, "$1:0")        replaces Psalm title references into an acceptable format (e.g., "Psalm 3:title" becomes "Psalm 3:0").
-            ///NOTE: .replace(/([:.;,；。；，\s])subscript(?:ion)?/ig, "$1255") replaces the word "subscription" with the verse number (255) used internally by BibleForge for Pauline subscriptions (e.g., "Philemon subscription" becomes "Philemon 255").
+            ///NOTE: .replace(/([0-9]+)[:.;,；。：，\s]title/ig, "$1:0")        replaces Psalm title references into an acceptable format (e.g., "Psalm 3:title" becomes "Psalm 3:0").
+            ///NOTE: .replace(/([:.;,；。：，\s])subscript(?:ion)?/ig, "$1255") replaces the word "subscription" with the verse number (255) used internally by BibleForge for Pauline subscriptions (e.g., "Philemon subscription" becomes "Philemon 255").
             ///NOTE: "$1255" replaces the text with the first placeholder followed by the literal "255" (without quotes).
             return query.replace(/[０-９]/g, function (number)
             {
                 /// Convert fullwidth numbers to normal numbers.
                 return String.fromCharCode(number.charCodeAt(0) - 65248);
-            }).replace(" IN RED", " AS RED").replace(/\s+/g, " ").replace(/\sAND\s/g, " & ").replace(/\sOR\s/g, " | ").replace(/(?:\s[-－]|\s*\bNOT)\s/g, " -").replace(/[‘’]/g, "'").replace(/[“”]/g, "\"").replace(/[\u2011－]/g, "-").replace(/[\u00AD\u2012-\u2015]/g, "").replace(/([0-9]+)[:.;,；。；，\s]title/ig, "$1:0").replace(/([:.;,；。；，\s])subscript(?:ion)?/ig, "$1255").replace(/＊/g, "*")
+            }).replace(" IN RED", " AS RED").replace(/\s+/g, " ").replace(/\sAND\s/g, " & ").replace(/\sOR\s/g, " | ").replace(/(?:\s[-－]|\s*\bNOT)\s/g, " -").replace(/[‘’]/g, "'").replace(/[“”]/g, "\"").replace(/[\u2011－]/g, "-").replace(/[\u00AD\u2012-\u2015]/g, "").replace(/([0-9]+)[:.;,；。：，\s]title/ig, "$1:0").replace(/([:.;,；。：，\s])subscript(?:ion)?/ig, "$1255").replace(/＊/g, "*")
                 /// In order to handle hyphenated words correctly, we treat them as a quoted phrase.
                 /// So we need to wrap hyphenated words in quotes (if they are not in a quotation already) and replace the hyphens with spaces.
                .replace(/"[^"]+"?|[^"\s]+/g, function (terms)
