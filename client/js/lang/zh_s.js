@@ -345,13 +345,100 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                 "song of solomon": 22
             };
             
+            /**
+             * Convert Chinese numbers to Arabic numerals.
+             *
+             * @example convert_numbers("一")       /// Returns "1"
+             * @example convert_numbers("十二")     /// Returns "12"
+             * @example convert_numbers("三十")     /// Returns "30"
+             * @example convert_numbers("四十五")    /// Returns "45"
+             * @example convert_numbers("两百")     /// Returns "200"
+             * @example convert_numbers("六百七")    /// Returns "670"
+             * @example convert_numbers("六百七十")   /// Returns "670"
+             * @example convert_numbers("六百七十八") /// Returns "678"
+             * @example convert_numbers("六百零九")   /// Returns "609"
+             * @example convert_numbers("创世记五十：十五")   /// Returns "创世记50：15"
+             * @param   str (string) The text to convert.
+             * @return  A string containing the converted numbers, if any
+             * @note    This only converts numbers less than one thousand.
+             */
+            function convert_numbers(str)
+            {
+                var val = {"一": 1, "二": 2, "两": 2, "兩": 2, "三": 3, "四": 4, "五": 5, "六": 6, "七": 7, "八": 8, "九": 9};
+                
+                ///TODO: Could also look to see if it is just a string of numbers and then treat it like a list of digits.
+                return str.replace(/[一二三四五六七八九十百两兩零]+/g, function (hanzi)
+                {
+                    var char,
+                        digits = [],
+                        len = hanzi.length,
+                        i,
+                        place_holder = 1,
+                        res = hanzi,
+                        tmp_val;
+                    
+                    for (i = 0; i < len; i += 1) {
+                        char = hanzi[i];
+                        tmp_val = val[char];
+                        
+                        /// If the character has a value (i.e., 1-9), add it to the list of digits.
+                        if (tmp_val) {
+                            digits[digits.length] = {val: tmp_val, place: place_holder, char: char};
+                            /// By default, we assume the digit will be in the ones column unless proven otherwise.
+                            place_holder = 1;
+                        } else {
+                            /// 十 (shi) is special since it can stand alone too.
+                            if (char === "十") {
+                                /// Is it not first?
+                                if (digits.length > 0) {
+                                    /// Then it is a place marker for the previous digit.
+                                    digits[digits.length - 1].place = 10;
+                                } else {
+                                    /// Otherwise it equals 10.
+                                    digits[digits.length] = {val: 1, place: 10, char: char};
+                                }
+                                place_holder = 1;
+                            } else if (char === "百") {
+                                /// 百 (bai) is always a place marker.
+                                digits[digits.length - 1].place = 100;
+                                /// We set the next digit to the tens column by default (e.g., 一百五 equals 150).
+                                place_holder = 10;
+                            } else if (char === "零") {
+                                /// If we find 零 (ling), just reset and assume the next value will be in the ones column unless proven otherwise.
+                                place_holder = 1;
+                            }
+                        }
+                    }
+                    
+                    /// If it didn't find anything, just return the original value.
+                    if (digits.length > 0) {
+                        /// Now, just total the digits.
+                        res = 0;
+                        digits.forEach(function (digit)
+                        {
+                            res += digit.val * digit.place;
+                        });
+                    }
+                    
+                    return res;
+                });
+            }
+            
             return function (ref)
             {
-                var book = books[ref.replace(/\s*\d+(?:[\s,.;:；：，。]+\d*)?$/, "").toLowerCase()],
+                var book,
                     chapter,
                     cv,
                     verse,
                     zeros;
+                
+                /// First, convert Chinese numbers into Arabic numerals (e.g., "创世记五十：十五" becomes "创世记50：15").
+                /// Remove special Chinese words to allow for verse references like this "{book} 第一章".
+                /// E.g., "创世记第五章十六节" first becomes "创世记第5章16节" and then becomes "创世记 5 16".
+                ///NOTE: The space in " $1$2" is necessary so that two numbers do not get put together.
+                ref = convert_numbers(String(ref)).replace(/第(\d+)[章首节節]?|第?(\d+)[章首节節]/g, " $1$2");
+                
+                book = books[ref.replace(/\s*\d+(?:[,.;:；：，。\s]\d*)?$/, "").toLowerCase()];
                 
                 if (!book) {
                     return 0;
@@ -369,7 +456,8 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                 ///    "Romans 3:9"    => ["Romans", "3", "9", ""]
                 ///    "Romans 3:9-"   => ["Romans", "3", "9", ""]
                 ///    "Romans 3:9-18" => ["Romans", "3", "9", ""]
-                cv = ref.split(/\s*([0-9]{1,3})(?:[；：，。:.;,\s]([0-9]{0,3})[\-0-9]*)?(?:[\d\W]+)?$/);
+                ///NOTE: The plus (+) in [；：，。:.;,\s]+ is to match extra spacing possibly added by the first regular expression above.
+                cv = ref.split(/\s*([0-9]{1,3})(?:[；：，。:.;,\s]+([0-9]{0,3})[\-0-9]*)?(?:[\d\W]+)?$/);
                 
                 if (cv.length > 1) {
                     /// Is the number a valid chapter?
