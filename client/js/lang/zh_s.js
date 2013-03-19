@@ -398,7 +398,7 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                                     digits[digits.length] = {val: 1, place: 10, char: char};
                                 }
                                 place_holder = 1;
-                            } else if (char === "百") {
+                            } else if (char === "百" && digits.length > 0) {
                                 /// 百 (bai) is always a place marker.
                                 digits[digits.length - 1].place = 100;
                                 /// We set the next digit to the tens column by default (e.g., 一百五 equals 150).
