@@ -242,7 +242,7 @@
                 ///NOTE: '(?!s\b) removes apostrophes that are not followed by an "s" and only an "s."
                 ///NOTE: "[^"]+"?|[^"\s]+ is used to split the string into groups of individual words and quoted phrases.
                 ///NOTE: Unterminated double quotes are treated as a phrase that ends at the end of the query, so '"unterminated quote' is treated as '"unterminated quote"'.
-                initial_search_arr = search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?|[^\s]*)|[~\/]\d*|[,.:?!;&|\)\(\]\[\/\\`{}<$\^+]|-\B|'(?!s\b))/g, "").toLowerCase().match(/"[^"]+"?|[^"\s]+/g);
+                initial_search_arr = search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?|[^\s]*)|[~\/]\d*|[，。：？！；＆｜（）［］｛｝「」『』,.:?!;&|\)\(\]\[\/\\`{}<$\^+]|-\B|'(?!s\b))/g, "").toLowerCase().match(/"[^"]+"?|[^"\s]+/g);
                 
                 /// Where no terms found?  If so, return an empty array.
                 ///NOTE: This could happen if all of the search terms are negative (e.g., "NOT bad").
