@@ -541,7 +541,7 @@
             
             function resolve_multiple_branches(branches)
             {
-                /// First, adding known good branches (single branches) to a resolved variable
+                /// First, add known good branches (single branches) to a resolved variable
                 /// while adding unresolved branches to an array of unresolved branches.
                 /// Then, recursively loop through all of the branches in the array and total up
                 /// how many known characters were found and the overall probability.
@@ -592,12 +592,11 @@
                 
                 chunks.cn.forEach(function (str, i)
                 {
-                    var branches,
-                        prob = get_probabilities(str);
+                    var branches;
                     
                     if (str !== "") {
                         /// Step 1
-                        branches = find_known_and_likely_words(str, prob);
+                        branches = find_known_and_likely_words(str, get_probabilities(str));
                         
                         /// Step 2
                         resolve_multiple_branches(branches);
