@@ -2133,7 +2133,6 @@ document.addEventListener("DOMContentLoaded", function ()
                         cached_count_top     = 0;
                         cached_count_bottom  = 0;
                         
-                        ///TODO: This should have smooth scrolling effects, etc.
                         bottomLoader.style.visibility = "hidden";
                         topLoader.style.visibility    = "hidden";
                         
@@ -3115,7 +3114,6 @@ document.addEventListener("DOMContentLoaded", function ()
                         }
                         
                         /// If the query is a verse lookup and the verse is visible, just scroll to it.
-                        ///TODO: The second parameter (smooth) should (probably) be TRUE, but it is not implemented yet.
                         ///TODO: If the user is already at that verse, nothing happens, so there may need to be some visual confirmation.
                         ///NOTE: If just the highlighting changes, the page does not need to reload.
                         if (options.extra_highlighting === query_manager.extra_highlighting && query_manager.lang_id === BF.lang.id && content_manager.scroll_to_verse(BF.get_b_c_v(verse_id))) {
