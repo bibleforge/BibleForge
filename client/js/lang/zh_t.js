@@ -71,6 +71,9 @@
         /// Indicate that the first verse should not get special CSS.
         first_verse_normal: true,
         
+        /// Use books_long_main names to create references when searching.
+        use_main_title: true,
+        
         linked_to_orig: false,
         no_paragraphs: true,
         

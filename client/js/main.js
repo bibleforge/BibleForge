@@ -58,13 +58,13 @@ document.addEventListener("DOMContentLoaded", function ()
     if (!BF.lang.zh_s) {
         BF.langs.zh_s = {
             full_name: "简体中文 (CKJV)",
-            modified: 37452541,
+            modified: 37452966,
         };
     }
     if (!BF.lang.zh_t) {
         BF.langs.zh_t = {
             full_name: "繁體中文 (CKJV)",
-            modified: 37452658,
+            modified: 37452974,
         };
     }
     
@@ -2394,7 +2394,7 @@ document.addEventListener("DOMContentLoaded", function ()
                                     verse_range.bottom_book = verse_obj.b;
                                     
                                     /// Convert the book number to text.
-                                    html_str += "<h1 class=short_book id=" + verse_id + "_title>" + BF.lang.books_short[verse_obj.b] + "</h1>";
+                                    html_str += "<h1 class=short_book id=" + verse_id + "_title>" + (BF.lang.use_main_title ? BF.lang.books_long_main[verse_obj.b] : BF.lang.books_short[verse_obj.b]) + "</h1>";
                                 }
                                 
                                 html_str += "<div class=search_verse id=" + verse_id + "_search><span>" + (BF.lang.chapter_count[verse_obj.b] === 1 ? "" : verse_obj.c + ":") + verse_obj.v + "</span> " + verse_html[i] + "</div>";
