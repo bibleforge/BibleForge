@@ -2841,6 +2841,7 @@ document.addEventListener("DOMContentLoaded", function ()
                         this.prepared_query     = options.prepared_query;
                         this.is_default         = options.is_default;
                         this.extra_highlighting = options.extra_highlighting;
+                        this.seo_query          = options.seo_query;
                         this.lang_id            = BF.lang.id;
                         
                         /// Store the user's position so that it can be retrieved when the user comes back later.
@@ -3069,6 +3070,8 @@ document.addEventListener("DOMContentLoaded", function ()
                     if (verse_id) {
                         /// In order to keep a consistent URL for a verse (for better SEO among other reasons), change the query into a standard form.
                         /// E.g., The query "gen" becomes "Genesis 1:1".
+                        ///NOTE: If the real query will actually be created by the position object, options.seo_query will be changed later;
+                        ///      however, it is still necessary to create it now so that it can be used to create the URL for the new state below.
                         options.seo_query = BF.create_ref(BF.get_b_c_v(verse_id)) + (options.extra_highlighting ? " {{" + options.extra_highlighting + "}}" : "");
                     }
                     
@@ -3105,6 +3108,11 @@ document.addEventListener("DOMContentLoaded", function ()
                         
                         options.verse = verse_id;
                         options.type  = BF.consts.verse_lookup;
+                        
+                        /// If we are using the position object to create the query, the seo_query must be changed to match that reference.
+                        if (position.b) {
+                            options.seo_query = BF.create_ref(position) + (options.extra_highlighting ? " {{" + options.extra_highlighting + "}}" : "");
+                        }
                         
                         /// If the query is a verse lookup and the verse is visible, just scroll to it.
                         ///TODO: The second parameter (smooth) should (probably) be TRUE, but it is not implemented yet.
