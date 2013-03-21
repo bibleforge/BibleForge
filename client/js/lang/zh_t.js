@@ -106,7 +106,7 @@
             /// Since the segmentation code is the same for both Simplified and Traditional Chinese (and since the dictionaries have to be downloaded any way),
             /// it makes sense to put the segmentation code in a separate, sharable file.
             cue.add({id: 0});
-            BF.include("/js/misc/zh_segment.js?37449649", context, function onload()
+            BF.include("/js/misc/zh_segment.js?37465013", context, function onload()
             {
                 cue.async_remove(0);
             });

@@ -614,13 +614,18 @@
                 /// Should it convert the data into a string separated by spaces between segments?
                 if (!return_raw) {
                     text = "";
-                    res.forEach(function (sec)
+                    res.forEach(function (sec, i)
                     {
                         if (typeof sec === "string") {
+                            /// Adding a space, even before non-Chinese parts, helps to keep segments separate.
+                            if (i > 0) {
+                                text += " ";
+                            }
                             text += sec;
                         } else {
                             sec.forEach(function (word, i)
                             {
+                                /// Add a space to separate words.
                                 if (i > 0) {
                                     text += " ";
                                 }
