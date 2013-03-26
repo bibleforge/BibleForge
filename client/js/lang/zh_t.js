@@ -64,9 +64,10 @@
         loaded: true,
         
         /// Indicate the language name so it can be distinguished later.
-        full_name:  "繁體中文 (CKJV)",
-        short_name: "繁體",
-        id:         "zh_t",
+        full_name:    "繁體中文 (CKJV)",
+        short_name:   "繁體",
+        abbreviation: "CKJV",
+        id:           "zh_t",
         
         /// Indicate that the first verse should not get special CSS.
         first_verse_normal: true,
@@ -149,7 +150,8 @@
         
         ///TODO: Determine if texts should be categorized.
         /// Miscellaneous Text
-        about:             "About",                                                /// Context menu item
+        about:             "關於BibleForge",                                        /// Context menu item
+        about_version:     "關於{v}",                                               /// Context menu item (e.g., "About KJV")
         app_name:          "BibleForge",                                           /// The name of the application
         biblical:          "Biblical",                                             /// The short name for the Biblical reconstructed pronunciation displayed on the menu
         biblical_pronun:   "Biblical Reconstructed Pronunciation",                 /// The long name for the Biblical reconstructed pronunciation displayed in a tooltip
@@ -159,6 +161,7 @@
         chapter:           "第{num}章",                                             /// Chapter headings
         chapter_psalm:     "第{num}首",                                             /// The title of chapters in the book of Psalms
         configure:         "Configure",                                            /// Context menu item
+        credits:           "<p>《中文英皇欽定本》的經文基於《和合本》，並與使用了《Textus Receptus》所翻譯出來的英文聖經《英皇欽定本（King James Version）》作仔細比較然後作出修訂。</p><p>更多信息請訪問<a href=\"http://ckjv.asia/\" target=_blank>ckjv.asia</a>。</p><p>《中文英皇欽定本》由ckjv.asia製作，以<a href=\"http://creativecommons.org/licenses/by-sa/3.0/deed.zh_TW\" target=_blank>創用CC姓名標示-相同方式分享3.0 Unported授權條款（CC BY-SA 3.0）</a>釋出。</p>",
         detailed_def:      "Detailed Definition",                                  /// Longer, more detailed definitions caption (in larger callout)
         done:              "Done",                                                 /// The button that closes panels
         err_unknown:       "An error occurred. Please try again.",                 /// A query returned an error for an unspecified reason.

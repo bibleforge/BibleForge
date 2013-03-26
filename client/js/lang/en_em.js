@@ -62,9 +62,10 @@
         loaded: true,
         
         /// Indicate the language name so it can be distinguished later.
-        full_name:  "Early Modern English (1611)",
-        short_name: "1611",
-        id:         "en_em",
+        full_name:    "Early Modern English (1611)",
+        short_name:   "1611",
+        abbreviation: "KJV",
+        id:           "en_em",
         
         /// Indicate whether or not this version needs a special CSS file.
         has_css: true,
@@ -103,7 +104,8 @@
         
         ///TODO: Determine if texts should be categorized.
         /// Miscellaneous Text
-        about:             "About",                                                /// Context menu item
+        about:             "About BibleForge",                                     /// Context menu item
+        about_version:     "About {v}",                                            /// Context menu item (e.g., "About KJV")
         app_name:          "BibleForge",                                           /// The name of the application
         biblical:          "Biblical",                                             /// The short name for the Biblical reconstructed pronunciation displayed on the menu
         biblical_pronun:   "Biblical Reconſtructed Pronunciation",                 /// The long name for the Biblical reconstructed pronunciation displayed in a tooltip
@@ -113,6 +115,7 @@
         chapter:           "Chapter {num}",                                        /// Chapter headings
         chapter_psalm:     "Psalme {num}",                                          /// The title of chapters in the book of Psalms
         configure:         "Configure",                                            /// Context menu item
+        credits:           "<p>The King James Verſion (KJV) was tranſlated by a group of ſcholars in 1611. This text attempts to be as cloſe as poſſible to the firſt printing of the KJV.</p><p>The KJV is in the <a href=\"https://creativecommons.org/publicdomain/mark/1.0/\" target=_blank>public domain</a>.</p>",
         detailed_def:      "Detailed Definition",                                  /// Longer, more detailed definitions caption (in larger callout)
         done:              "Finiſh",                                               /// The button that closes panels
         err_unknown:       "An errour occurred. Please try againe.",               /// A query returned an error for an unspecified reason. (This does not need a long s because it is displayed on the scroll.)
@@ -140,7 +143,7 @@
         ///NOTE: This key must be the same as the value in the settings.
         red_letters:       "Red Letters",                                          /// In the View configuration panel
         results_for:       "Reſults for",                                          /// Used in the meta description of searches in the non-JavaScript version to indicate the results for the query.
-        subscription:      "subſcription",                                         /// Used instead of 255 for subscripts to Paul's epistles (uncapitalized)
+        subscription:      "ſubſcription",                                         /// Used instead of 255 for subscripts to Paul's epistles (uncapitalized)
         title:             "title",                                                /// Used instead of 0 for Psalm title verse references (uncapitalized)
         translit:          "Tranſliteration",                                      /// The short name for the SBL transliteration display on the menu
         translit_long:     "Society of Biblical Languages Tranſliteration",        /// The long name for the SBL transliteration display on a tooltip

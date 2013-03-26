@@ -1575,6 +1575,21 @@
                 };
             }());
             
+            /**
+             * Prepare the help panel.
+             *
+             * @return A function that shows the panel.
+             * @note   Called immediately in order to create another function that shows the panel.
+             */
+            show_about_bible_panel = function ()
+            {
+                var panel_element = document.createElement("div");
+                
+                panel_element.className = "about_bible";
+                panel_element.innerHTML = "<legend>" + BF.insert({v: BF.lang.abbreviation}, BF.lang.about_version) + "</legend>" + BF.lang.credits;
+                show_panel(panel_element);
+            };
+            
             
             /**
              * Prepare to display the context menu near the wrench button.
@@ -1599,6 +1614,10 @@
                             line: true,
                             text: BF.lang.blog,
                             link: "http://blog.bibleforge.com/"
+                        },
+                        {
+                            text: BF.insert({v: BF.lang.abbreviation}, BF.lang.about_version),
+                            link: show_about_bible_panel
                         },
                         {
                             text: BF.lang.about,
