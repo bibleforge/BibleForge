@@ -1134,6 +1134,10 @@ h2 {
     line-height: 0;
 }
 
+.about_bible {
+    max-width: 800px;
+}
+
 /* Style the previous and next links for the non-JavaScript version. */
 .static_link {
     text-decoration: none;
