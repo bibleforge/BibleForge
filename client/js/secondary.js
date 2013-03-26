@@ -980,8 +980,9 @@
          */
         show_panel = (function ()
         {
-            var panel   = document.createElement("div"),
-                is_open = false;
+            var center_hor,
+                is_open = false,
+                panel   = document.createElement("div")
             
             ///NOTE: The default style does has "display" set to "none" and "position" set to "fixed."
             panel.className = "panel";
@@ -1006,6 +1007,8 @@
                     /// Ensure that the display is set to none (even though it might already be if this is the first time or if no CSS transitions were used).
                     panel.style.display = "none";
                     
+                    window.removeEventListener("resize", center_hor);
+                    
                     if (typeof callback === "function") {
                         callback();
                     }
@@ -1029,6 +1032,18 @@
             {
                 var done_button     = document.createElement("button"),
                     panel_container = document.createElement("div");
+                
+                /**
+                 * Center the panel horizontally
+                 *
+                 * @note This is a separate function because it called both when the panel is created and on browser resize.
+                 */
+                center_hor = function ()
+                {
+                    ///NOTE: document.body.clientWidth does not include the scroll bars.
+                    ///NOTE: Sometimes this does not align the panel perfectly.
+                    panel.style.left = ((document.body.clientWidth / 2) - (panel.offsetWidth / 2)) + "px";
+                }
                 
                 is_open = true;
                 
@@ -1060,9 +1075,10 @@
                 panel.style.maxWidth  = (document.body.clientWidth - 40) + "px";
                 /// Quickly move the element to just above of the visible area.
                 panel.style.top       = -panel.offsetHeight + "px";
-                /// Center the element on the page.
-                ///NOTE: document.body.clientWidth does not include the scroll bars.
-                panel.style.left      = ((document.body.clientWidth / 2) - (panel.offsetWidth / 2)) + "px";
+                /// Set the style.left property.
+                center_hor();
+                /// Attach the centering function to onresize so that the panel always stays centered.
+                window.addEventListener("resize", center_hor);
                 /// Restore CSS transitions (if supported by the browser).
                 panel.className       = "panel slide";
                 /// Move the panel to the very top of the page.
@@ -1071,6 +1087,8 @@
                 window.setTimeout(function ()
                 {
                     panel.style.top = 0;
+                    /// Center the element on the page.
+                    center_hor();
                 }, 0);
             }
             
@@ -1325,7 +1343,8 @@
          */
         (function ()
         {
-            var show_configure_panel,
+            var show_about_bible_panel,
+                show_configure_panel,
                 show_help_panel,
                 wrench_button = document.createElement("input"),
                 wrench_label  = document.createElement("label");
