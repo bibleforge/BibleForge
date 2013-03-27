@@ -113,7 +113,7 @@
         biblical_ipa_long: "Biblical Reconſtructed IPA",                           /// The long name for the Biblical reconstructed IPA pronunciation displayed in a tooltip
         blog:              "Weblog",                                               /// Context menu item
         chapter:           "Chapter {num}",                                        /// Chapter headings
-        chapter_psalm:     "Psalme {num}",                                          /// The title of chapters in the book of Psalms
+        chapter_psalm:     "Psalme {num}",                                         /// The title of chapters in the book of Psalms
         configure:         "Configure",                                            /// Context menu item
         credits:           "<p>The King James Verſion (KJV) was tranſlated by a group of ſcholars in 1611. This text attempts to be as cloſe as poſſible to the firſt printing of the KJV.</p><p>The KJV is in the <a href=\"https://creativecommons.org/publicdomain/mark/1.0/\" target=_blank>public domain</a>.</p>",
         detailed_def:      "Detailed Definition",                                  /// Longer, more detailed definitions caption (in larger callout)
@@ -131,11 +131,13 @@
         modern_pronun:     "Modern Pronunciation",                                 /// The long name for the modern pronunciation displayed in a tooltip
         modern_ipa:        "Modern IPA",                                           /// The name for the modern IPA pronunciation displayed on the menu and tooltip
         more:              "More",                                                 /// The text for the "[+] More" button on callouts
-        next:              "Next",                                                 /// The next chapter link in the non-JavaScript version
+        next_chap:         "Next Chapter",                                         /// The next chapter link in the non-JavaScript version
+        next_psalm:        "Next Psalme",                                          /// The next psalm link in the non-JavaScript version
         night_mode:        "Night Mode",                                           /// In the View configuration panel
         no_results1:       "Your search\u200A\u2014\u200A",                        /// Displayed when preforming a search that returns no results (before the search terms) (This does not need a long s because it is displayed on the scroll.)
         no_results2:       "\u200A\u2014\u200Adid not returne any results.",       /// Displayed when preforming a search that returns no results (after the search terms) (This does not need a long s because it is displayed on the scroll.)
-        previous:          "Preuious",                                             /// The previous chapter link in the non-JavaScript version
+        previous_chap:     "Preuious Chapter",                                     /// The previous chapter link in the non-JavaScript version
+        previous_psalm:    "Preuious Psalme",                                      /// The previous psalm link in the non-JavaScript version
         psalm:             "Psalme",                                               /// The title of chapters in the book of Psalms (This does not need a long s because it is displayed on the scroll.)
         query_explanation: "Keyword or Reference: \"God ſo loued\" or Romans 3:23",/// In a blank query input box before a search has been preformed
         query_button_title:"Click here (or preſſe Enter)",                         /// The text displayed when hovering over the magnifying glass (query button).

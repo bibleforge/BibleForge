@@ -177,11 +177,13 @@
         modern_pronun:     "Modern Pronunciation",                                 /// The long name for the modern pronunciation displayed in a tooltip
         modern_ipa:        "Modern IPA",                                           /// The name for the modern IPA pronunciation displayed on the menu and tooltip
         more:              "More",                                                 /// The text for the "[+] More" button on callouts
-        next:              "Next",                                                 /// The next chapter link in the non-JavaScript version
+        next_chap:         "下一章",                                                /// The next chapter link in the non-JavaScript version
+        next_psalm:        "下一首",                                                /// The next psalm link in the non-JavaScript version
         night_mode:        "Night Mode",                                           /// In the View configuration panel
         no_results1:       "Your search\u200A\u2014\u200A",                        /// Displayed when preforming a search that returns no results (before the search terms)
         no_results2:       "\u200A\u2014\u200Adid not return any results.",        /// Displayed when preforming a search that returns no results (after the search terms) (uncapitalized)
-        previous:          "Previous",                                             /// The previous chapter link in the non-JavaScript version
+        previous_chap:     "上一章",                                                /// The previous chapter link in the non-JavaScript version
+        previous_psalm:    "上一首",                                                /// The previous psalm link in the non-JavaScript version
         psalm:             "诗",                                                   /// How to reference Psalms in a reference
         query_explanation: "Keyword or Reference: \"God so loved\" or Romans 3:23",/// In a blank query input box before a search has been preformed
         query_button_title:"Click here (or press Enter)",                          /// The text displayed when hovering over the magnifying glass (query button)

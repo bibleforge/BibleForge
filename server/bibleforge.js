@@ -943,7 +943,7 @@ BF.lexical_lookup = function (data, callback)
                                             }
                                             
                                             ///NOTE: Psalms uses a special name (i.e., "psalm" instead of "chapter").
-                                            res += "<a class=\"static_link prev\" href=\"/" + lang.id + "/" + lang.books_short[prev_b] + "%20" + prev_c + "/!" + "\">&lt; " + lang.previous + " " + (prev_b === 19 ? lang.psalm : lang.chapter) + "</a>";
+                                            res += "<a class=\"static_link prev\" href=\"/" + lang.id + "/" + lang.books_short[prev_b] + "%20" + prev_c + "/!" + "\">&lt; " + (prev_b === 19 ? lang.previous_psalm : lang.previous_chap) + "</a>";
                                         }
                                         
                                         /// Is this not Revelation 22? (Revelation 22 does not need a next link.)
@@ -960,7 +960,7 @@ BF.lexical_lookup = function (data, callback)
                                             }
                                             
                                             ///NOTE: Psalms uses a special name (i.e., "psalm" instead of "chapter").
-                                            res += "<a class=\"static_link next\" href=\"/" + lang.id + "/" + lang.books_short[next_b] + "%20" + next_c + "/!" + "\">" + lang.next + " " + (next_b === 19 ? lang.psalm : lang.chapter) + " &gt;</a>";
+                                            res += "<a class=\"static_link next\" href=\"/" + lang.id + "/" + lang.books_short[next_b] + "%20" + next_c + "/!" + "\">" + (next_b === 19 ? lang.next_psalm : lang.next_chap) + " &gt;</a>";
                                         }
                                         
                                         return res;
