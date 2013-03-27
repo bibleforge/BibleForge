@@ -248,7 +248,7 @@
                 ///NOTE: '(?!s\b) removes apostrophes that are not followed by an "s" and only an "s."
                 ///NOTE: "[^"]+"?|[^"\s]+ is used to split the string into groups of individual words and quoted phrases.
                 ///NOTE: Unterminated double quotes are treated as a phrase that ends at the end of the query, so '"unterminated quote' is treated as '"unterminated quote"'.
-                initial_search_arr = search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?|[^\s]*)|[~\/]\d*|[，。：？！；＆｜（）［］｛｝「」『』,.:?!;&|\)\(\]\[\/\\`{}<$\^+]|-\B|'(?!s\b))/g, "").toLowerCase().match(/"[^"]+"?|[^"\s]+/g);
+                initial_search_arr = search_terms.replace(/(?:(?:^|\s)-(?:"[^"]*"?|[^\s]*)|[~\/]\d*|[…，。：？！；＆｜（）［］｛｝「」『』,.:?!;&|\)\(\]\[\/\\`{}<$\^+]|-\B|'(?!s\b))/g, "").toLowerCase().match(/"[^"]+"?|[^"\s]+/g);
                 
                 /// Where no terms found?  If so, return an empty array.
                 ///NOTE: This could happen if all of the search terms are negative (e.g., "NOT bad").
@@ -298,7 +298,7 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                 /// Convert the asterisks to a valid regex wildcard.
                 ///NOTE: Word breaks are found by looking for tag openings (<) or closings (>).
                 term = term.replace(/\*/g, "[^<>]*");
-                return "=([0-9]+)>[　「『（]?\\(*(?:" + term + "|[^<]+-" + term + ")[）；：，。？！」』]*[<-]";
+                return "=([0-9]+)>[　「『（]?\\(*(?:" + term + "|[^<]+-" + term + ")[…）；：，。？！」』]*[<-]";
             }
             
             /**

@@ -58,13 +58,13 @@ document.addEventListener("DOMContentLoaded", function ()
     if (!BF.lang.zh_s) {
         BF.langs.zh_s = {
             full_name: "简体中文 (CKJV)",
-            modified: 37921841,
+            modified: 38018608,
         };
     }
     if (!BF.lang.zh_t) {
         BF.langs.zh_t = {
             full_name: "繁體中文 (CKJV)",
-            modified: 37921823,
+            modified: 38018459,
         };
     }
     
@@ -3243,9 +3243,9 @@ document.addEventListener("DOMContentLoaded", function ()
                                 /// Are there standard verses to highlight?
                                 /// TODO: Handle mixed searches too.
                                 if (html) {
+                                    /// Loop through all of the terms and highlight them.
                                     for (re_id = highlight_re.length - 1; re_id >= 0; re_id -= 1) {
                                         tmp_found_ids = replace_hyphens(html).split(highlight_re[re_id].regex);
-                                        
                                         ids = tmp_found_ids.length;
                                         
                                         i = 1;
