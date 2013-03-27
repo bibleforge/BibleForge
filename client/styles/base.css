@@ -527,6 +527,9 @@ body {
     
     /* Just below the topBar (and context menu) but above callouts. */
     z-index: 999990;
+    
+    /* Make sure that the panel does not get too large. */
+    max-width: 800px;
 }
 
 
@@ -1134,9 +1137,6 @@ h2 {
     line-height: 0;
 }
 
-.about_bible {
-    max-width: 800px;
-}
 
 /* Style the previous and next links for the non-JavaScript version. */
 .static_link {

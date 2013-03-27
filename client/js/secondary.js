@@ -1041,8 +1041,19 @@
                 center_hor = function ()
                 {
                     ///NOTE: document.body.clientWidth does not include the scroll bars.
-                    ///NOTE: Sometimes this does not align the panel perfectly.
-                    panel.style.left = ((document.body.clientWidth / 2) - (panel.offsetWidth / 2)) + "px";
+                    var clientWidth = document.body.clientWidth,
+                        left = panel.style.left;
+                    
+                    /// Set the max with and height to get a little smaller than the screen so that the contents will always be visible.
+                    ///NOTE: document.body.clientHeight will not work right because it takes into account the entire page height, not just the viewable region.
+                    panel.style.maxHeight = (window.innerHeight - 80) + "px";
+                    
+                    panel.style.left = ((clientWidth / 2) - (panel.offsetWidth / 2)) + "px";
+                    
+                    /// For an unknown reason, the panel seems to change sizes when the left value is changed, so if the left value changes, it needs to realign the panel.
+                    if (panel.style.left !== left) {
+                        center_hor();
+                    }
                 }
                 
                 is_open = true;
@@ -1068,14 +1079,10 @@
                 panel.className       = "panel";
                 /// Ensure that the element is visible (display is set to "none" when it is closed).
                 panel.style.display   = "block";
-                /// Set the max with and height to get a little smaller than the screen so that the contents will always be visible.
-                ///TODO: Determine if this should be done each time the window is resized.
-                ///NOTE: document.body.clientHeight will not work right because it takes into account the entire page height, not just the viewable region.
-                panel.style.maxHeight = (window.innerHeight        - 80) + "px";
-                panel.style.maxWidth  = (document.body.clientWidth - 40) + "px";
                 /// Quickly move the element to just above of the visible area.
                 panel.style.top       = -panel.offsetHeight + "px";
-                /// Set the style.left property.
+                
+                /// Set the style.left and style.maxHeight properties.
                 center_hor();
                 /// Attach the centering function to onresize so that the panel always stays centered.
                 window.addEventListener("resize", center_hor);
@@ -1585,7 +1592,6 @@
             {
                 var panel_element = document.createElement("div");
                 
-                panel_element.className = "about_bible";
                 panel_element.innerHTML = "<legend>" + BF.insert({v: BF.lang.abbreviation}, BF.lang.about_version) + "</legend>" + BF.lang.credits;
                 show_panel(panel_element);
             };
