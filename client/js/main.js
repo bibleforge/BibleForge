@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function ()
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (1611)",
-            modified: 38004031,
+            modified: 38007072,
         };
     }
     if (!BF.lang.zh_s) {

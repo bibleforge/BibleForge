@@ -111,7 +111,7 @@
         chapter:           "Chapter {num}",                                        /// Chapter headings
         chapter_psalm:     "Psalm {num}",                                          /// The title of chapters in the book of Psalms
         configure:         "Configure",                                            /// Context menu item
-        credits:           "<p>The King James Version (KJV) was originally translated by a group of scholars in 1611. Over the years, the King James version went through many revisions. This text is primarily based on the Cambridge family of KJV editions.</p><p>The KJV is in the <a href=\"https://creativecommons.org/publicdomain/mark/1.0/\" target=_blank>public domain</a>.</p>",
+        credits:           "<p>The King James Version (KJV) was translated by a group of scholars in England and first printed in 1611. Over the years, the King James version went through many minor revisions. This text is primarily based on the Cambridge family of KJV editions.</p><p>The KJV is in the <a href=\"https://creativecommons.org/publicdomain/mark/1.0/\" target=_blank>public domain</a>.</p>",
         detailed_def:      "Detailed Definition",                                  /// Longer, more detailed definitions caption (in larger callout)
         done:              "Done",                                                 /// The button that closes panels
         err_unknown:       "An error occurred. Please try again.",                 /// A query returned an error for an unspecified reason.
