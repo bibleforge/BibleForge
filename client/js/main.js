@@ -2375,8 +2375,6 @@ document.addEventListener("DOMContentLoaded", function ()
                                             html_str += hebrew_heading;
                                         }
                                         
-                                        ///NOTE: The trailing space adds a space between verses in a paragraph and does not effect paragraph final verses.
-                                        //html_str += "<div class=verse id=" + verse_id + "_verse><span class=verse_number>" + verse_obj.v + "&nbsp;</span>" + verse_html[i] + " </div>";
                                         html_str += get_normal_verse_html();
                                     }
                                 }
