@@ -900,6 +900,7 @@ BF.lexical_lookup = function (data, callback)
                         var b,
                             c,
                             lang_css_html = "", /// If there is no language specific CSS, a blank string is needed.
+                            lang_select = "<select name=l>",
                             verseID = lang.determine_reference(query);
                         
                         /// Add the full URL to the page to redirect capable browsers to the full-featured page.
@@ -909,6 +910,14 @@ BF.lexical_lookup = function (data, callback)
                         html = html.replace("__QUERY__", BF.escape_html(query));
                         /// Add the language ID to the scroll's class to allow the CSS to change based on language.
                         html = html.replace("__LANG__", lang.id);
+                        
+                        /// Build a <select> element that lists the available languages.
+                        Object.keys(BF.langs).sort().forEach(function (lang_id)
+                        {
+                            lang_select += "<option value=\"" + lang_id + "\"" + (lang_id === lang.id ? " SELECTED" : "") + ">" + BF.langs[lang_id].full_name + "</option>";
+                        });
+                        lang_select += "</select>";
+                        html = html.replace("__LANG_SELECT__", lang_select);
                         
                         /// Add the a <link> tag for the language specific CSS, if any.
                         if (lang.has_css) {
