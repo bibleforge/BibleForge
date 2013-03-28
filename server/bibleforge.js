@@ -133,6 +133,23 @@ BF.get_b_c_v = function (verseID)
     };
 };
 
+/**
+ * Insert data into a string.
+ *
+ * @example BF.insert({"a": "text", num: 10}, "This is some {a}; {num} is a number. Here's more {a}.") /// Returns "This is some text; 10 is a number. Here's more text."
+ * @param   obj      (object) An object representing the data to insert.
+ * @param   template (string) The template string using curly brackets with a name to indicate placeholders.
+ */
+BF.insert = function (obj, template)
+{
+    /// Match all matching curly brackets, and send them to the function.
+    return template.replace(/{([^{}]+)}/g, function (whole, inside)
+    {
+        var data = obj[inside];
+        return typeof data !== "undefined" ? data : whole;
+    });
+};
+
 
 /// **************************
 /// * Create query functions *
@@ -979,7 +996,7 @@ BF.lexical_lookup = function (data, callback)
                                             /// Display chapter/psalm number (but not on verse 1 of psalms that have titles).
                                             } else if (i === 0) {
                                                 /// Is this the book of Psalms?  (Psalms have a special name.)
-                                                res += "<h3 class=chapter id=" + data[i].id + "_chapter>" + (b === 19 ? lang.psalm : lang.chapter) + " " + c + "</h3>";
+                                                res += "<h3 class=chapter id=" + data[i].id + "_chapter>" + BF.insert({num: c}, b === 19 ? lang.chapter_psalm : lang.chapter) + "</h3>";
                                             }
                                             /// Is this a Psalm title (i.e., verse 0)?  (Psalm titles are displayed specially.)
                                             if (v === 0) {
