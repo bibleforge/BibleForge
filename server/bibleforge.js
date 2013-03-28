@@ -925,6 +925,17 @@ BF.lexical_lookup = function (data, callback)
                                     res = "",
                                     v;
                                 
+                                /**
+                                 * Compile the HTML for a normal verse.
+                                 *
+                                 * @return A string containing the verse encapsulated in HTML.
+                                 * @note   This is a separate function because it can be called from two different places.
+                                 */
+                                function get_normal_verse_html()
+                                {
+                                    return "<div class=verse id=" + data[i].id + "_verse><span class=verse_number>" + v + "&nbsp;</span>" + data[i].words + " </div>";
+                                }
+                                
                                 /// Was there no response from the database?  This could mean the database crashed or the verse is invalid.
                                 if (!data || !data.length) {
                                     res = lang.no_results1 + "<b>" + BF.escape_html(query) + "</b>" + lang.no_results2;
@@ -1001,6 +1012,8 @@ BF.lexical_lookup = function (data, callback)
                                             /// Is this a Psalm title (i.e., verse 0)?  (Psalm titles are displayed specially.)
                                             if (v === 0) {
                                                 res += "<div class=psalm_title id=" + data[i].id + "_verse>" + data[i].words + "</div>";
+                                            } else if (lang.first_verse_normal) {
+                                                res += get_normal_verse_html();
                                             } else {
                                                 res += "<div class=first_verse id=" + data[i].id + "_verse>" + data[i].words + " </div>";
                                             }
@@ -1010,7 +1023,8 @@ BF.lexical_lookup = function (data, callback)
                                                 res += "<div class=subscription id=" + data[i].id  + "_verse>" + data[i].words + "</div>";
                                             } else {
                                                 ///TODO: Determine if "class=verse_number" is needed.
-                                                res += "<div class=verse id=" + data[i].id + "_verse><span class=verse_number>" + v + "&nbsp;</span>" + data[i].words + " </div>";
+                                                //res += "<div class=verse id=" + data[i].id + "_verse><span class=verse_number>" + v + "&nbsp;</span>" + data[i].words + " </div>";
+                                                res += get_normal_verse_html();
                                             }
                                         }
                                         v += 1;
