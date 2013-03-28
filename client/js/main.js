@@ -1110,11 +1110,6 @@ document.addEventListener("DOMContentLoaded", function ()
                         ///NOTE: It does not necessarily need to reload the verses if switching from paragraph mode to non-paragraph mode.
                         content_manager.clear_scroll();
                         
-                        /// Make sure to get the last query type to ensure that BibleForge knows what type of query this is.
-                        /// This is needed when a user switches between languages because the last query might be in a different language and therefore unintelligible in the new language.
-                        /// E.g., Look up "Ieremiah" in en_em, switch to en, and then change the paragraph setting.
-                        settings.user.position.type = settings.user.last_query.type;
-                        
                         /// Reload verses to where the user left off.
                         run_new_query(settings.user.last_query.real_query, false, true, settings.user.position);
                     }
@@ -2021,6 +2016,12 @@ document.addEventListener("DOMContentLoaded", function ()
                         }
                         
                         looking_up_verse_range = false;
+                        
+                        /// Make sure to save the last query type to ensure that BibleForge knows what type of query this is.
+                        /// This is needed when a user switches between languages because the last query might be in a different language and therefore unintelligible in the new language.
+                        /// E.g., Look up "Ieremiah" in en_em, switch to en, and then change the paragraph setting or load bibleforge.com again (without any query after it).
+                        ///NOTE: This is added to verse1 because modifying the settings.user.position object later does not trigger the onchnage function to save the settings. 
+                        verse1.type = settings.user.last_query.type;
                         
                         /// Store the state in the settings so that if the user comes back later, we can take them back to where they left off.
                         settings.user.position = verse1;
@@ -3662,7 +3663,7 @@ document.addEventListener("DOMContentLoaded", function ()
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?38008315", {
+                BF.include("/js/secondary.js?38080747", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
