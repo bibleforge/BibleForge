@@ -2979,14 +2979,14 @@ document.addEventListener("DOMContentLoaded", function ()
                  *
                  * @example run_new_query("John 3:16"); /// Looks up John 3:16 (and following)
                  * @example run_new_query("love");      /// Searches for the word "love"
-                 * @param   raw_query    (string)             The text from the user to query.
-                 * @param   is_default   (boolean) (optional) Whether or not this query is the default query (and therefore not entered by the user).
-                 * @param   ignore_state (boolean) (optional) Whether or not to push this query into the history as a new state.
-                 * @param   position     (object)  (optional) The actual position the user was at.
+                 * @param   raw_query     (string)             The text from the user to query.
+                 * @param   is_default    (boolean) (optional) Whether or not this query is the default query (and therefore not entered by the user).
+                 * @param   replace_state (boolean) (optional) Whether to push this query into the history as a new state or replace the current state.
+                 * @param   position      (object)  (optional) The actual position the user was at.
                  * @return  NULL
                  * @note    Called by searchForm.onsubmit() when a user submits a query.
                  */
-                return function run_new_query(raw_query, is_default, ignore_state, position)
+                return function run_new_query(raw_query, is_default, replace_state, position)
                 {
                     /// **********
                     /// * Step 1 *
@@ -3073,15 +3073,14 @@ document.addEventListener("DOMContentLoaded", function ()
                         options.seo_query = BF.create_ref(BF.get_b_c_v(verse_id)) + (options.extra_highlighting ? " {{" + options.extra_highlighting + "}}" : "");
                     }
                     
-                    if (!ignore_state) {
-                        /// If the query is a verse lookup (e.g., verse_id is a number) then determine the proper verse reference (e.g., turn "1cor" into "1 Corinthians 1:1").
-                        ///NOTE: Providing one URL for various verse spellings should improve SEO.
-                        ///NOTE: If the user enters in a URL manually into the browser, it will not replace it with the proper verse reference.
-                        ///NOTE: This must be done now, because the verse_id variable may change later based on the position object.
-                        ///NOTE: Another reason this needs to be called now is because later the function may exit before querying the server and simply scroll to the verse.
-                        ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
-                        BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(verse_id ? options.seo_query : raw_query) + "/", position ? {position: position} : undefined);
-                    }
+                    /// If the query is a verse lookup (e.g., verse_id is a number) then determine the proper verse reference (e.g., turn "1cor" into "1 Corinthians 1:1").
+                    ///NOTE: Providing one URL for various verse spellings should improve SEO.
+                    ///NOTE: If the user enters in a URL manually into the browser, it will not replace it with the proper verse reference.
+                    ///NOTE: This must be done now, because the verse_id variable may change later based on the position object.
+                    ///NOTE: Another reason this needs to be called now is because later the function may exit before querying the server and simply scroll to the verse.
+                    ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
+                    /// If 
+                    BF.history[replace_state ? "replaceState" : "pushState"]("/" + BF.lang.id + "/" + window.encodeURIComponent(verse_id ? options.seo_query : raw_query) + "/", position ? {position: position} : undefined);
                     
                     /// After saving the state above, make sure that position is an object to make checking for its properties easier.
                     position = position || {};
