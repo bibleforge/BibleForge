@@ -3064,13 +3064,14 @@ document.addEventListener("DOMContentLoaded", function ()
                     /// If the query is a verse reference, a number is returned, if it is a search, then FALSE is returned.
                     verse_id = Number(BF.lang.determine_reference(query));
                     
-                    /// Is the query a verse lookup?
-                    if (verse_id) {
+                    /// Is the query a verse lookup?  If so, let's make the URL look nice.
+                    if (verse_id || (position && position.type === BF.consts.verse_lookup)) {
                         /// In order to keep a consistent URL for a verse (for better SEO among other reasons), change the query into a standard form.
                         /// E.g., The query "gen" becomes "Genesis 1:1".
                         ///NOTE: If the real query will actually be created by the position object, options.seo_query will be changed later;
                         ///      however, it is still necessary to create it now so that it can be used to create the URL for the new state below.
-                        options.seo_query = BF.create_ref(BF.get_b_c_v(verse_id)) + (options.extra_highlighting ? " {{" + options.extra_highlighting + "}}" : "");
+                        ///NOTE: If the position variable exists, use that to create the verse reference, not the query (i.e., verse_id).
+                        options.seo_query = BF.create_ref(position || BF.get_b_c_v(verse_id)) + (options.extra_highlighting ? " {{" + options.extra_highlighting + "}}" : "");
                     }
                     
                     /// If the query is a verse lookup (e.g., verse_id is a number) then determine the proper verse reference (e.g., turn "1cor" into "1 Corinthians 1:1").
@@ -3079,8 +3080,7 @@ document.addEventListener("DOMContentLoaded", function ()
                     ///NOTE: This must be done now, because the verse_id variable may change later based on the position object.
                     ///NOTE: Another reason this needs to be called now is because later the function may exit before querying the server and simply scroll to the verse.
                     ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
-                    /// If 
-                    BF.history[replace_state ? "replaceState" : "pushState"]("/" + BF.lang.id + "/" + window.encodeURIComponent(verse_id ? options.seo_query : raw_query) + "/", position ? {position: position} : undefined);
+                    BF.history[replace_state ? "replaceState" : "pushState"]("/" + BF.lang.id + "/" + window.encodeURIComponent(options.seo_query || raw_query) + "/", position ? {position: position} : undefined);
                     
                     /// After saving the state above, make sure that position is an object to make checking for its properties easier.
                     position = position || {};
@@ -3105,11 +3105,6 @@ document.addEventListener("DOMContentLoaded", function ()
                         
                         options.verse = verse_id;
                         options.type  = BF.consts.verse_lookup;
-                        
-                        /// If we are using the position object to create the query, the seo_query must be changed to match that reference.
-                        if (position.b) {
-                            options.seo_query = BF.create_ref(position) + (options.extra_highlighting ? " {{" + options.extra_highlighting + "}}" : "");
-                        }
                         
                         /// If the query is a verse lookup and the verse is visible, just scroll to it.
                         ///TODO: If the user is already at that verse, nothing happens, so there may need to be some visual confirmation.
