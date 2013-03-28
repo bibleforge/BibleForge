@@ -854,6 +854,10 @@ BF.lexical_lookup = function (data, callback)
                     ///     /!
                     ///     /en/!
                     if (query === undefined || query === "") {
+                        /// Get the queried language.
+                        if (data && data.l && BF.langs[data.l]) {
+                            lang = BF.langs[data.l];
+                        }
                         /// Was there a query specified in the GET data?
                         ///NOTE: For example, this will occur when submitting a query from the query box in the non-JavaScript version.
                         /// Example query: /en/!?q=love
