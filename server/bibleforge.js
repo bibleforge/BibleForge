@@ -880,7 +880,7 @@ BF.lexical_lookup = function (data, callback)
                     /// If a query string is present, redirect it to the correct URL and cloes the connection.
                     ///TODO: Check for the presence of both the exclamation point (!) and _escaped_fragment_ and redirect to a page without the exclamation point.
                     ///TODO: Retrieve any query in the _escaped_fragment_ variable.
-                    if (data && data.q) {
+                    if (data && (data.q || data.l)) {
                         connection.writeHead(301, {"Location": "http" + (BF.config.use_ssl ? "s" : "") + "://" + url.host + (Number(url.port) !== 80 ? ":" + url.port : "") + full_featured_uri + "!"});
                         connection.end();
                         return;
