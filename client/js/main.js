@@ -3106,10 +3106,10 @@ document.addEventListener("DOMContentLoaded", function ()
                         options.verse = verse_id;
                         options.type  = BF.consts.verse_lookup;
                         
-                        /// If the query is a verse lookup and the verse is visible, just scroll to it.
+                        /// If the query is a verse lookup (and the last query was too) and the verse is visible, just scroll to it.
                         ///TODO: If the user is already at that verse, nothing happens, so there may need to be some visual confirmation.
                         ///NOTE: If just the highlighting changes, the page does not need to reload.
-                        if (options.extra_highlighting === query_manager.extra_highlighting && query_manager.lang_id === BF.lang.id && content_manager.scroll_to_verse(BF.get_b_c_v(verse_id))) {
+                        if (options.extra_highlighting === query_manager.extra_highlighting && query_manager.lang_id === BF.lang.id && settings.user.last_query && settings.user.last_query.type === BF.consts.verse_lookup && content_manager.scroll_to_verse(BF.get_b_c_v(verse_id))) {
                             ///NOTE: Since the verse had already been loaded, and therefore no query needs to be made, store the query info now.
                             query_manager.store_query_options(options);
                             return;
