@@ -616,7 +616,8 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
         prepare_search_terms: function (terms)
         {
             ///NOTE: Because segment() is created after this file loads, we cannot directly set prepare_search_terms() to equal segment().
-            return segment(terms);
+            /// The regular expression moves asterisks next to segmented words toward the left side.  (Punctuation will automatically connect toward the right if possible.)
+            return segment(terms).replace(/\s+\*($|\s)/g, "*$1");
         }
     };
 }(this));
