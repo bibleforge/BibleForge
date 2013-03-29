@@ -2022,6 +2022,9 @@ document.addEventListener("DOMContentLoaded", function ()
                         /// E.g., Look up "Ieremiah" in en_em, switch to en, and then change the paragraph setting or load bibleforge.com again (without any query after it).
                         ///NOTE: This is added to verse1 because modifying the settings.user.position object later does not trigger the onchnage function to save the settings. 
                         verse1.type = settings.user.last_query.type;
+                        /// When reloading the page, it is necessary to check what the original raw_query was.
+                        /// For example, changing languages will change the actual query, but we want the original query to be saved so that we can tell when the user actually enters in a new query.
+                        verse1.raw_query = settings.user.last_query.raw_query;
                         
                         /// Store the state in the settings so that if the user comes back later, we can take them back to where they left off.
                         settings.user.position = verse1;
@@ -3095,6 +3098,11 @@ document.addEventListener("DOMContentLoaded", function ()
                             ///TODO: Make this work when moving back/forth through the history.
                             verse_id = position.verse_id;
                             using_position = true;
+                            ///NOTE: position.raw_query should always exist (except for the time being because I just added position.raw_query).
+                            ///      Later, this IF statement can be removed after all of the users load the newest version of the code (but make sure to keep setting options.raw_query).
+                            if (position.raw_query) {
+                                options.raw_query = position.raw_query;
+                            }
                         }
                         
                         /// Is the lookup verse the beginning of a Psalm with a title?  If so, we need to start at the title.
@@ -3402,17 +3410,9 @@ document.addEventListener("DOMContentLoaded", function ()
                     {
                         run_new_query(raw_query, is_default, true, position);
                         
-                        /// If the user typed in a URL that does not match the standard form, rewrite the URL.
-                        /// E.g., the user entered in "http://bibleforge.com/en/gen"; turn that into "http://bibleforge.com/en/Genesis 1:1/".
-                        ///NOTE: This only rewrites the URL if the query does not match.  It does not rewrite if the URL if the language is missing but the query string is correct.
-                        ///NOTE: The URL must be rewritten; otherwise, if the user reloads the page, the URL will not match the actual query, and the position will not be saved.
-                        if (raw_query && settings.user.last_query.type === BF.consts.verse_lookup && raw_query !== settings.user.last_query.real_query) {
-                            BF.history.replaceState("/" + settings.user.last_query.lang_id + "/" + window.encodeURIComponent(settings.user.last_query.raw_query) + "/", position ? {position: position} : undefined);
-                        }
-                        
                         /// Only change the text in the query input if the user has not started typing and the user actually typed in the query.
                         if (!e.initial_page_load || qEl.value === "") {
-                            if (e.initial_page_load && !using_url && typeof settings.user.entered_text !== "undefined") {
+                            if (e.initial_page_load && typeof settings.user.entered_text !== "undefined" && (!using_url || position.raw_query === settings.user.entered_text)) {
                                 /// Fill in the last query that the user typed in, which is not necessary the same as what the user lasted queried.
                                 qEl.value = settings.user.entered_text;
                                 /// Clear the placeholder text to allow for the user to clear the query box so that he is not distracted.
