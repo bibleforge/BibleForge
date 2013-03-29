@@ -39,14 +39,14 @@ Welcome to hacking BibleForge.
 This is a non-JavaScript version of the HTML.  See index.html for more info about BibleForge.
 
 -->
-    <title>__TITLE__</title>
+    <title>{TITLE}</title>
     <link rel=stylesheet href="/styles/base.css?38006941">
-    __LANG_CSS__
+    {LANG_CSS}
     <link rel="icon" type="image/png" href="/images/favicon.png">
     <!-- This graphic is used by handhelds and tablets for a bookmark icon. -->
     <!-- NOTE: May want to use the precomposed option (apple-touch-icon-precomposed). -->
     <link rel="apple-touch-icon" href="/images/scroll_210.png">
-    <meta name=description content="BibleForge: The free, open source Bible Study web app. __DESC__">
+    <meta name=description content="BibleForge: The free, open source Bible Study web app. {DESC}">
     <!-- NOTE: Viewport properties are set in the CSS because the viewport meta tag does not support using a percentage for the width property. -->
     <!-- Tell Googlebot (and maybe other bots) to retry the same address with "?_escaped_fragment_=" at the end. -->
     <!-- Then the server can create a page for Googlebot to index. -->
@@ -57,14 +57,14 @@ This is a non-JavaScript version of the HTML.  See index.html for more info abou
         <script>
             /// Do not redirect Android browsers.
             if (window.navigator.userAgent.indexOf("Mobile Safari/") === 0 || window.navigator.userAgent.indexOf("Android") === 0) {
-                window.location.replace("__FULL_URI__");
+                window.location.replace("{FULL_URI}");
             }
         </script>
     <!-- <![endif]-->
     <!-- Redirect IE 10+. -->
     <!--[if gte IE 10]>
         <script>
-            window.location.replace("__FULL_URI__");
+            window.location.replace("{FULL_URI}");
         </script>
     <![endif]-->
 </head>
@@ -73,10 +73,10 @@ This is a non-JavaScript version of the HTML.  See index.html for more info abou
     ><div class=topBars
         ><div class=searchBars
             ><form action="/!"
-                >__LANG_SELECT__<label for=q0 class=queryPadding
+                >{LANG_SELECT}<label for=q0 class=queryPadding
                     ><nobr
                         ><input type=button class=lang
-                        ><input type=text value="__QUERY__" name=q id=q0 class=queryInput
+                        ><input type=text value="{QUERY}" name=q id=q0 class=queryInput
                         ><input type=submit class=inputIcon alt=Go value=""
                     ></nobr
                 ></label
@@ -87,7 +87,7 @@ This is a non-JavaScript version of the HTML.  See index.html for more info abou
         ></div
     ></div
     ><!-- This <div> is used to push the data down below the top bar. --><div class=loaders></div
-    ><div class="lang___LANG__ scrolls">__CONTENT__</div
+    ><div class="lang_{LANG} scrolls">{CONTENT}</div
 ></div
 ></body
 ></html>

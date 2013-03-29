@@ -899,17 +899,18 @@ BF.lexical_lookup = function (data, callback)
                     {
                         var b,
                             c,
+                            content = {},
                             lang_css_html = "", /// If there is no language specific CSS, a blank string is needed.
                             lang_select = "<select name=l>",
                             verseID = lang.determine_reference(query);
                         
                         /// Add the full URL to the page to redirect capable browsers to the full-featured page.
                         ///NOTE: A regular expression is used because this string occurs twice.
-                        html = html.replace(/__FULL_URI__/g, full_featured_uri);
+                        content.FULL_URI = full_featured_uri;
                         /// Add the query string to the query box.
-                        html = html.replace("__QUERY__", BF.escape_html(query));
+                        content.QUERY = BF.escape_html(query);
                         /// Add the language ID to the scroll's class to allow the CSS to change based on language.
-                        html = html.replace("__LANG__", lang.id);
+                        content.LANG = lang.id;
                         
                         /// Build a <select> element that lists the available languages.
                         Object.keys(BF.langs).sort().forEach(function (lang_id)
@@ -917,13 +918,13 @@ BF.lexical_lookup = function (data, callback)
                             lang_select += "<option value=\"" + lang_id + "\"" + (lang_id === lang.id ? " SELECTED" : "") + ">" + BF.langs[lang_id].full_name + "</option>";
                         });
                         lang_select += "</select>";
-                        html = html.replace("__LANG_SELECT__", lang_select);
+                        content.LANG_SELECT = lang_select;
                         
                         /// Add the a <link> tag for the language specific CSS, if any.
                         if (lang.has_css) {
                             lang_css_html = "<link rel=stylesheet href=\"/styles/lang/" + lang.id + ".css?" + (lang.css_modified || "") + "\">";
                         }
-                        html = html.replace("__LANG_CSS__", lang_css_html);
+                        content.LANG_CSS = lang_css_html;
                         
                         /// Is it a verse lookup?
                         if (verseID) {
@@ -1035,8 +1036,6 @@ BF.lexical_lookup = function (data, callback)
                                             if (i === len - 1 && (data[i].id % 1000) === 255) {
                                                 res += "<div class=subscription id=" + data[i].id  + "_verse>" + data[i].words + "</div>";
                                             } else {
-                                                ///TODO: Determine if "class=verse_number" is needed.
-                                                //res += "<div class=verse id=" + data[i].id + "_verse><span class=verse_number>" + v + "&nbsp;</span>" + data[i].words + " </div>";
                                                 res += get_normal_verse_html();
                                             }
                                         }
@@ -1047,16 +1046,17 @@ BF.lexical_lookup = function (data, callback)
                                     res += back_next;
                                 }
                                 
-                                /// Add the verses to the page.
-                                html = html.replace("__CONTENT__", res);
-                                connection.end(html);
+                                content.CONTENT = res;
+                                
+                                /// Add the verses and other content to the HTML and send it.
+                                connection.end(BF.insert(content, html));
                             });
                             
                             /// While the database is looking up the verses, prepare the HTML more.
                             /// Add the full verse book name along with the chapter and BibleForge's name to the <title> tag.
-                            html = html.replace("__TITLE__", BF.escape_html(lang.books_short[b]) + " " + c + " - " + lang.app_name);
+                            content.TITLE = BF.escape_html(lang.books_short[b]) + " " + c + " - " + lang.app_name;
                             /// Add a description to the <meta name=description> tag.
-                            html = html.replace("__DESC__", BF.escape_html(lang.books_short[b]) + " " + c + " " + lang.in + " " + lang.full_name);
+                            content.DESC = BF.escape_html(lang.books_short[b]) + " " + c + " " + lang.in + " " + lang.full_name;
                             /// Now, wait for the database to return the results to the function above.
                             
                         /// If it is not a verse lookup, it must be a search of some kind.
@@ -1101,15 +1101,16 @@ BF.lexical_lookup = function (data, callback)
                                         res += "<div class=search_verse id=" + data.n[i] + "_search><span>" + (lang.chapter_count[verse_obj.b] === 1 ? "" : verse_obj.c + ":") + verse_obj.v + "</span> " + data.v[i] + "</div>";
                                     }
                                 }
-                                /// Add the verses to the page.
-                                html = html.replace("__CONTENT__", res);
-                                connection.end(html);
+                                content.CONTENT = res;
+                                
+                                /// Add the verses and other content to the HTML and send it.
+                                connection.end(BF.insert(content, html));
                             });
                             /// While the database is looking up the verses, prepare the HTML more.
                             /// Add the query and BibleForge's name to the <title> tag.
-                            html = html.replace("__TITLE__", BF.escape_html(query) + " - " + lang.app_name);
+                            content.TITLE = BF.escape_html(query) + " - " + lang.app_name;
                             /// Add a description to the <meta name=description> tag.
-                            html = html.replace("__DESC__", BF.escape_html(lang.results_for + " " + query + " " + lang.in + " " + lang.full_name));
+                            content.TITLE = BF.escape_html(lang.results_for + " " + query + " " + lang.in + " " + lang.full_name);
                             /// Now, wait for the database to return the results to the function above.
                         }
                     });
