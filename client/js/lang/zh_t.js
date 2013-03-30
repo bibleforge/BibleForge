@@ -196,7 +196,7 @@
         title:             "title",                                                /// Used instead of 0 for Psalm title verse references (uncapitalized)
         translit:          "Transliteration",                                      /// The short name for the SBL transliteration display on the menu
         translit_long:     "Society of Biblical Languages Transliteration",        /// The long name for the SBL transliteration display on a tooltip
-        unsupported:       "對不起，您使用的瀏覽器不被支持。請更新您的瀏覽器或者安裝最新版本的<a href=\"https://www.mozilla.org/en-US/firefox/new/\" target=_blank>Firefox</a>或<a href=\"https://www.google.com/chrome/\" target=_blank>Chrome</a>。也可能必須啟用JavaScript。",
+        unsupported:       "對不起，您使用的瀏覽器不被支持。請更新您的瀏覽器或者安裝最新版本的<a href=\"https://www.mozilla.org/en-US/firefox/all/\" target=_blank>Firefox</a>或<a href=\"https://www.google.com/intl/zh-TW/chrome/browser/\" target=_blank>Chrome</a>。也可能必須啟用JavaScript。",
         view:              "View",                                                 /// The title of a configuration panel
         ///TODO: Determine if the app_name should be dynamically appended to the string below or if it should be done in the build system
         wrench_title:      "Customize and Configure BibleForge",                   /// The text displayed when hovering over the wrench menu
