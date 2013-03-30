@@ -1157,6 +1157,11 @@ h2 {
     float: right;
 }
 
+.unsupported_warning {
+    display: block;
+    text-align: center;
+    padding: 10px;
+}
 
 /* Highlighted found words from searches */
 .f1  {

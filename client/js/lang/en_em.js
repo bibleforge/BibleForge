@@ -134,7 +134,7 @@
         next_chap:         "Next Chapter",                                         /// The next chapter link in the non-JavaScript version
         next_psalm:        "Next Psalme",                                          /// The next psalm link in the non-JavaScript version
         night_mode:        "Night Mode",                                           /// In the View configuration panel
-        no_results1:       "Your search\u200A\u2014\u200A",                        /// Displayed when preforming a search that returns no results (before the search terms) (This does not need a long s because it is displayed on the scroll.)
+        no_results1:       "Thy search\u200A\u2014\u200A",                         /// Displayed when preforming a search that returns no results (before the search terms) (This does not need a long s because it is displayed on the scroll.)
         no_results2:       "\u200A\u2014\u200Adid not returne any results.",       /// Displayed when preforming a search that returns no results (after the search terms) (This does not need a long s because it is displayed on the scroll.)
         previous_chap:     "Preuious Chapter",                                     /// The previous chapter link in the non-JavaScript version
         previous_psalm:    "Preuious Psalme",                                      /// The previous psalm link in the non-JavaScript version
@@ -149,6 +149,7 @@
         title:             "title",                                                /// Used instead of 0 for Psalm title verse references (uncapitalized)
         translit:          "Tranſliteration",                                      /// The short name for the SBL transliteration display on the menu
         translit_long:     "Society of Biblical Languages Tranſliteration",        /// The long name for the SBL transliteration display on a tooltip
+        unsupported:       "Sory, but thy browſer is not supported. Pleaſe update thy browſer or uſe the lateſt uerſion of <a href=\"https://www.mozilla.org/en-US/firefox/new/\" target=_blank>Firefox</a> or <a href=\"https://www.google.com/chrome/\" target=_blank>Chrome</a>. Thou alſo mayeſt need to uninhibit JavaScript.",
         view:              "Uiew",                                                 /// The title of a configuration panel
         ///TODO: Determine if the app_name should be dynamically appended to the string below or if it should be done in the build system
         wrench_title:      "Cuſtomiſe & Configure BibleForge",                     /// The text displayed when hovering over the wrench menu

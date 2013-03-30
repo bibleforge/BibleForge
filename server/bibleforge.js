@@ -911,6 +911,8 @@ BF.lexical_lookup = function (data, callback)
                         content.QUERY = BF.escape_html(query);
                         /// Add the language ID to the scroll's class to allow the CSS to change based on language.
                         content.LANG = lang.id;
+                        ///TODO: Do not show this warning to bots.
+                        content.UNSUPPORTED_WARNING = lang.unsupported;
                         
                         /// Build a <select> element that lists the available languages.
                         Object.keys(BF.langs).sort().forEach(function (lang_id)
