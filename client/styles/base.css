@@ -1163,6 +1163,13 @@ h2 {
     padding: 10px;
 }
 
+/* This is used in the non-JS version. */
+.footer {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
 /* Highlighted found words from searches */
 .f1  {
     background: #FF6;

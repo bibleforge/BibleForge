@@ -913,6 +913,8 @@ BF.lexical_lookup = function (data, callback)
                         content.LANG = lang.id;
                         ///TODO: Do not show this warning to bots.
                         content.UNSUPPORTED_WARNING = lang.unsupported;
+                        /// Add information about the Bible version to the footer since there is no wrench menu.
+                        content.FOOTER = "<legend>" + BF.insert({v: lang.abbreviation}, lang.about_version) + "</legend>" + lang.credits;
                         
                         /// Build a <select> element that lists the available languages.
                         Object.keys(BF.langs).sort().forEach(function (lang_id)
