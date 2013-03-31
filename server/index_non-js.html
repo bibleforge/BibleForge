@@ -56,7 +56,8 @@ This is a non-JavaScript version of the HTML.  See index.html for more info abou
     <!--[if !IE]> -->
         <script>
             /// Do not redirect Android browsers.
-            if (window.navigator.userAgent.indexOf("Mobile Safari/") === 0 || window.navigator.userAgent.indexOf("Android") === 0) {
+            console.log(window.navigator.userAgent.indexOf("Mobile Safari/"))
+            if (window.navigator.userAgent.indexOf("Mobile Safari/") === -1 && window.navigator.userAgent.indexOf("Android") === -1) {
                 window.location.replace("{FULL_URI}");
             }
         </script>
