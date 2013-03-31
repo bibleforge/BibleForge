@@ -151,6 +151,19 @@ BF.insert = function (obj, template)
 };
 
 
+/**
+ * Tries to detect search engine bots based on their user-agent.
+ *
+ * @param  agent (string) The user-agent to examine.
+ * @return A boolean indicating whether or not the client appears to be a search engine bot.
+ * @note   This intentionally does not detect archiving bots (such as ia_archiver) since the archive is meant to be shown to a real browser later on.
+ * @note   User-agents can be easily spoofed.
+ */
+BF.is_search_engine = function (agent)
+{
+    return /google(?:bot|\/)|yahoo\!|bingbot|baiduspider|iaskspider|yandex/i.test(agent);
+}
+
 /// **************************
 /// * Create query functions *
 /// **************************
@@ -803,7 +816,7 @@ BF.lexical_lookup = function (data, callback)
                  * @param  data       (object) The GET/POST data as an object.
                  * @param  connection (object) The connection object though which data may be sent back to the client.
                  */
-                return function create_simple_page(url, data, connection)
+                return function create_simple_page(url, data, connection, info)
                 {
                     /// Because the URI starts with a slash (/), the first array element is empty.
                     var full_featured_uri,
@@ -911,8 +924,10 @@ BF.lexical_lookup = function (data, callback)
                         content.QUERY = BF.escape_html(query);
                         /// Add the language ID to the scroll's class to allow the CSS to change based on language.
                         content.LANG = lang.id;
-                        ///TODO: Do not show this warning to bots.
-                        content.UNSUPPORTED_WARNING = lang.unsupported;
+                        /// If the client is a real user, show an unsupported warning.
+                        /// Search engines are not intended to be supported and cannot read this text anyway.
+                        /// Furthermore, we don't want that text showing up in search results.
+                        content.UNSUPPORTED_WARNING = info.is_search_engine ? "" : lang.unsupported;
                         /// Add information about the Bible version to the footer since there is no wrench menu.
                         content.FOOTER = "<legend>" + BF.insert({v: lang.abbreviation}, lang.about_version) + "</legend>" + lang.credits;
                         
@@ -1135,7 +1150,7 @@ BF.lexical_lookup = function (data, callback)
              *                            end:       function (data, encoding)
              *                            writeHead: function (statusCode, headers)
              */
-            return function handle_query(url, data, connection)
+            return function handle_query(url, data, connection, info)
             {
                 var send_results;
                 
@@ -1173,7 +1188,7 @@ BF.lexical_lookup = function (data, callback)
                     }
                 } else {
                     /// All other requests are replied to with the non-Javascript version.
-                    create_simple_page(url, data, connection);
+                    create_simple_page(url, data, connection, info);
                 }
             };
         }());
@@ -1227,7 +1242,7 @@ BF.lexical_lookup = function (data, callback)
                 /// Is there GET data?
                 ///TODO: Merge POST data with GET data.
                 if (request.method.toUpperCase() === "GET") {
-                    handle_query({host: request.headers.host, path: url_parsed.pathname, port: request.headers.port}, qs.parse(url_parsed.query), connection);
+                    handle_query({host: request.headers.host, path: url_parsed.pathname, port: request.headers.port}, qs.parse(url_parsed.query), connection, {is_search_engine: BF.is_search_engine(request.headers["user-agent"])});
                 } else {
                     ///TODO: Also handle POST data.
                     /// If there is no data, close the connection.
