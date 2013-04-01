@@ -2991,7 +2991,8 @@
          */
         (function ()
         {
-            var crown_loader_timeout,
+            var changing,
+                crown_loader_timeout,
                 langEl = context.langEl;
             
             /**
@@ -3022,6 +3023,25 @@
                     prev_lang,
                     qEl_str = context.qEl.value,
                     qEl_str_trim;
+                
+                /// Since trying to change the language while another language is loading will cause problems, cancel any requests until the language has loaded.
+                ///TODO: Ideally, there should be a way to cancel the current language change request.
+                if (changing) {
+                    return;
+                }
+                
+                changing = true;
+                
+                /**
+                 * Indicate that the language change is complete and initiate the callback.
+                 */
+                function on_end()
+                {
+                    changing = false;
+                    if (callback) {
+                        callback();
+                    }
+                }
                 
                 qEl_str_trim = qEl_str.trim();
                 
@@ -3069,9 +3089,7 @@
                             activate_new_lang();
                         }
                     }
-                    if (typeof callback === "function") {
-                        callback();
-                    }
+                    on_end();
                 } else {
                     /// Does the language exist and is the new language different from the current language?
                     if (BF.langs[lang_id] && BF.lang.id !== lang_id) {
@@ -3153,10 +3171,8 @@
                                     context.run_new_query(query_str, query_info.is_default, true, position);
                                 }, 0);
                             }
-                            
-                            if (typeof callback === "function") {
-                                callback();
-                            }
+                            ///TODO: Determine if running this before the above timeout triggers is problematic.
+                            on_end();
                         };
                         
                         /// Since the language has changed, any currently loaded text must be removed and reloaded (after a moment).
@@ -3223,9 +3239,7 @@
                             }, 175);
                         }
                     } else {
-                        if (typeof callback === "function") {
-                            callback();
-                        }
+                        on_end();
                     }
                 }
             };
