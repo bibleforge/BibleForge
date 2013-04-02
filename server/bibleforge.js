@@ -1201,6 +1201,10 @@ BF.lexical_lookup = function (data, callback)
             var url = require("url"),
                 qs  = require("querystring");
             
+            /// HTTP is Node 0.10- is broken. This mitigates the problem.
+            /// See https://github.com/LearnBoost/knox/commit/0bc57294e1bf7b4526ce9f51aee6553bac77cebc.
+            require("http").globalAgent.maxSockets = 99999;
+            
             /**
              * Finally create the server.
              *
