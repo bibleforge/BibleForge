@@ -1156,8 +1156,9 @@ BF.lexical_lookup = function (data, callback)
              *                            Object structure:
              *                            end:       function (data, encoding)
              *                            writeHead: function (statusCode, headers)
+             * @param headers    (object) The HTTP headers from the request.
              */
-            return function handle_query(url, data, connection, info)
+            return function handle_query(url, data, connection, headers)
             {
                 var send_results;
                 
@@ -1195,7 +1196,7 @@ BF.lexical_lookup = function (data, callback)
                     }
                 } else {
                     /// All other requests are replied to with the non-Javascript version.
-                    create_simple_page(url, data, connection, info);
+                    create_simple_page(url, data, connection, {is_search_engine: BF.is_search_engine(headers["user-agent"])});
                 }
             };
         }());
@@ -1253,7 +1254,7 @@ BF.lexical_lookup = function (data, callback)
                 /// Is there GET data?
                 ///TODO: Merge POST data with GET data.
                 if (request.method.toUpperCase() === "GET") {
-                    handle_query({host: request.headers.host, path: url_parsed.pathname, port: request.headers.port}, qs.parse(url_parsed.query), connection, {is_search_engine: BF.is_search_engine(request.headers["user-agent"])});
+                    handle_query({host: request.headers.host, path: url_parsed.pathname, port: request.headers.port}, qs.parse(url_parsed.query), connection, request.headers);
                 } else {
                     ///TODO: Also handle POST data.
                     /// If there is no data, close the connection.
