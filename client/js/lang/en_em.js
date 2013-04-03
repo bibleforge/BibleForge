@@ -77,6 +77,7 @@
         /// Set the language's symbols.
         space: " ",
         chap_separator: ":",
+        ndash: "\u2013",
         
         /// Information about this particular Bible translation needed by the server.
         ///NOTE: paragraph_limit can be calculated in the Forge via find_longest_paragraph.js.

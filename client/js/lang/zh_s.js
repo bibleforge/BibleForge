@@ -81,6 +81,7 @@
         /// Set the language's symbols.
         space: "",
         chap_separator: "：",
+        ndash: "\u2014",
         
         /**
          * Load additional data from the server.

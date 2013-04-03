@@ -52,19 +52,19 @@ document.addEventListener("DOMContentLoaded", function ()
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (1611)",
-            modified: 38626005,
+            modified: 38630553,
         };
     }
     if (!BF.lang.zh_s) {
         BF.langs.zh_s = {
             full_name: "简体中文 (CKJV)",
-            modified: 38626015,
+            modified: 38630575,
         };
     }
     if (!BF.lang.zh_t) {
         BF.langs.zh_t = {
             full_name: "繁體中文 (CKJV)",
-            modified: 38626021,
+            modified: 38630570,
         };
     }
     
@@ -859,15 +859,39 @@ document.addEventListener("DOMContentLoaded", function ()
     {
         var ref = "";
         
-        if (!lang_id) {
-            lang_id = BF.lang.id;
+        if (bcv) {
+            
+            if (!Array.isArray(bcv)) {
+                bcv = [bcv];
+            }
+            
+            if (!lang_id) {
+                lang_id = BF.lang.id;
+            }
+            
+            if (BF.langs[lang_id] && BF.langs[lang_id].books_short[bcv[0].b]) {
+                ///NOTE: The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
+                ref = (bcv[0].b === 19 ? BF.lang.psalm : BF.langs[lang_id].books_short[bcv[0].b]) + BF.langs[lang_id].space + (BF.lang.chapter_count[bcv[0].b] === 1 ? "" : bcv[0].c + BF.langs[lang_id].chap_separator) + BF.get_full_verse(bcv[0].v, passover_titles);
+            }
+            
+            /// Is this a verse range?
+            if (bcv[1]) {
+                /// Are the books the same?
+                if (bcv[0].b === bcv[1].b) {
+                    /// Are the chapters the same?
+                    if (bcv[0].c === bcv[1].c) {
+                        /// Are the verses different?
+                        if (bcv[0].v !== bcv[1].v) {
+                            ref += BF.lang.ndash + BF.get_full_verse(bcv[1].v, passover_titles);
+                        }
+                    } else {
+                        ref += BF.lang.ndash + (BF.lang.chapter_count[bcv[1].b] === 1 ? "" : bcv[1].c + BF.lang.chap_separator) + BF.get_full_verse(bcv[1].v, passover_titles);
+                    }
+                } else {
+                    ref += BF.lang.ndash + (bcv[1].b === 19 ? BF.lang.psalm : BF.langs[lang_id].books_short[bcv[1].b]) + BF.lang.space + (BF.lang.chapter_count[bcv[1].b] === 1 ? "" : bcv[1].c + BF.lang.chap_separator) + BF.get_full_verse(bcv[1].v, passover_titles);
+                }
+            }
         }
-        
-        if (bcv && BF.langs[lang_id] && BF.langs[lang_id].books_short[bcv.b]) {
-            ///NOTE: The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
-            ref = (bcv.b === 19 ? BF.lang.psalm : BF.langs[lang_id].books_short[bcv.b]) + BF.langs[lang_id].space + (BF.lang.chapter_count[bcv.b] === 1 ? "" : bcv.c + BF.langs[lang_id].chap_separator) + BF.get_full_verse(bcv.v, passover_titles);
-        }
-        
         return ref;
     };
     
@@ -1960,36 +1984,10 @@ document.addEventListener("DOMContentLoaded", function ()
                         /// Store the query type in a variable because it may need to be accessed more than once.
                         query_type = query_manager.query_type;
                         
-
-                        verse1.full_verse = BF.get_full_verse(verse1.v, query_type === BF.consts.verse_lookup);
-                        verse2.full_verse = BF.get_full_verse(verse2.v, query_type === BF.consts.verse_lookup);
-                        
-                        
-                        ///NOTE: verse2.full_book is set here even though it is not always needed now,
-                        ///      but since these variables are stored as top_verse and bottom_verse it might be used later.
-                        verse2.full_book = (verse2.b === 19 ? BF.lang.psalm : BF.lang.books_short[verse2.b]);
-                        
                         /// Begin creating the verse range text.  (The first book, chapter, and verse is always present).
-                        ///NOTE: If the query was a verse lookup, we do not display "title" for Psalm titles; instead we just show "1."
+                        ///NOTE: If the query was a verse lookup, we do not display "title" for Psalm titles; instead we just show "1." (That's what "query_type === BF.consts.verse_lookup" is for)
                         ///      I.e., Psalm 3:title is displayed as Psalm 3:1.
-                        ref_range = BF.create_ref(verse1, BF.lang.id, query_type === BF.consts.verse_lookup);
-                        
-                        ///NOTE: \u2013 is Unicode for the en dash (–) (HTML: &ndash;).
-                        ///TODO: Determine if the colons should be language specified.
-                        /// Are the books the same?
-                        if (verse1.b === verse2.b) {
-                            /// Are the chapters the same?
-                            if (verse1.c === verse2.c) {
-                                /// Are the verses different?
-                                if (verse1.v !== verse2.v) {
-                                    ref_range += "\u2013" + verse2.full_verse;
-                                }
-                            } else {
-                                ref_range += "\u2013" + (BF.lang.chapter_count[verse2.b] === 1 ? "" : verse2.c + ":") + verse2.full_verse;
-                            }
-                        } else {
-                            ref_range += "\u2013" + verse2.full_book + " " + (BF.lang.chapter_count[verse2.b] === 1 ? "" : verse2.c + ":") + verse2.full_verse;
-                        }
+                        ref_range = BF.create_ref([verse1, verse2], BF.lang.id, query_type === BF.consts.verse_lookup);
                         
                         /// The verse range is displayed differently based on the type of search (i.e., a verse lookup or a search).
                         ///TODO: Set the date of the verse (or when it was written).
