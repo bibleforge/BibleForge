@@ -152,16 +152,15 @@ BF.insert = function (obj, template)
 
 
 /**
- * Tries to detect search engine bots based on their user-agent.
+ * Tries to detect bots based on their user-agent.
  *
  * @param  agent (string) The user-agent to examine.
- * @return A boolean indicating whether or not the client appears to be a search engine bot.
- * @note   This intentionally does not detect archiving bots (such as ia_archiver) since the archive is meant to be shown to a real browser later on.
+ * @return A boolean indicating whether or not the client appears to be a bot.
  * @note   User-agents can be easily spoofed.
  */
-BF.is_search_engine = function (agent)
+BF.is_bot = function (agent)
 {
-    return /google(?:bot|\/)|yahoo\!|bingbot|baiduspider|iaskspider|yandex/i.test(agent);
+    return /google(?:bot|\/)|yahoo\!|bingbot|baiduspider|iaskspider|ia_archiver|yandex/i.test(agent);
 }
 
 /// **************************
@@ -924,10 +923,21 @@ BF.lexical_lookup = function (data, callback)
                         content.QUERY = BF.escape_html(query);
                         /// Add the language ID to the scroll's class to allow the CSS to change based on language.
                         content.LANG = lang.id;
-                        /// If the client is a real user, show an unsupported warning.
-                        /// Search engines are not intended to be supported and cannot read this text anyway.
-                        /// Furthermore, we don't want that text showing up in search results.
-                        content.UNSUPPORTED_WARNING = info.is_search_engine ? "" : lang.unsupported;
+                        /// Is the client (purporting to be) a bot?
+                        if (info.is_bot) {
+                            /// Do not show an unsupported message to bots.
+                            /// Search engines are not intended to be supported and cannot read this text anyway.
+                            /// Furthermore, we don't want that text showing up in search results.
+                            content.UNSUPPORTED_WARNING = "";
+                            /// Prevent the page from attempting to be changed to the full version.
+                            /// This allows for cached versions to display properly without attempting to redirect to another page.
+                            content.FORCE_REDIRECT = "false && ";
+                        } else {
+                            /// If the client is a real user, show an unsupported warning.
+                            content.UNSUPPORTED_WARNING = lang.unsupported;
+                            /// By setting this to blank, it allows the client to be redirect to the full version if his browser appears to be supported.
+                            content.FORCE_REDIRECT = "";
+                        }
                         /// Add information about the Bible version to the footer since there is no wrench menu.
                         ///NOTE: More of the footer will be created below.
                         content.FOOTER = "<legend>" + BF.insert({v: lang.abbreviation}, lang.about_version) + "</legend>" + lang.credits;
@@ -1196,7 +1206,7 @@ BF.lexical_lookup = function (data, callback)
                     }
                 } else {
                     /// All other requests are replied to with the non-Javascript version.
-                    create_simple_page(url, data, connection, {is_search_engine: BF.is_search_engine(headers["user-agent"])});
+                    create_simple_page(url, data, connection, {is_bot: BF.is_bot(headers["user-agent"])});
                 }
             };
         }());
