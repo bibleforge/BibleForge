@@ -483,14 +483,28 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                 var book,
                     chapter,
                     cv,
+                    tmp_ref = "",
                     verse,
                     zeros;
+                
+                ///NOTE: Since 1st, 2nd, and 3rd John have Chinese numbers in them (e.g., "约一", "約翰二書", or "约翰三书"), we do not want to convert those number.
+                ///      However, the book of John can also be referred to as "约" or "約," so you could have "约" plus a number (e.g., "约四" or "约三：五").
+                ///      So we have to temporarily remove references to 1st, 2nd, and 3rd John, convert the numbers, and then add the reference back later.
+                /// First, remove references to 1st, 2nd, and 3rd John.
+                ref = ref.replace(/^[约約]翰?[一二三][书書]?(?![,.;:；：，。])/, function (john)
+                {
+                    tmp_ref = john;
+                    return "";
+                });
                 
                 /// First, convert Chinese numbers into Arabic numerals (e.g., "创世记五十：十五" becomes "创世记50：15").
                 /// Remove special Chinese words to allow for verse references like this "{book} 第一章".
                 /// E.g., "创世记第五章十六节" first becomes "创世记第5章16节" and then becomes "创世记 5 16".
                 ///NOTE: The space in " $1$2" is necessary so that two numbers do not get put together.
                 ref = convert_numbers(String(ref)).replace(/第(\d+)[章首节節]?|第?(\d+)[章首节節]/g, " $1$2");
+                
+                /// Add back references to 1st, 2nd, and 3rd John if they any.
+                ref = tmp_ref + ref;
                 
                 book = books[ref.replace(/\s*\d+(?:[,.;:；：，。\s]\d*)?$/, "").toLowerCase()];
                 
