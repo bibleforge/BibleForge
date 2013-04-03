@@ -78,6 +78,10 @@
         linked_to_orig: false,
         no_paragraphs: true,
         
+        /// Set the language's symbols.
+        space: "",
+        chap_separator: "：",
+        
         /**
          * Load additional data from the server.
          *

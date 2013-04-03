@@ -52,19 +52,19 @@ document.addEventListener("DOMContentLoaded", function ()
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (1611)",
-            modified: 38275350,
+            modified: 38626005,
         };
     }
     if (!BF.lang.zh_s) {
         BF.langs.zh_s = {
             full_name: "简体中文 (CKJV)",
-            modified: 38625707,
+            modified: 38626015,
         };
     }
     if (!BF.lang.zh_t) {
         BF.langs.zh_t = {
             full_name: "繁體中文 (CKJV)",
-            modified: 38625719,
+            modified: 38626021,
         };
     }
     
@@ -863,7 +863,7 @@ document.addEventListener("DOMContentLoaded", function ()
         
         if (bcv && BF.langs[lang_id] && BF.langs[lang_id].books_short[bcv.b]) {
             ///NOTE: In the future, the chapter and verse separator may need to be language specific.
-            ref = BF.langs[lang_id].books_short[bcv.b] + " " + (BF.lang.chapter_count[bcv.b] === 1 ? "" : bcv.c + ":") + BF.get_full_verse(bcv.v);
+            ref = BF.langs[lang_id].books_short[bcv.b] + BF.langs[lang_id].space + (BF.lang.chapter_count[bcv.b] === 1 ? "" : bcv.c + BF.langs[lang_id].chap_separator) + BF.get_full_verse(bcv.v);
         }
         
         return ref;
