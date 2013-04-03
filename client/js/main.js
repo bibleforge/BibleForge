@@ -2396,7 +2396,7 @@ document.addEventListener("DOMContentLoaded", function ()
                                     html_str += "<h1 class=short_book id=" + verse_id + "_title>" + (BF.lang.use_main_title ? BF.lang.books_long_main[verse_obj.b] : BF.lang.books_short[verse_obj.b]) + "</h1>";
                                 }
                                 
-                                html_str += "<div class=search_verse id=" + verse_id + "_search><span>" + (BF.lang.chapter_count[verse_obj.b] === 1 ? "" : verse_obj.c + ":") + verse_obj.v + "</span> " + verse_html[i] + "</div>";
+                                html_str += "<div class=search_verse id=" + verse_id + "_search><span>" + (BF.lang.chapter_count[verse_obj.b] === 1 ? "" : verse_obj.c + BF.lang.chap_separator) + verse_obj.v + "</span> " + verse_html[i] + "</div>";
                             }
                         }
                         
