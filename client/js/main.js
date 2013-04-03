@@ -3428,7 +3428,7 @@ document.addEventListener("DOMContentLoaded", function ()
                         
                         /// Only change the text in the query input if the user has not started typing and the user actually typed in the query.
                         if (!e.initial_page_load || qEl.value === "") {
-                            if (e.initial_page_load && typeof settings.user.entered_text !== "undefined" && (!using_url || position.raw_query === settings.user.entered_text)) {
+                            if (e.initial_page_load && typeof settings.user.entered_text !== "undefined" && (!using_url || (position && position.raw_query === settings.user.entered_text))) {
                                 /// Fill in the last query that the user typed in, which is not necessary the same as what the user lasted queried.
                                 qEl.value = settings.user.entered_text;
                                 /// Clear the placeholder text to allow for the user to clear the query box so that he is not distracted.
