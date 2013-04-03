@@ -848,11 +848,16 @@ document.addEventListener("DOMContentLoaded", function ()
     /**
      * Create a properly formated verse reference from numbers.
      *
-     * @example BF.create_ref({b:  1, c:  1, v:   1});          /// "Genesis 1:1"
-     * @example BF.create_ref({b: 19, c:  3, v:   0}, "en_em"); /// "Psalmes 3:title"
-     * @example BF.create_ref({b: 45, c: 16, v: 255}, "en");    /// "Romans 16:subscription"
-     * @param   bcv     (object)            An object containing the book, chapter, and verse to be converted: {b: book, c: chapter, v: verse}
-     * @param   lang_id (string) (optional) The ID for a language (default: current language)
+     * @example BF.create_ref({b:  1, c:  1, v:   1});                       /// "Genesis 1:1"
+     * @example BF.create_ref({b: 19, c:  3, v:   0}, "en_em");              /// "Psalmes 3:title"
+     * @example BF.create_ref({b: 19, c:  3, v:   0}, "en_em", true);        /// "Psalmes 3:1"
+     * @example BF.create_ref({b: 19, c:  3, v:   0}, "zh_s",  true);        /// "诗3：1"
+     * @example BF.create_ref({b: 45, c: 16, v: 255}, "en");                 /// "Romans 16:subscription"
+     * @example BF.create_ref([{b: 45, c: 16, v: 1}, {b: 45, c: 16, v: 9}]); /// "Romans 16:1–9"
+     * @example BF.create_ref([{b: 45, c: 16, v: 1}, {b: 46, c:  1, v: 1}]); /// "Romans 16:1–1 Corinthians 1:1"
+     * @param   bcv             (object || array)            An object or array of objects containing the book, chapter, and verse to be converted: {b: book, c: chapter, v: verse}
+     * @param   lang_id         (string)          (optional) The ID for a language (default: current language)
+     * @param   passover_titles (boolean)         (optional) Whether to convert Psalm titles to 1 or to "title" (used by BF.get_full_verse())
      * @return  A string repersenting a verse reference or a blank string ("") if there was a problem
      */
     BF.create_ref = function (bcv, lang_id, passover_titles)
@@ -860,38 +865,45 @@ document.addEventListener("DOMContentLoaded", function ()
         var ref = "";
         
         if (bcv) {
-            
+            /// To make things consistent, convert an object into an array with one element.
             if (!Array.isArray(bcv)) {
                 bcv = [bcv];
             }
             
+            /// If there is no lang_id, use the current language.
             if (!lang_id) {
                 lang_id = BF.lang.id;
             }
             
+            /// Does the language and book exist?
             if (BF.langs[lang_id] && BF.langs[lang_id].books_short[bcv[0].b]) {
+                /// Create the first part of the reference.
                 ///NOTE: The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
                 ref = (bcv[0].b === 19 ? BF.lang.psalm : BF.langs[lang_id].books_short[bcv[0].b]) + BF.langs[lang_id].space + (BF.lang.chapter_count[bcv[0].b] === 1 ? "" : bcv[0].c + BF.langs[lang_id].chap_separator) + BF.get_full_verse(bcv[0].v, passover_titles);
-            }
-            
-            /// Is this a verse range?
-            if (bcv[1]) {
-                /// Are the books the same?
-                if (bcv[0].b === bcv[1].b) {
-                    /// Are the chapters the same?
-                    if (bcv[0].c === bcv[1].c) {
-                        /// Are the verses different?
-                        if (bcv[0].v !== bcv[1].v) {
-                            ref += BF.lang.ndash + BF.get_full_verse(bcv[1].v, passover_titles);
+                
+                /// Is this a verse range?
+                if (bcv[1]) {
+                    /// Are the books the same?
+                    if (bcv[0].b === bcv[1].b) {
+                        /// Are the chapters the same?
+                        if (bcv[0].c === bcv[1].c) {
+                            /// Are the verses different?
+                            if (bcv[0].v !== bcv[1].v) {
+                                /// Just add the verse number.
+                                ref += BF.lang.ndash + BF.get_full_verse(bcv[1].v, passover_titles);
+                            }
+                        } else {
+                            /// Add the chapter and verse number.
+                            ref += BF.lang.ndash + (BF.lang.chapter_count[bcv[1].b] === 1 ? "" : bcv[1].c + BF.lang.chap_separator) + BF.get_full_verse(bcv[1].v, passover_titles);
                         }
                     } else {
-                        ref += BF.lang.ndash + (BF.lang.chapter_count[bcv[1].b] === 1 ? "" : bcv[1].c + BF.lang.chap_separator) + BF.get_full_verse(bcv[1].v, passover_titles);
+                        /// Add the entire reference: book, chapter, and verse number.
+                        ref += BF.lang.ndash + (bcv[1].b === 19 ? BF.lang.psalm : BF.langs[lang_id].books_short[bcv[1].b]) + BF.lang.space + (BF.lang.chapter_count[bcv[1].b] === 1 ? "" : bcv[1].c + BF.lang.chap_separator) + BF.get_full_verse(bcv[1].v, passover_titles);
                     }
-                } else {
-                    ref += BF.lang.ndash + (bcv[1].b === 19 ? BF.lang.psalm : BF.langs[lang_id].books_short[bcv[1].b]) + BF.lang.space + (BF.lang.chapter_count[bcv[1].b] === 1 ? "" : bcv[1].c + BF.lang.chap_separator) + BF.get_full_verse(bcv[1].v, passover_titles);
                 }
             }
         }
+        
         return ref;
     };
     
