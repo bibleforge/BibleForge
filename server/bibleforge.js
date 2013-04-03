@@ -1129,7 +1129,7 @@ BF.lexical_lookup = function (data, callback)
                             /// Add the query and BibleForge's name to the <title> tag.
                             content.TITLE = BF.escape_html(query) + " - " + lang.app_name;
                             /// Add a description to the <meta name=description> tag.
-                            content.TITLE = BF.escape_html(lang.results_for + " " + query + " " + lang.in + " " + lang.full_name);
+                            content.DESC = BF.escape_html(lang.results_for + " " + query + " " + lang.in + " " + lang.full_name + " (" + lang.abbreviation + ")");
                             /// Now, wait for the database to return the results to the function above.
                         }
                     });
