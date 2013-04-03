@@ -107,6 +107,7 @@
         /// Miscellaneous Text
         about:             "About BibleForge",                                     /// Context menu item
         about_version:     "About {v}",                                            /// Context menu item (e.g., "About KJV")
+        all_lang:          "All languages",                                        /// The heading for language links in the footer of the non-JS version.
         app_name:          "BibleForge",                                           /// The name of the application
         biblical:          "Biblical",                                             /// The short name for the Biblical reconstructed pronunciation displayed on the menu
         biblical_pronun:   "Biblical Reconstructed Pronunciation",                 /// The long name for the Biblical reconstructed pronunciation displayed in a tooltip

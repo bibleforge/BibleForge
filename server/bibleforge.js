@@ -929,15 +929,8 @@ BF.lexical_lookup = function (data, callback)
                         /// Furthermore, we don't want that text showing up in search results.
                         content.UNSUPPORTED_WARNING = info.is_search_engine ? "" : lang.unsupported;
                         /// Add information about the Bible version to the footer since there is no wrench menu.
+                        ///NOTE: More of the footer will be created below.
                         content.FOOTER = "<legend>" + BF.insert({v: lang.abbreviation}, lang.about_version) + "</legend>" + lang.credits;
-                        
-                        /// Build a <select> element that lists the available languages.
-                        Object.keys(BF.langs).sort().forEach(function (lang_id)
-                        {
-                            lang_select += "<option value=\"" + lang_id + "\"" + (lang_id === lang.id ? " SELECTED" : "") + ">" + BF.langs[lang_id].full_name + "</option>";
-                        });
-                        lang_select += "</select>";
-                        content.LANG_SELECT = lang_select;
                         
                         /// Add the a <link> tag for the language specific CSS, if any.
                         if (lang.has_css) {
@@ -1132,6 +1125,20 @@ BF.lexical_lookup = function (data, callback)
                             content.DESC = BF.escape_html(lang.results_for + " " + query + " " + lang.in + " " + lang.full_name + " (" + lang.abbreviation + ")");
                             /// Now, wait for the database to return the results to the function above.
                         }
+                        
+                        /// Add language links to the footer.
+                        ///NOTE: Part of the footer was created above.
+                        content.FOOTER += "<legend>" + lang.all_lang + "</legend>";
+                        
+                        /// Build a <select> element that lists the available languages.
+                        Object.keys(BF.langs).sort().forEach(function (lang_id)
+                        {
+                            /// Create the drop down box.
+                            lang_select += "<option value=\"" + lang_id + "\"" + (lang_id === lang.id ? " SELECTED" : "") + ">" + BF.langs[lang_id].full_name + "</option>";
+                            /// Create links for the footer for SEO purposes primarily.
+                            content.FOOTER += "<a href=\"/" + lang_id + "/" + (verseID ? BF.langs[lang_id].books_short[b] + BF.langs[lang_id].space + c : BF.escape_html(query)) + "/!\">" + BF.langs[lang_id].full_name + "<\a><br>";
+                        });
+                        content.LANG_SELECT = lang_select + "</select>";
                     });
                 };
             }());
