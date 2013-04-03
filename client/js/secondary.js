@@ -3151,8 +3151,7 @@
                                         /// If the last query was the default query (query_info.is_default) use the default query (i.e., Genesis 1:1).
                                         if (query_info.is_default) {
                                             /// Use Genesis 1:1 as the query, but do not store it in the URL since it is the default query.
-                                            ///NOTE: Could use BF.create_ref().
-                                            query_str = BF.lang.books_short[1] + " 1:1";
+                                            query_str = BF.create_ref({b: 1, c: 1, v: 1});
                                         } else {
                                             query_str = qEl_str;
                                         }

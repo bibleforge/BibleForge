@@ -3652,7 +3652,7 @@ document.addEventListener("DOMContentLoaded", function ()
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?38464721", {
+                BF.include("/js/secondary.js?38631642", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
