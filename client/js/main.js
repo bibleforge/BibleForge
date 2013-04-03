@@ -3411,8 +3411,7 @@ document.addEventListener("DOMContentLoaded", function ()
                         /// If the default query is empty, lookup the first verse (i.e., Genesis 1:1).
                         ///NOTE: This must be done after changing the language; otherwise, the book name will be wrong.
                         if (!raw_query) {
-                            ///NOTE: Could use BF.create_ref().
-                            raw_query = BF.lang.books_short[1] + " 1:1";
+                            raw_query = BF.create_ref({b: 1, c: 1, v: 1});
                             is_default = true;
                         }
                         run_new_query(raw_query, is_default, true, position);
