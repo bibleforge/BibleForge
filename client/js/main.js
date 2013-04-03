@@ -839,6 +839,8 @@ document.addEventListener("DOMContentLoaded", function ()
      */
     BF.get_full_verse = function (v, passover_titles)
     {
+        /// The titles in the book of Psalms are referenced as verse zero (cf. Psalm 3).
+        /// The subscriptions at the end of Paul's epistles are referenced as verse 255 (cf. Romans 16).
         return v === 0 ? (passover_titles ? 1 : BF.lang.title) : (v === 255 ? BF.lang.subscription : v);
     };
     
@@ -853,7 +855,7 @@ document.addEventListener("DOMContentLoaded", function ()
      * @param   lang_id (string) (optional) The ID for a language (default: current language)
      * @return  A string repersenting a verse reference or a blank string ("") if there was a problem
      */
-    BF.create_ref = function (bcv, lang_id)
+    BF.create_ref = function (bcv, lang_id, passover_titles)
     {
         var ref = "";
         
@@ -862,8 +864,8 @@ document.addEventListener("DOMContentLoaded", function ()
         }
         
         if (bcv && BF.langs[lang_id] && BF.langs[lang_id].books_short[bcv.b]) {
-            ///NOTE: In the future, the chapter and verse separator may need to be language specific.
-            ref = (bcv.b === 19 ? BF.lang.psalm : BF.langs[lang_id].books_short[bcv.b]) + BF.langs[lang_id].space + (BF.lang.chapter_count[bcv.b] === 1 ? "" : bcv.c + BF.langs[lang_id].chap_separator) + BF.get_full_verse(bcv.v);
+            ///NOTE: The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
+            ref = (bcv.b === 19 ? BF.lang.psalm : BF.langs[lang_id].books_short[bcv.b]) + BF.langs[lang_id].space + (BF.lang.chapter_count[bcv.b] === 1 ? "" : bcv.c + BF.langs[lang_id].chap_separator) + BF.get_full_verse(bcv.v, passover_titles);
         }
         
         return ref;
@@ -1958,21 +1960,19 @@ document.addEventListener("DOMContentLoaded", function ()
                         /// Store the query type in a variable because it may need to be accessed more than once.
                         query_type = query_manager.query_type;
                         
-                        /// The titles in the book of Psalms are referenced as verse zero (cf. Psalm 3).
-                        /// The subscriptions at the end of Paul's epistles are referenced as verse 255 (cf. Romans 16).
-                        ///NOTE: If the query was a verse lookup, we do not display "title" for Psalm titles; instead we just show "1."
-                        ///      I.e., Psalm 3:title is displayed as Psalm 3:1.
+
                         verse1.full_verse = BF.get_full_verse(verse1.v, query_type === BF.consts.verse_lookup);
                         verse2.full_verse = BF.get_full_verse(verse2.v, query_type === BF.consts.verse_lookup);
                         
-                        /// The book of Psalms is refereed to differently (e.g., Psalm 1:1, rather than Chapter 1:1).
+                        
                         ///NOTE: verse2.full_book is set here even though it is not always needed now,
                         ///      but since these variables are stored as top_verse and bottom_verse it might be used later.
-                        verse1.full_book = (verse1.b === 19 ? BF.lang.psalm : BF.lang.books_short[verse1.b]);
                         verse2.full_book = (verse2.b === 19 ? BF.lang.psalm : BF.lang.books_short[verse2.b]);
                         
                         /// Begin creating the verse range text.  (The first book, chapter, and verse is always present).
-                        ref_range = BF.create_ref({b: verse1.b, c: verse1.c, v: verse1.v});
+                        ///NOTE: If the query was a verse lookup, we do not display "title" for Psalm titles; instead we just show "1."
+                        ///      I.e., Psalm 3:title is displayed as Psalm 3:1.
+                        ref_range = BF.create_ref(verse1, BF.lang.id, query_type === BF.consts.verse_lookup);
                         
                         ///NOTE: \u2013 is Unicode for the en dash (–) (HTML: &ndash;).
                         ///TODO: Determine if the colons should be language specified.
