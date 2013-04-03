@@ -1972,7 +1972,7 @@ document.addEventListener("DOMContentLoaded", function ()
                         verse2.full_book = (verse2.b === 19 ? BF.lang.psalm : BF.lang.books_short[verse2.b]);
                         
                         /// Begin creating the verse range text.  (The first book, chapter, and verse is always present).
-                        ref_range = verse1.full_book + " " + (BF.lang.chapter_count[verse1.b] === 1 ? "" : verse1.c + ":") + verse1.full_verse;
+                        ref_range = BF.create_ref({b: verse1.b, c: verse1.c, v: verse1.v});
                         
                         ///NOTE: \u2013 is Unicode for the en dash (–) (HTML: &ndash;).
                         ///TODO: Determine if the colons should be language specified.
