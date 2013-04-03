@@ -58,13 +58,13 @@ document.addEventListener("DOMContentLoaded", function ()
     if (!BF.lang.zh_s) {
         BF.langs.zh_s = {
             full_name: "简体中文 (CKJV)",
-            modified: 38612514,
+            modified: 38625707,
         };
     }
     if (!BF.lang.zh_t) {
         BF.langs.zh_t = {
             full_name: "繁體中文 (CKJV)",
-            modified: 38612511,
+            modified: 38625719,
         };
     }
     
@@ -3408,6 +3408,13 @@ document.addEventListener("DOMContentLoaded", function ()
                      */
                     function do_query()
                     {
+                        /// If the default query is empty, lookup the first verse (i.e., Genesis 1:1).
+                        ///NOTE: This must be done after changing the language; otherwise, the book name will be wrong.
+                        if (!raw_query) {
+                            ///NOTE: Could use BF.create_ref().
+                            raw_query = BF.lang.books_short[1] + " 1:1";
+                            is_default = true;
+                        }
                         run_new_query(raw_query, is_default, true, position);
                         
                         /// Only change the text in the query input if the user has not started typing and the user actually typed in the query.
@@ -3534,13 +3541,6 @@ document.addEventListener("DOMContentLoaded", function ()
                     /// If the requested language is the same as the current one, there is no need to change it.
                     if (lang_id === BF.lang.id) {
                         lang_id = "";
-                    }
-                    
-                    /// If the default query is empty, lookup Genesis 1:1.
-                    if (!raw_query) {
-                        ///NOTE: Could use BF.create_ref().
-                        raw_query = BF.lang.books_short[1] + " 1:1";
-                        is_default = true;
                     }
                     
                     /// Is the query in a different language?  If there is no language specified, just use the default language.
