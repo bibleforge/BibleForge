@@ -863,7 +863,7 @@ document.addEventListener("DOMContentLoaded", function ()
         
         if (bcv && BF.langs[lang_id] && BF.langs[lang_id].books_short[bcv.b]) {
             ///NOTE: In the future, the chapter and verse separator may need to be language specific.
-            ref = BF.langs[lang_id].books_short[bcv.b] + BF.langs[lang_id].space + (BF.lang.chapter_count[bcv.b] === 1 ? "" : bcv.c + BF.langs[lang_id].chap_separator) + BF.get_full_verse(bcv.v);
+            ref = (bcv.b === 19 ? BF.lang.psalm : BF.langs[lang_id].books_short[bcv.b]) + BF.langs[lang_id].space + (BF.lang.chapter_count[bcv.b] === 1 ? "" : bcv.c + BF.langs[lang_id].chap_separator) + BF.get_full_verse(bcv.v);
         }
         
         return ref;
