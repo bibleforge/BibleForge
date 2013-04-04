@@ -982,7 +982,7 @@
         {
             var center_hor,
                 is_open = false,
-                panel   = document.createElement("div")
+                panel   = document.createElement("div");
             
             ///NOTE: The default style does has "display" set to "none" and "position" set to "fixed."
             panel.className = "panel";
@@ -1054,7 +1054,7 @@
                     if (panel.style.left !== left) {
                         center_hor();
                     }
-                }
+                };
                 
                 is_open = true;
                 

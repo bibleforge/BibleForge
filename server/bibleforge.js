@@ -160,8 +160,9 @@ BF.insert = function (obj, template)
  */
 BF.is_bot = function (agent)
 {
-    return /google(?:bot|\/)|yahoo\!|bingbot|baiduspider|iaskspider|ia_archiver|yandex/i.test(agent);
-}
+    ///NOTE: Using parentheses prevents the regex from possibly (however unlikely) from looking like the divion sign.
+    return (/google(?:bot|\/)|yahoo\!|bingbot|baiduspider|iaskspider|ia_archiver|yandex/i).test(agent);
+};
 
 /// **************************
 /// * Create query functions *
