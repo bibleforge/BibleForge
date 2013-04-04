@@ -1147,7 +1147,7 @@ BF.lexical_lookup = function (data, callback)
                             /// Create the drop down box.
                             lang_select += "<option value=\"" + lang_id + "\"" + (lang_id === lang.id ? " SELECTED" : "") + ">" + BF.langs[lang_id].full_name + "</option>";
                             /// Create links for the footer for SEO purposes primarily.
-                            content.FOOTER += "<a href=\"/" + lang_id + "/" + global.encodeURIComponent(verseID ? BF.langs[lang_id].books_short[b] + BF.langs[lang_id].space + c + BF.langs[lang_id].chap_separator + "1" : query) + "/" + (info.is_bot ? "" : "!") + "\">" + BF.langs[lang_id].full_name + "<\a><br>";
+                            content.FOOTER += "<a href=\"/" + lang_id + "/" + global.encodeURIComponent(verseID ? BF.langs[lang_id].books_short[b] + BF.langs[lang_id].space + c + BF.langs[lang_id].chap_separator + "1" : query) + "/" + (info.is_bot ? "" : "!") + "\">" + BF.langs[lang_id].full_name + "</a><br>";
                         });
                         content.LANG_SELECT = lang_select + "</select>";
                     });
