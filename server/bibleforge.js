@@ -1007,7 +1007,7 @@ BF.lexical_lookup = function (data, callback)
                                             }
                                             
                                             ///NOTE: Psalms uses a special name (i.e., "psalm" instead of "chapter").
-                                            res += "<a class=\"static_link prev\" href=\"/" + lang.id + "/" + global.encodeURIComponent(lang.books_short[prev_b] + lang.space + prev_c + lang.chap_separator + "1") + "/!" + "\">&lt; " + (prev_b === 19 ? lang.previous_psalm : lang.previous_chap) + "</a>";
+                                            res += "<a class=\"static_link prev\" href=\"/" + lang.id + "/" + global.encodeURIComponent(lang.books_short[prev_b] + lang.space + prev_c + lang.chap_separator + "1") + "/" + (info.is_bot ? "" : "!") + "\">&lt; " + (prev_b === 19 ? lang.previous_psalm : lang.previous_chap) + "</a>";
                                         }
                                         
                                         /// Is this not Revelation 22? (Revelation 22 does not need a next link.)
@@ -1024,7 +1024,7 @@ BF.lexical_lookup = function (data, callback)
                                             }
                                             
                                             ///NOTE: Psalms uses a special name (i.e., "psalm" instead of "chapter").
-                                            res += "<a class=\"static_link next\" href=\"/" + lang.id + "/" + global.encodeURIComponent(lang.books_short[next_b] + lang.space + next_c + lang.chap_separator + "1") + "/!" + "\">" + (next_b === 19 ? lang.next_psalm : lang.next_chap) + " &gt;</a>";
+                                            res += "<a class=\"static_link next\" href=\"/" + lang.id + "/" + global.encodeURIComponent(lang.books_short[next_b] + lang.space + next_c + lang.chap_separator + "1") + "/" + (info.is_bot ? "" : "!") + "\">" + (next_b === 19 ? lang.next_psalm : lang.next_chap) + " &gt;</a>";
                                         }
                                         
                                         return res;
@@ -1146,7 +1146,7 @@ BF.lexical_lookup = function (data, callback)
                             /// Create the drop down box.
                             lang_select += "<option value=\"" + lang_id + "\"" + (lang_id === lang.id ? " SELECTED" : "") + ">" + BF.langs[lang_id].full_name + "</option>";
                             /// Create links for the footer for SEO purposes primarily.
-                            content.FOOTER += "<a href=\"/" + lang_id + "/" + global.encodeURIComponent(verseID ? BF.langs[lang_id].books_short[b] + BF.langs[lang_id].space + c + BF.langs[lang_id].chap_separator + "1" : query) + "/!\">" + BF.langs[lang_id].full_name + "<\a><br>";
+                            content.FOOTER += "<a href=\"/" + lang_id + "/" + global.encodeURIComponent(verseID ? BF.langs[lang_id].books_short[b] + BF.langs[lang_id].space + c + BF.langs[lang_id].chap_separator + "1" : query) + "/" + (info.is_bot ? "" : "!") + "\">" + BF.langs[lang_id].full_name + "<\a><br>";
                         });
                         content.LANG_SELECT = lang_select + "</select>";
                     });
