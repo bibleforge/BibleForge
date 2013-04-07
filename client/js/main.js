@@ -3469,7 +3469,7 @@ document.addEventListener("DOMContentLoaded", function ()
                         }, 0);
                     }
                     
-                    /// Is the page loading for the first time and the user did not specify a query in the URL? (E.g., the user loaded "bibleforge.com" and not something like "bibleforge.com/en/gen".)
+                    /// Is the page loading (but the user has been here before) and the user did not specify a query in the URL? (E.g., the user loaded "bibleforge.com" and not something like "bibleforge.com/en/gen".)
                     if (e.initial_page_load && window.location.pathname === "/" && BF.is_object(settings.user.last_query) && settings.user.last_query.lang_id) {
                         /// Use the last query the user made instead of the default query.
                         lang_id   = settings.user.last_query.lang_id;
@@ -3719,7 +3719,7 @@ document.addEventListener("DOMContentLoaded", function ()
         qEl.placeholder = BF.lang.query_explanation;
         
         /// *********************
-        /// * Enf of set events *
+        /// * End of set events *
         /// *********************
     };
     /// *******************************
@@ -3753,7 +3753,7 @@ document.addEventListener("DOMContentLoaded", function ()
      * @param  limit (int) (optional)   The number of times to split the string.
      * @return Returns an array of the string now broken into pieces.
      * @see    http://blog.stevenlevithan.com/archives/cross-browser-split
-     * @todo   Determine if IE9 still needs this.
+     * @todo   Determine if IE10 still needs this (and even uses conditional comments).
      */
     ///NOTE: The following conditional compilation code blocks only executes in IE.
     /*@cc_on
