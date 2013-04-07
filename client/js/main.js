@@ -52,19 +52,22 @@ document.addEventListener("DOMContentLoaded", function ()
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (1611)",
-            modified: 38667295,
+            modified: 38993707,
+            match_lang: /x-early-modern-english/i,
         };
     }
     if (!BF.lang.zh_s) {
         BF.langs.zh_s = {
             full_name: "简体中文 (CKJV)",
-            modified: 38667325,
+            modified: 38993718,
+            match_lang: /zh-c(?:n|hs)/i,
         };
     }
     if (!BF.lang.zh_t) {
         BF.langs.zh_t = {
             full_name: "繁體中文 (CKJV)",
-            modified: 38667361,
+            modified: 38993730,
+            match_lang: /zh(?:-c(?!n|hs))?/i,
         };
     }
     
@@ -545,6 +548,7 @@ document.addEventListener("DOMContentLoaded", function ()
                             ajax_timeout = window.setTimeout(function ()
                             {
                                 ajax_obj.abort();
+                                ///TODO: If it should not retry, it should return undefined to the callback.
                                 if (retry) {
                                     retrying = true;
                                     ///NOTE: retry_func() was created in the query() function but initialized outside to give other functions access to it.
@@ -965,6 +969,66 @@ document.addEventListener("DOMContentLoaded", function ()
                 ///NOTE: textContent is essentially the same as innerText.
                 text_el.textContent = str || "a";
             }, 0);
+        };
+    }());
+    
+    
+    /**
+     * Attempt to get the most preferred language that BibleForge supports.
+     */
+    BF.get_preferred_supported_lang = (function ()
+    {
+        var best_lang;
+        
+        function analyze_langs(str)
+        {
+            var i,
+                langs,
+                langs_i,
+                langs_len,
+                len,
+                match,
+                matches;
+            
+            /// Separate all languages from the header string.
+            /// Example accept-language header string: en-US,en;q=0.8,en-CA;q=0.6,zh-CN;q=0.4,zh;q=0.2
+            matches = String(str).match(/[a-z]{1,3}(?:-[a-z-]+)?\s*(?:;\s*q\s*=\s*[\d.]+)?/ig);
+            
+            if (matches) {
+                len = matches.length;
+                langs = Object.keys(BF.langs);
+                langs_len = langs.length;
+                for (i = 0; i < len; i += 1) {
+                    /// Isolate the language name and country code.
+                    match = matches[i].match(/^[^,;]+/i);
+                    for (langs_i = 0; langs_i < langs_len; langs_i += 1) {
+                        if (BF.langs[langs[langs_i]].match_lang.test(match[0])) {
+                            return langs[langs_i];
+                        }
+                    }
+                }
+            }
+            
+            return "";
+        }
+        
+        return function ()
+        {
+            var ajax;
+            
+            if (!best_lang) {
+                /// Fake an Ajax call to be able to get the special header sent by Nginx.
+                ///NOTE: Since all HTML requests are cached, there should be very little delay.
+                ajax = new window.XMLHttpRequest();
+                ajax.open("GET", "#", false);
+                ajax.send();
+                
+                /// FireFox and Chrome support window.navigator.language but they treat it very differently and both only return one language.
+                /// IE supports window.navigator.userLanguage but again only returns one language.
+                best_lang = analyze_langs(ajax.getResponseHeader ? ajax.getResponseHeader("X-client-accept-lang") : window.navigator.language || window.navigator.userLanguage);
+            }
+            
+            return best_lang;
         };
     }());
     
@@ -3532,9 +3596,8 @@ document.addEventListener("DOMContentLoaded", function ()
                                 if (BF.langs[split_query[0]]) {
                                     lang_id = split_query[0];
                                 } else {
-                                    /// If no language was specified, default to English.
-                                    ///TODO: Consider changing the default language based on the user's location and settings.
-                                    lang_id   = "en";
+                                    /// If no language was specified, use the most preferred language BibleForge supports (or English as a fallback).
+                                    lang_id   = BF.get_preferred_supported_lang();
                                     raw_query = split_query[0];
                                     using_url = true;
                                 }
@@ -3664,7 +3727,7 @@ document.addEventListener("DOMContentLoaded", function ()
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?38631642", {
+                BF.include("/js/secondary.js?38704495", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,

@@ -67,6 +67,8 @@
         abbreviation: "KJV",
         id:           "en_em",
         
+        match_lang: /^x-early-modern-english$/i,
+        
         /// Indicate whether or not this version needs a special CSS file.
         has_css: true,
         css_modified: 31079547,

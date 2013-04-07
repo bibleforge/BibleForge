@@ -68,6 +68,8 @@
         abbreviation: "KJV",
         id:           "en",
         
+        match_lang: /^en(?:-.*)?$/i,
+        
         linked_to_orig: true,
         
         /// Set the language's symbols.

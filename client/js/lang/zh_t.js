@@ -72,6 +72,8 @@
         abbreviation: "CKJV",
         id:           "zh_t",
         
+        match_lang: /^zh(?:-c(?!n|hs))?$/i,
+        
         /// Indicate that the first verse should not get special CSS.
         first_verse_normal: true,
         
