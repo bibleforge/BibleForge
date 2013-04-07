@@ -62,7 +62,7 @@
         loaded: true,
         
         /// Indicate the language name so it can be distinguished later.
-        full_name:    "Early Modern English (1611)",
+        full_name:    "Early Modern English (KJV)",
         short_name:   "1611",
         abbreviation: "KJV",
         id:           "en_em",
