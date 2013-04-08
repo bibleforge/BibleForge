@@ -59,14 +59,14 @@ document.addEventListener("DOMContentLoaded", function ()
     if (!BF.lang.zh_s) {
         BF.langs.zh_s = {
             full_name: "简体中文 (CKJV)",
-            modified: 38993718,
+            modified: 39044664,
             match_lang: /zh-c(?:n|hs)/i,
         };
     }
     if (!BF.lang.zh_t) {
         BF.langs.zh_t = {
             full_name: "繁體中文 (CKJV)",
-            modified: 38993730,
+            modified: 39044649,
             match_lang: /zh(?:-c(?!n|hs))?/i,
         };
     }
