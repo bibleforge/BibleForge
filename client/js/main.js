@@ -980,6 +980,12 @@ document.addEventListener("DOMContentLoaded", function ()
     {
         var best_lang;
         
+        /**
+         * Parse the string of languages.
+         *
+         * @param  str (string) The string to parse, which should be in accordance with the accept-language header format standardized by RFC 3282
+         * @return A string representing the most preferred language from the client which is also supported language by BibleForge
+         */
         function parse_langs(str)
         {
             var i,
@@ -991,17 +997,25 @@ document.addEventListener("DOMContentLoaded", function ()
                 matches;
             
             /// Separate all languages from the header string.
-            /// Example accept-language header string: en-US,en;q=0.8,en-CA;q=0.6,zh-CN;q=0.4,zh;q=0.2
+            /// Example:
+            ///     "en-US,en;q=0.8,en-CA;q=0.6,zh-CN;q=0.4,zh;q=0.2"
+            ///     becomes
+            ///     ["en-US", "en;q=0.8", "en-CA;q=0.6", "zh-CN;q=0.4", "zh;q=0.2"]
             matches = String(str).match(/[a-z]{1,3}(?:-[a-z-]+)?\s*(?:;\s*q\s*=\s*[\d.]+)?/ig);
             
             if (matches) {
                 len = matches.length;
                 langs = Object.keys(BF.langs);
                 langs_len = langs.length;
+                /// Loop through all languages.
                 for (i = 0; i < len; i += 1) {
-                    /// Isolate the language name and country code.
+                    /// Isolate the language name and country code from the Q value.
+                    /// Example: "en-CA;q=0.6" becomes "en-CA".
                     match = matches[i].match(/^[^;]+/i);
+                    /// Loop through all of the languages to see if any match the language/country code.
                     for (langs_i = 0; langs_i < langs_len; langs_i += 1) {
+                        /// If the language code matches, return the ID for that language.
+                        /// Example: "en-US" will be matched by en.js, so it will return "en".
                         if (BF.langs[langs[langs_i]].match_lang.test(match[0])) {
                             return langs[langs_i];
                         }
@@ -1009,22 +1023,41 @@ document.addEventListener("DOMContentLoaded", function ()
                 }
             }
             
+            /// If nothing matches, just return a blank string.
             return "";
         }
         
+        /**
+         * Get (and store) the most preferred and supported language.
+         *
+         * @return A string representing the most preferred language from the client which is also supported language by BibleForge
+         */
         return function get_preferred_supported_lang()
         {
             var ajax;
             
+            /// Has the most preferred and supported language already been found?
             if (!best_lang) {
-                /// Fake an Ajax call to be able to get the special header sent by Nginx.
+                ///NOTE: The most reliable way to check for language preference is to parse the accept-language header sent by the browser; however, JavaScript cannot access the browser's headers.
+                ///      In order to get the accept-language header, the server is configured to bounce back the client's accept-language header to us in the X-client-accept-lang header.
+                ///      In order to get the X-client-accept-lang header, we need to make a synchronous Ajax call to load the same page (i.e., "#").
+                ///      There should not actually be any network delay since the browser should cache all requests.
+                ///      This is far from ideal, but the language preference only needs to be checked the very first time the client accesses BibleForge.
+                ///      Another option would be for the server to embed the header inside of the HTML when it first loads, but then it would no longer be a simple static page.
+                
+                /// Send a synchronous Ajax call in order to get the special header sent by the server.
                 ///NOTE: Since all HTML requests are cached, there should be very little delay.
                 ajax = new window.XMLHttpRequest();
-                ajax.open("GET", "#", false);
+                ajax.open("GET", "#", false); ///NOTE: Setting the third parameter to FALSE makes it synchronous.
                 ajax.send();
                 
-                /// FireFox and Chrome support window.navigator.language but they treat it very differently and both only return one language.
-                /// IE supports window.navigator.userLanguage but again only returns one language.
+                ///NOTE: If, for some reason, the X-client-accept-lang header is unaccessible, we can fallback to checking the browser's navigator object.
+                ///      However, FireFox and Chrome support window.navigator.language but they treat it very differently and both only return one language.
+                ///      IE supports window.navigator.userLanguage but again only returns one language.
+                ///      Each browser treats these language preferences differently and may send, for example, the browser's or OS's UI language.
+                ///      In short, the navigator object is not to be trusted as accurately communicating the client's preference.
+                ///      This is why we go through the trouble of capturing the accept-language header.
+                /// Store the language so that it does not have to be looked up again if this function were called again.
                 best_lang = parse_langs(ajax.getResponseHeader ? ajax.getResponseHeader("X-client-accept-lang") : window.navigator.language || window.navigator.userLanguage);
             }
             
@@ -3596,7 +3629,8 @@ document.addEventListener("DOMContentLoaded", function ()
                                 if (BF.langs[split_query[0]]) {
                                     lang_id = split_query[0];
                                 } else {
-                                    /// If no language was specified, use the most preferred language BibleForge supports (or English as a fallback).
+                                    /// If no language was specified, use the most preferred language BibleForge supports.
+                                    ///NOTE: An empty string is returned if no language which found.
                                     lang_id   = BF.get_preferred_supported_lang();
                                     raw_query = split_query[0];
                                     using_url = true;
