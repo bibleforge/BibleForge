@@ -8,3 +8,10 @@ The nuoveXT2 icon set is licensed under the LGPL 2.1 license.
 
 The magnifying glass graphic was derived from Derferman's public domain Magnifying glass icon.svg
 (http://commons.wikimedia.org/wiki/File:Magnifying_glass_icon.svg).
+
+The Chinese dictionaries (client/js/misc/zh_s_dict and client/js/misc/zh_t_dict) are licensed under the
+CC by-sa 3.0 Unported license and were created with content from the following projects:
+
+  * scim-googlepinyin (https://github.com/tchaikov/scim-googlepinyin) by tchaikov under the Apache License 2 license.
+  * VimIM Data Project (https://code.google.com/p/vimim-data/) MIT license.
+  * Wiktionary (https://zh.wiktionary.org) CC by-sa 3.0 Unported.
