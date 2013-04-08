@@ -9,7 +9,7 @@ To use BibleForge, all you have to do is go to <a href="http://bibleforge.com">b
 
 <h3>License</h3>
 
-Most of the BibleForge code is licensed under the <a href="http://www.opensource.org/licenses/AGPL-3.0" target="_blank">GNU Affero General Public License 3.0</a>. See the readme directory for more details.
+Most of the BibleForge code is licensed under the <a href="http://opensource.org/licenses/MIT" target="_blank">MIT</a>. See the readme directory for more details.
 
 <h3>Donate</h3>
 

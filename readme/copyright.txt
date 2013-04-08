@@ -1,7 +1,12 @@
-All BibleForge source code, images, and other data not mentioned below are copyrighted under
-the Affero General Public License Version 3 (AGPL-3.0), which can be found in agpl-3.0.txt.
+BibleForge follows the teachings of Jesus, namely
 
-The wrench graphic is under the Creative Commons by-sa 1.0 copyright.
+    "all things whatsoever ye would that men should do to you, do ye even so to them."
+        —Jesus (Matthew 7:12)
+
+Therefore, BibleForge is free, open source software.  BibleForge is licensed under the MIT license.
+This basically means that you can copy it, change it, and even sell it.  See mit.txt for details.
+
+Also, see credits.txt for details about specific files.
 
 Font licenses:
 
