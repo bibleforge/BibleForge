@@ -191,8 +191,7 @@
         next_chap:         "下一章",                                                /// The next chapter link in the non-JavaScript version
         next_psalm:        "下一首",                                                /// The next psalm link in the non-JavaScript version
         night_mode:        "Night Mode",                                           /// In the View configuration panel
-        no_results1:       "Your search\u200A\u2014\u200A",                        /// Displayed when preforming a search that returns no results (before the search terms)
-        no_results2:       "\u200A\u2014\u200Adid not return any results.",        /// Displayed when preforming a search that returns no results (after the search terms) (uncapitalized)
+        no_results:        "Your search\u200A\u2014\u200A<b>{q}</b>\u200A\u2014\u200Adid not return any results.", /// Displayed when preforming a search that returns no results
         previous:          "Previous",                                             /// The previous chapter link in the non-JavaScript version
         previous_chap:     "上一章",                                                /// The previous chapter link in the non-JavaScript version
         previous_psalm:    "上一首",                                                /// The previous psalm link in the non-JavaScript version

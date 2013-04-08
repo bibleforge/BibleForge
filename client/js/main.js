@@ -52,21 +52,21 @@ document.addEventListener("DOMContentLoaded", function ()
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (1611)",
-            modified: 38995957,
+            modified: 39051682,
             match_lang: /x-early-modern-english/i,
         };
     }
     if (!BF.lang.zh_s) {
         BF.langs.zh_s = {
             full_name: "简体中文 (CKJV)",
-            modified: 39044664,
+            modified: 39051698,
             match_lang: /zh-c(?:n|hs)/i,
         };
     }
     if (!BF.lang.zh_t) {
         BF.langs.zh_t = {
             full_name: "繁體中文 (CKJV)",
-            modified: 39044649,
+            modified: 39051688,
             match_lang: /zh(?:-c(?!n|hs))?/i,
         };
     }
@@ -405,6 +405,20 @@ document.addEventListener("DOMContentLoaded", function ()
             return typeof data !== "undefined" ? data : whole;
         });
     };
+    
+        /**
+         * Escape a string to be safely added inside HTML.
+         *
+         * @example BF.escape_html('This is a "harmless" comment <script>...</script>'); /// Returns "This is a &quot;harmless&quot; comment &lt;script&gt;...&lt;/script&gt;"
+         * @param   str (string) The string to be escaped
+         * @note    This code only escapes the few dangerous symbols, not all of them.
+         */
+        BF.escape_html = function (str)
+        {
+            ///NOTE: It must first replace ampersands (&); otherwise, the other entities would be escaped twice.
+            return str.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/'/g, "&#39;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        };
+
     
     /**
      * Create an easy to use Ajax object.
@@ -2722,11 +2736,8 @@ document.addEventListener("DOMContentLoaded", function ()
                                     /// Since no results were found, display a disappointing message.
                                     no_results = document.createElement("div");
                                     no_results.className = "no_results";
-                                    no_results.appendChild(document.createTextNode(BF.lang.no_results1));
-                                    b_tag = document.createElement("b");
-                                    b_tag.textContent = options.base_query;
-                                    no_results.appendChild(b_tag);
-                                    no_results.appendChild(document.createTextNode(BF.lang.no_results2));
+                                    /// Since the query must be inserted into the string, using createTextNode() is not possible, so we have to escape the query manually.
+                                    no_results.innerHTML = BF.insert({q: BF.escape_html(options.base_query)}, BF.lang.no_results);
                                     page.appendChild(no_results);
                                 } else {
                                     /// Verse lookups should never return an empty result on the initial query; therefore, something went wrong.

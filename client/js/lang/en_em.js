@@ -142,8 +142,7 @@
         next_chap:         "Next Chapter",                                         /// The next chapter link in the non-JavaScript version
         next_psalm:        "Next Psalme",                                          /// The next psalm link in the non-JavaScript version
         night_mode:        "Night Mode",                                           /// In the View configuration panel
-        no_results1:       "Thy search\u200A\u2014\u200A",                         /// Displayed when preforming a search that returns no results (before the search terms) (This does not need a long s because it is displayed on the scroll.)
-        no_results2:       "\u200A\u2014\u200Adid not returne any results.",       /// Displayed when preforming a search that returns no results (after the search terms) (This does not need a long s because it is displayed on the scroll.)
+        no_results:        "Thy search\u200A\u2014\u200A<b>{q}</b>\u200A\u2014\u200Areturneth not one result.", /// Displayed when preforming a search that returns no results (This does not need a long s because it is displayed on the scroll.)
         previous_chap:     "Preuious Chapter",                                     /// The previous chapter link in the non-JavaScript version
         previous_psalm:    "Preuious Psalme",                                      /// The previous psalm link in the non-JavaScript version
         psalm:             "Psalme",                                               /// The title of chapters in the book of Psalms (This does not need a long s because it is displayed on the scroll.)
