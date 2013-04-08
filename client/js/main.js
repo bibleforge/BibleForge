@@ -980,7 +980,7 @@ document.addEventListener("DOMContentLoaded", function ()
     {
         var best_lang;
         
-        function analyze_langs(str)
+        function parse_langs(str)
         {
             var i,
                 langs,
@@ -1000,7 +1000,7 @@ document.addEventListener("DOMContentLoaded", function ()
                 langs_len = langs.length;
                 for (i = 0; i < len; i += 1) {
                     /// Isolate the language name and country code.
-                    match = matches[i].match(/^[^,;]+/i);
+                    match = matches[i].match(/^[^;]+/i);
                     for (langs_i = 0; langs_i < langs_len; langs_i += 1) {
                         if (BF.langs[langs[langs_i]].match_lang.test(match[0])) {
                             return langs[langs_i];
@@ -1012,7 +1012,7 @@ document.addEventListener("DOMContentLoaded", function ()
             return "";
         }
         
-        return function ()
+        return function get_preferred_supported_lang()
         {
             var ajax;
             
@@ -1025,7 +1025,7 @@ document.addEventListener("DOMContentLoaded", function ()
                 
                 /// FireFox and Chrome support window.navigator.language but they treat it very differently and both only return one language.
                 /// IE supports window.navigator.userLanguage but again only returns one language.
-                best_lang = analyze_langs(ajax.getResponseHeader ? ajax.getResponseHeader("X-client-accept-lang") : window.navigator.language || window.navigator.userLanguage);
+                best_lang = parse_langs(ajax.getResponseHeader ? ajax.getResponseHeader("X-client-accept-lang") : window.navigator.language || window.navigator.userLanguage);
             }
             
             return best_lang;
