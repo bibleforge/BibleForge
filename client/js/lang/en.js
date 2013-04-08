@@ -123,8 +123,8 @@
         detailed_def:      "Detailed Definition",                                  /// Longer, more detailed definitions caption (in larger callout)
         done:              "Done",                                                 /// The button that closes panels
         err_unknown:       "An error occurred. Please try again.",                 /// A query returned an error for an unspecified reason.
-        found_plural:      " verses found for ",                                   /// On the info bar when searching (multiple results) (uncapitalized)
-        found_singular:    " verse found for ",                                    /// On the info bar when searching (one result) (uncapitalized)
+        found_plural:      "{num} verses found for <b>{q}</b>",                    /// On the info bar when searching (multiple results)
+        found_singular:    "{num} verse found for <b>{q}</b>",                     /// On the info bar when searching (one result)
         help:              "Help",                                                 /// Context menu item
         "in":              "in",                                                   /// Used in the meta description in the non-JavaScript version to indicate the language being used (uncapitalized)
         ///NOTE: This key must be the same as the value in the settings.
@@ -138,7 +138,7 @@
         next_chap:         "Next Chapter",                                         /// The next chapter link in the non-JavaScript version
         next_psalm:        "Next Psalm",                                           /// The next psalm link in the non-JavaScript version
         night_mode:        "Night Mode",                                           /// In the View configuration panel
-        no_results:        "Your search\u200A\u2014\u200A<b>{q}</b>\u200A\u2014\u200Adid not return any results.", /// Displayed when preforming a search that returns no results
+        no_results:        "Your search\u200A\u2014\u200A<b>{q}</b>\u200A\u2014\u200Adid not return any results.", /// Displayed when preforming a search that returns no results (NOTE: \u200A are hair spaces and \u2014 are em dashes.)
         previous_chap:     "Previous Chapter",                                     /// The previous chapter link in the non-JavaScript version
         previous_psalm:    "Previous Psalm",                                       /// The previous psalm link in the non-JavaScript version
         psalm:             "Psalm",                                                /// How to reference Psalms in a reference

@@ -52,21 +52,21 @@ document.addEventListener("DOMContentLoaded", function ()
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (1611)",
-            modified: 39051682,
+            modified: 39054961,
             match_lang: /x-early-modern-english/i,
         };
     }
     if (!BF.lang.zh_s) {
         BF.langs.zh_s = {
             full_name: "简体中文 (CKJV)",
-            modified: 39051698,
+            modified: 39054935,
             match_lang: /zh-c(?:n|hs)/i,
         };
     }
     if (!BF.lang.zh_t) {
         BF.langs.zh_t = {
             full_name: "繁體中文 (CKJV)",
-            modified: 39051688,
+            modified: 39054929,
             match_lang: /zh(?:-c(?!n|hs))?/i,
         };
     }
@@ -2562,8 +2562,7 @@ document.addEventListener("DOMContentLoaded", function ()
                      */
                     return function handle_new_verses(data, options)
                     {
-                        var b_tag,
-                            no_results,
+                        var no_results,
                             
                             direction     = options.direction,
                             in_paragraphs = options.in_paragraphs,
@@ -2720,13 +2719,9 @@ document.addEventListener("DOMContentLoaded", function ()
                             leftInfo.innerHTML = "";
                             
                             if (type !== BF.consts.verse_lookup) {
-                                /// Create the inital text.
-                                leftInfo.appendChild(document.createTextNode(BF.format_number(total) + BF.lang["found_" + (total === 1 ? "singular" : "plural")]));
-                                /// Create a <b> for the search terms.
-                                b_tag = document.createElement("b");
-                                ///NOTE: We use this method instead of straight innerHTML to prevent HTML injection inside the <b> tag.
-                                b_tag.appendChild(document.createTextNode(options.base_query));
-                                leftInfo.appendChild(b_tag);
+                                /// Since some languages have differences between singular and plural, we need to choose the correct language string.
+                                /// Since the query must be inserted into the string, using createTextNode() is not possible, so we have to escape the query manually.
+                                leftInfo.innerHTML = BF.insert({num: BF.format_number(total), q: BF.escape_html(options.base_query)}, BF.lang["found_" + (total === 1 ? "singular" : "plural")]);
                             }
                             
                             if (!total) {
