@@ -4,7 +4,7 @@
  * @date    09-28-10
  * @version alpha (α)
  * @link    http://BibleForge.com
- * @license MIT
+ * @license The MIT License (MIT)
  */
 
 /*!

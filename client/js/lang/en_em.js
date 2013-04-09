@@ -4,7 +4,7 @@
  * @date    12-30-11
  * @version alpha (α)
  * @link    http://BibleForge.com
- * @license MIT
+ * @license The MIT License (MIT)
  */
 
 /*!
@@ -81,7 +81,7 @@
         
         /// Indicate whether or not this version needs a special CSS file.
         has_css: true,
-        css_modified: 39075858,
+        css_modified: 39136917,
         
         /// Currently, this version does not have lexically linked words.
         linked_to_orig: false,

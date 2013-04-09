@@ -4,7 +4,7 @@
  * @date    03-18-13
  * @version alpha (α)
  * @link    http://BibleForge.com
- * @license MIT
+ * @license The MIT License (MIT)
  */
 
 /*!
@@ -128,7 +128,7 @@
             /// Since the segmentation code is the same for both Simplified and Traditional Chinese (and since the dictionaries have to be downloaded any way),
             /// it makes sense to put the segmentation code in a separate, sharable file.
             cue.add({id: 0});
-            BF.include("/js/misc/zh_segment.js?39075857", context, function onload()
+            BF.include("/js/misc/zh_segment.js?39136916", context, function onload()
             {
                 cue.async_remove(0);
             });
