@@ -35,7 +35,6 @@
 
 client/.htaccess
 client/google*
-client/robots.txt
 client/sitemap.xml
 server/node_modules
 server/config.js
