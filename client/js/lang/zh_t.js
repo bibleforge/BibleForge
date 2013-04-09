@@ -80,6 +80,9 @@
         abbreviation: "CKJV",
         id:           "zh_t",
         
+        /// This is used to match the accept-language header to indicate which languages this represents.
+        /// See RFC 3282: https://tools.ietf.org/html/rfc3282
+        /// This matches "zh" and "zh-*" except for "zh-cn" and "zh-chs".
         match_lang: /^zh(?:-c(?!n|hs))?$/i,
         
         /// Indicate that the first verse should not get special CSS.
@@ -100,7 +103,7 @@
          * Load additional data from the server.
          *
          * @param callback (function) The function to call asynchronously after all of the data is loaded.
-         * @note  This is called by BF.change_language in secondary.js.
+         * @note  This is called by BF.change_language() in secondary.js.
          */
         load_dependencies: function (callback)
         {
@@ -515,21 +518,24 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                     return "";
                 });
                 
-                /// First, convert Chinese numbers into Arabic numerals (e.g., "创世记五十：十五" becomes "创世记50：15").
+                /// Now, convert Chinese numbers into Arabic numerals (e.g., "创世记五十：十五" becomes "创世记50：15").
                 /// Remove special Chinese words to allow for verse references like this "{book} 第一章".
                 /// E.g., "创世记第五章十六节" first becomes "创世记第5章16节" and then becomes "创世记 5 16".
                 ///NOTE: The space in " $1$2" is necessary so that two numbers do not get put together.
                 ref = convert_numbers(String(ref)).replace(/第(\d+)[章首节節]?|第?(\d+)[章首节節]/g, " $1$2");
                 
-                /// Add back references to 1st, 2nd, and 3rd John if they any.
+                /// Add back references to 1st, 2nd, and 3rd John, if any.
                 ref = tmp_ref + ref;
                 
+                /// In order to check to see if the text matches a book, we have to remove any chapter and verse numbers.
                 book = books[ref.replace(/\s*\d+(?:[,.;:；：，。\s]\d*)?$/, "").toLowerCase()];
                 
+                /// If it is not a verse reference, return 0 now.
                 if (!book) {
                     return 0;
                 }
                 
+                /// Set the default chapter and verse.
                 chapter = "001";
                 verse   = "001";
                 
@@ -562,6 +568,7 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                             chapter = "001";
                         }
                     }
+                    /// Since verseID's require chapters and verses to be three digits, add in leading zeros, if necessary.
                     zeros   = ["", "00", "0", ""];
                     chapter = zeros[chapter.length] + chapter;
                     verse   = zeros[verse.length]   + verse;
@@ -580,8 +587,7 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
          * @example query = prepare_search("ps 16:title");                            /// Returns "ps 16:0"
          * @example query = prepare_search("“God is good”");                          /// Returns '"God is good"' (Note the curly quotes.)
          * @example query = prepare_search('he build El-beth-el "beth-el: because"'); /// Returns 'he build "El beth el" "beth el: because"' (Note the lack of hyphens and added quotes.)
-         * @example query = prepare_search("rom 16:subscription");                    /// Returns "rom 16:255" (Verse 255 is used internally by BibleForge for subscriptions.)
-         
+         * @example query = prepare_search("rom 16:subscription");                    /// Returns "rom 16:255" (Verse 255 is used internally by BibleForge for Pauline subscriptions.)
          * @param   query (string) The terms to be examined.
          * @return  A string that conforms to Sphinx syntax.
          * @note    Called by preform_query() in js/main.js.

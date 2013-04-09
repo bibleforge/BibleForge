@@ -75,6 +75,8 @@
         abbreviation: "KJV",
         id:           "en_em",
         
+        /// This is used to match the accept-language header to indicate which languages this represents.
+        /// See RFC 3282: https://tools.ietf.org/html/rfc3282
         match_lang: /^x-early-modern-english$/i,
         
         /// Indicate whether or not this version needs a special CSS file.
@@ -1968,10 +1970,12 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                     break;
                 }
                 
+                /// If it is not a verse reference, return 0 now.
                 if (book === 0) {
                     return 0;
                 }
                 
+                /// Set the default chapter and verse.
                 chapter = "001";
                 verse   = "001";
                 
@@ -2003,6 +2007,7 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                             chapter = "001";
                         }
                     }
+                    /// Since verseID's require chapters and verses to be three digits, add in leading zeros, if necessary.
                     zeros   = ["", "00", "0", ""];
                     chapter = zeros[chapter.length] + chapter;
                     verse   = zeros[verse.length]   + verse;
@@ -2021,7 +2026,7 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
          * @example query = prepare_search("ps 16:title");                            /// Returns "ps 16:0"
          * @example query = prepare_search("“God is good”");                          /// Returns '"God is good"' (Note the curly quotes.)
          * @example query = prepare_search('he build El-beth-el "beth-el: becauſe"'); /// Returns 'he build "El beth el" "beth el: because"' (Note the lack of long S, hyphens, and added quotes.)
-         * @example query = prepare_search("rom 16:subscription");                    /// Returns "rom 16:255" (Verse 255 is used internally by BibleForge for subscriptions.)
+         * @example query = prepare_search("rom 16:subscription");                    /// Returns "rom 16:255" (Verse 255 is used internally by BibleForge for Pauline subscriptions.)
          * @param   query (string) The terms to be examined.
          * @return  A string that conforms to Sphinx syntax.
          * @note    Called by preform_query() in js/main.js.
