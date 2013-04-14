@@ -1540,10 +1540,13 @@ document.addEventListener("DOMContentLoaded", function ()
                                     ///NOTE: It would be a good idea to use a try/catch to prevent errors in events from preventing the code that called the
                                     ///      event from firing.  However, there would need to be some sort of error handling. Sending a message back to the
                                     ///      server would be a good feature.
-                                    func_list[name][i].func(e);
+                                    /// Check to make sure the function actually exists.
+                                    if (func_list[name][i]) {
+                                        func_list[name][i].func(e);
+                                    }
                                     
                                     /// Is this function only supposed to be executed once?
-                                    if (func_list[name][i].once) {
+                                    if (!func_list[name][i] || func_list[name][i].once) {
                                         BF.remove(func_list[name], i);
                                     }
                                     
