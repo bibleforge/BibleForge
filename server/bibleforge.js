@@ -983,7 +983,7 @@ BF.lexical_lookup = function (data, callback)
                                 
                                 /// Was there no response from the database?  This could mean the database crashed or the verse is invalid.
                                 if (!data || !data.length) {
-                                    res = BF.insert({q: BF.escape_html(base_query)}, lang.no_results)
+                                    res = BF.insert({q: BF.escape_html(query)}, lang.no_results);
                                 } else {
                                     ///TODO: Reuse code from the client side to create the HTML.
                                     len = data.length;
@@ -1104,7 +1104,7 @@ BF.lexical_lookup = function (data, callback)
                                 
                                 /// Was there no response from the database?  This could mean the database crashed or Sphinx is not running.
                                 if (!data || !data.n || !data.n.length) {
-                                    res = BF.insert({q: BF.escape_html(query)}, lang.no_results)
+                                    res = BF.insert({q: BF.escape_html(query)}, lang.no_results);
                                 } else {
                                     ///TODO: Reuse code from the client side to create the HTML.
                                     len = data.n.length;
