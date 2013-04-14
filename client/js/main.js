@@ -60,21 +60,21 @@ document.addEventListener("DOMContentLoaded", function ()
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (1611)",
-            modified: 39114770,
+            modified: 39136917,
             match_lang: /x-early-modern-english/i,
         };
     }
     if (!BF.lang.zh_s) {
         BF.langs.zh_s = {
             full_name: "简体中文 (CKJV)",
-            modified: 39114610,
+            modified: 39597009,
             match_lang: /zh-c(?:n|hs)/i,
         };
     }
     if (!BF.lang.zh_t) {
         BF.langs.zh_t = {
             full_name: "繁體中文 (CKJV)",
-            modified: 39114651,
+            modified: 39597009,
             match_lang: /zh(?:-c(?!n|hs))?/i,
         };
     }
@@ -1322,7 +1322,7 @@ document.addEventListener("DOMContentLoaded", function ()
                             if (!css_added) {
                                 
                                 link_tag = document.createElement("link");
-                                link_tag.href = "/styles/night.css?39075858";
+                                link_tag.href = "/styles/night.css?39136917";
                                 link_tag.rel  = "stylesheet";
                                 if (BF.is_WebKit) {
                                     link_tag.onload = webkit_scrollbar_hack;
@@ -3778,7 +3778,7 @@ document.addEventListener("DOMContentLoaded", function ()
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?39075858", {
+                BF.include("/js/secondary.js?39136917", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
