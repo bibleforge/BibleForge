@@ -65,7 +65,6 @@
     }
     
     /// Return the language variables and functions.
-    ///TODO: Document all possible properties from all languages.
     that.BF.langs.en = {
         /// Indicate that the code has been downloaded and parsed.
         loaded: true,
@@ -81,7 +80,26 @@
         /// This matches "en" and "en-*".
         match_lang: /^en(?:-.*)?$/i,
         
+        /// Has this language been linked to the originals?
         linked_to_orig: true,
+        
+        /// **************************
+        /// * Start of unset options *
+        /// **************************
+        ///NOTE: By not setting these options, they default to undefined (i.e., falsey).  They are just listed below for reference's sake.
+        
+        /// Does this translation have no paragraph demarcations?
+        /// no_paragraphs: false,
+        
+        /// Indicate that the first verse should not get special CSS.
+        /// first_verse_normal: false,
+        
+        /// Use books_long_main names to create references when searching.
+        /// use_main_title: false,
+        
+        /// ************************
+        /// * End of unset options *
+        /// ************************
         
         /// Set the language's symbols.
         space: " ",
