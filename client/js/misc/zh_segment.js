@@ -49,13 +49,13 @@
                 var p;
                 
                 if (trad) {
-                    /// Created in the Forge on Sun, 14 Apr 2013 14:20:54 GMT.
+                    /// Created in the Forge on Wed, 17 Apr 2013 10:29:45 GMT.
                     /// Traditional Chinese Plot Data
                     p = [{x:0,y:8119},{x:66,y:1084},{x:140,y:735},{x:334,y:426},{x:987,y:193},{x:3013,y:72},{x:8226,y:23},{x:51140,y:1}];
                 } else {
-                    /// Created in the Forge on Sun, 14 Apr 2013 13:49:27 GMT.
+                    /// Created in the Forge on Wed, 17 Apr 2013 03:46:37 GMT.
                     /// Simplified Chinese Plot Data
-                    p = [{x:0,y:8119},{x:69,y:1084},{x:146,y:735},{x:340,y:426},{x:962,y:202},{x:3103,y:72},{x:8477,y:23},{x:52869,y:1}];
+                    p = [{x:0,y:8119},{x:69,y:1084},{x:146,y:735},{x:340,y:426},{x:962,y:202},{x:3103,y:72},{x:8464,y:23},{x:52846,y:1}];
                 }
                 
                 return function get_significance(x)
