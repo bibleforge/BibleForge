@@ -2483,7 +2483,8 @@ document.addEventListener("DOMContentLoaded", function ()
                                     if (verse_obj.v === 0) {
                                         html_str += "<div class=psalm_title id=" + verse_id + "_verse>" + verse_html[i] + "</div>";
                                     } else if (BF.lang.first_verse_normal) {
-                                        html_str += get_normal_verse_html();
+                                        ///NOTE: Even though the first verse should always the beginning of a paragraph, it doesn't to check.
+                                        html_str += (in_paragraphs && paragraphs[i] ? start_paragraph_HTML : "") + get_normal_verse_html();
                                     } else {
                                         ///NOTE: The trailing space adds a space between verses in a paragraph and does not effect paragraph final verses.
                                         html_str += first_paragraph_HTML + "<div class=first_verse id=" + verse_id + "_verse>" + verse_html[i] + " </div>";
