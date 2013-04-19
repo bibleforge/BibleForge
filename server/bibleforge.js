@@ -41,26 +41,6 @@
 /// Create the BibleForge global object to which everything else attaches.
 var BF = {};
 
-/**
- * Catch errors so that it does not cause the entire server to crash.
- */
-process.on("uncaughtException", function(e)
-{
-    /// Did db.js incorrectly connect to the database?
-    ///TODO: Determine if there is a way to detect this error without using e.message.
-    if (e.message === "Can't execute a query without being connected") {
-        /// Something is wrong with the database connection, try to re-establish a connection.
-        ///NOTE: Theoretically, this should never be necessary because db.js should queue connections while waiting to connect to the database;
-        ///      however, sometimes the database module sends false positives, indicating that it is connected when it is in fact not.
-        ///      This is especially true when BibleForge tries to connect to the database as the database sever is starting.
-        BF.db.reconnect();
-    }
-    
-    ///TODO: Log errors.
-    console.error(e.message);
-    console.error(e.stack);
-});
-
 /// ********************
 /// * Create constants *
 /// ********************
@@ -386,7 +366,8 @@ BF.verse_lookup = function (data, callback)
  */
 BF.standard_search = function (data, callback)
 {
-    var html_table,
+    var db_client,
+        html_table,
         initial,
         /// Select the language object specified by the query or use the default.
         lang = BF.langs[data.l] || BF.langs.en,
@@ -401,8 +382,11 @@ BF.standard_search = function (data, callback)
     ///NOTE: Currently, the first query does not specifiy a verse.
     initial = !Boolean(start_at);
     
+    ///TODO: Requery if no client is returned.
+    db_client = BF.db.request_a_client();
+    
     /// Create the first part of the SQL/SphinxQL query.
-    query = "SELECT " + verse_table + ".id, " + html_table + ".words FROM " + verse_table + ", " + html_table + " WHERE " + html_table + ".id = " + verse_table + ".id AND " + verse_table + ".query = \"" + BF.db.escape_sphinx(terms) + ";limit=" + lang.minimum_desired_verses + ";ranker=none";
+    query = "SELECT " + verse_table + ".id, " + html_table + ".words FROM " + verse_table + ", " + html_table + " WHERE " + html_table + ".id = " + verse_table + ".id AND " + verse_table + ".query = \"" + db_client.escape_sphinx(terms) + ";limit=" + lang.minimum_desired_verses + ";ranker=none";
     
     /// Should the query start somewhere in the middle of the Bible?
     if (start_at) {
@@ -478,7 +462,7 @@ BF.standard_search = function (data, callback)
     }
     
     /// Run the Sphinx search and return both the verse IDs and the HTML.
-    BF.db.query(query, function (data, err)
+    db_client.query(query, function (data, err)
     {
         var i,
             len,
@@ -539,7 +523,8 @@ BF.standard_search = function (data, callback)
  */
 BF.grammatical_search = function (data, callback)
 {
-    var html_table,
+    var db_client,
+        html_table,
         i,
         initial,
         /// Select the language object specified by the query or use the default.
@@ -558,13 +543,16 @@ BF.grammatical_search = function (data, callback)
         return;
     }
     
+    ///TODO: Requery if no client is returned.
+    db_client = BF.db.request_a_client();
+    
     html_table = "`bible_" + lang.id + "_html`";
     morphological_table = "`morphological_" + lang.id + "`";
     ///NOTE: Currently, the first query does not specifiy a verse.
     initial = !Boolean(start_at);
     
     /// Create the first part of the SQL/SphinxQL query.
-    query = "SELECT " + morphological_table + ".id, " + morphological_table + ".verseID, " + html_table + ".words FROM " + morphological_table + ", " + html_table + " WHERE " + html_table + ".id = " + morphological_table + ".verseID AND " + morphological_table + ".query = \"" + BF.db.escape_sphinx(query_arr[0]) + ";limit=" + lang.minimum_desired_verses + ";ranker=none";
+    query = "SELECT " + morphological_table + ".id, " + morphological_table + ".verseID, " + html_table + ".words FROM " + morphological_table + ", " + html_table + " WHERE " + html_table + ".id = " + morphological_table + ".verseID AND " + morphological_table + ".query = \"" + db_client.escape_sphinx(query_arr[0]) + ";limit=" + lang.minimum_desired_verses + ";ranker=none";
     
     /// Should the query start somewhere in the middle of the Bible?
     if (start_at) {
@@ -622,7 +610,7 @@ BF.grammatical_search = function (data, callback)
     }
     
     /// Run the Sphinx search, and return both the verse IDs and the HTML.
-    BF.db.query(query, function (data)
+    db_client.query(query, function (data)
     {
         var i,
             len,

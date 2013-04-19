@@ -39,204 +39,294 @@
 "use strict";
 
 /**
- * Create the database abstraction layer.
+ * Check if a Node.js module exists.
  *
- * @param config (object) An object defining the database parameters.
- *                        Object format:
- *                          {host: "The hostname to connect to",
- *                           user: "The database username",
- *                           pass: "The user's password",
- *                           base: "The database name"}
- * @todo  Determine if the hostname can contain a port or socket.  If not, allow this to be configured as separate options.
+ * @param  name (string) The name of the module to check for
+ * @return TRUE if the module was found and FALSE if not
  */
-exports.db = function (config)
+function module_exists(name)
 {
-    return (function ()
+    try {
+        require.resolve(name);
+        return true;
+    } catch (err) {
+        return false;
+    }
+}
+
+/**
+ * Escape special symbols used in Sphinx and the db connectors.
+ *
+ * @param  str (string) The string to escape.
+ * @return An escaped string
+ */
+function sphinx_escape(str)
+{
+    /// Because question marks (?) are a special symbol to the database connectors, they must be escaped too.
+    /// Semicolons are special symbols in SphinxQL and need to be escaped.
+    return str.replace(/\?/g, "\\?").replace(/;/g, "\\\\;");
+}
+
+/**
+ * Create an abstraction around the non-blocking Maria/MySQL connector.
+ *
+ * @param config (object) A BibleForge DB config object (see init() for details)
+ * @note  Currently, this module does not work properly (it cannot escape string and causes Node to crash on some errors).  It is only for testing purposes.
+ * @todo  Determine if this module is really faster and worth the trouble.
+ */
+function create_connection_non_blocking(config)
+{
+    var client = new (require("mariasql"))();
+    
+    client.connect({
+        host: config.host,
+        user: config.user,
+        password: config.pass,
+        db: config.base,
+    });
+    
+    client.on("error", function(err)
     {
-        var connected,
-            db = new (require("db-mysql")).Database((function ()
-            {
-                var settings = {
-                    charset:  "utf8", /// With this, we do not need to send "SET NAMES utf8;" when the connection is made.
-                    user:     config.user,
-                    password: config.pass,
-                    database: config.base
-                    /// Other options:
-                    ///     compress        (default: FALSE)
-                    ///     initCommand     (default: undefined)
-                    ///     readTimeout     (default: 0)
-                    ///     reconnect       (default: TRUE)
-                    ///     sslVerifyServer (default: FALSE)
-                    ///     timeout         (default: 0)
-                    ///     writeTimeout    (default: 0)
-                };
-                
-                if (config.host) {
-                    settings.hostname = config.host;
-                }
-                if (config.port) {
-                    settings.port     = config.port;
-                }
-                if (config.sock) {
-                    settings.socket   = config.sock;
-                }
-                
-                return settings;
-            }())),
-            /// The queue object is used to store any queries that are called before a connection to the database has been established.
-            /// This is only used before the database has started.  The intended purpose is to allow the BibleForge server to start up
-            /// before the database itself has started.  If the BibleForge loses its connection to the database later, the queries are
-            /// simply rejected.  Once the database is running again, a connection will automatically be re-established.
-            /**
-             * Create the queue object to handle queued queries.
-             */
-            queue = (function ()
-            {
-                var queries = [];
-                
-                return {
-                    /**
-                     * Add an additional query to the queue.
-                     *
-                     * @param sql      (string)   The SQL query to execute
-                     * @param callback (function) The function to call after the query returns
-                     * @todo  Remove old queued queries when the client that requested them closes.
-                     */
-                    add: function (sql, callback)
-                    {
-                        queries[queries.length] = {sql: sql, callback: callback};
-                    },
-                    /**
-                     * Execute queued queries.
-                     *
-                     * @note Since executing the queries is done asynchronously, this function may call itself.
-                     */
-                    flush: function ()
-                    {
-                        var query;
-                        
-                        /// Are there any queries?  If not, this function will simply end.
-                        if (queries.length) {
-                            
-                            /// Get the first array item and simultaneously remove it form the array.
-                            query = queries.shift();
-                            
-                            db.query().execute(query.sql, [], function (err, data)
-                            {
-                                if (typeof query.callback === "function") {
-                                    query.callback(data, err);
-                                }
-                                /// Call this function again to preform the next query (if any).
-                                queue.flush();
-                            });
-                        }
-                    }
-                };
-            }());
-        
+        ///TODO: Reconnect.
+        console.log("Client error: " + err);
+    })
+    .on("close", function()
+    {
+        ///TODO: Reconnect.
+        console.log("Client closed");
+    });
+    
+    return {
         /**
-         * Attempt to connect to the database.
+         * Escape a sphinx query argument.
          *
-         * @note If a connection cannot be made, this function will call itself after a short delay.
+         * @example var sql = "SELECT * FROM `table` WHERE query = \"" + db_client.escape_sphinx("fake query;limit=99999") + ";ranker=none\"";
+         * @param   str (string) The string to escape.
+         * @return  An escaped string.
+         * @note    This requires an open connection to a database.
          */
-        function connect()
+        escape_sphinx: function (str)
         {
-            /// Try to connect to the database.
-            db.connect(function (err)
+            return sphinx_escape(client.escape(str));
+        },
+        /**
+         * Send a simple SQL query and get any and all results.
+         *
+         * @param sql      (string)              The SQL string to execute.
+         * @param callback (function) (optional) The function to call after all of the data is returned or an error occurred
+         *                                       The callback() function will receive one variable if the query succeeds
+         *                                       and two (the first will be undefined) on errors.
+         */
+        query: function (sql, callback)
+        {
+            /// Send the query.
+            client.query(sql).on("result", function (res)
             {
-                /// If an error occurred, try again shortly.
-                ///NOTE: Since sometimes connect() returns a false positive, use isConnected() to double check the connection.
-                if (err || !db.isConnected()) {
-                    console.error(err);
-                    setTimeout(connect, 50);
-                } else {
-                    /// If a connection is made, prevent queries form being stored and flush any that have already been stored.
-                    connected = true;
-                    queue.flush();
+                var data = [];
+                
+                res.on("row", function (row)
+                {
+                    /// Store each row in an array.
+                    data[data.length] = row;
+                }).on("end", function ()
+                {
+                    /// Once the query has finished, send the results to the callback, if any.
+                    if (callback) {
+                        callback(data);
+                    }
+                });
+            }).on("error", function (err)
+            {
+                /// Catch errors.
+                console.log("err");console.log(err);
+                if (callback) {
+                    callback(undefined, err);
                 }
             });
+        },
+    };
+}
+
+/**
+ * Create an abstraction around the pure JavaScript Maria/MySQL connector.
+ *
+ * @param config (object) A BibleForge DB config object (see init() for details)
+ */
+function create_connection_js(config)
+{
+    var client = require("mysql").createConnection({
+        host: config.host,
+        user: config.user,
+        password: config.pass,
+        database: config.base,
+        socketPath: config.sock,
+        /// Keep everything as strings for compatibility (and maybe speed).
+        typeCast: false,
+    });
+    
+    client.connect(function(err)
+    {
+        if (err) {
+            ///TODO: Reconnect.
+            console.log(err);
         }
+    });
+    
+    client.on("error", function(err)
+    {
+        ///TODO: Reconnect.
+        console.log("Client error: " + err);
+    });
+    
+    return {
+        /**
+         * Escape a sphinx query argument.
+         *
+         * @example var sql = "SELECT * FROM `table` WHERE query = \"" + db_client.escape_sphinx("fake query;limit=99999") + ";ranker=none\"";
+         * @param   str (string) The string to escape.
+         * @return  An escaped string.
+         * @note    This requires an open connection to a database.
+         */
+        escape_sphinx: function (str)
+        {
+            /// This module adds quotations around strings, but those will cause issues with Sphinx.
+            return sphinx_escape(client.escape(str)).slice(1, -1);
+        },
+        /**
+         * Send a simple SQL query and get the results.
+         *
+         * @param sql      (string)              The SQL string to execute.
+         * @param callback (function) (optional) The function to call after all of the data is returned or an error occurred
+         *                                       The callback() function will receive one variable if the query succeeds
+         *                                       and two (the first will be undefined) on errors.
+         */
+        query: function (sql, callback)
+        {
+            /// Send the query.
+            client.query(sql, function (err, data)
+            {
+                if (callback) {
+                    callback(data, err);
+                }
+            });
+        },
+    };
+}
+
+/**
+ * Create the database abstraction layer.
+ *
+ * @param db_config (array || object) An object or array of objects describing how to configure the database (see config.sample.js)
+ *                                    Object structure:
+ *                                    {
+ *                                        host: "The host's address",
+ *                                        port: "The port to listen to",
+ *                                        sock: "The Unix file socket if not listening to a port",
+ *                                        user: "The database username",
+ *                                        user: "The database user's password",
+ *                                        base: "The database to connect to",
+ *                                    }
+ * @param use_experimental (boolean) (optional) Whether or not to try to use the experimental maraiasql module
+ */
+exports.db = function init(db_config, use_experimental)
+{
+    var create_connection,
+        request_a_client,
+        servers = [],
+        servers_count;
+    
+    /// If the mariasql module exists use that.
+    ///NOTE: The mariasql module is faster and non-blocking, but it is a C module, so it is not as portable and may not be installed.
+    ///NOTE: Currently, this module does not work properly.  Queries work, but escaping does not and it often causes segmentation faults on errors.
+    if (use_experimental && module_exists("mariasql")) {
+        create_connection = create_connection_non_blocking;
+    } else {
+        /// As a fallback, use the pure JavaScript client.
+        create_connection = create_connection_js;
+    }
+    
+    /// If only an object was sent, turn it into an array for convenience’s sake.
+    if (!Array.isArray(db_config)) {
+        db_config = [db_config];
+    }
+    
+    servers_count = db_config.length - 1;
+    
+    /// Create a connection to each server.
+    db_config.forEach(function (config)
+    {
+        servers[servers.length] = {
+            connection: create_connection(config)
+        };
+    });
+    
+    /**
+     * Get a free database client
+     *
+     * @return A client object or FALSE if none could be found
+     * @note   This uses a round robin method.
+     */
+    request_a_client = (function ()
+    {
+        var which_server = -1;
         
-        connect();
-        
-        return {
-            /**
-             * Escape a query argument.
-             *
-             * @example var sql = "SELECT * FROM `table` WHERE field = \"" + db.escape("\"; DROP TABLE table;") + "\"";
-             * @param   str (string) The string to escape.
-             * @return  A string or UNDEFINED if str is not a string.
-             */
-            escape: function (str)
-            {
-                if (typeof str === "string") {
-                    /// Because question marks (?) are a special symbol to db-mysql, they must be escaped too.
-                    return db.escape(str).replace(/\?/g, "\\?");
+        return function ()
+        {
+            var tries = 0;
+            
+            for (;;) {
+                which_server += 1;
+                
+                if (which_server > servers_count) {
+                    which_server = 0;
                 }
-                ///NOTE: Non-strings will return undefined.
-            },
-            /**
-             * Escape a sphinx query argument.
-             *
-             * @example var sql = "SELECT * FROM `table` WHERE query = \"" + db.escape_sphinx("fake query;limit=99999") + ";ranker=none\"";
-             * @param   str (string) The string to escape.
-             * @return  A string or UNDEFINED if str is not a string.
-             */
-            escape_sphinx: function (str)
-            {
-                if (typeof str === "string") {
-                    /// Because question marks (?) are a special symbol to db-mysql, they must be escaped too.
-                    /// Semicolons are special symbols in SphinxQL and need to be escaped.
-                    return db.escape(str).replace(/\?/g, "\\?").replace(/;/g, "\\\\;");
+                
+                ///TODO: Determine a way to mark servers offline.
+                if (!servers[which_server].offline) {
+                    break;
                 }
-                ///NOTE: Non-strings will return undefined.
-            },
-            /**
-             * Escape a table or field name.
-             *
-             * @example var sql = "SELECT * FROM " + db.name("table name");
-             * @param   str (string) The string to escape.
-             * @return  A string or UNDEFINED if str is not a string.
-             */
-            name: function (str)
-            {
-                if (typeof str === "string") {
-                    return db.name(str);
+                tries += 1;
+                
+                /// If we have tried all of the clients, give up.
+                if (tries > servers_count) {
+                    return false;
                 }
-                ///NOTE: Non-strings will return undefined.
-            },
-            /**
-             * Execute a query.
-             *
-             * @param sql      (string)   The SQL query to execute
-             * @param callback (function) The function to call after the query returns
-             * @note  If the database has not yet been connected to, the query will be queued.
-             */
-            query: function (sql, callback)
-            {
-                /// Has a connection been established?
-                if (connected) {
-                    db.query().execute(sql, [], function (err, data)
-                    {
-                        ///TODO: Log errors.
-                        if (typeof callback === "function") {
-                            callback(data, err);
-                        }
-                    });
-                } else {
-                    /// Queue queries if the database has not yet started up.
-                    queue.add(sql, callback);
-                }
-            },
-            /**
-             * Attempt to re-establish a connection with the server.
-             */
-            reconnect: function ()
-            {
-                db.disconnect();
-                connected = false;
-                connect();
             }
+            
+            ///TODO: Connection pooling.
+            return servers[which_server].connection;
         };
     }());
+    
+    return {
+        /**
+         * Execute a query.
+         *
+         * @param sql      (string)   The SQL query to execute
+         * @param callback (function) The function to call after the query returns
+         * @note  If the database has not yet been connected to, the query will be queued.
+         */
+        query: function query(sql, callback)
+        {
+            var client = request_a_client();
+            
+            /// Were no clients avaiable?
+            if (!client) {
+                /// If we cannot get a client, wait and try again later.
+                setTimeout(function ()
+                {
+                    query(sql, callback);
+                }, 100);
+                return;
+            }
+            
+            /// Hand off the query to the client.
+            client.query(sql, callback);
+        },
+        /// For more complex queries (like ones involving escaping) a client object and be requested directly.
+        /// Client's have the following functions:
+        ///     .escape_sphinx()
+        ///     .query()
+        request_a_client: request_a_client,
+    };
 };
