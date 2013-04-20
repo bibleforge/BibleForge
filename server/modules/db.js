@@ -160,8 +160,6 @@ function create_connection_js(config)
         password: config.pass,
         database: config.base,
         socketPath: config.sock,
-        /// Keep everything as strings for compatibility (and maybe speed).
-        typeCast: false,
     });
     
     client.connect(function(err)
