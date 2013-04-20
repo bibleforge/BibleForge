@@ -471,8 +471,8 @@ BF.standard_search = function (data, callback)
                 v: []
             };
         
-        /// Was there no response from the database?  This could mean the database or Sphinx crashed.
-        if (!data) {
+        /// Was there no response (or an invalid response) from the database?  This could mean the database or Sphinx crashed.
+        if (!data || data.length === 0) {
             ///TODO: Do better logging,
             if (err) {
                 console.log(err);
