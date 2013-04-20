@@ -83,7 +83,7 @@ function create_connection_non_blocking(config, set_status)
     function connect()
     {
         /// Make sure an open connection has not already been established or in the process of being established; otherwise, an infinite connection loop could occur.
-        if (!connecting && !connected) {
+        if (!connected && !connecting) {
             connecting = true;
             client.connect({
                 host: config.host,
@@ -175,30 +175,59 @@ function create_connection_non_blocking(config, set_status)
  *
  * @param config (object) A BibleForge DB config object (see init() for details)
  */
-function create_connection_js(config)
+function create_connection_js(config, set_status)
 {
-    var client = require("mysql").createConnection({
-        host: config.host,
-        user: config.user,
-        port: config.port,
-        password: config.pass,
-        database: config.base,
-        socketPath: config.sock,
-    });
+    var client,
+        connecting,
+        connected;
     
-    client.connect(function(err)
+    function create_connection()
     {
+        client = require("mysql").createConnection({
+            host: config.host,
+            user: config.user,
+            port: config.port,
+            password: config.pass,
+            database: config.base,
+            socketPath: config.sock,
+        });
+    }
+    
+    function connect()
+    {
+        if (!connected && !connecting) {
+            connecting = true;
+            /// In this module, a connection can only be used once (it cannot be used to reconnect to a server), so a new client object has to be created each time.
+            create_connection();
+            client.on("error", handle_disconnect);
+            client.connect(function on_connect(err)
+            {
+                if (err) {
+                    handle_disconnect(err);
+                } else {
+                    connecting = false;
+                    console.log("online");
+                    connected = true;
+                    set_status(1);
+                }
+            });
+        }
+    }
+    
+    function handle_disconnect(err)
+    {
+        connecting = false;
+        console.log("offline");
+        connected = false;
+        set_status(0);
+        setTimeout(connect, 1000);
+        
         if (err) {
-            ///TODO: Reconnect.
             console.log(err);
         }
-    });
+    }
     
-    client.on("error", function(err)
-    {
-        ///TODO: Reconnect.
-        console.log("Client error: " + err);
-    });
+    connect();
     
     return {
         /**
