@@ -233,7 +233,8 @@ BF.verse_lookup = function (data, callback)
                     ///      because it must stop before the last paragraph marker.
                     while (true) {
                         /// Is it at a paragraph break?
-                        if (verses[len - 1].paragraph) {
+                        ///NOTE: Since the database may return "0" or "1" as strings, it is necessary to convert them to JavaScript Numbers so that 0 will be falesy.
+                        if (Number(verses[len - 1].paragraph)) {
                             /// The first verse should be at a paragraph beginning, and the last verse
                             /// should be just before one. Therefore, when looking up previous verses,
                             /// we must get this verse (because previous lookups are in reverse).
