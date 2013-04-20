@@ -746,7 +746,7 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                         case "befal":
                         case "befallen":
                         case "befel":
-                            stemmed_word = "b[ae]fell?(?:en)?";
+                            stemmed_word = "bef[ae]ll?(?:en)?";
                             break;
                         case "beheld":
                         case "behold":
