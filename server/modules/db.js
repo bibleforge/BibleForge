@@ -111,7 +111,7 @@ function create_connection_non_blocking(config, set_status)
     /// Open a connection.
     connect();
     
-    client.on("connect", function (err)
+    client.on("connect", function ()
     {
         connecting = false;
         connected = true;
@@ -362,7 +362,7 @@ exports.db = function init(db_config, use_experimental)
         {
             var client = request_a_client();
             
-            /// Were no clients avaiable?
+            /// Were no clients available?
             if (!client) {
                 /// If we cannot get a client, wait and try again later.
                 setTimeout(function ()
