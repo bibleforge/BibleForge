@@ -60,21 +60,21 @@ document.addEventListener("DOMContentLoaded", function ()
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (1611)",
-            modified: 39136917,
+            modified: 40116628,
             match_lang: /x-early-modern-english/i,
         };
     }
     if (!BF.lang.zh_s) {
         BF.langs.zh_s = {
             full_name: "简体中文 (CKJV)",
-            modified: 39979182,
+            modified: 40116644,
             match_lang: /zh-c(?:n|hs)/i,
         };
     }
     if (!BF.lang.zh_t) {
         BF.langs.zh_t = {
             full_name: "繁體中文 (CKJV)",
-            modified: 39979184,
+            modified: 40116631,
             match_lang: /zh(?:-c(?!n|hs))?/i,
         };
     }

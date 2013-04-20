@@ -367,8 +367,9 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                             stemmed_tmp = add_regex(search_terms_arr[i][j]);
                             if (j > 0) {
                                 /// Add a short regular expression to "glue" the regular expressions for each word together to create a regular expression for the entire phrase.
-                                /// [^<]*[^>]* is used to skip over an HTML tag.
-                                stemmed_tmp = "[^<]*[^>]*" + stemmed_tmp;
+                                /// It also needs to skip over empty words (words that are just an empty HTML tag).
+                                /// /[^>]+>*\\s*(?:<[^>]+></[^>]+>)*\\s*<[^>]* is used to skip over HTML tags.
+                                stemmed_tmp = "/[^>]+>*\\s*(?:<[^>]+></[^>]+>)*\\s*<[^>]*" + stemmed_tmp;
                             }
                             /// Since we are looping backward, add it to the beginning of the string.
                             stemmed = stemmed_tmp + stemmed;
