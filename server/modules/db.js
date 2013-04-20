@@ -71,8 +71,6 @@ function sphinx_escape(str)
  * Create an abstraction around the non-blocking Maria/MySQL connector.
  *
  * @param config (object) A BibleForge DB config object (see init() for details)
- * @note  Currently, this module does not work properly (it cannot escape string and causes Node to crash on some errors).  It is only for testing purposes.
- * @todo  Determine if this module is really faster and worth the trouble.
  */
 function create_connection_non_blocking(config, set_status)
 {
@@ -275,9 +273,8 @@ function create_connection_js(config, set_status)
  *                                        user: "The database user's password",
  *                                        base: "The database to connect to",
  *                                    }
- * @param use_experimental (boolean) (optional) Whether or not to try to use the experimental maraiasql module
  */
-exports.db = function init(db_config, use_experimental)
+exports.db = function init(db_config)
 {
     var create_connection,
         request_a_client,
@@ -286,8 +283,7 @@ exports.db = function init(db_config, use_experimental)
     
     /// If the mariasql module exists use that.
     ///NOTE: The mariasql module is faster and non-blocking, but it is a C module, so it is not as portable and may not be installed.
-    ///NOTE: Currently, this module does not work properly.  Queries work, but escaping does not and it often causes segmentation faults on errors.
-    if (use_experimental && module_exists("mariasql")) {
+    if (module_exists("mariasql")) {
         create_connection = create_connection_non_blocking;
     } else {
         /// As a fallback, use the pure JavaScript client.
