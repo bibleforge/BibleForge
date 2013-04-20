@@ -74,28 +74,50 @@ function sphinx_escape(str)
  * @note  Currently, this module does not work properly (it cannot escape string and causes Node to crash on some errors).  It is only for testing purposes.
  * @todo  Determine if this module is really faster and worth the trouble.
  */
-function create_connection_non_blocking(config)
+function create_connection_non_blocking(config, set_status)
 {
-    var client = new (require("mariasql"))();
+    var client = new (require("mariasql"))(),
+        connecting,
+        connected;
     
-    client.connect({
-        host: config.host,
-        user: config.user,
-        port: config.port,
-        password: config.pass,
-        db: config.base,
-    });
+    function connect()
+    {
+        /// Make sure an open connection has not already been established or in the process of being established; otherwise, an infinite connection loop could occur.
+        if (!connecting && !connected) {
+            connecting = true;
+            client.connect({
+                host: config.host,
+                user: config.user,
+                port: config.port,
+                password: config.pass,
+                db: config.base,
+            });
+        }
+    }
     
-    client.on("error", function(err)
+    function handle_disconnect(err)
     {
-        ///TODO: Reconnect.
-        console.log("Client error: " + err);
-    })
-    .on("close", function()
+        connecting = false;
+        console.log("offline");
+        connected = false;
+        set_status(0);
+        setTimeout(connect, 1000);
+        
+        if (err) {
+            console.log(err);
+        }
+    }
+    
+    /// Open a connection.
+    connect();
+    
+    client.on("connect", function (err)
     {
-        ///TODO: Reconnect.
-        console.log("Client closed");
-    });
+        connecting = false;
+        console.log("online");
+        connected = true;
+        set_status(1);
+    }).on("error", handle_disconnect).on("close", handle_disconnect);
     
     return {
         /**
@@ -255,8 +277,12 @@ exports.db = function init(db_config, use_experimental)
     /// Create a connection to each server.
     db_config.forEach(function (config)
     {
-        servers[servers.length] = {
-            connection: create_connection(config)
+        var which = servers.length;
+        servers[which] = {
+            connection: create_connection(config, function set_status(status)
+            {
+                servers[which].online = status === 1;
+            })
         };
     });
     
@@ -281,8 +307,7 @@ exports.db = function init(db_config, use_experimental)
                     which_server = 0;
                 }
                 
-                ///TODO: Determine a way to mark servers offline.
-                if (!servers[which_server].offline) {
+                if (servers[which_server].online) {
                     break;
                 }
                 tries += 1;
