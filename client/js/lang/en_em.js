@@ -728,6 +728,7 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                         stemmed_word = stem_word(term);
                         
                         /// Possibly fix strong words with proper morphological regex.
+                        ///TODO: Check for words that end in "e" that do not normally (like "doe" instead of "do") and other spelling variations.
                         switch (stemmed_word) {
                         case "abid":
                         case "abod":
@@ -862,7 +863,7 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                         case "don[ei]":
                         case "dost":
                         case "doth":
-                            stemmed_word = "d(?:o(?:est?|ne|st|th)?|id(?:st)?)";
+                            stemmed_word = "d(?:o(?:e(?:st?)?|ne|st|th)?|id(?:st)?)";
                             /// Since this word is so short, it needs special regex to prevent false positives, so do not add additional morphological regex.
                             do_not_add_morph_regex = true;
                             break;
@@ -879,7 +880,7 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                         case "drank":
                         case "drink":
                         case "drunk":
-                            stemmed_word = "dr[aiu]nk";
+                            stemmed_word = "dr[aiu]nke?";
                             break;
                         case "dig":
                         case "dug":
@@ -918,11 +919,11 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                             break;
                         case "feet":
                         case "foot":
-                            stemmed_word = "f(?:ee|oo)t";
+                            stemmed_word = "f(?:ee|oo)te?";
                             break;
                         case "feel":
                         case "felt":
-                            stemmed_word = "fe(?:el|lt)";
+                            stemmed_word = "fe(?:ele?|lt)";
                             break;
                         case "fight":
                         case "fought":
@@ -1007,7 +1008,8 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                         case "go":
                         case "gon[ei]":
                         case "went":
-                            stemmed_word = "(?:go(?:e(?:st|th)|ing|ne)?|went)";
+                            ///NOTE: "Goe" and "go/went" are handled as separate words in Sphinx.
+                            stemmed_word = "(?:go(?:e(?:st|th)?|ing|ne)?|went)";
                             /// Because this word is so small and unique, it is easier to white list all of the forms used.
                             do_not_add_morph_regex = true;
                             break;
@@ -1057,7 +1059,7 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                             break;
                         case "keep":
                         case "kept":
-                            stemmed_word = "ke(?:ep|pt)";
+                            stemmed_word = "ke(?:epe?|pt)";
                             break;
                         case "kneel":
                         case "knelt":
