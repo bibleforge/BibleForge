@@ -98,7 +98,7 @@ function create_connection_non_blocking(config, set_status)
     function handle_disconnect(err)
     {
         connecting = false;
-        console.log("offline");
+        ///TODO: Log disconnection.
         connected = false;
         set_status(0);
         setTimeout(connect, 1000);
@@ -114,7 +114,6 @@ function create_connection_non_blocking(config, set_status)
     client.on("connect", function (err)
     {
         connecting = false;
-        console.log("online");
         connected = true;
         set_status(1);
     }).on("error", handle_disconnect).on("close", handle_disconnect);
@@ -161,7 +160,7 @@ function create_connection_non_blocking(config, set_status)
             }).on("error", function (err)
             {
                 /// Catch errors.
-                console.log("err");console.log(err);
+                ///TODO: Log errors.
                 if (callback) {
                     callback(undefined, err);
                 }
@@ -206,7 +205,6 @@ function create_connection_js(config, set_status)
                     handle_disconnect(err);
                 } else {
                     connecting = false;
-                    console.log("online");
                     connected = true;
                     set_status(1);
                 }
@@ -217,7 +215,7 @@ function create_connection_js(config, set_status)
     function handle_disconnect(err)
     {
         connecting = false;
-        console.log("offline");
+        ///TODO: Log disconnection.
         connected = false;
         set_status(0);
         setTimeout(connect, 1000);
