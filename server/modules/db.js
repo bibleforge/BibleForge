@@ -81,6 +81,7 @@ function create_connection_non_blocking(config)
     client.connect({
         host: config.host,
         user: config.user,
+        port: config.port,
         password: config.pass,
         db: config.base,
     });
@@ -157,6 +158,7 @@ function create_connection_js(config)
     var client = require("mysql").createConnection({
         host: config.host,
         user: config.user,
+        port: config.port,
         password: config.pass,
         database: config.base,
         socketPath: config.sock,
