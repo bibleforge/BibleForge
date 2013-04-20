@@ -1102,8 +1102,8 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                             stemmed_word = "lad(?:en?|i)";
                             break;
                         case "lept":
-                        case "leep":
-                            stemmed_word = "le(?:ep|pt)";
+                        case "leap":
+                            stemmed_word = "le(?:ap|pt)";
                             break;
                         ///NOTE: This has conflicts with the adjective form of "left."
                         case "leav":
