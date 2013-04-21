@@ -580,6 +580,16 @@
         return res;
     }
     
+    /**
+     * Segment a string of Chinese text.
+     *
+     * @param lang_analysis (object)  The analyzed language data
+     * @param lang_dict     (string)  A dictionary list of words
+     * @param lang_p        (object)  The dictionary plot data
+     * @param orig_str      (string)  The string to segment
+     * @param return_raw    (boolean) Whether or not to return the raw array of segmented strings (default) or a string with a space separating each segmentation
+     * @note  When compling the CKJV in the Forge, it needs the raw data.
+     */
     function segment(lang_analysis, lang_dict, lang_p, orig_str, return_raw)
     {
         var chunks = isolate_chinese_characters(orig_str),
