@@ -131,21 +131,27 @@
                 ///NOTE: BF.create_transition_cue() is created by secondary.js.  Currently, secondary.js is always loaded before other languages have a chance to be loaded.
                 cue = BF.create_transition_cue(function completed()
                 {
-                    ///NOTE: context.segment_init is added by zh_segment.js
-                    if (context.segment_init) {
+                    ///NOTE: context.segment() is added by zh_segment.js
+                    if (context.segment) {
                         ///NOTE: The true argument sets the segmentor to Traditional Chinese.
-                        segment = context.segment_init(analysis, dict, true);
+                        segment = function (terms)
+                        {
+                            return context.segment(analysis, dict, plot_data, terms);
+                        };
                     }
                     if (callback) {
                         callback();
                     }
                 }),
-                dict;
+                dict,
+                /// Created in the Forge on Wed, 17 Apr 2013 10:29:45 GMT.
+                /// Traditional Chinese Plot Data
+                plot_data = [{x:0,y:8119},{x:66,y:1084},{x:140,y:735},{x:334,y:426},{x:987,y:193},{x:3013,y:72},{x:8226,y:23},{x:51140,y:1}];
             
             /// Since the segmentation code is the same for both Simplified and Traditional Chinese (and since the dictionaries have to be downloaded any way),
             /// it makes sense to put the segmentation code in a separate, sharable file.
             cue.add({id: 0});
-            BF.include("/js/misc/zh_segment.js?39833585", context, function onload()
+            BF.include("/js/misc/zh_segment.js?40178163", context, function onload()
             {
                 cue.async_remove(0);
             });
