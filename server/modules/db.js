@@ -78,6 +78,9 @@ function create_connection_non_blocking(config, set_status)
         connecting,
         connected;
     
+    /**
+     * Open a connection to the database if one does not already exist.
+     */
     function connect()
     {
         /// Make sure an open connection has not already been established or in the process of being established; otherwise, an infinite connection loop could occur.
@@ -93,6 +96,11 @@ function create_connection_non_blocking(config, set_status)
         }
     }
     
+    /**
+     * Reconnect on disconnections.
+     *
+     * @param err (object) (optional) An error message from the server
+     */
     function handle_disconnect(err)
     {
         connecting = false;
@@ -109,6 +117,7 @@ function create_connection_non_blocking(config, set_status)
     /// Open a connection.
     connect();
     
+    /// Attach functions to the connect, error, and close events.
     client.on("connect", function ()
     {
         connecting = false;
@@ -178,6 +187,9 @@ function create_connection_js(config, set_status)
         connecting,
         connected;
     
+    /**
+     * Create the connection object and make the connection.
+     */
     function create_connection()
     {
         client = require("mysql").createConnection({
@@ -190,18 +202,25 @@ function create_connection_js(config, set_status)
         });
     }
     
+    /**
+     * Open and prepare a connection to the database if one does not already exist.
+     */
     function connect()
     {
         if (!connected && !connecting) {
             connecting = true;
             /// In this module, a connection can only be used once (it cannot be used to reconnect to a server), so a new client object has to be created each time.
             create_connection();
+            /// Attach functions to the connect, error, and close events.
+            ///NOTE: This has to be done each time because this connector cannot reuse a connection object.
             client.on("error", handle_disconnect);
             client.connect(function on_connect(err)
             {
+                /// Was there an error connecting?
                 if (err) {
                     handle_disconnect(err);
                 } else {
+                    /// If no error was reported then the connection apparently opened correctly.
                     connecting = false;
                     connected = true;
                     set_status(1);
@@ -210,6 +229,11 @@ function create_connection_js(config, set_status)
         }
     }
     
+    /**
+     * Reconnect on disconnections.
+     *
+     * @param err (object) (optional) An error message from the server
+     */
     function handle_disconnect(err)
     {
         connecting = false;
@@ -223,6 +247,7 @@ function create_connection_js(config, set_status)
         }
     }
     
+    /// Open a connection.
     connect();
     
     return {
@@ -314,16 +339,20 @@ exports.db = function init(db_config)
      *
      * @return A client object or FALSE if none could be found
      * @note   This uses a round robin method.
+     * @note   It would be nice if we could make a server as a backup server and only query it when the other servers are down.
      */
     request_a_client = (function ()
     {
+        /// Since it adds 1 at the beginning of the loop, we start with -1 to go to 0 (i.e., the first server).
         var which_server = -1;
         
         return function ()
         {
             var tries = 0;
             
+            /// Loop through all available servers (from where we left off) and try to find one online.
             for (;;) {
+                /// Try the next server.
                 which_server += 1;
                 
                 if (which_server > servers_count) {
@@ -331,8 +360,11 @@ exports.db = function init(db_config)
                 }
                 
                 if (servers[which_server].online) {
+                    /// If a server is online, Stop looping and use that server.
                     break;
                 }
+                
+                /// If that server is offline, keep track of how many we've tried and try the next one.  This way we know when we've tried them all.
                 tries += 1;
                 
                 /// If we have tried all of the clients, give up.
