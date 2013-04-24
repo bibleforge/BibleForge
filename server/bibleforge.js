@@ -159,10 +159,10 @@ BF.is_bot = function (agent)
 /**
  * Retrieve verses from the database.
  *
- * @example BF.verse_lookup({q: "1001001"}, function (data) {});                      /// Look up verses starting with Genesis 1:1.
- * @example BF.verse_lookup({q: "19119160", f: "1"}, function (data) {});             /// Look up verses starting with Psalm 119:160.
- * @example BF.verse_lookup({q: "19119152", d: "2"}, function (data) {});             /// Look up previous verses starting with Psalm 119:152.
- * @example BF.verse_lookup({q: "66022021", f: "1", l: "en_em"}, function (data) {}); /// Look up verses starting with Revelation 22:21 in Early Modern English.
+ * @example BF.verse_lookup({q: "1001001"}, function (data) {});                     /// Look up verses starting with Genesis 1:1 in English.
+ * @example BF.verse_lookup({q: "19119160", f: "1"}, function (data) {});            /// Look up verses starting with Psalm 119:160 in English.
+ * @example BF.verse_lookup({q: "19119152", d: "2"}, function (data) {});            /// Look up previous verses starting with Psalm 119:152 in English.
+ * @example BF.verse_lookup({q: "66022021", f: "1", l: "zh_t"}, function (data) {}); /// Look up verses starting with Revelation 22:21 in Traditional Chinese.
  * @param   data     (object)   An object containing the query and query options.
  *                              Object structure:
  *                              q: "The verse ID",
