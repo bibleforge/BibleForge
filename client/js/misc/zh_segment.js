@@ -498,7 +498,7 @@
             this_prob = this_prob_tmp / lined_up_branch.length;
             
             ///NOTE: Since the arrays are mutated, just send a copy.
-            if (branch_num === 0 || this_words_in_dict > best_words_in_dict || (this_words_in_dict === best_words_in_dict && is_more_likely(copy(this_sig), copy(best_sig), this_prob, best_prob))) {
+            if (branch_num === 0 || this_words_in_dict > best_words_in_dict || (this_words_in_dict - 1 >= best_words_in_dict && is_more_likely(copy(this_sig), copy(best_sig), this_prob, best_prob))) {
                 best_branch = branch_num;
                 best_words_in_dict = this_words_in_dict;
                 best_prob = this_prob;
