@@ -162,7 +162,7 @@
             /// Since the dictionary is a relatively large string, it makes sense to store it in another file and download it separately (it will still be cached).
             cue.add({id: 1});
             ///TODO: Add support for Create_easy_ajax() on the server.
-            (new that.BF.Create_easy_ajax()).query("GET", "/js/misc/zh_s_dict?40364787", "", function (res)
+            (new that.BF.Create_easy_ajax()).query("GET", "/js/misc/zh_s_dict?40409308", "", function (res)
             {
                 dict = res;
                 cue.async_remove(1);
@@ -670,6 +670,30 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
             ///NOTE: Because segment() is created after this file loads, we cannot directly set prepare_search_terms() to equal segment().
             /// The regular expression moves asterisks next to segmented words toward the left side.  (Punctuation will automatically connect toward the right if possible.)
             return segment(terms).replace(/\s+\*($|\s)/g, "*$1");
-        }
+        },
+        /**
+         * Split up characters so that they can be highlighted properly.
+         *
+         * Since Chinese does not use spaces to delineate words, defining word boundaries (i.e., segmenting) is only half of the solution.
+         * It is also necessary to break up each word into individual units so that a word can be searched for (and highlighted) by a single character.
+         * In order to do this, we split up the words into pseudo HTML that just has enough data to be matched by the highlighter.
+         *
+         * @example BF.lang.separate_grams("<a id=1>上帝</a>"); /// Returns: "<a id=1>上<=1>帝</a>"
+         * @param   html (string) The HTML to separate
+         * @note    This operates on the same principle as replace_hyphens() (see main.js).
+         */
+        separate_grams: function (html)
+        {
+            /// Find all words that have more than one character (excluding punctuation).
+            return html.replace(/=(\d+)>([^<]*[^　「『（…）；：，。？！」』、丶<]{2,}[^<]*)/g, function ()
+            {
+                /// arguments[0] = The entire string found.
+                /// arguments[1] = The tag's ID.
+                /// arguments[2] = The word
+                
+                /// Separate the characters and glue them back together with pseudo HTML.
+                return "=" + arguments[1] + ">" + arguments[2].replace(/([　「『（]*[^　「『（…）；：，。？！」』、丶](?![…）；：，。？！」』、丶]*$))/g, "$1<" + "=" + arguments[1] + ">");
+            });
+        },
     };
 }(this));

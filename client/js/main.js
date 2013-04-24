@@ -67,14 +67,14 @@ document.addEventListener("DOMContentLoaded", function ()
     if (!BF.lang.zh_s) {
         BF.langs.zh_s = {
             full_name: "简体中文 (CKJV)",
-            modified: 40402258,
+            modified: 40468924,
             match_lang: /zh-c(?:n|hs)/i,
         };
     }
     if (!BF.lang.zh_t) {
         BF.langs.zh_t = {
             full_name: "繁體中文 (CKJV)",
-            modified: 40397891,
+            modified: 40468965,
             match_lang: /zh(?:-c(?!n|hs))?/i,
         };
     }
@@ -3369,9 +3369,16 @@ document.addEventListener("DOMContentLoaded", function ()
                                 /// Are there standard verses to highlight?
                                 /// TODO: Handle mixed searches too.
                                 if (html) {
+                                    /// Does this language use ngram separation in Sphinx?
+                                    ///NOTE: This is useful in languages such as Chinese that do no have distinct spacing between words.
+                                    ///      This allows words to be highlighted even when only a part of the word is matched.
+                                    if (BF.lang.separate_grams) {
+                                        html = BF.lang.separate_grams(html);
+                                    }
+                                    html = replace_hyphens(html);
                                     /// Loop through all of the terms and highlight them.
                                     for (re_id = highlight_re.length - 1; re_id >= 0; re_id -= 1) {
-                                        tmp_found_ids = replace_hyphens(html).split(highlight_re[re_id].regex);
+                                        tmp_found_ids = html.split(highlight_re[re_id].regex);
                                         ids = tmp_found_ids.length;
                                         
                                         i = 1;
