@@ -60,21 +60,21 @@ document.addEventListener("DOMContentLoaded", function ()
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (1611)",
-            modified: 40117288,
+            modified: 40506485,
             match_lang: /x-early-modern-english/i,
         };
     }
     if (!BF.lang.zh_s) {
         BF.langs.zh_s = {
             full_name: "简体中文 (CKJV)",
-            modified: 40468924,
+            modified: 40509020,
             match_lang: /zh-c(?:n|hs)/i,
         };
     }
     if (!BF.lang.zh_t) {
         BF.langs.zh_t = {
             full_name: "繁體中文 (CKJV)",
-            modified: 40468965,
+            modified: 40509090,
             match_lang: /zh(?:-c(?!n|hs))?/i,
         };
     }
@@ -3381,6 +3381,7 @@ document.addEventListener("DOMContentLoaded", function ()
                                         tmp_found_ids = html.split(highlight_re[re_id].regex);
                                         ids = tmp_found_ids.length;
                                         
+                                        ///TODO: Document.
                                         i = 1;
                                         while (i < ids) {
                                             j = highlight_re[re_id].word_count;
