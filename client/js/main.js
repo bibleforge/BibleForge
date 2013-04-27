@@ -223,9 +223,9 @@ document.addEventListener("DOMContentLoaded", function ()
      * @example BF.remove([0,1,2,3], -1, true); /// Converts array to [0,1,2]
      * @param   arr (array)   The array to mutate.
      * @param   i   (integer) The index to remove.
-     * @return  NULL. It mutates the array.
+     * @return  NULL.  It mutates the array.
      */
-    BF.remove = function(arr, i, order_irrelevant)
+    BF.remove = function (arr, i, order_irrelevant)
     {
         var len = arr.length;
         
@@ -238,6 +238,10 @@ document.addEventListener("DOMContentLoaded", function ()
         ///NOTE: This is always the fastest method and it is orderly too.
         if (i === len - 1) {
             arr.pop();
+        /// If the second to last element is to be removed, we can just pop off the last one and replace the second to last one with it.
+        ///NOTE: This is always the fastest method and it is orderly too.
+        } else if (i === len - 2) {
+            arr[len - 2] = arr.pop();
         /// Can use we the faster (but unorderly) remove method?
         } else if (order_irrelevant || i === len - 2) {
             if (i >= 0 && i < len) {
