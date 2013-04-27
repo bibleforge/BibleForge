@@ -692,6 +692,7 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                 /// arguments[2] = The word
                 
                 /// Separate the characters and glue them back together with pseudo HTML.
+                /// Create fullly formed HTML: return "=" + arguments[1] + ">" + arguments[2].replace(/([　「『（]*[^　「『（…）；：，。？！」』、丶](?![…）；：，。？！」』、丶]*$))/g, "$1</a><a id=" + arguments[1] + ">");
                 return "=" + arguments[1] + ">" + arguments[2].replace(/([　「『（]*[^　「『（…）；：，。？！」』、丶](?![…）；：，。？！」』、丶]*$))/g, "$1<" + "=" + arguments[1] + ">");
             });
         },
