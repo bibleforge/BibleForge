@@ -98,7 +98,7 @@
     
     function isolate_chinese_characters(str)
     {
-        ///NOTE: This removes include punctuation too (\u3000-\u3020\u2014-\u2027\u4e36\ufe4f-\uffe5)
+        ///NOTE: This would include punctuation too (\u3000-\u3020\u2014-\u2027\u4e36\ufe4f-\uffe5)
         return {
             /// Divide the string at non-Chinese parts.
             cn:  str.split(/[^\u4e00-\u4e35\u4e37-\u9fff\u3400-\u4dff]+/),
@@ -629,7 +629,8 @@
             {
                 if (typeof sec === "string") {
                     /// Adding a space, even before non-Chinese parts, helps to keep segments separate.
-                    if (i > 0) {
+                    /// But don't add a space before a space.
+                    if (i > 0 && sec !== " ") {
                         text += " ";
                     }
                     text += sec;
