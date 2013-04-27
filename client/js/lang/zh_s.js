@@ -272,6 +272,13 @@
                     j,
                     new_arr_len = 0;
                 
+                /// Split up all Chinese characters.
+                ///NOTE: This is because Chinese uses single ngram searching.
+                ///NOTE: This uses a positive lookahead because so that it will match more than two characters in a row.
+                ///      Using a lookahead, only the first character matches, so "上帝的" first matches "上", then "帝", and finally "的" to make "上 帝 的".
+                ///      Without a lookahead, it would match two characters at a time, so it would match "上帝", but it would not match "的" by itself, so it would create "上 帝的".
+                search_terms = search_terms.replace(/([\u4e00-\u4e35\u4e37-\u9fff\u3400-\u4dff])(?=[\u4e00-\u4e35\u4e37-\u9fff\u3400-\u4dff])/g, "$1 ");
+                
                 /// Remove punctuation and break up the query string into individual parts to filter out duplicates.
                 /// E.g., 'in "and the earths "earths | in | earth. | "in the beginning God"' =>
                 ///       ["in","\"and the earths \"","earths","in","earth","\"in the beginning god\""]
@@ -378,8 +385,9 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                             if (j > 0) {
                                 /// Add a short regular expression to "glue" the regular expressions for each word together to create a regular expression for the entire phrase.
                                 /// It also needs to skip over empty words (words that are just an empty HTML tag).
-                                /// /[^>]+>*\\s*(?:<[^>]+></[^>]+>)*\\s*<[^>]* is used to skip over HTML tags.
-                                stemmed_tmp = "/[^>]+>*\\s*(?:<[^>]+></[^>]+>)*\\s*<[^>]*" + stemmed_tmp;
+                                /// (?:/[^>]+>*<[^>]*)? is used to skip over HTML tags.
+                                stemmed_tmp = "(?:/[^>]+>*<[^>]*)?" + stemmed_tmp;
+
                             }
                             /// Since we are looping backward, add it to the beginning of the string.
                             stemmed = stemmed_tmp + stemmed;
