@@ -108,8 +108,8 @@
         /// The longest paragraph length plus one
         ///NOTE: One is added because it needs to find the paragraph break, which would be demarcated on the next verse when preforming an additional lookup.
         paragraph_limit:        77,
-        /// The number of verses to request for a normal verse lookup (It should more than fill up the screen.)
-        minimum_desired_verses: 40,
+        /// The number of verses to request for a normal verse lookup (It should more than fill up the screen and not need to request more.)
+        minimum_desired_verses: 77,
         
         /// Information about different sections of the Bible
         divisions: {
