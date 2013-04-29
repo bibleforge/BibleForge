@@ -38,6 +38,9 @@
 
 "use strict";
 
+/// How long to wait after an error
+var reconnect_delay = 1000;
+
 /**
  * Check if a Node.js module exists.
  *
@@ -107,7 +110,7 @@ function create_connection_non_blocking(config, set_status)
         ///TODO: Log disconnection.
         connected = false;
         set_status(0);
-        setTimeout(connect, 1000);
+        setTimeout(connect, reconnect_delay);
         
         if (err) {
             console.log(err);
@@ -240,7 +243,7 @@ function create_connection_js(config, set_status)
         ///TODO: Log disconnection.
         connected = false;
         set_status(0);
-        setTimeout(connect, 1000);
+        setTimeout(connect, reconnect_delay);
         
         if (err) {
             console.log(err);
