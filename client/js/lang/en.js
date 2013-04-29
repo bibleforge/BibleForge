@@ -117,8 +117,10 @@
         /// Information about different sections of the Bible
         divisions: {
             ///NOTE: Currently, only the division between the Old and New Testaments is needed.
-            /// Calculated via find_beginning_of_nt.js.
+            /// Created in the Forge.
+            /// New Testament Division
             nt: 621719
+            /// End of New Testament Division
         },
         
         /// Book names
