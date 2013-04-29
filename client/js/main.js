@@ -56,28 +56,30 @@ document.addEventListener("DOMContentLoaded", function ()
     
     ///NOTE: The elements in this object are overwritten if/when the code is actually downloaded.
     
-    /// Created in the Forge by create_load_languages.js.
+    /// Created in the Forge on Mon, 29 Apr 2013 01:57:05 GMT.
+    /// Language Loading Info
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
-            full_name: "Early Modern English (1611)",
+            full_name: "Early Modern English (KJV)",
             modified: 40764313,
-            match_lang: /x-early-modern-english/i,
+            match_lang: /^x-early-modern-english$/i,
         };
     }
     if (!BF.lang.zh_s) {
         BF.langs.zh_s = {
             full_name: "简体中文 (CKJV)",
             modified: 40764335,
-            match_lang: /zh-c(?:n|hs)/i,
+            match_lang: /^zh-c(?:n|hs)$/i,
         };
     }
     if (!BF.lang.zh_t) {
         BF.langs.zh_t = {
             full_name: "繁體中文 (CKJV)",
             modified: 40764264,
-            match_lang: /zh(?:-c(?!n|hs))?/i,
+            match_lang: /^zh(?:-c(?!n|hs))?$/i,
         };
     }
+    /// End of Language Loading Info
     
     BF.consts = {
         /// Query type "constants"
