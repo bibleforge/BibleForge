@@ -791,20 +791,13 @@ document.addEventListener("DOMContentLoaded", function ()
      */
     BF.format_number = function (num)
     {
-        var re;
-        
         if (num < 1000) {
-            return num;
+            /// Make sure that it is not undefined.
+            ///NOTE: .toString() is faster.
+            return num ? num.toString() : String(num);
         }
         
-        num = String(num);
-        re  = /^([0-9]+)([0-9][0-9][0-9])/;
-        
-        while (re.test(num)) {
-            num = num.replace(re, "$1,$2");
-        }
-        
-        return num;
+        return num.toString().replace(/\B(?=(?:\d{3})+(?!\d))/g, ",");
     };
         
     
