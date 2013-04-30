@@ -857,7 +857,7 @@ document.addEventListener("DOMContentLoaded", function ()
      * @example BF.get_full_verse(0, TRUE); /// 1
      * @example BF.get_full_verse(1);       /// 1
      * @example BF.get_full_verse(2);       /// 2
-     * @example BF.get_full_verse(255)      /// "subscription"
+     * @example BF.get_full_verse(255);     /// "subscription"
      * @param   v               (number)             The verse to examine
      * @param   passover_titles (boolean) (optional) Whether to convert Psalm titles to 1 or to "title"
      * @return  A number or a string representing a verse
@@ -884,6 +884,7 @@ document.addEventListener("DOMContentLoaded", function ()
      * @param   lang_id         (string)          (optional) The ID for a language (default: current language)
      * @param   passover_titles (boolean)         (optional) Whether to convert Psalm titles to 1 or to "title" (used by BF.get_full_verse())
      * @return  A string repersenting a verse reference or a blank string ("") if there was a problem
+     * @note    Currently, it can only take up to two array elements.
      */
     BF.create_ref = function (bcv, lang_id, passover_titles)
     {
