@@ -3159,14 +3159,18 @@
                                             /// Because the book names are not the same in each language, recreate the verse and store it in the URL
                                             /// so that if the page is refreshed, it will be able to load the correct verse.
                                             query_url_str = BF.create_ref(position, lang_id);
-                                        }
-                                        
-                                        /// If the last query was the default query (query_info.is_default) use the default query (i.e., Genesis 1:1).
-                                        if (query_info.is_default) {
-                                            /// Use Genesis 1:1 as the query, but do not store it in the URL since it is the default query.
-                                            query_str = BF.create_ref({b: 1, c: 1, v: 1});
+                                            
+                                            /// If the last query was the default query (query_info.is_default) use the default query (i.e., Genesis 1:1).
+                                            if (query_info.is_default) {
+                                                /// Use Genesis 1:1 as the query, but do not store it in the URL since it is the default query.
+                                                query_str = BF.create_ref({b: 1, c: 1, v: 1});
+                                            } else {
+                                                query_str = qEl_str;
+                                            }
                                         } else {
-                                            query_str = qEl_str;
+                                            /// Searches do not need specially formatted query strings.
+                                            /// Separating searches from lookups prevents setting "query_str" to a blank string if the query box is blank.
+                                            query_str = query_url_str;
                                         }
                                     } else {
                                         query_str = query_url_str;
