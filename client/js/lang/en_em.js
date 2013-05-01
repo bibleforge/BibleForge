@@ -39,9 +39,9 @@
 /**
  * Create the BibleForge language specific object for Early Modern English.
  *
- * @param   that (object) The global used to attach the code to.
- * @note    The object that is created is used by main.js to preform language specific operations.
- * @return  NULL.  Attaches an object containing language specific functions and variables to the global BF object.
+ * @param  that (object) The global used to attach the code to.
+ * @note   The object that is created is used by main.js to preform language specific operations.
+ * @return NULL.  Attaches an object containing language specific functions and variables to the global BF object.
  */
 (function (that)
 {
