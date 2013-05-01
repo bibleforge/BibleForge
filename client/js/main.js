@@ -420,19 +420,18 @@ document.addEventListener("DOMContentLoaded", function ()
         });
     };
     
-        /**
-         * Escape a string to be safely added inside HTML.
-         *
-         * @example BF.escape_html('This is a "harmless" comment <script>...</script>'); /// Returns "This is a &quot;harmless&quot; comment &lt;script&gt;...&lt;/script&gt;"
-         * @param   str (string) The string to be escaped
-         * @note    This code only escapes the few dangerous symbols, not all of them.
-         */
-        BF.escape_html = function (str)
-        {
-            ///NOTE: It must first replace ampersands (&); otherwise, the other entities would be escaped twice.
-            return str.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/'/g, "&#39;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        };
-
+    /**
+     * Escape a string to be safely added inside HTML.
+     *
+     * @example BF.escape_html('This is a "harmless" comment <script>...</script>'); /// Returns "This is a &quot;harmless&quot; comment &lt;script&gt;...&lt;/script&gt;"
+     * @param   str (string) The string to be escaped
+     * @note    This code only escapes the few dangerous symbols, not all of them.
+     */
+    BF.escape_html = function (str)
+    {
+        ///NOTE: It must first replace ampersands (&); otherwise, the other entities would be escaped twice.
+        return str.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/'/g, "&#39;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    };
     
     /**
      * Create an easy to use Ajax object.
