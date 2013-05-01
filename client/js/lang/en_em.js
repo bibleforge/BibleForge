@@ -717,6 +717,13 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                     do_not_add_morph_regex = true;
                     break;
                 
+                /// Ideally, "el" should only match words like "Beth-el" and "Migdal-el"; however, in Early Modern English, it also matches "els" (i.e., and older spelling of "else").
+                /// But this would need to be fixed in the Sphinx stemmer.
+                case "el":
+                    stemmed_word = "els?";
+                    do_not_add_morph_regex = true;
+                    break;
+                
                 /// Try stemming the word and then checking for strong words.
                 default:
                     /// Does the word contain a wildcard symbol (*)?
