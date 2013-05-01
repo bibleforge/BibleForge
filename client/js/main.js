@@ -3432,7 +3432,7 @@ document.addEventListener("DOMContentLoaded", function ()
              *
              * @param  e (object) The event object (normally supplied by the browser).
              * @return NULL
-             * @note   Called on all keydown events.
+             * @note   This is not able to cancel query box drop down menu on page up and page down.  But that is intended to be removed eventually.
              * @todo   Determine if this viewport is selected (currently, there is only one viewport).
              * @todo   Determine how to use the keyPress event (since Mozilla only fires this event once when the button is held down).
              */
@@ -3447,8 +3447,9 @@ document.addEventListener("DOMContentLoaded", function ()
                 keyCode = e.keyCode;
                 
                 /// Is there an input box selected?  If so, this function should not be executed.
+                /// Except for page up and page down (33 and 34 respectively); they should still scroll the page down.
                 ///NOTE: If an <input> or <button> is selected, the enter and space bar keys still works like normal, but other key strokes are caught.
-                if (((activeEl.tagName === "INPUT" || activeEl.tagName === "BUTTON") && ((activeEl.type !== "submit" && activeEl.type !== "button" && activeEl.type !== "checkbox") || keyCode === 13 || keyCode === 32)) || activeEl.tagName === "TEXTAREA" || system.keyboard_busy) {
+                if (((((activeEl.tagName === "INPUT" || activeEl.tagName === "BUTTON") && ((activeEl.type !== "submit" && activeEl.type !== "button" && activeEl.type !== "checkbox") || keyCode === 13 || keyCode === 32)) || activeEl.tagName === "TEXTAREA") && keyCode !== 33 && keyCode !== 34) || system.keyboard_busy) {
                     return;
                 }
                 
@@ -3871,8 +3872,8 @@ document.addEventListener("DOMContentLoaded", function ()
     /**
      * Fix IE's String.split().
      *
-     * @param  s     (regexp || string) The regular expression or string with which to break the string.
-     * @param  limit (int) (optional)   The number of times to split the string.
+     * @param  s     (regexp || string)            The regular expression or string with which to break the string.
+     * @param  limit (number)           (optional) The number of times to split the string.
      * @return Returns an array of the string now broken into pieces.
      * @see    http://blog.stevenlevithan.com/archives/cross-browser-split
      * @todo   Determine if IE10 still needs this (and even uses conditional comments).
