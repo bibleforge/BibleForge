@@ -3374,6 +3374,8 @@ document.addEventListener("DOMContentLoaded", function ()
                                     if (BF.lang.separate_grams) {
                                         html = BF.lang.separate_grams(html);
                                     }
+                                    /// Separate hyphenated words since they are stored in the database as only one word, but we want to be able to match part of a hyphenated word.
+                                    /// E.g., searching for "Jehovah" should match "Jehovah" and hyphenated forms, like "Jehovah-jireh."
                                     html = replace_hyphens(html);
                                     /// Loop through all of the terms and highlight them.
                                     for (re_id = highlight_re.length - 1; re_id >= 0; re_id -= 1) {
