@@ -1285,14 +1285,16 @@
             
             (function ()
             {
-                /// This variable is used to stop immeidate propagation (instead of using e.stopImmediatePropagation()) because we only want to stop
-                /// window.onmousemove(), not all other onmousemove events.
-                var stop_immediate_propagation;
+                /// WebKit/Blink wrongly trigger the window.onmousemove too many times, but we can use this varible to prevent show_cursor() from being triggered wrongly.
+                var mouse_moved,
+                    /// This variable is used to stop immediate propagation (instead of using e.stopImmediatePropagation()) because we only want to stop
+                    /// window.onmousemove(), not all other onmousemove events.
+                    stop_immediate_propagation;
                 
                 /**
                  * Trigger cursor hiding.
                  */
-                page.addEventListener("mousemove", function ()
+                page.addEventListener("mousemove", function (e)
                 {
                     ///NOTE: Because WebKit must be tricked into thinking that the mouse cursor moved in order for it to update the cursor, the onmousemove event
                     ///      can be triggered too many times.  Therefore, WebKit needs to ignore the onmousemove event occationally.
@@ -1301,10 +1303,22 @@
                         return;
                     }
                     
-                    if (!is_cursor_visible) {
-                        show_cursor();
+                    /// Since sometimes onmousemove is called when the cursor does not actually move (e.g., scrolling), we need to check to see if the mouse really moved.
+                    if (BF.mouse_x !== e.clientX && BF.mouse_y !== e.clientY) {
+                        if (!is_cursor_visible) {
+                            show_cursor();
+                        }
+                        hide_cursor_delayed();
+                        
+                        /// Keep track of the cursor's position so that we can tell if the mouse really moved.
+                        BF.mouse_x = e.clientX
+                        BF.mouse_y = e.clientY;
+                        /// Setting "mouse_moved" as TRUE tells window.onmousemove that the mouse really moved.
+                        mouse_moved = true;
+                    } else {
+                        /// Setting "mouse_moved" as FALSE tells window.onmousemove that the mouse didn't actually move.
+                        mouse_moved = false;
                     }
-                    hide_cursor_delayed();
                     
                     /// Tell window.onmousemove() that we don't want it to fire like normal because the cursor is over the text.
                     stop_immediate_propagation = true;
@@ -1320,7 +1334,9 @@
                     ///NOTE: If the mouse is also over the text area, stop_immediate_propagation will be set to TRUE.
                     if (stop_immediate_propagation) {
                         stop_immediate_propagation = false;
-                    } else {
+                    /// Did the mouse actually move or was this event wrongly triggered.
+                    /// WebKit/Blink particularly trigger this function wrongly.
+                    } else if (mouse_moved) {
                         /// If the mouse is off of the text area, show the cursor.
                         show_cursor();
                     }
