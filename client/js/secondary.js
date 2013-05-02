@@ -1128,85 +1128,28 @@
         
         /**
          * Register events to manage the cursor for better readability.
-         *
-         * @return NULL
-         * @note   Called immediately.
          */
         (function ()
         {
             var hidden_css = "hidden_cursor",
                 hide_cursor_timeout,
-                is_cursor_visible = true,
-                
-                /// Special variables needed for an ugly WebKit hack.
-                webkit_cursor_hack,
-                webkit_ignore_event_once;
-            
-            ///NOTE: Webkit only changes the mouse cursor after the mouse cursor moves, making cursor hiding impossible.
-            ///      However, there is a way to trick WebKit into thinking the cursor moved when it did not.  The following
-            ///      function does just that.  Needed for at least Chromium 15/Safari 5.
-            ///      See https://code.google.com/p/chromium/issues/detail?id=26723 for more details.
-            if (BF.is_WebKit) {
-                /**
-                 * Create the function that tricks WebKit into hiding the cursor.
-                 *
-                 * @return A function used to trick WebKit.
-                 */
-                webkit_cursor_hack = (function ()
-                {
-                    /**
-                     * Trick WebKit into updating the cursor.
-                     *
-                     * @param  el        (DOM element) The element which cursor is changing
-                     * @param  className (string)      The class name to add or remove
-                     * @param  add       (boolean)     Whether to add or remove the class.
-                     * @return NULL
-                     * @bug    This does not work with at least Chromium 15 on mousedown.
-                     */
-                    return function (el, className, add)
-                    {
-                        window.setTimeout(function ()
-                        {
-                            if (add) {
-                                el.classList.add(className);
-                            } else {
-                                el.classList.remove(className);
-                            }
-                            
-                            ///NOTE: Because WebKit thinks the cursor moved, it will call the onmousemove event, which will reset the cursor.
-                            ///      So, we need to ignore the next onmousemove event.
-                            webkit_ignore_event_once = true;
-                        },0);
-                    };
-                }());
-            }
-            
+                is_cursor_visible = true;
             
             /**
              * Set the mouse cursor back to its default state.
              *
              * @return NULL
-             * @note   Called by hide_cursor_delayed(), page.onmousedown(), and page.onmouseout().
+             * @note   Called by hide_cursor_delayed(), page.onmousedown(), and page.onmouseout() window.onresize().
              */
             function show_cursor()
             {
                 /// Prevent the cursor from being hidden.
                 window.clearTimeout(hide_cursor_timeout);
-                
                 if (!is_cursor_visible) {
-                    if (BF.is_WebKit) {
-                        ///NOTE: For a yet unknown reason, when being called onmousedown, this must be called twice.
-                        ///      Actually, this used to work, but in Chrome 15 it does not seem to.
-                        webkit_cursor_hack(page, hidden_css, false);
-                        webkit_cursor_hack(page, hidden_css, false);
-                    } else {
-                        page.classList.remove(hidden_css);
-                    }
-                    
+                    page.classList.remove(hidden_css);
                     is_cursor_visible = true;
                 }
             }
-            
             
             /**
              * Hide the cursor after a short delay.
@@ -1220,25 +1163,20 @@
                 
                 hide_cursor_timeout = window.setTimeout(function ()
                 {
-                    ///NOTE: WebKit can use an almost completely transparent PNG.
-                    ///      Opera (at least 10.53) has no alternate cursor support whatsoever.
-                    if (BF.is_WebKit) {
-                        webkit_cursor_hack(page, hidden_css, true);
-                    } else {
-                        /// Mozilla/IE10(?)
-                        page.classList.add(hidden_css);
-                    }
+                    /// Opera (at least 10.53) has no alternate cursor support whatsoever.
+                    page.classList.add(hidden_css);
                     
                     is_cursor_visible = false;
                 }, 2000);
             }
-            
             
             /**
              * Handle cursor hiding when a mouse button is clicked.
              *
              * @param  e (object) The event object (normally supplied by the browser).
              * @return NULL
+             * @note   This does not work in WebKit/Blink.
+             * @see    https://code.google.com/p/chromium/issues/detail?id=26723
              */
             page.addEventListener("mousedown", function (e)
             {
@@ -1254,7 +1192,6 @@
                     hide_cursor_delayed();
                 }
             }, false);
-            
             
             /**
              * Prevent hiding the cursor when cursor moves off the scroll.
@@ -1293,6 +1230,8 @@
                 
                 /**
                  * Trigger cursor hiding.
+                 *
+                 * @param e (object) The event object
                  */
                 page.addEventListener("mousemove", function (e)
                 {
