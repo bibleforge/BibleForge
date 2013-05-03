@@ -1574,48 +1574,50 @@
              */
             wrench_button.onclick = function (e)
             {
-                show_context_menu(function ()
+                /// Create the configuration menu.
+                show_context_menu(function get_pos()
                 {
                     var wrench_pos = BF.get_position(wrench_button);
                     
                     return {x: wrench_pos.left, y: wrench_pos.top + wrench_button.offsetHeight};
-                }, [
-                        {
-                            text: BF.lang.configure,
-                            link: show_configure_panel
-                        },
-                        {
-                            line: true,
-                            text: BF.lang.blog,
-                            link: "http://blog.bibleforge.com/"
-                        },
-                        {
-                            text: BF.insert({v: BF.lang.abbreviation}, BF.lang.about_version),
-                            link: show_about_bible_panel
-                        },
-                        {
-                            text: BF.lang.about,
-                            link: "http://bibleforge.wordpress.com/about/"
-                        },
-                        {
-                            text: BF.lang.help,
-                            link: show_help_panel
-                        }
-                    ],
-                    /// Make sure no items are selected by default.
-                    false,
-                    function open()
+                },
+                /// Create the menu items.
+                [
                     {
-                        /// Because the context menu is open, keep the icon dark.
-                        wrench_button.classList.add("activeWrenchIcon");
+                        text: BF.lang.configure,
+                        link: show_configure_panel
                     },
-                    function close()
                     {
-                        /// When the menu closes, the wrench button should be lighter.
-                        wrench_button.classList.remove("activeWrenchIcon");
+                        line: true,
+                        text: BF.lang.blog,
+                        link: "http://blog.bibleforge.com/"
+                    },
+                    {
+                        text: BF.insert({v: BF.lang.abbreviation}, BF.lang.about_version),
+                        link: show_about_bible_panel
+                    },
+                    {
+                        text: BF.lang.about,
+                        link: "http://bibleforge.wordpress.com/about/"
+                    },
+                    {
+                        text: BF.lang.help,
+                        link: show_help_panel
                     }
-                );
-                
+                ],
+                /// Make sure no items are selected by default.
+                false,
+                function open()
+                {
+                    /// Because the context menu is open, keep the icon dark.
+                    wrench_button.classList.add("activeWrenchIcon");
+                },
+                function close()
+                {
+                    /// When the menu closes, the wrench button should be lighter.
+                    wrench_button.classList.remove("activeWrenchIcon");
+                });
+            
                 /// Stop the even from bubbling so that document.onclick() does not fire and attempt to close the menu immediately.
                 e.stopPropagation();
             };
@@ -2436,7 +2438,7 @@
                         el.textContent = options[select] ? options[select].display : options[0].display;
                         
                         /**
-                         * Open the drop down menu
+                         * Open the pronunciation drop down menu.
                          *
                          * @param  e (event object) The onclick mouse event.
                          * @return FALSE to prevent the default action.
@@ -2444,7 +2446,8 @@
                          */
                         el.onclick = function (e)
                         {
-                            show_context_menu(function ()
+                            /// Create the pronunciation menu.
+                            show_context_menu(function get_pos()
                             {
                                 /// Calculate the proper location for the drop down menu.
                                 ///NOTE: Because the callout itself can have a scroll bar, we must calculate the actual position on the viewport and then add in the scroll position of the entire scroll (window.pageYOffset).
@@ -3271,7 +3274,8 @@
                  */
                 return function onclick(e)
                 {
-                    show_context_menu(function ()
+                    /// Create the language selection menu.
+                    show_context_menu(function get_pos()
                     {
                         var langEl_pos = BF.get_position(langEl);
                         
@@ -3282,18 +3286,21 @@
                         
                         /// The -1 moves it up slightly so that the top border of the menu is inline with the bottom border of the query box.
                         return {x: langEl_pos.left, y: langEl_pos.top + langEl.offsetHeight - 1};
-                    }, lang_menu, BF.lang.id,
-                        function open()
-                        {
-                            /// Because the menu is open, keep the button dark.
-                            langEl.classList.add("activeLang");
-                        },
-                        function close()
-                        {
-                            /// When the menu closes, the button should be lighter.
-                            langEl.classList.remove("activeLang");
-                        }
-                    );
+                    },
+                    /// Menu items
+                    lang_menu,
+                    /// Default selected item
+                    BF.lang.id,
+                    function open()
+                    {
+                        /// Because the menu is open, keep the button dark.
+                        langEl.classList.add("activeLang");
+                    },
+                    function close()
+                    {
+                        /// When the menu closes, the button should be lighter.
+                        langEl.classList.remove("activeLang");
+                    });
                     
                     /// Stop the even from bubbling so that document.onclick() does not fire and attempt to close the menu immediately.
                     e.stopPropagation();
