@@ -165,7 +165,7 @@
             /// Since the dictionary is a relatively large string, it makes sense to store it in another file and download it separately (it will still be cached).
             cue.add({id: 1});
             ///TODO: Add support for Create_easy_ajax() on the server.
-            (new that.BF.Create_easy_ajax()).query("GET", "/js/misc/zh_s_dict?40723161", "", function (res)
+            (new that.BF.Create_easy_ajax()).query("GET", "/js/misc/zh_s_dict.txt?41187662", "", function (res)
             {
                 dict = res;
                 cue.async_remove(1);
