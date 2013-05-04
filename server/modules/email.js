@@ -1,0 +1,51 @@
+/// Set JSHint options.
+// jshint bitwise:true, curly:true, eqeqeq:true, forin:true, immed:true, latedef:true, newcap:true, noarg:true, noempty:true, nonew:true, onevar:true, plusplus:true, quotmark:double, strict:true, undef:true, unused:strict, es5:true, node:true
+
+"use strict";
+
+exports.init = function (config)
+{
+    var server  = require("emailjs/email").server.connect({
+        user:     config.user,
+        password: config.pass,
+        host:     config.host,
+        ssl:      config.ssl,
+    });
+    
+    return {
+        send_help: function (data, callback)
+        {
+            var message_data = {
+                text: data.message,
+                from: config.from,
+                to:   config.to,
+                subject: "BibleForge Help Request: " + (data.sender_name || "anonymous") + " <" + (data.sender_email || "NOEMAIL") + ">",
+            };
+            
+            /// If the user submitted an email address, use that address in the reply-to header.
+            if (data.sender_email) {
+                /// The reply-to header should be the submitter's name and address, if any, a reply can be made to him.
+                /// Email format is "[NAME ]<EMAIL>"
+                message_data["reply-to"] = (data.sender_name ? data.sender_name + " " : "") + "<" + data.sender_email + ">";
+            }
+            
+            server.send(message_data, function server_response(err, message)
+            {
+                var res;
+                
+                if (err) {
+                    console.log("Error sending an email!");
+                    console.log(err);
+                    console.log(message);
+                    res = false;
+                } else {
+                    res = true;
+                }
+                
+                if (callback) {
+                    callback(res);
+                }
+            });
+        }
+    };
+};

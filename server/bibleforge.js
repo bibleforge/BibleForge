@@ -68,6 +68,9 @@ BF.config = require("./config.js").config;
 /// Attach the database object.
 BF.db = require("./modules/db.js").db(BF.config.db);
 
+/// Attach the email sender module.
+BF.email = require("./modules/email.js").init(BF.config.smtp);
+
 /// ***************************
 /// * Create helper functions *
 /// ***************************
@@ -1199,8 +1202,12 @@ BF.lexical_lookup = function (data, callback)
                             BF.lexical_lookup(data, send_results);
                             break;
                         default:
-                            /// The request type was invalid, so close the connection.
-                            connection.end();
+                            if (data.t === "email") {
+                                BF.email.send_help(data, send_results);
+                            } else {
+                                /// The request type was invalid, so close the connection.
+                                connection.end();
+                            }
                     }
                 } else {
                     /// All other requests are replied to with the non-Javascript version.
