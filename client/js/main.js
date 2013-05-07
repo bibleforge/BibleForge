@@ -940,14 +940,14 @@ document.addEventListener("DOMContentLoaded", function ()
     /**
      * Determine if a variable is really an object or not.
      *
-     * @param  mixed_var (variable) The variable to analyze.
+     * @param  mixed (variable) The variable to analyze
      * @return TRUE if the variable is a real object (not including arrays), FALSE for all other types.
      * @note   Arrays inherit from Object, so they are a type of an object.
      * @note   Due to an old JavaScript bug (now a part of the standard), NULL is wrongly identified as an object when using typeof.
      */
-    BF.is_object = function (mixed_var)
+    BF.is_object = function (mixed)
     {
-        return !(mixed_var instanceof Array) && mixed_var instanceof Object;
+        return typeof mixed === "object" && mixed !== null && !Array.isArray(mixed);
     };
     
     
