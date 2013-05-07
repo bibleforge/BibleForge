@@ -13,6 +13,17 @@ exports.init = function (config)
     });
     
     return {
+        /**
+         * Send an email from a user asking for help.
+         *
+         * @param data (object)                  An object describing the help request
+         *                                       Object structure:
+         *                                       message:      "The message to send; only plain text is allowed"
+         *                                       sender_name:  "(optional) The name to use for the reply-to address"
+         *                                       sender_email: "(optional) The address to use in the reply-to header"
+         * @param callback (function) (optional) The function to call after an email is sent
+         *                                       The function will be sent TRUE on success and FALSE if the email fails to send.
+         */
         send_help: function (data, callback)
         {
             var message_data = {
@@ -34,6 +45,7 @@ exports.init = function (config)
                 var res;
                 
                 if (err) {
+                    ///NOTE: If an error occurs, it seems to keep an open connection (the script will not terminate).
                     console.log("Error sending an email!");
                     console.log(err);
                     console.log(message);
