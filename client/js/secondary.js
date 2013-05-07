@@ -1234,13 +1234,6 @@
                  */
                 page.addEventListener("mousemove", function (e)
                 {
-                    ///NOTE: Because WebKit must be tricked into thinking that the mouse cursor moved in order for it to update the cursor, the onmousemove event
-                    ///      can be triggered too many times.  Therefore, WebKit needs to ignore the onmousemove event occasionally.
-                    if (webkit_ignore_event_once) {
-                        webkit_ignore_event_once = false;
-                        return;
-                    }
-                    
                     /// Since sometimes onmousemove is called when the cursor does not actually move (e.g., scrolling), we need to check to see if the mouse really moved.
                     if (BF.mouse_x !== e.clientX && BF.mouse_y !== e.clientY) {
                         if (!is_cursor_visible) {
