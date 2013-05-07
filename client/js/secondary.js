@@ -1242,7 +1242,7 @@
                         hide_cursor_delayed();
                         
                         /// Keep track of the cursor's position so that we can tell if the mouse really moved.
-                        BF.mouse_x = e.clientX
+                        BF.mouse_x = e.clientX;
                         BF.mouse_y = e.clientY;
                         /// Setting "mouse_moved" as TRUE tells window.onmousemove that the mouse really moved.
                         mouse_moved = true;
@@ -1516,7 +1516,7 @@
                 ///TODO: Display the last pane the user selected, not just View.
                 panel_element = create_element_from_config("view");
                 
-                return function ()
+                return function show_configure_panel()
                 {
                     show_panel(panel_element);
                 };
