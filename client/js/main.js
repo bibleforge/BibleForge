@@ -1302,6 +1302,7 @@ document.addEventListener("DOMContentLoaded", function ()
                      */
                     function webkit_scrollbar_hack()
                     {
+                        ///TODO: Explain why overflowY needs to be changed.
                         document.getElementsByTagName("html")[0].style.overflowY = "hidden";
                         /// Since hiding the scrollbar moves the page, we need to push the page back to the left half of the scrollbar width.
                         ///NOTE: The query box, however, does not get pushed back.
@@ -1313,30 +1314,44 @@ document.addEventListener("DOMContentLoaded", function ()
                         }, 10);
                     }
                     
-                    return function (values)
+                    /**
+                     * Change to/from night mode.
+                     *
+                     * @param values (object) An object containing the new value (.new_val) and the original value (.old_val).
+                     */
+                    return function onchange(values)
                     {
                         var link_tag;
                         
+                        /// Should night mode be turned on?
                         if (values.new_val) {
+                            /// Has the CSS not already been added (i.e., is this the first time to enable night mode)?
                             if (!css_added) {
-                                
+                                /// Create a <style> element and add it to the DOM.
                                 link_tag = document.createElement("link");
                                 link_tag.href = "/styles/night.css?39136917";
                                 link_tag.rel  = "stylesheet";
+                                
+                                ///NOTE: WebKit needs some help to update the scroll bar colors.
                                 if (BF.is_WebKit) {
+                                    /// When the CSS loads, call the function that makes WebKit update the colors.
                                     link_tag.onload = webkit_scrollbar_hack;
                                 }
-                                ///TODO: Add a wait cursor
+                                ///TODO: Add a wait cursor since it can take a long time.
                                 document.getElementsByTagName("head")[0].appendChild(link_tag);
                                 css_added = true;
                             } else {
+                                /// If the CSS has already been added, we'll need to manually call the function to update WebKit's colors.
                                 if (BF.is_WebKit) {
                                     webkit_scrollbar_hack();
                                 }
                             }
+                            /// Add "night" to the HTML class list to make the CSS styles to take effect.
                             document.getElementsByTagName("html")[0].classList.add("night");
                         } else {
+                            /// Remove "night" to the HTML class list to make the CSS styles go back to normal.
                             document.getElementsByTagName("html")[0].classList.remove("night");
+                            /// Since the colors changed, we need to call the function to update WebKit's styles.
                             if (BF.is_WebKit) {
                                 webkit_scrollbar_hack();
                             }
