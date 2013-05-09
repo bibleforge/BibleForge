@@ -1002,8 +1002,16 @@
             /// Attach the element to the DOM now so that it does not have to be done each time it is displayed.
             document.body.insertBefore(panel, null);
             
+            /**
+             * Close a panel, if it is open already.
+             *
+             * @param callback (function) The function to call after the panel is closed or (asynchronously) as fast as possible if it is already closed
+             */
             function close_panel(callback)
             {
+                /**
+                 * Prepare the panel and (possibly) trigger the callback.
+                 */
                 function on_panel_close()
                 {
                     /// Set the panel's is_open status to false after the delay to prevent the menu from being re-opened in the meantime.
@@ -1021,7 +1029,7 @@
                     
                     window.removeEventListener("resize", center_hor);
                     
-                    if (typeof callback === "function") {
+                    if (callback) {
                         callback();
                     }
                 }
@@ -1032,6 +1040,7 @@
                     panel.addEventListener("oTransitionEnd",      on_panel_close, false);
                     panel.addEventListener("webkitTransitionEnd", on_panel_close, false);
                     
+                    /// Make the panel retract upwards.
                     panel.style.top = -panel.offsetHeight + "px";
                 } else {
                     panel.style.display = "none";
@@ -1040,15 +1049,25 @@
                 }
             }
             
-            function open_panel(panel_el)
+            /**
+             * Display the panel and make it slide down.
+             *
+             * @param panel_el (DOM element)         The DOM element to place into the container
+             * @param buttons  (array)    (optional) An array of the buttons to display at the bottom of the panel
+             * @param onpress  (function) (optional) The function to call when a button is pressed
+             *                                       If the onpress() function returns FALSE, the panel will not close.
+             *                                       If onpress() returns anything else, the panel will close.
+             */
+            function open_panel(panel_el, buttons, onpress)
             {
-                var done_button     = document.createElement("button"),
+                var button_count,
+                    done_button     = document.createElement("button"),
                     panel_container = document.createElement("div");
                 
                 /**
                  * Center the panel horizontally
                  *
-                 * @note This is a separate function because it called both when the panel is created and on browser resize.
+                 * @note This is a separate function because it called both when the panel is created and on client resize.
                  */
                 center_hor = function ()
                 {
@@ -1070,36 +1089,51 @@
                 
                 is_open = true;
                 
-                done_button.innerHTML = BF.lang.done;
-                done_button.className = "button done_button";
-                /// An anonymous function must be used because we do not want to send the event object to close_panel().
-                done_button.onclick   = function ()
-                {
-                    close_panel();
-                };
-                
+                /// Add the panel to the container.
                 ///NOTE: The reason why panel_container is used is to provide a single element that can be attached to the DOM so that the page does not have to reflow multiple times.
                 ///      Also, clearing innerHTML works much better when there is just one element to clear.
                 panel_container.appendChild(panel_el);
-                panel_container.appendChild(done_button);
+                
+                /// Add buttons to the container.
+                if (buttons) {
+                    button_count = buttons.length;
+                    /**
+                     * Create buttons to 
+                     */
+                    buttons.forEach(function (button, i)
+                    {
+                        panel_container.appendChild(BF.create_dom_el("button", {textContent: button, className: "button button" + (i + 1) + "of" + button_count}));
+                    });
+                } else {
+                    done_button.innerHTML = BF.lang.done;
+                    done_button.className = "button done_button";
+                    /// An anonymous function must be used because we do not want to send the event object to close_panel().
+                    done_button.onclick = function ()
+                    {
+                        close_panel();
+                    };
+                    
+                    panel_container.appendChild(done_button);
+                }
+                
                 /// Remove the old panel.
                 ///TODO: Figure out if it is better not to clear the panel if the panel is the same as the previous one.
                 panel.innerHTML = "";
                 panel.appendChild(panel_container);
                 
                 /// Remove CSS Transitions so that the element will immediately be moved just outside of the visible area so that it can slide in nicely (if CSS transitions are supported).
-                panel.className       = "panel";
+                panel.className = "panel";
                 /// Ensure that the element is visible (display is set to "none" when it is closed).
-                panel.style.display   = "block";
+                panel.style.display = "block";
                 /// Quickly move the element to just above of the visible area.
-                panel.style.top       = -panel.offsetHeight + "px";
+                panel.style.top = -panel.offsetHeight + "px";
                 
                 /// Set the style.left and style.maxHeight properties.
                 center_hor();
                 /// Attach the centering function to onresize so that the panel always stays centered.
                 window.addEventListener("resize", center_hor);
                 /// Restore CSS transitions (if supported by the browser).
-                panel.className       = "panel slide";
+                panel.className = "panel slide";
                 /// Move the panel to the very top of the page.
                 /// The element has enough padding on the top to ensure that everything inside of it is visible to the user.
                 ///NOTE: Opera needs a short delay in order for the transition to take effect.
@@ -1111,11 +1145,20 @@
                 }, 0);
             }
             
-            return function (panel_el)
+            /**
+             * Close an open panel (if any) and open the new one.
+             *
+             * @param panel_el (DOM element)         The DOM element to place into the container
+             * @param buttons  (array)    (optional) An array of the buttons to display at the bottom of the panel
+             * @param onpress  (function) (optional) The function to call when a button is pressed
+             * @note  See open_panel() for details.
+             */
+            return function show_panel(panel_el, buttons, onpress)
             {
+                /// First, try to close any open panel, and then open the new one.
                 close_panel(function ()
                 {
-                    open_panel(panel_el);
+                    open_panel(panel_el, buttons, onpress);
                 });
             };
         }());
