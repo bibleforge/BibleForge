@@ -149,6 +149,12 @@
     text-shadow: none;
 }
 
+.night .emailForm input, .night .emailForm textarea {
+    background: #121212;
+    color: #828282;
+    border-color: #828282;
+}
+
 
 .night .contextMenu {
     background: rgba(18,18,18,.94);

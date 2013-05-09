@@ -580,8 +580,13 @@ legend {
     max-width: 800px;
 }
 
+/* Align the first button to the left. */
+.button1of2 {
+    float: left;
+}
 
-.panel .done_button {
+/* The done button and the second of two should be right aligned. */
+.done_button, .button2of2 {
     float: right;
 }
 
@@ -627,6 +632,32 @@ legend {
     
     background-color: rgba(0,0,200,.1);
 }
+
+.emailForm input, .emailForm textarea {
+    display: block;
+    background: #FFF;
+    color: #000;
+    border: 1px solid #CCC;
+    border-radius: 3px;
+    margin: 5px;
+    width: 230px;
+    max-width: 100%;
+    font-size: 14px;
+    padding: 2px;
+}
+
+.emailForm textarea {
+    /* Override the width to make it larger than the input boxes. */
+    width: 500px;
+    height: 120px;
+}
+
+.emailForm div {
+    /* Line up the email address link with the input boxes. */
+    padding-left: 4px;
+}
+
+
 
 .scrolls {
     overflow: hidden;

@@ -1572,18 +1572,18 @@
              * @return A function that shows the panel.
              * @note   Called immediately in order to create another function that shows the panel.
              */
-            show_help_panel = (function ()
+            show_help_panel = function ()
             {
-                var panel_element = document.createElement("div");
+                var email = BF.create_dom_el("div", {textContent: "email: "}, null, [BF.create_dom_el("a", {href: "mailto:hello@bibleforge.com", textContent: "hello@bibleforge.com"})]),
+                    submitter_name  = BF.create_dom_el("input",    {"placeholder": "Your Name (optional)",  type: "text"}),
+                    submitter_email = BF.create_dom_el("input",    {"placeholder": "Your Email (optional)", type: "text"}),
+                    message         = BF.create_dom_el("textarea", {"placeholder": "Dear Bibleforge..."});
                 
-                ///FIXME: Make a real help panel.
-                panel_element.innerHTML = "Email: <a href=\"mailto:info@bibleforge.com\">info@bibleforge.com</a><br><br>More coming soon, Lord willing.<br><br>";
-                
-                return function ()
-                {
-                    show_panel(panel_element);
-                };
-            }());
+                //panel_element.innerHTML = "Email: <a href=\"mailto:info@bibleforge.com\">info@bibleforge.com</a><legend>Send a message";
+                show_panel(BF.create_dom_el("form", {className: "emailForm"}, null, [email, submitter_name, submitter_email, message]),
+                    ["Cancel", "Send"]
+                );
+            };
             
             /**
              * Prepare the help panel.
