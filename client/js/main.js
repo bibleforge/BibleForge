@@ -1088,6 +1088,51 @@ document.addEventListener("DOMContentLoaded", function ()
     
     
     /**
+     * Create a DOM element (or fragment)
+     *
+     * @param type       (string)            The type of element or "documentFragment" to make a document fragment
+     * @param attributes (object) (optional) An object containing the attributes and values of the new element
+     * @param events     (object) (optional) An object containing the DOM events to attach, without the "on" prefix
+     * @param children   (array)  (optional) An array of DOM elements and/or fragments to append to the element
+     */
+    BF.create_dom_el = function (type, attributes, events, children)
+    {
+        var el = type === "documentFragment" ? document.createDocumentFragment() : document.createElement(type);
+        
+        /// Set HTML attributes, if any.
+        if (BF.is_object(attributes)) {
+            Object.keys(attributes).forEach(function (prop)
+            {
+                /// Some properties are specially and must be set via el.setAttribute().
+                if (prop === "list" || prop === "for") {
+                    el.setAttribute(prop, attributes[prop]);
+                } else {
+                    el[prop] = attributes[prop];
+                }
+            });
+        }
+        
+        /// Attach event functions, if any.
+        if (typeof events === "object" && events instanceof Object) {
+            Object.keys(events).forEach(function (prop)
+            {
+                el.addEventListener(prop, events[prop]);
+            });
+        }
+        
+        /// Append child elements/fragments, if any.
+        if (Array.isArray(children)) {
+            children.forEach(function (child)
+            {
+                el.appendChild(child);
+            });
+        }
+        
+        return el;
+    };
+    
+    
+    /**
      * Initialize the BibleForge environment.
      *
      * Load all of the JavaScript necessary to start BibleForge running,
