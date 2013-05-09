@@ -207,7 +207,7 @@
 }
 
 /* WebKit's default font color is too bright, so it needs to be lightened. */
-.queryInput::-webkit-input-placeholder {
+.night input::-webkit-input-placeholder, .night textarea::-webkit-input-placeholder {
     color: rgba(130,130,130,.65);
 }
 
