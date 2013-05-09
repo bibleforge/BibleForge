@@ -1550,10 +1550,10 @@
              */
             show_about_bible_panel = function ()
             {
-                var panel_element = document.createElement("div");
-                
-                panel_element.innerHTML = "<legend>" + BF.insert({v: BF.lang.abbreviation}, BF.lang.about_version) + "</legend>" + BF.lang.credits;
-                show_panel(panel_element);
+                show_panel(BF.create_dom_el("div", {className: "aboutBible"}, null, [
+                    BF.create_dom_el("legend", {textContent: BF.insert({v: BF.lang.abbreviation}, BF.lang.about_version)}),
+                    BF.create_dom_el("div", {innerHTML: BF.lang.credits})
+                ]));
             };
             
             

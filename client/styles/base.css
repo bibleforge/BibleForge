@@ -539,7 +539,7 @@ body {
     z-index: 999990;
     
     /* Make sure that the panel does not get too large. */
-    max-width: 800px;
+    max-width: 90%;
 }
 
 
@@ -572,6 +572,12 @@ fieldset {
 legend {
     font-size:    20px;
     margin-left: -10px;
+}
+
+/* Make sure that the panel does not get too big. */
+/*NOTE: It needs to be set here because the panel must have "max-width: 100%" to prevent the panel as a whole from getting too big.*/
+.aboutBible {
+    max-width: 800px;
 }
 
 
