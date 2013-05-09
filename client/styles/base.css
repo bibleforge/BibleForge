@@ -43,6 +43,11 @@ button::-moz-focus-inner, input::-moz-focus-inner {
     padding: 0;
 }
 
+input, textarea {
+    /* This removes the awful, non-rounded selection rectangle that WebKit imposes. */
+    outline: 0;
+}
+
 
 html, body {
     margin: 0;
@@ -172,9 +177,6 @@ body {
         
     /* The margin balances moves the input box over a little so as not to cover the wrench icon. */
     margin: 2px 30px;
-    
-    /* This removes the awful, non-rounded selection rectangle that WebKit imposes. */
-    outline: 0;
     
     /* Apply transitions to all changes (in particular, background-color, border-color, and color). */
     /* Transition for Mozilla (Firefox 4.0+) */
