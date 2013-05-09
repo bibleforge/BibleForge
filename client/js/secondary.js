@@ -1065,6 +1065,26 @@
                     panel_container = document.createElement("div");
                 
                 /**
+                 * Check to see if onpress cancles the button press event.
+                 *
+                 * @param which    (number)   Which button was pressed
+                 * @param callback (function) The function to call if onpress() does not cancel it
+                 * @note  If onpress() returns anything other than FALSE, the callback function will be called.
+                 */
+                function button_press(which, callback)
+                {
+                    var cancel;
+                    
+                    if (onpress) {
+                        cancel = (onpress(which) === false);
+                    }
+                    
+                    if (!cancel) {
+                        callback();
+                    }
+                }
+                
+                /**
                  * Center the panel horizontally
                  *
                  * @note This is a separate function because it called both when the panel is created and on client resize.
@@ -1098,19 +1118,26 @@
                 if (buttons) {
                     button_count = buttons.length;
                     /**
-                     * Create buttons to 
+                     * Create buttons from the buttons array.
                      */
                     buttons.forEach(function (button, i)
                     {
-                        panel_container.appendChild(BF.create_dom_el("button", {textContent: button, className: "button button" + (i + 1) + "of" + button_count}));
+                        /// Create and add the button to the panel container.
+                        /// A class attribute is given that indicates which button this is in order to properly align the buttons.
+                        panel_container.appendChild(BF.create_dom_el("button", {textContent: button, className: "button button" + (i + 1) + "of" + button_count}, {click: function ()
+                        {
+                            /// Close the panel if the event is not canceled by onpress().
+                            button_press(i, close_panel);
+                        }}));
                     });
                 } else {
                     done_button.innerHTML = BF.lang.done;
                     done_button.className = "button done_button";
+                    /// Check to see if the button press event is canceled.
                     /// An anonymous function must be used because we do not want to send the event object to close_panel().
                     done_button.onclick = function ()
                     {
-                        close_panel();
+                        button_press(0, close_panel);
                     };
                     
                     panel_container.appendChild(done_button);
