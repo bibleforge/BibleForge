@@ -18,9 +18,9 @@ exports.init = function (config)
          *
          * @param data (object)                  An object describing the help request
          *                                       Object structure:
-         *                                       message:      "The message to send; only plain text is allowed"
-         *                                       sender_name:  "(optional) The name to use for the reply-to address"
-         *                                       sender_email: "(optional) The address to use in the reply-to header"
+         *                                       message:         "The message to send; only plain text is allowed"
+         *                                       submitter_name:  "(optional) The name to use for the reply-to address"
+         *                                       submitter_email: "(optional) The address to use in the reply-to header"
          * @param callback (function) (optional) The function to call after an email is sent
          *                                       The function will be sent TRUE on success and FALSE if the email fails to send.
          */
@@ -30,14 +30,14 @@ exports.init = function (config)
                 text: data.message,
                 from: config.from,
                 to:   config.to,
-                subject: "BibleForge Help Request: " + (data.sender_name || "anonymous") + " <" + (data.sender_email || "NOEMAIL") + ">",
+                subject: "BibleForge Help Request: " + (data.submitter_name || "anonymous") + " <" + (data.submitter_email || "NOEMAIL") + ">",
             };
             
             /// If the user submitted an email address, use that address in the reply-to header.
-            if (data.sender_email) {
+            if (data.submitter_email) {
                 /// The reply-to header should be the submitter's name and address, if any, a reply can be made to him.
                 /// Email format is "[NAME ]<EMAIL>"
-                message_data["reply-to"] = (data.sender_name ? data.sender_name + " " : "") + "<" + data.sender_email + ">";
+                message_data["reply-to"] = (data.submitter_name ? data.submitter_name + " " : "") + "<" + data.submitter_email + ">";
             }
             
             server.send(message_data, function server_response(err, message)
