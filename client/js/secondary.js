@@ -1055,8 +1055,9 @@
              * @param panel_el (DOM element)         The DOM element to place into the container
              * @param buttons  (array)    (optional) An array of the buttons to display at the bottom of the panel
              * @param onpress  (function) (optional) The function to call when a button is pressed
-             *                                       If the onpress() function returns FALSE, the panel will not close.
+             *                                       If the onpress() function returns FALSE (not just falsey), the panel will not close.
              *                                       If onpress() returns anything else, the panel will close.
+             *                                       This could be used, for example, to validate a form and prevent the closing of the panel if the submission was invalid.
              */
             function open_panel(panel_el, buttons, onpress)
             {
@@ -1076,6 +1077,7 @@
                     var cancel;
                     
                     if (onpress) {
+                        /// If onpress() returns FALSE, do not call the callback.
                         cancel = (onpress(which) === false);
                     }
                     
