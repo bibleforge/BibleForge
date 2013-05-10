@@ -586,7 +586,7 @@ legend {
 }
 
 /* The done button and the second of two should be right aligned. */
-.done_button, .button2of2 {
+.doneButton, .button2of2 {
     float: right;
 }
 
