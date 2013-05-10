@@ -199,13 +199,13 @@
         chapter:           "第{num}章",                                             /// Chapter headings
         chapter_psalm:     "第{num}首",                                             /// The title of chapters in the book of Psalms
         configure:         "Configure",                                            /// Context menu item
+        contact:           "联系",                                                  /// Context menu item
         credits:           "<p>《中文英皇钦定本》（CKJV）的经文基于《和合本》，并与使用了《Textus Receptus》所翻译出来的英文圣经《英皇钦定本（King James Version）》作仔细比较然后作出修订。<p><p>更多信息请访问<a href=\"http://ckjv.asia/\" target=_blank>ckjv.asia</a>。</p><p>《中文英皇钦定本》由ckjv.asia制作，以<a href=\"http://creativecommons.org/licenses/by-sa/3.0/deed.zh\" target=_blank>创用CC姓名标示-相同方式分享3.0 Unported授权条款（CC BY-SA 3.0）</a>释出。</p>",
         detailed_def:      "Detailed Definition",                                  /// Longer, more detailed definitions caption (in larger callout)
         done:              "Done",                                                 /// The button that closes panels
         err_unknown:       "An error occurred. Please try again.",                 /// A query returned an error for an unspecified reason.
         found_plural:      "{num} verses found for <b>{q}</b>",                    /// On the info bar when searching (multiple results)
         found_singular:    "{num} verse found for <b>{q}</b>",                     /// On the info bar when searching (one result)
-        help:              "Help",                                                 /// Context menu item
         "in":              "in",                                                   /// Used in the meta description in the non-JavaScript version to indicate the language being used (uncapitalized)
         ///NOTE: This key must be the same as the value in the settings.
         in_paragraphs:     "Paragraphs",                                           /// In the View configuration panel

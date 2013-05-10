@@ -1203,7 +1203,7 @@ BF.lexical_lookup = function (data, callback)
                             break;
                         default:
                             if (data.t === "email") {
-                                BF.email.send_help(data, send_results);
+                                BF.email.send_user_message(data, send_results);
                             } else {
                                 /// The request type was invalid, so close the connection.
                                 connection.end();

@@ -1384,7 +1384,7 @@
         {
             var show_about_bible_panel,
                 show_configure_panel,
-                show_help_panel,
+                show_contact_panel,
                 wrench_button = document.createElement("input"),
                 wrench_label  = document.createElement("label");
             
@@ -1596,12 +1596,9 @@
             
             
             /**
-             * Prepare the help panel.
-             *
-             * @return A function that shows the panel.
-             * @note   Called immediately in order to create another function that shows the panel.
+             * Createthe contact panel.
              */
-            show_help_panel = function ()
+            show_contact_panel = function ()
             {
                 var email = BF.create_dom_el("div", {textContent: "email: "}, null, [BF.create_dom_el("a", {href: "mailto:hello@bibleforge.com", textContent: "hello@bibleforge.com"})]),
                     submitter_name  = BF.create_dom_el("input",    {"placeholder": "Your Name (optional)",  type: "text"}),
@@ -1643,10 +1640,7 @@
             };
             
             /**
-             * Prepare the help panel.
-             *
-             * @return A function that shows the panel.
-             * @note   Called immediately in order to create another function that shows the panel.
+             * Create the about Bible version panel.
              */
             show_about_bible_panel = function ()
             {
@@ -1693,8 +1687,8 @@
                         link: "http://bibleforge.wordpress.com/about/"
                     },
                     {
-                        text: BF.lang.help,
-                        link: show_help_panel
+                        text: BF.lang.contact,
+                        link: show_contact_panel
                     }
                 ],
                 /// Make sure no items are selected by default.

@@ -14,9 +14,9 @@ exports.init = function (config)
     
     return {
         /**
-         * Send an email from a user asking for help.
+         * Send an email from a user.
          *
-         * @param data (object)                  An object describing the help request
+         * @param data (object)                  An object describing the message
          *                                       Object structure:
          *                                       message:         "The message to send; only plain text is allowed"
          *                                       submitter_name:  "(optional) The name to use for the reply-to address"
@@ -24,13 +24,13 @@ exports.init = function (config)
          * @param callback (function) (optional) The function to call after an email is sent
          *                                       The function will be sent TRUE on success and FALSE if the email fails to send.
          */
-        send_help: function (data, callback)
+        send_user_message: function (data, callback)
         {
             var message_data = {
                 text: data.message,
                 from: config.from,
                 to:   config.to,
-                subject: "BibleForge Help Request: " + (data.submitter_name || "anonymous") + " <" + (data.submitter_email || "NOEMAIL") + ">",
+                subject: "BibleForge User Message: " + (data.submitter_name || "anonymous") + " <" + (data.submitter_email || "NOEMAIL") + ">",
             };
             
             /// If the user submitted an email address, use that address in the reply-to header.
