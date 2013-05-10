@@ -40,7 +40,7 @@
 
 exports.config = {
     cache_simple_html: true, /// Whether or not to cache the contents of index_non-js.html.  Should be TRUE on production servers.
-    /// The database options.
+    /// The database options
     db: [
         /// Database server #1
         {
@@ -57,5 +57,14 @@ exports.config = {
     ],
     use_ssl: false, /// Whether or not to use SSL (partially implemented)
     port: 7777,     /// The port for the BibleForge server to listen to.  This is the port that HTTP server forwards requests to, not the port of the HTTP server.
+    /// The SMTP info for sending emails
+    smtp: {
+        user: "email@address.com", /// SMTP username
+        pass: "password",          /// SMTP password
+        host: "smtp.address.com",  /// SMTP server
+        from: "sender <email@address.com>",    /// The address displayed in the FROM header (does not need to be the same as user)
+        to:   "recipient <email@address.com>", /// The address to send user generated emails to
+        ssl:   true /// Whether or not to use SSL when connecting to the SMTP server
+    },
     static_path: "../client/" /// The folder containing files sent to the client.  The server also includes some of them.
 };
