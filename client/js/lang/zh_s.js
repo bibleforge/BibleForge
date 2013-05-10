@@ -195,11 +195,11 @@
         biblical_pronun:   "Biblical Reconstructed Pronunciation",                 /// The long name for the Biblical reconstructed pronunciation displayed in a tooltip
         biblical_ipa:      "Biblical IPA",                                         /// The short name for the Biblical reconstructed IPA pronunciation displayed on the menu
         biblical_ipa_long: "Biblical Reconstructed IPA",                           /// The long name for the Biblical reconstructed IPA pronunciation displayed in a tooltip
-        blog:              "Blog",                                                 /// Context menu item
+        blog:              "博客",                                                  /// Context menu item
         cancel:            "取消",                                                  /// Cancel button text
         chapter:           "第{num}章",                                             /// Chapter headings
         chapter_psalm:     "第{num}首",                                             /// The title of chapters in the book of Psalms
-        configure:         "Configure",                                            /// Context menu item
+        configure:         "形态",                                                  /// Context menu item
         contact:           "联系",                                                  /// Context menu item
         credits:           "<p>《中文英皇钦定本》（CKJV）的经文基于《和合本》，并与使用了《Textus Receptus》所翻译出来的英文圣经《英皇钦定本（King James Version）》作仔细比较然后作出修订。<p><p>更多信息请访问<a href=\"http://ckjv.asia/\" target=_blank>ckjv.asia</a>。</p><p>《中文英皇钦定本》由ckjv.asia制作，以<a href=\"http://creativecommons.org/licenses/by-sa/3.0/deed.zh\" target=_blank>创用CC姓名标示-相同方式分享3.0 Unported授权条款（CC BY-SA 3.0）</a>释出。</p>",
         detailed_def:      "Detailed Definition",                                  /// Longer, more detailed definitions caption (in larger callout)
