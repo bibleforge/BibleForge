@@ -1169,7 +1169,7 @@
                 window.setTimeout(function ()
                 {
                     panel.style.top = 0;
-                    /// Center the element on the page.
+                    /// Center the element on the page again, just to make sure.
                     center_hor();
                 }, 0);
             }
@@ -1608,9 +1608,37 @@
                     submitter_email = BF.create_dom_el("input",    {"placeholder": "Your Email (optional)", type: "text"}),
                     message         = BF.create_dom_el("textarea", {"placeholder": "Dear Bibleforge..."});
                 
-                //panel_element.innerHTML = "Email: <a href=\"mailto:info@bibleforge.com\">info@bibleforge.com</a><legend>Send a message";
+                ///TODO: Remember the user's info.
+                ///TODO: Warn about leaving email blank. (Could be done on validation.)
                 show_panel(BF.create_dom_el("form", {className: "emailForm"}, null, [email, submitter_name, submitter_email, message]),
-                    ["Cancel", "Send"]
+                    /// Show two buttons.
+                    ["Cancel", "Send"],
+                    /**
+                     * Validate the form and (possibly) send the message
+                     */
+                    function onpress(which)
+                    {
+                        var message_text;
+                        
+                        /// If the second button was pressed ("Send"), send the message.
+                        if (which === 1) {
+                            message_text = message.value.trim();
+                            if (message_text) {
+                                ///TODO: Use POST instead of GET (bibleforge.js currently does not handle POST data).
+                                (new BF.Create_easy_ajax()).query("GET", "/api", "t=email&submitter_name=" + window.encodeURIComponent(submitter_name.value) + "&submitter_email=" + window.encodeURIComponent(submitter_email.value) + "&message=" + window.encodeURIComponent(message_text), function success(data)
+                                {
+                                    /// Was the message sent properly?
+                                    if (BF.parse_json(data) !== true) {
+                                        ///TODO: Warn the user in a nicer way.
+                                        window.alert("Sorry but there was an error sending your message. Please try again.");
+                                    }
+                                });
+                            } else {
+                                /// If there is no message, do not attempt to send a message or close the panel.
+                                return false;
+                            }
+                        }
+                    }
                 );
             };
             
