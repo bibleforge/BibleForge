@@ -61,21 +61,21 @@ document.addEventListener("DOMContentLoaded", function ()
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (KJV)",
-            modified: 41806346,
+            modified: 41826096,
             match_lang: /^x-early-modern-english$/i,
         };
     }
     if (!BF.lang.zh_s) {
         BF.langs.zh_s = {
             full_name: "简体中文 (CKJV)",
-            modified: 41806412,
+            modified: 41826459,
             match_lang: /^zh-c(?:n|hs)$/i,
         };
     }
     if (!BF.lang.zh_t) {
         BF.langs.zh_t = {
             full_name: "繁體中文 (CKJV)",
-            modified: 41806462,
+            modified: 41826471,
             match_lang: /^zh(?:-c(?!n|hs))?$/i,
         };
     }
@@ -3849,7 +3849,7 @@ document.addEventListener("DOMContentLoaded", function ()
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?41807118", {
+                BF.include("/js/secondary.js?41826367", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,

@@ -1600,16 +1600,16 @@
              */
             show_contact_panel = function ()
             {
-                var email = BF.create_dom_el("div", {textContent: "email: "}, null, [BF.create_dom_el("a", {href: "mailto:hello@bibleforge.com", textContent: "hello@bibleforge.com"})]),
-                    submitter_name  = BF.create_dom_el("input",    {"placeholder": "Your Name (optional)",  type: "text"}),
-                    submitter_email = BF.create_dom_el("input",    {"placeholder": "Your Email (optional)", type: "text"}),
-                    message         = BF.create_dom_el("textarea", {"placeholder": "Dear Bibleforge..."});
+                var email = BF.create_dom_el("div", {textContent: BF.lang.form_email}, null, [BF.create_dom_el("a", {href: "mailto:hello@bibleforge.com", textContent: "hello@bibleforge.com"})]),
+                    submitter_name  = BF.create_dom_el("input",    {"placeholder": BF.lang.form_your_name,  type: "text"}),
+                    submitter_email = BF.create_dom_el("input",    {"placeholder": BF.lang.form_your_email, type: "text"}),
+                    message         = BF.create_dom_el("textarea", {"placeholder": BF.lang.form_message});
                 
                 ///TODO: Remember the user's info.
                 ///TODO: Warn about leaving email blank. (Could be done on validation.)
                 show_panel(BF.create_dom_el("form", {className: "emailForm"}, null, [email, submitter_name, submitter_email, message]),
                     /// Show two buttons.
-                    ["Cancel", "Send"],
+                    [BF.lang.cancel, BF.lang.send],
                     /**
                      * Validate the form and (possibly) send the message
                      */
@@ -1627,7 +1627,7 @@
                                     /// Was the message sent properly?
                                     if (BF.parse_json(data) !== true) {
                                         ///TODO: Warn the user in a nicer way.
-                                        window.alert("Sorry but there was an error sending your message. Please try again.");
+                                        window.alert(BF.lang.form_error);
                                     }
                                 });
                             } else {

@@ -132,6 +132,7 @@
         biblical_ipa:      "Biblical IPA",                                         /// The short name for the Biblical reconstructed IPA pronunciation displayed on the menu
         biblical_ipa_long: "Biblical Reconſtructed IPA",                           /// The long name for the Biblical reconstructed IPA pronunciation displayed in a tooltip
         blog:              "Weblog",                                               /// Context menu item
+        cancel:            "Cancel",                                               /// Cancel button text
         chapter:           "Chapter {num}",                                        /// Chapter headings
         chapter_psalm:     "Psalme {num}",                                         /// The title of chapters in the book of Psalms
         configure:         "Configure",                                            /// Context menu item
@@ -140,6 +141,11 @@
         detailed_def:      "Detailed Definition",                                  /// Longer, more detailed definitions caption (in larger callout)
         done:              "Finiſh",                                               /// The button that closes panels
         err_unknown:       "An errour occurred. Please try againe.",               /// A query returned an error for an unspecified reason. (This does not need a long s because it is displayed on the scroll.)
+        form_email:        "email: ",                                              /// On the contact panel, indicating Bibleforge's email address
+        form_error:        "Sorry, an errour occured while sending your meſſage. Pleaſe try againe.", /// An error message stating that the message was not sent properly and asking the user to try again
+        form_message:      "Deare Bibleforge...",                                  /// The placeholder for the <textarea> where the user can type a message
+        form_your_email:   "Electronic mail addreſſe (optional)",                  /// Input box placeholder indicating the user's email address (as optional)
+        form_your_name:    "Name (optional)",                                      /// Input box placeholder indicating the user's name (as optional)
         found_plural:      "{num} verſes found for <b>{q}</b>",                    /// On the info bar when searching (multiple results)
         found_singular:    "{num} verſe found for <b>{q}</b>",                     /// On the info bar when searching (one result)
         "in":              "in",                                                   /// Used in the meta description in the non-JavaScript version to indicate the language being used (uncapitalized)
@@ -164,6 +170,7 @@
         ///NOTE: This key must be the same as the value in the settings.
         red_letters:       "Red Letters",                                          /// In the View configuration panel
         results_for:       "Reſults for",                                          /// Used in the meta description of searches in the non-JavaScript version to indicate the results for the query.
+        send:              "Send",                                                 /// Send a message button text
         subscription:      "ſubſcription",                                         /// Used instead of 255 for subscripts to Paul's epistles (uncapitalized)
         title:             "title",                                                /// Used instead of 0 for Psalm title verse references (uncapitalized)
         translit:          "Tranſliteration",                                      /// The short name for the SBL transliteration display on the menu

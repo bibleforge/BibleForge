@@ -196,6 +196,7 @@
         biblical_ipa:      "Biblical IPA",                                         /// The short name for the Biblical reconstructed IPA pronunciation displayed on the menu
         biblical_ipa_long: "Biblical Reconstructed IPA",                           /// The long name for the Biblical reconstructed IPA pronunciation displayed in a tooltip
         blog:              "Blog",                                                 /// Context menu item
+        cancel:            "取消",                                                  /// Cancel button text
         chapter:           "第{num}章",                                             /// Chapter headings
         chapter_psalm:     "第{num}首",                                             /// The title of chapters in the book of Psalms
         configure:         "Configure",                                            /// Context menu item
@@ -204,6 +205,11 @@
         detailed_def:      "Detailed Definition",                                  /// Longer, more detailed definitions caption (in larger callout)
         done:              "Done",                                                 /// The button that closes panels
         err_unknown:       "An error occurred. Please try again.",                 /// A query returned an error for an unspecified reason.
+        form_email:        "电子邮件：",                                             /// On the contact panel, indicating Bibleforge's email address
+        form_error:        "对不起，发生了错误。请再试一次。",                           /// An error message stating that the message was not sent properly and asking the user to try again
+        form_message:      "你好……",                                                /// The placeholder for the <textarea> where the user can type a message
+        form_your_email:   "电子邮件（可选）",                                        /// Input box placeholder indicating the user's email address (as optional)
+        form_your_name:    "名字（可选）",                                           /// Input box placeholder indicating the user's name (as optional)
         found_plural:      "{num} verses found for <b>{q}</b>",                    /// On the info bar when searching (multiple results)
         found_singular:    "{num} verse found for <b>{q}</b>",                     /// On the info bar when searching (one result)
         "in":              "in",                                                   /// Used in the meta description in the non-JavaScript version to indicate the language being used (uncapitalized)
@@ -228,6 +234,7 @@
         ///NOTE: This key must be the same as the value in the settings.
         red_letters:       "Red Letters",                                          /// In the View configuration panel
         results_for:       "Results for",                                          /// Used in the meta description of searches in the non-JavaScript version to indicate the results for the query.
+        send:              "发送",                                                  /// Send a message button text
         subscription:      "subscription",                                         /// Used instead of 255 for subscripts to Paul's epistles (uncapitalized)
         title:             "title",                                                /// Used instead of 0 for Psalm title verse references (uncapitalized)
         translit:          "Transliteration",                                      /// The short name for the SBL transliteration display on the menu
