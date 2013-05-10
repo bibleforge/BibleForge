@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function ()
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (KJV)",
-            modified: 41063462,
+            modified: 41790128,
             match_lang: /^x-early-modern-english$/i,
         };
     }
@@ -3525,7 +3525,8 @@ document.addEventListener("DOMContentLoaded", function ()
                 }
                 
                 /// Is the user pressing a key that should probably be entered into the input box?  If so, bring focus to the query box so that the keystrokes will be captured.
-                ///NOTE:  8 = Backspace
+                /// keyCode values:
+                ///       8 = Backspace
                 ///      13 = Enter
                 ///      32 = Space
                 ///      33 = Page Up
@@ -3535,8 +3536,6 @@ document.addEventListener("DOMContentLoaded", function ()
                 ///   48-90 = Alphanumeric
                 ///  96-111 = Numpad keys
                 /// 186-254 = Punctuation
-                ///TODO: Determine if capturing Backspace and/Space is confusing because they have alternate functions (the back button and page down, respectively).
-                ///      One possible solution is to allow Shift, Ctrl, or Alt + Backspace or Space to be the normal action.
                 if (keyCode === 8 || keyCode === 13 || keyCode === 32 || (keyCode > 47 && keyCode < 91) || (keyCode > 95 && keyCode < 112) || (keyCode > 185 && keyCode < 255)) {
                     qEl.focus();
                 } else if (keyCode === 38 || keyCode === 40) {
@@ -3548,6 +3547,7 @@ document.addEventListener("DOMContentLoaded", function ()
                     /// Scroll to the next/previous chapter on page down/up respectively.
                     
                     /// The verse range needs to be updated in order to make sure it selects the correct chapter.
+                    ///NOTE: Sending TRUE makes the function synchronous.
                     content_manager.update_verse_range(true);
                     
                     new_book = content_manager.top_verse.b;

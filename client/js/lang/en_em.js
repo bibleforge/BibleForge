@@ -867,12 +867,13 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                             break;
                         case "did":
                         case "didst":
-                        case "do":
+                        case "do": ///NOTE: "doeth" is stemmed to "do."
                         case "do[ei]":
                         case "don[ei]":
                         case "dost":
                         case "doth":
-                            stemmed_word = "d(?:o(?:e(?:st?)?|ne|st|th)?|id(?:st)?)";
+                            ///NOTE: In Early Modern English, the word "doe" is used for "do."
+                            stemmed_word = "d(?:o(?:e(?:st?|th)?|ing|ne|st|th)|id(?:st)?)";
                             /// Since this word is so short, it needs special regex to prevent false positives, so do not add additional morphological regex.
                             do_not_add_morph_regex = true;
                             break;
