@@ -2276,9 +2276,9 @@
                                 if (!options.ignore_state) {
                                     highlight_terms = BF.get_highlighted_terms();
                                     /// Change the URL to allow linking to this specific resource.
-                                    /// In order to prevent the page from jumping up and down when the history changes (e.g., the back button is pressed) save the top verse as the actual position.
+                                    /// This way, if the user reload the page (or links to this URL) he will be taken back to the verse where the callout is pointing to.
                                     ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
-                                    BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(BF.get_ref_from_word_id(this.id) + (highlight_terms ? " {{" + highlight_terms + "}}" : "")) + "/" + this.id  + "/", {position: context.content_manager.top_verse});
+                                    BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(BF.get_ref_from_word_id(this.id) + (highlight_terms ? " {{" + highlight_terms + "}}" : "")) + "/" + this.id  + "/", {position: context.settings.user.position});
                                 }
                                 
                                 maximized_callout = id;
@@ -2414,20 +2414,19 @@
                                 if (!options.ignore_state) {
                                     /// Change state now that the callout is not maximized to point to the top verse.
                                     highlight_terms = BF.get_highlighted_terms();
-                                    
                                     if (context.settings.user.last_query.type === BF.consts.verse_lookup) {
-                                        /// If the last query was a lookup, use the current verse as verse reference for the URL plus any highlighted terms.
-                                        url_component = BF.create_ref(context.content_manager.top_verse) + (highlight_terms ? " {{" + highlight_terms + "}}" : "");
+                                        /// If the last query was a lookup, use the last seo_query (which was the previous query in the URL, not including the maximized callout URL).
+                                        /// This way, reloading the page will take the user back to where they left off, not to where the callout was.
+                                        url_component = context.settings.user.last_query.seo_query;
                                     } else {
                                         /// If the last query was a search, just put the search terms back in the URL.
                                         url_component = context.settings.user.last_query.raw_query;
                                     }
-                                    
-                                    BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(url_component) + "/");
+                                    BF.history.pushState("/" + BF.lang.id + "/" + window.encodeURIComponent(url_component) + "/", {position: context.settings.user.position});
                                 }
                             },
 
-                            /// Properties
+                            /// Callout properties
                             id: id,
                             just_created: true
                         };
