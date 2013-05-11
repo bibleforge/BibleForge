@@ -3670,73 +3670,62 @@ document.addEventListener("DOMContentLoaded", function ()
                         /// Change the current state to match the last query so that if the user presses the back button later, they will get to the right query.
                         ///NOTE: The query and language is stored in the state object so as not to cause the URL to change.
                         ///      This way, if the user clicks refresh, it will load back to the same position.
-                        BF.history.replaceState("/", {
-                            lang_id:  lang_id,
-                            query:    raw_query,
-                            position: position
-                        });
+                        BF.history.replaceState("/", {position: position});
                     } else {
-                        /// Was the query and language stored in the history state?
-                        ///NOTE: This occurs when the page first loads in order to take the user back to where they left off without changing the URL.
-                        ///TODO: Remove this IF statement (and the above land_id, and query) if this really is not used.
-                        if (e.state && e.state.lang_id && e.state.query) {
-                            /// Load the query from the history state.
-                            lang_id   = e.state.lang_id;
-                            raw_query = e.state.query;
+                        /// Try to load a query from the URL.
+                        
+                        /// URL structure:
+                        ///     /[lang/][query/]
+                        /// or
+                        ///     /lang/query/word_id/
+                        ///
+                        /// Examples:
+                        ///     /
+                        ///     /en/
+                        ///     /en/Genesis 1:1/
+                        ///     /Genesis 1:1/
+                        ///     /en_em/love/
+                        ///     /love/
+                        ///     /en/Matthew 1:1/621719/
+                        ///
+                        
+                        /// window.location.pathname should always start with a slash (/); substr(1) removes it.
+                        /// Since there should only be two parameters, anything after the second slash is ignored by limiting split() to two results.
+                        ///TODO: Check if IE 10 has the leading slash (see http://trac.osgeo.org/openlayers/ticket/3478).
+                        split_query = window.location.pathname.substr(1).split("/").map(window.decodeURIComponent);
+                        
+                        /// If the last parameter is empty (""), remove it.
+                        /// E.g., "/en/" turns into ["en", ""], so make it just ["en"].
+                        /// The reason for removing the last empty element is to make it easier to determine if the URL contains both a language ID and a query.
+                        if (split_query.length && split_query[split_query.length - 1].trim() === "") {
+                            split_query.pop();
+                        }
+                        
+                        /// Does if have at least both a language ID and a query?
+                        ///NOTE: There could be more than 2 parameters if there is a word ID at then end (e.g., /en/Matthew 1/621719/).
+                        if (split_query.length >= 2) {
+                            /// If the language has already been loaded, there is no need to change the language.
+                            lang_id   = split_query[0];
+                            raw_query = split_query[1];
+                            using_url = true;
+                            /// Get any extra pieces of the URL (such as word ID).
+                            /// This extra URL string must be appended to the end of the URL when updating the state (in run_new_query()).
+                            /// Otherwise, it would not store the entire URL in the state.
+                            /// This occurs when moving back and forth between a maximized callout or loading the page to a maximized callout.
+                            /// E.g., if window.location.pathname is "/en/John%201%3A1/691005/",
+                            ///       "url_suffix" will equal "691005/".
+                            url_suffix = window.location.pathname.match(/(?:\/[^\/]*){2}\/(.*)/)[1];
                         } else {
-                            /// Try to load a query from the URL.
-                            /// URL structure:
-                            ///     /[lang/][query/]
-                            /// or
-                            ///     /lang/query/word_id/
-                            ///
-                            /// Examples:
-                            ///     /
-                            ///     /en/
-                            ///     /en/Genesis 1:1/
-                            ///     /Genesis 1:1/
-                            ///     /en_em/love/
-                            ///     /love/
-                            ///     /en/Matthew 1:1/621719/
-                            ///
-                            /// window.location.pathname should always start with a slash (/); substr(1) removes it.
-                            /// Since there should only be two parameters, anything after the second slash is ignored by limiting split() to two results.
-                            ///TODO: Check if IE 10 has the leading slash (see http://trac.osgeo.org/openlayers/ticket/3478).
-                            split_query = window.location.pathname.substr(1).split("/").map(window.decodeURIComponent);
-                            
-                            /// If the last parameter is empty (""), remove it.
-                            /// E.g., "/en/" turns into ["en", ""], so make it just ["en"].
-                            /// The reaon for removing the last empty element is to make it easier to determine if the URL contains both a language ID and a query.
-                            if (split_query.length && split_query[split_query.length - 1].trim() === "") {
-                                split_query.pop();
-                            }
-                            
-                            /// Does if have at least both a language ID and a query?
-                            ///NOTE: There could be more than 2 parameters if there is a word ID at then end (e.g., /en/Matthew 1/621719/).
-                            if (split_query.length >= 2) {
-                                /// If the language has already been loaded, there is no need to change the language.
-                                lang_id   = split_query[0];
-                                raw_query = split_query[1];
-                                using_url = true;
-                                /// Get any extra pieces of the URL (such as word ID).
-                                /// This extra URL string must be appended to the end of the URL when updating the state (in run_new_query()).
-                                /// Otherwise, it would not store the entire URL in the state.
-                                /// This occurs when moving back and forth between a maximized callout or loading the page to a maximized callout.
-                                /// E.g., http://bibleforge.com/en/John%201%3A1/691005/
-                                ///       "url_suffix" will equal "691005/".
-                                url_suffix = window.location.pathname.match(/(?:\/[^\/]*){2}\/(.*)/)[1];
+                            ///NOTE: If only one parameter is found, it could be either a language ID or a query.
+                            /// Is the parameter a valid language ID?
+                            if (BF.langs[split_query[0]]) {
+                                lang_id = split_query[0];
                             } else {
-                                ///NOTE: If only one parameter is found, it could be either a language ID or a query.
-                                /// Is the parameter a valid language ID?
-                                if (BF.langs[split_query[0]]) {
-                                    lang_id = split_query[0];
-                                } else {
-                                    /// If no language was specified, use the most preferred language BibleForge supports.
-                                    ///NOTE: An empty string is returned if no language which found.
-                                    lang_id   = BF.get_preferred_supported_lang();
-                                    raw_query = split_query[0];
-                                    using_url = true;
-                                }
+                                /// If no language was specified, use the most preferred language BibleForge supports.
+                                ///NOTE: An empty string is returned if no language which found.
+                                lang_id   = BF.get_preferred_supported_lang();
+                                raw_query = split_query[0];
+                                using_url = true;
                             }
                         }
                         
