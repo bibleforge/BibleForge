@@ -3487,7 +3487,10 @@ document.addEventListener("DOMContentLoaded", function ()
             /// ************************
             /// * End of run_new_query *
             /// ************************
-            
+        
+            /// **************
+            /// * Set events *
+            /// **************
             
             /**
              * Capture certain key events, bringing focus to the query box.
@@ -3845,6 +3848,41 @@ document.addEventListener("DOMContentLoaded", function ()
                 this.removeAttribute("placeholder");
             };
             
+            /**
+             * Capture form submit events and begin a new query.
+             *
+             * @return FALSE.  It must always return false in order to prevent the form from submitting.
+             * @note   Called when a user submits the form.
+             */
+            searchForm.onsubmit = function ()
+            {
+                var raw_query = qEl.value;
+                
+                /// If the user has not entered in a query, draw attention to the input box.
+                if (!raw_query.trim()) {
+                    qEl.focus();
+                /// If the Alt and/or Ctrl key is pressed, open in a new tab.
+                ///TODO: Determine if it would be good to indicate to the user somehow that it will open in a new tab (maybe change the magnifying glass icon).
+                ///TODO: Open a new tab when the query box is empty.
+                } else if (BF.keys_pressed.alt || BF.keys_pressed.ctrl) {
+                    ///BUG: Chromium only opens a new tab when clicking on the magnifying glass (not when pressing enter).
+                    ///NOTE: In Chromium, holding Alt brings the new tab to the forefront but Ctrl opens it in the background.
+                    window.open("/" + BF.lang.id + "/" + window.encodeURIComponent(raw_query) + "/", "_blank");
+                } else {
+                    run_new_query(raw_query);
+                }
+                
+                ///NOTE: Must return false in order to stop the form submission.
+                return false;
+            };
+            
+            /// *********************
+            /// * End of set events *
+            /// *********************
+            
+            /// Set the default placeholder text.
+            qEl.placeholder = BF.lang.query_explanation;
+            
             /// After a short delay, lazily load extra, nonessential (or at least not immediately essential) code, like the wrench menu.
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
@@ -3865,47 +3903,6 @@ document.addEventListener("DOMContentLoaded", function ()
         /// ************************************************
         /// * End of main BibleForge initializing function *
         /// ************************************************
-        
-        
-        /// **************
-        /// * Set events *
-        /// **************
-        
-        /**
-         * Capture form submit events and begin a new query.
-         *
-         * @return FALSE.  It must always return false in order to prevent the form from submitting.
-         * @note   Called when a user submits the form.
-         */
-        searchForm.onsubmit = function ()
-        {
-            var raw_query = qEl.value;
-            
-            /// If the user has not entered in a query, draw attention to the input box.
-            if (raw_query.trim() === "") {
-                qEl.focus();
-            } else {
-                /// If the Alt and/or Ctrl key is pressed, open in a new tab.
-                ///TODO: Determine if it would be good to indicate to the user somehow that it will open in a new tab (maybe change the magnifying glass icon).
-                if (BF.keys_pressed.alt || BF.keys_pressed.ctrl) {
-                    ///BUG: Chromium only opens a new tab when clicking on the magnifying glass (not when pressing enter).
-                    ///NOTE: In Chromium, holding Alt brings the new tab to the forefront but Ctrl opens it in the background.
-                    window.open("/" + BF.lang.id + "/" + window.encodeURIComponent(raw_query) + "/", "_blank");
-                } else {
-                    run_new_query(raw_query);
-                }
-            }
-            
-            ///NOTE: Must return false in order to stop the form submission.
-            return false;
-        };
-        
-        /// Set the default placeholder text.
-        qEl.placeholder = BF.lang.query_explanation;
-        
-        /// *********************
-        /// * End of set events *
-        /// *********************
     };
     /// *******************************
     /// * End of Bf.create_viewport() *
