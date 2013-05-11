@@ -3166,14 +3166,15 @@ document.addEventListener("DOMContentLoaded", function ()
                  *
                  * @example run_new_query("John 3:16"); /// Looks up John 3:16 (and following)
                  * @example run_new_query("love");      /// Searches for the word "love"
-                 * @param   raw_query     (string)             The text from the user to query.
-                 * @param   is_default    (boolean) (optional) Whether or not this query is the default query (and therefore not entered by the user).
-                 * @param   replace_state (boolean) (optional) Whether to push this query into the history as a new state or replace the current state.
-                 * @param   position      (object)  (optional) The actual position the user was at.
+                 * @param   raw_query     (string)             The text from the user to query
+                 * @param   is_default    (boolean) (optional) Whether or not this query is the default query (and therefore not entered by the user)
+                 * @param   replace_state (boolean) (optional) Whether to push this query into the history as a new state or replace the current state
+                 * @param   position      (object)  (optional) The actual position the user was at
+                 * @param   url_suffix    (string)  (optional) Any extra pieces of URL that must be appended when saving the state (e.g., when the page loads to a maximized callout)
                  * @return  NULL
                  * @note    Called by searchForm.onsubmit() when a user submits a query.
                  */
-                return function run_new_query(raw_query, is_default, replace_state, position)
+                return function run_new_query(raw_query, is_default, replace_state, position, url_suffix)
                 {
                     /// **********
                     /// * Step 1 *
@@ -3267,7 +3268,7 @@ document.addEventListener("DOMContentLoaded", function ()
                     ///NOTE: This must be done now, because the verse_id variable may change later based on the position object.
                     ///NOTE: Another reason this needs to be called now is because later the function may exit before querying the server and simply scroll to the verse.
                     ///NOTE: The trailing slash is necessary to make the meta redirect to preserve the entire URL and add the exclamation point to the end.
-                    BF.history[replace_state ? "replaceState" : "pushState"]("/" + BF.lang.id + "/" + window.encodeURIComponent(options.seo_query || raw_query) + "/", position ? {position: position} : undefined);
+                    BF.history[replace_state ? "replaceState" : "pushState"]("/" + BF.lang.id + "/" + window.encodeURIComponent(options.seo_query || raw_query) + "/" + (url_suffix || ""), position ? {position: position} : undefined);
                     
                     /// After saving the state above, make sure that position is an object to make checking for its properties easier.
                     position = position || {};
@@ -3592,7 +3593,8 @@ document.addEventListener("DOMContentLoaded", function ()
                  */
                 function on_state_change(e)
                 {
-                    var is_default = false,
+                    var url_suffix,
+                        is_default = false,
                         lang_id,
                         position,
                         raw_query,
@@ -3612,7 +3614,8 @@ document.addEventListener("DOMContentLoaded", function ()
                             raw_query = BF.create_ref({b: 1, c: 1, v: 1});
                             is_default = true;
                         }
-                        run_new_query(raw_query, is_default, true, position);
+                        
+                        run_new_query(raw_query, is_default, true, position, url_suffix);
                         
                         /// Only change the text in the query input if the user has not started typing and the user actually typed in the query.
                         if (!e.initial_page_load || qEl.value === "") {
@@ -3675,6 +3678,7 @@ document.addEventListener("DOMContentLoaded", function ()
                     } else {
                         /// Was the query and language stored in the history state?
                         ///NOTE: This occurs when the page first loads in order to take the user back to where they left off without changing the URL.
+                        ///TODO: Remove this IF statement (and the above land_id, and query) if this really is not used.
                         if (e.state && e.state.lang_id && e.state.query) {
                             /// Load the query from the history state.
                             lang_id   = e.state.lang_id;
@@ -3689,11 +3693,11 @@ document.addEventListener("DOMContentLoaded", function ()
                             /// Examples:
                             ///     /
                             ///     /en/
-                            ///     /en/Genesis 1/
-                            ///     /Genesis 1/
+                            ///     /en/Genesis 1:1/
+                            ///     /Genesis 1:1/
                             ///     /en_em/love/
                             ///     /love/
-                            ///     /en/Matthew 1/621719/
+                            ///     /en/Matthew 1:1/621719/
                             ///
                             /// window.location.pathname should always start with a slash (/); substr(1) removes it.
                             /// Since there should only be two parameters, anything after the second slash is ignored by limiting split() to two results.
@@ -3714,6 +3718,13 @@ document.addEventListener("DOMContentLoaded", function ()
                                 lang_id   = split_query[0];
                                 raw_query = split_query[1];
                                 using_url = true;
+                                /// Get any extra pieces of the URL (such as word ID).
+                                /// This extra URL string must be appended to the end of the URL when updating the state (in run_new_query()).
+                                /// Otherwise, it would not store the entire URL in the state.
+                                /// This occurs when moving back and forth between a maximized callout or loading the page to a maximized callout.
+                                /// E.g., http://bibleforge.com/en/John%201%3A1/691005/
+                                ///       "url_suffix" will equal "691005/".
+                                url_suffix = window.location.pathname.match(/(?:\/[^\/]*){2}\/(.*)/)[1];
                             } else {
                                 ///NOTE: If only one parameter is found, it could be either a language ID or a query.
                                 /// Is the parameter a valid language ID?
