@@ -2838,12 +2838,12 @@ document.addEventListener("DOMContentLoaded", function ()
                         {
                             /// Query Variables:
                             /// d Direction (number)  The direction of the query (1 = additional, 2 = previous) (lookup only)
-                            /// f Find      (boolean) Whether or not to find a paragraph break to start at    (lookup only)
-                            /// p Paragraph (boolean) Whether or not verses will be displayed in paragraphs   (lookup only)
+                            /// f Find      (boolean) Whether or not to find a paragraph break to start at      (lookup only)
+                            /// p Paragraph (boolean) Whether or not verses will be displayed in paragraphs     (lookup only)
                             /// q Query     (string)  The verse reference or search string to query
-                            /// s Start At  (string)  The verse or word id at which to start the query        (search only)
+                            /// s Start At  (number)  The verse or word id at which to start the query          (search only)
                             /// t Type      (number)  The type of query (verse_lookup, mixed_search, standard_search, grammatical_search)
-                            /// l Language  (number)  The language to use.  If not present, use 0 (English).
+                            /// l Language  (string)  The language ID of the language to use; if not present, the server will default to English (optional)
                             
                             var query_str = "t=" + options.type;
                             
