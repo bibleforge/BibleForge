@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function ()
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (KJV)",
-            modified: 41826096,
+            modified: 42106234,
             match_lang: /^x-early-modern-english$/i,
         };
     }
