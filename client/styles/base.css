@@ -577,7 +577,7 @@ legend {
 /* Make sure that the panel does not get too big. */
 /*NOTE: It needs to be set here because the panel must have "max-width: 100%" to prevent the panel as a whole from getting too big.*/
 .aboutBible {
-    max-width: 800px;
+    max-width: 700px;
 }
 
 /* Align the first button to the left. */
