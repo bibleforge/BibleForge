@@ -14,6 +14,9 @@ exports.init = function (config)
             password: config.pass,
             host:     config.host,
             ssl:      config.ssl,
+            tls:      config.tls,
+            domain:   config.domain,
+            port:     config.port,
         });
     }
     

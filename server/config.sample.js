@@ -59,12 +59,15 @@ exports.config = {
     port: 7777,     /// The port for the BibleForge server to listen to.  This is the port that HTTP server forwards requests to, not the port of the HTTP server.
     /// The SMTP info for sending emails
     smtp: {
-        user: "email@address.com", /// SMTP username
-        pass: "password",          /// SMTP password
-        host: "smtp.address.com",  /// SMTP server
-        from: "sender <email@address.com>",    /// The address displayed in the FROM header (does not need to be the same as user)
-        to:   "recipient <email@address.com>", /// The address to send user generated emails to
-        ssl:   true /// Whether or not to use SSL when connecting to the SMTP server
+        user:   "email@address.com", /// SMTP username
+        pass:   "password",          /// SMTP password
+        host:   "smtp.address.com",  /// SMTP server
+        port:    null,               /// SMTP port (if NULL, a standard port will be used)
+        from:   "sender <email@address.com>",    /// The address displayed in the FROM header (does not need to be the same as user)
+        to:     "recipient <email@address.com>", /// The address to send user generated emails to
+        ssl:     true,  /// Whether or not to use SSL when connecting to the SMTP server
+        tls:     false, /// Whether or not to use TLS when connecting to the SMTP server
+        domain: "bibleforge.com", /// The domain to claim when connecting (optional)
     },
     static_path: "../client/" /// The folder containing files sent to the client.  The server also includes some of them.
 };
