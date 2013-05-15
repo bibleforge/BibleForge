@@ -5,12 +5,19 @@
 
 exports.init = function (config)
 {
-    var server  = require("emailjs/email").server.connect({
-        user:     config.user,
-        password: config.pass,
-        host:     config.host,
-        ssl:      config.ssl,
-    });
+    var server;
+    
+    function init()
+    {
+        server = require("emailjs/email").server.connect({
+            user:     config.user,
+            password: config.pass,
+            host:     config.host,
+            ssl:      config.ssl,
+        });
+    }
+    
+    init();
     
     return {
         /**
@@ -50,6 +57,8 @@ exports.init = function (config)
                     console.log(err);
                     console.log(message);
                     res = false;
+                    /// Reinitialize the client since when there is an error, it gets messed up.
+                    init();
                 } else {
                     res = true;
                 }
