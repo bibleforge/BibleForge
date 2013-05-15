@@ -63,8 +63,8 @@ exports.config = {
         pass:   "password",          /// SMTP password
         host:   "smtp.address.com",  /// SMTP server
         port:    null,               /// SMTP port (if NULL, a standard port will be used)
-        from:   "sender <email@address.com>",    /// The address displayed in the FROM header (does not need to be the same as user)
-        to:     "recipient <email@address.com>", /// The address to send user generated emails to
+        from:   "sender <info@bibleforge.com>",    /// The address displayed in the FROM header (does not need to be the same as user)
+        to:     "recipient <info@bibleforge.com>", /// The address to send user generated emails to
         ssl:     true,  /// Whether or not to use SSL when connecting to the SMTP server
         tls:     false, /// Whether or not to use TLS when connecting to the SMTP server
         domain: "bibleforge.com", /// The domain to claim when connecting (optional)
