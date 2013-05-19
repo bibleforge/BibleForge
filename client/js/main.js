@@ -4038,6 +4038,26 @@ document.addEventListener("DOMContentLoaded", function ()
     /// ********************************
     
     /**
+     * Remove languages that have not been used recently.
+     */
+    (function ()
+    {
+        var now = Date.now(),
+            recent_langs = BF.parse_json(window.localStorage.getItem("recent_langs")) || {};
+        
+        Object.keys(recent_langs).forEach(function (lang) {
+            /// Was the language last used more than 30 days ago?
+            ///NOTE: 2592000000 = 30 * 24 * 60 * 60 * 1000
+            if (now - recent_langs[lang] > 2592000000) {
+                delete recent_langs[lang];
+            }
+        });
+        
+        /// Update the recently used languages in case some old ones were removed.
+        window.localStorage.setItem("recent_langs", JSON.stringify(recent_langs));
+    }());
+    
+    /**
      * Prime the browser and initialize BibleForge.
      */
     (function ()
