@@ -1133,6 +1133,21 @@ document.addEventListener("DOMContentLoaded", function ()
     
     
     /**
+     * Update the timestamp for the specific language.
+     *
+     * @param lang (string) The language to update
+     */
+    BF.upate_recent_langs = function (lang)
+    {
+        var recent_langs = BF.parse_json(window.localStorage.getItem("recent_langs")) || {};
+        
+        recent_langs[lang] = Date.now();
+        
+        window.localStorage.setItem("recent_langs", JSON.stringify(recent_langs));
+    };
+    
+    
+    /**
      * Initialize the BibleForge environment.
      *
      * Load all of the JavaScript necessary to start BibleForge running,
@@ -3192,6 +3207,9 @@ document.addEventListener("DOMContentLoaded", function ()
                         standard_terms = "", /// Search terms that are not grammatical.
                         using_position,
                         verse_id;
+                    
+                    /// Store/update the latest used languages for later use.
+                    BF.upate_recent_langs(BF.lang.id);
                     
                     /// ***********
                     /// * Step 1a *
