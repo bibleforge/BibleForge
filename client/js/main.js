@@ -2693,6 +2693,59 @@ document.addEventListener("DOMContentLoaded", function ()
                         content_manager.update_verse_range();
                     }
                     
+                    function try_a_lookup(query, no_lookup_found)
+                    {
+                        ///TODO: Ignore the used language.
+                        var langs = BF.get_recent_and_acceptable_langs() || [],
+                            len;
+                        
+                        len = langs.length - 1;
+                        
+                        (function loop_through_langs(i)
+                        {
+                            var lang_id = langs[i],
+                                verse_id;
+                            
+                            if (i > len) {
+                                no_lookup_found();
+                                return;
+                            }
+                            
+                            if (BF.langs[lang_id].loaded) {
+                                verse_id = Number(BF.langs[lang_id].determine_reference(query));
+                                /// Did it find a valid verse?
+                                if (verse_id) {
+                                    /// Let's re-run the query and look up that verse.
+                                    ///TODO: There should be a way to ignore the state entirely (or re-run a query more excatly (e.g., keep url_suffix)).
+                                    run_new_query(query, false, true, {raw_query: query, type: 1, verse_id: verse_id})
+                                } else {
+                                    /// No, the query does not look like a verse lookup in that language either.
+                                    /// Let's try the next language (if any).
+                                    loop_through_langs(i += 1);
+                                }
+                            } else {
+                                /// Since this language has not loaded yet, we don't have access to that language's determine_reference() function.
+                                /// So, we need to load it and try again.
+                                /// If BF.load_language() has not been created by secondary.js, we must wait until that code has loaded.
+                                if (BF.load_language) {
+                                    BF.load_language(lang_id, function ()
+                                    {
+                                        loop_through_langs(i);
+                                    });
+                                } else {
+                                    system.event.attach("secondaryLoaded", function ()
+                                    {
+                                        BF.load_language(lang_id, function ()
+                                        {
+                                            loop_through_langs(i);
+                                        });
+                                    }, true);
+                                }
+                            }
+                        }(0));
+                    }
+                    
+                    
                     /**
                      * Handles new verses from the server.
                      *
@@ -2755,6 +2808,7 @@ document.addEventListener("DOMContentLoaded", function ()
                                 topLoader.style.visibility    = "hidden";
                             }
                         }
+                        
                         
                         /// Were there any verses returned?
                         if (verse_ids && verse_ids.length) {
@@ -2847,7 +2901,6 @@ document.addEventListener("DOMContentLoaded", function ()
                         } else {
                             /// Since total could be undefined, make sure the total is 0.
                             total = 0;
-                            prevent_further_queries();
                         }
                         
                         /// Is this is the first results of a query?
@@ -2873,13 +2926,18 @@ document.addEventListener("DOMContentLoaded", function ()
                             if (!total) {
                                 /// Is it a search?
                                 if (type !== BF.consts.verse_lookup) {
-                                    ///TODO: It should try to spell check (using the right language) and make suggestions (like did you mean "Godhead" if they enter "Trinity").
-                                    /// Since no results were found, display a disappointing message.
-                                    no_results = document.createElement("div");
-                                    no_results.className = "no_results";
-                                    /// Since the query must be inserted into the string, using createTextNode() is not possible, so we have to escape the query manually.
-                                    no_results.innerHTML = BF.insert({q: BF.escape_html(options.base_query)}, BF.lang.no_results);
-                                    page.appendChild(no_results);
+                                    try_a_lookup(options.base_query, function no_lookup_found()
+                                    {
+                                        /// Hide the loaders graphics and tell the browser not to continue searching.
+                                        prevent_further_queries();
+                                        ///TODO: It should try to spell check (using the right language) and make suggestions (like did you mean "Godhead" if they enter "Trinity").
+                                        /// Since no results were found, display a disappointing message.
+                                        no_results = document.createElement("div");
+                                        no_results.className = "no_results";
+                                        /// Since the query must be inserted into the string, using createTextNode() is not possible, so we have to escape the query manually.
+                                        no_results.innerHTML = BF.insert({q: BF.escape_html(options.base_query)}, BF.lang.no_results);
+                                        page.appendChild(no_results);
+                                    });
                                 } else {
                                     /// Verse lookups should never return an empty result on the initial query; therefore, something went wrong.
                                     page.textContent = BF.lang.err_unknown;
@@ -3965,7 +4023,7 @@ document.addEventListener("DOMContentLoaded", function ()
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?43056432", {
+                BF.include("/js/secondary.js?43057809", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
