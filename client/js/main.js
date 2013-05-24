@@ -3850,7 +3850,8 @@ document.addEventListener("DOMContentLoaded", function ()
                             /// This occurs when moving back and forth between a maximized callout or loading the page to a maximized callout.
                             /// E.g., if window.location.pathname is "/en/John%201%3A1/691005/",
                             ///       "url_suffix" will equal "691005/".
-                            url_suffix = window.location.pathname.match(/(?:\/[^\/]*){2}\/(.*)/)[1];
+                            ///NOTE: If the URL has no ending slash (e.g., "/en/love"), the regex will return NULL, so a blank array is used to prevent errors.
+                            url_suffix = (window.location.pathname.match(/(?:\/[^\/]*){2}\/(.*)/) || ["",""])[1];
                         } else {
                             ///NOTE: If only one parameter is found, it could be either a language ID or a query.
                             /// Is the parameter a valid language ID?
