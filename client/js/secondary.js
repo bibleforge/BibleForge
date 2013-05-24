@@ -3065,6 +3065,55 @@
                 context.qEl.style.paddingLeft = (langEl.offsetWidth + 3) + "px";
             }
             
+            BF.load_language = function (lang_id, callback)
+            {
+                ///NOTE: The last modified time is added (if available) to prevent browsers from caching an outdated file.
+                BF.include("/js/lang/" + lang_id + ".js?" + (BF.langs[lang_id].modified || ""), {}, function onload()
+                {
+                    var cue,
+                        link;
+                    
+                    /// After the language specific JavaScript has been download, check to see if language specific CSS is also needed.
+                    
+                    /// Does this language need additional files?
+                    if (BF.langs[lang_id].has_css || BF.langs[lang_id].load_dependencies) {
+                        /// Create a cue since there may be more than one asynchronous task.
+                        cue = BF.create_transition_cue(callback);
+                        
+                        /// Does the language have additional files it needs to download before it is ready?
+                        if (BF.langs[lang_id].load_dependencies) {
+                            cue.add({id: 0});
+                            BF.langs[lang_id].load_dependencies(function ()
+                            {
+                                cue.async_remove(0);
+                            });
+                        }
+                        
+                        /// Does this language need special CSS?
+                        ///NOTE: The CSS is loaded second just in case the onload event fires synchronously (though I'm not sure if this can happen).
+                        if (BF.langs[lang_id].has_css) {
+                            link = document.createElement("link");
+                            /// Since style sheets are cached for a long period of time, we can use css_modified to create a unique URL to esentially invalidate the cache.
+                            link.href = "/styles/lang/" + lang_id + ".css?" + (BF.langs[lang_id].css_modified || "");
+                            link.rel = "stylesheet";
+                            
+                            cue.add({id: 1});
+                            /// Because the CSS could contain fonts and other important rules, we must wait until the CSS has downloaded before initiating the language.
+                            ///TODO: Determine if any onerror event needs to be listened to in order to handle errors.
+                            link.addEventListener("load", function ()
+                            {
+                                cue.async_remove(1);
+                            });
+                            
+                            document.getElementsByTagName("head")[0].appendChild(link);
+                        }
+                    } else {
+                        /// If this language does not need special CSS or additional data to download, initiate the language immediately.
+                        callback();
+                    }
+                });
+            };
+            
             /**
              * Handle changes to the language.
              *
@@ -3076,6 +3125,7 @@
             BF.change_language = function (lang_id, prevent_reload, callback)
             {
                 var activate_new_lang,
+                    open_new_tab,
                     prev_lang,
                     qEl_str = context.qEl.value,
                     qEl_str_trim;
@@ -3105,10 +3155,18 @@
                 /// But make sure to prevent loading in a new tab as well.
                 if (!prevent_reload && (BF.keys_pressed.alt || BF.keys_pressed.ctrl)) {
                     if (BF.langs[lang_id]) {
-                        activate_new_lang = function ()
+                        /**
+                         * Open a new tab with the selected language.
+                         *
+                         * @note It is a separate function because it is called in two different places below.
+                         */
+                        open_new_tab = function ()
                         {
                             /// If the user has typed something into the query box, use that; otherwise, use the last query.
                             var query_str;
+                            
+                            /// This is to set the name back because the crown of throns loader could be present (if the langauge takes too long to load).
+                            change_langEl_text(BF.lang.short_name);
                             
                             if (context.settings.user.last_query.type === BF.consts.verse_lookup && (qEl_str === "" || qEl_str === context.settings.user.last_query.real_query)) {
                                 query_str = BF.create_ref(context.settings.user.position, lang_id);
@@ -3127,13 +3185,7 @@
                         ///NOTE: If the query input box is blank, use the last query made by the user.
                         if (!BF.langs[lang_id].loaded && (context.settings.user.last_query.type === BF.consts.verse_lookup && (qEl_str === "" || qEl_str === context.settings.user.last_query.real_query))) {
                             /// Because we needs to know the name of the book, it must first download the selected language and then open a new tab.
-                            ///NOTE: The last modified time is added (if available) to prevent browsers from caching an outdated file.
-                            BF.include("/js/lang/" + lang_id + ".js?" + (BF.langs[lang_id].modified || ""), {}, function ()
-                            {
-                                /// This is to set the name back because the crown of throns loader could be present.
-                                change_langEl_text(BF.lang.short_name);
-                                activate_new_lang();
-                            });
+                            BF.load_language(lang_id, open_new_tab);
                             
                             /// If the language data does not download quickly enough, display a loader graphic.
                             ///NOTE: This timeout will be canceled in change_langEl_text() if the data loads quickly enough.
@@ -3142,7 +3194,7 @@
                                 langEl.innerHTML = "<div class=crown_loader></div>";
                             }, 175);
                         } else {
-                            activate_new_lang();
+                            open_new_tab();
                         }
                     }
                     on_end();
@@ -3244,51 +3296,7 @@
                             activate_new_lang();
                         } else {
                             /// If the language code has not been downloaded yet, download it now and activate the language after the code has loaded.
-                            ///NOTE: The last modified time is added (if available) to prevent browsers from caching an outdated file.
-                            BF.include("/js/lang/" + lang_id + ".js?" + (BF.langs[lang_id].modified || ""), {}, function onload()
-                            {
-                                var cue,
-                                    link;
-                                
-                                /// After the language specific JavaScript has been download, check to see if language specific CSS is also needed.
-                                
-                                /// Does this language need additional files?
-                                if (BF.langs[lang_id].has_css || BF.langs[lang_id].load_dependencies) {
-                                    /// Create a cue since there may be more than one asynchronous task.
-                                    cue = BF.create_transition_cue(activate_new_lang);
-                                    
-                                    /// Does the language have additional files it needs to download before it is ready?
-                                    if (BF.langs[lang_id].load_dependencies) {
-                                        cue.add({id: 0});
-                                        BF.langs[lang_id].load_dependencies(function ()
-                                        {
-                                            cue.async_remove(0);
-                                        });
-                                    }
-                                    
-                                    /// Does this language need special CSS?
-                                    ///NOTE: The CSS is loaded second just in case the onload event fires syncronously (though I'm not sure if this can happen).
-                                    if (BF.langs[lang_id].has_css) {
-                                        link = document.createElement("link");
-                                        /// Since style sheets are cached for a long period of time, we can use css_modified to create a unique URL to esentially invalidate the cache.
-                                        link.href = "/styles/lang/" + lang_id + ".css?" + (BF.langs[lang_id].css_modified || "");
-                                        link.rel = "stylesheet";
-                                        
-                                        cue.add({id: 1});
-                                        /// Because the CSS could contain fonts and other important rules, we must wait until the CSS has downloaded before initiating the language.
-                                        ///TODO: Determine if any onerror event needs to be listened to in order to handle errors.
-                                        link.addEventListener("load", function ()
-                                        {
-                                            cue.async_remove(1);
-                                        });
-                                        
-                                        document.getElementsByTagName("head")[0].appendChild(link);
-                                    }
-                                } else {
-                                    /// If this language does not need special CSS or additional data to download, initiate the language immediately.
-                                    activate_new_lang();
-                                }
-                            });
+                            BF.load_language(lang_id, activate_new_lang);
                             
                             /// If the language data does not download quickly enough, display a loader graphic.
                             ///NOTE: This timeout will be canceled in change_langEl_text() if the data loads quickly enough.
