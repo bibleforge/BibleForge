@@ -1170,6 +1170,42 @@ document.addEventListener("DOMContentLoaded", function ()
         window.localStorage.setItem("recent_langs", JSON.stringify(recent_langs));
     };
     
+    /**
+     * Get a list of recently used and acceptable languages
+     *
+     * @param first (string) (optional) The language to add to the beginning of the array
+     */
+    BF.get_recent_and_acceptable_langs = function (first)
+    {
+        var acceptable_langs,
+            recent_langs = BF.parse_json(window.localStorage.getItem("recent_langs")) || {},
+            langs = [];
+        
+        if (first) {
+            langs[langs.length] = first;
+        }
+        
+        Object.keys(recent_langs).forEach(function (lang)
+        {
+            if (langs.indexOf(lang) === -1) {
+                langs[langs.length] = lang;
+            }
+        });
+        
+        acceptable_langs = BF.get_acceptable_langs();
+        
+        if (acceptable_langs) {
+            acceptable_langs.forEach(function (lang)
+            {
+                if (langs.indexOf(lang) === -1) {
+                    langs[langs.length] = lang;
+                }
+            });
+        }
+        
+        return langs;
+    };
+    
     
     /**
      * Initialize the BibleForge environment.
