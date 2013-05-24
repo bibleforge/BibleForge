@@ -997,9 +997,10 @@ document.addEventListener("DOMContentLoaded", function ()
     /**
      * Attempt to get the most preferred language that BibleForge supports.
      */
-    BF.get_preferred_supported_lang = (function ()
+    (function ()
     {
-        var best_lang;
+        var best_lang = "",
+            all_langs;
         
         /**
          * Parse the string of languages.
@@ -1012,10 +1013,12 @@ document.addEventListener("DOMContentLoaded", function ()
             var i,
                 langs,
                 langs_i,
+                lang_id,
                 langs_len,
                 len,
                 match,
-                matches;
+                matches,
+                res = [];
             
             /// Separate all languages from the header string.
             /// Example:
@@ -1037,15 +1040,43 @@ document.addEventListener("DOMContentLoaded", function ()
                     for (langs_i = 0; langs_i < langs_len; langs_i += 1) {
                         /// If the language code matches, return the ID for that language.
                         /// Example: "en-US" will be matched by en.js, so it will return "en".
-                        if (BF.langs[langs[langs_i]].match_lang.test(match[0])) {
-                            return langs[langs_i];
+                        lang_id = langs[langs_i];
+                        if (BF.langs[lang_id].match_lang.test(match[0]) && res.indexOf(lang_id) === -1) {
+                            res[res.length] = lang_id;
                         }
                     }
                 }
             }
             
             /// If nothing matches, just return a blank string.
-            return "";
+            return res;
+        }
+        
+        ///TODO: Document
+        ///TODO: Use a different file, like main.js (one that is actually cached).
+        function get_all_langs()
+        {
+            ///NOTE: The most reliable way to check for language preference is to parse the accept-language header sent by the browser; however, JavaScript cannot access the browser's headers.
+            ///      In order to get the accept-language header, the server is configured to bounce back the client's accept-language header to us in the X-client-accept-lang header.
+            ///      In order to get the X-client-accept-lang header, we need to make a synchronous Ajax call to load the same page (i.e., "#").
+            ///      There should not actually be any network delay since the browser should cache all requests.
+            ///      This is far from ideal, but the language preference only needs to be checked the very first time the client accesses BibleForge.
+            ///      Another option would be for the server to embed the header inside of the HTML when it first loads, but then it would no longer be a simple static page.
+            
+            /// Send a synchronous Ajax call in order to get the special header sent by the server.
+            ///NOTE: Since all HTML requests are cached, there should be very little delay.
+            var ajax = new window.XMLHttpRequest();
+            ajax.open("GET", "#", false); ///NOTE: Setting the third parameter to FALSE makes it synchronous.
+            ajax.send();
+            
+            ///NOTE: If, for some reason, the X-client-accept-lang header is unaccessible, we can fallback to checking the browser's navigator object.
+            ///      However, FireFox and Chrome support window.navigator.language but they treat it very differently and both only return one language.
+            ///      IE supports window.navigator.userLanguage but again only returns one language.
+            ///      Each browser treats these language preferences differently and may send, for example, the browser's or OS's UI language.
+            ///      In short, the navigator object is not to be trusted as accurately communicating the client's preference.
+            ///      This is why we go through the trouble of capturing the accept-language header.
+            /// Store the language so that it does not have to be looked up again if this function were called again.
+            all_langs = parse_langs(ajax.getResponseHeader ? ajax.getResponseHeader("X-client-accept-lang") : window.navigator.language || window.navigator.userLanguage);
         }
         
         /**
@@ -1053,36 +1084,29 @@ document.addEventListener("DOMContentLoaded", function ()
          *
          * @return A string representing the most preferred language from the client which is also supported language by BibleForge
          */
-        return function get_preferred_supported_lang()
+        BF.get_preferred_supported_lang = function get_preferred_supported_lang()
         {
-            var ajax;
-            
             /// Has the most preferred and supported language already been found?
             if (!best_lang) {
-                ///NOTE: The most reliable way to check for language preference is to parse the accept-language header sent by the browser; however, JavaScript cannot access the browser's headers.
-                ///      In order to get the accept-language header, the server is configured to bounce back the client's accept-language header to us in the X-client-accept-lang header.
-                ///      In order to get the X-client-accept-lang header, we need to make a synchronous Ajax call to load the same page (i.e., "#").
-                ///      There should not actually be any network delay since the browser should cache all requests.
-                ///      This is far from ideal, but the language preference only needs to be checked the very first time the client accesses BibleForge.
-                ///      Another option would be for the server to embed the header inside of the HTML when it first loads, but then it would no longer be a simple static page.
+                if (!all_langs) {
+                    get_all_langs();
+                }
                 
-                /// Send a synchronous Ajax call in order to get the special header sent by the server.
-                ///NOTE: Since all HTML requests are cached, there should be very little delay.
-                ajax = new window.XMLHttpRequest();
-                ajax.open("GET", "#", false); ///NOTE: Setting the third parameter to FALSE makes it synchronous.
-                ajax.send();
-                
-                ///NOTE: If, for some reason, the X-client-accept-lang header is unaccessible, we can fallback to checking the browser's navigator object.
-                ///      However, FireFox and Chrome support window.navigator.language but they treat it very differently and both only return one language.
-                ///      IE supports window.navigator.userLanguage but again only returns one language.
-                ///      Each browser treats these language preferences differently and may send, for example, the browser's or OS's UI language.
-                ///      In short, the navigator object is not to be trusted as accurately communicating the client's preference.
-                ///      This is why we go through the trouble of capturing the accept-language header.
-                /// Store the language so that it does not have to be looked up again if this function were called again.
-                best_lang = parse_langs(ajax.getResponseHeader ? ajax.getResponseHeader("X-client-accept-lang") : window.navigator.language || window.navigator.userLanguage);
+                if (all_langs && all_langs.length > 0) {
+                    best_lang = all_langs[0];
+                }
             }
             
             return best_lang;
+        };
+        
+        BF.get_acceptable_langs = function ()
+        {
+            if (!all_langs) {
+                get_all_langs();
+            }
+            
+            return all_langs;
         };
     }());
     
