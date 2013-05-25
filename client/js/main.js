@@ -995,7 +995,7 @@ document.addEventListener("DOMContentLoaded", function ()
     
     
     /**
-     * Attempt to get the most preferred language that BibleForge supports.
+     * Create both get_preferred_supported_lang() and get_acceptable_langs().
      */
     (function ()
     {
@@ -1052,8 +1052,12 @@ document.addEventListener("DOMContentLoaded", function ()
             return res;
         }
         
-        ///TODO: Document
-        ///TODO: Use a different file, like main.js (one that is actually cached).
+        /**
+         * Attempt to figure out all languages the client claims to support.
+         *
+         * @return UNDEFINED.  Any languages that it finds will be stored in the "all_langs" closure variable.
+         * @note   This is done by first attempting to get the accept-language header and will fallback to parsing less accurate variables.
+         */
         function get_all_langs()
         {
             ///NOTE: The most reliable way to check for language preference is to parse the accept-language header sent by the browser; however, JavaScript cannot access the browser's headers.
@@ -1065,6 +1069,8 @@ document.addEventListener("DOMContentLoaded", function ()
             
             /// Send a synchronous Ajax call in order to get the special header sent by the server.
             ///NOTE: Since all HTML requests are cached, there should be very little delay.
+            ///TODO: Use a different file, like main.js (one that is actually cached).
+            ///      Better yet, restructure the code so that this info is already received when loading main.js.
             var ajax = new window.XMLHttpRequest();
             ajax.open("GET", "#", false); ///NOTE: Setting the third parameter to FALSE makes it synchronous.
             ajax.send();
@@ -1082,7 +1088,7 @@ document.addEventListener("DOMContentLoaded", function ()
         /**
          * Get (and store) the most preferred and supported language.
          *
-         * @return A string representing the most preferred language from the client which is also supported language by BibleForge
+         * @return A string representing the most preferred language from the client which is also supported language by BibleForge or a blank string if none found
          */
         BF.get_preferred_supported_lang = function get_preferred_supported_lang()
         {
@@ -1100,6 +1106,11 @@ document.addEventListener("DOMContentLoaded", function ()
             return best_lang;
         };
         
+        /**
+         * Get a list of all languages the client claims to accept.
+         *
+         * @return An array of strings representing languages or UNDEFINED if none found
+         */
         BF.get_acceptable_langs = function ()
         {
             if (!all_langs) {
@@ -1185,6 +1196,7 @@ document.addEventListener("DOMContentLoaded", function ()
             langs[langs.length] = first;
         }
         
+        /// Loop through the recently used languages and add them to the list, if they are not already there.
         Object.keys(recent_langs).forEach(function (lang)
         {
             if (langs.indexOf(lang) === -1) {
@@ -1194,6 +1206,7 @@ document.addEventListener("DOMContentLoaded", function ()
         
         acceptable_langs = BF.get_acceptable_langs();
         
+        /// Loop through the languages the client claims are acceptable and add them to the list, if they are not already there.
         if (acceptable_langs) {
             acceptable_langs.forEach(function (lang)
             {
@@ -3392,6 +3405,7 @@ document.addEventListener("DOMContentLoaded", function ()
                     (function ()
                     {
                         var i,
+                            /// Make sure the current language is checked first by passing it as the first argument.
                             langs = BF.get_recent_and_acceptable_langs(BF.lang.id),
                             lang_id,
                             len;
@@ -3410,8 +3424,10 @@ document.addEventListener("DOMContentLoaded", function ()
                                 verse_id = Number(BF.langs[lang_id].determine_reference(query));
                                 /// Did it find a verse reference.
                                 if (verse_id) {
-                                    /// Make sure to mark this language as recently used so that it does not get removed.
-                                    BF.upate_recent_langs(lang_id);
+                                    /// Make sure to mark this language as recently used so that it does not get removed, if it is not the current language.
+                                    if (lang_id !== BF.lang.id) {
+                                        BF.upate_recent_langs(lang_id);
+                                    }
                                     /// If it found a verse reference, stop here.
                                     break;
                                 }
@@ -4055,7 +4071,7 @@ document.addEventListener("DOMContentLoaded", function ()
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?43057809", {
+                BF.include("/js/secondary.js?43139327", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,

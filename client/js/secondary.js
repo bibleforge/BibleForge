@@ -3005,6 +3005,7 @@
             }
         }, false);
         
+        /// When the scroll is cleared, remove all callouts as quickly as possible.
         context.system.event.attach("scrollCleared", function ()
         {
             BF.callout_manager.remove_callouts(null, {asap: true, force: true, ignore_state: true});
@@ -3012,7 +3013,6 @@
             BF.callout_manager.clear_cache();
         });
         
-        ///TODO: UPDATE docs
         /**
          * Move callouts to compensate for additional or the absence of text.
          *
@@ -3065,6 +3065,12 @@
                 context.qEl.style.paddingLeft = (langEl.offsetWidth + 3) + "px";
             }
             
+            /**
+             * Download and parse language files (and all other related files)
+             *
+             * @param lang_id  (string)   The ID of the language to load
+             * @param callback (function) The function to call once all of the related files are downloaded and parsed.
+             */
             BF.load_language = function (lang_id, callback)
             {
                 ///NOTE: The last modified time is added (if available) to prevent browsers from caching an outdated file.
