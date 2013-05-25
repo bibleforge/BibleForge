@@ -2715,6 +2715,8 @@ document.addEventListener("DOMContentLoaded", function ()
                                 verse_id = Number(BF.langs[lang_id].determine_reference(query));
                                 /// Did it find a valid verse?
                                 if (verse_id) {
+                                    /// Make sure to mark this language as recently used so that it does not get removed.
+                                    BF.upate_recent_langs(lang_id);
                                     /// Let's re-run the query and look up that verse.
                                     ///TODO: There should be a way to ignore the state entirely (or re-run a query more excatly (e.g., keep url_suffix)).
                                     run_new_query(query, false, true, {raw_query: query, type: 1, verse_id: verse_id})
@@ -3385,8 +3387,37 @@ document.addEventListener("DOMContentLoaded", function ()
                     ///
                     
                     /// Determine if the user is preforming a search or looking up a verse.
-                    /// If the query is a verse reference, a number is returned, if it is a search, then FALSE is returned.
-                    verse_id = Number(BF.lang.determine_reference(query));
+                    /// We do this by checking if a query is a verse reference against the current language and every language that the user has recently used
+                    /// or claims to understand (and is loaded).
+                    (function ()
+                    {
+                        var i,
+                            langs = BF.get_recent_and_acceptable_langs(BF.lang.id),
+                            lang_id,
+                            len;
+                        
+                        len = langs.length;
+                        
+                        for (i = 0; i < len; i += 1) {
+                            /// Make sure the language really exists and has been loaded.
+                            ///NOTE: Since it could take a long time to download all of the language files, it does not make sense to check unloaded languages,
+                            ///      since it would have to do that for a legitimate search.
+                            ///      However, if no verses are found, handle_new_verses() will go ahead and download all of the language files of recently used
+                            ///      and acceptable languages to check them before declaring no results found.
+                            lang_id = langs[i];
+                            if (BF.langs[lang_id] && BF.langs[lang_id].loaded) {
+                                /// If the query is a verse reference, a number is returned, if it is a search, then FALSE is returned.
+                                verse_id = Number(BF.langs[lang_id].determine_reference(query));
+                                /// Did it find a verse reference.
+                                if (verse_id) {
+                                    /// Make sure to mark this language as recently used so that it does not get removed.
+                                    BF.upate_recent_langs(lang_id);
+                                    /// If it found a verse reference, stop here.
+                                    break;
+                                }
+                            }
+                        }
+                    }());
                     
                     /// Is the query a verse lookup?  If so, let's make the URL look nice.
                     if (verse_id || (position && position.type === BF.consts.verse_lookup)) {
