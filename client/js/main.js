@@ -720,8 +720,8 @@ document.addEventListener("DOMContentLoaded", function ()
          */
         this.evaler = function (code)
         {
-            /// Since the eval'ed code has access to the variables in this closure, we need to clear out the code variable both as a security caution and
-            /// to prevent memory leaks.  The following code does just that: (code = "").
+            ///NOTE: Since the eval'ed code has access to the variables in this closure, we need to clear out the code variable both as a security caution and
+            ///      to prevent memory leaks.  The following code does just that: (code = ""). However, this also messes up Firebug's debugger.
             return eval(code + (code = ""));
         };
         
@@ -733,7 +733,9 @@ document.addEventListener("DOMContentLoaded", function ()
             (new BF.Create_easy_ajax()).query("GET", path, "", function (response)
             {
                 /// Evaluate the code in a safe environment.
-                var res = that.evaler(response);
+                /// Before evaluation, add the sourceURL so that debuggers can debug properly be matching the code to the correct file.
+                /// See https://blog.getfirebug.com/2009/08/11/give-your-eval-a-name-with-sourceurl/.
+                var res = that.evaler(response + "//@ sourceURL=" + path);
                 
                 /// If the eval'ed code is a function, send it the context.
                 if (typeof res === "function") {
@@ -4071,7 +4073,7 @@ document.addEventListener("DOMContentLoaded", function ()
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?43139327", {
+                BF.include("/js/secondary.js?43224684", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
