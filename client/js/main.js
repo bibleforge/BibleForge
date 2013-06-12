@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", function ()
     if (!BF.lang.zh_s) {
         BF.langs.zh_s = {
             full_name: "简体中文 (CKJV)",
-            modified: 41827138,
+            modified: 43697521,
             match_lang: /^zh-c(?:n|hs)$/i,
         };
     }
@@ -2798,7 +2798,7 @@ document.addEventListener("DOMContentLoaded", function ()
                             /// i Word IDs      (array)  (optional) An array of integers containing word IDs indicating which words should be highlighted in grammatical searches
                             /// n Verse Numbers (array)             An array of integers containing verse IDs for each verse returned
                             /// p Paragraphs    (array)  (optional) An array of 1's and 0's corresponding to n array indicating which verses are at the beginning of a paragraph
-                            /// t Total         (number)            The total number of verses returned
+                            /// t Total         (number) (optional) The total number of verses found in the initial search query or the number of verses being returned in this verse lookup
                             /// v Verse HTML    (array)             An array containing the HTML of the verses returned
                             total      = data.t;
                             paragraphs = data.p;
@@ -2830,6 +2830,12 @@ document.addEventListener("DOMContentLoaded", function ()
                         /// Were there any verses returned?
                         if (verse_ids && verse_ids.length) {
                             write_verses(type, direction, verse_ids, verse_html, paragraphs, in_paragraphs, options.verse_range);
+                            
+                            /// Because total number of verses is only returned on the first search query, we must calculate how many verses were returned are manually/.
+                            ///NOTE: Lookups always return the number of verses returned in this lookup.
+                            if (!total) {
+                                total = verse_ids.length;
+                            }
                             
                             if (options.highlight) {
                                 ///TODO: Determine if these variables should be isolated.
