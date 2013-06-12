@@ -476,7 +476,8 @@ BF.standard_search = function (data, callback)
             };
         
         /// Was there no response (or an invalid response) from the database?  This could mean the database or Sphinx crashed.
-        if (!data || data.length === 0) {
+        ///NOTE: If merely the length is 0, that means there were no results for that query, and we need to send an empty result with the proper response and not attempt to log it as an error.
+        if (!data) {
             ///TODO: Do better logging,
             if (err) {
                 console.log(err);
@@ -487,8 +488,12 @@ BF.standard_search = function (data, callback)
         }
         
         if (initial) {
-            /// Because all of the columns share the same name when using UNION, the total verses found statistic is in the "words" column.
-            res.t = Number(data.pop().words);
+            if (data.length > 0) {
+                /// Because all of the columns share the same name when using UNION, the total verses found statistic is in the "words" column.
+                res.t = Number(data.pop().words);
+            } else {
+                res.t = 0;
+            }
         }
         
         len = data.length;

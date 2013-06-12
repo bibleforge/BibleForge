@@ -2966,6 +2966,14 @@ document.addEventListener("DOMContentLoaded", function ()
                                     page.textContent = BF.lang.err_unknown;
                                 }
                             }
+                        } else {
+                            /// If no results were returned, we need to stop looking up more verses.
+                            ///NOTE: This will be triggered if a search query returns exactly the number of BF.lang.minimum_desired_verses.
+                            ///      An example query in English is "Ith* | elisheba | jabez | Shepho | Masrekah", which returns exactly 40 verses.
+                            if (!total) {
+                                /// Hide the loaders graphics and tell the browser not to continue searching.
+                                prevent_further_queries();
+                            }
                         }
                     };
                 }());
