@@ -34,7 +34,7 @@
  */
 
 /// Set JSHint options.
-// jshint bitwise:true, curly:true, eqeqeq:true, forin:true, immed:true, latedef:true, newcap:true, noarg:true, noempty:true, nonew:true, onevar:true, plusplus:true, quotmark:double, strict:true, undef:true, unused:strict, es5:true, browser:true
+// jshint bitwise:true, curly:true, eqeqeq:true, forin:true, immed:true, latedef:true, newcap:true, noarg:true, noempty:true, nonew:true, onevar:true, plusplus:true, quotmark:double, strict:true, undef:true, unused:strict, browser:true
 
 /**
  * Create the BibleForge language specific object for the English language.
@@ -158,7 +158,7 @@
             /// it makes sense to put the segmentation code in a separate, sharable file.
             cue.add({id: 0});
             ///TODO: Add support for include() on the server.
-            that.BF.include("/js/misc/zh_segment.js?40716644", context, function onload()
+            that.BF.include("/js/misc/zh_segment.js?46075211", context, function onload()
             {
                 cue.async_remove(0);
             });
