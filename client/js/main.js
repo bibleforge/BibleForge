@@ -1414,6 +1414,7 @@ document.addEventListener("DOMContentLoaded", function ()
                         content_manager.clear_scroll();
                         
                         /// Reload verses to where the user left off.
+                        ///TODO: Store url_suffix.
                         run_new_query(settings.user.last_query.real_query, false, true, settings.user.position);
                     }
                 });
