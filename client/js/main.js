@@ -483,7 +483,7 @@ document.addEventListener("DOMContentLoaded", function ()
                         
                         if (!retrying) {
                             ///TODO: Adjust the delay according to how many times the queries have failed and perhaps other factors (like connection quality and speed).
-                            window.setTimeout(retry, 5000);
+                            window.setTimeout(retry, 2000);
                             retrying = true;
                         }
                     }
@@ -602,7 +602,8 @@ document.addEventListener("DOMContentLoaded", function ()
                      */
                     return function query(method, path, message, onsuccess, onfailure, timeout, retry)
                     {
-                        var post_message;
+                        var post_message,
+                            failed;
                         
                         /// Because queries could be stored in the global_retry and run later, we need to make sure any cued queries are aborted.
                         ajax_obj.abort();
@@ -646,10 +647,31 @@ document.addEventListener("DOMContentLoaded", function ()
                         
                         /// Without the correct content-type, the data in the message will not become variables on the server.
                         ajax.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                        
+                        /**
+                         * Handle Ajax failures.
+                         */
+                        failed = function failed()
+                        {
+                            if (onfailure) {
+                                onfailure(ajax.status, ajax.responseText);
+                            }
+                            
+                            /// Should it retry?
+                            ///NOTE: Since 400 errors indicate a problem with the client, most 400 errors should not be repeated.
+                            ///      Error 408 (Request Timeout) can be repeated by the client without modification.
+                            if (retry && !aborted) {
+                                retrying = true;
+                                global_retry.attach(retry_func);
+                            }
+                        };
+                        
+                        ajax.onerror = failed;
+                        
                         /**
                          * Handle the request once it has been completed.
                          */
-                        ajax.onload = function ()
+                        ajax.onload = function onload()
                         {
                             /// Stop the timeout timer that may be running so it does not try again.
                             window.clearTimeout(ajax_timeout);
@@ -670,17 +692,7 @@ document.addEventListener("DOMContentLoaded", function ()
                                     onsuccess(ajax.responseText);
                                 }
                             } else {
-                                if (onfailure) {
-                                    onfailure(ajax.status, ajax.responseText);
-                                }
-                                
-                                /// Should it retry?
-                                ///NOTE: Since 400 errors indicate a problem with the client, most 400 errors should not be repeated.
-                                ///      Error 408 (Request Timeout) can be repeated by the client without modification.
-                                if (retry && !aborted) {
-                                    retrying = true;
-                                    global_retry.attach(retry_func);
-                                }
+                                failed();
                             }
                         };
                         send_query(post_message, timeout, retry);
