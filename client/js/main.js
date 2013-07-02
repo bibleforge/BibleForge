@@ -747,6 +747,10 @@ document.addEventListener("DOMContentLoaded", function ()
                 /// Evaluate the code in a safe environment.
                 /// Before evaluation, add the sourceURL so that debuggers can debug properly be matching the code to the correct file.
                 /// See https://blog.getfirebug.com/2009/08/11/give-your-eval-a-name-with-sourceurl/.
+                ///NOTE: The spec was recently changed to use //# to avoid complications with IE's conditional comments.
+                ///      However, it doesn't work with older browsers (tried with Chromium 25), and the current form still works (albeit depreciated),
+                ///      so for now, we'll keep //@ and change to //# at some point in the future.
+                ///      See https://groups.google.com/forum/#!msg/mozilla.dev.js-sourcemap/4uo7Z5nTfUY/_YNQtSxdclkJ for details.
                 var res = that.evaler(response + "//@ sourceURL=" + path);
                 
                 /// If the eval'ed code is a function, send it the context.
