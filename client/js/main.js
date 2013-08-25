@@ -2729,7 +2729,19 @@ document.addEventListener("DOMContentLoaded", function ()
                     {
                         ///TODO: Ignore the used language.
                         var langs = BF.get_recent_and_acceptable_langs() || [],
-                            len;
+                            len,
+                            should_stop;
+                        
+                        /**
+                         * Stop further searching if the user submits a new query.
+                         */
+                        function on_query()
+                        {
+                            should_stop = true;
+                        }
+                        
+                        /// Listen to see if the user submits another query.
+                        system.event.attach("query", on_query, true);
                         
                         len = langs.length - 1;
                         
@@ -2738,7 +2750,15 @@ document.addEventListener("DOMContentLoaded", function ()
                             var lang_id = langs[i],
                                 verse_id;
                             
+                            /// Stop if a new query has been sent.
+                            if (should_stop) {
+                                return;
+                            }
+                            
+                            /// Have we reached the end of the recently used and suggested languages?
                             if (i > len) {
+                                /// Detach the event since it didn't fire.
+                                system.event.detach("query", on_query, true);
                                 no_lookup_found();
                                 return;
                             }
@@ -2747,11 +2767,13 @@ document.addEventListener("DOMContentLoaded", function ()
                                 verse_id = Number(BF.langs[lang_id].determine_reference(query));
                                 /// Did it find a valid verse?
                                 if (verse_id) {
+                                    /// Detach the event since it didn't fire.
+                                    system.event.detach("query", on_query, true);
                                     /// Make sure to mark this language as recently used so that it does not get removed.
                                     BF.upate_recent_langs(lang_id);
                                     /// Let's re-run the query and look up that verse.
                                     ///TODO: There should be a way to ignore the state entirely (or re-run a query more excatly (e.g., keep url_suffix)).
-                                    run_new_query(query, false, true, {raw_query: query, type: 1, verse_id: verse_id})
+                                    run_new_query(query, false, true, {raw_query: query, type: 1, verse_id: verse_id});
                                 } else {
                                     /// No, the query does not look like a verse lookup in that language either.
                                     /// Let's try the next language (if any).
@@ -3145,6 +3167,9 @@ document.addEventListener("DOMContentLoaded", function ()
                                 return function query(options)
                                 {
                                     ///TODO: At some point, there needs to be feedback to the user that the query is taking place.  Maybe have something in the infoBar.
+                                    
+                                    /// This event is used to stop looking up queries in other languages (and could possibly be used for much more).
+                                    system.event.trigger("query", {query: options.query, type: options.type});
                                     
                                     /// Stop any old requests since we have a new one.
                                     ajax_additional.abort();
