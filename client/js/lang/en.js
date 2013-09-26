@@ -218,7 +218,7 @@
         stem_word: (function ()
         {
             /// Create stem arrays for stem_word().
-            var step2list = {ational: "ate", tional: "tion", enci: "ence", anci: "ance", izer: "ize", bli: "ble", alli: "al", entli: "ent", eli: "e", ousli: "ous", ization: "ize", ation: "ate", ator: "ate", alism: "al", iveness: "ive", fulness: "ful", ousness: "ous", aliti: "al", iviti: "ive", biliti: "ble", logi: "log"},
+            var step2list = {ational: "ate", tional: "tion", enci: "ence", anci: "ance", izer: "ize", bli: "ble", alli: "al", entli: "ent", eli: "e", ousli: "ous", ization: "ize", ation: "ate", ator: "ate", alism: "al", iveness: "ive", fulness: "ful", ousness: "ous", aliti: "al", iviti: "ive", biliti: "ble", logi: "log", fulli: "ful", lessli: "less"},
                 step3list = {icate: "ic", ative: "", alize: "al", iciti: "ic", ical: "ic", ful: "", ness: "", self: ""},
                 
                 ///TODO: Determine if there is a faster way to do this.  E.g., using an in_array() or isset() function.
@@ -371,7 +371,7 @@
                 if (re.test(w)) {
                     fp   = re.exec(w);
                     stem = fp[1];
-                    if (/^.[^aeiouy]/.test(stem)) {
+                    if (/.[^aeiouy]$/.test(stem)) {
                         w = stem + "i";
                     }
                 }
@@ -434,7 +434,7 @@
                 ///     li+     delete (if preceded by a valid li-ending)
                 ///             A valid li-ending is one of these: c, d, e, g, h, k, m, n, r, t.
                 
-                re = /^(.+?)(a(?:t(?:ion(?:al)?|or)|nci|l(?:li|i(?:sm|ti)))|tional|e(?:n(?:ci|til)|li)|i(?:z(?:er|ation)|v(?:eness|iti))|b(?:li|iliti)|ous(?:li|ness)|fulness|logi)$/;
+                re = /^(.+?)(a(?:t(?:ion(?:al)?|or)|nci|l(?:li|i(?:sm|ti)))|tional|e(?:n(?:ci|til)|li)|i(?:z(?:er|ation)|v(?:eness|iti))|b(?:li|iliti)|ous(?:li|ness)|ful(?:ness|li)|l(?:ogi|essli))$/;
                 r1 = /^([^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*/;
                 
                 if (re.test(w)) {
