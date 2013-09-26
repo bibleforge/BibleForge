@@ -47,6 +47,8 @@
 {
     "use strict";
     
+    var lang_obj;
+    
     /// In the eval context, "this" is undefined, so it needs to get the global object manually.
     /// Because this file is included immediately via <script> tags, it is not eval'ed.
     ///NOTE: Object.isFrozen() is needed for eval'ed code because the "this" object is the one from the evaler() function.
@@ -65,7 +67,7 @@
     }
     
     /// Return the language variables and functions.
-    that.BF.langs.en = {
+    lang_obj = {
         /// Indicate that the code has been downloaded and parsed.
         loaded: true,
         
@@ -206,389 +208,399 @@
         grammar_marker_len: 4,   /// The length of grammar_marker.
         grammar_separator:  ",", /// The punctuation that separates two attributes.
         
+        
+        /**
+         * Create the stem_word closure
+         *
+         * @return A function with variables inside the closure.
+         * @note   This function is executed immediately.
+         */
+        stem_word: (function ()
+        {
+            /// Create stem arrays for stem_word().
+            var step2list = {ational: "ate", tional: "tion", enci: "ence", anci: "ance", izer: "ize", bli: "ble", alli: "al", entli: "ent", eli: "e", ousli: "ous", ization: "ize", ation: "ate", ator: "ate", alism: "al", iveness: "ive", fulness: "ful", ousness: "ous", aliti: "al", iviti: "ive", biliti: "ble", logi: "log"},
+                step3list = {icate: "ic", ative: "", alize: "al", iciti: "ic", ical: "ic", ful: "", ness: "", self: ""},
+                
+                ///TODO: Determine if there is a faster way to do this.  E.g., using an in_array() or isset() function.
+                /// Words to ignore that are already the root word but don't look like it.
+                stop_words_re = /^(?:th[iu]s|h[ai]s|was|yes|succeed|proceed|e(?:arly|xceed)|only|news)$/i;
+            
+            /**
+             * Convert an English word to its root form.
+             *
+             * Based on the Porter stemmer in Javascript.
+             * Improved for BibleForge.
+             *
+             * @example root_word = stem_word("loving"); /// Returns "lov[ei]"
+             * @param   w (string) Word to stem.
+             * @return  Root word string.
+             * @todo    Update this (and Sphinx) to the porter2 algorithm.
+             * @note    Called by prepare_highlighter() in js/main.js.
+             * @link    http://snowball.tartarus.org/algorithms/english/stemmer.html
+             * @link    http://www.tartarus.org/~martin/PorterStemmer
+             * @todo    Document stem_word() better: give examples (from the KJV if possible) and reasonings for each regular expression, etc.
+             * @todo    Review stem_word() for optimizations: avoid regex when possible.
+             */
+            return function stem_word(w, plain)
+            {
+                var fp,
+                    last_letter,
+                    r1,
+                    r2,
+                    re,
+                    re2,
+                    re3,
+                    re4,
+                    stem,
+                    suffix;
+                
+                /// Some quick checking to see if we even need to continue.
+                if (w.length < 3) {
+                    return w;
+                }
+                
+                if (stop_words_re.test(w)) {
+                    return w;
+                }
+                
+                /// ***********
+                /// * Step 0a *
+                /// ***********
+                ///
+                /// Search for the longest among the suffixes
+                ///     '
+                ///     's
+                ///     's'
+                /// and remove if found.
+                                    
+                w = w.replace(/'(?:s'?)?$/, "");
+                
+                /// ***********
+                /// * Step 0b *
+                /// ***********
+                ///
+                /// Convert y's at the beginning of a word or after a vowel to upper case to indicate that they are to be treated as consonants.
+                /// They are converted back to lower case near the end.
+                
+                w = w.replace(/(?:^y|([aeiouy])y)/g, "$1Y");
+                
+                /// ***********
+                /// * Step 1a *
+                /// ***********
+                ///
+                /// Find the longest suffix and preform the following:
+                /// Replace suffixes: sses             => ss     (witnesses => witness)
+                ///                   ??ied+ || ??ies* => ??i    (cried     => cri,      cries => cri)
+                ///                   ?ied+  || ?ies*  => ??ie   (tied      => tie,      ties  => tie)
+                ///                   {V}{C}s          => {V}{C} (gaps      => gap)
+                /// Ignore suffixes:  us+ && ss                  (grievous  => grievous, pass  => pass)
+                
+                re  = /^(.+?)(ss|i)es$/;
+                re2 = /^(.+?)([^s])s$/;
+                
+                if (re.test(w)) {
+                    w = w.replace(re,  "$1$2");
+                } else if (re2.test(w)) {
+                    w = w.replace(re2, "$1$2");
+                }
+                
+                /// ***********
+                /// * Step 1b *
+                /// ***********
+                ///
+                /// Replace "eed" with "ee" if after the first non-vowel following a vowel, or the end of the word if there is no such non-vowel (aka R1).
+                ///     agreed => agree
+                /// Delete
+                ///     ed
+                ///     edly
+                ///     ing
+                ///     ingly
+                /// and for Early Modern English
+                ///     eth
+                ///     est
+                ///     edst
+                /// if the preceding word part contains a vowel.
+                ///
+                /// After the deletion:
+                /// if the word ends with "at," "bl," or "iz," add "e" (so luxuriat => luxuriate), or
+                /// if the word ends with a double remove the last letter (so hopp => hop), or
+                /// if the word (syllable) is short, add "e" (so hop => hope)
+                
+                ///TODO: Also stem "eedly" (porter2).
+                re  = /^(.+?)eed$/;
+                /// "Present-day" English: re2 = /^(.+?)(ingly|edly|ed|ing|ly)$/;
+                re2 = /^(.+?)(ing(?:ly)?|e(?:d(?:ly|st)?|st|th|ly))$/;
+                
+                if (re.test(w)) {
+                    fp = re.exec(w);
+                    if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(fp[1])) {
+                        w.slice(0, -1);
+                    }
+                } else if (re2.test(w)) {
+                    fp   = re2.exec(w);
+                    stem = fp[1];
+                    
+                    if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy]/.test(stem)) {
+                        w   = stem;
+                        re2 = /(?:at|bl|iz)$/;
+                        re3 = /([^aeiouylsz])\1$/; /// Look for repeating characters.
+                        /// Check for a short syllable.
+                        re4  = /(?:^[aeiouy][^aeiouy]$|[^aeiouy][aeiouy][^aeiouwxyY]$)/;
+                        if (re2.test(w)) {
+                            /// TODO: Determine why if (re2.test(w)) and else if (re4.test(w)) should not be merged to the same line since they have the same code following.
+                            w += "e";
+                        } else if (re3.test(w)) {
+                            w = w.slice(0, -1);
+                        } else if (re4.test(w)) {
+                            w += "e";
+                        }
+                    }
+                }
+                
+                /// ***********
+                /// * Step 1c *
+                /// ***********
+                ///
+                /// Replace y or Y suffixes with i if preceded by a non-vowel which is not the first letter of the word.
+                ///     cry => cri
+                ///     by  => by
+                ///     say => say
+                
+                re = /^(.+?)[yY]$/;
+                
+                if (re.test(w)) {
+                    fp   = re.exec(w);
+                    stem = fp[1];
+                    if (/^.[^aeiouy]/.test(stem)) {
+                        w = stem + "i";
+                    }
+                }
+                
+                /// **********
+                /// * Step 2 *
+                /// **********
+                ///
+                /// Replace stems in step2list if after the first non-vowel following a vowel, or the end of the word if there is no such non-vowel (aka R1).
+                ///
+                /// Current:
+                ///     ational => ate
+                ///     tional  => tion
+                ///     enci    => ence
+                ///     anci    => ance
+                ///     izer    => ize
+                ///     bli     => ble (not in Porter 2)
+                ///     alli    => al
+                ///     entli   => ent
+                ///     eli     => e (not in Porter 2)
+                ///     ousli   => ous
+                ///     ization => ize
+                ///     ation   => ate
+                ///     ator    => ate
+                ///     alism   => al
+                ///     iveness => ive
+                ///     fulness => ful
+                ///     ousness => ous
+                ///     aliti   => al
+                ///     iviti   => ive
+                ///     biliti  => ble
+                ///     logi    => log (not in Porter 2)
+                ///     fulli   => ful
+                ///     lessli  => less
+                ///
+                /// Porter 2:
+                ///     tional  => tion
+                ///     enci    => ence
+                ///     anci    => ance
+                ///     abli    => able
+                ///     entli   => ent
+                ///     izer    => ize
+                ///     ization => ize
+                ///     ational => ate
+                ///     ation   => ate
+                ///     ator    => ate
+                ///     alism   => al
+                ///     aliti   => al
+                ///     alli    => al
+                ///     fulness => ful
+                ///     ousli   => ous
+                ///     ousness => ous
+                ///     iveness => ive
+                ///     iviti   => ive
+                ///     biliti  => ble
+                ///     bli+    => ble
+                ///     ogi+    => og (if preceded by l)
+                ///     fulli+  => ful
+                ///     lessli+ => less
+                ///     li+     delete (if preceded by a valid li-ending)
+                ///             A valid li-ending is one of these: c, d, e, g, h, k, m, n, r, t.
+                
+                re = /^(.+?)(a(?:t(?:ion(?:al)?|or)|nci|l(?:li|i(?:sm|ti)))|tional|e(?:n(?:ci|til)|li)|i(?:z(?:er|ation)|v(?:eness|iti))|b(?:li|iliti)|ous(?:li|ness)|fulness|logi)$/;
+                r1 = /^([^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*/;
+                
+                if (re.test(w)) {
+                    fp     = re.exec(w);
+                    stem   = fp[1];
+                    suffix = fp[2];
+                    if (r1.test(stem)) {
+                        w = stem + step2list[suffix];
+                    }
+                }
+                
+                /// **********
+                /// * Step 3 *
+                /// **********
+                ///
+                /// Replace stems in step3list if after the first non-vowel following a vowel, or the end of the word if there is no such non-vowel (aka R1).
+                ///NOTE: "ative" should be removed if after the first non-vowel following a vowel in R1 or the end of the word, if there is no such non-vowel (aka R2).
+                ///
+                /// Current:
+                ///     icate => ic
+                ///     alize => al
+                ///     iciti => ic
+                ///     ical  => ic
+                ///     ative delete
+                ///     ful   delete
+                ///     ness  delete
+                ///     self  delete
+                ///
+                /// Porter 2:
+                ///     tional+  => tion
+                ///     ational+ => ate
+                ///     alize    => al
+                ///     icate    => ic
+                ///     iciti    => ic
+                ///     ical     => ic
+                ///     ful      delete
+                ///     ness     delete
+                ///     ative*   delete (if in R2)
+                
+                re = /^(.+?)(ic(?:a(?:te|l)|iti)|a(?:tive|lize)|ful|ness|self)$/;
+                
+                if (re.test(w)) {
+                    fp     = re.exec(w);
+                    stem   = fp[1];
+                    suffix = fp[2];
+                    if (r1.test(stem)) {
+                        w = stem + step3list[suffix];
+                    }
+                }
+                
+                /// **********
+                /// * Step 4 *
+                /// **********
+                ///
+                /// Essentially, delete certain suffixes if found in after the first non-vowel following a vowel in R1 or the end of the word, if there is no such non-vowel (aka R2).
+                ///
+                /// Possibly delete these suffixes:
+                ///     al
+                ///     ance
+                ///     ence
+                ///     er
+                ///     ic
+                ///     able
+                ///     ible
+                ///     ant
+                ///     ement
+                ///     ment
+                ///     ent
+                ///     ism
+                ///     ate
+                ///     iti
+                ///     ous
+                ///     ive
+                ///     ize
+                ///
+                /// The following suffix must also be preceded by an "s" or "t" as well as the other requirements:
+                ///     ion
+                
+                re  = /^(.+?)(?:a(?:l|n(?:ce|t)|te|ble)|e(?:n(?:ce|t)|r|ment)|i(?:c|ble|sm|ti|ve|ze)|ment|ous?)$/;
+                re2 = /^(.+?)([st])ion$/;
+                r2  = /^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/;
+                
+                if (re.test(w)) {
+                    fp   = re.exec(w);
+                    stem = fp[1];
+                    if (r2.test(stem)) {
+                        w = stem;
+                    }
+                } else if (re2.test(w)) {
+                    fp   = re2.exec(w);
+                    stem = fp[1] + fp[2];
+                    if (r2.test(stem)) {
+                        w = stem;
+                    }
+                }
+                
+                /// **********
+                /// * Step 5 *
+                /// **********
+                ///
+                /// Delete "e" if in R2, or in R1 and not preceded by a short syllable.
+                ///     creature => creatur
+                ///     eye      => eye
+                /// Delete "l" if in R2 and preceded by "l":
+                ///     fulfill => fulfil
+                ///     tell    => tell
+                
+                re = /^(.+?)e$/;
+                
+                if (re.test(w)) {
+                    fp   = re.exec(w);
+                    stem = fp[1];
+                    re2  = /^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*(?:[aeiouy][aeiou]*)?$/;
+                    /// Check for a short syllable.
+                    ///NOTE: A short syllable is defined as either a vowel followed by a non-vowel other than w, x or Y and preceded by a non-vowel, or
+                    ///      a vowel at the beginning of the word followed by a non-vowel.
+                    re3  = /(?:^[aeiouy][^aeiouy]$|[^aeiouy][aeiouy][^aeiouwxyY]$)/;
+                    
+                    ///NOTE: The only stem that causes false negatives is step 2's "ator" which becomes "ate" (which step 5 would convert from "ate" to "at").
+                    ///      Therefore, we must add optional regex to match against the "or" ending.
+                    ///      E.g., mediate => mediat(?:or)?
+                    ///      Since other words can end in "or" (e.g., "creator"), this must only be applied in special circumstances.
+                    ///NOTE: If a word is misspelled (like "mediat"), it will not add the extra regex, so it will return search results but not highlight them correctly.
+                    if (r2.test(stem) && stem.slice(-2) === "at") {
+                        w = stem + "(?:or)?";
+                    } else if (r2.test(stem) || (re2.test(stem) && !(re3.test(stem)))) {
+                        w = stem;
+                    }
+                } else {
+                    if (/ll$/.test(w) && (r2.test(w))) {
+                        w = w.slice(0, -1);
+                    }
+                }
+                
+                w = w.toLowerCase();
+                
+                /// In order to match different stemmed versions with regex, convert final y or i to [yi] and final e to [ei].
+                ///     love => lov[ei] (therefore it can match "loving" and "hope")
+                ///     cri  => cr[yi]  (therefore it can match "cried" and "cry")
+                
+                last_letter = w.slice(-1);
+                
+                if (last_letter === "y" || last_letter === "i") {
+                    if (plain) {
+                        w = w.slice(0, w.length - 1) + "y";
+                    } else {
+                        w = w.slice(0, w.length - 1) + "[yi]";
+                    }
+                } else if (last_letter === "e") {
+                    if (plain) {
+                        w = w.slice(0, w.length - 1) + "e";
+                    } else {
+                        w = w.slice(0, w.length - 1) + "[ei]";
+                    }
+                }
+                
+                return w;
+            };
+        }()),
+        
         /// ****************************************
         /// * Start of Language Specific Functions *
         /// ****************************************
         
         prepare_highlighter: (function ()
         {
-            /**
-             * Create the stem_word closure
-             *
-             * @return A function with variables inside the closure.
-             * @note   This function is executed immediately.
-             */
-            var stem_word = (function ()
-            {
-                /// Create stem arrays for stem_word().
-                var step2list = {ational: "ate", tional: "tion", enci: "ence", anci: "ance", izer: "ize", bli: "ble", alli: "al", entli: "ent", eli: "e", ousli: "ous", ization: "ize", ation: "ate", ator: "ate", alism: "al", iveness: "ive", fulness: "ful", ousness: "ous", aliti: "al", iviti: "ive", biliti: "ble", logi: "log"},
-                    step3list = {icate: "ic", ative: "", alize: "al", iciti: "ic", ical: "ic", ful: "", ness: "", self: ""},
-                    
-                    ///TODO: Determine if there is a faster way to do this.  E.g., using an in_array() or isset() function.
-                    /// Words to ignore that are already the root word but don't look like it.
-                    stop_words_re = /^(?:th[iu]s|h[ai]s|was|yes|succeed|proceed|e(?:arly|xceed)|only|news)$/i;
-                
-                /**
-                 * Convert an English word to its root form.
-                 *
-                 * Based on the Porter stemmer in Javascript.
-                 * Improved for BibleForge.
-                 *
-                 * @example root_word = stem_word("loving"); /// Returns "lov[ei]"
-                 * @param   w (string) Word to stem.
-                 * @return  Root word string.
-                 * @todo    Update this (and Sphinx) to the porter2 algorithm.
-                 * @note    Called by prepare_highlighter() in js/main.js.
-                 * @link    http://snowball.tartarus.org/algorithms/english/stemmer.html
-                 * @link    http://www.tartarus.org/~martin/PorterStemmer
-                 * @todo    Document stem_word() better: give examples (from the KJV if possible) and reasonings for each regular expression, etc.
-                 * @todo    Review stem_word() for optimizations: avoid regex when possible.
-                 */
-                return function stem_word(w)
-                {
-                    var fp,
-                        last_letter,
-                        r1,
-                        r2,
-                        re,
-                        re2,
-                        re3,
-                        re4,
-                        stem,
-                        suffix;
-                    
-                    /// Some quick checking to see if we even need to continue.
-                    if (w.length < 3) {
-                        return w;
-                    }
-                    
-                    if (stop_words_re.test(w)) {
-                        return w;
-                    }
-                    
-                    /// ***********
-                    /// * Step 0a *
-                    /// ***********
-                    ///
-                    /// Search for the longest among the suffixes
-                    ///     '
-                    ///     's
-                    ///     's'
-                    /// and remove if found.
-                                        
-                    w = w.replace(/'(?:s'?)?$/, "");
-                    
-                    /// ***********
-                    /// * Step 0b *
-                    /// ***********
-                    ///
-                    /// Convert y's at the beginning of a word or after a vowel to upper case to indicate that they are to be treated as consonants.
-                    /// They are converted back to lower case near the end.
-                    
-                    w = w.replace(/(?:^y|([aeiouy])y)/g, "$1Y");
-                    
-                    /// ***********
-                    /// * Step 1a *
-                    /// ***********
-                    ///
-                    /// Find the longest suffix and preform the following:
-                    /// Replace suffixes: sses             => ss     (witnesses => witness)
-                    ///                   ??ied+ || ??ies* => ??i    (cried     => cri,      cries => cri)
-                    ///                   ?ied+  || ?ies*  => ??ie   (tied      => tie,      ties  => tie)
-                    ///                   {V}{C}s          => {V}{C} (gaps      => gap)
-                    /// Ignore suffixes:  us+ && ss                  (grievous  => grievous, pass  => pass)
-                    
-                    re  = /^(.+?)(ss|i)es$/;
-                    re2 = /^(.+?)([^s])s$/;
-                    
-                    if (re.test(w)) {
-                        w = w.replace(re,  "$1$2");
-                    } else if (re2.test(w)) {
-                        w = w.replace(re2, "$1$2");
-                    }
-                    
-                    /// ***********
-                    /// * Step 1b *
-                    /// ***********
-                    ///
-                    /// Replace "eed" with "ee" if after the first non-vowel following a vowel, or the end of the word if there is no such non-vowel (aka R1).
-                    ///     agreed => agree
-                    /// Delete
-                    ///     ed
-                    ///     edly
-                    ///     ing
-                    ///     ingly
-                    /// and for Early Modern English
-                    ///     eth
-                    ///     est
-                    ///     edst
-                    /// if the preceding word part contains a vowel.
-                    ///
-                    /// After the deletion:
-                    /// if the word ends with "at," "bl," or "iz," add "e" (so luxuriat => luxuriate), or
-                    /// if the word ends with a double remove the last letter (so hopp => hop), or
-                    /// if the word (syllable) is short, add "e" (so hop => hope)
-                    
-                    ///TODO: Also stem "eedly" (porter2).
-                    re  = /^(.+?)eed$/;
-                    /// "Present-day" English: re2 = /^(.+?)(ingly|edly|ed|ing|ly)$/;
-                    re2 = /^(.+?)(ing(?:ly)?|e(?:d(?:ly|st)?|st|th)|ly)$/;
-                    
-                    if (re.test(w)) {
-                        fp = re.exec(w);
-                        if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*/.test(fp[1])) {
-                            w.slice(0, -1);
-                        }
-                    } else if (re2.test(w)) {
-                        fp   = re2.exec(w);
-                        stem = fp[1];
-                        
-                        if (/^(?:[^aeiou][^aeiouy]*)?[aeiouy]/.test(stem)) {
-                            w   = stem;
-                            re2 = /(?:at|bl|iz)$/;
-                            re3 = /([^aeiouylsz])\1$/; /// Look for repeating characters.
-                            /// Check for a short syllable.
-                            re4  = /(?:^[aeiouy][^aeiouy]$|[^aeiouy][aeiouy][^aeiouwxyY]$)/;
-                            if (re2.test(w)) {
-                                /// TODO: Determine why if (re2.test(w)) and else if (re4.test(w)) should not be merged to the same line since they have the same code following.
-                                w += "e";
-                            } else if (re3.test(w)) {
-                                w = w.slice(0, -1);
-                            } else if (re4.test(w)) {
-                                w += "e";
-                            }
-                        }
-                    }
-                    
-                    /// ***********
-                    /// * Step 1c *
-                    /// ***********
-                    ///
-                    /// Replace y or Y suffixes with i if preceded by a non-vowel which is not the first letter of the word.
-                    ///     cry => cri
-                    ///     by  => by
-                    ///     say => say
-                    
-                    re = /^(.+?)[yY]$/;
-                    
-                    if (re.test(w)) {
-                        fp   = re.exec(w);
-                        stem = fp[1];
-                        if (/^.[^aeiouy]/.test(stem)) {
-                            w = stem + "i";
-                        }
-                    }
-                    
-                    /// **********
-                    /// * Step 2 *
-                    /// **********
-                    ///
-                    /// Replace stems in step2list if after the first non-vowel following a vowel, or the end of the word if there is no such non-vowel (aka R1).
-                    ///
-                    /// Current:
-                    ///     ational => ate
-                    ///     tional  => tion
-                    ///     enci    => ence
-                    ///     anci    => ance
-                    ///     izer    => ize
-                    ///     bli     => ble
-                    ///     alli    => al
-                    ///     entli   => ent
-                    ///     eli     => e
-                    ///     ousli   => ous
-                    ///     ization => ize
-                    ///     ation   => ate
-                    ///     ator    => ate
-                    ///     alism   => al
-                    ///     iveness => ive
-                    ///     fulness => ful
-                    ///     ousness => ous
-                    ///     aliti   => al
-                    ///     iviti   => ive
-                    ///     biliti  => ble
-                    ///     logi    => log
-                    ///
-                    /// Porter 2:
-                    ///     tional  => tion
-                    ///     enci    => ence
-                    ///     anci    => ance
-                    ///     abli    => able
-                    ///     entli   => ent
-                    ///     izer    => ize
-                    ///     ization => ize
-                    ///     ational => ate
-                    ///     ation   => ate
-                    ///     ator    => ate
-                    ///     alism   => al
-                    ///     aliti   => al
-                    ///     alli    => al
-                    ///     fulness => ful
-                    ///     ousli   => ous
-                    ///     ousness => ous
-                    ///     iveness => ive
-                    ///     iviti   => ive
-                    ///     biliti  => ble
-                    ///     bli+    => ble
-                    ///     ogi+    => og (if preceded by l)
-                    ///     fulli+  => ful
-                    ///     lessli+ => less
-                    ///     li+     delete (if preceded by a valid li-ending)
-                    ///             A valid li-ending is one of these: c, d, e, g, h, k, m, n, r, t.
-                    
-                    re = /^(.+?)(a(?:t(?:ion(?:al)?|or)|nci|l(?:li|i(?:sm|ti)))|tional|e(?:n(?:ci|til)|li)|i(?:z(?:er|ation)|v(?:eness|iti))|b(?:li|iliti)|ous(?:li|ness)|fulness|logi)$/;
-                    r1 = /^([^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*/;
-                    
-                    if (re.test(w)) {
-                        fp     = re.exec(w);
-                        stem   = fp[1];
-                        suffix = fp[2];
-                        if (r1.test(stem)) {
-                            w = stem + step2list[suffix];
-                        }
-                    }
-                    
-                    /// **********
-                    /// * Step 3 *
-                    /// **********
-                    ///
-                    /// Replace stems in step3list if after the first non-vowel following a vowel, or the end of the word if there is no such non-vowel (aka R1).
-                    ///NOTE: "ative" should be removed if after the first non-vowel following a vowel in R1 or the end of the word, if there is no such non-vowel (aka R2).
-                    ///
-                    /// Current:
-                    ///     icate => ic
-                    ///     alize => al
-                    ///     iciti => ic
-                    ///     ical  => ic
-                    ///     ative delete
-                    ///     ful   delete
-                    ///     ness  delete
-                    ///     self  delete
-                    ///
-                    /// Porter 2:
-                    ///     tional+  => tion
-                    ///     ational+ => ate
-                    ///     alize    => al
-                    ///     icate    => ic
-                    ///     iciti    => ic
-                    ///     ical     => ic
-                    ///     ful      delete
-                    ///     ness     delete
-                    ///     ative*   delete (if in R2)
-                    
-                    re = /^(.+?)(ic(?:a(?:te|l)|iti)|a(?:tive|lize)|ful|ness|self)$/;
-                    
-                    if (re.test(w)) {
-                        fp     = re.exec(w);
-                        stem   = fp[1];
-                        suffix = fp[2];
-                        if (r1.test(stem)) {
-                            w = stem + step3list[suffix];
-                        }
-                    }
-                    
-                    /// **********
-                    /// * Step 4 *
-                    /// **********
-                    ///
-                    /// Essentially, delete certain suffixes if found in after the first non-vowel following a vowel in R1 or the end of the word, if there is no such non-vowel (aka R2).
-                    ///
-                    /// Possibly delete these suffixes:
-                    ///     al
-                    ///     ance
-                    ///     ence
-                    ///     er
-                    ///     ic
-                    ///     able
-                    ///     ible
-                    ///     ant
-                    ///     ement
-                    ///     ment
-                    ///     ent
-                    ///     ism
-                    ///     ate
-                    ///     iti
-                    ///     ous
-                    ///     ive
-                    ///     ize
-                    ///
-                    /// The following suffix must also be preceded by an "s" or "t" as well as the other requirements:
-                    ///     ion
-                    
-                    re  = /^(.+?)(?:a(?:l|n(?:ce|t)|te|ble)|e(?:n(?:ce|t)|r|ment)|i(?:c|ble|sm|ti|ve|ze)|ment|ous?)$/;
-                    re2 = /^(.+?)([st])ion$/;
-                    r2  = /^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*[aeiouy][aeiou]*[^aeiou][^aeiouy]*/;
-                    
-                    if (re.test(w)) {
-                        fp   = re.exec(w);
-                        stem = fp[1];
-                        if (r2.test(stem)) {
-                            w = stem;
-                        }
-                    } else if (re2.test(w)) {
-                        fp   = re2.exec(w);
-                        stem = fp[1] + fp[2];
-                        if (r2.test(stem)) {
-                            w = stem;
-                        }
-                    }
-                    
-                    /// **********
-                    /// * Step 5 *
-                    /// **********
-                    ///
-                    /// Delete "e" if in R2, or in R1 and not preceded by a short syllable.
-                    ///     creature => creatur
-                    ///     eye      => eye
-                    /// Delete "l" if in R2 and preceded by "l":
-                    ///     fulfill => fulfil
-                    ///     tell    => tell
-                    
-                    re = /^(.+?)e$/;
-                    
-                    if (re.test(w)) {
-                        fp   = re.exec(w);
-                        stem = fp[1];
-                        re2  = /^(?:[^aeiou][^aeiouy]*)?[aeiouy][aeiou]*[^aeiou][^aeiouy]*(?:[aeiouy][aeiou]*)?$/;
-                        /// Check for a short syllable.
-                        ///NOTE: A short syllable is defined as either a vowel followed by a non-vowel other than w, x or Y and preceded by a non-vowel, or
-                        ///      a vowel at the beginning of the word followed by a non-vowel.
-                        re3  = /(?:^[aeiouy][^aeiouy]$|[^aeiouy][aeiouy][^aeiouwxyY]$)/;
-                        
-                        ///NOTE: The only stem that causes false negatives is step 2's "ator" which becomes "ate" (which step 5 would convert from "ate" to "at").
-                        ///      Therefore, we must add optional regex to match against the "or" ending.
-                        ///      E.g., mediate => mediat(?:or)?
-                        ///      Since other words can end in "or" (e.g., "creator"), this must only be applied in special circumstances.
-                        ///NOTE: If a word is misspelled (like "mediat"), it will not add the extra regex, so it will return search results but not highlight them correctly.
-                        if (r2.test(stem) && stem.slice(-2) === "at") {
-                            w = stem + "(?:or)?";
-                        } else if (r2.test(stem) || (re2.test(stem) && !(re3.test(stem)))) {
-                            w = stem;
-                        }
-                    } else {
-                        if (/ll$/.test(w) && (r2.test(w))) {
-                            w = w.slice(0, -1);
-                        }
-                    }
-                    
-                    w = w.toLowerCase();
-                    
-                    /// In order to match different stemmed versions with regex, convert final y or i to [yi] and final e to [ei].
-                    ///     love => lov[ei] (therefore it can match "loving" and "hope")
-                    ///     cri  => cr[yi]  (therefore it can match "cried" and "cry")
-                    
-                    last_letter = w.slice(-1);
-                    
-                    if (last_letter === "y" || last_letter === "i") {
-                        w = w.slice(0, w.length - 1) + "[yi]";
-                    } else if (last_letter === "e") {
-                        w = w.slice(0, w.length - 1) + "[ei]";
-                    }
-                    
-                    return w;
-                };
-            }());
-            
-            
             /**
              * Prepare the search terms for the highlighter.
              *
@@ -759,7 +771,7 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                         do_not_add_morph_regex = true;
                         } else {
                         /// A normal word without a wildcard gets stemmed.
-                        stemmed_word = stem_word(term);
+                        stemmed_word = lang_obj.stem_word(term);
                         
                         /// Possibly fix strong words with proper morphological regex.
                         switch (stemmed_word) {
@@ -2060,4 +2072,6 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
                 });
         }
     };
+    
+    that.BF.langs.en = lang_obj;
 }(this));
