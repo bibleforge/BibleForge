@@ -61,21 +61,21 @@ document.addEventListener("DOMContentLoaded", function ()
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (KJV)",
-            hash: 56a02c9d68d61fa64536c290c43d7d39,
+            hash: "0a673110958e8a159a05da5619a57be2",
             match_lang: /^x-early-modern-english$/i,
         };
     }
     if (!BF.lang.zh_s) {
         BF.langs.zh_s = {
             full_name: "简体中文 (CKJV)",
-            hash: 7ec2f25116878b82f09fd72177e25c46,
+            hash: "7ec2f25116878b82f09fd72177e25c46",
             match_lang: /^zh-c(?:n|hs)$/i,
         };
     }
     if (!BF.lang.zh_t) {
         BF.langs.zh_t = {
             full_name: "繁體中文 (CKJV)",
-            hash: 45810811d706a1b4d263afe2ed1194c7,
+            hash: "45810811d706a1b4d263afe2ed1194c7",
             match_lang: /^zh(?:-c(?!n|hs))?$/i,
         };
     }
