@@ -61,21 +61,21 @@ document.addEventListener("DOMContentLoaded", function ()
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (KJV)",
-            modified: 53819333,
+            hash: 56a02c9d68d61fa64536c290c43d7d39,
             match_lang: /^x-early-modern-english$/i,
         };
     }
     if (!BF.lang.zh_s) {
         BF.langs.zh_s = {
             full_name: "简体中文 (CKJV)",
-            modified: 53775890,
+            hash: 7ec2f25116878b82f09fd72177e25c46,
             match_lang: /^zh-c(?:n|hs)$/i,
         };
     }
     if (!BF.lang.zh_t) {
         BF.langs.zh_t = {
             full_name: "繁體中文 (CKJV)",
-            modified: 53819192,
+            hash: 45810811d706a1b4d263afe2ed1194c7,
             match_lang: /^zh(?:-c(?!n|hs))?$/i,
         };
     }
@@ -1481,7 +1481,7 @@ document.addEventListener("DOMContentLoaded", function ()
                             if (!css_added) {
                                 /// Create a <style> element and add it to the DOM.
                                 link_tag = document.createElement("link");
-                                link_tag.href = "/styles/night.css?41744511";
+                                link_tag.href = "/styles/night.css?54047c1818f7a9f9d8f1c14b5bfb39ba";
                                 link_tag.rel  = "stylesheet";
                                 
                                 ///NOTE: WebKit needs some help to update the scroll bar colors.
@@ -4129,7 +4129,7 @@ document.addEventListener("DOMContentLoaded", function ()
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?46075108", {
+                BF.include("/js/secondary.js?4fd605abd53f3a1cf7d53ed62ed1622f", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,

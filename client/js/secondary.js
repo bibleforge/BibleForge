@@ -3073,8 +3073,8 @@
              */
             BF.load_language = function (lang_id, callback)
             {
-                ///NOTE: The last modified time is added (if available) to prevent browsers from caching an outdated file.
-                BF.include("/js/lang/" + lang_id + ".js?" + (BF.langs[lang_id].modified || ""), {}, function onload()
+                ///NOTE: The hash is added (if available) to prevent browsers from caching an outdated file.
+                BF.include("/js/lang/" + lang_id + ".js?" + (BF.langs[lang_id].hash || ""), {}, function onload()
                 {
                     var cue,
                         link;
@@ -3099,8 +3099,8 @@
                         ///NOTE: The CSS is loaded second just in case the onload event fires synchronously (though I'm not sure if this can happen).
                         if (BF.langs[lang_id].has_css) {
                             link = document.createElement("link");
-                            /// Since style sheets are cached for a long period of time, we can use css_modified to create a unique URL to esentially invalidate the cache.
-                            link.href = "/styles/lang/" + lang_id + ".css?" + (BF.langs[lang_id].css_modified || "");
+                            /// Since style sheets are cached for a long period of time, we can use css_hash to create a unique URL to esentially invalidate the cache.
+                            link.href = "/styles/lang/" + lang_id + ".css?" + (BF.langs[lang_id].css_hash || "");
                             link.rel = "stylesheet";
                             
                             cue.add({id: 1});

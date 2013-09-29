@@ -158,14 +158,14 @@
             /// it makes sense to put the segmentation code in a separate, sharable file.
             cue.add({id: 0});
             ///TODO: Add support for include() on the server.
-            that.BF.include("/js/misc/zh_segment.js?46075211", context, function onload()
+            that.BF.include("/js/misc/zh_segment.js?4b8b8ad9cb5dbc5cc326b9dd37c77c2a", context, function onload()
             {
                 cue.async_remove(0);
             });
             /// Since the dictionary is a relatively large string, it makes sense to store it in another file and download it separately (it will still be cached).
             cue.add({id: 1});
             ///TODO: Add support for Create_easy_ajax() on the server.
-            (new that.BF.Create_easy_ajax()).query("GET", "/js/misc/zh_s_dict.txt?53773053", "", function (res)
+            (new that.BF.Create_easy_ajax()).query("GET", "/js/misc/zh_s_dict.txt?ac5680d02606bbf179a796f87ef8efbb", "", function (res)
             {
                 dict = res;
                 cue.async_remove(1);

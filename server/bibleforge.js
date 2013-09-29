@@ -950,7 +950,7 @@ BF.lexical_lookup = function (data, callback)
                         
                         /// Add the a <link> tag for the language specific CSS, if any.
                         if (lang.has_css) {
-                            lang_css_html = "<link rel=stylesheet href=\"/styles/lang/" + lang.id + ".css?" + (lang.css_modified || "") + "\">";
+                            lang_css_html = "<link rel=stylesheet href=\"/styles/lang/" + lang.id + ".css?" + (lang.css_hash || "") + "\">";
                         }
                         content.LANG_CSS = lang_css_html;
                         
