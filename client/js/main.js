@@ -61,21 +61,21 @@ document.addEventListener("DOMContentLoaded", function ()
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (KJV)",
-            hash: "0a673110958e8a159a05da5619a57be2",
+            hash: "9a68f50219243add3166e0a4b477173c",
             match_lang: /^x-early-modern-english$/i,
         };
     }
     if (!BF.lang.zh_s) {
         BF.langs.zh_s = {
             full_name: "简体中文 (CKJV)",
-            hash: "7ec2f25116878b82f09fd72177e25c46",
+            hash: "69dd027bfbda2b5170ed940eb84a8521",
             match_lang: /^zh-c(?:n|hs)$/i,
         };
     }
     if (!BF.lang.zh_t) {
         BF.langs.zh_t = {
             full_name: "繁體中文 (CKJV)",
-            hash: "45810811d706a1b4d263afe2ed1194c7",
+            hash: "4987b74bd3f6952a7fa4c934e2ea0220",
             match_lang: /^zh(?:-c(?!n|hs))?$/i,
         };
     }
@@ -1481,7 +1481,7 @@ document.addEventListener("DOMContentLoaded", function ()
                             if (!css_added) {
                                 /// Create a <style> element and add it to the DOM.
                                 link_tag = document.createElement("link");
-                                link_tag.href = "/styles/night.css?54047c1818f7a9f9d8f1c14b5bfb39ba";
+                                link_tag.href = "/styles/night.css?1fe7f1961f341d4fd4a247a88f9630c1";
                                 link_tag.rel  = "stylesheet";
                                 
                                 ///NOTE: WebKit needs some help to update the scroll bar colors.
@@ -4129,7 +4129,7 @@ document.addEventListener("DOMContentLoaded", function ()
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?4fd605abd53f3a1cf7d53ed62ed1622f", {
+                BF.include("/js/secondary.js?580d7033c98e48be2b5a07cc8e202404", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
