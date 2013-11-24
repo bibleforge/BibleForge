@@ -643,7 +643,7 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
             {
                 /// Convert fullwidth numbers to normal numbers.
                 return String.fromCharCode(number.charCodeAt(0) - 65248);
-            }).replace(/[、，丶]/g, ",").replace(" IN RED", " AS RED").replace(/\s+/g, " ").replace(/\sAND\s|\s*＆\s*/g, " & ").replace(/\sOR\s|\s*｜\s*/g, " | ").replace(/(?:\s[-－]|\s*\bNOT)\s/g, " -").replace(/[‘’]/g, "'").replace(/[“”]/g, "\"").replace(/[\u2011－]/g, "-").replace(/[\u00AD\u2012-\u2015]/g, "").replace(/([0-9]+)[:.;,；。：\s]title/ig, "$1:0").replace(/([:.;,；。：\s])subscript(?:ion)?/ig, "$1255").replace(/＊/g, "*").replace(/[\\、]+$/, "")
+            }).replace(/[\\、]+$/, "").replace(/[、，丶]/g, ",").replace(" IN RED", " AS RED").replace(/\s+/g, " ").replace(/\sAND\s|\s*＆\s*/g, " & ").replace(/\sOR\s|\s*｜\s*/g, " | ").replace(/(?:\s[-－]|\s*\bNOT)\s/g, " -").replace(/[‘’]/g, "'").replace(/[“”]/g, "\"").replace(/[\u2011－]/g, "-").replace(/[\u00AD\u2012-\u2015]/g, "").replace(/([0-9]+)[:.;,；。：\s]title/ig, "$1:0").replace(/([:.;,；。：\s])subscript(?:ion)?/ig, "$1255").replace(/＊/g, "*")
                 /// In order to handle hyphenated words correctly, we treat them as a quoted phrase.
                 /// So we need to wrap hyphenated words in quotes (if they are not in a quotation already) and replace the hyphens with spaces.
                .replace(/"[^"]+"?|[^"\s]+/g, function (terms)

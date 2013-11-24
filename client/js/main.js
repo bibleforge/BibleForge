@@ -68,14 +68,14 @@ document.addEventListener("DOMContentLoaded", function ()
     if (!BF.lang.zh_s) {
         BF.langs.zh_s = {
             full_name: "简体中文 (CKJV)",
-            hash: "141917f00e94416e9f5835d4379d5738",
+            hash: "7768584ce15680e83d9c90a28f8b53c0",
             match_lang: /^zh-c(?:n|hs)$/i,
         };
     }
     if (!BF.lang.zh_t) {
         BF.langs.zh_t = {
             full_name: "繁體中文 (CKJV)",
-            hash: "900815e3e18776f6e9567fa21082e510",
+            hash: "40e76980c06e381bd5c38265c26a4cfb",
             match_lang: /^zh(?:-c(?!n|hs))?$/i,
         };
     }
@@ -3466,7 +3466,8 @@ document.addEventListener("DOMContentLoaded", function ()
                             /// Make sure the current language is checked first by passing it as the first argument.
                             langs = BF.get_recent_and_acceptable_langs(BF.lang.id),
                             lang_id,
-                            len;
+                            len,
+                            tmp_query;
                         
                         len = langs.length;
                         
@@ -3477,14 +3478,19 @@ document.addEventListener("DOMContentLoaded", function ()
                             ///      However, if no verses are found, handle_new_verses() will go ahead and download all of the language files of recently used
                             ///      and acceptable languages to check them before declaring no results found.
                             lang_id = langs[i];
+                            ///TODO: This needs to be able to asynchronously load the languages and then continue one.
                             if (BF.langs[lang_id] && BF.langs[lang_id].loaded) {
+                                /// Because each language's prepare_query() function is different, it needs to be run each time on the base query.
+                                tmp_query = BF.langs[lang_id].prepare_query(options.base_query).trim();
                                 /// If the query is a verse reference, a number is returned, if it is a search, then FALSE is returned.
-                                verse_id = Number(BF.langs[lang_id].determine_reference(query));
+                                verse_id = Number(BF.langs[lang_id].determine_reference(tmp_query));
                                 /// Did it find a verse reference.
                                 if (verse_id) {
                                     /// Make sure to mark this language as recently used so that it does not get removed, if it is not the current language.
                                     if (lang_id !== BF.lang.id) {
                                         BF.upate_recent_langs(lang_id);
+                                        /// Since the query might have been changed by this language's prepare_query(), it needs to be replaced.
+                                        options.prepared_query = tmp_query;
                                     }
                                     /// If it found a verse reference, stop here.
                                     break;
