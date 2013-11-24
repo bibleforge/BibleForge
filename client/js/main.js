@@ -61,21 +61,21 @@ document.addEventListener("DOMContentLoaded", function ()
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (KJV)",
-            hash: "9a68f50219243add3166e0a4b477173c",
+            hash: "30cb4357b4b1ab9068da88357de9e5c6",
             match_lang: /^x-early-modern-english$/i,
         };
     }
     if (!BF.lang.zh_s) {
         BF.langs.zh_s = {
             full_name: "简体中文 (CKJV)",
-            hash: "69dd027bfbda2b5170ed940eb84a8521",
+            hash: "141917f00e94416e9f5835d4379d5738",
             match_lang: /^zh-c(?:n|hs)$/i,
         };
     }
     if (!BF.lang.zh_t) {
         BF.langs.zh_t = {
             full_name: "繁體中文 (CKJV)",
-            hash: "4987b74bd3f6952a7fa4c934e2ea0220",
+            hash: "900815e3e18776f6e9567fa21082e510",
             match_lang: /^zh(?:-c(?!n|hs))?$/i,
         };
     }
@@ -4177,7 +4177,7 @@ document.addEventListener("DOMContentLoaded", function ()
      * @param  limit (number)           (optional) The number of times to split the string.
      * @return Returns an array of the string now broken into pieces.
      * @see    http://blog.stevenlevithan.com/archives/cross-browser-split
-     * @todo   Determine if IE10 still needs this (and even uses conditional comments).
+     * @todo   Determine if IE11 still needs this.
      */
     ///NOTE: The following conditional compilation code blocks only executes in IE.
     /*@cc_on
@@ -4286,7 +4286,7 @@ document.addEventListener("DOMContentLoaded", function ()
      */
     (function ()
     {
-        /// If the user presses the refresh button, the browser will try to scroll back to the user's last scroll position.
+        /// If the user presses the refresh button, some browsers will try to scroll back to the user's last scroll position.
         /// However, since BibleForge does not display all of the text on the screen at the same time, this causes lots of problems.
         /// To prevent the browser from altering the starting scroll position, we have to manually scroll the browser.
         /// This is done by creating an element slightly larger than the viewport and scrolling up and down one pixel.
@@ -4302,7 +4302,7 @@ document.addEventListener("DOMContentLoaded", function ()
         window.scrollTo(0, 0);
         document.body.removeChild(big_el);
         
-        /// Remove the element since it is no longer needed.
+        /// Destroy the element since it is no longer needed.
         big_el = undefined;
         
         /// Initialize BibleForge.

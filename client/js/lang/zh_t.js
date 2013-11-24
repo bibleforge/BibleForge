@@ -638,11 +638,12 @@ first_loop:     for (i = 0; i < arr_len; i += 1) {
             ///NOTE: .replace(/([0-9]+)[:.;,；。：，\s]title/ig, "$1:0")        replaces Psalm title references into an acceptable format (e.g., "Psalm 3:title" becomes "Psalm 3:0").
             ///NOTE: .replace(/([:.;,；。：，\s])subscript(?:ion)?/ig, "$1255") replaces the word "subscription" with the verse number (255) used internally by BibleForge for Pauline subscriptions (e.g., "Philemon subscription" becomes "Philemon 255").
             ///NOTE: "$1255" replaces the text with the first placeholder followed by the literal "255" (without quotes).
+            ///NOTE: [\\、]+$ removes the trailing back slashes that are so easy to hit by accident when pressing Enter.
             return query.replace(/[０-９]/g, function (number)
             {
                 /// Convert fullwidth numbers to normal numbers.
                 return String.fromCharCode(number.charCodeAt(0) - 65248);
-            }).replace(/[、，丶]/g, ",").replace(" IN RED", " AS RED").replace(/\s+/g, " ").replace(/\sAND\s|\s*＆\s*/g, " & ").replace(/\sOR\s|\s*｜\s*/g, " | ").replace(/(?:\s[-－]|\s*\bNOT)\s/g, " -").replace(/[‘’]/g, "'").replace(/[“”]/g, "\"").replace(/[\u2011－]/g, "-").replace(/[\u00AD\u2012-\u2015]/g, "").replace(/([0-9]+)[:.;,；。：\s]title/ig, "$1:0").replace(/([:.;,；。：\s])subscript(?:ion)?/ig, "$1255").replace(/＊/g, "*")
+            }).replace(/[、，丶]/g, ",").replace(" IN RED", " AS RED").replace(/\s+/g, " ").replace(/\sAND\s|\s*＆\s*/g, " & ").replace(/\sOR\s|\s*｜\s*/g, " | ").replace(/(?:\s[-－]|\s*\bNOT)\s/g, " -").replace(/[‘’]/g, "'").replace(/[“”]/g, "\"").replace(/[\u2011－]/g, "-").replace(/[\u00AD\u2012-\u2015]/g, "").replace(/([0-9]+)[:.;,；。：\s]title/ig, "$1:0").replace(/([:.;,；。：\s])subscript(?:ion)?/ig, "$1255").replace(/＊/g, "*").replace(/[\\、]+$/, "")
                 /// In order to handle hyphenated words correctly, we treat them as a quoted phrase.
                 /// So we need to wrap hyphenated words in quotes (if they are not in a quotation already) and replace the hyphens with spaces.
                .replace(/"[^"]+"?|[^"\s]+/g, function (terms)
