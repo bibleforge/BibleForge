@@ -15,7 +15,7 @@
  */
 
 /*!
- * Copyright (C) 2013
+ * Copyright (C) 2014
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -61,21 +61,21 @@ document.addEventListener("DOMContentLoaded", function ()
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (KJV)",
-            hash: "30cb4357b4b1ab9068da88357de9e5c6",
+            hash: "3f99df048ca89c2edb5551b0695b19db",
             match_lang: /^x-early-modern-english$/i,
         };
     }
     if (!BF.lang.zh_s) {
         BF.langs.zh_s = {
             full_name: "简体中文 (CKJV)",
-            hash: "7768584ce15680e83d9c90a28f8b53c0",
+            hash: "d9382a406dc8564faf5b9ae2cdd2255f",
             match_lang: /^zh-c(?:n|hs)$/i,
         };
     }
     if (!BF.lang.zh_t) {
         BF.langs.zh_t = {
             full_name: "繁體中文 (CKJV)",
-            hash: "40e76980c06e381bd5c38265c26a4cfb",
+            hash: "4695f8e939b32ff9e65ccdfded968205",
             match_lang: /^zh(?:-c(?!n|hs))?$/i,
         };
     }
@@ -1481,7 +1481,7 @@ document.addEventListener("DOMContentLoaded", function ()
                             if (!css_added) {
                                 /// Create a <style> element and add it to the DOM.
                                 link_tag = document.createElement("link");
-                                link_tag.href = "/styles/night.css?1fe7f1961f341d4fd4a247a88f9630c1";
+                                link_tag.href = "/styles/night.css?67ab37278173d0789a533907de977b89";
                                 link_tag.rel  = "stylesheet";
                                 
                                 ///NOTE: WebKit needs some help to update the scroll bar colors.
@@ -4135,7 +4135,7 @@ document.addEventListener("DOMContentLoaded", function ()
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?580d7033c98e48be2b5a07cc8e202404", {
+                BF.include("/js/secondary.js?105857bc68dac4e3c783fb060e2e1c6c", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,

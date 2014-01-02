@@ -15,7 +15,7 @@
  */
 
 /*!
- * Copyright (C) 2013
+ * Copyright (C) 2014
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -158,7 +158,7 @@
             /// it makes sense to put the segmentation code in a separate, sharable file.
             cue.add({id: 0});
             ///TODO: Add support for include() on the server.
-            that.BF.include("/js/misc/zh_segment.js?1e23d7f456e15c0a742bd30ca3b5eb22", context, function onload()
+            that.BF.include("/js/misc/zh_segment.js?dc2d253b20a1f85bcd07b8ba5e15a4ed", context, function onload()
             {
                 cue.async_remove(0);
             });
