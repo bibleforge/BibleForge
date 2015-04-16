@@ -1596,7 +1596,7 @@
             
             
             /**
-             * Createthe contact panel.
+             * Create the contact panel.
              */
             show_contact_panel = function ()
             {

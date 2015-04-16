@@ -1269,7 +1269,7 @@ BF.lexical_lookup = function (data, callback)
                     },
                     /// Get the original URI that is being requested and parse it.
                     ///NOTE: Use the X-Request-URI header if present because sometimes the original URL gets modified (e.g., a request to /en/love/ is redirected to /api).
-                    url_parsed = url.parse(request.headers["x-request-uri"] || request.headers.url);
+                    url_parsed = url.parse(request.headers["x-request-uri"] || request.headers.url || request.url);
                 
                 /// Is there GET data?
                 ///TODO: Merge POST data with GET data.
