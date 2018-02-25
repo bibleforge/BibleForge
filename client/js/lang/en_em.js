@@ -15,7 +15,7 @@
  */
 
 /**
- * Copyright (C) 2014
+ * Copyright (C) 2018
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -81,7 +81,7 @@
         
         /// Indicate whether or not this version needs a special CSS file.
         has_css: true,
-        css_hash: "893a9be7f6f6ae08a78754ef25844425",
+        css_hash: "617eaed967ca5d97371074d2180b5387",
         
         /// Currently, this version does not have lexically linked words.
         linked_to_orig: false,

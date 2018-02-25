@@ -11,10 +11,6 @@ To use BibleForge, all you have to do is go to <a href="http://bibleforge.com">b
 
 Most of the BibleForge code is licensed under the <a href="http://opensource.org/licenses/MIT" target="_blank">MIT</a>. See the readme directory for more details.
 
-<h3>Donate</h3>
-
-BibleForge is free, but it's not free to host. If you find BibleForge useful, please consider a donation via <a href="https://www.gittip.com/bibleforge/" title="Gittip: Inspiring Generosity">Gittip</a>.
-
 <h3>Contact</h3>
 
 * Blog: <a href="http://blog.bibleforge.com">blog.bibleforge.com</a>
