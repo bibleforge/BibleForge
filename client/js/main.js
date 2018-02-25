@@ -15,7 +15,7 @@
  */
 
 /*!
- * Copyright (C) 2014
+ * Copyright (C) 2018
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -61,21 +61,21 @@ document.addEventListener("DOMContentLoaded", function ()
     if (!BF.lang.en_em) {
         BF.langs.en_em = {
             full_name: "Early Modern English (KJV)",
-            hash: "3f99df048ca89c2edb5551b0695b19db",
+            modified: 47578417,
             match_lang: /^x-early-modern-english$/i,
         };
     }
     if (!BF.lang.zh_s) {
         BF.langs.zh_s = {
             full_name: "简体中文 (CKJV)",
-            hash: "d9382a406dc8564faf5b9ae2cdd2255f",
+            modified: 46075246,
             match_lang: /^zh-c(?:n|hs)$/i,
         };
     }
     if (!BF.lang.zh_t) {
         BF.langs.zh_t = {
             full_name: "繁體中文 (CKJV)",
-            hash: "4695f8e939b32ff9e65ccdfded968205",
+            modified: 46075246,
             match_lang: /^zh(?:-c(?!n|hs))?$/i,
         };
     }
@@ -1481,7 +1481,7 @@ document.addEventListener("DOMContentLoaded", function ()
                             if (!css_added) {
                                 /// Create a <style> element and add it to the DOM.
                                 link_tag = document.createElement("link");
-                                link_tag.href = "/styles/night.css?67ab37278173d0789a533907de977b89";
+                                link_tag.href = "/styles/night.css?ab1cf200d4fb2d2dc745582a86ea6ba6";
                                 link_tag.rel  = "stylesheet";
                                 
                                 ///NOTE: WebKit needs some help to update the scroll bar colors.
@@ -1831,6 +1831,7 @@ document.addEventListener("DOMContentLoaded", function ()
                         function remove_excess_content_top()
                         {
                             var child = page.firstChild,
+                                origPageYOffset,
                                 child_height;
                             
                             if (child === null) {
@@ -1853,12 +1854,15 @@ document.addEventListener("DOMContentLoaded", function ()
                                 cached_verses_top[cached_count_top] = child.innerHTML;
                                 cached_count_top += 1;
                                 
+                                /// Some browsers try to be smart and scroll for you, but it's not consistent.
+                                origPageYOffset = window.pageYOffset;
+                                
                                 page.removeChild(child);
                                 
                                 /// Calculate and set the new scroll position.
                                 /// Because content is being removed from the top of the page, the rest of the content will be shifted upward.
                                 /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was removed.
-                                scroll_view_to(window.pageYOffset - child_height);
+                                scroll_view_to(origPageYOffset - child_height);
                                 
                                 system.event.trigger("contentRemovedAbove", {amount: -child_height});
                                 
@@ -2178,6 +2182,7 @@ document.addEventListener("DOMContentLoaded", function ()
                     function add_content_top_if_needed()
                     {
                         var child = page.firstChild,
+                            origPageYOffset,
                             newEl;
                         
                         if (child === null) {
@@ -2194,11 +2199,14 @@ document.addEventListener("DOMContentLoaded", function ()
                                 cached_count_top -= 1;
                                 newEl.innerHTML = cached_verses_top[cached_count_top];
                                 
+                                /// Some browsers try to be smart and scroll for you, but it's not consistent.
+                                origPageYOffset = window.pageYOffset;
+                                
                                 page.insertBefore(newEl, child);
                                 
                                 /// The new content that was just added to the top of the page will push the other contents downward.
                                 /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was added.
-                                scroll_view_to(window.pageYOffset + newEl.clientHeight);
+                                scroll_view_to(origPageYOffset + newEl.clientHeight);
                                 
                                 system.event.trigger("contentAddedAbove", {amount: newEl.clientHeight});
                                 
@@ -2575,7 +2583,8 @@ document.addEventListener("DOMContentLoaded", function ()
                             stop_key             = verse_ids.length,
                             verse_id,
                             verse_obj,
-                            which_hebrew_letter;
+                            which_hebrew_letter,
+                            origPageYOffset;
                         
                         /**
                          * Compile the HTML for a normal verse.
@@ -2714,11 +2723,14 @@ document.addEventListener("DOMContentLoaded", function ()
                         if (direction === BF.consts.additional) {
                             page.appendChild(newEl);
                         } else {
+                            /// Some browsers try to be smart and scroll for you, but it's not consistent.
+                            origPageYOffset = window.pageYOffset;
+                            
                             page.insertBefore(newEl, page.childNodes[0]);
                             
                             /// The new content that was just added to the top of the page will push the other contents downward.
                             /// Therefore, the page must be instantly scrolled down the same amount as the height of the content that was added.
-                            content_manager.scroll_view_to(window.pageYOffset + newEl.clientHeight);
+                            content_manager.scroll_view_to(origPageYOffset + newEl.clientHeight);
                             
                             system.event.trigger("contentAddedAbove", {amount: newEl.clientHeight});
                         }
@@ -4129,7 +4141,7 @@ document.addEventListener("DOMContentLoaded", function ()
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?105857bc68dac4e3c783fb060e2e1c6c", {
+                BF.include("/js/secondary.js?b9615a7b167c2e72cfe34c294d6cb35f", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
@@ -4177,7 +4189,7 @@ document.addEventListener("DOMContentLoaded", function ()
      * @param  limit (number)           (optional) The number of times to split the string.
      * @return Returns an array of the string now broken into pieces.
      * @see    http://blog.stevenlevithan.com/archives/cross-browser-split
-     * @todo   Determine if IE11 still needs this.
+     * @todo   Determine if IE10 still needs this (and even uses conditional comments).
      */
     ///NOTE: The following conditional compilation code blocks only executes in IE.
     /*@cc_on
@@ -4286,7 +4298,7 @@ document.addEventListener("DOMContentLoaded", function ()
      */
     (function ()
     {
-        /// If the user presses the refresh button, some browsers will try to scroll back to the user's last scroll position.
+        /// If the user presses the refresh button, the browser will try to scroll back to the user's last scroll position.
         /// However, since BibleForge does not display all of the text on the screen at the same time, this causes lots of problems.
         /// To prevent the browser from altering the starting scroll position, we have to manually scroll the browser.
         /// This is done by creating an element slightly larger than the viewport and scrolling up and down one pixel.
@@ -4302,7 +4314,7 @@ document.addEventListener("DOMContentLoaded", function ()
         window.scrollTo(0, 0);
         document.body.removeChild(big_el);
         
-        /// Destroy the element since it is no longer needed.
+        /// Remove the element since it is no longer needed.
         big_el = undefined;
         
         /// Initialize BibleForge.
