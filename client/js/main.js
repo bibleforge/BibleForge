@@ -1819,7 +1819,7 @@ document.addEventListener("DOMContentLoaded", function ()
                             
                             remove_content_bottom_timeout,
                             remove_content_top_timeout,
-                            remove_speed = 3000; /// In milliseconds
+                            remove_speed = 15000; /// In milliseconds
                         
                         ///TODO: Determine if remove_excess_content_top and remove_excess_content_bottom can be combined.
                         /**
