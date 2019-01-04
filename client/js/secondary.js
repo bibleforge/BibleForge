@@ -1733,8 +1733,12 @@
                 /// Force the browser to scroll three lines of text up or down.
                 ///NOTE: window.pageYOffset % line_height calculates the offset from the nearest line to snap the view to a line.
                 ///NOTE: If between lines, this actually scrolls up more than 3 lines and down less than 3, but it is simple and doesn't seem to impede usability.
-                window.scrollBy(window.pageXOffset, (line_height * (delta > 0 ? -3 : 3)) - (window.pageYOffset % line_height));
                 e.preventDefault();
+                window.scrollBy(window.pageXOffset, (line_height * (delta > 0 ? -3 : 3)) - (window.pageYOffset % line_height));
+                ///HACK to fix Brave Browser
+                if (!e.defaultPrevented) {
+                    window.scrollBy(window.pageXOffset, -e.deltaY);
+                }
             };
             
             /// WebKit/Opera/IE9(?)
