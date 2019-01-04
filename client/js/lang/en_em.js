@@ -81,7 +81,7 @@
         
         /// Indicate whether or not this version needs a special CSS file.
         has_css: true,
-        css_hash: "617eaed967ca5d97371074d2180b5387",
+        css_hash: "ae33e330a5a657cde2be231eab76a143",
         
         /// Currently, this version does not have lexically linked words.
         linked_to_orig: false,

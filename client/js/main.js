@@ -1481,7 +1481,7 @@ document.addEventListener("DOMContentLoaded", function ()
                             if (!css_added) {
                                 /// Create a <style> element and add it to the DOM.
                                 link_tag = document.createElement("link");
-                                link_tag.href = "/styles/night.css?ab1cf200d4fb2d2dc745582a86ea6ba6";
+                                link_tag.href = "/styles/night.css?15b26f4538e325230e70e3cd6a7bc913";
                                 link_tag.rel  = "stylesheet";
                                 
                                 ///NOTE: WebKit needs some help to update the scroll bar colors.
@@ -4141,7 +4141,7 @@ document.addEventListener("DOMContentLoaded", function ()
             ///TODO: Determine if there is any problem hitting the server again so quickly.
             window.setTimeout(function ()
             {
-                BF.include("/js/secondary.js?b9615a7b167c2e72cfe34c294d6cb35f", {
+                BF.include("/js/secondary.js?3fd9e37311d8fcdaa0640a4450c3b54b", {
                     content_manager: content_manager,
                     langEl:          langEl,
                     page:            page,
