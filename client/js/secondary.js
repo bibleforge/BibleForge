@@ -1600,7 +1600,7 @@
              */
             show_contact_panel = function ()
             {
-                var email = BF.create_dom_el("div", {textContent: BF.lang.form_email}, null, [BF.create_dom_el("a", {href: "mailto:hello@bibleforge.com", textContent: "hello@bibleforge.com"})]),
+                var email = BF.create_dom_el("div", {textContent: BF.lang.form_email}, null, [BF.create_dom_el("a", {href: "mailto:info@bibleforge.com", textContent: "info@bibleforge.com"})]),
                     submitter_name  = BF.create_dom_el("input",    {"placeholder": BF.lang.form_your_name,  type: "text"}),
                     submitter_email = BF.create_dom_el("input",    {"placeholder": BF.lang.form_your_email, type: "text"}),
                     message         = BF.create_dom_el("textarea", {"placeholder": BF.lang.form_message});
