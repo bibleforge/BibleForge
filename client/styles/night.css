@@ -41,7 +41,7 @@
 /* NOTE: Since the <HTML> tag has the class, the class name must come after its tag name. */
 .night body, html.night {
     background: #121212;
-    color: #dedede;
+    color: #a7a7a3;
 }
 
 .night .q {

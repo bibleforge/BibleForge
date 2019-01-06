@@ -1481,7 +1481,7 @@ document.addEventListener("DOMContentLoaded", function ()
                             if (!css_added) {
                                 /// Create a <style> element and add it to the DOM.
                                 link_tag = document.createElement("link");
-                                link_tag.href = "/styles/night.css?15b26f4538e325230e70e3cd6a7bc913";
+                                link_tag.href = "/styles/night.css?d1f478b092c1f128b996ac23ac6af631";
                                 link_tag.rel  = "stylesheet";
                                 
                                 ///NOTE: WebKit needs some help to update the scroll bar colors.
