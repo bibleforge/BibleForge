@@ -1742,9 +1742,9 @@
             };
             
             /// WebKit/Opera/IE9(?)
-            window.addEventListener("mousewheel",     mousewheel_scroller, false);
+            window.addEventListener("mousewheel",     mousewheel_scroller, {capture: false, passive: false});
             /// Mozilla
-            window.addEventListener("DOMMouseScroll", mousewheel_scroller, false);
+            window.addEventListener("DOMMouseScroll", mousewheel_scroller, {capture: false, passive: false});
         }());
         
         /// ****************************
