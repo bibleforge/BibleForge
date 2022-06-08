@@ -158,7 +158,7 @@
             /// it makes sense to put the segmentation code in a separate, sharable file.
             cue.add({id: 0});
             ///TODO: Add support for include() on the server.
-            that.BF.include("/js/misc/zh_segment.js?42eaeb94d58cad75800c56c15f6e1416", context, function onload()
+            that.BF.include("/js/misc/zh_segment.js?da1ea9bc0502f4b00891a7475ce84d3a", context, function onload()
             {
                 cue.async_remove(0);
             });
