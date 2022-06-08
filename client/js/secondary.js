@@ -2699,7 +2699,7 @@
                             } else {
                                 strongs = "G" + strongs;
                             }
-                            child_el.title = strongs;
+                            child_el.title = "Strong’s #: " + strongs;
                             child_el.textContent = data.word;
                             parent_el.appendChild(child_el);
                             /// Add a space between the word and pronunciation drop down box to separate the two elements.
