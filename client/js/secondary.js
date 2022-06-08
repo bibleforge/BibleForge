@@ -2665,7 +2665,8 @@
                             html,
                             lex_data,
                             more_el,
-                            parent_el;
+                            parent_el,
+                            strongs;
                         
                         /// Did the query return any results?
                         if (data.word) {
@@ -2691,9 +2692,14 @@
                             /// Create lex-orig_word.
                             child_el = document.createElement("span");
                             child_el.className = "lex-orig_word";
+                            strongs = data.strongs;
                             if (callout.id < BF.lang.divisions.nt) {
                                 child_el.classList.add("hebrew");
+                                strongs = "H" + strongs;
+                            } else {
+                                strongs = "G" + strongs;
                             }
+                            child_el.title = strongs;
                             child_el.textContent = data.word;
                             parent_el.appendChild(child_el);
                             /// Add a space between the word and pronunciation drop down box to separate the two elements.
